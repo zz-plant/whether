@@ -7,6 +7,59 @@ const staticGenerationWorkers = parsePositiveInt(process.env.NEXT_STATIC_GENERAT
 const staticGenerationMinPagesPerWorker = parsePositiveInt(process.env.NEXT_STATIC_GENERATION_MIN_PAGES_PER_WORKER);
 const buildCpus = parsePositiveInt(process.env.NEXT_BUILD_CPUS);
 
+const solutionRedirects = [
+  {
+    source: "/solutions/engineering-capacity",
+    destination: "/toolkits/ops-capacity",
+    permanent: true,
+  },
+  {
+    source: "/solutions/product-roadmapping",
+    destination: "/toolkits/focus",
+    permanent: true,
+  },
+  {
+    source: "/solutions/market-regime-playbook",
+    destination: "/decide/ops-risk",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths",
+    destination: "/decide/product",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths/senior-product-manager",
+    destination: "/decide/product",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths/group-product-manager",
+    destination: "/decide/product",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths/director-of-product",
+    destination: "/decide/product",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths/vp-product",
+    destination: "/decide/ceo",
+    permanent: true,
+  },
+  {
+    source: "/solutions/career-paths/product-strategy-chief-of-staff",
+    destination: "/decide/ops-risk",
+    permanent: true,
+  },
+  {
+    source: "/solutions/:path*",
+    destination: "/decide",
+    permanent: true,
+  },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -17,6 +70,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      ...solutionRedirects,
       {
         source: "/startup-macro-posture/index",
         destination: "/method#formula-reference",
