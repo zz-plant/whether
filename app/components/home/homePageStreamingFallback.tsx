@@ -33,33 +33,23 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">
       <section className="weather-panel px-4 py-4 sm:px-5 sm:py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">Weekly brief</span>
-              <span className="rounded-full border border-cyan-300/35 bg-cyan-400/10 px-2.5 py-1 text-cyan-100">{contextLabel}</span>
-            </div>
-            <p className="max-w-2xl text-sm text-slate-100">{introLabel}</p>
-          </div>
-          <div className="rounded-xl border border-slate-700/75 bg-slate-950/70 px-3 py-2.5 text-right">
-            <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
-              <span className="weather-loading-beacon" />
-              Loading
-            </p>
-          </div>
-        </div>
-
         <article className="weather-panel-static rounded-[1.5rem] px-5 py-5 sm:px-6 sm:py-6">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100">
-                Weekly brief
-              </span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/65 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-                {contextLabel}
-              </span>
-              <Skeleton className="h-7 w-28 rounded-full bg-slate-500/40" />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100">
+                  Weekly brief
+                </span>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/65 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+                  {contextLabel}
+                </span>
+              </div>
+              <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+                <span className="weather-loading-beacon" />
+                Loading
+              </p>
             </div>
+            <p className="max-w-2xl text-sm text-slate-100">{introLabel}</p>
             <div className="space-y-3">
               <Skeleton className="h-11 w-full max-w-3xl rounded-xl bg-slate-500/50" />
               <Skeleton className="h-5 w-11/12 max-w-2xl rounded-full bg-slate-500/40" />
