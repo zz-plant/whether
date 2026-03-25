@@ -5,6 +5,8 @@ export default function Loading() {
     <RouteLoadingShell
       label="Loading answers"
       description="Preparing the answer surface with current posture context."
+      currentPath="/answers"
+      pageTitle="Answers"
     />
   );
 }

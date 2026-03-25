@@ -5,6 +5,8 @@ export default function Loading() {
     <RouteLoadingShell
       label="Loading guides"
       description="Preparing decision-ready guides and bounded playbooks."
+      currentPath="/guides"
+      pageTitle="Guides"
     />
   );
 }
