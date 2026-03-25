@@ -6,7 +6,6 @@ export type NavigationLayerKey =
   | "operations"
   | "decide"
   | "toolkits"
-  | "learn"
   | "method";
 
 export type NavigationLayer = {
@@ -82,16 +81,6 @@ export const navigationLayers: NavigationLayer[] = [
     tier: "supporting",
     parentKey: "decide",
   },
-  {
-    key: "learn",
-    href: "/learn",
-    label: "Learn",
-    description: "Supporting reference library under Method for concepts, diagnostics, and failure modes.",
-    boundary: "Supporting surface under Method; never the canonical workflow or trust path.",
-    group: "reference",
-    tier: "supporting",
-    parentKey: "method",
-  },
 ] as const;
 
 export const primaryNavigationLayers = navigationLayers.filter((layer) => layer.tier === "primary");
@@ -113,7 +102,7 @@ export const trustHubAliases: ReadonlyArray<{ href: Route; canonicalHref: Route;
     href: "/methodology",
     canonicalHref: "/method",
     status: "legacy-alias",
-    note: "Methodology remains a legacy alias that resolves to Method formula reference content.",
+    note: "Methodology permanently redirects to the Method formula reference anchor.",
   },
 ] as const;
 

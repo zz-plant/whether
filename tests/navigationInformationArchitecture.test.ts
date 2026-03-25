@@ -43,7 +43,6 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/operations"], "Operations");
     assert.equal(navigationLabelByPath["/decide"], "Decide");
     assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
-    assert.equal(navigationLabelByPath["/learn"], "Learn");
     assert.equal(navigationLabelByPath["/method"], "Method");
   });
 
@@ -57,7 +56,7 @@ describe("navigation information architecture", () => {
     assert.equal(methodLayer?.href.startsWith("#"), false);
   });
 
-  it("demotes Toolkits and Learn into supporting surfaces with explicit parents", () => {
+  it("demotes Toolkits into a supporting surface with an explicit parent", () => {
     assert.equal(primaryNavigationLayers.length, 5);
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.key),
@@ -71,7 +70,6 @@ describe("navigation information architecture", () => {
       })),
       [
         { key: "toolkits", parentKey: "decide" },
-        { key: "learn", parentKey: "method" },
       ],
     );
   });
