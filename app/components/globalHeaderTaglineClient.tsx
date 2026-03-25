@@ -1,13 +1,15 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { resolveGlobalHeaderTagline } from "../../lib/navigation/globalHeader";
 
 type GlobalHeaderTaglineClientProps = {
-  pathname: string;
+  pathname?: string;
 };
 
 export function GlobalHeaderTaglineClient({ pathname }: GlobalHeaderTaglineClientProps) {
-  const tagline = resolveGlobalHeaderTagline(pathname);
+  const currentPathname = usePathname() ?? "/";
+  const tagline = resolveGlobalHeaderTagline(pathname ?? currentPathname);
 
   if (!tagline.description) {
     return <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">{tagline.title}</p>;

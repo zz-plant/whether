@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   globalHeaderGroupLabels,
@@ -9,7 +10,7 @@ import {
 } from "../../lib/navigation/globalHeader";
 
 type GlobalHeaderNavClientProps = {
-  pathname: string;
+  pathname?: string;
 };
 
 function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
@@ -42,7 +43,9 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
 }
 
 export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
-  const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(pathname), [pathname]);
+  const currentPathname = usePathname() ?? "/";
+  const resolvedPathname = pathname ?? currentPathname;
+  const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
