@@ -35,10 +35,7 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
-    assert.ok(urls.has(`${siteUrl}/learn`));
     assert.ok(urls.has(`${siteUrl}/operations`));
-    assert.ok(urls.has(`${siteUrl}/operations/data`));
-    assert.ok(urls.has(`${siteUrl}/operations/cli`));
 
     for (const retiredPath of retiredSitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${retiredPath}`));
@@ -121,8 +118,7 @@ describe("sitemap", () => {
     const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
 
     assert.ok((priorityByUrl.get(`${siteUrl}/decide`) ?? 0) > (priorityByUrl.get(`${siteUrl}/toolkits`) ?? 1));
-    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn`) ?? 1));
-    assert.ok((priorityByUrl.get(`${siteUrl}/learn`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn/failure-modes`) ?? 1));
+    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn/failure-modes`) ?? 1));
     assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/concepts`) ?? 1));
   });
 

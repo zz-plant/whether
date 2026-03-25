@@ -32,6 +32,31 @@ const nextConfig = {
         destination: "/posture",
         permanent: true,
       },
+      {
+        source: "/methodology",
+        destination: "/method#formula-reference",
+        permanent: true,
+      },
+      {
+        source: "/learn",
+        destination: "/learn/failure-modes",
+        permanent: true,
+      },
+      {
+        source: "/operations/data",
+        destination: "/operations",
+        permanent: true,
+      },
+      {
+        source: "/operations/cli",
+        destination: "/operations",
+        permanent: true,
+      },
+      {
+        source: "/operations/integrations",
+        destination: "/operations",
+        permanent: true,
+      },
     ];
   },
   experimental: {

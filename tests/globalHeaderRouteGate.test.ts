@@ -7,7 +7,7 @@ describe("isReportShellRoute", () => {
     assert.equal(isReportShellRoute("/"), true);
     assert.equal(isReportShellRoute("/signals"), true);
     assert.equal(isReportShellRoute("/signals/time-machine"), true);
-    assert.equal(isReportShellRoute("/operations/integrations"), true);
+    assert.equal(isReportShellRoute("/operations/cli"), true);
   });
 
   it("preserves the full header on non-report routes", () => {

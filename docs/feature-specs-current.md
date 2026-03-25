@@ -17,7 +17,7 @@ Primary IA is now the five-surface operator loop:
 
 Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decide**
-- `/learn` is a supporting reference library under **Method**
+- `/learn/failure-modes` is a supporting diagnostic reference under **Method**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
@@ -83,18 +83,12 @@ four-step progressive flow:
 
 Only one step is expanded at a time, while the other steps collapse into summary cards. Existing
 hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
-data/API, and terminal usage remain optional implementation handoffs after the weekly plan is
-approved.
+implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
 
 ### 1.4 Operations workstreams
 - **Weekly plan** (`/operations`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
-- **Send to tools** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
-  and Linear.
-- **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
-- **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
-
-The `/operations/data` companion is intentionally static-first: endpoint docs and copy-ready snippets should load even when the live weekly report is degraded, so trust/reference content does not inherit avoidable report-fetch timeouts.
+- **Developer references** (linked from `/operations`): `docs/developer/api-reference.md`, `docs/developer/cli-fallback.md`, and `docs/developer/integrations.md`.
 
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
@@ -104,14 +98,12 @@ the weekly brief flow.
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
 
-### 1.6 Method hub (/method) and formula reference (/methodology)
+### 1.6 Method hub (/method) and formula reference
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
 confidence, freshness, source coverage, and revisit conditions, then links out to `/sources`,
-`/confidence`, `/methodology`, and `/learn`.
+`/confidence`, `/method#formula-reference`, and `/learn/failure-modes`.
 
-`/methodology` remains the lower-level formula reference documenting the sensor methodology and the
-public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit
-spreads, FRED VIX, and Chicago Fed NFCI).
+`/methodology` now permanently redirects to `/method#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
 The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
 

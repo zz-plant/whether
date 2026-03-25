@@ -34,7 +34,7 @@ export const summaryCardCadences: CadenceSummaryConfigByKey = {
   weekly: {
     cadenceLabel: "weekly",
     apiHref: "/api/weekly",
-    companionHref: "/operations/data#weekly-api",
+    companionHref: "https://github.com/zz-plant/whether/blob/main/docs/developer/api-reference.md",
     sectionBuilder: (summary) => [
       { title: "Capital posture", items: [summary.structured.climate.label, ...summary.structured.climate.summary] },
       { title: "Recommended moves", items: summary.structured.recommendedMoves },
@@ -67,4 +67,3 @@ export const summaryCardCadences: CadenceSummaryConfigByKey = {
     apiHref: "/api/yearly",
   },
 };
-

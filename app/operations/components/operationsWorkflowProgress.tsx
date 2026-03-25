@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
 import { CircleTargetIcon, SectionJumpIcon } from "../../components/uiIcons";
 
 const executionSteps = [
@@ -28,21 +26,18 @@ const executionSteps = [
 
 const implementationHandoffLinks = [
   {
-    href: "/operations/integrations",
+    href: "https://github.com/zz-plant/whether/blob/main/docs/developer/integrations.md",
     label: "Send to tools",
     description: "Optional: route the approved brief into Slack, Notion, and Linear.",
   },
   {
-    href: "/operations/data",
+    href: "https://github.com/zz-plant/whether/blob/main/docs/developer/api-reference.md",
     label: "Open data/API handoff",
     description: "Optional: share payload and endpoint guidance with data and automation owners.",
   },
 ] as const;
 
 export const OperationsWorkflowProgress = () => {
-  const searchParams = useSearchParams();
-  const currentSearch = searchParams.toString();
-
   return (
     <section className="weather-panel space-y-3 px-4 py-4" aria-label="Operations workflow progress">
       <div>
@@ -94,11 +89,12 @@ export const OperationsWorkflowProgress = () => {
         </p>
         <ul className="grid gap-2 md:grid-cols-2">
           {implementationHandoffLinks.map((link) => {
-            const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
             return (
               <li key={link.href}>
                 <Link
-                  href={href as Route}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
                   className="weather-card block rounded-lg border border-slate-800/80 px-3 py-2 text-xs transition-colors hover:border-sky-400/70"
                 >
                   <p className="font-semibold uppercase tracking-[0.14em] text-sky-200">{link.label}</p>

@@ -13,23 +13,25 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     label: "Weekly plan",
     description: "Default: review the weekly plan before you change team pace, spend, or priorities.",
   },
-  {
-    href: "/operations/integrations" as Route,
-    label: "Send to tools",
-    description: "Optional: push the approved brief into Slack, Notion, and Linear.",
-  },
-
-  {
-    href: "/operations/data",
-    label: "Data/API",
-    description: "Optional: share payloads, endpoints, and references with automation owners.",
-  },
-  {
-    href: "/operations/cli",
-    label: "Terminal",
-    description: "Optional: inspect status, changes, history, and scenarios from the command line.",
-  },
 ];
+
+export const operationsDeveloperReferenceLinks = [
+  {
+    href: "https://github.com/zz-plant/whether/blob/main/docs/developer/api-reference.md",
+    label: "API reference",
+    description: "Endpoint contracts and payload shapes for machine consumers.",
+  },
+  {
+    href: "https://github.com/zz-plant/whether/blob/main/docs/developer/cli-fallback.md",
+    label: "CLI fallback guide",
+    description: "Terminal workflows and fallback expectations for operator handoffs.",
+  },
+  {
+    href: "https://github.com/zz-plant/whether/blob/main/docs/developer/integrations.md",
+    label: "Integrations guide",
+    description: "Slack, Notion, and Linear integration usage for weekly brief distribution.",
+  },
+] as const;
 
 export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
   plan: [
