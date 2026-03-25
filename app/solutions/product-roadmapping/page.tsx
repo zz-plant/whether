@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { ActionLink } from "../../components/ui/actionLink";
 import { buildPageMetadata } from "../../../lib/seo";
 import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
+import { SecondarySurfaceStartBlock } from "../../components/secondarySurfaceStartBlock";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Treasury yield curve signals for product roadmapping — Whether",
   description:
-    "Use Treasury yield curve changes to sequence roadmap bets, adjust pricing posture, and reduce product delivery risk.",
+    "Downstream product roadmap helper playbook for converting weekly brief posture into keep/pause/accelerate sequencing calls.",
   path: "/solutions/product-roadmapping",
   imageAlt: "Treasury signals for product roadmapping",
   imageParams: {
@@ -67,6 +68,7 @@ const connectedPages = [
 export default async function ProductRoadmappingPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <SecondarySurfaceStartBlock surface="solutions" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           Product planning in this market

@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { ActionLink } from "../../components/ui/actionLink";
 import { buildPageMetadata } from "../../../lib/seo";
 import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
+import { SecondarySurfaceStartBlock } from "../../components/secondarySurfaceStartBlock";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Market regime operations playbook — Whether",
   description:
-    "Action framework for operating in high, moderate, and low market-stress regimes using Treasury macro signal guidance.",
+    "Downstream leadership helper playbook for applying weekly brief regime posture across hiring, spend, and roadmap guardrails.",
   path: "/solutions/market-regime-playbook",
   imageAlt: "Market regime operations playbook",
   imageParams: {
@@ -67,6 +68,7 @@ const connectedPages = [
 export default async function MarketRegimePlaybookPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <SecondarySurfaceStartBlock surface="solutions" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           Leadership playbook by market posture
