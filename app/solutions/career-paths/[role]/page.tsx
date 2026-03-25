@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../../lib/seo";
 import { roleLandingBySlug, roleLandings } from "../roleLandingData";
 import { createBreadcrumbTrail } from "../../../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../../../components/breadcrumbTrail";
+import { ActionLink } from "../../../components/ui/actionLink";
 
 const rolePageTitleSuffix = "career growth playbook";
 
@@ -120,12 +120,9 @@ export default async function CareerPathRolePage({
         ]}
       />
       <section className="weather-panel space-y-4 px-6 py-6">
-        <Link
-          href="/solutions/career-paths"
-          className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-300 transition-colors hover:text-sky-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-        >
+        <ActionLink href="/solutions/career-paths" variant="inline">
           ← Back to all role playbooks
-        </Link>
+        </ActionLink>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           Career growth playbook
         </p>
@@ -230,30 +227,18 @@ export default async function CareerPathRolePage({
           </li>
         </ol>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          <ActionLink href="/">
             See this week&apos;s market brief
-          </Link>
-          <Link
-            href="/signals"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          </ActionLink>
+          <ActionLink href="/signals">
             Inspect signal confidence
-          </Link>
-          <Link
-            href="/operations"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          </ActionLink>
+          <ActionLink href="/operations">
             Turn signals into execution plans
-          </Link>
-          <Link
-            href="/decide"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          </ActionLink>
+          <ActionLink href="/decide">
             Explore decision pathways
-          </Link>
+          </ActionLink>
         </div>
       </section>
 
@@ -264,12 +249,12 @@ export default async function CareerPathRolePage({
             <article key={peerRole.slug} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{peerRole.roleTitle}</h3>
               <p className="text-sm text-slate-300">{peerRole.hero}</p>
-              <Link
+              <ActionLink
                 href={`/solutions/career-paths/${peerRole.slug}`}
-                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="mt-auto justify-center"
               >
                 View this role
-              </Link>
+              </ActionLink>
             </article>
           ))}
         </div>
@@ -282,12 +267,12 @@ export default async function CareerPathRolePage({
             <article key={workflow.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{workflow.title}</h3>
               <p className="text-sm text-slate-300">{workflow.detail}</p>
-              <Link
+              <ActionLink
                 href={workflow.href}
-                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="mt-auto justify-center"
               >
                 {workflow.cta}
-              </Link>
+              </ActionLink>
             </article>
           ))}
         </div>

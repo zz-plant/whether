@@ -65,3 +65,12 @@
   - keep minimum hit area at least 44x44 CSS px,
   - preserve high-contrast focus indicators (outline + halo) on `.weather-button`, `.weather-button-primary`, `.weather-pill`, and `.weather-tab`,
   - ensure keyboard users can visibly track focus on citation/copy actions.
+
+## X. Shared action-link primitives
+- Reuse `app/components/ui/actionLink.tsx` and `app/components/ui/buttonLink.tsx` for entry-page CTAs before introducing new one-off class chains.
+- Use variants consistently:
+  - `primary`: main CTA (`weather-button-primary`) with 44px touch target.
+  - `pill`: secondary navigation CTA (`weather-pill`) with shared hover/focus/touch behavior.
+  - `ghost`: tertiary button-style navigation (`weather-button`) for lower-emphasis actions.
+  - `inline`: textual back-navigation links that still preserve focus-visible and touch-manipulation rules.
+- Keep touch/manipulation and min-height behavior intact; only add `className` overrides for layout positioning (e.g., `mt-auto`, `justify-center`, icon gaps), not to remove focus affordances.

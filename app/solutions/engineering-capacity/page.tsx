@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { ActionLink } from "../../components/ui/actionLink";
 import { buildPageMetadata } from "../../../lib/seo";
 import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
 
@@ -115,18 +115,12 @@ export default async function EngineeringCapacityPage() {
           Start in Signals to confirm direction and thresholds, then move to Operations to assign owners and timing.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/signals"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          <ActionLink href="/signals">
             Open signals dashboard
-          </Link>
-          <Link
-            href="/operations"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
+          </ActionLink>
+          <ActionLink href="/operations">
             Open Operations
-          </Link>
+          </ActionLink>
         </div>
       </section>
 
@@ -137,12 +131,12 @@ export default async function EngineeringCapacityPage() {
             <article key={page.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{page.title}</h3>
               <p className="text-sm text-slate-300">{page.description}</p>
-              <Link
+              <ActionLink
                 href={page.href}
-                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="mt-auto justify-center"
               >
                 {page.cta}
-              </Link>
+              </ActionLink>
             </article>
           ))}
         </div>
