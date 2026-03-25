@@ -210,6 +210,12 @@ export type HomePageAssembly = {
   interpretationLayer: InterpretationLayer;
   interpretationSearchParams?: Record<string, string | undefined>;
   fallbackActive: boolean;
+  fallbackAlert: {
+    lastCachedTimestamp: string;
+    sourceLabel?: string;
+    effectiveRecordDate?: string;
+    fallbackReason?: string | null;
+  } | null;
 };
 
 type HomePageAssemblerDependencies = {
@@ -708,6 +714,15 @@ export const assembleHomePage = async ({
     }
   })();
 
+  const fallbackAlert = !historicalSelection && isFallback
+    ? {
+        lastCachedTimestamp: reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp,
+        sourceLabel: treasury.source,
+        effectiveRecordDate: treasury.record_date,
+        fallbackReason: treasury.fallback_reason,
+      }
+    : null;
+
   return {
     reportResult,
     weeklyDecisionCardModel,
@@ -728,6 +743,7 @@ export const assembleHomePage = async ({
         : null
     ),
     fallbackActive: !historicalSelection && isFallback,
+    fallbackAlert,
     interpretationLayer,
     interpretationSearchParams,
     diagnosticsLanePromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
