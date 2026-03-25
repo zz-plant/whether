@@ -4,12 +4,13 @@ import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib
 import { answerCategories, answerPages } from "./decisionPages";
 import { featuredAnswerPages } from "./selectors";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
 
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Operator decision answers",
-  description: "Direct-answer pages mapped to canonical bounded rules and weekly posture thresholds.",
+  description: "Downstream direct-answer helper pages for single operating questions after this week’s brief and posture review.",
   path: "/answers",
   imageAlt: "Whether operator answer cluster",
   imagePath: "/social/answers.svg",
@@ -33,6 +34,7 @@ export default async function AnswersHubPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(listData) }} />
+      <SecondarySurfaceStartBlock surface="answers" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Operator answer hub</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Direct answers mapped to canonical decisions</h1>

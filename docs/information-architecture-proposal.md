@@ -15,6 +15,15 @@ Align navigation to the operator loop so leaders can move from posture to decisi
 - **Learn** (`/learn`) is a supporting reference library under **Method**, not a peer workflow hub.
 - **Guides**, **Resources**, **Answers**, **Solutions**, **Concepts**, and **Startup Macro Posture** remain secondary discovery, SEO, or long-form distribution surfaces.
 
+## Shared secondary-surface contract
+Every secondary root should declare and render the same contract:
+- **Intent label:** what downstream helper job the page serves.
+- **Canonical parent hub:** the primary workflow hub this surface feeds (`/decide`, `/operations`, or `/method`).
+- **Return CTA:** explicit "Start from Weekly Brief" and "Return to parent hub" actions at the top of the page.
+
+This contract keeps secondary pages indexable/discoverable while reinforcing the canonical operator loop:
+`weekly brief → primary hub workflow → secondary helper`.
+
 ## Rationale
 - The product loop is `signals → posture → decision → artifact`; primary IA should mirror that loop instead of exposing every supporting library as an equal first choice.
 - `Toolkits` and `Learn` are both downstream surfaces by design: one executes a chosen path, the other supplies optional background.

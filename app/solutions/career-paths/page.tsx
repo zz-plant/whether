@@ -3,13 +3,14 @@ import { ActionLink } from "../../components/ui/actionLink";
 import { ButtonLink } from "../../components/ui/buttonLink";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { roleLandings, type ScopeType, type SeniorityBand } from "./roleLandingData";
+import { SecondarySurfaceStartBlock } from "../../components/secondarySurfaceStartBlock";
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Career paths for product leaders — Whether",
   description:
-    "Choose a product leadership career path and use market-regime signals to sharpen planning, trade-offs, and promotion-ready operating habits.",
+    "Downstream career helper playbooks for turning weekly brief posture into role-level growth habits and decision narratives.",
   path: "/solutions/career-paths",
   imageAlt: "Career paths for product leaders",
   imageParams: {
@@ -142,6 +143,7 @@ export default async function CareerPathsPage({ searchParams }: CareerPathsPageP
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(careerPathsStructuredData) }}
       />
+      <SecondarySurfaceStartBlock surface="solutions" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           Career growth playbooks

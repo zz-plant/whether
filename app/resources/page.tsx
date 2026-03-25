@@ -9,11 +9,12 @@ import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import { featuredAnswerPages } from "../answers/selectors";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — board governance pillars",
   description:
-    "Board-facing long-form resources on capital discipline, posture frameworks, pain-driven operating decisions, and practical templates.",
+    "Downstream governance helper library for operators who need board-ready long-form artifacts after setting this week’s posture.",
   path: "/resources",
   imageAlt: "Whether resources hub",
   imagePath: "/social/resources.svg",
@@ -56,6 +57,7 @@ export default async function ResourcesPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
+      <SecondarySurfaceStartBlock surface="resources" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Resources</h1>
         <p className="text-sm text-slate-300">

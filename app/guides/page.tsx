@@ -3,11 +3,12 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { stageGuides } from "./stageGuides";
 import { stakeholderGuides } from "./stakeholderGuides";
+import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Role & Stage Guides — Whether",
   description:
-    "Operator-first overview of Whether stakeholder and company-stage guides: choose the right guide, get role-level outcomes, and return to the weekly brief.",
+    "Downstream role and stage helper guides for translating the weekly brief into bounded team decisions and review-ready operating calls.",
   path: "/guides",
   imageAlt: "Whether guides overview",
   imagePath: "/social/guides.svg",
@@ -27,6 +28,7 @@ export default function GuidesPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <SecondarySurfaceStartBlock surface="guides" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Guides overview</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">

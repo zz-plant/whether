@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { ActionLink } from "../../components/ui/actionLink";
 import { buildPageMetadata } from "../../../lib/seo";
 import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
+import { SecondarySurfaceStartBlock } from "../../components/secondarySurfaceStartBlock";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Macro signals for engineering capacity planning — Whether",
   description:
-    "Translate market stress signals into engineering capacity plans for hiring, delivery scope, and reliability investment.",
+    "Downstream engineering capacity helper playbook for applying weekly brief posture to hiring, scope, and reliability calls.",
   path: "/solutions/engineering-capacity",
   imageAlt: "Macro signals for engineering capacity planning",
   imageParams: {
@@ -67,6 +68,7 @@ const boundedCapacityRules = [
 export default async function EngineeringCapacityPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <SecondarySurfaceStartBlock surface="solutions" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           Engineering planning in this market

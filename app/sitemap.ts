@@ -100,26 +100,26 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
-    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
+    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.64 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.2 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
-    { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
+    { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/operations", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/operations/data", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.68 },
     { path: "/operations/cli", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
     { path: "/operations/integrations", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
-    { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.78 },
-    { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
-    { path: "/solutions/career-paths", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
-    { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
-    { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
-    { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
+    { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
+    { path: "/solutions/career-paths", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
+    { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
+    { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
+    { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
     { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
-    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
+    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -164,14 +164,14 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     path: `/concepts/${article.slug}`,
     lastModified: buildPublishedMonthDate(article.publishedYear, article.publishedMonth),
     changeFrequency: "monthly",
-    priority: 0.6,
+    priority: 0.5,
   }));
 
   const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages.map((page) => ({
     path: `/resources/${page.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
-    priority: 0.79,
+    priority: 0.6,
   }));
 
   const resourceSupportEntries: SitemapEntryDescriptor[] = [
@@ -181,14 +181,14 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     path: path as `/${string}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
-    priority: 0.68,
+    priority: 0.54,
   }));
 
   const resourceArticleEntries: SitemapEntryDescriptor[] = resourceArticles.map((article) => ({
     path: `/resources/${article.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
-    priority: 0.73,
+    priority: 0.58,
   }));
 
   const vcAuthorityEntries: SitemapEntryDescriptor[] = [
@@ -196,7 +196,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
       lastModified: staticContentLastModified,
       changeFrequency: "monthly",
-      priority: 0.78,
+      priority: 0.59,
     },
   ];
 
@@ -204,7 +204,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     path: `/answers/${page.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "weekly",
-    priority: 0.72,
+    priority: 0.58,
   }));
 
   const regimeDeepEntries: SitemapEntryDescriptor[] = (programmaticEligible ? regimePages : []).map((regime) => ({
@@ -217,36 +217,36 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const stageGuideEntries: SitemapEntryDescriptor[] = stageGuides.map((stageGuide) => ({
     path: `/guides/stage/${stageGuide.slug}`,
     lastModified: staticContentLastModified,
-    changeFrequency: "weekly",
-    priority: 0.7,
+    changeFrequency: "monthly",
+    priority: 0.56,
   }));
 
   const stakeholderGuideEntries: SitemapEntryDescriptor[] = stakeholderGuides.map((stakeholderGuide) => ({
     path: `/guides/${stakeholderGuide.slug}`,
     lastModified: staticContentLastModified,
-    changeFrequency: "weekly",
-    priority: 0.72,
+    changeFrequency: "monthly",
+    priority: 0.58,
   }));
 
   const careerRoleEntries: SitemapEntryDescriptor[] = roleLandings.map((roleLanding) => ({
     path: `/solutions/career-paths/${roleLanding.slug}`,
     lastModified: staticContentLastModified,
-    changeFrequency: "weekly",
-    priority: 0.68,
+    changeFrequency: "monthly",
+    priority: 0.56,
   }));
 
   const conceptFocusEntries: SitemapEntryDescriptor[] = conceptFocuses.map((focus) => ({
     path: `/concepts/focus/${toConceptTaxonomySlug(focus)}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
-    priority: 0.64,
+    priority: 0.52,
   }));
 
   const conceptAudienceEntries: SitemapEntryDescriptor[] = conceptAudiences.map((audience) => ({
     path: `/concepts/audience/${toConceptTaxonomySlug(audience)}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
-    priority: 0.64,
+    priority: 0.52,
   }));
 
   const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioRoutes.map((clusterRoute) => ({

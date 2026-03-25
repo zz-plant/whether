@@ -20,13 +20,14 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { formatConceptPublishedLabel } from "../../lib/formatters";
+import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Product management canon in macro context — Whether",
   description:
-    "Plot widely read PM essays against the macro regime history to explain why specific frameworks spread when they did.",
+    "Downstream concept helper hub that maps PM canon to regime context so teams can pressure-test this week’s operating calls.",
   path: "/concepts",
   imageAlt: "Product management concept timeline with macro context",
   imageParams: {
@@ -182,6 +183,7 @@ export default async function ProductConceptTimelinePage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
       />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Concepts" }]} />
+      <SecondarySurfaceStartBlock surface="concepts" />
       <HubHero
         eyebrow="Product canon in context"
         title="Use the canon to translate this week&apos;s delta into operating calls."
