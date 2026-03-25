@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel, formatBoundedDecisionTriplet } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
@@ -12,7 +12,7 @@ import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
-import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
+import { boundedDecisionPhraseFallbacks, buildCompactFreshnessMeta, formatDecisionTriplet } from "../../lib/report/reportFormatting";
 import { getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
@@ -530,6 +530,15 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   };
   const rowOrder: Array<"hiring" | "product" | "capital" | "burn"> = ["hiring", "product", "capital", "burn"];
   const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
+  const fallbackDecisionTriplet = boundedDecisionPhraseFallbacks;
+  const getTriplet = (rule?: BoundedDecisionRule) => (rule
+    ? formatDecisionTriplet({
+      action: rule.doNow[0] ?? rule.recommendation,
+      threshold: rule.pauseTrigger,
+      reversal: rule.resumeTrigger,
+      fallbacks: fallbackDecisionTriplet,
+    })
+    : fallbackDecisionTriplet);
   const fallbackMatrix = {
     columns: [
       { key: "approve" as const, label: "Approve" },
@@ -543,25 +552,25 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
         label: rule ? decisionAreaLabel(rule.area) : key.charAt(0).toUpperCase() + key.slice(1),
         cells: {
           approve: {
-            text: rule?.doNow[0] ?? "Stage approvals",
+            text: rule?.doNow[0] ?? fallbackDecisionTriplet.action,
             detail: rule?.rationale ?? "Keep approvals tied to near-term proof.",
-            action: rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals",
-            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
-            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+            action: getTriplet(rule).action,
+            threshold: getTriplet(rule).threshold,
+            reversal: getTriplet(rule).reversal,
           },
           delay: {
             text: rule?.avoidNow[0] ?? "Delay irreversible commitments",
             detail: rule?.pauseTrigger ?? "Pause when thresholds weaken.",
             action: rule?.avoidNow[0] ?? "Delay irreversible commitments",
-            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
-            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+            threshold: getTriplet(rule).threshold,
+            reversal: getTriplet(rule).reversal,
           },
           flip: {
             text: rule?.resumeTrigger ?? "Flip after threshold recovery",
             detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
-            action: rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals",
-            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
-            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+            action: getTriplet(rule).action,
+            threshold: getTriplet(rule).threshold,
+            reversal: getTriplet(rule).reversal,
           },
         },
         context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
@@ -580,25 +589,25 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
           label: matrixRow?.label ?? (rule ? decisionAreaLabel(rule.area) : rowKey.charAt(0).toUpperCase() + rowKey.slice(1)),
           cells: {
             approve: {
-              text: matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? "Stage approvals",
+              text: matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? fallbackDecisionTriplet.action,
               detail: matrixRow?.cells.approve.detail ?? rule?.rationale ?? "Keep approvals tied to near-term proof.",
-              action: matrixRow?.cells.approve.action ?? (rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals"),
-              threshold: matrixRow?.cells.approve.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
-              reversal: matrixRow?.cells.approve.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
+              action: matrixRow?.cells.approve.action ?? getTriplet(rule).action,
+              threshold: matrixRow?.cells.approve.threshold ?? getTriplet(rule).threshold,
+              reversal: matrixRow?.cells.approve.reversal ?? getTriplet(rule).reversal,
             },
             delay: {
               text: matrixRow?.cells.delay.text ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
               detail: matrixRow?.cells.delay.detail ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
               action: matrixRow?.cells.delay.action ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
-              threshold: matrixRow?.cells.delay.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
-              reversal: matrixRow?.cells.delay.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
+              threshold: matrixRow?.cells.delay.threshold ?? getTriplet(rule).threshold,
+              reversal: matrixRow?.cells.delay.reversal ?? getTriplet(rule).reversal,
             },
             flip: {
               text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Flip after threshold recovery",
               detail: matrixRow?.cells.flip.detail ?? rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
-              action: matrixRow?.cells.flip.action ?? (rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals"),
-              threshold: matrixRow?.cells.flip.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
-              reversal: matrixRow?.cells.flip.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
+              action: matrixRow?.cells.flip.action ?? getTriplet(rule).action,
+              threshold: matrixRow?.cells.flip.threshold ?? getTriplet(rule).threshold,
+              reversal: matrixRow?.cells.flip.reversal ?? getTriplet(rule).reversal,
             },
           },
           context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",

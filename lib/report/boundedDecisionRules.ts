@@ -1,4 +1,11 @@
 import type { RegimeKey } from "../regimeEngine";
+import {
+  extractCompactClause as extractCompactClauseFromFormatting,
+  formatDecisionAction,
+  formatDecisionReversal,
+  formatDecisionThreshold,
+  formatDecisionTriplet,
+} from "./reportFormatting";
 
 export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
 
@@ -55,54 +62,35 @@ const areaLabels: Record<DecisionArea, string> = {
 };
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
-
-export const extractCompactClause = (value: string, fallback: string) => {
-  const normalized = value.trim();
-  if (!normalized) {
-    return fallback;
-  }
-
-  let boundaryIndex = -1;
-  for (let index = 0; index < normalized.length; index += 1) {
-    const character = normalized[index];
-    if (character === ";") {
-      boundaryIndex = index;
-      break;
-    }
-
-    if (character !== ".") {
-      continue;
-    }
-
-    const previousCharacter = normalized[index - 1] ?? "";
-    const nextCharacter = normalized[index + 1] ?? "";
-    const isDecimalPoint = /\d/.test(previousCharacter) && /\d/.test(nextCharacter);
-    if (!isDecimalPoint) {
-      boundaryIndex = index;
-      break;
-    }
-  }
-
-  const firstClause = boundaryIndex >= 0 ? normalized.slice(0, boundaryIndex) : normalized;
-  return (firstClause.trim() || fallback).replace(/\.$/, "");
-};
-
-const compactSentence = (value: string, fallback: string) => extractCompactClause(value, fallback);
+export const extractCompactClause = extractCompactClauseFromFormatting;
 
 export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
-  compactSentence(rule.doNow[0] ?? rule.recommendation, "Keep current approvals staged");
+  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep current approvals staged");
 
 export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
-  compactSentence(rule.pauseTrigger.replace(/^Pause\s+/i, ""), "Pause if thresholds weaken");
+  formatDecisionThreshold(rule.pauseTrigger, "Pause if thresholds weaken");
 
 export const formatBoundedDecisionReverse = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) =>
-  compactSentence(rule.resumeTrigger.replace(/^Resume\s+/i, ""), "Reverse only after threshold recovery");
+  formatDecisionReversal(rule.resumeTrigger, "Reverse only after threshold recovery");
 
-export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation" | "pauseTrigger" | "resumeTrigger">) => ({
-  action: formatBoundedDecisionAction(rule),
-  threshold: formatBoundedDecisionThreshold(rule),
-  reverse: formatBoundedDecisionReverse(rule),
-});
+export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation" | "pauseTrigger" | "resumeTrigger">) => {
+  const triplet = formatDecisionTriplet({
+    action: rule.doNow[0] ?? rule.recommendation,
+    threshold: rule.pauseTrigger,
+    reversal: rule.resumeTrigger,
+    fallbacks: {
+      action: "Keep current approvals staged",
+      threshold: "Pause if thresholds weaken",
+      reversal: "Reverse only after threshold recovery",
+    },
+  });
+
+  return {
+    action: triplet.action,
+    threshold: triplet.threshold,
+    reverse: triplet.reversal,
+  };
+};
 
 const fmt = (value: number) => {
   if (Math.abs(value) < 10 || !Number.isInteger(value)) {

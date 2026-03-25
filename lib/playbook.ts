@@ -7,6 +7,7 @@ import type { RegimeKey } from "./regimeEngine";
 import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./report/decisionKnobs";
 import { buildCanonicalBoundedDecisionRules } from "./report/boundedDecisionRules";
 import { buildActionStripItems } from "./report/operatingCalls";
+import { formatDecisionAction, formatDecisionReversal, formatDecisionThreshold } from "./report/reportFormatting";
 
 type PlaybookOperatingLever = {
   lever: OperatingLeverKey;
@@ -42,9 +43,9 @@ const DEFAULT_STOP_ITEMS = ["Avoid unbudgeted bets."];
 const DEFAULT_START_ITEMS = ["Invest in margin-positive moves."];
 
 const CANONICAL_RULE_FALLBACK = {
-  actionNow: "Keep current operating posture until a rule refresh is available.",
-  triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
-  reversalCondition: "Loosen only when threshold conditions recover and hold.",
+  actionNow: formatDecisionAction("Keep current operating posture until a rule refresh is available."),
+  triggerThreshold: formatDecisionThreshold("Pause if confidence and threshold signals worsen."),
+  reversalCondition: formatDecisionReversal("Resume loosen stance only when threshold conditions recover and hold."),
 } satisfies Omit<PlaybookOperatingLever, "lever" | "label">;
 
 const DEFAULT_PLAYBOOK_RULE_CONTEXT = {

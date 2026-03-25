@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildCompactFreshnessMeta, formatRegimeSignalValue, formatTrendArrow } from "../lib/report/reportFormatting";
+import {
+  buildCompactFreshnessMeta,
+  formatDecisionTriplet,
+  formatRegimeSignalValue,
+  formatTrendArrow,
+} from "../lib/report/reportFormatting";
 
 describe("reportFormatting regime signal helpers", () => {
   it("formats regime signal values with score vs decimal precision", () => {
@@ -53,6 +58,20 @@ describe("reportFormatting regime signal helpers", () => {
     assert.equal(stale.maxAge, "stale");
     assert.match(stale.line, /12h old/);
     assert.match(stale.line, /degraded/);
+  });
+
+  it("keeps canonical action-threshold-reversal formatting compact and prefix-safe", () => {
+    const formatted = formatDecisionTriplet({
+      action: "Prioritize revenue-linked hiring lanes. Keep approvals staged weekly.",
+      threshold: "Pause net-new hiring if tightness > 76 or risk appetite < 44.",
+      reversal: "Resume staged approvals when tightness < 66 and risk appetite > 54.",
+    });
+
+    assert.deepEqual(formatted, {
+      action: "Prioritize revenue-linked hiring lanes",
+      threshold: "net-new hiring if tightness > 76 or risk appetite < 44",
+      reversal: "staged approvals when tightness < 66 and risk appetite > 54",
+    });
   });
 
 });
