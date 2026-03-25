@@ -111,6 +111,11 @@ export async function HomeWorkspaceBands({
   workspaceModelPromise,
 }: HomeWorkspaceBandsProps) {
   const workspaceModel = await workspaceModelPromise;
+  const trustMarkerToneClass = workspaceModel.audit.trustMarkerTone === "stable"
+    ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-100"
+    : workspaceModel.audit.trustMarkerTone === "historical"
+      ? "border-violet-400/35 bg-violet-500/10 text-violet-100"
+      : "border-amber-400/35 bg-amber-500/10 text-amber-100";
 
   return (
     <div className="home-band-stack">
@@ -142,6 +147,11 @@ export async function HomeWorkspaceBands({
         <div className="grid gap-3 lg:grid-cols-2">
           <article className="home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3" data-emphasis="true">
             <CardEyebrow icon={<AuditIcon className="h-3.5 w-3.5" />} label="Trust summary" accentClass="text-sky-200" />
+            <p className="mt-2">
+              <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustMarkerToneClass}`}>
+                {workspaceModel.audit.trustMarkerLabel}
+              </span>
+            </p>
             <p className="mt-2 text-sm font-semibold text-slate-100">
               {workspaceModel.audit.trustStatusLabel} — {workspaceModel.audit.trustStatusDetail}
             </p>
@@ -150,6 +160,22 @@ export async function HomeWorkspaceBands({
               <p><span className="font-semibold text-slate-100">Freshness:</span> {workspaceModel.audit.freshnessSummary}</p>
               <p><span className="font-semibold text-slate-100">Coverage:</span> {workspaceModel.audit.sourceCoverageLine}</p>
             </div>
+            <details className="mt-3 rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-2">
+              <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Source trust detail
+              </summary>
+              <p className="mt-2 text-xs text-slate-300">{workspaceModel.audit.trustMarkerDetail}</p>
+              {workspaceModel.audit.sourceDegraded ? (
+                <p className="mt-1 text-xs font-semibold text-amber-200">Degraded state: keep decisions reversible until one verified live refresh.</p>
+              ) : null}
+              <ul className="mt-2 grid gap-1.5 text-xs text-slate-300">
+                {workspaceModel.audit.sourceRows.map((row) => (
+                  <li key={row.sourceName} className="rounded-md border border-slate-800/70 bg-slate-950/55 px-2 py-1.5">
+                    <span className="font-semibold text-slate-100">{row.sourceName}:</span> {row.modeLabel} · {row.freshnessStatus}
+                  </li>
+                ))}
+              </ul>
+            </details>
           </article>
 
           <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">

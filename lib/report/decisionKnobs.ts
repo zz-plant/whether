@@ -2,6 +2,14 @@ import type { RegimeKey } from "../regimeEngine";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 
+/**
+ * Loop stage owner: posture → decision.
+ *
+ * This module translates committed regime state into bounded operating knobs and
+ * lock commitments. It should stay UI-agnostic and consume only normalized
+ * posture inputs from report/model layers.
+ */
+
 export const operatingLeverOrder = [
   "hiring-stance",
   "investment-pace",

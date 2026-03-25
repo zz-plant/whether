@@ -8,6 +8,14 @@ import {
 import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
 import { operatingLeverToDecisionArea } from "./operatingLeverMap";
 
+/**
+ * Loop stage owner: decision.
+ *
+ * Builds reusable bounded decision artifacts (action strip + role templates)
+ * from canonical decision rules. Keep this logic detached from component-level
+ * rendering concerns.
+ */
+
 export type ActionStripItem = {
   lever: OperatingLeverKey;
   label: string;

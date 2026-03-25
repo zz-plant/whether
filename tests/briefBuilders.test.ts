@@ -138,6 +138,29 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Suggested burn adjustment:/);
   });
 
+  it("uses bounded decision triplets in stable action-trigger-reversal order", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      modeledDecision: {
+        actionStripItems: [
+          {
+            lever: "hiring-stance",
+            label: "Hiring stance",
+            actionNow: "Limit net new hiring.",
+            triggerThreshold: "Pause approvals when tightness > 70.",
+            reversalCondition: "Resume when tightness < 64.",
+          },
+        ],
+      },
+    });
+
+    assert.match(brief, /Bounded decision \(action \/ trigger \/ reversal\):/);
+    assert.match(brief, /• Action: Limit net new hiring\./);
+    assert.match(brief, /• Trigger threshold: Pause approvals when tightness > 70\./);
+    assert.match(brief, /• Reversal condition: Resume when tightness < 64\./);
+    assert.ok(brief.indexOf("• Action: Limit net new hiring.") < brief.indexOf("• Trigger threshold: Pause approvals when tightness > 70."));
+    assert.ok(brief.indexOf("• Trigger threshold: Pause approvals when tightness > 70.") < brief.indexOf("• Reversal condition: Resume when tightness < 64."));
+  });
+
   it("optionally appends interpretation layer content for handoff", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
       interpretationLayer: {
@@ -222,6 +245,13 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Action now: Backfills only/);
     assert.match(brief, /Trigger\/threshold to tighten or loosen: Pause net-new hiring if tightness > 76/);
     assert.match(brief, /Reversal condition: Resume staged approvals when tightness < 66/);
+  });
+
+  it("keeps citation-ready source lines in exported briefs", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros);
+    assert.match(brief, /Citations:/);
+    assert.match(brief, /Treasury source: https:\/\/fred\.stlouisfed\.org \(2026-03-04\)/);
+    assert.match(brief, /Chicago Fed National Financial Conditions Index: https:\/\/fred\.stlouisfed\.org\/series\/NFCI \(2026-02-27\)/);
   });
 
 

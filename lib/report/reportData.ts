@@ -1,6 +1,20 @@
 /**
  * Shared loader for Whether Report pages.
  * Centralizes Treasury data fetching and formatting for multi-page layouts.
+ *
+ * Loop stage owner: signals.
+ *
+ * Responsibilities:
+ * - fetch and normalize signal inputs + source freshness
+ * - derive report dynamics from normalized readings
+ *
+ * Allowed dependencies:
+ * - ingestion/fetch + formatting helpers
+ * - pure decision libraries only for read-only enrichment
+ *
+ * Not allowed:
+ * - React/UI components
+ * - view-specific presentation decisions
  */
 import { fetchTreasuryData } from "../treasury/treasuryClient";
 import { snapshotData } from "../snapshot";

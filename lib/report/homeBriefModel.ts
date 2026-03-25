@@ -49,6 +49,14 @@ import type { ConfidenceTrendFraming, ReportDynamics, WeeklyConfidencePoint } fr
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { ForecastRegimeLabel } from "./forecastModel";
 
+/**
+ * Loop stage owner: posture → decision.
+ *
+ * This module owns transformation from normalized report inputs into decision-ready
+ * weekly brief models. It may depend on signal-normalized data + decision libraries,
+ * but should not import React/UI components.
+ */
+
 export { buildDecisionMatrixPayload };
 
 export type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
@@ -150,6 +158,13 @@ type RegimeSignalIndicator = {
 };
 
 type InputInfluenceTone = "warning" | "positive" | "neutral";
+
+export type FlipRiskMeterState = {
+  progressPercent: number;
+  urgencyLabel: "Low" | "Medium" | "High" | "Unknown";
+  detailLabel: string;
+  triggerLabel: string;
+};
 
 export type InputInfluenceItem = {
   key: RegimeSignalKey;
@@ -293,6 +308,7 @@ export type WeeklyDecisionCardViewModel = {
       pointsToFlip: number;
       thresholdDirection: BoundaryDirection;
     };
+    flipRiskMeter: FlipRiskMeterState;
     regimeVelocity: TransitionVelocityEstimate;
     whyThisCall: WhyThisCallItem[];
     evidenceItems: ReportEvidenceItem[];
@@ -775,6 +791,49 @@ const buildBoundaryTriggerText = ({
   const dimensionLabel = dimension === "tightness" ? "tightness" : "risk appetite";
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
   return `Flip to ${targetRegimeLabel} if ${dimensionLabel} ${condition} ${threshold.toFixed(1)} (now ${current.toFixed(1)}).`;
+};
+
+export const buildFlipRiskMeterState = (
+  regimeDistance?: WeeklyDecisionCardViewModel["diagnostics"]["regimeDistance"],
+): FlipRiskMeterState => {
+  if (!regimeDistance || !Number.isFinite(regimeDistance.pointsToFlip)) {
+    return {
+      progressPercent: 8,
+      urgencyLabel: "Unknown",
+      detailLabel: "We need one more live update before we can size flip risk with confidence.",
+      triggerLabel: "Flip trigger pending fresh data.",
+    };
+  }
+
+  const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlip));
+  const clampedDistance = Math.min(pointsToFlip, 12);
+  const progressPercent = Math.max(10, Math.round(((12 - clampedDistance) / 12) * 100));
+  const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${regimeDistance.thresholdValue.toFixed(1)}.`;
+
+  if (pointsToFlip <= 3) {
+    return {
+      progressPercent,
+      urgencyLabel: "High",
+      detailLabel: "We are close to a flip. Recheck major commitments before locking spend.",
+      triggerLabel,
+    };
+  }
+
+  if (pointsToFlip <= 6) {
+    return {
+      progressPercent,
+      urgencyLabel: "Medium",
+      detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
+      triggerLabel,
+    };
+  }
+
+  return {
+    progressPercent,
+    urgencyLabel: "Low",
+    detailLabel: "There is room before a flip. Keep this week’s pace unless signals turn.",
+    triggerLabel,
+  };
 };
 
 const buildMacroOverlay = (
@@ -1548,6 +1607,7 @@ export const buildWeeklyDecisionCardViewModel = ({
       inputInfluence: homeBriefModel.inputInfluence,
       startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
+      flipRiskMeter: buildFlipRiskMeterState(homeBriefModel.regimeDistance),
       regimeVelocity: homeBriefModel.regimeVelocity,
       whyThisCall: homeBriefModel.whyThisCall,
       evidenceItems: homeBriefModel.evidenceItems,

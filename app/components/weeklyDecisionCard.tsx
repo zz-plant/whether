@@ -11,14 +11,28 @@ import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
+import type {
+  DecisionMatrixPayload,
+  FlipRiskMeterState,
+  InputInfluenceItem,
+  StartupVariantPolicy,
+  WeeklyDecisionCardViewModel,
+} from "../../lib/report/homeBriefModel";
 import { boundedDecisionPhraseFallbacks, buildCompactFreshnessMeta, formatDecisionTriplet } from "../../lib/report/reportFormatting";
 import { getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
+  buildTrustMarker,
 } from "../../lib/report/trustStatus";
+
+/**
+ * Loop stage owner: presentation/artifact.
+ *
+ * This component renders decision-ready artifacts from view models and should
+ * avoid deriving posture/threshold policy logic directly.
+ */
 
 type WeeklyDecisionCardModel =
   & WeeklyDecisionCardViewModel["status"]
@@ -108,54 +122,7 @@ type RegimeBannerProps = {
   confidenceLabel: WeeklyDecisionCardModel["confidenceLabel"];
   trendLabel?: string;
   regimeDistance?: WeeklyDecisionCardModel["regimeDistance"];
-};
-
-type FlipRiskMeterState = {
-  progressPercent: number;
-  urgencyLabel: "Low" | "Medium" | "High" | "Unknown";
-  detailLabel: string;
-  triggerLabel: string;
-};
-
-const resolveFlipRiskMeterState = (regimeDistance?: WeeklyDecisionCardModel["regimeDistance"]): FlipRiskMeterState => {
-  if (!regimeDistance || !Number.isFinite(regimeDistance.pointsToFlip)) {
-    return {
-      progressPercent: 8,
-      urgencyLabel: "Unknown",
-      detailLabel: "We need one more live update before we can size flip risk with confidence.",
-      triggerLabel: "Flip trigger pending fresh data.",
-    };
-  }
-
-  const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlip));
-  const clampedDistance = Math.min(pointsToFlip, 12);
-  const progressPercent = Math.max(10, Math.round(((12 - clampedDistance) / 12) * 100));
-  const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${regimeDistance.thresholdValue.toFixed(1)}.`;
-
-  if (pointsToFlip <= 3) {
-    return {
-      progressPercent,
-      urgencyLabel: "High",
-      detailLabel: "We are close to a flip. Recheck major commitments before locking spend.",
-      triggerLabel,
-    };
-  }
-
-  if (pointsToFlip <= 6) {
-    return {
-      progressPercent,
-      urgencyLabel: "Medium",
-      detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
-      triggerLabel,
-    };
-  }
-
-  return {
-    progressPercent,
-    urgencyLabel: "Low",
-    detailLabel: "There is room before a flip. Keep this week’s pace unless signals turn.",
-    triggerLabel,
-  };
+  flipRiskMeter: FlipRiskMeterState;
 };
 
 const flipRiskFillClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
@@ -355,6 +322,7 @@ function RegimeBanner({
   confidenceLabel,
   trendLabel,
   regimeDistance,
+  flipRiskMeter,
 }: RegimeBannerProps) {
   const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({
     statusLabel,
@@ -369,7 +337,7 @@ function RegimeBanner({
   const bannerTone = REGIME_BANNER_TOKENS[regimeKey];
   const activeWeather = getRegimeWeatherLabel(regimeKey);
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
-  const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
+  const flipRiskState = flipRiskMeter;
   const exactConfidenceLabel = `${Math.round(confidencePercent)}%`;
   const compactMetricChips = [
     `Trend ${trendValue}`,
@@ -1109,6 +1077,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = presentation ?? {};
   const {
     regimeDistance,
+    flipRiskMeter,
     evidenceItems,
     failureModes = [],
     inputInfluence = [],
@@ -1132,6 +1101,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     confidenceLabel,
     recordDateLabel,
     freshnessLabel,
+  });
+  const inlineTrustMarker = buildTrustMarker({
+    confidenceLabel,
+    freshnessMeta,
+    isFallbackSnapshot,
   });
   const snapshotDoNow = immediateDecision;
   const snapshotGuardrail = guardrailThreshold?.trim()
@@ -1281,6 +1255,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         confidenceLabel={confidenceLabel}
         trendLabel={trendLabel}
         regimeDistance={regimeDistance}
+        flipRiskMeter={flipRiskMeter}
       />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.28fr)_minmax(19rem,0.82fr)] xl:items-start">
@@ -1306,6 +1281,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trustStateDetail={trustStateDetail}
             trustTimestamp={freshnessLabel}
             trustReason={isFallbackSnapshot ? artifact.freshnessLine ?? trustCueLine : undefined}
+            inlineTrustLabel={inlineTrustMarker.label}
+            inlineTrustTone={inlineTrustMarker.tone}
             stabilityRule={stabilityRule}
             decisionBullets={decisionBullets}
             guardrailPolicyDetails={guardrailPolicyDetails}

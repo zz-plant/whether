@@ -3,7 +3,7 @@ import {
   getAdjacentTimeMachineRequest,
 } from "../timeMachine/timeMachineSelection";
 import { type ReportData, type ReportDataFallback } from "./reportData";
-import { buildTrustStatus } from "./trustStatus";
+import { buildTrustMarker, buildTrustStatus } from "./trustStatus";
 import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealth";
 import {
   buildInterpretationLayer,
@@ -99,6 +99,10 @@ export type HomePageWorkspaceModel = {
     trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
     freshnessSummary: string;
     sourceCoverageLine: string;
+    trustMarkerLabel: string;
+    trustMarkerTone: "stable" | "warning" | "historical";
+    trustMarkerDetail: string;
+    sourceDegraded: boolean;
     sourceRows: Array<{
       sourceName: string;
       modeLabel: string;
@@ -334,6 +338,10 @@ const buildHomeWorkspaceModel = ({
   trustStatusAction,
   trustStatusTone,
   freshnessLabel,
+  trustMarkerLabel,
+  trustMarkerTone,
+  trustMarkerDetail,
+  sourceDegraded,
   sectionLinks,
 }: {
   reportData: ReportData | ReportDataFallback;
@@ -344,6 +352,10 @@ const buildHomeWorkspaceModel = ({
   trustStatusAction: string;
   trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
   freshnessLabel: string;
+  trustMarkerLabel: string;
+  trustMarkerTone: "stable" | "warning" | "historical";
+  trustMarkerDetail: string;
+  sourceDegraded: boolean;
   sectionLinks: { href: string; label: string }[];
 }): HomePageWorkspaceModel => {
   const actionStripItems = weeklyDecisionCardModel.decision.actionStripItems ?? [];
@@ -379,6 +391,10 @@ const buildHomeWorkspaceModel = ({
       trustStatusTone,
       freshnessSummary: freshnessLabel,
       sourceCoverageLine: buildSourceCoverageLine(reportData.sourceHealth),
+      trustMarkerLabel,
+      trustMarkerTone,
+      trustMarkerDetail,
+      sourceDegraded,
       sourceRows: reportData.sourceHealth.map((row) => ({
         sourceName: row.sourceName,
         modeLabel: formatSourceModeLabel(row.mode),
@@ -666,6 +682,12 @@ export const assembleHomePage = async ({
     trustStatusAction,
     trustStatusTone,
   } = trustStatus;
+  const trustMarker = buildTrustMarker({
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    freshnessMeta,
+    isFallbackSnapshot: isFallback && !historicalSelection,
+    isHistoricalSelection: Boolean(historicalSelection),
+  });
   const interpretationLayer = buildInterpretationLayer({
     view: interpretationView,
     homeBriefModel,
@@ -771,6 +793,10 @@ export const assembleHomePage = async ({
         trustStatusAction,
         trustStatusTone,
         freshnessLabel: freshnessMeta.line,
+        trustMarkerLabel: trustMarker.label,
+        trustMarkerTone: trustMarker.tone,
+        trustMarkerDetail: trustMarker.detail,
+        sourceDegraded: trustMarker.degraded,
         sectionLinks,
       });
     }),

@@ -35,6 +35,8 @@ type WeeklyCallModePanelProps = {
   trustStateDetail: string;
   trustTimestamp: string;
   trustReason?: string;
+  inlineTrustLabel: string;
+  inlineTrustTone: "stable" | "warning" | "historical";
   stabilityRule: string;
   decisionBullets: Array<{ label: string; detail: string }>;
   guardrailPolicyDetails: PolicyDetails;
@@ -65,6 +67,8 @@ export function WeeklyCallModePanel({
   trustStateDetail,
   trustTimestamp,
   trustReason,
+  inlineTrustLabel,
+  inlineTrustTone,
   stabilityRule,
   decisionBullets,
   guardrailPolicyDetails,
@@ -79,6 +83,11 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/35 bg-amber-500/10 text-amber-50"
     : "border-emerald-400/30 bg-emerald-500/10 text-emerald-50";
   const detailDisclosureBase = "mt-2 rounded-lg border border-slate-700/60 bg-slate-950/65 px-3 py-2";
+  const inlineTrustToneClass = inlineTrustTone === "stable"
+    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
+    : inlineTrustTone === "historical"
+      ? "border-violet-400/30 bg-violet-500/10 text-violet-100"
+      : "border-amber-400/30 bg-amber-500/10 text-amber-100";
   const flipSupport = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== snapshotWatch.trim())
     .slice(0, 2);
@@ -116,15 +125,24 @@ export function WeeklyCallModePanel({
           </article>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
+                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+              </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+              </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+              </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
