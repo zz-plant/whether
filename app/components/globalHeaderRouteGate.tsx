@@ -8,7 +8,8 @@ import {
   resolveGlobalHeaderRouteLabel,
 } from "../../lib/navigation/globalHeader";
 import { NavigationOrientationBadge } from "./navigationOrientationBadge";
-import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME, GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME } from "./globalHeaderShared";
+import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME } from "./globalHeaderShared";
+import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 
 import type { ReactNode } from "react";
 
@@ -47,13 +48,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
             <NavigationOrientationBadge currentPath={pathname} className="max-w-full" />
           </div>
 
-          <Link
-            href="/search"
-            className={`${GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME} uppercase lg:flex-shrink-0`}
-            aria-label="Open global search"
-          >
-            Search
-          </Link>
+          <GlobalHeaderSearchForm className="grid gap-2 sm:grid-cols-[minmax(0,14rem)_auto] sm:items-center lg:flex-shrink-0" />
         </div>
       </div>
     </header>

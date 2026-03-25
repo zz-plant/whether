@@ -3,7 +3,8 @@ import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderRouteGate } from "./globalHeaderRouteGate";
 import { GlobalHeaderTaglineClient } from "./globalHeaderTaglineClient";
 import { ThemeToggleButton } from "./themeToggleButton";
-import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME, GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME } from "./globalHeaderShared";
+import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME } from "./globalHeaderShared";
+import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 
 export async function GlobalHeader() {
   return (
@@ -22,13 +23,7 @@ export async function GlobalHeader() {
                 <GlobalHeaderTaglineClient />
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center xl:justify-end">
-                <Link
-                  href="/search"
-                  className={`${GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME} w-full tracking-[0.02em] sm:w-auto`}
-                  aria-label="Open global search"
-                >
-                  Search
-                </Link>
+                <GlobalHeaderSearchForm className="grid w-full gap-2 sm:w-auto sm:grid-cols-[minmax(0,15rem)_auto] sm:items-center" />
                 <ThemeToggleButton />
               </div>
             </div>
