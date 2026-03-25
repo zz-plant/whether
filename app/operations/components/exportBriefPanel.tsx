@@ -11,6 +11,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../l
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberWithUnit, resolveWeekEndingIsoDateUTC } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
+import type { CanonicalDecisionCopy } from "../../../lib/report/canonicalDecisionCopy";
 import {
   buildWeeklyOperatorBriefCardText,
   buildWeeklyOperatorBriefPayload,
@@ -20,9 +21,12 @@ import {
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import {
+  buildBoundedDecisionLines,
+  buildBoardSlideBullets,
   buildBoardBrief,
   buildConstraintHeadlines,
   buildSlackBrief,
+  type ModeledExportDecisionPayload,
 } from "../../../lib/export/briefBuilders";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -46,117 +50,49 @@ const buildExportStamp = (
     confidence,
   });
 
-const buildJiraMarkdownBrief = (
+type ExportDecisionModel = ModeledExportDecisionPayload & {
+  confidenceLabel?: "HIGH" | "MED" | "LOW";
+  compactFlipConditionLabels?: string[];
+  canonicalDecisionCopy?: CanonicalDecisionCopy;
+};
+
+const buildIssueTrackerMarkdownBrief = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
   sensors: SensorReading[],
-  macros: MacroSeriesReading[]
+  macros: MacroSeriesReading[],
+  decisionModel?: ExportDecisionModel,
+  format: "markdown" | "wiki" = "markdown",
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const regimeLabel = formatRegimeLabel(assessment.regime);
-  const macroLines = macros.map(
-    (macro) => `- ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
-  );
-  const constraintLines = assessment.constraints.map((item) => `- ${item}`);
+  const bullet = format === "wiki" ? "*" : "-";
+  const heading2 = format === "wiki" ? "h2. " : "## ";
+  const heading3 = format === "wiki" ? "h3. " : "### ";
+  const macroLines = macros.map((macro) => `${bullet} ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`);
+  const boundedDecisionLines = buildBoundedDecisionLines(assessment, { modeledDecision: decisionModel })
+    .map((line) => `${bullet} ${line.replace(/^•\s*/, "")}`);
+  const sourceLine = format === "wiki"
+    ? `Source: [${treasury.source}|${treasury.source}]`
+    : `Source: ${treasury.source}`;
 
   return [
-    `## Whether Report — ${treasury.record_date}`,
-    `**Regime:** ${regimeLabel} (${assessment.regime})`,
-    `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
-    `**Base rate:** ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `**Curve slope:** ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `${heading2}Whether Report — ${treasury.record_date}`,
+    `${format === "wiki" ? "*Regime:*" : "**Regime:**"} ${decisionModel?.postureWithStageLabel ?? regimeLabel} (${assessment.regime})`,
+    `${format === "wiki" ? "*Tightness:*" : "**Tightness:**"} ${assessment.scores.tightness} / ${format === "wiki" ? "*Risk appetite:*" : "**Risk appetite:**"} ${assessment.scores.riskAppetite}`,
+    `${format === "wiki" ? "*Base rate:*" : "**Base rate:**"} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `${format === "wiki" ? "*Curve slope:*" : "**Curve slope:**"} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
-    "### Macro signals",
+    `${heading3}Macro signals`,
     ...macroLines,
     "",
-    "### Constraints",
-    ...constraintLines,
+    `${heading3}Bounded decision`,
+    ...boundedDecisionLines,
     "",
-    `Source: ${treasury.source}`,
+    sourceLine,
     "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
-};
-
-const buildConfluenceWikiBrief = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[]
-) => {
-  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
-  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = formatRegimeLabel(assessment.regime);
-  const macroLines = macros.map(
-    (macro) => `* ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
-  );
-  const constraintLines = assessment.constraints.map((item) => `* ${item}`);
-
-  return [
-    `h2. Whether Report — ${treasury.record_date}`,
-    `*Regime:* ${regimeLabel} (${assessment.regime})`,
-    `*Tightness:* ${assessment.scores.tightness} / *Risk appetite:* ${assessment.scores.riskAppetite}`,
-    `*Base rate:* ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `*Curve slope:* ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
-    "",
-    "h3. Macro signals",
-    ...macroLines,
-    "",
-    "h3. Constraints",
-    ...constraintLines,
-    "",
-    `Source: [${treasury.source}|${treasury.source}]`,
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
-};
-
-const buildLinearMarkdownBrief = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[]
-) => {
-  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
-  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = formatRegimeLabel(assessment.regime);
-  const macroLines = macros.map(
-    (macro) => `- ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
-  );
-  const constraintLines = assessment.constraints.map((item) => `- ${item}`);
-
-  return [
-    `## Whether Report — ${treasury.record_date}`,
-    `**Regime:** ${regimeLabel} (${assessment.regime})`,
-    `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
-    `**Base rate:** ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `**Curve slope:** ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
-    "",
-    "### Macro signals",
-    ...macroLines,
-    "",
-    "### Constraints",
-    ...constraintLines,
-    "",
-    `Source: ${treasury.source}`,
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
-};
-
-const buildSlideBullets = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  macros: MacroSeriesReading[]
-) => {
-  return [
-    `Capital posture: ${assessment.regime}`,
-    `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
-    ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
-    ...assessment.constraints.map((item) => `Guardrail: ${item}`),
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
+    ...buildExportStamp(treasury, decisionModel?.confidenceLabel ? `${decisionModel.confidenceLabel} confidence` : "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -165,6 +101,7 @@ export const ExportBriefPanel = ({
   treasury,
   sensors,
   macroSeries,
+  decisionModel,
   provenance,
   showProvenance = true,
 }: {
@@ -172,6 +109,7 @@ export const ExportBriefPanel = ({
   treasury: TreasuryData;
   sensors: SensorReading[];
   macroSeries: MacroSeriesReading[];
+  decisionModel?: ExportDecisionModel;
   provenance: DataProvenance;
   showProvenance?: boolean;
 }) => {
@@ -205,8 +143,8 @@ export const ExportBriefPanel = ({
   }, [add, copiedTarget, errorReason, status]);
 
   const briefing = useMemo(
-    () => buildSlackBrief(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries]
+    () => buildSlackBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel }),
+    [assessment, treasury, sensors, macroSeries, decisionModel]
   );
   const weeklyOperatorDate = useMemo(
     () => resolveWeekEndingIsoDateUTC(treasury.record_date),
@@ -216,7 +154,12 @@ export const ExportBriefPanel = ({
     assessment,
     treasury,
     date: weeklyOperatorDate,
-  }), [assessment, treasury, weeklyOperatorDate]);
+    postureWithStageLabel: decisionModel?.postureWithStageLabel,
+    confidenceLabel: decisionModel?.confidenceLabel,
+    actionStripItems: decisionModel?.actionStripItems,
+    flipConditionLabels: decisionModel?.compactFlipConditionLabels,
+    canonicalDecisionCopy: decisionModel?.canonicalDecisionCopy,
+  }), [assessment, treasury, weeklyOperatorDate, decisionModel]);
   const weeklyOperatorPlainText = useMemo(
     () => buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload),
     [weeklyOperatorPayload],
@@ -230,24 +173,24 @@ export const ExportBriefPanel = ({
     [weeklyOperatorPayload],
   );
   const jiraMarkdownBrief = useMemo(
-    () => buildJiraMarkdownBrief(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries]
+    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "markdown"),
+    [assessment, treasury, sensors, macroSeries, decisionModel]
   );
   const confluenceWikiBrief = useMemo(
-    () => buildConfluenceWikiBrief(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries]
+    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "wiki"),
+    [assessment, treasury, sensors, macroSeries, decisionModel]
   );
   const linearMarkdownBrief = useMemo(
-    () => buildLinearMarkdownBrief(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries]
+    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "markdown"),
+    [assessment, treasury, sensors, macroSeries, decisionModel]
   );
   const slideBullets = useMemo(
-    () => buildSlideBullets(assessment, treasury, macroSeries),
-    [assessment, treasury, macroSeries]
+    () => buildBoardSlideBullets(assessment, treasury, macroSeries, { modeledDecision: decisionModel }),
+    [assessment, treasury, macroSeries, decisionModel],
   );
   const boardBrief = useMemo(
-    () => buildBoardBrief(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries],
+    () => buildBoardBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel }),
+    [assessment, treasury, sensors, macroSeries, decisionModel],
   );
 
   const constraintHeadlines = useMemo(

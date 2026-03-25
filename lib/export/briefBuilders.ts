@@ -13,15 +13,20 @@ import {
   type PlannerPosture,
 } from "../report/runwayPlanner";
 
+export type ModeledExportDecisionPayload = {
+  postureWithStageLabel?: string;
+  operatingStanceLine?: string;
+  guardrailThreshold?: string;
+  reversalTrigger?: string;
+  actionStripItems?: ActionStripItem[];
+};
+
 const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
   buildComplianceStamp({
     sourceLine: treasury.source,
     timestamp: treasury.record_date,
     confidence,
   });
-
-const buildDecisionHighlights = (assessment: RegimeAssessment) =>
-  assessment.constraints.slice(0, 3).map((constraint) => `• ${constraint}`);
 
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
@@ -36,10 +41,40 @@ type ExportLayerOptions = {
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
   postureState?: PostureStateContract;
+  modeledDecision?: ModeledExportDecisionPayload;
+};
+
+const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => ({
+  postureWithStageLabel: options?.modeledDecision?.postureWithStageLabel ?? options?.postureWithStageLabel,
+  operatingStanceLine: options?.modeledDecision?.operatingStanceLine ?? options?.operatingStanceLine,
+  guardrailThreshold: options?.modeledDecision?.guardrailThreshold,
+  reversalTrigger: options?.modeledDecision?.reversalTrigger,
+  actionStripItems: options?.modeledDecision?.actionStripItems ?? options?.actionStripItems,
+});
+
+export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+  const modeled = resolveModeledDecisionPayload(options);
+  const topActionStripItems = (modeled.actionStripItems ?? []).slice(0, 3);
+
+  if (topActionStripItems.length > 0) {
+    return topActionStripItems.flatMap((item) => [
+      `• Action: ${item.actionNow}`,
+      `• Trigger threshold: ${item.triggerThreshold}`,
+      `• Reversal condition: ${item.reversalCondition}`,
+    ]);
+  }
+
+  return [
+    `• Action: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
+    `• Trigger threshold: ${modeled.guardrailThreshold ?? assessment.constraints[1] ?? "Do not approve irreversible commitments without trigger confirmation."}`,
+    `• Reversal condition: ${modeled.reversalTrigger ?? assessment.constraints[2] ?? "Re-open approvals when confidence and trend stabilize."}`,
+  ];
 };
 
 const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
-  if (!options?.operatingStanceLine) {
+  const modeled = resolveModeledDecisionPayload(options);
+
+  if (!modeled.operatingStanceLine) {
     return [];
   }
 
@@ -48,7 +83,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
 
-  const actionStrip = (options.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
+  const actionStrip = (modeled.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
     `• ${item.label}`,
     `  Action now: ${item.actionNow}`,
     `  Trigger/threshold to tighten or loosen: ${item.triggerThreshold}`,
@@ -58,15 +93,15 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   return [
     "",
     "Startup environment — weekly call:",
-    `• Posture: ${options.postureWithStageLabel ?? "Current posture"}`,
+    `• Posture: ${modeled.postureWithStageLabel ?? "Current posture"}`,
     `• Trend: ${(options.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
-    `• Current call: ${options?.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
+    `• Current call: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Flip if: ${condition}`),
     `• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.`,
     ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
-    `• Operating posture: ${options.operatingStanceLine}`,
+    `• Operating posture: ${modeled.operatingStanceLine}`,
     ...actionStrip,
   ];
 };
@@ -143,16 +178,16 @@ const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]
   ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
 ];
 
-const buildSlideBullets = (
+export const buildBoardSlideBullets = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Capital posture: ${options?.postureWithStageLabel ?? assessment.regime}`,
+  `Capital posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? assessment.regime}`,
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
-  ...assessment.constraints.map((item) => `Guardrail: ${item}`),
+  ...buildBoundedDecisionLines(assessment, options),
   ...buildInterpretationLayerBlock(options),
   "",
   ...buildExportStamp(treasury, "Score-based posture confidence"),
@@ -170,13 +205,14 @@ export const buildSlackBrief = (
   const macroLines = macros.map(
     (macro) => `• ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)} · refreshed ${macro.record_date}`,
   );
-  const decisionHighlights = buildDecisionHighlights(assessment);
+  const decisionHighlights = buildBoundedDecisionLines(assessment, options);
+  const modeled = resolveModeledDecisionPayload(options);
   const citations = buildCitationLines(treasury, macros);
   const financialImplications = buildFinancialImplicationsBlock(assessment);
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
-    `Capital posture: ${options?.postureWithStageLabel ?? assessment.regime}`,
+    `Capital posture: ${modeled.postureWithStageLabel ?? assessment.regime}`,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
@@ -184,7 +220,7 @@ export const buildSlackBrief = (
     "Macro signals:",
     ...macroLines,
     "",
-    "Decision Shield highlights (top 3):",
+    "Bounded decision (action / trigger / reversal):",
     ...decisionHighlights,
     "",
     "Constraints:",
@@ -211,7 +247,7 @@ export const buildBoardBrief = (
   options?: ExportLayerOptions,
 ) => {
   const briefing = buildSlackBrief(assessment, treasury, sensors, macros, options);
-  const slideBullets = buildSlideBullets(assessment, treasury, macros, options);
+  const slideBullets = buildBoardSlideBullets(assessment, treasury, macros, options);
   return [briefing, "", "---", "", slideBullets].join("\n");
 };
 
