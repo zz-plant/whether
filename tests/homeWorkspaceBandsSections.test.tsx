@@ -16,9 +16,12 @@ const workspaceModel: HomePageWorkspaceModel = {
     trustMarkerLabel: "Live",
     trustMarkerDetail: "detail",
     sourceDegraded: false,
-    freshnessSummary: "now",
-    sourceCoverageLine: "coverage",
-    sourceRows: [],
+    freshnessSummary: "Freshness: As of Mar 25, 2026",
+    sourceCoverageLine: "Source coverage: Treasury live; labor snapshot",
+    sourceRows: [
+      { sourceName: "Treasury", modeLabel: "Live", freshnessStatus: "Fresh · Daily cadence" },
+      { sourceName: "Labor", modeLabel: "Snapshot", freshnessStatus: "Stale · Monthly cadence" },
+    ],
     revisitHeadline: "revisit",
     revisitDetail: "detail",
     flipHeadline: "flip",
@@ -51,6 +54,10 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="audit-this-call"/);
     assert.match(html, /id="approve-this-weeks-plan"/);
     assert.match(html, /id="historical-replay-workspace"/);
+    assert.match(html, /Freshness: As of Mar 25, 2026/);
+    assert.match(html, /Source coverage: Treasury live; labor snapshot/);
+    assert.match(html, /Treasury/);
+    assert.match(html, /Live · Fresh · Daily cadence/);
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("approve-this-weeks-plan"));
     assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("historical-replay-workspace"));
   });

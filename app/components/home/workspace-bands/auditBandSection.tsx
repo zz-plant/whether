@@ -28,6 +28,23 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
           <p className="mt-2"><span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustMarkerToneClass}`}>{workspaceModel.audit.trustMarkerLabel}</span></p>
           <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.trustStatusLabel} — {workspaceModel.audit.trustStatusDetail}</p>
           <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.trustStatusAction}</p>
+          <p className="mt-3 text-xs text-slate-300">{workspaceModel.audit.freshnessSummary}</p>
+          <p className="mt-1 text-xs text-slate-300">{workspaceModel.audit.sourceCoverageLine}</p>
+          {workspaceModel.audit.sourceDegraded ? (
+            <p className="mt-2 rounded-md border border-amber-400/40 bg-amber-500/10 px-2.5 py-2 text-xs text-amber-100">
+              Source mix is degraded this refresh. Keep approvals reversible until one clean live update lands.
+            </p>
+          ) : null}
+          {workspaceModel.audit.sourceRows.length > 0 ? (
+            <ul className="mt-3 space-y-1.5 text-xs text-slate-300" aria-label="Source detail">
+              {workspaceModel.audit.sourceRows.map((row) => (
+                <li key={row.sourceName} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-700/80 px-2.5 py-1.5">
+                  <span className="font-medium text-slate-100">{row.sourceName}</span>
+                  <span className="text-slate-300">{row.modeLabel} · {row.freshnessStatus}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </article>
 
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
