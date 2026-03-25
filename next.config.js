@@ -15,6 +15,25 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/startup-macro-posture/index",
+        destination: "/method#formula-reference",
+        permanent: true,
+      },
+      {
+        source: "/startup-macro-posture/:regime",
+        destination: "/posture/:regime",
+        permanent: true,
+      },
+      {
+        source: "/startup-macro-posture",
+        destination: "/posture",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     ...(staticGenerationWorkers ? { staticGenerationMaxConcurrency: staticGenerationWorkers } : {}),
     ...(staticGenerationMinPagesPerWorker ? { staticGenerationMinPagesPerWorker } : {}),

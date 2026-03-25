@@ -16,7 +16,6 @@ import { tierOneDecisionPages } from "./answers/decisionPages";
 import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { roleLandings } from "./solutions/career-paths/roleLandingData";
-import { regimePages } from "./startup-macro-posture/clusterData";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 import { signalScenarioRoutes } from "./seoRouteClusters";
@@ -115,8 +114,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
-    { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
-    { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
     { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
@@ -207,13 +204,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.58,
   }));
 
-  const regimeDeepEntries: SitemapEntryDescriptor[] = (programmaticEligible ? regimePages : []).map((regime) => ({
-    path: `/startup-macro-posture/${regime.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "weekly",
-    priority: 0.76,
-  }));
-
   const stageGuideEntries: SitemapEntryDescriptor[] = stageGuides.map((stageGuide) => ({
     path: `/guides/stage/${stageGuide.slug}`,
     lastModified: staticContentLastModified,
@@ -283,7 +273,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...resourceArticleEntries,
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
-    ...regimeDeepEntries,
     ...stageGuideEntries,
     ...stakeholderGuideEntries,
     ...careerRoleEntries,

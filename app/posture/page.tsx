@@ -31,7 +31,7 @@ export default async function PosturePage() {
           <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Decide</Link>
           <Link href="/operations" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Operations</Link>
         </div>
-        <p className="text-xs text-slate-400">External discovery overview lives at <Link href="/startup-macro-posture" className="underline decoration-slate-500/70 underline-offset-2">/startup-macro-posture</Link>.</p>
+        <p className="text-xs text-slate-400">Use this page as the canonical posture reference surface.</p>
       </section>
       <section className="grid gap-3 sm:grid-cols-3">
         {postureDefinitions.map((posture) => (
