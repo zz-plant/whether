@@ -4,6 +4,18 @@ import { formatScoreValue } from "../formatters";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
+export type DecisionPhraseTriplet = {
+  action: string;
+  threshold: string;
+  reversal: string;
+};
+
+export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
+  action: "Stage approvals",
+  threshold: "Pause if thresholds weaken",
+  reversal: "Reverse only after threshold recovery",
+};
+
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
   tightness: "Capital tightness",
   riskAppetite: "Risk appetite",
@@ -103,6 +115,75 @@ export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" =>
 
   return delta > 0 ? "↑" : "↓";
 };
+
+export const extractCompactClause = (value: string, fallback: string): string => {
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  let boundaryIndex = -1;
+  for (let index = 0; index < normalized.length; index += 1) {
+    const character = normalized[index];
+    if (character === ";") {
+      boundaryIndex = index;
+      break;
+    }
+
+    if (character !== ".") {
+      continue;
+    }
+
+    const previousCharacter = normalized[index - 1] ?? "";
+    const nextCharacter = normalized[index + 1] ?? "";
+    const isDecimalPoint = /\d/.test(previousCharacter) && /\d/.test(nextCharacter);
+    if (!isDecimalPoint) {
+      boundaryIndex = index;
+      break;
+    }
+  }
+
+  const firstClause = boundaryIndex >= 0 ? normalized.slice(0, boundaryIndex) : normalized;
+  return (firstClause.trim() || fallback).replace(/\.$/, "");
+};
+
+const compactDecisionPhrase = ({
+  value,
+  fallback,
+  stripPrefix,
+}: {
+  value: string;
+  fallback: string;
+  stripPrefix?: RegExp;
+}): string => {
+  const normalized = stripPrefix ? value.replace(stripPrefix, "") : value;
+  return extractCompactClause(normalized, fallback);
+};
+
+export const formatDecisionAction = (value: string, fallback = boundedDecisionPhraseFallbacks.action): string =>
+  compactDecisionPhrase({ value, fallback });
+
+export const formatDecisionThreshold = (value: string, fallback = boundedDecisionPhraseFallbacks.threshold): string =>
+  compactDecisionPhrase({ value, fallback, stripPrefix: /^Pause\s+/i });
+
+export const formatDecisionReversal = (value: string, fallback = boundedDecisionPhraseFallbacks.reversal): string =>
+  compactDecisionPhrase({ value, fallback, stripPrefix: /^Resume\s+/i });
+
+export const formatDecisionTriplet = ({
+  action,
+  threshold,
+  reversal,
+  fallbacks = boundedDecisionPhraseFallbacks,
+}: {
+  action?: string;
+  threshold?: string;
+  reversal?: string;
+  fallbacks?: DecisionPhraseTriplet;
+}): DecisionPhraseTriplet => ({
+  action: formatDecisionAction(action ?? "", fallbacks.action),
+  threshold: formatDecisionThreshold(threshold ?? "", fallbacks.threshold),
+  reversal: formatDecisionReversal(reversal ?? "", fallbacks.reversal),
+});
 
 export type CompactFreshnessMeta = {
   updatedAtLabel: string;

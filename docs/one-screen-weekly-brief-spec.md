@@ -171,6 +171,11 @@ Canonical top-fold order on homepage must remain:
 
 Implementation guardrails:
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
+- Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
+  - **Action**: what to do now.
+  - **Threshold**: the trip line that pauses/tightens the current call.
+  - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
+  - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - The current-outlook strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
