@@ -3,6 +3,7 @@ import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderRouteGate } from "./globalHeaderRouteGate";
 import { GlobalHeaderTaglineClient } from "./globalHeaderTaglineClient";
 import { ThemeToggleButton } from "./themeToggleButton";
+import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME, GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME } from "./globalHeaderShared";
 
 export async function GlobalHeader() {
   return (
@@ -14,7 +15,7 @@ export async function GlobalHeader() {
               <div className="min-w-0 space-y-3">
                 <Link
                   href="/"
-                  className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/70 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-200 hover:border-sky-400/70 hover:text-sky-100"
+                  className={GLOBAL_HEADER_BRAND_LINK_CLASSNAME}
                 >
                   Whether
                 </Link>
@@ -23,7 +24,7 @@ export async function GlobalHeader() {
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center xl:justify-end">
                 <Link
                   href="/search"
-                  className="weather-button inline-flex min-h-[44px] w-full items-center justify-center px-3 text-xs font-semibold tracking-[0.02em] sm:w-auto"
+                  className={`${GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME} w-full tracking-[0.02em] sm:w-auto`}
                   aria-label="Open global search"
                 >
                   Search

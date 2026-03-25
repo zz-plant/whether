@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   globalHeaderGroupLabels,
   resolveGlobalHeaderNavigationLinks,
@@ -15,7 +15,7 @@ type GlobalHeaderNavClientProps = {
 
 function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
   return (
-    <li key={link.href} className="flex-shrink-0 sm:min-w-0">
+    <li className="flex-shrink-0 sm:min-w-0">
       <Link
         href={link.href}
         aria-current={link.isActive ? "page" : undefined}
@@ -47,6 +47,10 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
   const resolvedPathname = pathname ?? currentPathname;
   const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [resolvedPathname]);
 
   return (
     <div className="relative">
