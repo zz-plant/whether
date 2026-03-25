@@ -202,9 +202,9 @@ export default async function MethodPage() {
           ))}
           <article className="weather-hub-link-card space-y-2">
             <h2 className="text-lg font-semibold text-slate-100">Optional context only</h2>
-            <p className="text-sm text-slate-300">Use Learn for conceptual diagnostics after you have already made the operating call.</p>
-            <Link href="/learn" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              Open Learn context
+            <p className="text-sm text-slate-300">Use failure-mode diagnostics only when a reviewer needs additional context after the operating call is made.</p>
+            <Link href="/learn/failure-modes" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              Open failure-mode diagnostics
             </Link>
           </article>
         </div>

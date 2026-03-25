@@ -117,7 +117,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
-    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },

@@ -6,7 +6,6 @@ export type NavigationLayerKey =
   | "operations"
   | "decide"
   | "toolkits"
-  | "learn"
   | "method";
 
 export type NavigationLayer = {
@@ -81,16 +80,6 @@ export const navigationLayers: NavigationLayer[] = [
     group: "workflow",
     tier: "supporting",
     parentKey: "decide",
-  },
-  {
-    key: "learn",
-    href: "/learn",
-    label: "Learn",
-    description: "Supporting reference library under Method for concepts, diagnostics, and failure modes.",
-    boundary: "Supporting surface under Method; never the canonical workflow or trust path.",
-    group: "reference",
-    tier: "supporting",
-    parentKey: "method",
   },
 ] as const;
 
