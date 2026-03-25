@@ -230,7 +230,7 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 - Above-the-fold density may regress first-load performance without sequencing.
 
 ### Open questions
-- Long-term canonical home: `/start` vs `/briefing`?
+- Long-term canonical home: `/` vs `/briefing`?
 - Timeline for preserving `/operations/*` compatibility paths?
 - Default role selection strategy for first-time playbook users?
 

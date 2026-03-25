@@ -1,7 +1,7 @@
 # Design debt audit (UI walkthrough + frontend code cross-reference)
 
 Date: 2026-03-04
-Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`, `/method` (desktop + mobile)
+Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`, `/method` (desktop + mobile). Note: `/start` was retired before this cleanup.
 
 ## Priority 0 — Fix immediately
 
@@ -18,7 +18,7 @@ Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`,
 | DD-001 | P0 | Mobile global nav scroll affordance | Design + Frontend | Open |
 | DD-002 | P1 | IA taxonomy/nav alignment with canonical hubs | Product + Frontend | Open |
 | DD-003 | P1 | Theme toggle accessibility semantics | Frontend | Open |
-| DD-004 | P1 | `/start` progressive disclosure on mobile | Product + Frontend | Open |
+| DD-004 | P1 | Homepage (`/`) progressive disclosure on mobile | Product + Frontend | Open |
 | DD-005 | P2 | Consolidate duplicate CTA patterns on primary pages | Product + Frontend | Open |
 | DD-006 | P2 | Improve dark-theme secondary text contrast tokens | Design system + Frontend | Open |
 | DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Open |
@@ -27,10 +27,10 @@ Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`,
 ## Priority 1 — High leverage
 
 2. **Information architecture drift between intended hub model and surfaced navigation labels/routes.**
-   - **Why it matters:** Product framing emphasizes Command Center (`/start`) and clear layer boundaries, but primary nav currently favors `/` + `/evidence` naming and omits several decision surfaces from top-level navigation.
+   - **Why it matters:** Product framing previously emphasized a retired Command Center (`/start`) and clear layer boundaries, but primary nav currently favors `/` + `/evidence` naming and omits several decision surfaces from top-level navigation.
    - **UI evidence:** Header hubs are `Weekly Capital Posture Brief`, `Evidence appendix`, `Operations`, `Resources`, `Reference`.
-   - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/start`, `/signals`, `/decide`, `/toolkits`, `/learn`, `/method`.
-   - **Recommendation:** Align global navigation taxonomy with IA boundaries and make "start path" prominence explicit.
+   - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/signals`, `/decide`, `/toolkits`, `/learn`, `/method`.
+   - **Recommendation:** Align global navigation taxonomy with IA boundaries and make the homepage weekly path prominence explicit.
 
 3. **Theme toggle has stale accessibility labeling and weak mode semantics.**
    - **Why it matters:** Assistive tech users hear an aria label that does not describe current state or next action accurately once toggled.
@@ -38,9 +38,9 @@ Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`,
    - **Recommendation:** Use dynamic `aria-label` or `aria-pressed` semantics (`Switch to light/dark mode`) and include state announcement.
 
 4. **Command Center page is cognitively dense on mobile (long, high-cardinality decision surface).**
-   - **Why it matters:** `/start` is positioned as the one-page weekly flow, but on mobile it becomes a long scroll with multiple sections and many equal-weight cards; this dilutes the "5-minute" promise.
+   - **Why it matters:** The homepage (`/`) now carries the one-page weekly flow, but on mobile it becomes a long scroll with multiple sections and many equal-weight cards; this dilutes the "5-minute" promise.
    - **UI evidence:** Mobile page length is very high and includes posture, situation chips, and many toolkit cards in one pass.
-   - **Code signals:** `/start` inlines all posture cards, all situations, and all toolkit definitions in a single page render with limited progressive disclosure.
+   - **Code signals:** `/` inlines all posture cards, all situations, and all toolkit definitions in a single page render with limited progressive disclosure.
    - **Recommendation:** Collapse secondary choices behind progressive disclosure (e.g., pick posture → reveal situation subset → reveal 1–3 recommended toolkits).
 
 ## Priority 2 — Medium
