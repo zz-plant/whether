@@ -1,43 +1,49 @@
 import { Skeleton } from "./skeleton";
+import { ReportShell } from "./reportShell";
+import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export function RouteLoadingShell({
   label = "Loading page",
   description = "Content is loading.",
+  currentPath = "/",
+  pageTitle = "Weekly Brief",
 }: {
   label?: string;
   description?: string;
+  currentPath?: string;
+  pageTitle?: string;
 }) {
   return (
-    <main
-      id="main-content"
-      aria-label="Loading page"
-      aria-live="polite"
-      aria-busy="true"
-      className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 pb-10 pt-6 sm:px-6 lg:px-8"
+    <ReportShell
+      statusLabel={label}
+      regime="NEUTRAL"
+      recordDateLabel="Updating now"
+      fetchedAtLabel="Refreshing"
+      treasurySource="fiscaldata.treasury.gov"
+      pageTitle={pageTitle}
+      pageSummary={description}
+      pageLinks={reportPageLinks}
+      sectionLinks={[]}
+      trustStatusLabel="Loading"
+      trustStatusDetail="Signals are still loading."
+      trustStatusAction="Keep this page open while the latest brief is prepared."
+      trustStatusTone="stable"
+      currentPath={currentPath}
     >
-      <section className="weather-panel px-5 py-5 sm:px-6">
+      <section aria-label="Loading page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-[1.6rem] px-5 py-5 sm:px-6 sm:py-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">
-                {label}
-              </span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">
-                In progress
-              </span>
+              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
             </div>
             <p className="max-w-2xl text-sm text-slate-100">{description}</p>
           </div>
           <div className="rounded-xl border border-slate-700/75 bg-slate-950/70 px-3 py-2.5 text-right">
-            <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
-              <span className="weather-loading-beacon" />
-              Loading
-            </p>
+            <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100"><span className="weather-loading-beacon" />Loading</p>
           </div>
         </div>
-      </section>
 
-      <section className="weather-panel-static space-y-5 rounded-[1.6rem] px-5 py-5 sm:px-6 sm:py-6">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <Skeleton className="h-7 w-28 rounded-full bg-slate-500/38" />
@@ -109,6 +115,6 @@ export function RouteLoadingShell({
           </div>
         </div>
       </section>
-    </main>
+    </ReportShell>
   );
 }

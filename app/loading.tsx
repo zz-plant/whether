@@ -1,5 +1,5 @@
 import { RouteLoadingShell } from "./components/routeLoadingShell";
 
 export default function Loading() {
-  return <RouteLoadingShell />;
+  return <RouteLoadingShell currentPath="/" pageTitle="Weekly Brief" />;
 }
