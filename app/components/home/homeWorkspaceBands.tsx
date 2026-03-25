@@ -3,6 +3,8 @@ import type { Route } from "../../../lib/navigation/routeType";
 import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { PageFlowNav } from "../pageFlowNav";
+import { ActionLink } from "../ui/actionLink";
+import { ButtonLink } from "../ui/buttonLink";
 import { LayoutGridIcon } from "../uiIcons";
 import { AuditBandSection } from "./workspace-bands/auditBandSection";
 import { CadenceBandSection } from "./workspace-bands/cadenceBandSection";
