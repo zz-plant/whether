@@ -15,7 +15,6 @@ import { resourceArticles } from "../lib/resourceArticles";
 import { tierOneDecisionPages } from "./answers/decisionPages";
 import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
-import { roleLandings } from "./solutions/career-paths/roleLandingData";
 import { regimePages } from "./startup-macro-posture/clusterData";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
@@ -111,10 +110,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/operations/integrations", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
     { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
-    { path: "/solutions/career-paths", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
-    { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
-    { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
-    { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
     { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
@@ -228,13 +223,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.58,
   }));
 
-  const careerRoleEntries: SitemapEntryDescriptor[] = roleLandings.map((roleLanding) => ({
-    path: `/solutions/career-paths/${roleLanding.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.56,
-  }));
-
   const conceptFocusEntries: SitemapEntryDescriptor[] = conceptFocuses.map((focus) => ({
     path: `/concepts/focus/${toConceptTaxonomySlug(focus)}`,
     lastModified: staticContentLastModified,
@@ -286,7 +274,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...regimeDeepEntries,
     ...stageGuideEntries,
     ...stakeholderGuideEntries,
-    ...careerRoleEntries,
     ...conceptFocusEntries,
     ...conceptAudienceEntries,
     ...signalsClusterEntries,

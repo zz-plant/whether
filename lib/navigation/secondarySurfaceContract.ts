@@ -1,7 +1,7 @@
 import type { Route } from "./routeType";
 
 export type SecondarySurfaceContract = {
-  surfaceKey: "guides" | "resources" | "answers" | "concepts" | "solutions";
+  surfaceKey: "guides" | "resources" | "answers" | "concepts";
   intentLabel: string;
   parentHubHref: Route;
   parentHubLabel: string;
@@ -41,13 +41,5 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubLabel: "Method",
     returnCtaLabel: "Return to Method",
     helperSummary: "Use concepts after the weekly brief to pressure-test language and frameworks against current regime evidence.",
-  },
-  solutions: {
-    surfaceKey: "solutions",
-    intentLabel: "Functional operating playbooks",
-    parentHubHref: "/decide",
-    parentHubLabel: "Decide",
-    returnCtaLabel: "Return to Decide",
-    helperSummary: "Use solutions after the weekly brief to apply posture to product, engineering, and career operating decisions.",
   },
 };

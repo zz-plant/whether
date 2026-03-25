@@ -20,6 +20,20 @@ const nextConfig = {
     ...(staticGenerationMinPagesPerWorker ? { staticGenerationMinPagesPerWorker } : {}),
     ...(buildCpus ? { cpus: buildCpus } : {}),
   },
+  async redirects() {
+    return [
+      { source: "/solutions", destination: "/decide", permanent: true },
+      { source: "/solutions/market-regime-playbook", destination: "/decide/ceo", permanent: true },
+      { source: "/solutions/product-roadmapping", destination: "/decide/roadmap-focus", permanent: true },
+      { source: "/solutions/engineering-capacity", destination: "/toolkits/ops-capacity", permanent: true },
+      { source: "/solutions/career-paths", destination: "/decide/product", permanent: true },
+      { source: "/solutions/career-paths/senior-product-manager", destination: "/decide/product", permanent: true },
+      { source: "/solutions/career-paths/group-product-manager", destination: "/decide/product", permanent: true },
+      { source: "/solutions/career-paths/director-of-product", destination: "/decide/product", permanent: true },
+      { source: "/solutions/career-paths/vp-product", destination: "/decide/product", permanent: true },
+      { source: "/solutions/career-paths/product-strategy-chief-of-staff", destination: "/decide/ops-risk", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

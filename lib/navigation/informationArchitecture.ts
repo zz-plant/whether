@@ -122,8 +122,4 @@ export const secondarySurfaceRoots: ReadonlyArray<Route> = [
   "/resources",
   "/answers",
   "/concepts",
-  "/solutions/engineering-capacity",
-  "/solutions/product-roadmapping",
-  "/solutions/market-regime-playbook",
-  "/solutions/career-paths",
 ] as const;
