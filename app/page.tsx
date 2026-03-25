@@ -3,20 +3,14 @@ import { Suspense } from "react";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
-import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
-import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
-import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
-import {
-  assembleHomePage,
-  type ArtifactPayload,
-} from "../lib/report/homePageAssembler";
-import { ArtifactActionsFallback } from "./components/home/artifactActionsFallback";
+import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
-import { WeeklyDiagnosticsFallback } from "./components/home/weeklyDiagnosticsFallback";
-import { StreamedSectionReveal } from "./components/streamedSectionReveal";
-import { HomeWorkspaceBands } from "./components/home/homeWorkspaceBands";
-import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
+import {
+  HomeDecisionSection,
+  HomeRevisitFlipSection,
+  HomeWhatChangedSection,
+} from "./components/home/homeBriefSections";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -26,36 +20,6 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<HomePageSearchParams>;
 }): Promise<Metadata> => buildHomeMetadata(searchParams);
-
-type ArtifactActionsProps = {
-  artifactPayloadPromise: Promise<ArtifactPayload | null>;
-  fallbackActive: boolean;
-};
-
-const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActive }: ArtifactActionsProps) => {
-  const artifactPayload = await artifactPayloadPromise;
-
-  if (!artifactPayload) {
-    return (
-      <p className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
-        Artifact export is temporarily unavailable. Use the weekly call card for source-of-truth guidance while we recover.
-      </p>
-    );
-  }
-
-  return (
-    <StreamedSectionReveal delay="medium">
-      <CopyLeadershipArtifactsButtons
-        boardSnippet={artifactPayload.boardSnippetText}
-        weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
-        weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
-        boardSummary={artifactPayload.boardSummary}
-        citation={artifactPayload.callCitation}
-        fallbackActive={fallbackActive}
-      />
-    </StreamedSectionReveal>
-  );
-};
 
 export default async function HomePage({
   searchParams,
@@ -78,12 +42,6 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
-  const fallbackTreasury = homepage.reportResult.ok
-    ? homepage.reportResult.data.treasury
-    : homepage.reportResult.fallback.treasury;
-  const lastCachedTimestamp = homepage.reportResult.ok
-    ? fallbackTreasury.fetched_at
-    : homepage.reportResult.fallback.lastCachedTimestamp;
 
   return (
     <ReportShell
@@ -133,47 +91,20 @@ export const HomePageReportContent = async ({
         ) : null
       }
     >
-      <WeeklyDecisionCard
-        model={homepage.weeklyDecisionCardModel}
-        searchParams={homepage.interpretationSearchParams}
-        actions={(
-          <Suspense fallback={<ArtifactActionsFallback />}>
-            <LeadershipArtifactActions
-              artifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
-              fallbackActive={homepage.fallbackActive}
-            />
-          </Suspense>
-        )}
+      <HomeWhatChangedSection
+        weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
+        interpretationSearchParams={homepage.interpretationSearchParams}
+        leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
+        fallbackActive={homepage.fallbackActive}
       />
 
-      <Suspense fallback={<WeeklyDiagnosticsFallback />}>
-        <StreamedSectionReveal delay="short">
-          <HomeWorkspaceBands
-            workspaceModelPromise={homepage.workspaceModelPromise}
-          />
-        </StreamedSectionReveal>
-      </Suspense>
+      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
 
-      {homepage.interpretationLayer.view !== "default" ? (
-        <StreamedSectionReveal delay="medium">
-          <HomeInterpretationPanel
-            layer={homepage.interpretationLayer}
-            searchParams={homepage.interpretationSearchParams}
-          />
-        </StreamedSectionReveal>
-      ) : null}
-
-      {homepage.fallbackActive ? (
-        <StreamedSectionReveal delay="medium">
-          <LiveDataFallbackAlert
-            lastCachedTimestamp={lastCachedTimestamp}
-            sourceLabel={fallbackTreasury.source}
-            effectiveRecordDate={fallbackTreasury.record_date}
-            fallbackReason={fallbackTreasury.fallback_reason}
-            followUpLabel="Review live evidence"
-          />
-        </StreamedSectionReveal>
-      ) : null}
+      <HomeRevisitFlipSection
+        interpretationLayer={homepage.interpretationLayer}
+        interpretationSearchParams={homepage.interpretationSearchParams}
+        fallbackAlert={homepage.fallbackAlert}
+      />
     </ReportShell>
   );
 };
