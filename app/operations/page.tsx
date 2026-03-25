@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
-import { loadReportDataSafe } from "../../lib/report/reportData";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, websiteName } from "../../lib/seo";
 import {
@@ -100,8 +100,10 @@ export default async function OperationsPage({
     ],
   };
 
-  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/operations" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operations" });
+  const reportResult = weeklySnapshotResult.reportResult;
+  const reportData = weeklySnapshotResult.reportData;
+  const { snapshot } = weeklySnapshotResult;
   const {
     assessment,
     fenceItems,
@@ -379,6 +381,16 @@ export default async function OperationsPage({
                     treasury={treasury}
                     sensors={sensors}
                     macroSeries={macroSeries}
+                    decisionModel={{
+                      postureWithStageLabel: snapshot.homeBriefModel.postureWithStageLabel,
+                      operatingStanceLine: snapshot.homeBriefModel.operatingStanceLine,
+                      guardrailThreshold: snapshot.homeBriefModel.guardrailThreshold,
+                      reversalTrigger: snapshot.homeBriefModel.reversalTrigger,
+                      actionStripItems: snapshot.homeBriefModel.actionStripItems,
+                      confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+                      compactFlipConditionLabels: snapshot.homeBriefModel.compactFlipConditionLabels,
+                      canonicalDecisionCopy: snapshot.canonicalDecisionCopy ?? undefined,
+                    }}
                     provenance={treasuryProvenance}
                     showProvenance={false}
                   />
