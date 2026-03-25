@@ -10,7 +10,7 @@ This audit answers: **which toolkit pages need a rewrite vs targeted enhancement
 | --- | --- | --- |
 | `/toolkits` | **Enhancement** | Core structure is correct (search + inventory grid), but selection support is weak for fast operator routing. Keep the route; add stronger “pick the right toolkit now” affordances. |
 | `/toolkits/[slug]` | **Rewrite (content architecture), not route** | Detail pages are comprehensive but read like a long checklist. They should lead with decision delta, bounded thresholds, and reversal triggers before method detail. |
-| `/start` toolkit block | **Enhancement** | This section already supports the “run one toolkit” path; tune progressive disclosure and recommendation quality rather than rebuild. |
+| `/` toolkit block | **Enhancement** | This section already supports the “run one toolkit” path; tune progressive disclosure and recommendation quality rather than rebuild. |
 | `/decide/[slug]` recommended toolkits | **Enhancement** | Routing logic and linkage exist; improve recommendation clarity with “why this toolkit now” context and tighter ordering. |
 
 ## Per-page notes
@@ -44,7 +44,7 @@ Rewrite targets:
 Why rewrite (not enhancement):
 - The current flow is method-first. To match product direction, these pages should become decision-first artifacts with bounded calls.
 
-### 3) `/start` toolkit section — enhancement
+### 3) `/` toolkit section — enhancement
 
 Current strengths:
 - Already frames a single-path journey (posture → situation → toolkit).
@@ -77,4 +77,4 @@ Why enhancement (not rewrite):
 1. Rewrite `/toolkits/[slug]` top section into decision-first summaries.
 2. Upgrade `/toolkits` selection affordances and recovery states.
 3. Tighten `/decide/[slug]` recommendation rationale and ordering.
-4. Tune `/start` toolkit card compression for mobile decisiveness.
+4. Tune `/` toolkit card compression for mobile decisiveness.
