@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
-import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
+import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseWeeksSearchParam } from "../../../../lib/cli/queryContracts";
 import { formatConfidencePlainLabel } from "../../../../lib/report/reportFormatting";
+import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -11,13 +12,12 @@ const DEFAULT_WINDOW_WEEKS = 12;
 const MAX_WINDOW_WEEKS = 52;
 
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.history);
-  if (invalidQuery) return invalidQuery;
+  const parsedRequest = parseCliRouteRequest(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.history);
+  if (parsedRequest instanceof NextResponse) return parsedRequest;
 
-  const searchParams = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));
-  if (searchParams === null) {
-    return NextResponse.json({ error: "Invalid asOf input. Expected YYYY-MM." }, { status: 400 });
-  }
+  const searchParams = parsedRequest.asOf
+    ? { year: String(parsedRequest.asOf.year), month: String(parsedRequest.asOf.month) }
+    : undefined;
 
   const weeksParam = parseWeeksSearchParam({
     weeks: request.nextUrl.searchParams.get("weeks"),
