@@ -104,4 +104,19 @@ describe("api cli query contracts", () => {
     assert.deepEqual(await parsed.json(), { error: INVALID_AS_OF_ERROR });
   });
 
+  it("returns NextResponse for unsupported query parameters in shared route parser", async () => {
+    const parsed = parseCliRouteRequest(
+      new NextRequest("http://localhost:3000/api/cli/status?foo=1"),
+      CLI_QUERY_ALLOWLIST_BY_ENDPOINT.status,
+    );
+
+    assert.ok(parsed instanceof NextResponse);
+    assert.equal(parsed.status, 400);
+    assert.deepEqual(await parsed.json(), {
+      error: "Unsupported query parameters.",
+      unsupported: ["foo"],
+      supported: ["asOf", "view"],
+    });
+  });
+
 });

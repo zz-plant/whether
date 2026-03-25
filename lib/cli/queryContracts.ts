@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 type CliQueryRequest = {
   nextUrl: {
     searchParams: URLSearchParams;
@@ -25,7 +27,7 @@ export const rejectUnsupportedCliQuery = (request: CliQueryRequest, supportedPar
     return null;
   }
 
-  return Response.json(
+  return NextResponse.json(
     {
       error: "Unsupported query parameters.",
       unsupported,
