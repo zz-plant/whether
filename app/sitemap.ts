@@ -96,7 +96,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
-    { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
+    { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.86 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
@@ -115,8 +115,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
-    { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
-    { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.8 },
+    { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
+    { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
     { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
