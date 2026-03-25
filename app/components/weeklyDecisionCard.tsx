@@ -18,6 +18,7 @@ import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
+  buildTrustMarker,
 } from "../../lib/report/trustStatus";
 
 type WeeklyDecisionCardModel =
@@ -1133,6 +1134,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     recordDateLabel,
     freshnessLabel,
   });
+  const inlineTrustMarker = buildTrustMarker({
+    confidenceLabel,
+    freshnessMeta,
+    isFallbackSnapshot,
+  });
   const snapshotDoNow = immediateDecision;
   const snapshotGuardrail = guardrailThreshold?.trim()
     || executiveOperationalStance.avoid[0]?.trim()
@@ -1306,6 +1312,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trustStateDetail={trustStateDetail}
             trustTimestamp={freshnessLabel}
             trustReason={isFallbackSnapshot ? artifact.freshnessLine ?? trustCueLine : undefined}
+            inlineTrustLabel={inlineTrustMarker.label}
+            inlineTrustTone={inlineTrustMarker.tone}
             stabilityRule={stabilityRule}
             decisionBullets={decisionBullets}
             guardrailPolicyDetails={guardrailPolicyDetails}

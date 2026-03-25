@@ -1,3 +1,5 @@
+import type { CompactFreshnessMeta } from "./reportFormatting";
+
 type TrustStatusTone = "stable" | "warning" | "historical";
 
 export type FailureModeWarning = {
@@ -180,5 +182,43 @@ export const buildTrustStatus = ({
     trustStatusDetail: detail,
     trustStatusAction: action,
     trustStatusTone: tone,
+  };
+};
+
+export const buildTrustMarker = ({
+  confidenceLabel,
+  freshnessMeta,
+  isFallbackSnapshot,
+  isHistoricalSelection = false,
+}: {
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  freshnessMeta: CompactFreshnessMeta;
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection?: boolean;
+}) => {
+  const trustSummary = buildCompactTrustSummary({
+    confidenceLabel,
+    freshnessLabel: freshnessMeta.updatedAtLabel,
+    isFallbackSnapshot,
+    isHistoricalSelection,
+  });
+  const degraded = isFallbackSnapshot || freshnessMeta.maxAge === "stale" || confidenceLabel === "LOW";
+  const label = isHistoricalSelection
+    ? "Historical snapshot"
+    : degraded
+      ? "Degraded trust"
+      : "Live trust";
+  const tone: "stable" | "warning" | "historical" = isHistoricalSelection
+    ? "historical"
+    : degraded
+      ? "warning"
+      : "stable";
+
+  return {
+    label,
+    tone,
+    degraded,
+    summaryLine: freshnessMeta.line,
+    detail: trustSummary,
   };
 };
