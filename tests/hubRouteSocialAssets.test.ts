@@ -10,8 +10,6 @@ import { metadata as operationsMetadata } from "../app/operations/page";
 import { metadata as postureMetadata } from "../app/posture/page";
 import { metadata as resourcesMetadata } from "../app/resources/page";
 import { metadata as signalsMetadata } from "../app/signals/page";
-import { metadata as startupMacroIndexMetadata } from "../app/startup-macro-posture/index/page";
-import { metadata as startupMacroMetadata } from "../app/startup-macro-posture/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";
 
 const readFirstImageUrl = (metadata: Metadata) => {
@@ -52,8 +50,6 @@ describe("hub route social assets", () => {
       { metadata: operationsMetadata, imagePath: "/social/operations.svg" },
       { metadata: decideMetadata, imagePath: "/social/decide.svg" },
       { metadata: resourcesMetadata, imagePath: "/social/resources.svg" },
-      { metadata: startupMacroMetadata, imagePath: "/social/startup-macro-posture.svg" },
-      { metadata: startupMacroIndexMetadata, imagePath: "/social/startup-macro-posture.svg" },
       { metadata: guidesMetadata, imagePath: "/social/guides.svg" },
       { metadata: guidesStageMetadata, imagePath: "/social/guides.svg" },
       { metadata: answersHubMetadata, imagePath: "/social/answers.svg" },
