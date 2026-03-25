@@ -101,7 +101,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.64 },
-    { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.2 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },

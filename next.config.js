@@ -15,6 +15,16 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/methodology",
+        destination: "/method#formula-reference",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     ...(staticGenerationWorkers ? { staticGenerationMaxConcurrency: staticGenerationWorkers } : {}),
     ...(staticGenerationMinPagesPerWorker ? { staticGenerationMinPagesPerWorker } : {}),

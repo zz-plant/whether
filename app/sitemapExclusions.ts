@@ -20,6 +20,7 @@ export const retiredSitemapPaths = [
   "/briefing",
   "/plan",
   "/brief/stage",
+  "/methodology",
 ] as const;
 
 const retiredPathSet = new Set<string>(retiredSitemapPaths);

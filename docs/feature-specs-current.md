@@ -104,14 +104,12 @@ the weekly brief flow.
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
 
-### 1.6 Method hub (/method) and formula reference (/methodology)
+### 1.6 Method hub (/method) and formula reference anchor
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
 confidence, freshness, source coverage, and revisit conditions, then links out to `/sources`,
-`/confidence`, `/methodology`, and `/learn`.
+`/confidence`, `/method#formula-reference`, and `/learn`.
 
-`/methodology` remains the lower-level formula reference documenting the sensor methodology and the
-public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit
-spreads, FRED VIX, and Chicago Fed NFCI).
+Formula details live on the `/method#formula-reference` anchor, and legacy `/methodology` traffic is permanently redirected there.
 
 The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
 

@@ -4,8 +4,15 @@ import { describe, it } from "node:test";
 import nextConfig from "../next.config.js";
 
 describe("next.config redirects", () => {
-  it("does not configure route redirects", async () => {
+  it("keeps legacy methodology alias permanently routed to Method formula reference", async () => {
     const redirects = await nextConfig.redirects?.();
-    assert.ok(redirects == null || redirects.length === 0);
+
+    assert.deepEqual(redirects, [
+      {
+        source: "/methodology",
+        destination: "/method#formula-reference",
+        permanent: true,
+      },
+    ]);
   });
 });

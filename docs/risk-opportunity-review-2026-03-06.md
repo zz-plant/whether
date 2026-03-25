@@ -26,9 +26,9 @@ This review flags product and engineering risks paired with concrete opportuniti
 - **Risk:** The repo contains numerous resource/concept/solution pages, which can drift from current posture language and reduce trust if stale.
 - **Opportunity:** Add an automated freshness stamp and “last reviewed against weekly posture” check for SEO pages, with a lightweight stale-content warning in generation workflows.
 
-## 7) Two methodology routes (`/method` and `/methodology`) can create IA ambiguity
-- **Risk:** Duplicate naming for closely related methodology content can confuse users and fragment inbound links.
-- **Opportunity:** Pick one canonical route, redirect the other permanently, and normalize internal links/site metadata to reduce routing ambiguity.
+## 7) Legacy methodology alias needs strict canonical routing hygiene
+- **Risk:** Legacy aliases can reappear in internal links or sitemap entries and fragment trust-surface analytics.
+- **Opportunity:** Keep `/method` canonical, enforce permanent alias redirecting to `/method#formula-reference`, and continuously normalize internal links/site metadata.
 
 ## 8) Rich fallback behavior exists, but degraded-state UX can still become cognitively heavy
 - **Risk:** The product intentionally carries provenance/fallback metadata; if too many trust markers appear at once, operators may spend time re-litigating state rather than deciding.
