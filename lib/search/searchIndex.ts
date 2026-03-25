@@ -42,13 +42,13 @@ const keyDocs: SearchEntity[] = [
     keywords: ["evidence", "provenance", "sources", "trust"],
   },
   {
-    id: "doc-formulas",
+    id: "doc-method-formulas",
     type: "doc",
-    title: "Methodology — formulas and scoring reference",
-    href: "/methodology",
-    summary: "Reference formulas behind regime scoring and decision thresholds.",
+    title: "Method — formula reference",
+    href: "/method#formula-reference",
+    summary: "Open the formula reference section from the canonical Method trust hub.",
     intentLabel: "Inspect scoring",
-    keywords: ["formulas", "scoring", "thresholds", "regime"],
+    keywords: ["formulas", "scoring", "thresholds", "regime", "methodology", "trust"],
   },
 ];
 

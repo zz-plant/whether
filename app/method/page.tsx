@@ -82,13 +82,14 @@ export default async function MethodPage() {
     {
       title: "Validate model assumptions",
       detail: "Audit formulas and fallback behavior if you need to defend this posture externally.",
-      href: "/methodology" as Route,
+      href: "/method#formula-reference" as Route,
       cta: "Open formula reference",
     },
   ];
   const sectionLinks = [
     { href: "#trust-snapshot", label: "60-second trust check" },
     { href: "#trust-hub-links", label: "Audit workflow" },
+    { href: "#formula-reference", label: "Formula reference" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
   ];
@@ -161,7 +162,7 @@ export default async function MethodPage() {
           <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center">
             Return to Weekly Brief
           </Link>
-          <Link href="/methodology" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
+          <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
             Open formula reference
           </Link>
         </div>
@@ -206,6 +207,28 @@ export default async function MethodPage() {
               Open Learn context
             </Link>
           </article>
+        </div>
+      </HubSection>
+
+      <HubSection
+        id="formula-reference"
+        title="Formula reference"
+        description="Methodology is maintained as a legacy alias and resolves here within the Method trust hub."
+        className="scroll-mt-28"
+      >
+        <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <p className="text-sm text-slate-200">
+            Use this section when reviewers ask how posture scoring works, which thresholds trigger pauses, and what would reverse the call.
+          </p>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li>• Tie formula review to the current confidence and freshness labels before making irreversible decisions.</li>
+            <li>• Verify flip and guardrail thresholds align with the weekly brief before changing operating tempo.</li>
+            <li>• Document reversal conditions before reopening fixed-cost approvals.</li>
+          </ul>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <Link href="/confidence" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View confidence limits</Link>
+            <Link href="/sources" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View source provenance</Link>
+          </div>
         </div>
       </HubSection>
 

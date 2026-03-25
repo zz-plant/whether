@@ -77,6 +77,7 @@ export default async function SourcesPage() {
         <div className="flex flex-wrap gap-2">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly brief</Link>
           <Link href="/method" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Back to trust snapshot</Link>
+          <Link href="/method#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Formula reference (Method)</Link>
           <Link href="/confidence" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Confidence and limits</Link>
         </div>
       </section>

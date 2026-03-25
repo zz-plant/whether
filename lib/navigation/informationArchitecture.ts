@@ -107,3 +107,13 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
   acc[layer.href] = layer.label;
   return acc;
 }, {});
+
+export const trustHubAliases: ReadonlyArray<{ href: Route; canonicalHref: Route; status: "legacy-alias" | "subordinate"; note: string }> = [
+  {
+    href: "/methodology",
+    canonicalHref: "/method",
+    status: "legacy-alias",
+    note: "Methodology remains a legacy alias that resolves to Method formula reference content.",
+  },
+] as const;
+
