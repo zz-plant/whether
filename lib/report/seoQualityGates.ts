@@ -2,10 +2,13 @@ const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
 
 export type SeoQualityGateId =
   | "decision-completeness"
+  | "decision-transmission"
   | "freshness"
   | "uniqueness"
   | "thin-page"
-  | "trust";
+  | "trust"
+  | "artifact-readiness"
+  | "canonical-progression";
 
 export type SeoQualityGateStatus = {
   passed: boolean;
@@ -47,6 +50,12 @@ export type EvaluateSeoQualityGatesInput = {
   fallbackLabel?: string;
   interpretationLabel?: string;
   siblingsInCluster?: SeoQualitySiblingInput[];
+  enforceLaunchChecklist?: boolean;
+  scanSecondsEstimate?: number;
+  hasDecisionBullets?: boolean;
+  hasCopyableDecision?: boolean;
+  linksToWeeklyBrief?: boolean;
+  linksToDecideOrOperations?: boolean;
 };
 
 const hasValue = (value?: string) => Boolean(value && value.trim().length > 0);
@@ -149,6 +158,37 @@ const buildThinPageGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateS
   };
 };
 
+const estimateScanSeconds = (input: EvaluateSeoQualityGatesInput): number => {
+  if (typeof input.scanSecondsEstimate === "number") return input.scanSecondsEstimate;
+
+  const text = [input.currentCall, input.immediateAction, input.triggerThreshold, input.reversalCondition].filter(hasValue).join(" ");
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const wordsPerMinute = 180;
+  return Math.ceil((words / wordsPerMinute) * 60);
+};
+
+const buildDecisionTransmissionGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStatus => {
+  if (!input.enforceLaunchChecklist) {
+    return { passed: true, reasons: [] };
+  }
+
+  const reasons: string[] = [];
+  const scanSeconds = estimateScanSeconds(input);
+  if (scanSeconds > 60) {
+    reasons.push("decision-transmission-over-60s");
+  }
+
+  if (!hasValue(input.immediateAction) || !hasValue(input.triggerThreshold) || !hasValue(input.reversalCondition)) {
+    reasons.push("decision-transmission-missing-bounded-rule");
+  }
+
+  return {
+    passed: reasons.length === 0,
+    reasons,
+    details: { scanSeconds },
+  };
+};
+
 const buildTrustGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStatus => {
   const reasons: string[] = [];
 
@@ -174,16 +214,57 @@ const buildTrustGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStat
   };
 };
 
+const buildArtifactReadinessGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStatus => {
+  if (!input.enforceLaunchChecklist) {
+    return { passed: true, reasons: [] };
+  }
+
+  const reasons: string[] = [];
+  if (!input.hasDecisionBullets) {
+    reasons.push("artifact-missing-decision-bullets");
+  }
+  if (!input.hasCopyableDecision) {
+    reasons.push("artifact-missing-copyable-decision");
+  }
+
+  return {
+    passed: reasons.length === 0,
+    reasons,
+  };
+};
+
+const buildCanonicalProgressionGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStatus => {
+  if (!input.enforceLaunchChecklist) {
+    return { passed: true, reasons: [] };
+  }
+
+  const reasons: string[] = [];
+  if (!input.linksToWeeklyBrief) {
+    reasons.push("canonical-link-weekly-brief-missing");
+  }
+  if (!input.linksToDecideOrOperations) {
+    reasons.push("canonical-link-decide-or-operations-missing");
+  }
+
+  return {
+    passed: reasons.length === 0,
+    reasons,
+  };
+};
+
 export const evaluateSeoQualityGates = (
   input: EvaluateSeoQualityGatesInput,
   now: Date = new Date(),
 ): SeoQualityGateResult => {
   const gates: Record<SeoQualityGateId, SeoQualityGateStatus> = {
     "decision-completeness": buildDecisionCompletenessGate(input),
+    "decision-transmission": buildDecisionTransmissionGate(input),
     freshness: buildFreshnessGate(input, now),
     uniqueness: buildUniquenessGate(input),
     "thin-page": buildThinPageGate(input),
     trust: buildTrustGate(input),
+    "artifact-readiness": buildArtifactReadinessGate(input),
+    "canonical-progression": buildCanonicalProgressionGate(input),
   };
 
   const reasons = Object.values(gates).flatMap((gate) => gate.reasons);

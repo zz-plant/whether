@@ -3,27 +3,34 @@
 All new SEO content must pass the following gates before publish.
 
 ## Required gates
-- Must map to one of the four target personas:
-  - `cfo`
-  - `board`
-  - `vp-product`
-  - `vc-partner`
-- Must include governance framing + reversibility language.
-- Must include at least **3 internal links** to canonical/core pages.
-- Must include:
-  - one conversion CTA (`download`, `request`, or `demo/contact`)
-  - one board-forwardable block.
+- Must pass bounded-decision completeness:
+  - current call,
+  - immediate action,
+  - trigger threshold,
+  - reversal condition,
+  - evidence present.
+- Must pass freshness and trust checks:
+  - freshness window valid,
+  - no fallback/degraded provenance labels,
+  - provenance links, confidence label, and fallback label present.
+- Must pass anti-duplication and thin-page checks:
+  - distinct datapoint and/or interpretation vs sibling pages in cluster,
+  - section completeness and minimum decision value.
+- Launch-readiness runs now enforce additional checklist gates:
+  - decision transmission (scan/decide in <=60s),
+  - artifact readiness (decision bullets + copyable decision text),
+  - canonical progression (links to `/` and `/decide` or `/operations`).
 
 ## Metadata and reporting gates
-- Content entry must include cluster classification: `authority | pain | tool | vc`.
-- Content entry must include an intent tag in frontmatter/CMS-equivalent fields.
-- Page must emit/attach measurement attributes for conversion and internal-link path analysis.
+- Content entry must include cluster classification + intent tag.
+- Page should emit/attach measurement attributes for conversion and internal-link path analysis.
+- Failed launch-readiness checks should be treated as `noindex` until corrected.
 
 ## QA checklist (copy/paste)
-- [ ] Persona tag selected.
-- [ ] Cluster selected.
-- [ ] Governance + reversibility language included.
-- [ ] >=3 internal links to core canonical pages.
-- [ ] One conversion CTA present.
-- [ ] One board-forwardable block present.
+- [ ] Bounded-decision contract complete (action, threshold, reversal, evidence).
+- [ ] Freshness + provenance + confidence + fallback labels pass.
+- [ ] Distinct intent/value vs sibling pages in cluster.
+- [ ] Decision transmission <=60s.
+- [ ] Decision bullets and copyable decision text present.
+- [ ] Canonical links to `/` and `/decide` or `/operations`.
 - [ ] Measurement attributes verified.

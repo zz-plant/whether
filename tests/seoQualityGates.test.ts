@@ -27,11 +27,52 @@ describe("seo quality gates", () => {
           evidenceTitles: ["Treasury volatility"],
         },
       ],
+      enforceLaunchChecklist: true,
+      scanSecondsEstimate: 35,
+      hasDecisionBullets: true,
+      hasCopyableDecision: true,
+      linksToWeeklyBrief: true,
+      linksToDecideOrOperations: true,
     }, new Date("2026-02-12T00:00:00.000Z"));
 
     assert.equal(result.eligible, true);
     assert.equal(result.noindex, false);
     assert.deepEqual(result.reasons, []);
+  });
+
+  it("fails launch checklist gates when decision transmission, artifact readiness, and canonical links are missing", () => {
+    const result = evaluateSeoQualityGates({
+      pageKey: "/answers/should-we-freeze-or-selectively-hire",
+      currentCall: "Default to selective hiring with stop triggers.",
+      immediateAction: "Approve reliability and revenue-adjacent roles first.",
+      triggerThreshold: "Trigger tighter mode if tightness > 70.",
+      reversalCondition: "Reverse after two easing reads.",
+      evidenceCount: 2,
+      evidenceTitles: ["Treasury volatility", "Credit spreads"],
+      fetchedAtIso: "2026-02-10T12:00:00.000Z",
+      provenanceStatusLabel: "Live (high confidence)",
+      provenanceLinks: ["https://fred.stlouisfed.org/series/DGS10"],
+      confidenceLabel: "HIGH",
+      fallbackLabel: "live",
+      trustSummary: "High confidence",
+      citationMeta: "Cite: 2026-02-10 UTC",
+      enforceLaunchChecklist: true,
+      scanSecondsEstimate: 90,
+      hasDecisionBullets: false,
+      hasCopyableDecision: false,
+      linksToWeeklyBrief: false,
+      linksToDecideOrOperations: false,
+    }, new Date("2026-02-12T00:00:00.000Z"));
+
+    assert.equal(result.eligible, false);
+    assert.ok(result.reasons.includes("decision-transmission-over-60s"));
+    assert.ok(result.reasons.includes("artifact-missing-decision-bullets"));
+    assert.ok(result.reasons.includes("artifact-missing-copyable-decision"));
+    assert.ok(result.reasons.includes("canonical-link-weekly-brief-missing"));
+    assert.ok(result.reasons.includes("canonical-link-decide-or-operations-missing"));
+    assert.equal(result.gates["decision-transmission"].passed, false);
+    assert.equal(result.gates["artifact-readiness"].passed, false);
+    assert.equal(result.gates["canonical-progression"].passed, false);
   });
 
   it("fails uniqueness when sibling pages share the same data points and interpretation", () => {
