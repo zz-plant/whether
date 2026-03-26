@@ -3,7 +3,10 @@ import type { ReportData } from "../../lib/report/reportData";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { TreasuryData } from "../../lib/types";
 
-type AssessmentOverrides = Partial<RegimeAssessment> & {
+type AssessmentOverrides = Omit<
+  Partial<RegimeAssessment>,
+  "regimeTransition" | "scores" | "diagnostics" | "thresholds" | "policyAssessment"
+> & {
   regimeTransition?: Partial<RegimeAssessment["regimeTransition"]> & {
     snapshot?: Partial<NonNullable<RegimeAssessment["regimeTransition"]>["snapshot"]>;
   };
@@ -22,15 +25,17 @@ type TreasuryOverrides = Partial<TreasuryData> & {
   yields?: Partial<TreasuryData["yields"]>;
 };
 
-type ReportDataOverrides = Partial<ReportData> & {
+type ReportDataOverrides = Omit<Partial<ReportData>, "assessment" | "treasury" | "liveTreasury" | "thresholds"> & {
   assessment?: AssessmentOverrides;
   treasury?: TreasuryOverrides;
-  liveTreasury?: TreasuryOverrides | null;
+  liveTreasury?: TreasuryOverrides;
   thresholds?: Partial<ReportData["thresholds"]>;
 };
 
 export const buildAssessmentFixture = (overrides: AssessmentOverrides = {}): RegimeAssessment => {
-  const base: RegimeAssessment = {
+  const base: RegimeAssessment & {
+    regimeTransition: NonNullable<RegimeAssessment["regimeTransition"]>;
+  } = {
     regime: "DEFENSIVE",
     regimeTransition: {
       nextState: "DEFENSIVE",
@@ -151,10 +156,7 @@ export const buildTreasuryFixture = (overrides: TreasuryOverrides = {}): Treasur
 export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): ReportData => {
   const assessment = buildAssessmentFixture(overrides.assessment);
   const treasury = buildTreasuryFixture(overrides.treasury);
-  const liveTreasury =
-    overrides.liveTreasury === null
-      ? null
-      : buildTreasuryFixture(overrides.liveTreasury ?? overrides.treasury);
+  const liveTreasury = buildTreasuryFixture(overrides.liveTreasury ?? overrides.treasury);
 
   const base: ReportData = {
     assessment,
