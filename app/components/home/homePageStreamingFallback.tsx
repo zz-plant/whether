@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Skeleton } from "../skeleton";
 import { WeeklyDiagnosticsFallback } from "./weeklyDiagnosticsFallback";
 
@@ -33,23 +34,55 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">
       <section className="weather-panel px-4 py-4 sm:px-5 sm:py-5">
-        <article className="weather-panel-static rounded-[1.5rem] px-5 py-5 sm:px-6 sm:py-6">
+        <article className="weather-appbar relative z-20 border-slate-800/70 px-4 py-4 sm:px-6 sm:py-5">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100">
-                  Weekly brief
-                </span>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/65 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-                  {contextLabel}
-                </span>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div className="min-w-0 space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Image
+                    src="/whether-logo.svg"
+                    alt="Whether — Weekly Operating Posture (Loading)"
+                    width={156}
+                    height={36}
+                    className="h-9 w-auto"
+                    priority
+                  />
+                  <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
+                    Weekly operating forecast
+                  </span>
+                  <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                    {contextLabel}
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
+                  <p className="max-w-3xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
+                    This week&apos;s posture, action, and flip risk in one scan.
+                  </p>
+                </div>
               </div>
+              <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[30rem]">
+                <div className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Posture</p>
+                  <Skeleton className="mt-1 h-5 w-24 rounded-full bg-slate-500/40" />
+                </div>
+                <div className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+                  <Skeleton className="mt-1 h-5 w-28 rounded-full bg-slate-500/35" />
+                </div>
+                <div className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
+                  <Skeleton className="mt-1 h-5 w-20 rounded-full bg-slate-500/32" />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="max-w-2xl text-sm text-slate-100">{introLabel}</p>
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
                 <span className="weather-loading-beacon" />
                 Loading
               </p>
             </div>
-            <p className="max-w-2xl text-sm text-slate-100">{introLabel}</p>
             <div className="space-y-3">
               <Skeleton className="h-11 w-full max-w-3xl rounded-xl bg-slate-500/50" />
               <Skeleton className="h-5 w-11/12 max-w-2xl rounded-full bg-slate-500/40" />
