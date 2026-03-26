@@ -14,6 +14,7 @@ import {
   resourcePillarPages,
   resourceSupportingPages,
 } from "../../../lib/resourcesContent";
+import { secondarySurfaceContractByKey } from "../../../lib/navigation/secondarySurfaceContract";
 import { GovernanceLexiconCallout } from "../components/governanceLexiconCallout";
 import { PillarCtaBlock } from "../components/pillarCtaBlock";
 import {
@@ -33,6 +34,7 @@ import { resourceArticles } from "../../../lib/resourceArticles";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 type Params = { slug: string };
+const resourcesContract = secondarySurfaceContractByKey.resources;
 
 export const revalidate = 21600;
 
@@ -105,16 +107,29 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
 
     return (
-      <ResourceArticlePage
-        article={article}
-        decisionArtifact={{
-          decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-          postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
-          mappedRules,
-          freshnessLabel: reportData.fetchedAtLabel,
-          citation: callCitation,
-        }}
-      />
+      <>
+        <section className="mx-auto mt-6 flex w-full max-w-4xl flex-wrap gap-2 px-4 sm:px-6">
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Start from Weekly Brief
+          </Link>
+          <Link
+            href={resourcesContract.parentHubHref}
+            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
+          >
+            {resourcesContract.returnCtaLabel}
+          </Link>
+        </section>
+        <ResourceArticlePage
+          article={article}
+          decisionArtifact={{
+            decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+            postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
+            mappedRules,
+            freshnessLabel: reportData.fetchedAtLabel,
+            citation: callCitation,
+          }}
+        />
+      </>
     );
   }
 
@@ -158,6 +173,17 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationSchema) }} />
 
       <section className="weather-panel space-y-4 px-6 py-6">
+        <div className="flex flex-wrap gap-2">
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Start from Weekly Brief
+          </Link>
+          <Link
+            href={resourcesContract.parentHubHref}
+            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
+          >
+            {resourcesContract.returnCtaLabel}
+          </Link>
+        </div>
         <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Primary keyword: {page.keyword}</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.h1}</h1>
         <p className="text-sm text-slate-200">{page.description}</p>

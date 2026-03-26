@@ -35,6 +35,9 @@ const conversionTargetByTier = {
   low: 0.02,
 };
 
+const PRUNE_REVIEW_STREAK_MIN = 3;
+const PRUNE_REVIEW_CONVERSION_GAP = -0.015;
+
 const toSlaState = ({ dueAtIso, nowIso, resolvedAtIso }) => {
   if (!dueAtIso) return "unknown";
   if (resolvedAtIso && resolvedAtIso >= dueAtIso) return "completed";
@@ -63,12 +66,17 @@ const computeSlaDueAtIso = ({ queueMeta, previousRequestedAtIso, nowIso }) => {
   return new Date(requestedAtBaseMs + priorityToSlaHours[queueMeta.priority] * HOURS).toISOString();
 };
 
-const buildQueueRecord = ({ page, metric, stale, conversionRate }) => {
+const buildQueueRecord = ({ page, metric, stale, conversionRate, previousUnderperformingStreak = 0 }) => {
   const trafficTier = toTrafficTier(metric);
   const conversionTarget = conversionTargetByTier[trafficTier];
   const conversionGap = conversionRate - conversionTarget;
   const conversionUnderperforming = Number.isFinite(conversionRate) && conversionGap < 0;
   const highIntentUnderperforming = trafficTier !== "low" && conversionUnderperforming;
+  const underperformingStreak = highIntentUnderperforming ? previousUnderperformingStreak + 1 : 0;
+  const pruneCandidate =
+    highIntentUnderperforming &&
+    underperformingStreak >= PRUNE_REVIEW_STREAK_MIN &&
+    conversionGap <= PRUNE_REVIEW_CONVERSION_GAP;
 
   const shouldEnqueue = stale || highIntentUnderperforming;
   if (!shouldEnqueue) {
@@ -82,12 +90,15 @@ const buildQueueRecord = ({ page, metric, stale, conversionRate }) => {
       noindexNow: false,
       reasons: [],
       priority: null,
+      underperformingStreak,
+      pruneCandidate,
     };
   }
 
   const reasons = [];
   if (stale) reasons.push("freshness-stale");
   if (highIntentUnderperforming) reasons.push("conversion-below-tier-target");
+  if (pruneCandidate) reasons.push("merge-or-prune-candidate");
 
   const priority = stale ? "p0" : trafficTier === "high" ? "p1" : "p2";
 
@@ -97,11 +108,13 @@ const buildQueueRecord = ({ page, metric, stale, conversionRate }) => {
     conversionRate,
     conversionTarget,
     conversionGap,
-    stale,
-    noindexNow: stale,
-    reasons,
-    priority,
-  };
+      stale,
+      noindexNow: stale,
+      reasons,
+      priority,
+      underperformingStreak,
+      pruneCandidate,
+    };
 };
 
 export const evaluateRefreshQueue = ({
@@ -122,7 +135,13 @@ export const evaluateRefreshQueue = ({
       const stale = Number.isNaN(fetchedAtMs) ? true : now.getTime() - fetchedAtMs > staleCutoffMs;
       const conversionRate = Number(metric.ctaConversionRate ?? Number.NaN);
 
-      const queueMeta = buildQueueRecord({ page, metric, stale, conversionRate });
+      const queueMeta = buildQueueRecord({
+        page,
+        metric,
+        stale,
+        conversionRate,
+        previousUnderperformingStreak: Number(previous.underperformingStreak ?? 0),
+      });
       const lastRefreshRequestedAtIso = queueMeta.enqueue
         ? (previous.lastRefreshRequestedAtIso ?? nowIso)
         : null;
@@ -145,6 +164,8 @@ export const evaluateRefreshQueue = ({
         conversionTarget: queueMeta.conversionTarget,
         priority: queueMeta.priority,
         reasons: queueMeta.reasons,
+        underperformingStreak: queueMeta.underperformingStreak,
+        pruneCandidate: queueMeta.pruneCandidate,
         slaDueAtIso: dueAtIso,
         slaState: toSlaState({ dueAtIso, nowIso, resolvedAtIso: lastRefreshedAtIso }),
       };
@@ -162,6 +183,8 @@ export const evaluateRefreshQueue = ({
         conversionRate: status.conversionRate,
         conversionTarget: status.conversionTarget,
         conversionGap: Number.isFinite(queueMeta.conversionGap) ? queueMeta.conversionGap : null,
+        underperformingStreak: queueMeta.underperformingStreak,
+        pruneCandidate: queueMeta.pruneCandidate,
         status,
       };
     })

@@ -91,6 +91,7 @@ Use these when shaping follow-on work, not as sole implementation truth:
 - `seo/quality-gates.md`
 - `seo/measurement-model.md`
 - `seo/refresh-loop.md`
+- `programmatic-seo-operations.md`
 
 ## Evidence and research docs
 

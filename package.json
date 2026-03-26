@@ -35,6 +35,8 @@
     "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
     "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
     "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs",
+    "seo:answers:launch-readiness": "bun scripts/seo-answer-launch-readiness.ts",
+    "seo:weekly-runbook": "bun scripts/seo-weekly-runbook.ts",
     "cli:whether": "node scripts/whether-cli.mjs",
     "deploy:cloudflare:nonprod": "node scripts/vinext-run.mjs build",
     "deploy:vinext": "node scripts/vinext-deploy.mjs --preview",

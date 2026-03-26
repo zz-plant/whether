@@ -134,4 +134,33 @@ describe("seo refresh queue", () => {
     assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
     assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaState, "overdue");
   });
+
+  it("flags sustained high-intent underperformers as merge-or-prune candidates", () => {
+    const result = evaluateRefreshQueue({
+      payloadRecords: [
+        {
+          ...basePage,
+          url: "/answers/should-startups-slow-roadmap-expansion",
+        },
+      ],
+      metricsByUrl: {
+        "/answers/should-startups-slow-roadmap-expansion": {
+          trafficTier: "high",
+          ctaConversionRate: 0.01,
+        },
+      },
+      previousStatusByUrl: {
+        "/answers/should-startups-slow-roadmap-expansion": {
+          underperformingStreak: 2,
+        },
+      },
+      now: new Date("2026-03-20T00:00:00.000Z"),
+      staleAfterHours: 24 * 14,
+    });
+
+    assert.equal(result.queue.length, 1);
+    assert.ok(result.queue[0]?.reasons.includes("merge-or-prune-candidate"));
+    assert.equal(result.queue[0]?.pruneCandidate, true);
+    assert.equal(result.statusByUrl["/answers/should-startups-slow-roadmap-expansion"]?.underperformingStreak, 3);
+  });
 });
