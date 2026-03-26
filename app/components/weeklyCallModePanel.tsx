@@ -94,6 +94,7 @@ export function WeeklyCallModePanel({
   const compactDecisionBullets = decisionBullets
     .filter((item) => item.detail.trim().length > 0)
     .slice(0, 3);
+  const changedThisWeekDetail = decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.";
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
   const revisitLabel = revisitDecisions ? "YES — revise this week." : "NO — hold posture.";
   const revisitDetail = revisitDecisions
@@ -103,26 +104,18 @@ export function WeeklyCallModePanel({
   return (
     <>
       <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly call snapshot">
-        <div className={`rounded-xl border px-3 py-2 ${trustToneClass}`}>
-          <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-            <span>{trustStateLabel}</span>
-            <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
-            <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
-            <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
-          </div>
-          <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
-          <p className="mt-1 text-[11px] leading-5 text-current/80">Trend: {trendLabel}. {stabilityRule}</p>
-        </div>
-
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-          <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{operatingCall}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{postureLabel}</p>
-          <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
-            <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
-          </article>
+          <h2 className={tierOneHeadingClassName}>Decision strip</h2>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{postureLabel}</p>
+            </article>
+            <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
+            </article>
+          </div>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
@@ -145,6 +138,22 @@ export function WeeklyCallModePanel({
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
+          </div>
+          <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
+          </article>
+          <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+              <span>{trustStateLabel}</span>
+              <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
+              <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
+              <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
+              <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+            </div>
+            <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
+            <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p>
           </div>
           {compactDecisionBullets.length > 0 ? (
             <ul className="mt-3 grid gap-2 md:grid-cols-3">
