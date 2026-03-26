@@ -1,8 +1,9 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { buildFlipRiskMeterState } from "../lib/report/homeBriefModel";
 
 describe("buildFlipRiskMeterState", () => {
-  test("marks near-boundary distances as high urgency", () => {
+  it("marks near-boundary distances as high urgency", () => {
     const state = buildFlipRiskMeterState({
       dimensionLabel: "Tightness",
       dimensionKey: "tightness",
@@ -12,11 +13,11 @@ describe("buildFlipRiskMeterState", () => {
       thresholdDirection: "riseAbove",
     });
 
-    expect(state.urgencyLabel).toBe("High");
-    expect(state.progressPercent).toBeGreaterThan(70);
+    assert.equal(state.urgencyLabel, "High");
+    assert.ok(state.progressPercent > 70);
   });
 
-  test("marks medium distances as medium urgency", () => {
+  it("marks medium distances as medium urgency", () => {
     const state = buildFlipRiskMeterState({
       dimensionLabel: "Risk appetite",
       dimensionKey: "riskAppetite",
@@ -26,7 +27,7 @@ describe("buildFlipRiskMeterState", () => {
       thresholdDirection: "fallToOrBelow",
     });
 
-    expect(state.urgencyLabel).toBe("Medium");
-    expect(state.triggerLabel).toContain("to or below");
+    assert.equal(state.urgencyLabel, "Medium");
+    assert.ok(state.triggerLabel.includes("to or below"));
   });
 });

@@ -33,7 +33,7 @@ const treasury = buildTreasuryFixture({
   source: "https://fred.stlouisfed.org",
   record_date: "2026-03-04",
   fetched_at: "2026-03-04T00:00:00.000Z",
-  yields: { threeMonth: 5.1, twoYear: 4.7, tenYear: 4.4 },
+  yields: { oneMonth: 5.1, twoYear: 4.7, tenYear: 4.4 },
 });
 
 describe("weekly operator brief export adapters", () => {
