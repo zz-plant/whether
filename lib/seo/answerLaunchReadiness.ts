@@ -14,6 +14,11 @@ const buildSyntheticEvidenceTitles = (page: DecisionPageDefinition) =>
   page.mappedDecisionAreas.map((area) => `Signal context: ${area}`);
 
 const buildInterpretationLabel = (page: DecisionPageDefinition) => `${page.shortAnswer}|${page.directAnswer}`;
+const estimateScanSeconds = (page: DecisionPageDefinition): number => {
+  const words = [page.shortAnswer, page.directAnswer].join(" ").split(/\s+/).filter(Boolean).length;
+  const wordsPerMinute = 180;
+  return Math.ceil((words / wordsPerMinute) * 60);
+};
 
 export const scoreAnswerLaunchReadiness = (
   pages: DecisionPageDefinition[] = answerPages,
@@ -45,6 +50,12 @@ export const scoreAnswerLaunchReadiness = (
       citationMeta: "Weekly macro decision artifact",
       interpretationLabel: buildInterpretationLabel(page),
       siblingsInCluster: siblings,
+      enforceLaunchChecklist: true,
+      scanSecondsEstimate: estimateScanSeconds(page),
+      hasDecisionBullets: page.mappedDecisionAreas.length > 0,
+      hasCopyableDecision: page.directAnswer.trim().length > 0,
+      linksToWeeklyBrief: true,
+      linksToDecideOrOperations: true,
     });
 
     return {

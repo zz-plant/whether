@@ -117,6 +117,8 @@ export async function DecisionAnswerPageContent({
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
         <div className="flex flex-wrap gap-2">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly brief</Link>
+          <Link href="/decide" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Role decisions</Link>
+          <Link href="/operations" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Operating guardrails</Link>
           <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">All answers</Link>
           {relatedPages.map((related) => (
             <Link key={related.slug} href={`/answers/${related.slug}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
