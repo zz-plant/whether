@@ -17,6 +17,7 @@ const buildInterpretationLabel = (page: DecisionPageDefinition) => `${page.short
 
 export const scoreAnswerLaunchReadiness = (
   pages: DecisionPageDefinition[] = answerPages,
+  fetchedAtIso: string = new Date().toISOString(),
 ): AnswerLaunchReadinessRecord[] =>
   pages.map((page) => {
     const siblings = pages
@@ -35,7 +36,7 @@ export const scoreAnswerLaunchReadiness = (
       reversalCondition: "Reverse after two consecutive supportive weekly reads.",
       evidenceCount: page.mappedDecisionAreas.length,
       evidenceTitles: buildSyntheticEvidenceTitles(page),
-      fetchedAtIso: "2026-03-26T00:00:00.000Z",
+      fetchedAtIso,
       isFallbackSnapshot: false,
       provenanceStatusLabel: "Live (high confidence)",
       provenanceLinks: ["https://fred.stlouisfed.org/"],

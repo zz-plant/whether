@@ -4,7 +4,7 @@ import { scoreAnswerLaunchReadiness, summarizeAnswerLaunchReadiness } from "../l
 
 describe("answer launch readiness", () => {
   it("scores all configured answer pages as launch-eligible", () => {
-    const records = scoreAnswerLaunchReadiness();
+    const records = scoreAnswerLaunchReadiness(undefined, "2026-03-26T00:00:00.000Z");
     const summary = summarizeAnswerLaunchReadiness(records);
 
     assert.ok(summary.total > 0);
