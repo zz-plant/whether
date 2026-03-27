@@ -24,7 +24,6 @@ import { buildThresholdMarkerState } from "../../lib/report/homeBriefPresentatio
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
-  buildCompactTrustSummary,
   buildTrustMarker,
 } from "../../lib/report/trustStatus";
 
@@ -466,11 +465,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     isFallbackSnapshot,
   });
   const freshnessLabel = freshnessMeta.updatedAtLabel;
-  const trustCueLine = buildCompactTrustSummary({
-    confidenceLabel,
-    freshnessLabel,
-    isFallbackSnapshot,
-  });
   const citationMetaLine = buildWeeklyCitationMetaLine({
     statusLabel,
     confidenceLabel,
@@ -505,10 +499,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
   const trustStateLabel = isFallbackSnapshot ? "FALLBACK SNAPSHOT" : "LIVE";
   const trustStateDetail = isFallbackSnapshot
-    ? "Cached weekly read. Use for pacing and defer irreversible approvals until live data returns."
-    : confidenceLabel === "HIGH"
-      ? "Live weekly read. Safe for near-term operating decisions."
-      : "Live weekly read, but confidence is not HIGH yet. Keep approvals staged.";
+    ? "Cached weekly read. Defer irreversible approvals until live data returns."
+    : "";
   const decisionBullets = [
     { label: "What changed", detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim() },
     { label: "What that changes", detail: immediateDecision.trim() },
@@ -541,7 +533,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     product: buildRoleHref("product", searchParams),
   };
 
-  const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
+  const hasMaterialTrustDelta = isFallbackSnapshot || freshnessMeta.maxAge === "stale";
   const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
     selectedMode: "series-a",
     options: [
@@ -651,11 +643,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             sectionSpacingClassName={sectionSpacing}
             tierOneHeadingClassName={tierOneHeading}
             whyItMattersLine={whyItMattersLine}
-            needsTrustWarning={needsTrustWarning}
+            needsTrustWarning={hasMaterialTrustDelta}
             trustStateLabel={trustStateLabel}
             trustStateDetail={trustStateDetail}
             trustTimestamp={freshnessLabel}
-            trustReason={isFallbackSnapshot ? artifact.freshnessLine ?? trustCueLine : undefined}
+            trustReason={isFallbackSnapshot ? artifact.freshnessLine : undefined}
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
             stabilityRule={stabilityRule}

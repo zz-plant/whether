@@ -144,17 +144,19 @@ export function WeeklyCallModePanel({
             <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
             <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
           </article>
-          <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-              <span>{trustStateLabel}</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
-              <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+          {needsTrustWarning ? (
+            <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                <span>{trustStateLabel}</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
+                <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+              </div>
+              {trustStateDetail ? <p className="mt-1 text-xs leading-5">{trustStateDetail}</p> : null}
+              {stabilityRule ? <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p> : null}
             </div>
-            <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
-            <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p>
-          </div>
+          ) : null}
           {compactDecisionBullets.length > 0 ? (
             <ul className="mt-3 grid gap-2 md:grid-cols-3">
               {compactDecisionBullets.map((item) => (
