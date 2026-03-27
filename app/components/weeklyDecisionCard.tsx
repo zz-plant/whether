@@ -683,35 +683,63 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             roleHrefs={roleHrefs}
           />
         )}
-        influenceSection={<InputInfluenceSection items={inputInfluence} />}
-        diagnosticsSection={diagnosticsLane ?? (
-          <DiagnosticsSection
-            weeklyMemoLines={weeklyMemoLines}
-            immediateDecision={immediateDecision}
-            revisitDecisions={revisitDecisions}
-            guardrail={guardrail}
-            regimeDistance={regimeDistance}
-            postureWithStageLabel={postureWithStageLabel}
-            statusLabel={statusLabel}
-            trendLabel={trendLabel}
-            confidencePercent={confidencePercent}
-            decisionMatrix={decisionMatrix}
-            decisionRules={decisionRules}
-            roleAwareTemplates={roleAwareTemplates}
-            evidenceItems={evidenceItems}
-            reportDynamics={reportDynamics}
-            weeklyMovement={weeklyMovement}
-            transitionProbabilities={transitionProbabilities}
-            failureModes={failureModes}
-            sinceLastReview={sinceLastReview}
-          />
+        influenceSection={inputInfluence.length > 0 ? (
+          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Input influence</span>
+              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
+            </summary>
+            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
+              <InputInfluenceSection items={inputInfluence} />
+            </div>
+          </details>
+        ) : null}
+        diagnosticsSection={(
+          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Diagnostics</span>
+              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
+            </summary>
+            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
+              {diagnosticsLane ?? (
+                <DiagnosticsSection
+                  weeklyMemoLines={weeklyMemoLines}
+                  immediateDecision={immediateDecision}
+                  revisitDecisions={revisitDecisions}
+                  guardrail={guardrail}
+                  regimeDistance={regimeDistance}
+                  postureWithStageLabel={postureWithStageLabel}
+                  statusLabel={statusLabel}
+                  trendLabel={trendLabel}
+                  confidencePercent={confidencePercent}
+                  decisionMatrix={decisionMatrix}
+                  decisionRules={decisionRules}
+                  roleAwareTemplates={roleAwareTemplates}
+                  evidenceItems={evidenceItems}
+                  reportDynamics={reportDynamics}
+                  weeklyMovement={weeklyMovement}
+                  transitionProbabilities={transitionProbabilities}
+                  failureModes={failureModes}
+                  sinceLastReview={sinceLastReview}
+                />
+              )}
+            </div>
+          </details>
         )}
         matrixSection={(
-          <BoundedRulesMatrix
-            decisionMatrix={decisionMatrix}
-            decisionRules={decisionRules}
-            startupVariantPolicy={resolvedStartupVariantPolicy}
-          />
+          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Bounded rules matrix</span>
+              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
+            </summary>
+            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
+              <BoundedRulesMatrix
+                decisionMatrix={decisionMatrix}
+                decisionRules={decisionRules}
+                startupVariantPolicy={resolvedStartupVariantPolicy}
+              />
+            </div>
+          </details>
         )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
         asideContent={(
