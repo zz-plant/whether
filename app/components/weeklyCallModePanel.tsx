@@ -94,7 +94,9 @@ export function WeeklyCallModePanel({
   const compactDecisionBullets = decisionBullets
     .filter((item) => item.detail.trim().length > 0)
     .slice(0, 3);
-  const changedThisWeekDetail = decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.";
+  const changedThisWeekBullet = compactDecisionBullets.find((item) => item.label === "What changed");
+  const changedThisWeekDetail = changedThisWeekBullet?.detail ?? "No material weekly delta.";
+  const secondaryDecisionBullets = compactDecisionBullets.filter((item) => item.label !== "What changed");
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
   const revisitLabel = revisitDecisions ? "YES — revise this week." : "NO — hold posture.";
   const revisitDetail = revisitDecisions
@@ -105,66 +107,68 @@ export function WeeklyCallModePanel({
     <>
       <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly call snapshot">
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-          <h2 className={tierOneHeadingClassName}>Decision strip</h2>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{postureLabel}</p>
-            </article>
-            <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
+          <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className={tierOneHeadingClassName}>Decision contract</h2>
+              <span className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+            </div>
+            <div className="mt-3 grid gap-2">
+              <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
+              </article>
+              <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
+              </article>
+              <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
+              </article>
+            </div>
+            <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
             </article>
-          </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
-            <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
-              <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
-            </article>
-            <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
-              <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
-            </article>
-            <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
-              <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
-            </article>
-          </div>
-          <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
-            <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
           </article>
-          <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-              <span>{trustStateLabel}</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
-              <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
-              <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+
+          <details className={`${detailDisclosureBase} mt-3`}>
+            <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              Context + trust
+            </summary>
+            <div className="mt-2 grid gap-2 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{postureLabel}</p>
+              </article>
+              <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
+                <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
+              </article>
             </div>
-            <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
-            <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p>
-          </div>
-          {compactDecisionBullets.length > 0 ? (
-            <ul className="mt-3 grid gap-2 md:grid-cols-3">
-              {compactDecisionBullets.map((item) => (
-                <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
-                  <p className="mt-1 leading-5">{item.detail}</p>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+            <div className={`mt-2 rounded-xl border px-3 py-2 ${trustToneClass}`}>
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                <span>{trustStateLabel}</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
+                <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
+                <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+              </div>
+              <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
+              <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p>
+            </div>
+            {secondaryDecisionBullets.length > 0 ? (
+              <ul className="mt-2 grid gap-2 md:grid-cols-2">
+                {secondaryDecisionBullets.map((item) => (
+                  <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
+                    <p className="mt-1 leading-5">{item.detail}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </details>
         </article>
 
         <details className={`${detailDisclosureBase} mt-3`}>

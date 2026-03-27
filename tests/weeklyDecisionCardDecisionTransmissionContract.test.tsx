@@ -100,12 +100,12 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("This week&#x27;s call"));
+    const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("Decision contract"));
     assert.doesNotMatch(snapshotRegion, /Current conditions/);
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Cloudy/);
-    assert.match(html, /We are close to a flip/i);
+    assert.match(html, /Flip risk is in play/i);
   });
 
   it("keeps top-fold sequence canonical: posture, call, do now, flip when", () => {
