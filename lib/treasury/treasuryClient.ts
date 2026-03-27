@@ -10,6 +10,10 @@ const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
 const RETRY_FETCH_TIMEOUT_MS = 20_000;
 const MAX_SERIES_FETCH_ATTEMPTS = 3;
 const RETRY_BACKOFF_MS = 250;
+const TREASURY_FETCH_HEADERS = {
+  accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
+  "user-agent": "WhetherDataBot/1.0 (+https://whether.app)",
+} as const;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 const TREASURY_FISCALDATA_ENDPOINT =
@@ -122,7 +126,12 @@ const parseCsvRow = (row: string) => {
 };
 
 const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: string) => {
-  const response = await fetchWithTimeout(fetcher, TREASURY_RATES_ENDPOINT, undefined, PRIMARY_FETCH_TIMEOUT_MS);
+  const response = await fetchWithTimeout(
+    fetcher,
+    TREASURY_RATES_ENDPOINT,
+    { headers: TREASURY_FETCH_HEADERS },
+    PRIMARY_FETCH_TIMEOUT_MS
+  );
   if (!response.ok) {
     throw new Error(`Treasury daily rates CSV fetch error: ${response.status}`);
   }
@@ -214,7 +223,12 @@ const parseFiscalDataRate = (value: FiscalDataRow["avg_interest_rate_amt"]) => {
 };
 
 const fetchTreasuryFromFiscalDataApi = async (fetcher: typeof fetch, fetchedAt: string) => {
-  const response = await fetchWithTimeout(fetcher, TREASURY_FISCALDATA_ENDPOINT, undefined, PRIMARY_FETCH_TIMEOUT_MS);
+  const response = await fetchWithTimeout(
+    fetcher,
+    TREASURY_FISCALDATA_ENDPOINT,
+    { headers: TREASURY_FETCH_HEADERS },
+    PRIMARY_FETCH_TIMEOUT_MS
+  );
   if (!response.ok) {
     throw new Error(`Treasury fiscaldata API fetch error: ${response.status}`);
   }
@@ -373,9 +387,7 @@ const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => 
         fetcher,
         endpoint,
         {
-          headers: {
-            accept: "text/csv,application/csv;q=0.9,*/*;q=0.8",
-          },
+          headers: TREASURY_FETCH_HEADERS,
         },
         attempt === 0 ? PRIMARY_FETCH_TIMEOUT_MS : RETRY_FETCH_TIMEOUT_MS
       );
