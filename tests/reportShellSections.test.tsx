@@ -17,6 +17,25 @@ describe("ReportShell extracted sections", () => {
         trustStatusLabel="HIGH"
         trustStatusDetail="Stable feed"
         trustStatusAction="Proceed with planning"
+        outageType="live-data"
+        outageSeverity="advisory"
+        decisionImpactWindow="Live window: safe for approvals."
+        approvalBuckets={[
+          { label: "Allowed now", detail: "Proceed with standard approvals." },
+          { label: "Hold", detail: "None." },
+          { label: "Blocked", detail: "None." },
+        ]}
+        recoveryPlan={{
+          owner: "CEO + Finance lead",
+          nextCheckpoint: "Weekly planning cadence",
+          exitCondition: "Keep standard approvals while confidence remains above LOW.",
+        }}
+        outageExitGate={{
+          label: "Outage mode exits when 3/3 checks pass.",
+          summary: "3/3 checks passed this refresh.",
+          metCount: 3,
+          totalCount: 3,
+        }}
         statusLabel="DEFENSIVE"
         fetchedAtLabel="Mar 6, 2026"
         resolvedNextRefreshLabel="15m cadence"
@@ -26,6 +45,8 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Data provenance/);
+    assert.match(html, /Outage approvals/);
+    assert.match(html, /Recovery runbook/);
     assert.match(html, /Data source details/);
     assert.match(html, /\/method/);
   });

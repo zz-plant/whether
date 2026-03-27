@@ -18,6 +18,9 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /do now \/ hold \/ revisit/);
     assert.match(result.trustStatusAction, /Trigger: confidence drops/);
     assert.match(result.trustStatusAction, /Reversal: return to standard cadence/);
+    assert.equal(result.outageType, "live-data");
+    assert.equal(result.outageSeverity, "advisory");
+    assert.equal(result.outageExitGate.metCount, 2);
   });
 
   it("returns warning trust copy that keeps decision path but stages irreversible approvals", () => {
@@ -28,6 +31,7 @@ describe("buildTrustStatus trust tones", () => {
       historicalAction: "unused",
       fallbackAction: "Use cached read for pacing.",
       stableAction: "unused",
+      freshnessLabel: "Unavailable",
     });
 
     assert.equal(result.trustStatusTone, "warning");
@@ -36,6 +40,9 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /Source issue: Treasury API timeout/);
     assert.match(result.trustStatusAction, /Trigger: confidence LOW or feed unavailable/);
     assert.match(result.trustStatusAction, /Reversal: resume normal approvals/);
+    assert.equal(result.outageType, "feed-unavailable");
+    assert.equal(result.outageSeverity, "critical");
+    assert.equal(result.outageExitGate.metCount, 1);
   });
 
   it("returns historical trust copy for retrospective use with explicit confidence fallback action", () => {
@@ -52,6 +59,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /retrospective only/);
     assert.match(result.trustStatusAction, /Trigger: confidence LOW/);
     assert.match(result.trustStatusAction, /Reversal: switch to current data/);
+    assert.equal(result.outageType, "historical-snapshot");
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {

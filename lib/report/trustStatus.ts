@@ -2,6 +2,35 @@ import type { CompactFreshnessMeta } from "./reportFormatting";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 
+type TrustOutageSeverity = "advisory" | "blocking" | "critical";
+
+type TrustOutageType = "live-data" | "feed-unavailable" | "stale-cache" | "source-divergence" | "historical-snapshot";
+
+export type TrustApprovalBucket = {
+  label: "Allowed now" | "Hold" | "Blocked";
+  detail: string;
+};
+
+export type TrustRecoveryPlan = {
+  owner: string;
+  nextCheckpoint: string;
+  exitCondition: string;
+};
+
+export type TrustExitGateCriterion = {
+  key: "live-mode" | "freshness" | "confidence";
+  label: string;
+  met: boolean;
+};
+
+export type TrustExitGate = {
+  label: string;
+  summary: string;
+  metCount: number;
+  totalCount: number;
+  criteria: TrustExitGateCriterion[];
+};
+
 export type FailureModeWarning = {
   id: "boundary-whipsaw" | "stale-cached" | "anomaly-divergence";
   warning: string;
@@ -30,6 +59,156 @@ const hasStrongSignalDisagreement = (
   }
 
   return positive > 0 && negative > 0;
+};
+
+const buildOutageExitGate = ({
+  isFallback,
+  confidenceLow,
+  freshnessUnavailable,
+}: {
+  isFallback: boolean;
+  confidenceLow: boolean;
+  freshnessUnavailable: boolean;
+}): TrustExitGate => {
+  const criteria: TrustExitGateCriterion[] = [
+    {
+      key: "live-mode",
+      label: "Live mode restored",
+      met: !isFallback,
+    },
+    {
+      key: "freshness",
+      label: "Fresh timestamp available",
+      met: !freshnessUnavailable,
+    },
+    {
+      key: "confidence",
+      label: "Confidence above LOW",
+      met: !confidenceLow,
+    },
+  ];
+  const metCount = criteria.filter((criterion) => criterion.met).length;
+
+  return {
+    label: "Outage mode exits when 3/3 checks pass.",
+    summary: `${metCount}/${criteria.length} checks passed this refresh.`,
+    metCount,
+    totalCount: criteria.length,
+    criteria,
+  };
+};
+
+const buildApprovalBuckets = ({
+  tone,
+}: {
+  tone: TrustStatusTone;
+}): TrustApprovalBucket[] => {
+  if (tone === "historical") {
+    return [
+      {
+        label: "Allowed now",
+        detail: "Retrospective analysis and scenario planning only.",
+      },
+      {
+        label: "Hold",
+        detail: "Weekly pacing changes until current live data is loaded.",
+      },
+      {
+        label: "Blocked",
+        detail: "Irreversible approvals tied to net-new fixed spend.",
+      },
+    ];
+  }
+
+  if (tone === "warning") {
+    return [
+      {
+        label: "Allowed now",
+        detail: "Reversible pacing adjustments inside existing guardrails.",
+      },
+      {
+        label: "Hold",
+        detail: "Headcount expansion or multi-quarter vendor commitments.",
+      },
+      {
+        label: "Blocked",
+        detail: "Irreversible approvals until one verified live refresh lands.",
+      },
+    ];
+  }
+
+  return [
+    {
+      label: "Allowed now",
+      detail: "Standard weekly approvals under the current operating call.",
+    },
+    {
+      label: "Hold",
+      detail: "No additional holds required while trust remains stable.",
+    },
+    {
+      label: "Blocked",
+      detail: "No outage-specific blocks in this state.",
+    },
+  ];
+};
+
+const buildRecoveryPlan = ({
+  tone,
+}: {
+  tone: TrustStatusTone;
+}): TrustRecoveryPlan => {
+  if (tone === "warning") {
+    return {
+      owner: "CEO + Finance lead",
+      nextCheckpoint: "Daily 10:00 UTC until outage gate clears",
+      exitCondition: "Resume normal approval cadence after one verified live refresh across core sources.",
+    };
+  }
+
+  if (tone === "historical") {
+    return {
+      owner: "CEO + Finance lead",
+      nextCheckpoint: "Before the next approval window",
+      exitCondition: "Switch to current live snapshot before changing pace.",
+    };
+  }
+
+  return {
+    owner: "CEO + Finance lead",
+    nextCheckpoint: "Weekly planning cadence",
+    exitCondition: "Keep standard approvals while confidence remains above LOW.",
+  };
+};
+
+const resolveOutageClassification = ({
+  historicalSelection,
+  isFallback,
+  fallbackReason,
+}: {
+  historicalSelection: boolean;
+  isFallback: boolean;
+  fallbackReason?: string;
+}): { outageType: TrustOutageType; outageSeverity: TrustOutageSeverity } => {
+  if (historicalSelection) {
+    return { outageType: "historical-snapshot", outageSeverity: "advisory" };
+  }
+
+  if (!isFallback) {
+    return { outageType: "live-data", outageSeverity: "advisory" };
+  }
+
+  const normalizedReason = fallbackReason?.toLowerCase() ?? "";
+
+  if (normalizedReason.includes("timeout") || normalizedReason.includes("unavailable") || normalizedReason.includes("down")) {
+    return { outageType: "feed-unavailable", outageSeverity: "critical" };
+  }
+
+  if (normalizedReason.includes("diverg") || normalizedReason.includes("anomal")) {
+    return { outageType: "source-divergence", outageSeverity: "blocking" };
+  }
+
+  return { outageType: "stale-cache", outageSeverity: "blocking" };
 };
 
 export const buildFailureModeWarnings = ({
@@ -145,6 +324,8 @@ export const buildTrustStatus = ({
   historicalAction,
   fallbackAction,
   stableAction,
+  confidenceLabel = "MED",
+  freshnessLabel = FALLBACK_FRESHNESS_LABEL,
 }: {
   historicalSelection: boolean;
   isFallback: boolean;
@@ -152,6 +333,8 @@ export const buildTrustStatus = ({
   historicalAction: string;
   fallbackAction: string;
   stableAction: string;
+  confidenceLabel?: "HIGH" | "MED" | "LOW";
+  freshnessLabel?: string;
 }) => {
   const label = historicalSelection
     ? "Historical snapshot"
@@ -177,11 +360,38 @@ export const buildTrustStatus = ({
       ? "warning"
       : "stable";
 
+  const classification = resolveOutageClassification({
+    historicalSelection,
+    isFallback,
+    fallbackReason,
+  });
+
+  const confidenceLow = confidenceLabel === "LOW";
+  const freshnessUnavailable = isUnavailableFreshness(freshnessLabel);
+
+  const outageWindow = historicalSelection
+    ? "Retrospective only; do not use for live approvals."
+    : isFallback
+      ? "Outage window: safe for reversible pacing moves only until one live refresh lands."
+      : "Live window: safe for near-term operating approvals under standard guardrails.";
+
+  const outageExitGate = buildOutageExitGate({
+    isFallback,
+    confidenceLow,
+    freshnessUnavailable,
+  });
+
   return {
     trustStatusLabel: label,
     trustStatusDetail: detail,
     trustStatusAction: action,
     trustStatusTone: tone,
+    outageType: classification.outageType,
+    outageSeverity: classification.outageSeverity,
+    decisionImpactWindow: outageWindow,
+    approvalBuckets: buildApprovalBuckets({ tone }),
+    recoveryPlan: buildRecoveryPlan({ tone }),
+    outageExitGate,
   };
 };
 

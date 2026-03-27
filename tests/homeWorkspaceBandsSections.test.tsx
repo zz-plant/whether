@@ -12,6 +12,26 @@ const workspaceModel: HomePageWorkspaceModel = {
     trustStatusDetail: "Fresh",
     trustStatusAction: "Use this call",
     trustStatusTone: "stable",
+    outageType: "live-data",
+    outageSeverity: "advisory",
+    decisionImpactWindow: "Live window active.",
+    approvalBuckets: [
+      { label: "Allowed now", detail: "Proceed." },
+      { label: "Hold", detail: "None." },
+      { label: "Blocked", detail: "None." },
+    ],
+    recoveryPlan: {
+      owner: "CEO + Finance lead",
+      nextCheckpoint: "Weekly",
+      exitCondition: "Remain live.",
+    },
+    outageExitGate: {
+      label: "Outage mode exits when 3/3 checks pass.",
+      summary: "3/3 checks passed this refresh.",
+      metCount: 3,
+      totalCount: 3,
+      criteria: [],
+    },
     trustMarkerTone: "stable",
     trustMarkerLabel: "Live",
     trustMarkerDetail: "detail",
@@ -20,6 +40,9 @@ const workspaceModel: HomePageWorkspaceModel = {
     sourceCoverageLine: "Source coverage: Treasury live; labor snapshot",
     sourceRows: [
       { sourceName: "Treasury", modeLabel: "Live", freshnessStatus: "Fresh · Daily cadence" },
+      { sourceName: "Labor", modeLabel: "Snapshot", freshnessStatus: "Stale · Monthly cadence" },
+    ],
+    degradedSourceRows: [
       { sourceName: "Labor", modeLabel: "Snapshot", freshnessStatus: "Stale · Monthly cadence" },
     ],
     revisitHeadline: "revisit",
@@ -56,6 +79,9 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Freshness: As of Mar 25, 2026/);
     assert.match(html, /Source coverage: Treasury live; labor snapshot/);
+    assert.match(html, /Outage approvals/);
+    assert.match(html, /Recovery runbook/);
+    assert.match(html, /Labor/);
     assert.match(html, /Treasury/);
     assert.match(html, /Live · Fresh · Daily cadence/);
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("approve-this-weeks-plan"));
