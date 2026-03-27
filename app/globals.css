@@ -6,6 +6,26 @@
   color-scheme: dark;
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
+  --weather-interactive-duration: 200ms;
+  --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --weather-focus-ring: rgba(125, 211, 252, 0.88);
+  --weather-focus-halo: rgba(14, 165, 233, 0.32);
+  --weather-primary-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
+  --weather-primary-shadow:
+    0 20px 36px -22px rgba(14, 165, 233, 0.75),
+    0 6px 16px -12px rgba(125, 211, 252, 0.4),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+  --weather-primary-shadow-hover:
+    0 20px 40px -24px rgba(14, 165, 233, 0.75),
+    0 8px 18px -14px rgba(125, 211, 252, 0.4),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+  --weather-secondary-shadow:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.42),
+    0 12px 20px -16px rgba(2, 6, 23, 0.82);
+  --weather-secondary-shadow-hover:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.45),
+    0 20px 32px -22px rgba(2, 6, 23, 0.9),
+    0 8px 18px -14px rgba(99, 102, 241, 0.24);
   --shell-glow: rgba(188, 222, 255, 0.42);
   --shell-glow-secondary: rgba(147, 230, 196, 0.3);
   --shell-glow-tertiary: rgba(167, 243, 255, 0.24);
@@ -39,6 +59,11 @@ body {
   background-image:
     radial-gradient(110% 58% at 50% -8%, rgba(186, 230, 253, 0.22), transparent 55%),
     linear-gradient(180deg, rgba(6, 23, 46, 0.98) 0%, rgba(8, 37, 71, 0.96) 38%, rgba(9, 49, 86, 0.92) 100%);
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: rgb(240 249 255);
 }
 
 .weather-shell {
@@ -882,11 +907,11 @@ body {
     0 18px 30px -20px rgba(2, 6, 23, 0.66),
     0 6px 14px -12px rgba(245, 158, 11, 0.16);
   transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    color 200ms ease,
-    background-color 200ms ease;
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
 }
 
 .weather-input {
@@ -917,11 +942,11 @@ body {
     inset 0 0 0 1px rgba(15, 23, 42, 0.5),
     0 10px 18px -16px rgba(2, 6, 23, 0.84);
   transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    color 200ms ease,
-    background-color 200ms ease;
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
 }
 
 .weather-button-primary {
@@ -929,17 +954,14 @@ body {
   min-height: 44px;
   padding-inline: 1rem;
   font-weight: 600;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
-  box-shadow:
-    0 20px 36px -22px rgba(14, 165, 233, 0.75),
-    0 6px 16px -12px rgba(125, 211, 252, 0.4),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+  background: var(--weather-primary-gradient);
+  box-shadow: var(--weather-primary-shadow);
   transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    color 200ms ease,
-    background-position 200ms ease;
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    background-position var(--weather-interactive-duration) var(--weather-interactive-ease);
 }
 
 .weather-cta {
@@ -947,30 +969,25 @@ body {
   min-height: 44px;
   padding: 0.5rem 1rem;
   transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    color 200ms ease,
-    background-color 200ms ease;
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
 }
 
 .weather-cta-primary {
   border-color: rgba(56, 189, 248, 0.72);
   color: rgb(241 245 249);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
-  box-shadow:
-    0 20px 36px -22px rgba(14, 165, 233, 0.75),
-    0 6px 16px -12px rgba(125, 211, 252, 0.4),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+  background: var(--weather-primary-gradient);
+  box-shadow: var(--weather-primary-shadow);
 }
 
 .weather-cta-secondary {
   border-color: rgba(156, 204, 255, 0.42);
   color: rgb(241 245 249);
   background: linear-gradient(180deg, rgba(9, 53, 99, 0.76), rgba(8, 34, 72, 0.8));
-  box-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.42),
-    0 12px 20px -16px rgba(2, 6, 23, 0.82);
+  box-shadow: var(--weather-secondary-shadow);
 }
 
 .weather-cta-export {
@@ -986,10 +1003,27 @@ body {
 .weather-icon-chip,
 .weather-surface {
   transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    color 200ms ease;
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease);
+}
+
+:where(
+  .weather-tab,
+  .weather-pill,
+  .weather-button,
+  .weather-button-primary,
+  .weather-cta,
+  .weather-icon-chip,
+  .weather-route-card,
+  .weather-hub-link-card
+):focus-visible {
+  outline: 2px solid var(--weather-focus-ring);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 4px var(--weather-focus-halo),
+    var(--weather-secondary-shadow);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1020,10 +1054,7 @@ body {
   .weather-button-primary:hover {
     transform: translateY(-1px);
     border-color: rgba(125, 211, 252, 0.9);
-    box-shadow:
-      0 20px 40px -24px rgba(14, 165, 233, 0.75),
-      0 8px 18px -14px rgba(125, 211, 252, 0.4),
-      inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+    box-shadow: var(--weather-primary-shadow-hover);
   }
 
   .weather-cta-primary:hover,
@@ -1034,18 +1065,12 @@ body {
 
   .weather-cta-primary:hover {
     border-color: rgba(125, 211, 252, 0.9);
-    box-shadow:
-      0 20px 40px -24px rgba(14, 165, 233, 0.75),
-      0 8px 18px -14px rgba(125, 211, 252, 0.4),
-      inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+    box-shadow: var(--weather-primary-shadow-hover);
   }
 
   .weather-cta-secondary:hover {
     border-color: rgba(129, 140, 248, 0.42);
-    box-shadow:
-      inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-      0 20px 32px -22px rgba(2, 6, 23, 0.9),
-      0 8px 18px -14px rgba(99, 102, 241, 0.24);
+    box-shadow: var(--weather-secondary-shadow-hover);
   }
 
   .weather-cta-export:hover {
