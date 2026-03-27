@@ -67763,7 +67763,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -67776,7 +67776,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-01-09",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -67787,7 +67787,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-01-09",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -67797,7 +67797,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-09",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -67807,7 +67807,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-09",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -67850,7 +67850,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Jan 9, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 9, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: HIGH\n• Payback window tolerance: STANDARD\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BALANCED\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Jan 9, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 9, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: HIGH\n• Payback window tolerance: STANDARD\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BALANCED\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -67877,7 +67877,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -67890,7 +67890,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-01-16",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -67901,7 +67901,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-01-16",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -67911,7 +67911,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-16",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -67921,7 +67921,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-16",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -67964,7 +67964,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Jan 16, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 16, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Jan 16, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 16, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -67991,7 +67991,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68004,7 +68004,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-01-23",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68015,7 +68015,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-01-23",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68025,7 +68025,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-23",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68035,7 +68035,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-23",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68078,7 +68078,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Jan 23, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 23, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: HIGH\n• Payback window tolerance: STANDARD\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BALANCED\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Jan 23, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 23, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: HIGH\n• Payback window tolerance: STANDARD\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BALANCED\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68105,7 +68105,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68118,7 +68118,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68129,7 +68129,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68139,7 +68139,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68149,7 +68149,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68192,7 +68192,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Jan 30, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: high (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 30, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Jan 30, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: high (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Jan 30, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68307,7 +68307,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68320,7 +68320,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-02-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68331,7 +68331,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-02-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68341,7 +68341,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68351,7 +68351,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68394,7 +68394,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Feb 6, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 6, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Feb 6, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 6, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68421,7 +68421,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68434,7 +68434,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-02-13",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68445,7 +68445,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-02-13",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68455,7 +68455,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-13",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68465,7 +68465,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-13",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68508,7 +68508,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Feb 13, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 13, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Feb 13, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 13, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68535,7 +68535,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68548,7 +68548,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-02-20",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68559,7 +68559,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-02-20",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68569,7 +68569,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-20",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68579,7 +68579,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-20",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68622,7 +68622,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Feb 20, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 20, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Feb 20, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 20, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68649,7 +68649,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68662,7 +68662,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-02-27",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68673,7 +68673,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-02-27",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68683,7 +68683,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-27",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68693,7 +68693,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-02-27",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -68736,7 +68736,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Feb 27, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 27, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Feb 27, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Feb 27, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -68939,7 +68939,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -68952,7 +68952,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-03-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -68963,7 +68963,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-03-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
@@ -68973,7 +68973,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-03-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
@@ -68983,7 +68983,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-03-06",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -69026,7 +69026,7 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Mar 6, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 6, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Mar 6, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 6, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   },
   {
@@ -69034,7 +69034,7 @@
     "year": 2026,
     "week": 11,
     "asOf": "2026-03-13",
-    "record_date": "2026-03-12",
+    "record_date": "2026-03-13",
     "summary": {
       "title": "Weekly action summary — Mar 13, 2026",
       "summary": "Expand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).",
@@ -69053,7 +69053,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Mar 16, 2026 at 1:15 AM",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -69061,43 +69061,43 @@
         {
           "id": "base-rate",
           "label": "Policy base rate (1M)",
-          "value": 3.76,
+          "value": 3.75,
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2026-03-12",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "recordDate": "2026-03-13",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
           "id": "two-year",
           "label": "US Treasury 2Y",
-          "value": 3.76,
+          "value": 3.73,
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2026-03-12",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "recordDate": "2026-03-13",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "ten-year",
           "label": "US Treasury 10Y",
-          "value": 4.27,
+          "value": 4.28,
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2026-03-12",
-          "fetchedAt": "2026-03-16T01:15:13.267Z"
+          "recordDate": "2026-03-13",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
         },
         {
           "id": "curve-slope",
           "label": "Yield curve slope (10Y - 2Y)",
-          "value": 0.5099999999999998,
+          "value": 0.5500000000000003,
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2026-03-12",
-          "fetchedAt": "2026-03-16T01:15:13.267Z",
+          "recordDate": "2026-03-13",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
@@ -69140,7 +69140,235 @@
           "experimentationTolerance": "LOW"
         }
       },
-      "copy": "Weekly action summary — Mar 13, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 13, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 16, 2026 at 1:15 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 16, 2026 at 1:15 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+      "copy": "Weekly action summary — Mar 13, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 13, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+    }
+  },
+  {
+    "cadence": "weekly",
+    "year": 2026,
+    "week": 12,
+    "asOf": "2026-03-20",
+    "record_date": "2026-03-20",
+    "summary": {
+      "title": "Weekly action summary — Mar 20, 2026",
+      "summary": "Expand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).",
+      "regime": "EXPANSION",
+      "regimeLabel": "Expand",
+      "guidance": "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Prioritize reach and learning velocity over perfect finish.",
+        "Spend with clear guardrails, even if some experiments fail.",
+        "Scale capacity ahead of demand only where leading signals stay strong."
+      ],
+      "recordDateLabel": "Mar 20, 2026",
+      "provenance": {
+        "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
+        "ageLabel": "0h.",
+        "statusLabel": "Historical (simulated)"
+      },
+      "inputs": [
+        {
+          "id": "base-rate",
+          "label": "Policy base rate (1M)",
+          "value": 3.73,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+          "recordDate": "2026-03-20",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
+          "notes": "Used as the cost-of-money anchor for tightness scoring."
+        },
+        {
+          "id": "two-year",
+          "label": "US Treasury 2Y",
+          "value": 3.88,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "recordDate": "2026-03-20",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
+        },
+        {
+          "id": "ten-year",
+          "label": "US Treasury 10Y",
+          "value": 4.39,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-03-20",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
+        },
+        {
+          "id": "curve-slope",
+          "label": "Yield curve slope (10Y - 2Y)",
+          "value": 0.5099999999999998,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-03-20",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
+          "derivedFrom": "US Treasury 10Y and 2Y yields",
+          "notes": "Derived metric used to score risk appetite."
+        }
+      ],
+      "structured": {
+        "climate": {
+          "label": "✅ RISK-ON / CAPITAL-LOOSE",
+          "summary": [
+            "Capital is accessible and risk appetite is healthy.",
+            "Expect faster approvals and higher tolerance for bold bets."
+          ]
+        },
+        "recommendedMoves": [
+          "Prioritize speed and distribution over perfection",
+          "Scale proven growth channels and widen market coverage",
+          "Move decisively while enforcing payback guardrails"
+        ],
+        "executionPriorities": [
+          "Growth experiments with clear scaling paths",
+          "New market expansion backed by demand signals",
+          "Product investments that amplify acquisition"
+        ],
+        "watchouts": [
+          "Over-optimizing cost at the expense of momentum",
+          "Delaying launches while waiting for perfect data",
+          "Under-investing in capacity while demand is strong"
+        ],
+        "planningLanguage": "“Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”",
+        "executionConstraints": [
+          "Prioritize reach and learning velocity over perfect finish.",
+          "Spend with clear guardrails, even if some experiments fail.",
+          "Scale capacity ahead of demand only where leading signals stay strong."
+        ],
+        "governanceParameters": {
+          "hiringThreshold": "MODERATE",
+          "paybackWindowTolerance": "LONGER",
+          "rollbackRequirement": "REVERSIBLE_ONLY",
+          "approvalVelocity": "SLOWER_STRUCTURED",
+          "expansionScope": "BROAD",
+          "experimentationTolerance": "LOW"
+        }
+      },
+      "copy": "Weekly action summary — Mar 20, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 20, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+    }
+  },
+  {
+    "cadence": "weekly",
+    "year": 2026,
+    "week": 13,
+    "asOf": "2026-03-27",
+    "record_date": "2026-03-25",
+    "summary": {
+      "title": "Weekly action summary — Mar 27, 2026",
+      "summary": "Expand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).",
+      "regime": "EXPANSION",
+      "regimeLabel": "Expand",
+      "guidance": "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Prioritize reach and learning velocity over perfect finish.",
+        "Spend with clear guardrails, even if some experiments fail.",
+        "Scale capacity ahead of demand only where leading signals stay strong."
+      ],
+      "recordDateLabel": "Mar 27, 2026",
+      "provenance": {
+        "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+        "timestampLabel": "Mar 27, 2026, 6:06 PM",
+        "ageLabel": "0h.",
+        "statusLabel": "Historical (simulated)"
+      },
+      "inputs": [
+        {
+          "id": "base-rate",
+          "label": "Policy base rate (1M)",
+          "value": 3.73,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+          "recordDate": "2026-03-25",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
+          "notes": "Used as the cost-of-money anchor for tightness scoring."
+        },
+        {
+          "id": "two-year",
+          "label": "US Treasury 2Y",
+          "value": 3.84,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "recordDate": "2026-03-25",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
+        },
+        {
+          "id": "ten-year",
+          "label": "US Treasury 10Y",
+          "value": 4.33,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-03-25",
+          "fetchedAt": "2026-03-27T18:06:27.951Z"
+        },
+        {
+          "id": "curve-slope",
+          "label": "Yield curve slope (10Y - 2Y)",
+          "value": 0.4900000000000002,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-03-25",
+          "fetchedAt": "2026-03-27T18:06:27.951Z",
+          "derivedFrom": "US Treasury 10Y and 2Y yields",
+          "notes": "Derived metric used to score risk appetite."
+        }
+      ],
+      "structured": {
+        "climate": {
+          "label": "✅ RISK-ON / CAPITAL-LOOSE",
+          "summary": [
+            "Capital is accessible and risk appetite is healthy.",
+            "Expect faster approvals and higher tolerance for bold bets."
+          ]
+        },
+        "recommendedMoves": [
+          "Prioritize speed and distribution over perfection",
+          "Scale proven growth channels and widen market coverage",
+          "Move decisively while enforcing payback guardrails"
+        ],
+        "executionPriorities": [
+          "Growth experiments with clear scaling paths",
+          "New market expansion backed by demand signals",
+          "Product investments that amplify acquisition"
+        ],
+        "watchouts": [
+          "Over-optimizing cost at the expense of momentum",
+          "Delaying launches while waiting for perfect data",
+          "Under-investing in capacity while demand is strong"
+        ],
+        "planningLanguage": "“Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”",
+        "executionConstraints": [
+          "Prioritize reach and learning velocity over perfect finish.",
+          "Spend with clear guardrails, even if some experiments fail.",
+          "Scale capacity ahead of demand only where leading signals stay strong."
+        ],
+        "governanceParameters": {
+          "hiringThreshold": "MODERATE",
+          "paybackWindowTolerance": "LONGER",
+          "rollbackRequirement": "REVERSIBLE_ONLY",
+          "approvalVelocity": "SLOWER_STRUCTURED",
+          "expansionScope": "BROAD",
+          "experimentationTolerance": "LOW"
+        }
+      },
+      "copy": "Weekly action summary — Mar 27, 2026\nExpand posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Capital Posture Governance\n\nUpdated Mar 27, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize reach and learning velocity over perfect finish.\n• Spend with clear guardrails, even if some experiments fail.\n• Scale capacity ahead of demand only where leading signals stay strong.\n\n\n\n---\n\nGOVERNANCE PARAMETER ADJUSTMENTS\n\n• Hiring threshold: MODERATE\n• Payback window tolerance: LONGER\n• Rollback requirement: REVERSIBLE_ONLY\n• Approval velocity: SLOWER_STRUCTURED\n• Expansion scope: BROAD\n• Experimentation tolerance: LOW\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 27, 2026, 6:06 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Governance artifact; not investment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 27, 2026, 6:06 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
   }
 ]

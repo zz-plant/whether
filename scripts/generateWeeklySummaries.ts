@@ -73,6 +73,23 @@ type WeekDescriptor = {
 
 const MS_PER_DAY = 86400000;
 const MAX_WEEKLY_DATA_LAG_DAYS = 7;
+const HISTORY_WEEKS_ENV = "HISTORY_WEEKS";
+
+const resolveHistoryWeeksLimit = () => {
+  const value = process.env[HISTORY_WEEKS_ENV];
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(
+      `${HISTORY_WEEKS_ENV} must be a positive integer (received "${value}").`
+    );
+  }
+
+  return parsed;
+};
 
 const parseSeries = (csv: string) => {
   const lines = csv.trim().split("\n");
@@ -327,8 +344,11 @@ const generateWeeklySummaries = async () => {
       ? latestCompletedWeekEnd
       : new Date(Date.UTC(endYear, 11, 31));
   const weeks = buildWeekDescriptors(startYear, endYear, endDateOverride);
+  const historyWeeksLimit = resolveHistoryWeeksLimit();
+  const scopedWeeks =
+    historyWeeksLimit === null ? weeks : weeks.slice(Math.max(0, weeks.length - historyWeeksLimit));
 
-  for (const { year, week, asOf } of weeks) {
+  for (const { year, week, asOf } of scopedWeeks) {
     const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
     assertCoverageForAsOf(asOf, asOfTime, datasets);
     const recordDate = findLatestCommonDate(
@@ -387,7 +407,7 @@ const generateWeeklySummaries = async () => {
     });
   }
 
-  const mode = isPartial ? "merge" : "replace";
+  const mode = isPartial || historyWeeksLimit !== null ? "merge" : "replace";
   await writeSummaryFile({
     path: OUTPUT_PATH(effectiveEndYear),
     entries: output,
