@@ -26,6 +26,7 @@ import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
 import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
 import { ReportShellHeader, type ReportShellHeaderVariant } from "./reportShellHeader";
+import { ManualRefreshButton } from "./manualRefreshButton";
 
 type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarget?: string };
 type SecondaryCtaProps = { href: string; label: string };
@@ -326,12 +327,15 @@ export function CommandCenterNavBlock({
           </div>
         ) : null}
         {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <InternalAwareLink href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</InternalAwareLink></p> : null}
-        <dl className="weather-surface weather-meta-list min-h-[44px] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
-          <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
-          <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
-          <div className="weather-meta-list__item"><dt className="text-slate-400">Updated</dt><dd>{fetchedAtLabel}</dd></div>
-          <div className="weather-meta-list__item"><dt className="text-slate-400">Next refresh</dt><dd>{resolvedNextRefreshLabel}</dd></div>
-        </dl>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <dl className="weather-surface weather-meta-list min-h-[44px] flex-1 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
+            <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
+            <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
+            <div className="weather-meta-list__item"><dt className="text-slate-400">Updated</dt><dd>{fetchedAtLabel}</dd></div>
+            <div className="weather-meta-list__item"><dt className="text-slate-400">Next refresh</dt><dd>{resolvedNextRefreshLabel}</dd></div>
+          </dl>
+          <ManualRefreshButton title="Request the latest weekly brief snapshot." />
+        </div>
         <p className="text-sm text-slate-200">{trustStatusAction}</p>
         {showOfflineBadge ? <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">{offlineBadgeLabel}</p> : null}
       </section>
