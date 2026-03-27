@@ -300,6 +300,40 @@ describe("treasury client", () => {
     }
   });
 
+  it("surfaces a clearer fallback reason when 520 persists across retries", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+
+      if (url.includes("fredgraph.csv?id=")) {
+        return new Response("upstream unavailable", { status: 520 });
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const snapshot: TreasuryData = {
+      source: "snapshot",
+      record_date: "2024-09-30",
+      fetched_at: "2026-02-01T00:00:00Z",
+      isLive: false,
+      yields: {
+        oneMonth: 5.1,
+        twoYear: 4.7,
+        tenYear: 4.5,
+      },
+    };
+
+    const data = await fetchTreasuryData({
+      fetcher,
+      snapshotFallback: snapshot,
+    });
+
+    assert.equal(
+      data.fallback_reason,
+      "FRED Treasury upstream unavailable (HTTP 520) after 3 attempts."
+    );
+  });
+
   it("uses a clearer fallback reason after repeated timeout aborts", async () => {
     const fetcher: typeof fetch = async (input) => {
       if (input.toString().includes("api.fiscaldata.treasury.gov")) {
