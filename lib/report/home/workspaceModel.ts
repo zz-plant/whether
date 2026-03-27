@@ -39,6 +39,12 @@ export const buildHomeWorkspaceModel = ({
   trustStatusDetail,
   trustStatusAction,
   trustStatusTone,
+  outageType,
+  outageSeverity,
+  decisionImpactWindow,
+  approvalBuckets,
+  recoveryPlan,
+  outageExitGate,
   freshnessLabel,
   trustMarkerLabel,
   trustMarkerTone,
@@ -53,6 +59,12 @@ export const buildHomeWorkspaceModel = ({
   trustStatusDetail: string;
   trustStatusAction: string;
   trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+  outageType: ReturnType<typeof buildTrustStatus>["outageType"];
+  outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
+  decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
+  approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
+  recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
+  outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
   freshnessLabel: string;
   trustMarkerLabel: string;
   trustMarkerTone: "stable" | "warning" | "historical";
@@ -91,6 +103,12 @@ export const buildHomeWorkspaceModel = ({
       trustStatusDetail,
       trustStatusAction,
       trustStatusTone,
+      outageType,
+      outageSeverity,
+      decisionImpactWindow,
+      approvalBuckets,
+      recoveryPlan,
+      outageExitGate,
       freshnessSummary: freshnessLabel,
       sourceCoverageLine: buildSourceCoverageLine(reportData.sourceHealth),
       trustMarkerLabel,
@@ -102,6 +120,13 @@ export const buildHomeWorkspaceModel = ({
         modeLabel: formatSourceModeLabel(row.mode),
         freshnessStatus: formatSourceFreshnessLabel(row),
       })),
+      degradedSourceRows: reportData.sourceHealth
+        .filter((row) => row.mode !== "live")
+        .map((row) => ({
+          sourceName: row.sourceName,
+          modeLabel: formatSourceModeLabel(row.mode),
+          freshnessStatus: formatSourceFreshnessLabel(row),
+        })),
       revisitHeadline: diagnosticsLane.revisitDecisions
         ? "YES — revisit this week's approvals now."
         : "NO — hold the current weekly baseline.",

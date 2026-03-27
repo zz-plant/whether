@@ -65,6 +65,13 @@ export const HomePageReportContent = async ({
           trustStatusDetail: homepage.reportShell.trustStatusDetail,
           trustStatusAction: homepage.reportShell.trustStatusAction,
           trustStatusTone: homepage.reportShell.trustStatusTone,
+          outageType: homepage.reportShell.outageType,
+          outageSeverity: homepage.reportShell.outageSeverity,
+          decisionImpactWindow: homepage.reportShell.decisionImpactWindow,
+          approvalBuckets: homepage.reportShell.approvalBuckets,
+          recoveryPlan: homepage.reportShell.recoveryPlan,
+          outageExitGate: homepage.reportShell.outageExitGate,
+          degradedSourceRows: homepage.reportShell.degradedSourceRows,
           showOfflineBadge: homepage.reportShell.showOfflineBadge,
           inlineTrustPlacement: "after-first-section",
           provenance: homepage.reportShell.provenance,
@@ -114,6 +121,13 @@ export const HomePageReportContent = async ({
       trustStatusDetail={homepage.reportShell.trustStatusDetail}
       trustStatusAction={homepage.reportShell.trustStatusAction}
       trustStatusTone={homepage.reportShell.trustStatusTone}
+      outageType={homepage.reportShell.outageType}
+      outageSeverity={homepage.reportShell.outageSeverity}
+      decisionImpactWindow={homepage.reportShell.decisionImpactWindow}
+      approvalBuckets={homepage.reportShell.approvalBuckets}
+      recoveryPlan={homepage.reportShell.recoveryPlan}
+      outageExitGate={homepage.reportShell.outageExitGate}
+      degradedSourceRows={homepage.reportShell.degradedSourceRows}
       currentPath="/"
     >
       <HomeWhatChangedSection

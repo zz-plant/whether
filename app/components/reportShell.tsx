@@ -97,6 +97,13 @@ type ReportShellProps = {
   trustStatusDetail: string;
   trustStatusAction: string;
   trustStatusTone: "stable" | "warning" | "historical";
+  outageType?: "live-data" | "feed-unavailable" | "stale-cache" | "source-divergence" | "historical-snapshot";
+  outageSeverity?: "advisory" | "blocking" | "critical";
+  decisionImpactWindow?: string;
+  approvalBuckets?: Array<{ label: string; detail: string }>;
+  recoveryPlan?: { owner: string; nextCheckpoint: string; exitCondition: string };
+  outageExitGate?: { label: string; summary: string; metCount: number; totalCount: number };
+  degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
   showOfflineBadge?: boolean;
   offlineBadgeLabel?: string;
   heroVariant?: "full" | "compact";
@@ -130,7 +137,7 @@ type ReportShellProps = {
 type ReportShellModel = {
   status: Pick<ReportShellProps, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
   page: Pick<ReportShellProps, "pageTitle" | "pageSummary" | "pageSummaryLink" | "pageLinks" | "sectionLinks" | "currentPath">;
-  trust: Pick<ReportShellProps, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
+  trust: Pick<ReportShellProps, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
   chrome?: Pick<ReportShellProps, "heroVariant" | "pageNavVariant" | "showPageNavigation" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
   actions?: Pick<ReportShellProps, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellProps, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
@@ -161,6 +168,13 @@ export function HeroTrustProvenanceBlock({
   trustStatusLabel,
   trustStatusDetail,
   trustStatusAction,
+  outageType,
+  outageSeverity,
+  decisionImpactWindow,
+  approvalBuckets,
+  recoveryPlan,
+  outageExitGate,
+  degradedSourceRows,
   statusLabel,
   fetchedAtLabel,
   resolvedNextRefreshLabel,
@@ -172,6 +186,13 @@ export function HeroTrustProvenanceBlock({
   trustStatusLabel: string;
   trustStatusDetail: string;
   trustStatusAction: string;
+  outageType?: ReportShellProps["outageType"];
+  outageSeverity?: ReportShellProps["outageSeverity"];
+  decisionImpactWindow?: string;
+  approvalBuckets?: ReportShellProps["approvalBuckets"];
+  recoveryPlan?: ReportShellProps["recoveryPlan"];
+  outageExitGate?: ReportShellProps["outageExitGate"];
+  degradedSourceRows?: ReportShellProps["degradedSourceRows"];
   statusLabel: string;
   fetchedAtLabel: string;
   resolvedNextRefreshLabel: string;
@@ -188,6 +209,13 @@ export function HeroTrustProvenanceBlock({
         label={trustStatusLabel}
         detail={trustStatusDetail}
         action={trustStatusAction}
+        outageType={outageType}
+        outageSeverity={outageSeverity}
+        decisionImpactWindow={decisionImpactWindow}
+        approvalBuckets={approvalBuckets}
+        recoveryPlan={recoveryPlan}
+        outageExitGate={outageExitGate}
+        degradedSourceRows={degradedSourceRows}
         sourceDetails={
           trustProvenance ? (
             <DataProvenanceStrip provenance={trustProvenance} variant="compact" />
@@ -357,6 +385,13 @@ export const ReportShell = ({
   trustStatusDetail,
   trustStatusAction,
   trustStatusTone,
+  outageType,
+  outageSeverity,
+  decisionImpactWindow,
+  approvalBuckets,
+  recoveryPlan,
+  outageExitGate,
+  degradedSourceRows,
   showOfflineBadge = false,
   offlineBadgeLabel = "Cached snapshot",
   heroVariant = "full",
@@ -398,6 +433,13 @@ export const ReportShell = ({
   const resolvedTrustStatusDetail = model?.trust.trustStatusDetail ?? trustStatusDetail;
   const resolvedTrustStatusAction = model?.trust.trustStatusAction ?? trustStatusAction;
   const resolvedTrustStatusTone = model?.trust.trustStatusTone ?? trustStatusTone;
+  const resolvedOutageType = model?.trust.outageType ?? outageType;
+  const resolvedOutageSeverity = model?.trust.outageSeverity ?? outageSeverity;
+  const resolvedDecisionImpactWindow = model?.trust.decisionImpactWindow ?? decisionImpactWindow;
+  const resolvedApprovalBuckets = model?.trust.approvalBuckets ?? approvalBuckets;
+  const resolvedRecoveryPlan = model?.trust.recoveryPlan ?? recoveryPlan;
+  const resolvedOutageExitGate = model?.trust.outageExitGate ?? outageExitGate;
+  const resolvedDegradedSourceRows = model?.trust.degradedSourceRows ?? degradedSourceRows;
   const resolvedShowOfflineBadge = model?.trust.showOfflineBadge ?? showOfflineBadge;
   const resolvedOfflineBadgeLabel = model?.trust.offlineBadgeLabel ?? offlineBadgeLabel;
   const resolvedInlineTrustPlacement = model?.trust.inlineTrustPlacement ?? inlineTrustPlacement;
@@ -466,16 +508,16 @@ export const ReportShell = ({
           {resolvedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
 
           <div className={`mt-5 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{resolvedSectionLinks.length ? <ReportSectionNavigation sectionLinks={resolvedSectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></aside> : null}
+            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{resolvedSectionLinks.length ? <ReportSectionNavigation sectionLinks={resolvedSectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} outageType={resolvedOutageType} outageSeverity={resolvedOutageSeverity} decisionImpactWindow={resolvedDecisionImpactWindow} approvalBuckets={resolvedApprovalBuckets} recoveryPlan={resolvedRecoveryPlan} outageExitGate={resolvedOutageExitGate} degradedSourceRows={resolvedDegradedSourceRows} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></aside> : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
               {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={resolvedTrustStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={resolvedTrustStatusAction} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={resolvedTrustStatusDetail} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
-              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}
+              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} outageType={resolvedOutageType} outageSeverity={resolvedOutageSeverity} decisionImpactWindow={resolvedDecisionImpactWindow} approvalBuckets={resolvedApprovalBuckets} recoveryPlan={resolvedRecoveryPlan} outageExitGate={resolvedOutageExitGate} degradedSourceRows={resolvedDegradedSourceRows} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}
 
-              <div className="space-y-10 lg:space-y-12">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}</div>; })}</div>
+              <div className="space-y-10 lg:space-y-12">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} outageType={resolvedOutageType} outageSeverity={resolvedOutageSeverity} decisionImpactWindow={resolvedDecisionImpactWindow} approvalBuckets={resolvedApprovalBuckets} recoveryPlan={resolvedRecoveryPlan} outageExitGate={resolvedOutageExitGate} degradedSourceRows={resolvedDegradedSourceRows} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}</div>; })}</div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>

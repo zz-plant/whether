@@ -44,6 +44,12 @@ export type HomePageWorkspaceModel = {
     trustStatusDetail: string;
     trustStatusAction: string;
     trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+    outageType: ReturnType<typeof buildTrustStatus>["outageType"];
+    outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
+    decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
+    approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
+    recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
+    outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
     freshnessSummary: string;
     sourceCoverageLine: string;
     trustMarkerLabel: string;
@@ -51,6 +57,11 @@ export type HomePageWorkspaceModel = {
     trustMarkerDetail: string;
     sourceDegraded: boolean;
     sourceRows: Array<{
+      sourceName: string;
+      modeLabel: string;
+      freshnessStatus: string;
+    }>;
+    degradedSourceRows: Array<{
       sourceName: string;
       modeLabel: string;
       freshnessStatus: string;
@@ -135,6 +146,17 @@ export type HomePageAssembly = {
     trustStatusDetail: string;
     trustStatusAction: string;
     trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+    outageType: ReturnType<typeof buildTrustStatus>["outageType"];
+    outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
+    decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
+    approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
+    recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
+    outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
+    degradedSourceRows: Array<{
+      sourceName: string;
+      modeLabel: string;
+      freshnessStatus: string;
+    }>;
     provenance: ReportData["treasuryProvenance"];
     showOfflineBadge: boolean;
     sectionLinks: { href: string; label: string }[];
