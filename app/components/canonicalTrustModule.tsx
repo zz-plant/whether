@@ -123,6 +123,9 @@ export const CanonicalTrustModule = ({
   const outageTypeLabel = outageType
     ? outageType.replaceAll("-", " ")
     : "live data";
+  const outageSummaryIncludesCount = outageExitGate
+    ? outageExitGate.summary.includes(`${outageExitGate.metCount}/${outageExitGate.totalCount}`)
+    : false;
 
   return (
     <section
@@ -177,7 +180,10 @@ export const CanonicalTrustModule = ({
         <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2 text-xs text-slate-100/90">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Outage exit gate</p>
           <p className="font-semibold text-slate-100">{outageExitGate.label}</p>
-          <p>{outageExitGate.summary} ({outageExitGate.metCount}/{outageExitGate.totalCount})</p>
+          <p>
+            {outageExitGate.summary}
+            {outageSummaryIncludesCount ? "" : ` (${outageExitGate.metCount}/${outageExitGate.totalCount})`}
+          </p>
         </div>
       ) : null}
       {degradedSourceRows && degradedSourceRows.length > 0 ? (
