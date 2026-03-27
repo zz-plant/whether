@@ -19,19 +19,25 @@ export type DataProvenance = {
 
 const statusStyles = {
   "Live (high confidence)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
+  "Canonical snapshot (high confidence)": "border-sky-300/55 bg-sky-400/10 text-sky-100",
   "Cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
+  "Cached (fallback)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
   "Simulated (low)": "border-slate-600/70 bg-slate-800/40 text-slate-200",
 } as const;
 
 const statusDescriptions = {
   "Live (high confidence)": "Streaming feeds updated within the last 24 hours.",
+  "Canonical snapshot (high confidence)": "Canonical snapshot generated from curated Treasury and macro inputs.",
   "Cached (medium)": "Latest available data cached from our last refresh.",
+  "Cached (fallback)": "Fallback snapshot is active while live feeds recover.",
   "Simulated (low)": "Modeled inputs or backfilled estimates where live data is absent.",
 } as const;
 
 const statusConfidence = {
   "Live (high confidence)": 100,
+  "Canonical snapshot (high confidence)": 92,
   "Cached (medium)": 64,
+  "Cached (fallback)": 52,
   "Simulated (low)": 28,
 } as const;
 
@@ -41,8 +47,18 @@ const statusDataMode = {
     icon: "live",
     className: "weather-data-mode weather-data-mode-dynamic",
   },
+  "Canonical snapshot (high confidence)": {
+    label: "Static · canonical snapshot",
+    icon: "static",
+    className: "weather-data-mode weather-data-mode-static",
+  },
   "Cached (medium)": {
     label: "Static · cached snapshot",
+    icon: "static",
+    className: "weather-data-mode weather-data-mode-static",
+  },
+  "Cached (fallback)": {
+    label: "Static · fallback snapshot",
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
@@ -77,6 +93,11 @@ export const DataProvenanceStrip = ({
   const dataModeIcon = dataMode.icon === "live"
     ? <StatusLiveIcon className="h-2.5 w-2.5" />
     : <StatusStaticIcon className="h-2.5 w-2.5" />;
+  const derivationLine = provenance.statusLabel === "Live (high confidence)"
+    ? "Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes."
+    : provenance.statusLabel === "Simulated (low)"
+      ? "Derived from modeled Treasury and macro inputs while live coverage is unavailable."
+      : "Derived from the latest Treasury and macro snapshots available this refresh.";
 
   const provenanceRows = [
     {
@@ -111,7 +132,7 @@ export const DataProvenanceStrip = ({
   if (variant === "compact") {
     return (
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
-        <p className="text-xs text-slate-300">Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes.</p>
+        <p className="text-xs text-slate-300">{derivationLine}</p>
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
           <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
             <span aria-hidden="true">{dataModeIcon}</span>
@@ -163,7 +184,7 @@ export const DataProvenanceStrip = ({
 
   return (
     <div className="weather-surface space-y-2 rounded-2xl border-slate-800/80 bg-slate-950/50 px-4 py-3 text-[0.65rem] font-semibold text-slate-300 shadow-none">
-      <p className="text-xs font-medium normal-case tracking-normal text-slate-300">Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes.</p>
+      <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />

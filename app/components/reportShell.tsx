@@ -148,19 +148,25 @@ export const resolveTrustProvenance = ({
   provenance,
   sourceLabel,
   sourceHref,
+  degradedSourceRows,
 }: {
   provenance?: DataProvenance;
   sourceLabel: string;
   sourceHref?: string;
+  degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
 }): DataProvenance | undefined => {
   if (!provenance) {
     return undefined;
   }
 
+  const hasDegradedSourceRows = Boolean(degradedSourceRows && degradedSourceRows.length > 0);
+  const shouldDowngradeLiveLabel = hasDegradedSourceRows && provenance.statusLabel === "Live (high confidence)";
+
   return {
     ...provenance,
     sourceLabel,
     sourceUrl: sourceHref ?? provenance.sourceUrl,
+    statusLabel: shouldDowngradeLiveLabel ? "Cached (medium)" : provenance.statusLabel,
   };
 };
 
@@ -201,7 +207,7 @@ export function HeroTrustProvenanceBlock({
   sourceHref?: string;
   provenance?: DataProvenance;
 }) {
-  const trustProvenance = resolveTrustProvenance({ provenance, sourceLabel, sourceHref });
+  const trustProvenance = resolveTrustProvenance({ provenance, sourceLabel, sourceHref, degradedSourceRows });
 
   return (
     <>
