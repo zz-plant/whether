@@ -109,26 +109,6 @@ export const HomePageReportContent = async ({
           ) : null,
         },
       }}
-      statusLabel={homepage.reportShell.statusLabel}
-      recordDateLabel={homepage.reportShell.recordDateLabel}
-      fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
-      treasurySource={homepage.reportShell.treasurySource}
-      pageTitle="Weekly Operating Posture Brief"
-      pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
-      pageLinks={reportPageLinks}
-      sectionLinks={homepage.reportShell.sectionLinks}
-      trustStatusLabel={homepage.reportShell.trustStatusLabel}
-      trustStatusDetail={homepage.reportShell.trustStatusDetail}
-      trustStatusAction={homepage.reportShell.trustStatusAction}
-      trustStatusTone={homepage.reportShell.trustStatusTone}
-      outageType={homepage.reportShell.outageType}
-      outageSeverity={homepage.reportShell.outageSeverity}
-      decisionImpactWindow={homepage.reportShell.decisionImpactWindow}
-      approvalBuckets={homepage.reportShell.approvalBuckets}
-      recoveryPlan={homepage.reportShell.recoveryPlan}
-      outageExitGate={homepage.reportShell.outageExitGate}
-      degradedSourceRows={homepage.reportShell.degradedSourceRows}
-      currentPath="/"
     >
       <HomeWhatChangedSection
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
