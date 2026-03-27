@@ -145,35 +145,16 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
 
       <section className="home-band-stack" aria-label="Loading additional sections">
         <section className="home-band home-band--flow home-band-shell home-band-shell--nav weather-panel weather-section-stage space-y-3 px-4 py-4">
-          <div className="flex flex-col gap-3">
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Scroll path</p>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-                  1 of 3
-                </span>
-              </div>
-              <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Move through the weekly brief in one pass</h2>
-              <p className="max-w-3xl text-sm text-slate-300">Confirm why the call changed, lock the operating plan, then use replay only when continuity helps this week.</p>
-            </div>
-          </div>
-          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {["Audit", "Approve", "Replay"].map((label, index) => (
-              <article key={label} className={`weather-surface weather-step-card rounded-xl border px-3 py-3 ${index === 0 ? "border-sky-400/40 bg-sky-500/10" : "border-slate-800/80 bg-slate-950/45"}`}>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-200">
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-600/80 text-[10px] text-slate-300">{index + 1}</span>
-                    {label}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">{index === 0 ? "Current" : "Queued"}</span>
-                </div>
-                <div className="mt-2 space-y-2">
-                  <Skeleton className="h-3 w-11/12 rounded-full bg-slate-500/34" />
-                  <Skeleton className="h-3 w-8/12 rounded-full bg-slate-500/26" />
-                </div>
-              </article>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Loading flow</p>
+          <p className="text-sm text-slate-300">Decision card first, workspace second, deeper evidence last.</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {["Decision card", "Workspace", "Evidence"].map((label) => (
+              <span key={label} className="inline-flex min-h-[32px] items-center rounded-full border border-slate-700/80 bg-slate-950/65 px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-slate-200">
+                {label}
+              </span>
             ))}
           </div>
+          <Skeleton className="h-3 w-full max-w-2xl rounded-full bg-slate-500/26" />
         </section>
 
         <WeeklyDiagnosticsFallback />

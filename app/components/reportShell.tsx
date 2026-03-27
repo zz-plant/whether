@@ -319,14 +319,34 @@ export function CommandCenterNavBlock({
           {heroVariant === "full" ? <span className="sr-only">Signals stamped {recordDateLabel}</span> : null}
         </div>
 
-        {primaryCta || secondaryCta || exportCta ? (
-          <div id="report-primary-actions" className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-            {primaryCta ? <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta> : null}
-            {secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</InternalAwareLink> : null}
-            {exportCta ? <InternalAwareLink href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</InternalAwareLink> : null}
+        {primaryCta ? (
+          <div id="report-primary-actions" className="flex w-full min-w-0">
+            <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
           </div>
         ) : null}
-        {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <InternalAwareLink href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</InternalAwareLink></p> : null}
+        {secondaryCta || nextStep || exportCta ? (
+          <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">
+            Continue:
+            {secondaryCta ? (
+              <>
+                {" "}
+                <InternalAwareLink href={secondaryCta.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{secondaryCta.label}</InternalAwareLink>
+              </>
+            ) : null}
+            {nextStep ? (
+              <>
+                {secondaryCta ? <span className="mx-1 text-slate-500">•</span> : " "}
+                <InternalAwareLink href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</InternalAwareLink>
+              </>
+            ) : null}
+            {exportCta ? (
+              <>
+                {secondaryCta || nextStep ? <span className="mx-1 text-slate-500">•</span> : " "}
+                <InternalAwareLink href={exportCta.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{exportCta.label}</InternalAwareLink>
+              </>
+            ) : null}
+          </p>
+        ) : null}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dl className="weather-surface weather-meta-list min-h-[44px] flex-1 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
             <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
