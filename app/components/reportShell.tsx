@@ -81,9 +81,7 @@ type RoleSwitcher = {
 
 type DecisionDiff = { label: string; tone?: "neutral" | "positive" | "warning" };
 
-type ReportShellProps = {
-  children: ReactNode;
-  model?: ReportShellModel;
+type ReportShellInput = {
   statusLabel: string;
   regime?: RegimeIconType;
   recordDateLabel: string;
@@ -136,13 +134,18 @@ type ReportShellProps = {
 };
 
 type ReportShellModel = {
-  status: Pick<ReportShellProps, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
-  page: Pick<ReportShellProps, "pageTitle" | "pageSummary" | "pageSummaryLink" | "pageLinks" | "sectionLinks" | "currentPath">;
-  trust: Pick<ReportShellProps, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
-  chrome?: Pick<ReportShellProps, "heroVariant" | "pageNavVariant" | "showPageNavigation" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
-  actions?: Pick<ReportShellProps, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
-  payloads?: Pick<ReportShellProps, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
+  status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
+  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "pageLinks" | "sectionLinks" | "currentPath">;
+  trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
+  chrome?: Pick<ReportShellInput, "heroVariant" | "pageNavVariant" | "showPageNavigation" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
+  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
+  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
+
+type ReportShellProps = { children: ReactNode } & (
+  | ({ model: ReportShellModel } & { [K in keyof ReportShellInput]?: never })
+  | ({ model?: never } & ReportShellInput)
+);
 
 export const resolveTrustProvenance = ({
   provenance,
@@ -378,103 +381,74 @@ export function SidebarSequenceBlock({ stageRail }: { stageRail?: { title?: stri
   );
 }
 
-export const ReportShell = ({
-  children,
-  model,
-  statusLabel,
-  regime,
-  recordDateLabel,
-  fetchedAtLabel,
-  treasurySource,
-  pageTitle,
-  pageSummary,
-  pageSummaryLink,
-  pageLinks,
-  sectionLinks,
-  trustStatusLabel,
-  trustStatusDetail,
-  trustStatusAction,
-  trustStatusTone,
-  outageType,
-  outageSeverity,
-  decisionImpactWindow,
-  approvalBuckets,
-  recoveryPlan,
-  outageExitGate,
-  degradedSourceRows,
-  showOfflineBadge = false,
-  offlineBadgeLabel = "Cached snapshot",
-  heroVariant = "full",
-  pageNavVariant = "full",
-  showPageNavigation = false,
-  headerVariant,
-  sidebarVariant = "full",
-  hideHeroChrome = false,
-  primaryCta = { href: "#weekly-action-summary", label: "This week" },
-  secondaryCta,
-  exportCta = { href: "/operations#ops-export-briefs", label: "Generate executive brief" },
-  structuredData,
-  historicalBanner,
-  currentPath,
-  stageRail,
-  decisionBanner,
-  actionSequence,
-  roleSwitcher,
-  decisionDiffs,
-  nextStep,
-  nextRefreshLabel,
-  inlineTrustPlacement = "before-content",
-  provenance,
-  commandBar,
-  ambientMode = "standard",
-}: ReportShellProps) => {
-  const resolvedStatusLabel = model?.status.statusLabel ?? statusLabel;
-  const resolvedRegime = model?.status.regime ?? regime;
-  const resolvedRecordDateLabel = model?.status.recordDateLabel ?? recordDateLabel;
-  const resolvedFetchedAtLabel = model?.status.fetchedAtLabel ?? fetchedAtLabel;
-  const resolvedTreasurySource = model?.status.treasurySource ?? treasurySource;
-  const resolvedPageTitle = model?.page.pageTitle ?? pageTitle;
-  const resolvedPageSummary = model?.page.pageSummary ?? pageSummary;
-  const resolvedPageSummaryLink = model?.page.pageSummaryLink ?? pageSummaryLink;
-  const resolvedPageLinks = model?.page.pageLinks ?? pageLinks;
-  const resolvedSectionLinks = model?.page.sectionLinks ?? sectionLinks;
-  const resolvedCurrentPath = model?.page.currentPath ?? currentPath;
-  const resolvedTrustStatusLabel = model?.trust.trustStatusLabel ?? trustStatusLabel;
-  const resolvedTrustStatusDetail = model?.trust.trustStatusDetail ?? trustStatusDetail;
-  const resolvedTrustStatusAction = model?.trust.trustStatusAction ?? trustStatusAction;
-  const resolvedTrustStatusTone = model?.trust.trustStatusTone ?? trustStatusTone;
-  const resolvedOutageType = model?.trust.outageType ?? outageType;
-  const resolvedOutageSeverity = model?.trust.outageSeverity ?? outageSeverity;
-  const resolvedDecisionImpactWindow = model?.trust.decisionImpactWindow ?? decisionImpactWindow;
-  const resolvedApprovalBuckets = model?.trust.approvalBuckets ?? approvalBuckets;
-  const resolvedRecoveryPlan = model?.trust.recoveryPlan ?? recoveryPlan;
-  const resolvedOutageExitGate = model?.trust.outageExitGate ?? outageExitGate;
-  const resolvedDegradedSourceRows = model?.trust.degradedSourceRows ?? degradedSourceRows;
-  const resolvedShowOfflineBadge = model?.trust.showOfflineBadge ?? showOfflineBadge;
-  const resolvedOfflineBadgeLabel = model?.trust.offlineBadgeLabel ?? offlineBadgeLabel;
-  const resolvedInlineTrustPlacement = model?.trust.inlineTrustPlacement ?? inlineTrustPlacement;
-  const resolvedProvenance = model?.trust.provenance ?? provenance;
-  const resolvedHeroVariant = model?.chrome?.heroVariant ?? heroVariant;
-  const resolvedPageNavVariant = model?.chrome?.pageNavVariant ?? pageNavVariant;
-  const resolvedShowPageNavigation = model?.chrome?.showPageNavigation ?? showPageNavigation;
-  const resolvedHeaderVariantInput = model?.chrome?.headerVariant ?? headerVariant;
-  const resolvedSidebarVariant = model?.chrome?.sidebarVariant ?? sidebarVariant;
-  const resolvedHideHeroChrome = model?.chrome?.hideHeroChrome ?? hideHeroChrome;
-  const resolvedAmbientMode = model?.chrome?.ambientMode ?? ambientMode;
-  const resolvedPrimaryCta = model?.actions?.primaryCta ?? primaryCta;
-  const resolvedSecondaryCta = model?.actions?.secondaryCta ?? secondaryCta;
-  const resolvedExportCta = model?.actions?.exportCta ?? exportCta;
-  const resolvedNextStep = model?.actions?.nextStep ?? nextStep;
-  const resolvedNextRefreshLabel = (model?.actions?.nextRefreshLabel ?? nextRefreshLabel)
-    ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
-  const resolvedStructuredData = model?.payloads?.structuredData ?? structuredData;
-  const resolvedHistoricalBanner = model?.payloads?.historicalBanner ?? historicalBanner;
-  const resolvedStageRail = model?.payloads?.stageRail ?? stageRail;
-  const resolvedDecisionBanner = model?.payloads?.decisionBanner ?? decisionBanner;
-  const resolvedActionSequence = model?.payloads?.actionSequence ?? actionSequence;
-  const resolvedRoleSwitcher = model?.payloads?.roleSwitcher ?? roleSwitcher;
-  const resolvedDecisionDiffs = model?.payloads?.decisionDiffs ?? decisionDiffs;
-  const resolvedCommandBar = model?.payloads?.commandBar ?? commandBar;
+const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput => {
+  if ("model" in props && props.model) {
+    const { model } = props;
+    return {
+      ...model.status,
+      ...model.page,
+      ...model.trust,
+      ...model.chrome,
+      ...model.actions,
+      ...model.payloads,
+    };
+  }
+
+  return props;
+};
+
+export const ReportShell = (props: ReportShellProps) => {
+  const { children } = props;
+  const input = normalizeReportShellInput(props);
+  const {
+    statusLabel: resolvedStatusLabel,
+    regime: resolvedRegime,
+    recordDateLabel: resolvedRecordDateLabel,
+    fetchedAtLabel: resolvedFetchedAtLabel,
+    treasurySource: resolvedTreasurySource,
+    pageTitle: resolvedPageTitle,
+    pageSummary: resolvedPageSummary,
+    pageSummaryLink: resolvedPageSummaryLink,
+    pageLinks: resolvedPageLinks,
+    sectionLinks: resolvedSectionLinks,
+    currentPath: resolvedCurrentPath,
+    trustStatusLabel: resolvedTrustStatusLabel,
+    trustStatusDetail: resolvedTrustStatusDetail,
+    trustStatusAction: resolvedTrustStatusAction,
+    trustStatusTone: resolvedTrustStatusTone,
+    outageType: resolvedOutageType,
+    outageSeverity: resolvedOutageSeverity,
+    decisionImpactWindow: resolvedDecisionImpactWindow,
+    approvalBuckets: resolvedApprovalBuckets,
+    recoveryPlan: resolvedRecoveryPlan,
+    outageExitGate: resolvedOutageExitGate,
+    degradedSourceRows: resolvedDegradedSourceRows,
+    showOfflineBadge: resolvedShowOfflineBadge = false,
+    offlineBadgeLabel: resolvedOfflineBadgeLabel = "Cached snapshot",
+    heroVariant: resolvedHeroVariant = "full",
+    pageNavVariant: resolvedPageNavVariant = "full",
+    showPageNavigation: resolvedShowPageNavigation = false,
+    headerVariant: resolvedHeaderVariantInput,
+    sidebarVariant: resolvedSidebarVariant = "full",
+    hideHeroChrome: resolvedHideHeroChrome = false,
+    primaryCta: resolvedPrimaryCta = { href: "#weekly-action-summary", label: "This week" },
+    secondaryCta: resolvedSecondaryCta,
+    exportCta: resolvedExportCta = { href: "/operations#ops-export-briefs", label: "Generate executive brief" },
+    structuredData: resolvedStructuredData,
+    historicalBanner: resolvedHistoricalBanner,
+    stageRail: resolvedStageRail,
+    decisionBanner: resolvedDecisionBanner,
+    actionSequence: resolvedActionSequence,
+    roleSwitcher: resolvedRoleSwitcher,
+    decisionDiffs: resolvedDecisionDiffs,
+    nextStep: resolvedNextStep,
+    nextRefreshLabel,
+    inlineTrustPlacement: resolvedInlineTrustPlacement = "before-content",
+    provenance: resolvedProvenance,
+    commandBar: resolvedCommandBar,
+    ambientMode: resolvedAmbientMode = "standard",
+  } = input;
+  const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
   const hasSidebar = resolvedSidebarVariant === "full";
@@ -536,7 +510,7 @@ export const ReportShell = ({
           </div>
         </div>
 
-        {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{decisionBanner?.decision ?? `${resolvedPrimaryCta.label}.`}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
+        {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{resolvedDecisionBanner?.decision ?? `${resolvedPrimaryCta.label}.`}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
 
         {resolvedShowPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={resolvedPageLinks} pageTitle={resolvedPageTitle} currentPath={resolvedCurrentPath} className="mt-3 px-4 pb-6" sectionLinks={resolvedSectionLinks} /></div> : null}
 
