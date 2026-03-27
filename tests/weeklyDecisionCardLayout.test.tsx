@@ -68,7 +68,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Weekly call snapshot/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Action now/);
-    assert.match(html, /This week&#x27;s call/);
+    assert.match(html, /Decision strip/);
     assert.match(html, /How inputs move this call/);
     assert.match(html, /Action now/);
     assert.match(html, /Revisit decisions\?/);
@@ -82,13 +82,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.doesNotMatch(html, /Seed/);
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
-    assert.match(html, /Artifact handoff/);
+    assert.match(html, /Share &amp; cite/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Weekly call snapshot");
     const postureIndex = html.indexOf("Current outlook");
     const influenceIndex = html.indexOf("How inputs move this call");
-    const guidanceIndex = html.indexOf("This week&#x27;s call");
+    const guidanceIndex = html.indexOf("Decision strip");
     const diagnosticsIndex = html.indexOf("Need deeper analysis?");
 
     assert.ok(deltaIndex > heroIndex);
@@ -180,7 +180,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     });
 
     assert.match(html, /id="weekly-call-core"/);
-    assert.equal((html.match(/This week&#x27;s call/g) ?? []).length, 1);
+    assert.equal((html.match(/Decision strip/g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.doesNotMatch(html, /Open Signals/);
     assert.match(html, /weather-panel space-y-4 px-4 py-4/);
@@ -231,7 +231,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const callCore = html.slice(
       html.indexOf('id="weekly-call-core"'),
-      html.indexOf("Supporting rationale") > -1 ? html.indexOf("Supporting rationale") : html.indexOf('id="citation-actions"'),
+      html.indexOf("Supporting rationale"),
     );
 
     assert.match(callCore, /Action now/);

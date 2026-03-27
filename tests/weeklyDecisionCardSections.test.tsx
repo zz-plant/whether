@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   BoundedRulesMatrix,
-  CitationActionFooter,
   DecisionCallHeader,
   MoreContextDisclosureBody,
   WeeklyDecisionCard,
@@ -390,7 +389,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(detailsHtml, /2026-01-31 • Hold approvals/);
   });
 
-  it("renders collapsed context and citation footer", () => {
+  it("renders collapsed context and keeps share and cite content consolidated", () => {
     const detailsHtml = renderToStaticMarkup(
       <MoreContextDisclosureBody
         startupClimateIndex={{ score: 62, status: "Stable", breakdown: [{ label: "Capital", score: 60 }] }}
@@ -402,13 +401,18 @@ describe("WeeklyDecisionCard extracted sections", () => {
         macroOverlay={[{ label: "VC", detail: "Muted" }]}
       />,
     );
-    const footerHtml = renderToStaticMarkup(
-      <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" />,
+    const cardHtml = renderToStaticMarkup(
+      <WeeklyDecisionCard
+        model={buildWeeklyDecisionCardModel({})}
+        actions={<button type="button">Copy citation</button>}
+      />,
     );
 
     assert.match(detailsHtml, /Why this posture call/);
     assert.match(detailsHtml, /Posture history/);
-    assert.match(footerHtml, /Use this citation in meeting notes, board updates, or operating memos\./);
-    assert.match(footerHtml, /Share actions stay in the transmission rail above\./);
+    assert.match(cardHtml, /Share &amp; cite/);
+    assert.match(cardHtml, /Copy citation/);
+    assert.doesNotMatch(cardHtml, /Use this citation in meeting notes, board updates, or operating memos\./);
+    assert.doesNotMatch(cardHtml, /Share actions stay in the transmission rail above\./);
   });
 });

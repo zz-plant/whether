@@ -9,7 +9,7 @@ import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
+import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading } from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
 import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDecisionContent";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -258,16 +258,12 @@ export function MoreContextDisclosureBody({
   );
 }
 
-type CitationActionFooterProps = {
-  citationMetaLine: string;
-  citation: string;
-};
-
 type DecisionTransmissionRailProps = {
   actionNow: string;
   guardrail: string;
   flipWhen: string;
   citationMetaLine: string;
+  citation: string;
   actions?: ReactNode;
 };
 
@@ -276,6 +272,7 @@ function DecisionTransmissionRail({
   guardrail,
   flipWhen,
   citationMetaLine,
+  citation,
   actions,
 }: DecisionTransmissionRailProps) {
   return (
@@ -295,25 +292,12 @@ function DecisionTransmissionRail({
         <p className="mt-1"><span className="font-semibold text-slate-100">Flip:</span> {flipWhen}</p>
       </div>
       <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact handoff</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Share &amp; cite</p>
         <p className="mt-1 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
+        <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
         <div className="mt-3 flex flex-wrap gap-2">
           {actions}
         </div>
-      </div>
-    </article>
-  );
-}
-
-export function CitationActionFooter({ citationMetaLine, citation }: CitationActionFooterProps) {
-  return (
-    <article id="citation-actions" className={`${tierThreePanel} ${sectionSpacing}`}>
-      <h2 className={tierThreeHeading}>Cite this call</h2>
-      <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
-      <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
-        <span>Use this citation in meeting notes, board updates, or operating memos.</span>
-        <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Share actions stay in the transmission rail above.</span>
       </div>
     </article>
   );
@@ -750,13 +734,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               guardrail={snapshotGuardrail}
               flipWhen={snapshotWatch}
               citationMetaLine={citationMetaLine}
+              citation={citation}
               actions={actions}
             />
           </>
         )}
       />
-
-      <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} />
     </section>
   );
 }
