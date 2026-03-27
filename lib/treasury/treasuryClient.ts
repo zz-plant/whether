@@ -9,6 +9,7 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
 const RETRY_FETCH_TIMEOUT_MS = 20_000;
 const MAX_SERIES_FETCH_ATTEMPTS = 3;
+const RETRY_BACKOFF_MS = 250;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 const TREASURY_FISCALDATA_ENDPOINT =
@@ -360,6 +361,8 @@ const formatFetchError = (error: unknown) => {
   return error instanceof Error ? error.message : "Unknown Treasury fetch error";
 };
 
+const pause = (durationMs: number) => new Promise<void>((resolve) => setTimeout(resolve, durationMs));
+
 const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => {
   let lastError: unknown;
   let lastResponse: Response | null = null;
@@ -386,16 +389,28 @@ const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => 
       if (!shouldRetryStatus) {
         return response;
       }
+
+      if (attempt < MAX_SERIES_FETCH_ATTEMPTS - 1) {
+        await pause(RETRY_BACKOFF_MS * (attempt + 1));
+      }
     } catch (error) {
       lastError = error;
       const shouldRetryError = isAbortLikeError(error) || isTransientFetchError(error);
       if (!shouldRetryError || attempt >= MAX_SERIES_FETCH_ATTEMPTS - 1) {
         throw error;
       }
+
+      await pause(RETRY_BACKOFF_MS * (attempt + 1));
     }
   }
 
   if (lastResponse) {
+    if (lastResponse.status === 520) {
+      throw new Error(
+        `FRED Treasury upstream unavailable (HTTP 520) after ${MAX_SERIES_FETCH_ATTEMPTS} attempts.`
+      );
+    }
+
     return lastResponse;
   }
 
