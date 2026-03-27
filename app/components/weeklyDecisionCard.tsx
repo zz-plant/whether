@@ -170,74 +170,66 @@ export function MoreContextDisclosureBody({
     <div className="space-y-2.5">
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Startup Climate Index (context)</span>
+          <span>More context and continuity</span>
           <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
         </summary>
-        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-2">
-          <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
-          <ul className="grid gap-1.5 sm:grid-cols-2">
-            {startupClimateIndex.breakdown.map((item) => (
-              <li key={item.label} className="space-y-1 text-xs">
-                <div className="flex items-center justify-between gap-2">
-                  <span>{item.label}</span>
-                  <span className="font-semibold text-slate-100">{item.score}</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-slate-800">
-                  <div
-                    className="h-1.5 w-full origin-left rounded-full bg-sky-300/70"
-                    style={{ transform: `scaleX(${Math.max(0.05, Math.min(1, item.score / 100))})` }}
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </details>
+        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-3">
+          <section aria-labelledby="why-this-posture-call">
+            <h3 id="why-this-posture-call" className={tierThreeHeading}>Why this posture call</h3>
+            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-3">
+              {whyThisCall.map((reason) => (
+                <li key={reason.label} className={`${compactInset} text-xs text-slate-200`}>
+                  <p className="font-semibold text-slate-300">{reason.label}</p>
+                  <p className="mt-1 leading-5 text-slate-300">{reason.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
-        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Evidence snapshot</span>
-          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-        </summary>
-        <ul className="weather-disclosure-panel animate-collapsible-in mt-2 grid gap-2 lg:grid-cols-3">
-          {evidenceItems.map((item) => (
-            <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
-              <p className="font-semibold text-slate-100">{item.title}</p>
-              <p className="text-[11px] text-slate-400">Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}</p>
-              <ul className="space-y-1 text-[11px] text-slate-300">
-                {item.supportingBullets.slice(0, 3).map((bullet) => (
-                  <li key={`${item.key}-${bullet}`}>• {bullet}</li>
-                ))}
-              </ul>
-              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
-              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
-              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
-            </li>
-          ))}
-        </ul>
-      </details>
+          <section aria-labelledby="evidence-snapshot">
+            <h3 id="evidence-snapshot" className={tierThreeHeading}>Evidence snapshot</h3>
+            <ul className="mt-1.5 grid gap-2 lg:grid-cols-3">
+              {evidenceItems.map((item) => (
+                <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
+                  <p className="font-semibold text-slate-100">{item.title}</p>
+                  <p className="text-[11px] text-slate-400">Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}</p>
+                  <ul className="space-y-1 text-[11px] text-slate-300">
+                    {item.supportingBullets.slice(0, 3).map((bullet) => (
+                      <li key={`${item.key}-${bullet}`}>• {bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
-        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Why this posture call</span>
-          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-        </summary>
-        <ul className="weather-disclosure-panel animate-collapsible-in mt-2 grid gap-1.5 sm:grid-cols-3">
-          {whyThisCall.map((reason) => (
-            <li key={reason.label} className={`${compactInset} text-xs text-slate-200`}>
-              <p className="font-semibold text-slate-300">{reason.label}</p>
-              <p className="mt-1 leading-5 text-slate-300">{reason.detail}</p>
-            </li>
-          ))}
-        </ul>
-      </details>
+          <section aria-labelledby="startup-climate-index-context">
+            <h3 id="startup-climate-index-context" className={tierThreeHeading}>Startup Climate Index (context)</h3>
+            <p className="mt-1.5 text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
+            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
+              {startupClimateIndex.breakdown.map((item) => (
+                <li key={item.label} className="space-y-1 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{item.label}</span>
+                    <span className="font-semibold text-slate-100">{item.score}</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-slate-800">
+                    <div
+                      className="h-1.5 w-full origin-left rounded-full bg-sky-300/70"
+                      style={{ transform: `scaleX(${Math.max(0.05, Math.min(1, item.score / 100))})` }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
-        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Posture history and overlays</span>
-          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-        </summary>
-        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-2">
+          <section aria-labelledby="posture-history-and-overlays">
+            <h3 id="posture-history-and-overlays" className={tierThreeHeading}>Posture history and overlays</h3>
+            <div className="mt-1.5 space-y-2">
           <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
           <div>
             <p className={tierThreeHeading}>Historical memory rail</p>
@@ -258,6 +250,8 @@ export function MoreContextDisclosureBody({
               </li>
             ))}
           </ul>
+            </div>
+          </section>
         </div>
       </details>
     </div>
