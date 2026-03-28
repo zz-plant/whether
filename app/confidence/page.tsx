@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { buildCompactTrustSummary, buildFailureModeWarnings } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { ButtonLink } from "../components/ui/buttonLink";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -45,28 +46,25 @@ export default async function ConfidencePage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <SecondaryPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust", href: "/method" }, { label: "Confidence & Limits" }]} />
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Confidence &amp; Limits</h1>
-        <p className="text-sm text-slate-200">Confidence now: {formatConfidencePlainLabel(homeBriefModel.confidenceLabel)} · Regime shift watch {homeBriefModel.transitionWatch}.</p>
-        <p className="text-sm text-slate-300">Immediate implication: {reportData.actionNowShort}</p>
-      </section>
+      <SecondaryPageHeader
+        title="Confidence & Limits"
+        description={`Confidence now: ${formatConfidencePlainLabel(homeBriefModel.confidenceLabel)} · Regime shift watch ${homeBriefModel.transitionWatch}. Immediate implication: ${reportData.actionNowShort}`}
+      />
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Bounded decision checks</h2>
+      <SecondaryPageSection title="Bounded decision checks">
         <ul className="space-y-2 text-sm text-slate-200">
           <li><span className="text-slate-400">Flip trigger:</span> {reportData.flipThreshold}</li>
           <li><span className="text-slate-400">Pause trigger:</span> {reportData.guardrailThreshold}</li>
           <li><span className="text-slate-400">Reversal condition:</span> Confidence returns to HIGH and shift watch turns OFF before expanding fixed-cost approvals.</li>
           <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
         </ul>
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Failure-mode checks</h2>
+      <SecondaryPageSection title="Failure-mode checks">
         {warnings.length === 0 ? (
           <p className="text-sm text-slate-300">No active compact failure-mode warning. Continue with staged approvals.</p>
         ) : (
@@ -79,17 +77,16 @@ export default async function ConfidencePage() {
             ))}
           </ul>
         )}
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
+      <SecondaryPageSection title="Continue decision flow">
         <div className="flex flex-wrap gap-2">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly brief</Link>
-          <Link href="/method" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Back to trust snapshot</Link>
-          <Link href="/method#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Formula reference (Trust)</Link>
-          <Link href="/sources" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Sources and freshness</Link>
+          <ButtonLink href="/" variant="pill">Weekly brief</ButtonLink>
+          <ButtonLink href="/method" variant="pill">Back to trust snapshot</ButtonLink>
+          <ButtonLink href="/method#formula-reference" variant="pill">Formula reference (Trust)</ButtonLink>
+          <ButtonLink href="/sources" variant="pill">Sources and freshness</ButtonLink>
         </div>
-      </section>
-    </main>
+      </SecondaryPageSection>
+    </SecondaryPageShell>
   );
 }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { serializeJsonLd } from "../../../lib/seo";
@@ -7,6 +6,8 @@ import { findStageGuide } from "../stageGuides";
 import {
   findStakeholderGuide,
 } from "../stakeholderGuides";
+import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../../components/secondaryPageShell";
+import { ButtonLink } from "../../components/ui/buttonLink";
 
 type StakeholderPageProps = {
   params: Promise<{ stakeholder: string }>;
@@ -86,22 +87,24 @@ export default async function StakeholderGuidePage({ params }: StakeholderPagePr
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <SecondaryPageShell width="narrow">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqData) }}
       />
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Stakeholder guide
-        </p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {guide.title}</h1>
-        <p className="text-base text-sky-200">{guide.tagline}</p>
-        <p className="text-sm text-slate-300">{guide.seoDescription}</p>
-      </section>
+      <SecondaryPageHeader
+        eyebrow="Stakeholder guide"
+        title={`For ${guide.title}`}
+        description={guide.seoDescription}
+        aside={(
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Tagline</p>
+            <p className="text-sm font-semibold text-sky-200">{guide.tagline}</p>
+          </div>
+        )}
+      />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">How Whether helps this role</h2>
+      <SecondaryPageSection title="How Whether helps this role">
         <ul className="space-y-3 text-sm text-slate-200">
           {guide.bullets.map((bullet) => (
             <li key={bullet} className="weather-surface flex gap-3 px-4 py-3">
@@ -112,10 +115,9 @@ export default async function StakeholderGuidePage({ params }: StakeholderPagePr
             </li>
           ))}
         </ul>
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Stage-specific playbook</h2>
+      <SecondaryPageSection title="Stage-specific playbook">
         <ul className="space-y-3 text-sm text-slate-200">
           {guide.stageSpecificContent.map((entry) => {
             const stage = findStageGuide(entry.stageSlug);
@@ -127,11 +129,10 @@ export default async function StakeholderGuidePage({ params }: StakeholderPagePr
             );
           })}
         </ul>
-      </section>
+      </SecondaryPageSection>
 
       {guide.promotionAccelerator ? (
-        <section className="weather-panel space-y-4 px-6 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">{guide.promotionAccelerator.title}</h2>
+        <SecondaryPageSection title={guide.promotionAccelerator.title}>
           <p className="text-sm text-slate-200">{guide.promotionAccelerator.summary}</p>
           <ul className="space-y-2 text-sm text-slate-300">
             {guide.promotionAccelerator.signals.map((signal) => (
@@ -143,49 +144,28 @@ export default async function StakeholderGuidePage({ params }: StakeholderPagePr
               </li>
             ))}
           </ul>
-        </section>
+        </SecondaryPageSection>
       ) : null}
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Open the live app</p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/"
-            className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
-          >
-            Weekly Brief
-          </Link>
-          <Link
-            href="/operations"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            Planning
-          </Link>
-        </div>
-      </section>
+      <SecondaryPageSection
+        eyebrow="Open the live app"
+        actions={(
+          <>
+            <ButtonLink href="/" variant="primary">Weekly Brief</ButtonLink>
+            <ButtonLink href="/operations" variant="pill">Planning</ButtonLink>
+          </>
+        )}
+      />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Positioning line
-        </p>
+      <SecondaryPageSection eyebrow="Positioning line">
         <p className="weather-surface px-4 py-3 text-sm font-semibold text-slate-100">
           {guide.positioning}
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/guides/stage"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            Company stage pages
-          </Link>
-          <Link
-            href="/guides"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            Back to overview
-          </Link>
+          <ButtonLink href="/guides/stage" variant="pill">Company stage pages</ButtonLink>
+          <ButtonLink href="/guides" variant="pill">Back to overview</ButtonLink>
         </div>
-      </section>
-    </main>
+      </SecondaryPageSection>
+    </SecondaryPageShell>
   );
 }
