@@ -7,6 +7,7 @@
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
   --weather-interactive-duration: 200ms;
+  --weather-interactive-duration-fast: 160ms;
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --weather-focus-ring: rgba(125, 211, 252, 0.88);
   --weather-focus-halo: rgba(14, 165, 233, 0.32);
@@ -80,7 +81,7 @@ body {
     radial-gradient(circle at 58% 30%, rgba(191, 219, 254, 0.25) 0 1px, transparent 1.5px),
     radial-gradient(circle at 26% 58%, rgba(226, 232, 240, 0.18) 0 1px, transparent 1.5px);
   background-size: 100% 100%;
-  opacity: 0.42;
+  opacity: 0.34;
 }
 
 .weather-aurora {
@@ -190,7 +191,7 @@ body {
 .weather-hub-title {
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   font-size: clamp(2.3rem, 1.8rem + 2.1vw, 4.35rem);
-  line-height: 0.96;
+  line-height: 1;
   letter-spacing: -0.05em;
   color: white;
   text-wrap: balance;
@@ -262,6 +263,9 @@ body {
 .weather-hub-link-card:focus-visible {
   outline: 2px solid rgba(253, 224, 71, 0.85);
   outline-offset: 3px;
+  box-shadow:
+    0 0 0 4px rgba(250, 204, 21, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .weather-hub-chip {
@@ -860,9 +864,9 @@ body {
 .weather-command-bar__card {
   height: 100%;
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease;
+    transform var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
 }
 
 .weather-command-bar__card:hover,
@@ -1006,6 +1010,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .weather-live-hero::before,
   .weather-live-hero::after,
   .weather-live-dot,
@@ -1018,6 +1026,21 @@ body {
   .weather-skeleton__shimmer,
   .weather-stream-reveal {
     animation: none;
+  }
+
+  .weather-tab,
+  .weather-pill,
+  .weather-button,
+  .weather-button-primary,
+  .weather-cta,
+  .weather-icon-chip,
+  .weather-route-card,
+  .weather-hub-link-card,
+  .weather-command-bar__card,
+  .weather-delta-card,
+  .weather-step-card,
+  .weather-step-summary {
+    transition: none;
   }
 }
 
