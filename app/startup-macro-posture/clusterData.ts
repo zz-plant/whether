@@ -32,7 +32,7 @@ export const regimePages: StartupRegimePage[] = [
   {
     slug: "volatile",
     title: "Volatile posture",
-    summary: "Signals are mixed, so optionality is the operating default.",
+    summary: "Evidence is mixed, so optionality is the operating default.",
     hiring: "Stay selective and tie approvals to 1–2 quarter payback.",
     product: "Run milestone-gated launches with rollback ownership.",
     finance: "Fund reversible bets and avoid long lock-in commitments.",

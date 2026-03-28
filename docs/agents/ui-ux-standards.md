@@ -49,12 +49,12 @@
 
 ## VIII. IA boundary checklist (current navigation model)
 - **Weekly Brief (`/`):** the only canonical weekly workspace and first stop for posture, decision delta, and shareable artifact.
-- **Signals (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
-- **Operations (`/operations`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
-- **Decide (`/decide`):** role translation only (founder, product, finance, strategy views).
+- **Evidence (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
+- **Planning (`/operations`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
+- **Decision Tools (`/decide`):** role translation only (founder, product, finance, strategy views).
 - **Toolkits (`/toolkits`):** runnable instruments/templates only; do not restate posture logic or evidence narrative.
 - **Learn (`/learn`):** diagnostic and conceptual references only; no new canonical guidance should originate here.
-- **Method (`/method`):** transparency only (formulas, sources, cadence, limitations).
+- **Trust (`/method`):** transparency only (formulas, sources, cadence, limitations).
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
 
 ## IX. Homepage weekly brief motion guardrails

@@ -75,7 +75,7 @@ export const buildMonthlySummary = ({
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? " Signals are near a regime boundary; hold major scope changes until the next read."
+    ? " Evidence is near a regime boundary; hold major scope changes until the next read."
     : "";
   const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
   const title = recordDateLabel

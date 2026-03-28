@@ -39,7 +39,7 @@ const implementationHandoffLinks = [
 
 export const OperationsWorkflowProgress = () => {
   return (
-    <section className="weather-panel space-y-3 px-4 py-4" aria-label="Operations workflow progress">
+    <section className="weather-panel space-y-3 px-4 py-4" aria-label="Planning workflow progress">
       <div>
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Start here</p>
         <h2 className="text-sm font-semibold text-slate-100">Use this page in 3 steps</h2>

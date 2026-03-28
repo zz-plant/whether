@@ -22,7 +22,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           data-conversion-surface="pillar-cta"
           data-conversion-keyword={keyword}
         >
-          Open Operations
+          Open Planning
         </Link>
         <Link
           href={`/resources/capital-posture-template?source=${encodeURIComponent(sourceSlug)}`}
@@ -40,7 +40,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           data-conversion-surface="pillar-cta"
           data-conversion-keyword={keyword}
         >
-          Open board-pack exports
+          Open board-pack brief
         </Link>
       </div>
     </section>

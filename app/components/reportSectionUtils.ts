@@ -111,7 +111,7 @@ export const regimeBadges = [
     key: "VOLATILE",
     label: "Volatile",
     icon: "balance",
-    description: "Signals are mixed; balance experimentation with controls.",
+    description: "Evidence is mixed; balance experimentation with controls.",
     classes: REGIME_STYLE_TOKENS.VOLATILE.badge,
   },
   {

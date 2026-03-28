@@ -25,7 +25,7 @@ export function RouteLoadingShell({
       pageLinks={reportPageLinks}
       sectionLinks={[]}
       trustStatusLabel="Loading"
-      trustStatusDetail="Signals are still loading."
+      trustStatusDetail="Evidence is still loading."
       trustStatusAction="Keep this page open while the latest brief is prepared."
       trustStatusTone="stable"
       currentPath={currentPath}

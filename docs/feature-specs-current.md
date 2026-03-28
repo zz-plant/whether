@@ -84,7 +84,7 @@ Only one step is expanded at a time, while the other steps collapse into summary
 hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
 implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
 
-### 1.4 Operations workstreams
+### 1.4 Planning workstreams
 - **Weekly plan** (`/operations`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
 - **Developer references** (linked from `/operations`): `docs/developer/api-reference.md`, `docs/developer/cli-fallback.md`, and `docs/developer/integrations.md`.
@@ -299,7 +299,7 @@ $$
 - **P2 (open):** Monthly section expansion toward weekly parity where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
 
 ### 5.3 Briefing exports
-Operations briefings support copy-ready briefs and executive narratives with sensor data and
+Planning briefings support copy-ready briefs and executive narratives with sensor data and
 macro context embedded for leadership consumption.
 
 Interpretation-context transmission contract (homepage-selected `?view=` only):
@@ -344,4 +344,4 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 
 ## 7) Non-goals (as enforced in UI copy)
 - The UI is framed as operational guidance, not financial advice.
-- Signals are deterministic and traceable; no predictive ML output is used.
+- Evidence is deterministic and traceable; no predictive ML output is used.

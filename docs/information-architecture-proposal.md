@@ -5,14 +5,14 @@ Align navigation to the operator loop so leaders can move from posture to decisi
 
 ## Rationalized primary IA
 - **Weekly Brief** (`/`) for the canonical weekly call, bounded decision delta, and share artifact.
-- **Signals** (`/signals`) for evidence depth, thresholds, and historical replay.
-- **Decide** (`/decide`) for role, situation, and utility-based decision translation.
-- **Operations** (`/operations`) for execution guardrails, finance posture, and export actions.
-- **Method** (`/method`) for trust, sources, formulas, and confidence limits.
+- **Evidence** (`/signals`) for evidence depth, thresholds, and historical replay.
+- **Decision Tools** (`/decide`) for role, situation, and utility-based decision translation.
+- **Planning** (`/operations`) for execution guardrails, finance posture, and export actions.
+- **Trust** (`/method`) for trust, sources, formulas, and confidence limits.
 
 ## Supporting surfaces
-- **Toolkits** (`/toolkits`) is a supporting instrument library under **Decide**, not a peer workflow hub.
-- **Learn** (`/learn`) is a supporting reference library under **Method**, not a peer workflow hub.
+- **Toolkits** (`/toolkits`) is a supporting instrument library under **Decision Tools**, not a peer workflow hub.
+- **Learn** (`/learn`) is a supporting reference library under **Trust**, not a peer workflow hub.
 - **Guides**, **Resources**, **Answers**, **Solutions**, **Concepts**, and **Startup Macro Posture** remain secondary discovery, SEO, or long-form distribution surfaces.
 
 ## Shared secondary-surface contract
@@ -31,6 +31,6 @@ This contract keeps secondary pages indexable/discoverable while reinforcing the
 
 ## Implementation notes
 - Keep the global nav limited to the five primary hubs.
-- Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decide`, `Learn` → `Method`).
+- Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decision Tools`, `Learn` → `Trust`).
 - Keep first-party CTAs pointed at primary hubs unless the user already needs a supporting surface.
 - Use sitemap and metadata to distinguish canonical workflow hubs from supporting or distribution pages.

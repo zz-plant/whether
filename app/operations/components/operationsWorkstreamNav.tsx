@@ -27,7 +27,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
   const currentSearch = searchParams.toString();
 
   return (
-    <nav aria-label="Operations workstreams" className="weather-panel px-4 py-4">
+    <nav aria-label="Planning workstreams" className="weather-panel px-4 py-4">
       <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Other handoffs</p>
         <p className="text-sm text-slate-300">

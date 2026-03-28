@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!clusterDefinition) return {};
 
   const metadata = buildPageMetadata({
-    title: `${clusterDefinition.title} | Signals`,
+    title: `${clusterDefinition.title} | Evidence`,
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,

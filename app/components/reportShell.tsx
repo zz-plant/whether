@@ -319,7 +319,7 @@ export function CommandCenterNavBlock({
           <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">Whether report</p>
           <h1 className={heroVariant === "compact" ? "text-2xl font-semibold text-slate-100 sm:text-3xl" : "type-headline text-slate-100"}>{pageTitle}</h1>
           <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base"><span>{pageSummary}</span>{summaryLink}</p>
-          {heroVariant === "full" ? <span className="sr-only">Signals stamped {recordDateLabel}</span> : null}
+          {heroVariant === "full" ? <span className="sr-only">Evidence stamped {recordDateLabel}</span> : null}
         </div>
 
         {primaryCta ? (

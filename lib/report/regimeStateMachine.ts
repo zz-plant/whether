@@ -115,7 +115,7 @@ const advanceRegimeStateBase = (
 
   const transitionReason = crossingReasons.length > 0
     ? `${crossingReasons.join("; ")}.`
-    : "Signals moved into a different regime quadrant.";
+    : "Evidence moved into a different regime quadrant.";
 
   if (!committed) {
     return {

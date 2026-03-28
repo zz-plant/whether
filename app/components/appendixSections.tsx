@@ -1645,7 +1645,7 @@ export const SensorArray = ({
                     href={sensor.formulaUrl}
                     className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                   >
-                    Method notes
+                    Formula notes
                   </a>
                 </p>
                 <div className="mt-3">
@@ -1778,7 +1778,7 @@ export const MacroSignalsPanel = ({
                         href={signal.formulaUrl}
                         className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                       >
-                        Method notes
+                        Formula notes
                       </a>
                     </p>
                     <div className="mt-3">

@@ -39,7 +39,7 @@ export function LiveDataFallbackAlert({
       <p className="mt-1">
         Low confidence action: stage commitments, wait for one verified live refresh, and use the cached call as a translation layer rather than final authority. {followUpLabel} in{" "}
         <Link href={signalsHref} className="underline">
-          Signals
+          Evidence
         </Link>
         .
       </p>

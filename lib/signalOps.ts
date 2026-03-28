@@ -166,7 +166,7 @@ export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {
   if (!latest) {
     return {
       summary: "No regime-change alerts this week.",
-      bullets: ["Signals updated with no threshold crossings."],
+      bullets: ["Evidence updated with no threshold crossings."],
     };
   }
 

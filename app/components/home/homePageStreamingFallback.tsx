@@ -67,7 +67,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-1 h-5 w-24 rounded-full bg-slate-500/40" />
                 </div>
                 <div className="weather-stat-card">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Evidence updated</p>
                   <Skeleton className="mt-1 h-5 w-28 rounded-full bg-slate-500/35" />
                 </div>
                 <div className="weather-stat-card">

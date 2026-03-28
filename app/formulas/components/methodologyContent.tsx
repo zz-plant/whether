@@ -62,7 +62,7 @@ export const MethodologyContent = () => {
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Formula notes</p>
           <h1 className="text-3xl font-semibold text-slate-100">Methodology</h1>
           <p className="text-sm text-slate-300">Deep technical reference: each signal includes a plain-English formula, model role, and direct source.</p>
           <p className="mt-4 text-xs text-slate-400">Canonical Treasury feed: FRED CSV Treasury series. Secondary validation source: US Treasury Fiscal Data API when running provenance checks.</p>

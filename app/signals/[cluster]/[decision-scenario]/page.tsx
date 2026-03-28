@@ -98,8 +98,8 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Signal cluster</Link>
-          <Link href={`/decide/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decide scenario</Link>
+          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence cluster</Link>
+          <Link href={`/decide/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
         </div>
       </section>
     </main>

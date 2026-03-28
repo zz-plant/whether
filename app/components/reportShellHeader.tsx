@@ -93,7 +93,7 @@ export function ReportShellHeader({
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
             <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Evidence updated</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
             </div>
             <div className="weather-stat-card">

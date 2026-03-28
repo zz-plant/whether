@@ -1,8 +1,8 @@
-import type { LinkProps } from "next/link";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
+import Link from "next/link";
 import { ActionLink, type ActionLinkVariant } from "./actionLink";
 
-type ButtonLinkProps = LinkProps & {
+type ButtonLinkProps = Omit<ComponentProps<typeof Link>, "className"> & {
   children: ReactNode;
   className?: string;
   variant?: Extract<ActionLinkVariant, "primary" | "pill" | "ghost">;

@@ -75,7 +75,7 @@ export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_R
 export const REGIME_LEGEND_DESCRIPTORS: Record<RegimeKey, string> = {
   SCARCITY: "Cash is tight. Protect runway and pause big one-way commitments.",
   DEFENSIVE: "Stay efficient. Approve only work that pays back soon.",
-  VOLATILE: "Signals are mixed. Keep moves reversible until the trend is clearer.",
+  VOLATILE: "Evidence is mixed. Keep moves reversible until the trend is clearer.",
   EXPANSION: "Conditions support growth. Move faster, but keep guardrails in place.",
 };
 

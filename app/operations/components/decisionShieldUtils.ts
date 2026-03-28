@@ -65,7 +65,7 @@ export const buildShareText = (
     "",
     `Summary: ${output.summary}`,
     "",
-    "Signals:",
+    "Evidence:",
     ...output.bullets.map((bullet) => `- ${bullet}`),
     "",
     `Execution boundary: ${output.guardrail}`,

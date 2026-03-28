@@ -19,7 +19,7 @@ export default function DecisionShieldOverviewPage() {
           thresholds, classify reversibility risk, and preserve audit-ready decision memory.
         </p>
         <Link href="/operations" className="weather-button inline-flex items-center justify-center" data-conversion-event="demo/contact">
-          Open Decision Shield in Operations
+          Open Decision Shield in Planning
         </Link>
       </section>
     </main>

@@ -52,7 +52,7 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   { href: "#executive-snapshot", label: "Leadership summary" },
-  { href: "/operations#ops-playbook", label: "Operations" },
+  { href: "/operations#ops-playbook", label: "Planning" },
   { href: "/signals?advanced=1#time-machine", label: "Time machine" },
 ];
 
@@ -106,7 +106,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
     title: "Reading notes",
     bullets: [
       { emphasis: "Posture badge", detail: "summarizes current operating posture." },
-      { emphasis: "Signals map to constraints", detail: "rather than forecasts." },
+      { emphasis: "Evidence maps to constraints", detail: "rather than forecasts." },
       { emphasis: "Exports support alignment", detail: "across teams." },
     ],
   },
@@ -115,17 +115,17 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
 export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/operations",
-    label: "Operations",
+    label: "Planning",
     description: "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
   },
   {
     href: "/method",
-    label: "Method",
+    label: "Trust",
     description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
     href: "/method#beginner-glossary",
-    label: "Method & glossary",
+    label: "Trust & glossary",
     description: "Open trust details and plain-English definitions for teams that need term translation.",
   },
 ];
@@ -138,12 +138,12 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   },
   {
     href: "/operations",
-    label: "Operations",
+    label: "Planning",
     description: "Turn the regime readout into concrete posture and execution guidance.",
   },
   {
     href: "/method#beginner-glossary",
-    label: "Method & glossary",
+    label: "Trust & glossary",
     description: "Review trust status, confidence limits, and the plain-English glossary in one place.",
   },
 ];

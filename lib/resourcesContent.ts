@@ -347,7 +347,7 @@ export const resourcePillarPages: ResourcePillarPage[] = [
         ],
         subsections: [
           {
-            heading: "H3: Signals of a mature capital discipline system",
+            heading: "H3: Markers of a mature capital discipline system",
             paragraphs: [
               "Mature systems show repeatability: decisions are documented the same way, thresholds are interpreted consistently, and post-decision reviews feed directly into the next cycle.",
               "Maturity also shows up in narrative quality. Leadership can explain not only what was decided, but why alternatives were deferred and what evidence would reopen them."
@@ -416,7 +416,7 @@ export const resourcePillarPages: ResourcePillarPage[] = [
             heading: "H3: Layer one — external regime signals",
             paragraphs: [
               "External regime signals should be tracked as directional inputs rather than deterministic forecasts. The purpose is to calibrate posture, not to claim certainty.",
-              "Signals should include persistence windows and confidence notes. Single-period movements should not trigger major posture shifts absent corroborating evidence."
+              "Evidence should include persistence windows and confidence notes. Single-period movements should not trigger major posture shifts absent corroborating evidence."
             ]
           },
           {

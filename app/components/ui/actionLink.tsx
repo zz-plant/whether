@@ -1,5 +1,5 @@
-import Link, { type LinkProps } from "next/link";
-import type { ReactNode } from "react";
+import Link from "next/link";
+import type { ComponentProps, ReactNode } from "react";
 
 type ActionLinkVariant = "primary" | "pill" | "ghost" | "inline";
 
@@ -16,7 +16,7 @@ const actionLinkVariantClasses: Record<ActionLinkVariant, string> = {
 
 const joinClasses = (...values: Array<string | undefined>) => values.filter(Boolean).join(" ");
 
-type ActionLinkProps = LinkProps & {
+type ActionLinkProps = Omit<ComponentProps<typeof Link>, "className"> & {
   children: ReactNode;
   className?: string;
   variant?: ActionLinkVariant;

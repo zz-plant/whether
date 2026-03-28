@@ -180,7 +180,7 @@ export default async function SignalsPage({
       "Use historical data to understand trends, not to approve live bets.",
     fallbackAction:
       "Hold major decisions until live signals return or you validate the cache.",
-    stableAction: "Signals are live with current thresholds and timestamps.",
+    stableAction: "Evidence is live with current thresholds and timestamps.",
   });
   const nextRefreshLabel = historicalSelection
     ? "Fixed historical snapshot"

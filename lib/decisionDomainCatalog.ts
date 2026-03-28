@@ -24,7 +24,7 @@ export const postureDefinitions: PostureDefinition[] = [
     slug: "safety-mode",
     title: "Safety Mode",
     summary: "Use this when downside risk is elevated and mistakes are expensive.",
-    trigger: "Signals suggest tighter conditions or fragile demand.",
+    trigger: "Evidence suggests tighter conditions or fragile demand.",
     defaults: [
       "Protect retention, reliability, and cash runway.",
       "Gate hiring and other long-cycle commitments.",
@@ -35,7 +35,7 @@ export const postureDefinitions: PostureDefinition[] = [
     slug: "transition",
     title: "Transition",
     summary: "Use this when direction is shifting but confidence is still mixed.",
-    trigger: "Signals are moving, but persistence is not fully confirmed yet.",
+    trigger: "Evidence is moving, but persistence is not fully confirmed yet.",
     defaults: [
       "Sequence options behind explicit trigger conditions.",
       "Run upside and downside plans in parallel.",
@@ -221,7 +221,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
         deliverable: "Cohort quality score with confidence notes and known blind spots.",
       },
       {
-        phase: "Decide",
+        phase: "Translate",
         objective: "Convert evidence into a specific investment gate.",
         prompts: [
           "What threshold upgrades this from hold to scale?",
