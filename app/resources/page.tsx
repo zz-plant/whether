@@ -63,7 +63,17 @@ export default async function ResourcesPage() {
       <SecondarySurfaceStartBlock surface="resources" />
       <SecondaryPageHeader
         title="Resources"
-        description="Board-ready governance resources for capital allocation, escalation controls, reversibility discipline, and operating strategy under pressure. For formulas, source transparency, and model mechanics, use Reference."
+        description="Board-ready governance resources for capital allocation, escalation controls, reversibility discipline, and operating strategy under pressure. Use Planning for the live approval and export workflow; use Resources when you need the deeper library behind it."
+        actions={(
+          <>
+            <ButtonLink href="/" variant="primary">
+              Weekly Brief
+            </ButtonLink>
+            <ButtonLink href="/operations" variant="pill">
+              Planning
+            </ButtonLink>
+          </>
+        )}
       />
 
       <SecondaryPageSection

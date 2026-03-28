@@ -11,7 +11,6 @@ import {
 } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
-import { NextStepRail } from "../components/nextStepRail";
 import { PageFlowNav } from "../components/pageFlowNav";
 import { decideScrollPlan } from "../../lib/navigation/scrollPlans";
 
@@ -154,7 +153,6 @@ export default async function DecidePage() {
           ))}
         </div>
       </HubSection>
-      <NextStepRail currentPath="/decide" />
     </HubPageShell>
   );
 }

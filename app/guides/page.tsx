@@ -35,14 +35,14 @@ export default function GuidesPage() {
       <SecondaryPageHeader
         eyebrow="Guides overview"
         title="Pick the fastest guide for this week&apos;s operating decision"
-        description="Use stakeholder guides when you need role-specific actions. Use stage guides when you need company-maturity context for pacing, spend, and planning discipline."
+        description="Use stakeholder guides only after the weekly brief and Decision Tools narrowed the question. Use stage guides when you need company-maturity context for pacing, spend, and planning discipline."
         actions={(
           <>
             <ButtonLink href="/" variant="primary">
               Weekly Brief
             </ButtonLink>
-            <ButtonLink href="/method" variant="pill">
-              Trust
+            <ButtonLink href="/decide" variant="pill">
+              Decision Tools
             </ButtonLink>
           </>
         )}

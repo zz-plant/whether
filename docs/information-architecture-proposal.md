@@ -6,9 +6,12 @@ Align navigation to the operator loop so leaders can move from posture to decisi
 ## Rationalized primary IA
 - **Weekly Brief** (`/`) for the canonical weekly call, bounded decision delta, and share artifact.
 - **Evidence** (`/signals`) for evidence depth, thresholds, and historical replay.
-- **Decision Tools** (`/decide`) for role, situation, and utility-based decision translation.
 - **Planning** (`/operations`) for execution guardrails, finance posture, and export actions.
+- **Decision Tools** (`/decide`) for role, situation, and utility-based decision translation.
 - **Trust** (`/method`) for trust, sources, formulas, and confidence limits.
+
+Recommended in-product sequence:
+`/` → `/signals` only if proof is needed → `/operations` to approve the live plan → `/decide` only if one owner-specific edge case remains → `/method` when the call needs a trust audit.
 
 ## Supporting surfaces
 - **Toolkits** (`/toolkits`) is a supporting instrument library under **Decision Tools**, not a peer workflow hub.
@@ -31,6 +34,7 @@ This contract keeps secondary pages indexable/discoverable while reinforcing the
 
 ## Implementation notes
 - Keep the global nav limited to the five primary hubs.
+- Order the workflow hubs to match the operator loop users are asked to follow in-product: **Weekly Brief → Evidence → Planning → Decision Tools → Trust**.
 - Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decision Tools`, `Learn` → `Trust`).
 - Keep first-party CTAs pointed at primary hubs unless the user already needs a supporting surface.
 - Use sitemap and metadata to distinguish canonical workflow hubs from supporting or distribution pages.

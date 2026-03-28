@@ -46,8 +46,8 @@ export default async function AnswersHubPage() {
             <ButtonLink href="/" variant="ghost">
               Open weekly brief
             </ButtonLink>
-            <ButtonLink href="/signals" variant="pill">
-              Review evidence
+            <ButtonLink href="/decide" variant="pill">
+              Decision Tools
             </ButtonLink>
           </>
         )}
@@ -70,7 +70,7 @@ export default async function AnswersHubPage() {
           </article>
         </div>
         <p className="text-sm text-slate-300">
-          Use `/answers` when you need a direct, shareable answer to one operating question. Use the weekly brief when you need the full planning baseline for this week.
+          Use `/answers` when you need a direct, shareable answer to one operating question after Decision Tools has already narrowed the frame. Use the weekly brief when you need the full planning baseline for this week.
         </p>
       </SecondaryPageSection>
 

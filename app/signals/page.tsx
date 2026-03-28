@@ -23,7 +23,6 @@ import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePic
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
-import { NextStepRail } from "../components/nextStepRail";
 import { PageFlowNav } from "../components/pageFlowNav";
 
 export const runtime = "edge";
@@ -697,7 +696,6 @@ export default async function SignalsPage({
         links={SIGNALS_RELATED_LINKS}
         variant="compact"
       />
-      <NextStepRail currentPath="/signals" />
     </ReportShell>
   );
 }

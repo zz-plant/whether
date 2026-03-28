@@ -5,7 +5,6 @@ import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubSection } from "../components/hubPageShell";
-import { NextStepRail } from "../components/nextStepRail";
 import { BeginnerGlossaryPanel } from "../components/appendixSections";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
@@ -255,8 +254,6 @@ export default async function MethodPage() {
       </HubSection>
 
       <BeginnerGlossaryPanel />
-
-      <NextStepRail currentPath="/method" />
     </ReportShell>
   );
 }

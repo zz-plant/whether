@@ -24,7 +24,6 @@ import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
-import { NextStepRail } from "../components/nextStepRail";
 import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
 import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
@@ -209,35 +208,6 @@ export default async function OperationsPage({
           stopItems[0] ?? "Escalate to leadership if a stop trigger is hit.",
         ],
         updatedAt: fetchedAtLabel,
-      }}
-      actionSequence={{
-        title: "How to use this page",
-        items: [
-          {
-            title: "Read the weekly plan",
-            detail: "Start with the approve, hold, and revisit call for this cycle.",
-            href: "#ops-monthly-action-summary",
-            cta: "Open plan",
-          },
-          {
-            title: "Apply guardrails",
-            detail: "Choose start, stop, and fence actions before committing new work.",
-            href: "#ops-playbook",
-            cta: "Open guardrails",
-          },
-          {
-            title: "Verify finance strategy",
-            detail: "Confirm budget posture and runway timing before you publish the brief.",
-            href: "#ops-finance-strategy",
-            cta: "Open finance",
-          },
-          {
-            title: "Share the aligned brief",
-            detail: "Copy the artifact once finance strategy and operator asks are aligned.",
-            href: "#ops-export-briefs",
-            cta: "Open share brief",
-          },
-        ],
       }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
@@ -432,7 +402,6 @@ export default async function OperationsPage({
             ))}
         </div>
       </section>
-      <NextStepRail currentPath="/operations" />
     </ReportShell>
   );
 }
