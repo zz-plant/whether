@@ -39,8 +39,8 @@ export default async function AnswersHubPage() {
       <SecondarySurfaceStartBlock surface="answers" />
       <SecondaryPageHeader
         eyebrow="One-question answer library"
-        title="Get a direct answer without reopening the whole workflow"
-        description={`Use this surface when the operating question is already crisp and you want a shareable answer with bounded policy, trigger, and weekly-brief linkback. Total pages: ${answerPages.length}.`}
+        title="Open one answer, then return to Decision Tools"
+        description={`Use this surface when the operating question is already crisp and you want a shareable answer with bounded policy, trigger, and weekly-brief linkback. Featured answers: ${featuredAnswerPages.length}.`}
         actions={(
           <>
             <ButtonLink href="/" variant="ghost">
@@ -75,8 +75,8 @@ export default async function AnswersHubPage() {
       </SecondaryPageSection>
 
       <SecondaryPageSection
-        title="Distribution-ready direct pages"
-        description="These are the highest-signal direct answers. Use `/decide` for discovery; use this page when you already know the exact question you need answered."
+        title="Featured answers"
+        description="Use `/decide` for discovery. Use this page when you already know the exact question and want one direct answer page."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {featuredAnswerPages.map((page) => (
@@ -87,14 +87,14 @@ export default async function AnswersHubPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <ButtonLink href="/decide#direct-answers" variant="pill">
-            Browse from Decision Tools
+            Return to Decision Tools
           </ButtonLink>
         </div>
       </SecondaryPageSection>
 
       <details className="weather-panel space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open full one-question library ({answerPages.length})
+          Open the rest of the answer library ({answerPages.length})
         </summary>
         <div className="mt-4 space-y-6">
           {answerCategories.map((category) => {

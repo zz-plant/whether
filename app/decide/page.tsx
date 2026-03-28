@@ -12,8 +12,6 @@ import {
 } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
-import { PageFlowNav } from "../components/pageFlowNav";
-import { decideScrollPlan } from "../../lib/navigation/scrollPlans";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
@@ -54,6 +52,9 @@ export default async function DecidePage() {
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
     featuredStakeholderSlugs.includes(guide.slug as (typeof featuredStakeholderSlugs)[number]),
   );
+  const recommendedAnswerPages = featuredAnswerPages.slice(0, 2);
+  const recommendedStakeholderGuides = featuredStakeholders.slice(0, 2);
+  const recommendedStageGuides = stageGuides.slice(0, 2);
 
   return (
     <HubPageShell width="standard">
@@ -82,17 +83,78 @@ export default async function DecidePage() {
         )}
       />
 
-      <PageFlowNav
-        eyebrow={decideScrollPlan.eyebrow}
-        title={decideScrollPlan.title}
-        description={decideScrollPlan.description}
-        items={decideScrollPlan.items}
-      />
+      <HubSection
+        id="choose-your-path"
+        title="Pick the smallest useful path"
+        description="If the weekly plan is already clear, choose exactly one unresolved question: an exact answer, one utility, or one translation path."
+        className="scroll-mt-28"
+      >
+        <div className="grid gap-3 lg:grid-cols-3">
+          <article className="weather-hub-card space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Exact answer</p>
+            <p className="text-sm text-slate-200">Use this when the question is already crisp and you want a shareable answer, not a browse flow.</p>
+            <div className="space-y-2">
+              {recommendedAnswerPages.map((page) => (
+                <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
+                  <p className="text-sm font-semibold text-slate-100">{page.title}</p>
+                  <p className="text-xs text-slate-300">{page.shortAnswer}</p>
+                </Link>
+              ))}
+            </div>
+            <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
+              Open answers library
+            </Link>
+          </article>
+          <article className="weather-hub-card space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">One utility</p>
+            <p className="text-sm text-slate-200">Use a bounded checker when one move still needs validation before you commit.</p>
+            <div className="grid gap-2">
+              <Link href="/decide/ship-checklist" className="weather-hub-link-card space-y-1">
+                <p className="text-sm font-semibold text-slate-100">Whether to ship checklist</p>
+                <p className="text-xs text-slate-300">Get a go / wait / kill recommendation tied to the current regime.</p>
+              </Link>
+              <Link href="/decide/team-context" className="weather-hub-link-card space-y-1">
+                <p className="text-sm font-semibold text-slate-100">Team context profile</p>
+                <p className="text-xs text-slate-300">Adjust the weekly call for your company profile without reopening the whole brief.</p>
+              </Link>
+            </div>
+          </article>
+          <article className="weather-hub-card space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Translate one path</p>
+            <p className="text-sm text-slate-200">Use this when the weekly call is directionally clear but one owner or company stage still needs framing.</p>
+            <div className="grid gap-2">
+              {recommendedStakeholderGuides.map((guide) => (
+                <Link
+                  key={guide.slug}
+                  href={`/guides/${guide.slug}` as Route}
+                  className="weather-hub-link-card space-y-1"
+                >
+                  <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
+                  <p className="text-xs text-slate-300">{guide.tagline}</p>
+                </Link>
+              ))}
+              {recommendedStageGuides.map((stage) => (
+                <Link
+                  key={stage.slug}
+                  href={`/guides/stage/${stage.slug}` as Route}
+                  className="weather-hub-link-card space-y-1"
+                >
+                  <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
+                  <p className="text-xs text-slate-300">{stage.primaryValue}</p>
+                </Link>
+              ))}
+            </div>
+            <Link href="/guides" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
+              Open guides library
+            </Link>
+          </article>
+        </div>
+      </HubSection>
 
       <HubSection
-        id="start-from-this-weeks-call"
-        title="Start from this week’s live call"
-        description="Use the same bounded weekly decision everywhere below so translation never drifts from the canonical brief."
+        id="current-call"
+        title="Current weekly call"
+        description="Keep the live brief visible while you choose a single next path."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-3">
@@ -112,146 +174,46 @@ export default async function DecidePage() {
         </div>
       </HubSection>
 
-      <HubSection
-        id="continue-only-if-needed"
-        title="Continue only if one bounded question remains"
-        description="Return to Planning when approvals, guardrails, or finance posture are still unsettled. Use this page only when those are already directionally clear."
-        className="scroll-mt-28"
-      >
-        <div className="grid gap-3 md:grid-cols-3">
-          <article className="weather-hub-card space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">Good use</p>
-            <p className="text-sm text-slate-200">One launch, staffing, roadmap, or company-context question still needs a bounded answer.</p>
-          </article>
-          <article className="weather-hub-card space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Do not use</p>
-            <p className="text-sm text-slate-200">Re-reading the weekly plan, collecting broad context, or rebuilding trust and evidence from scratch.</p>
-          </article>
-          <article className="weather-hub-card space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">If not ready</p>
-            <Link href="/operations#ops-monthly-action-summary" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-              Return to Planning
-            </Link>
-          </article>
-        </div>
-      </HubSection>
-
-      <HubSection
-        id="run-this-now"
-        title="Fastest bounded tools"
-        description="Start with the shortest runnable tool only after the weekly call already tells you the direction and you just need owner-specific translation."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-3">
-          {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
-            const toolkit = findToolkitDefinition(toolkitSlug);
-            if (!toolkit) return null;
-
-            return (
-              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2 text-sm text-slate-100">
-                <span className="weather-hub-chip w-fit">Toolkit</span>
-                <p className="font-semibold">{toolkit.title}</p>
-                <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
-              </Link>
-            );
-          })}
-        </div>
-      </HubSection>
-
-      <HubSection
-        id="decision-utilities"
-        title="Validation utilities"
-        description="Use these only when one unresolved move needs bounded validation or company context before you act."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-2">
-          <Link href="/decide/ship-checklist" className="weather-hub-link-card space-y-2">
-            <h2 className="text-lg font-semibold text-slate-100">Whether to ship checklist</h2>
-            <p className="text-sm text-slate-300">Get a go / wait / kill recommendation tied to the current regime.</p>
-          </Link>
-          <Link href="/decide/team-context" className="weather-hub-link-card space-y-2">
-            <h2 className="text-lg font-semibold text-slate-100">Team context profile</h2>
-            <p className="text-sm text-slate-300">Adjust the weekly call for your company profile without reopening the whole brief.</p>
-          </Link>
-        </div>
-      </HubSection>
-
-      <HubSection
-        id="direct-answers"
-        title="Answer one exact question"
-        description="If the unresolved issue is already crisp, use a single-question answer here instead of widening into a broader browse flow."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-2">
-          {featuredAnswerPages.slice(0, 4).map((page) => (
-            <Link
-              key={page.slug}
-              href={`/answers/${page.slug}` as Route}
-              className="weather-hub-link-card space-y-2"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Direct answer</p>
-              <h2 className="text-lg font-semibold text-slate-100">{page.title}</h2>
-              <p className="text-sm text-slate-300">{page.shortAnswer}</p>
-            </Link>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Open answers library
-          </Link>
-        </div>
-      </HubSection>
-
-      <HubSection
-        id="guided-translation"
-        title="Translate the call for one owner or company stage"
-        description="Use these paths after the weekly call is directionally settled and you need a reusable framing for one team, function, or company stage."
-        className="scroll-mt-28"
-      >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Owner-specific paths</p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {featuredStakeholders.map((guide) => (
-                <Link
-                  key={guide.slug}
-                  href={`/guides/${guide.slug}` as Route}
-                  className="weather-hub-link-card space-y-2"
-                >
-                  <h2 className="text-base font-semibold text-slate-100">{guide.title}</h2>
-                  <p className="text-sm text-slate-300">{guide.tagline}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Company-stage paths</p>
-            <div className="grid gap-3">
-              {stageGuides.map((stage) => (
-                <Link
-                  key={stage.slug}
-                  href={`/guides/stage/${stage.slug}` as Route}
-                  className="weather-hub-link-card space-y-1"
-                >
-                  <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
-                  <p className="text-xs text-slate-300">{stage.primaryValue}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/guides" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Open guides library
-          </Link>
-        </div>
-      </HubSection>
-
       <details className="weather-panel scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           Open full edge-case library
         </summary>
         <div className="mt-4 space-y-6">
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Fastest bounded tools</h2>
+            <div className="weather-page-grid-3">
+              {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
+                const toolkit = findToolkitDefinition(toolkitSlug);
+                if (!toolkit) return null;
+
+                return (
+                  <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2 text-sm text-slate-100">
+                    <span className="weather-hub-chip w-fit">Toolkit</span>
+                    <p className="font-semibold">{toolkit.title}</p>
+                    <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Exact answers</h2>
+            <div className="weather-page-grid-2">
+              {featuredAnswerPages.map((page) => (
+                <Link
+                  key={page.slug}
+                  href={`/answers/${page.slug}` as Route}
+                  className="weather-hub-link-card space-y-2"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Direct answer</p>
+                  <h2 className="text-lg font-semibold text-slate-100">{page.title}</h2>
+                  <p className="text-sm text-slate-300">{page.shortAnswer}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Owner-specific paths</h2>
             <div className="weather-page-grid-3">

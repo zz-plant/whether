@@ -34,7 +34,7 @@ export default function GuidesPage() {
       <SecondarySurfaceStartBlock surface="guides" />
       <SecondaryPageHeader
         eyebrow="Translation library"
-        title="Translate the call for one team or company stage"
+        title="Translate the call, then return to Decision Tools"
         description="Use this page as a lightweight guide shelf after Decision Tools narrowed the question. It is a library shell for translation work, not the primary discovery workflow."
         actions={(
           <>
@@ -49,11 +49,11 @@ export default function GuidesPage() {
       />
 
       <SecondaryPageSection
-        title="Owner-specific paths"
-        description="Featured paths for the most common translation jobs."
+        title="Featured owner paths"
+        description="Use `/decide` for discovery. Use this page when the question already belongs to one team or executive owner."
         actions={(
           <ActionLink href="/decide#guided-translation" variant="inline">
-            Browse from Decision Tools
+            Return to Decision Tools
           </ActionLink>
         )}
       >
@@ -73,20 +73,19 @@ export default function GuidesPage() {
 
       <details className="weather-panel space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open company-stage paths ({stageGuides.length})
+          Open the rest of the stage library ({stageGuides.length})
         </summary>
-        <ul className="mt-4 space-y-2 text-sm text-slate-200">
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
           {stageGuides.map((stage) => (
-            <li key={stage.slug} className="weather-surface flex items-center justify-between gap-4 px-4 py-3">
-              <span>
-                <span className="font-semibold text-slate-100">{stage.title}</span> — {stage.primaryValue}
-              </span>
+            <article key={stage.slug} className="weather-surface space-y-2 px-4 py-4">
+              <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
+              <p className="text-xs text-slate-300">{stage.primaryValue}</p>
               <ActionLink href={`/guides/stage/${stage.slug}`} variant="inline">
-                Open
+                Open stage guide
               </ActionLink>
-            </li>
+            </article>
           ))}
-        </ul>
+        </div>
       </details>
     </SecondaryPageShell>
   );

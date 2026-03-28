@@ -445,28 +445,33 @@ export default async function OperationsPage({
         </div>
       </details>
 
-      <section id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-developer-reference-title">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
-          <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Endpoint, terminal, and integration handoffs</h2>
-          <p className="text-sm text-slate-300">Use these docs when you need implementation depth after the weekly plan is approved.</p>
+      <details id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-3 px-5 py-5">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Need implementation handoffs?
+        </summary>
+        <div className="mt-4 space-y-4">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
+            <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Endpoint, terminal, and integration handoffs</h2>
+            <p className="text-sm text-slate-300">Use these docs only when the weekly plan is approved and you need implementation depth for delivery.</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {operationsDeveloperReferenceLinks
+              .map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{link.label}</p>
+                  <p className="mt-2 text-sm text-slate-300">{link.description}</p>
+                </a>
+              ))}
+          </div>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          {operationsDeveloperReferenceLinks
-            .map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{link.label}</p>
-                <p className="mt-2 text-sm text-slate-300">{link.description}</p>
-              </a>
-            ))}
-        </div>
-      </section>
+      </details>
     </ReportShell>
   );
 }

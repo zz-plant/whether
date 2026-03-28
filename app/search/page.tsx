@@ -5,6 +5,7 @@ import {
   groupSearchResultsByJob,
   searchJobDescriptions,
   searchJobLabels,
+  searchPrimaryHubByJob,
   searchIndex,
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
@@ -165,6 +166,7 @@ export default async function SearchPage({
           {searchJobOrder.map((jobKey) => {
             const entries = groupedResults[jobKey];
             if (entries.length === 0) return null;
+            const primaryHub = searchPrimaryHubByJob[jobKey];
 
             return (
               <HubSection
@@ -172,17 +174,29 @@ export default async function SearchPage({
                 title={searchJobLabels[jobKey]}
                 description={searchJobDescriptions[jobKey]}
               >
-                <ul className="grid gap-3">
+                <div className="weather-hub-card space-y-3 px-5 py-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Recommended next step</p>
+                  <h3 className="text-lg font-semibold text-slate-100">{primaryHub.label}</h3>
+                  <p className="text-sm text-slate-300">{primaryHub.summary}</p>
+                  <Link href={primaryHub.href} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+                    Open {searchJobLabels[jobKey]}
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Supporting matches</p>
+                  <ul className="grid gap-3">
                   {entries.map((entry) => (
                     <li key={entry.id}>
                       <Link href={entry.href} className="weather-hub-link-card space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-200">{entry.intentLabel}</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">{entry.recommendedHubLabel}</p>
                         <p className="text-base font-semibold text-slate-100">{entry.title}</p>
                         <p className="text-sm text-slate-300">{entry.summary}</p>
                       </Link>
                     </li>
                   ))}
-                </ul>
+                  </ul>
+                </div>
               </HubSection>
             );
           })}
@@ -195,9 +209,10 @@ export default async function SearchPage({
                 <span className="font-semibold text-slate-100">trust</span>.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Link href="/search?q=rollback" className="weather-hub-chip">Try rollback</Link>
-                <Link href="/search?q=runway" className="weather-hub-chip">Try runway</Link>
-                <Link href="/search?q=trust" className="weather-hub-chip">Try trust docs</Link>
+                <Link href="/signals" className="weather-hub-chip">Try Evidence</Link>
+                <Link href="/operations" className="weather-hub-chip">Try Planning</Link>
+                <Link href="/decide" className="weather-hub-chip">Try Decision Tools</Link>
+                <Link href="/method" className="weather-hub-chip">Try Trust</Link>
               </div>
             </div>
           ) : null}

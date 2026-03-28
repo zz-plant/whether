@@ -3,11 +3,15 @@ import { productConceptArticles } from "../productCanon";
 
 export type SearchEntityType = "toolkit" | "failure-mode" | "concept" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
+export type SearchPrimaryHub = "/signals" | "/operations" | "/decide" | "/method";
 
 export type SearchEntity = {
   id: string;
   type: SearchEntityType;
   job: SearchEntityJob;
+  routePriority: number;
+  recommendedHubHref: SearchPrimaryHub;
+  recommendedHubLabel: string;
   title: string;
   href: string;
   summary: string;
@@ -31,11 +35,42 @@ export const searchJobDescriptions: Record<SearchEntityJob, string> = {
   trust: "Freshness, confidence, source, and formula checks for defending the call.",
 };
 
+export const searchPrimaryHubByJob: Record<SearchEntityJob, { href: SearchPrimaryHub; label: string; summary: string }> = {
+  check: {
+    href: "/signals",
+    label: "Open Evidence",
+    summary: "Start with the canonical proof surface when you need to see what changed and why.",
+  },
+  approve: {
+    href: "/operations",
+    label: "Open Planning",
+    summary: "Start with the approval workspace when you need to approve, hold, or share the weekly plan.",
+  },
+  resolve: {
+    href: "/decide",
+    label: "Open Decision Tools",
+    summary: "Start with the edge-case hub when one bounded question still needs an answer.",
+  },
+  risk: {
+    href: "/method",
+    label: "Open Trust",
+    summary: "Start with the audit gate when you need to pressure-test the call or its assumptions.",
+  },
+  trust: {
+    href: "/method",
+    label: "Open Trust",
+    summary: "Start with the audit gate when you need freshness, confidence, sources, or formulas.",
+  },
+};
+
 const keyDocs: SearchEntity[] = [
   {
     id: "doc-signals",
     type: "doc",
     job: "check",
+    routePriority: 4,
+    recommendedHubHref: "/signals",
+    recommendedHubLabel: "Open Evidence",
     title: "Check what changed and why",
     href: "/signals",
     summary: "Review macro evidence, thresholds, and the context behind current posture.",
@@ -46,6 +81,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-method",
     type: "doc",
     job: "trust",
+    routePriority: 4,
+    recommendedHubHref: "/method",
+    recommendedHubLabel: "Open Trust",
     title: "Run a trust check",
     href: "/method",
     summary: "See scoring, data cadence, source quality, and transparency notes.",
@@ -56,6 +94,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-evidence",
     type: "doc",
     job: "check",
+    routePriority: 4,
+    recommendedHubHref: "/signals",
+    recommendedHubLabel: "Open Evidence",
     title: "Audit evidence and provenance",
     href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
@@ -66,6 +107,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-guides",
     type: "doc",
     job: "resolve",
+    routePriority: 1,
+    recommendedHubHref: "/decide",
+    recommendedHubLabel: "Open Decision Tools",
     title: "Translate the call by role or stage",
     href: "/guides",
     summary: "Downstream helper guides for translating weekly brief posture into role- and stage-specific calls.",
@@ -76,6 +120,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-answers",
     type: "doc",
     job: "resolve",
+    routePriority: 1,
+    recommendedHubHref: "/decide",
+    recommendedHubLabel: "Open Decision Tools",
     title: "Get a direct answer",
     href: "/answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
@@ -86,6 +133,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-resources",
     type: "doc",
     job: "approve",
+    routePriority: 1,
+    recommendedHubHref: "/operations",
+    recommendedHubLabel: "Open Planning",
     title: "Prepare a board-ready artifact",
     href: "/resources",
     summary: "Board-ready long-form helper artifacts for leadership reviews after weekly posture is set.",
@@ -96,6 +146,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-concepts",
     type: "doc",
     job: "risk",
+    routePriority: 1,
+    recommendedHubHref: "/method",
+    recommendedHubLabel: "Open Trust",
     title: "Pressure-test a framework",
     href: "/concepts",
     summary: "Framework helper pages that contextualize product canon against current macro regime evidence.",
@@ -106,6 +159,9 @@ const keyDocs: SearchEntity[] = [
     id: "doc-method-formulas",
     type: "doc",
     job: "trust",
+    routePriority: 4,
+    recommendedHubHref: "/method",
+    recommendedHubLabel: "Open Trust",
     title: "Inspect scoring and formulas",
     href: "/method#formula-reference",
     summary: "Open the formula reference section from the canonical Trust hub.",
@@ -121,6 +177,9 @@ export const buildSearchIndex = (): SearchEntity[] => {
     id: `toolkit-${toolkit.slug}`,
     type: "toolkit",
     job: "resolve",
+    routePriority: 2,
+    recommendedHubHref: "/decide",
+    recommendedHubLabel: "Open Decision Tools",
     title: toolkit.title,
     href: `/toolkits/${toolkit.slug}`,
     summary: toolkit.decisionThisSession,
@@ -138,6 +197,9 @@ export const buildSearchIndex = (): SearchEntity[] => {
     id: `failure-mode-${failureMode.slug}`,
     type: "failure-mode",
     job: "risk",
+    routePriority: 2,
+    recommendedHubHref: "/method",
+    recommendedHubLabel: "Open Trust",
     title: failureMode.title,
     href: `/learn/failure-modes/${formatFailureModeSlug(failureMode.slug)}`,
     summary: failureMode.summary,
@@ -149,6 +211,9 @@ export const buildSearchIndex = (): SearchEntity[] => {
     id: `concept-${concept.slug}`,
     type: "concept",
     job: "risk",
+    routePriority: 1,
+    recommendedHubHref: "/method",
+    recommendedHubLabel: "Open Trust",
     title: concept.title,
     href: `/concepts/${concept.slug}`,
     summary: concept.summary,
@@ -194,7 +259,7 @@ export const searchIndex = (query: string): SearchEntity[] => {
         if (entity.summary.toLowerCase().includes(term)) return total + 2;
         if (haystack.includes(term)) return total + 1;
         return total;
-      }, 0);
+      }, 0) + entity.routePriority;
       return { entity, score };
     })
     .filter((entry) => entry.score > 0)

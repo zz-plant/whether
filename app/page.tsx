@@ -92,8 +92,8 @@ export const HomePageReportContent = async ({
             label: "Open evidence handoff",
           },
           nextStep: {
-            href: "/signals",
-            description: "Open Evidence only when the brief needs proof, replay, or threshold review",
+            href: "/operations",
+            description: "Open Planning next for approvals, guardrails, finance posture, and the final aligned brief",
           },
         },
         payloads: {
