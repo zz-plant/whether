@@ -31,10 +31,10 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
   return (
     <section id="audit-this-call" className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="audit-this-call-title">
       <HomeBandHeader
-        step="01"
-        kicker="Evidence + trust"
-        title="Leave home only when the brief needs proof or a trust audit."
-        description="Weekly Brief owns the live call. Open Evidence for drivers, thresholds, and replay. Open Trust when you need to defend freshness, confidence, or formulas."
+        step="02"
+        kicker="Exception paths"
+        title="Open Evidence or Trust only when the weekly call still needs proof."
+        description="Planning stays the default path. Leave home for Evidence when the drivers need checking, or Trust when a reviewer needs freshness, confidence, or formula defense."
         icon={<AuditIcon className="h-5 w-5 text-sky-100" />}
         toneClass="border-sky-400/40 text-sky-200"
         actions={(
@@ -58,7 +58,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
               {workspaceModel.audit.trustMarkerLabel}
             </span>
             <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-              Use on home
+              Exception only
             </span>
           </div>
           <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.trustStatusAction}</p>
@@ -105,7 +105,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
           <Link href={"/signals" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Evidence owns</p>
             <p className="mt-2 text-sm font-semibold">Why the call moved</p>
-            <p className="mt-1 text-xs text-slate-300">Use the evidence view when you need the driver stack, thresholds, and replay rather than the compact home readout.</p>
+            <p className="mt-1 text-xs text-slate-300">Use this only when the compact home readout is not enough and you need the driver stack, thresholds, or replay before approving the plan.</p>
             {workspaceModel.audit.evidenceMovers.length > 0 ? (
               <ul className="mt-3 space-y-2">
                 {workspaceModel.audit.evidenceMovers.slice(0, 2).map((item) => (
@@ -121,7 +121,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
           <Link href={"/method" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Trust owns</p>
             <p className="mt-2 text-sm font-semibold">Whether you can defend the call</p>
-            <p className="mt-1 text-xs text-slate-300">Treat Trust as the audit surface for methodology, formulas, source coverage, and readiness edge cases.</p>
+            <p className="mt-1 text-xs text-slate-300">Use this only when someone challenges readiness and you need a fast trust verdict, source coverage check, or formula explanation.</p>
             <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/45 px-2.5 py-2 text-xs">
               <p className="font-semibold text-slate-100">Operating implication</p>
               <p className="mt-1 text-slate-300">{workspaceModel.audit.decisionImpactWindow}</p>

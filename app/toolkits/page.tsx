@@ -46,16 +46,21 @@ export default async function ToolkitsPage({
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
       <HubHero
         eyebrow="Supporting surface under Decision Tools"
-        title="Run one instrument only after Weekly Brief or Decision Tools has already set the direction."
-        description="Toolkits are execution helpers, not the canonical workflow. Use them when the call is clear and you need one runnable instrument end to end."
-        actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decision Tools</Link>}
+        title="Run one instrument to close the last execution question."
+        description="Search by the decision job you need to finish now. Toolkits are for execution when the direction is already clear and one runnable checker or template will unblock action."
+        actions={(
+          <>
+            <Link href="#find-the-runnable-instrument" className="weather-button inline-flex items-center justify-center">Find a toolkit</Link>
+            <Link href="/decide" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Decision Tools</Link>
+          </>
+        )}
         stats={[
           { label: "Results", value: `${filteredToolkits.length} toolkit${filteredToolkits.length === 1 ? "" : "s"}` },
           { label: "Best use", value: "Action after direction" },
           { label: "Search mode", value: query ? `Intent: ${query}` : "Browse all", detail: "Search by decision job, not by abstract framework language." },
         ]}
       />
-      <HubSection title="Find the runnable instrument" description="Search by the decision you need to make this week. Each toolkit is designed to help a team move from posture to a bounded action." >
+      <HubSection id="find-the-runnable-instrument" title="Find the runnable instrument" description="Search by the decision you need to make this week. Each toolkit is designed to move a team from posture to one bounded action." >
         <form action="/toolkits" className="flex flex-col gap-3 sm:flex-row">
           <label htmlFor="toolkits-search-input" className="sr-only">Search toolkits by decision</label>
           <input

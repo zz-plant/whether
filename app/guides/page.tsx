@@ -34,12 +34,12 @@ export default function GuidesPage() {
       <SecondarySurfaceStartBlock surface="guides" />
       <SecondaryPageHeader
         eyebrow="Translation library"
-        title="Translate the call, then return to Decision Tools"
-        description="Use this page as a lightweight guide shelf after Decision Tools narrowed the question. It is a library shell for translation work, not the primary discovery workflow."
+        title="Translate this week's call for one team or stage"
+        description="Start with the owner or stage that needs a tailored operating frame right now. Each guide translates the live call into bounded actions without reopening the whole brief."
         actions={(
           <>
-            <ButtonLink href="/" variant="primary">
-              Weekly Brief
+            <ButtonLink href="#featured-owner-paths" variant="primary">
+              Open featured paths
             </ButtonLink>
             <ButtonLink href="/decide" variant="pill">
               Decision Tools
@@ -49,15 +49,16 @@ export default function GuidesPage() {
       />
 
       <SecondaryPageSection
+        className="scroll-mt-28"
         title="Featured owner paths"
-        description="Use `/decide` for discovery. Use this page when the question already belongs to one team or executive owner."
+        description="Pick the team or leader that needs the call translated now."
         actions={(
           <ActionLink href="/decide#guided-translation" variant="inline">
-            Return to Decision Tools
+            Need help choosing a path?
           </ActionLink>
         )}
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <div id="featured-owner-paths" className="grid gap-4 md:grid-cols-2">
           {featuredStakeholders.map((guide) => (
             <article key={guide.slug} className="weather-surface space-y-2 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{guide.title}</h3>

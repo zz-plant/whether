@@ -39,12 +39,12 @@ export default async function AnswersHubPage() {
       <SecondarySurfaceStartBlock surface="answers" />
       <SecondaryPageHeader
         eyebrow="One-question answer library"
-        title="Open one answer, then return to Decision Tools"
-        description={`Use this surface when the operating question is already crisp and you want a shareable answer with bounded policy, trigger, and weekly-brief linkback. Featured answers: ${featuredAnswerPages.length}.`}
+        title="Get one direct answer tied to this week's call"
+        description={`Start with a featured answer below when you need one bounded operating answer fast. Each answer stays linked to the live weekly posture, immediate implication, and flip condition. Featured answers: ${featuredAnswerPages.length}.`}
         actions={(
           <>
-            <ButtonLink href="/" variant="ghost">
-              Open weekly brief
+            <ButtonLink href="#featured-answers" variant="primary">
+              Open featured answers
             </ButtonLink>
             <ButtonLink href="/decide" variant="pill">
               Decision Tools
@@ -53,7 +53,10 @@ export default async function AnswersHubPage() {
         )}
       />
 
-      <SecondaryPageSection title="Current weekly posture">
+      <SecondaryPageSection className="scroll-mt-28" title="Current weekly posture">
+        <p className="text-sm text-slate-300">
+          Use the answer cards below when one question needs a direct answer right now. If you still need help deciding which question to ask, go back to Decision Tools.
+        </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-surface px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Posture now</p>
@@ -69,25 +72,24 @@ export default async function AnswersHubPage() {
             <p className="mt-2 text-sm text-slate-200">{weeklyDecisionCardModel.decision.reversalTrigger}</p>
           </article>
         </div>
-        <p className="text-sm text-slate-300">
-          Use `/answers` when you need a direct, shareable answer to one operating question after Decision Tools has already narrowed the frame. Use the weekly brief when you need the full planning baseline for this week.
-        </p>
       </SecondaryPageSection>
 
       <SecondaryPageSection
+        className="scroll-mt-28"
         title="Featured answers"
-        description="Use `/decide` for discovery. Use this page when you already know the exact question and want one direct answer page."
+        description="Pick the answer that matches the decision you need to make now."
       >
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div id="featured-answers" className="grid gap-3 sm:grid-cols-2">
           {featuredAnswerPages.map((page) => (
-            <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">
-              {page.title}
+            <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-100 transition hover:border-sky-300/40 hover:bg-slate-900/80">
+              <p className="font-semibold text-slate-100">{page.title}</p>
+              <p className="text-slate-300">{page.shortAnswer}</p>
             </Link>
           ))}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           <ButtonLink href="/decide#direct-answers" variant="pill">
-            Return to Decision Tools
+            Need routing help instead?
           </ButtonLink>
         </div>
       </SecondaryPageSection>

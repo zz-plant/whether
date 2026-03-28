@@ -85,6 +85,28 @@ export default async function MethodPage() {
       cta: "Open formula reference",
     },
   ];
+  const trustStatusTone = reportData.historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
+  const trustVerdict = trustStatusTone === "stable"
+    ? {
+        label: "Safe to use for this week's operating call",
+        detail: "Freshness, confidence, and source coverage are strong enough to defend the current brief without escalating to a deeper trust review.",
+        toneClasses: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
+      }
+    : trustStatusTone === "historical"
+      ? {
+          label: "Use only for retrospective comparison",
+          detail: "This is a historical snapshot. Use it to compare prior weeks, not to approve fresh irreversible moves.",
+          toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
+        }
+      : {
+          label: "Use cautiously before approving irreversible moves",
+          detail: "Trust is degraded enough that the current brief needs an explicit freshness and confidence check before you treat it as planning authority.",
+          toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
+        };
   const sectionLinks = [
     { href: "#trust-snapshot", label: "60-second trust check" },
     { href: "#trust-hub-links", label: "Audit workflow" },
@@ -92,11 +114,6 @@ export default async function MethodPage() {
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
   ];
-  const trustStatusTone = reportData.historicalSelection
-    ? "historical"
-    : isFallback
-      ? "warning"
-      : "stable";
 
   return (
     <ReportShell
@@ -117,8 +134,8 @@ export default async function MethodPage() {
       heroVariant="compact"
       pageNavVariant="compact"
       showPageNavigation={true}
-      primaryCta={{ href: "/", label: "Return to Weekly Brief" }}
-      secondaryCta={{ href: "#trust-snapshot", label: "Open trust check" }}
+      primaryCta={{ href: "#trust-snapshot", label: "Run trust check" }}
+      secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       nextStep={{
         href: "/",
         description: "Return to Weekly Brief after validating trust and confidence",
@@ -155,16 +172,23 @@ export default async function MethodPage() {
           Trust the weekly call fast: confidence, freshness, and flip conditions.
         </h1>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Use Trust only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here.
+          Start with the verdict below, then run the short trust check only if someone still needs proof before acting on the brief.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center">
+          <Link href="#trust-snapshot" className="weather-button inline-flex min-h-[44px] items-center justify-center">
+            Run 60-second trust check
+          </Link>
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
             Return to Weekly Brief
           </Link>
-          <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
-            Open formula reference
-          </Link>
         </div>
+      </section>
+
+      <section className="weather-panel scroll-mt-28 space-y-3 px-6 py-5" aria-label="Trust verdict">
+        <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
+          {trustVerdict.label}
+        </p>
+        <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
       </section>
 
       <HubSection id="trust-snapshot" title="60-second trust check" description="Read top-to-bottom before acting on this week's posture." className="scroll-mt-28">

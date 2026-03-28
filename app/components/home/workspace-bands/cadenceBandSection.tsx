@@ -10,8 +10,8 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
       <HomeBandHeader
         step="03"
         kicker="Only if a question remains"
-        title="Pick one downstream surface only if the brief still leaves a question open."
-        description="Use one follow-on surface for the remaining question instead of reopening the whole brief."
+        title="Choose one follow-on surface only after the plan is already clear."
+        description="Use one downstream surface for the remaining question instead of reopening the brief or turning helper surfaces into a second workflow."
         icon={<HistoryIcon className="h-5 w-5 text-violet-100" />}
         toneClass="border-violet-400/40 text-violet-200"
       />

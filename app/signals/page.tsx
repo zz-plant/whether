@@ -400,6 +400,23 @@ export default async function SignalsPage({
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
           {decisionDeltaLabel}
         </p>
+        <article className="weather-surface space-y-3 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">What this means now</p>
+          <div className="grid gap-3 lg:grid-cols-3">
+            <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Current call</p>
+              <p className="mt-2 text-sm font-semibold text-slate-100">{actionNowShort}</p>
+            </div>
+            <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Main pressure</p>
+              <p className="mt-2 text-sm text-slate-200">{topDiagnosticCallouts[0]?.why ?? "Review the scorecard below to validate the main driver before you change posture."}</p>
+            </div>
+            <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reopen the call when</p>
+              <p className="mt-2 text-sm text-slate-200">{flipThreshold}</p>
+            </div>
+          </div>
+        </article>
         <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Posture</p>

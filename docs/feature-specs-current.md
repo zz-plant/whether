@@ -32,8 +32,8 @@ links, and section anchors used across the report experience.
 
 The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
 hero plus share/copy actions, then the page continues as a compact handoff sequence:
-- evidence handoff,
 - planning handoff,
+- evidence/trust exception handoff,
 - deeper-surface chooser.
 
 The home top fold now separates metadata from decision contract: a compact current-outlook strip
@@ -48,6 +48,8 @@ The planning handoff compresses the weekly action, guardrail, and finance/share 
 deeper review in `/operations`. Historical replay now belongs to `/signals` rather than running as
 an inline home interaction. Role, situation, and toolkit paths are handled as explicit downstream
 surfaces after planning rather than as a parallel home workflow.
+The default post-brief path is now Planning; Evidence and Trust are framed as exception checks when
+the weekly call still needs proof.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
 labels, embedded threshold context, and restrained accent usage for outlier conditions.
@@ -71,6 +73,8 @@ The evidence report is the deep evidence appendix for the weekly workspace, with
 
 Advanced controls remain available for threshold tuning and diagnostics expansion, but historical
 replay is no longer treated as an expert-only action.
+The entry sequence now opens with a compact `what this means now` summary before the denser
+diagnostic stack so cold visitors get the operating implication before the appendix depth.
 
 ### 1.3 Planning overview (/operations)
 Planning is the detailed execution depth page for the home workspace. The default surface is a
@@ -101,6 +105,8 @@ The About page explicitly frames Whether as a small independent operator tool ra
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
 confidence, freshness, source coverage, and revisit conditions, then links out to `/sources`,
 `/confidence`, `/method#formula-reference`, and `/learn/failure-modes`.
+The page now opens with a binary trust verdict (`safe to use`, `use cautiously`, or historical-only)
+before the detailed trust workflow so operators can decide whether a deeper audit is necessary.
 
 `/methodology` now permanently redirects to `/method#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
@@ -118,6 +124,9 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/answers` and `/answers/[slug]`
 
 The `/answers` hub now opens with live weekly posture context (current posture, immediate implication, flip condition, and direct return path to `/`) before the answer directory grid so operators can orient quickly before browsing distribution pages.
+Secondary hubs (`/answers`, `/guides`, `/resources`, `/toolkits`) now lead with immediate value and
+focused next actions rather than leading with backtracking copy about where the user should have
+started. Full libraries remain below the featured paths.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 

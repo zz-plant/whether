@@ -11,10 +11,10 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
   return (
     <section id="approve-this-weeks-plan" className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
       <HomeBandHeader
-        step="02"
+        step="01"
         kicker="Planning"
-        title="Commit the weekly plan here. Open Planning only for approval detail."
-        description="Use this section to lock the weekly operating line, hold line, and reopen conditions before you widen the workflow."
+        title="Open Planning next unless this week's call needs an exception review."
+        description="This is the default next move after the weekly brief: lock the operating line, hold line, and reopen conditions before you widen the workflow."
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Open Planning</span></Link>}
@@ -101,7 +101,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <div className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3 text-sm text-slate-300">
         <p className="font-semibold text-slate-100">Need more detail?</p>
         <p className="mt-2">
-          Stay in Planning for approvals and guardrails. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only if one owner-specific question is still unresolved.
+          Stay in Planning for approvals and guardrails. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only if one owner-specific question is still unresolved after the plan is clear.
         </p>
       </div>
     </section>

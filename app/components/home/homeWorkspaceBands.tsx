@@ -14,8 +14,8 @@ export async function HomeWorkspaceBands({
 
   return (
     <div className="home-band-stack">
-      <AuditBandSection workspaceModel={workspaceModel} />
       <OperationsBandSection workspaceModel={workspaceModel} />
+      <AuditBandSection workspaceModel={workspaceModel} />
       <CadenceBandSection workspaceModel={workspaceModel} />
     </div>
   );

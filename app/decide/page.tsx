@@ -61,13 +61,13 @@ export default async function DecidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero
-        eyebrow="Resolve one remaining edge case"
-        title="Use Decision Tools only when the weekly brief does not settle the edge case."
-        description="If Weekly Brief and Planning already resolved the decision, stop there. Open Decision Tools only when one owner-specific translation or bounded utility still needs work."
+        eyebrow="Resolve the one question still blocking action"
+        title="Find the smallest decision aid that closes this week's remaining gap."
+        description="Use this page to get one direct answer, one bounded checker, or one role-specific translation tied to the live weekly call. If that closes the gap, stop here and execute."
         actions={(
           <>
-            <Link href="/" className="weather-button inline-flex items-center justify-center">Return to Weekly Brief</Link>
-            <Link href="/decide/ship-checklist" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Run ship checklist</Link>
+            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Find my next path</Link>
+            <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Weekly Brief</Link>
           </>
         )}
         aside={(
@@ -84,15 +84,15 @@ export default async function DecidePage() {
       />
 
       <HubSection
-        id="choose-your-path"
-        title="Pick the smallest useful path"
-        description="If the weekly plan is already clear, choose exactly one unresolved question: an exact answer, one utility, or one translation path."
+        id="unresolved-question-router"
+        title="What remains unresolved?"
+        description="Choose the plain-language job that still blocks action. This page should route you to one next move, not make you browse the whole library."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-3">
-          <article className="weather-hub-card space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Exact answer</p>
-            <p className="text-sm text-slate-200">Use this when the question is already crisp and you want a shareable answer, not a browse flow.</p>
+          <article id="direct-answers" className="weather-hub-card scroll-mt-28 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">I need a yes/no call</p>
+            <p className="text-sm text-slate-200">Start here when the question is already crisp and you want one direct answer you can share immediately.</p>
             <div className="space-y-2">
               {recommendedAnswerPages.map((page) => (
                 <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
@@ -102,12 +102,12 @@ export default async function DecidePage() {
               ))}
             </div>
             <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
-              Open answers library
+              Open direct answers
             </Link>
           </article>
           <article className="weather-hub-card space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">One utility</p>
-            <p className="text-sm text-slate-200">Use a bounded checker when one move still needs validation before you commit.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">I need a checker before committing</p>
+            <p className="text-sm text-slate-200">Use a bounded utility when you know the move but still need a go / wait / kill check before you commit.</p>
             <div className="grid gap-2">
               <Link href="/decide/ship-checklist" className="weather-hub-link-card space-y-1">
                 <p className="text-sm font-semibold text-slate-100">Whether to ship checklist</p>
@@ -118,10 +118,13 @@ export default async function DecidePage() {
                 <p className="text-xs text-slate-300">Adjust the weekly call for your company profile without reopening the whole brief.</p>
               </Link>
             </div>
+            <Link href="/decide/ship-checklist" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
+              Start with a checker
+            </Link>
           </article>
-          <article className="weather-hub-card space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Translate one path</p>
-            <p className="text-sm text-slate-200">Use this when the weekly call is directionally clear but one owner or company stage still needs framing.</p>
+          <article id="guided-translation" className="weather-hub-card scroll-mt-28 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">I need this translated for one team</p>
+            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner, function, or company stage still needs a tailored operating frame.</p>
             <div className="grid gap-2">
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
@@ -145,7 +148,7 @@ export default async function DecidePage() {
               ))}
             </div>
             <Link href="/guides" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
-              Open guides library
+              Open role translations
             </Link>
           </article>
         </div>

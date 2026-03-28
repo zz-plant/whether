@@ -63,11 +63,11 @@ export default async function ResourcesPage() {
       <SecondarySurfaceStartBlock surface="resources" />
       <SecondaryPageHeader
         title="Deeper governance artifacts"
-        description="Use Planning for the live approval and export workflow. Open Resources only when leadership needs deeper board, governance, or reversibility material behind that weekly plan."
+        description="Use this page when leadership needs one deeper board, governance, or reversibility artifact behind the current weekly plan. Start with the focused artifact that matches the review you are in."
         actions={(
           <>
-            <ButtonLink href="/" variant="primary">
-              Weekly Brief
+            <ButtonLink href="#resource-decision-extract" variant="primary">
+              Open the decision extract
             </ButtonLink>
             <ButtonLink href="/operations" variant="pill">
               Planning
@@ -77,31 +77,34 @@ export default async function ResourcesPage() {
       />
 
       <SecondaryPageSection
+        className="scroll-mt-28"
         eyebrow="This week before long-form reading"
         title="Decision extract for leadership reviews"
       >
-        <p className="text-sm text-slate-200">{snapshot.homeBriefModel.decisionShiftSummary}</p>
-        {topRule ? (
-          <article className="weather-surface space-y-2 px-4 py-4 text-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Bounded rule · {decisionAreaLabel(topRule.area)}</p>
-            <p className="font-semibold text-slate-100">{topRule.recommendation}</p>
-            <p className="text-xs text-rose-200">Pause: {topRule.pauseTrigger}</p>
-            <p className="text-xs text-emerald-200">Resume: {topRule.resumeTrigger}</p>
-          </article>
-        ) : null}
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink href="/" variant="ghost">
-            Open Weekly Brief
-          </ButtonLink>
-          <ButtonLink href="/operations#ops-export-briefs" variant="pill">
-            Open export briefs
-          </ButtonLink>
+        <div id="resource-decision-extract" className="space-y-3">
+          <p className="text-sm text-slate-200">{snapshot.homeBriefModel.decisionShiftSummary}</p>
+          {topRule ? (
+            <article className="weather-surface space-y-2 px-4 py-4 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Bounded rule · {decisionAreaLabel(topRule.area)}</p>
+              <p className="font-semibold text-slate-100">{topRule.recommendation}</p>
+              <p className="text-xs text-rose-200">Pause: {topRule.pauseTrigger}</p>
+              <p className="text-xs text-emerald-200">Resume: {topRule.resumeTrigger}</p>
+            </article>
+          ) : null}
+          <div className="flex flex-wrap gap-3">
+            <ButtonLink href="/" variant="ghost">
+              Open Weekly Brief
+            </ButtonLink>
+            <ButtonLink href="/operations#ops-export-briefs" variant="pill">
+              Open export briefs
+            </ButtonLink>
+          </div>
         </div>
       </SecondaryPageSection>
 
       <SecondaryPageSection eyebrow="Deeper planning artifacts" title="Start from the operating question">
         <p className="text-sm text-slate-300">
-          Use Planning for live approval and export. If you need a deeper artifact or a one-question governance answer, open one of the focused resources below.
+          If you need deeper material, open one focused artifact below instead of browsing the whole library first.
         </p>
         <div className="flex flex-wrap gap-2">
           <ButtonLink href="/operations" variant="pill">
