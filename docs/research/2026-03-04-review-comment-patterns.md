@@ -5,7 +5,7 @@
 - Snapshot method: `bun run review:comment-trends:update` (writes JSON + markdown artifacts).
 - Sample size: 200 review comments.
 - Note: this repository's recent review comments are predominantly from automated reviewers; use `--humans-only` if you want an explicit human-only cut.
-- Automation: `.github/workflows/review-comment-trends.yml` runs weekly and on-demand to generate trend artifacts in CI.
+- Regeneration is manual: rerun `bun run review:comment-trends:update` whenever you want a fresh cut.
 
 ## What comes up often
 Top recurring themes in the sampled comments:

@@ -8,7 +8,7 @@ Generated from Whether data snapshot: **2026-02-01**.
 >
 > `bun scripts/generateWeeklySlackBrief.ts --format markdown --out docs/briefs/latest-weekly-slack-brief.md`
 >
-> Automation: `.github/workflows/weekly-slack-brief-artifact.yml` refreshes this file weekly and can also be invoked from release workflows via `workflow_call`.
+> Refresh this artifact from a local shell or an external scheduler; this repo no longer auto-refreshes it through GitHub Actions.
 
 ```text
 Whether Report Brief — 2026-02-01
