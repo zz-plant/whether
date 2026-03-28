@@ -100,20 +100,38 @@ export function WeeklyCallModePanel({
   const revisitDetail = revisitDecisions
     ? "Recheck last week's approvals before adding fixed cost."
     : "No regime shift detected; keep last week's approvals in force.";
+  const revisitToneClass = revisitDecisions
+    ? "border-amber-400/25 bg-amber-500/8 text-amber-50"
+    : "border-emerald-400/25 bg-emerald-500/8 text-emerald-50";
 
   return (
     <>
       <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly call snapshot">
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-          <h2 className={tierOneHeadingClassName}>Decision strip</h2>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{postureLabel}</p>
-            </article>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              <h2 className={tierOneHeadingClassName}>Decision contract</h2>
+              <p className="text-xs leading-5 text-slate-300">
+                One action, one hold line, one flip condition. Read this as the weekly operating baseline.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{postureLabel}</span>
+              <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+            </div>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
+            </article>
+            <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit decisions?</p>
+              <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
+            </article>
+            <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Trend + confidence</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{trendLabel} · {confidenceLabel} {Math.round(confidencePercent)}%</p>
             </article>
           </div>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
@@ -139,11 +157,10 @@ export function WeeklyCallModePanel({
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
-          <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
-            <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
-          </article>
+          <div className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Weekly implication</p>
+            <p className="mt-1 text-sm text-slate-100">{revisitDetail}</p>
+          </div>
           {needsTrustWarning ? (
             <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
@@ -156,16 +173,6 @@ export function WeeklyCallModePanel({
               {trustStateDetail ? <p className="mt-1 text-xs leading-5">{trustStateDetail}</p> : null}
               {stabilityRule ? <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p> : null}
             </div>
-          ) : null}
-          {compactDecisionBullets.length > 0 ? (
-            <ul className="mt-3 grid gap-2 md:grid-cols-3">
-              {compactDecisionBullets.map((item) => (
-                <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
-                  <p className="mt-1 leading-5">{item.detail}</p>
-                </li>
-              ))}
-            </ul>
           ) : null}
         </article>
 
@@ -212,6 +219,16 @@ export function WeeklyCallModePanel({
             </summary>
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? <p className="mt-2 text-[11px] leading-5 text-slate-400">Reason: {trustReason}</p> : null}
+            {compactDecisionBullets.length > 0 ? (
+              <ul className="mt-3 grid gap-2 md:grid-cols-3">
+                {compactDecisionBullets.map((item) => (
+                  <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
+                    <p className="mt-1 leading-5">{item.detail}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {activeRoleTranslation ? (
               <div className="mt-3 border-t border-slate-800/70 pt-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">

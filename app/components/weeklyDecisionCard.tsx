@@ -285,10 +285,30 @@ function DecisionTransmissionRail({
       <p className="text-xs leading-5 text-slate-300">
         Default handoff: copy the weekly operator brief once the call is aligned. Use the snapshot for short chat context; keep board variants and exceptions secondary.
       </p>
-      <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
-        <p><span className="font-semibold text-slate-100">Action:</span> {actionNow}</p>
-        <p className="mt-1"><span className="font-semibold text-slate-100">Guardrail:</span> {guardrail}</p>
-        <p className="mt-1"><span className="font-semibold text-slate-100">Flip:</span> {flipWhen}</p>
+      <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact preview</p>
+          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">
+            Ready to share
+          </span>
+        </div>
+        <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/75 px-3 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Whether weekly call</p>
+          <div className="mt-2 space-y-2 text-sm">
+            <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-emerald-200">Action</span>
+              {actionNow}
+            </p>
+            <p className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Guardrail</span>
+              {guardrail}
+            </p>
+            <p className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Flip</span>
+              {flipWhen}
+            </p>
+          </div>
+        </div>
       </div>
       <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Share &amp; cite</p>

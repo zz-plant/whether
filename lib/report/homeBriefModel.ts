@@ -166,6 +166,25 @@ export type FlipRiskMeterState = {
   triggerLabel: string;
 };
 
+export type PostureTrajectoryState = {
+  current: {
+    tightness: number;
+    riskAppetite: number;
+  };
+  previous: {
+    tightness: number;
+    riskAppetite: number;
+  };
+  weeklyDelta: {
+    tightness: number;
+    riskAppetite: number;
+  };
+  thresholds: {
+    tightness: number;
+    riskAppetite: number;
+  };
+};
+
 export type InputInfluenceItem = {
   key: RegimeSignalKey;
   label: string;
@@ -299,6 +318,7 @@ export type WeeklyDecisionCardViewModel = {
   diagnostics: {
     regimeSignalIndicators: RegimeSignalIndicator[];
     inputInfluence: InputInfluenceItem[];
+    postureTrajectory?: PostureTrajectoryState;
     startupClimateIndex: StartupClimateIndex;
     regimeDistance: {
       dimensionLabel: string;
@@ -1268,6 +1288,27 @@ export const buildHomeBriefModel = (
         : reportDynamics?.directionLabel === "mixed"
           ? "Mixed"
           : "Stable";
+  const weeklyDeltaBySignal = new Map(
+    (reportDynamics?.changedSignals ?? []).map((item) => [item.key, item.delta]),
+  );
+  const postureTrajectory: PostureTrajectoryState = {
+    current: {
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
+    },
+    previous: {
+      tightness: assessment.scores.tightness - (weeklyDeltaBySignal.get("tightness") ?? 0),
+      riskAppetite: assessment.scores.riskAppetite - (weeklyDeltaBySignal.get("riskAppetite") ?? 0),
+    },
+    weeklyDelta: {
+      tightness: weeklyDeltaBySignal.get("tightness") ?? 0,
+      riskAppetite: weeklyDeltaBySignal.get("riskAppetite") ?? 0,
+    },
+    thresholds: {
+      tightness: tightnessThreshold,
+      riskAppetite: riskThreshold,
+    },
+  };
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
   const operatingStanceLine = buildOperatingStanceLine({
     severityDelta,
@@ -1447,6 +1488,7 @@ export const buildHomeBriefModel = (
     trendLabel,
     regimeSignalIndicators,
     inputInfluence,
+    postureTrajectory,
     operatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
       operatingStanceLine,
@@ -1605,6 +1647,7 @@ export const buildWeeklyDecisionCardViewModel = ({
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,
       inputInfluence: homeBriefModel.inputInfluence,
+      postureTrajectory: homeBriefModel.postureTrajectory,
       startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
       flipRiskMeter: buildFlipRiskMeterState(homeBriefModel.regimeDistance),

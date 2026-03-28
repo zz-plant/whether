@@ -7,6 +7,23 @@ const confidenceTrendTone: Record<ConfidenceTrendFraming, string> = {
   unstable: "text-amber-200",
 };
 
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const buildLinePath = (points: Array<{ x: number; y: number }>) =>
+  points.length === 0
+    ? ""
+    : points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+
+const buildAreaPath = (points: Array<{ x: number; y: number }>, chartHeight: number) => {
+  if (points.length === 0) {
+    return "";
+  }
+
+  const [first] = points;
+  const last = points[points.length - 1];
+  return `${buildLinePath(points)} L ${last.x} ${chartHeight} L ${first.x} ${chartHeight} Z`;
+};
+
 export const ConfidenceMiniChart = ({
   confidenceHistory,
   confidenceTrend,
@@ -14,38 +31,85 @@ export const ConfidenceMiniChart = ({
   confidenceHistory: WeeklyConfidencePoint[];
   confidenceTrend: ConfidenceTrendFraming;
 }) => {
-  const knownValues = confidenceHistory
-    .filter((point): point is WeeklyConfidencePoint & { confidencePercent: number } => typeof point.confidencePercent === "number")
-    .map((point) => point.confidencePercent);
-  const min = knownValues.length > 0 ? Math.min(...knownValues) : 0;
-  const max = knownValues.length > 0 ? Math.max(...knownValues) : 100;
-  const range = Math.max(max - min, 1);
+  const chartWidth = 176;
+  const chartHeight = 64;
+  const insetX = 8;
+  const insetY = 8;
+  const activePoints = confidenceHistory
+    .map((point, index) => ({ ...point, index }))
+    .filter((point): point is WeeklyConfidencePoint & { confidencePercent: number; index: number } => typeof point.confidencePercent === "number");
+  const currentPoint = activePoints[activePoints.length - 1] ?? null;
+  const renderedPoints = confidenceHistory.map((point, index) => {
+    const x = insetX + ((chartWidth - insetX * 2) * (confidenceHistory.length <= 1 ? 0 : index / (confidenceHistory.length - 1)));
+    if (typeof point.confidencePercent !== "number" || point.isMissing) {
+      return {
+        kind: "missing" as const,
+        x,
+        y: chartHeight - insetY,
+        label: `${point.recordDate} missing confidence data`,
+      };
+    }
+
+    return {
+      kind: "value" as const,
+      x,
+      y: insetY + ((chartHeight - insetY * 2) * (100 - clamp(point.confidencePercent, 0, 100))) / 100,
+      value: point.confidencePercent,
+      recordDate: point.recordDate,
+      label: `${point.recordDate} confidence ${Math.round(point.confidencePercent)}%`,
+    };
+  });
+  const linePoints = renderedPoints
+    .filter((point): point is Extract<typeof renderedPoints[number], { kind: "value" }> => point.kind === "value")
+    .map((point) => ({ x: point.x, y: point.y }));
+  const linePath = buildLinePath(linePoints);
+  const areaPath = buildAreaPath(linePoints, chartHeight - insetY);
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
-      <h2 className={tierOneHeading}>Confidence trend (8w)</h2>
-      <p className={`text-xs font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>{confidenceTrend}</p>
-      <div className="mt-1 flex h-14 items-end gap-1.5" role="img" aria-label="Last 8 weekly confidence values">
-        {confidenceHistory.length === 0 ? <p className="text-xs text-slate-400">No confidence history available.</p> : null}
-        {confidenceHistory.map((point) => {
-          const missing = point.isMissing || typeof point.confidencePercent !== "number";
-          const confidencePercent = typeof point.confidencePercent === "number" ? point.confidencePercent : null;
-          const height = missing || confidencePercent === null ? 14 : Math.max(14, Math.round(((confidencePercent - min) / range) * 44) + 14);
-          return (
-            <div key={point.recordDate} className="group relative flex-1">
-              <span
-                className={missing ? "block rounded-sm border border-amber-400/80 border-dashed bg-amber-500/5" : "block rounded-sm bg-sky-300/80"}
-                style={{ height }}
-                aria-label={missing || confidencePercent === null ? `${point.recordDate} missing confidence data` : `${point.recordDate} confidence ${Math.round(confidencePercent)}%`}
-              />
-              <span className="pointer-events-none absolute -top-7 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-100 group-hover:block">
-                {missing || confidencePercent === null ? `${point.recordDate}: missing` : `${point.recordDate}: ${Math.round(confidencePercent)}%`}
-              </span>
-            </div>
-          );
-        })}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className={tierOneHeading}>Confidence trend (8w)</h2>
+          <p className={`text-xs font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>{confidenceTrend}</p>
+        </div>
+        {currentPoint ? (
+          <p className="text-right text-[11px] text-slate-300">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Now</span>
+            <span className="text-sm font-semibold text-slate-100">{Math.round(currentPoint.confidencePercent)}%</span>
+          </p>
+        ) : null}
       </div>
-      <p className="text-[11px] text-slate-400">Missing weeks are dashed markers.</p>
+      <div className="mt-2 rounded-xl border border-slate-800/70 bg-slate-950/60 px-2 py-2">
+        <svg
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+          className="h-24 w-full"
+          role="img"
+          aria-label="Last 8 weekly confidence values"
+        >
+          <line x1={insetX} y1={chartHeight / 2} x2={chartWidth - insetX} y2={chartHeight / 2} stroke="rgba(71,85,105,0.45)" strokeWidth="1" strokeDasharray="3 3" />
+          {areaPath ? <path d={areaPath} fill="rgba(125,211,252,0.08)" /> : null}
+          {linePath ? <path d={linePath} fill="none" stroke="rgba(125,211,252,0.95)" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" /> : null}
+          {renderedPoints.map((point) => (
+            point.kind === "value" ? (
+              <circle
+                key={point.label}
+                cx={point.x}
+                cy={point.y}
+                r={currentPoint?.recordDate === point.recordDate ? 3.5 : 2.4}
+                fill={currentPoint?.recordDate === point.recordDate ? "rgb(251 191 36)" : "rgb(186 230 253)"}
+                stroke="rgba(15,23,42,0.95)"
+                strokeWidth="1.2"
+              />
+            ) : (
+              <g key={point.label}>
+                <line x1={point.x} y1={point.y - 12} x2={point.x} y2={point.y} stroke="rgba(251,191,36,0.85)" strokeWidth="1.4" strokeDasharray="3 2" />
+                <circle cx={point.x} cy={point.y} r="2.1" fill="rgba(15,23,42,0.95)" stroke="rgba(251,191,36,0.95)" strokeWidth="1.1" />
+              </g>
+            )
+          ))}
+        </svg>
+      </div>
+      <p className="text-[11px] text-slate-400">Solid line = reported confidence. Hollow markers = missing weeks. Wider swings imply lower forecast reliability.</p>
     </article>
   );
 };

@@ -167,6 +167,12 @@ export type HomePageAssembly = {
       doNow: string[];
       flipConditions: string[];
       updatedAt: string;
+      postureLabel?: string;
+      trendLabel?: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["trendLabel"];
+      confidenceLabel?: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidenceLabel"];
+      confidencePercent?: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidencePercent"];
+      postureTrajectory?: ReturnType<typeof buildWeeklyDecisionCardViewModel>["diagnostics"]["postureTrajectory"];
+      regimeDistance?: ReturnType<typeof buildWeeklyDecisionCardViewModel>["diagnostics"]["regimeDistance"];
     };
     historicalBanner: {
       banner: string;
