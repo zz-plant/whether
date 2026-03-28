@@ -304,6 +304,30 @@ export const buildCompactTrustSummary = ({
   return `Live signal reliability ${confidenceLabel} (${normalizedFreshness}): safe for near-term operating decisions.`;
 };
 
+export const resolveTrustReadinessCopy = ({
+  trustStatusTone,
+  degradedSourceRows,
+}: {
+  trustStatusTone: TrustStatusTone;
+  degradedSourceRows?: Array<unknown>;
+}): { tone: TrustStatusTone; headline: string } => {
+  const hasDegradedSources = (degradedSourceRows?.length ?? 0) > 0;
+  const tone = trustStatusTone === "historical"
+    ? "historical"
+    : hasDegradedSources || trustStatusTone === "warning"
+      ? "warning"
+      : "stable";
+
+  return {
+    tone,
+    headline: tone === "historical"
+      ? "Historical snapshot"
+      : tone === "warning"
+        ? "Readiness watch"
+        : "Readiness clear",
+  };
+};
+
 export const buildWeeklyCitationMetaLine = ({
   statusLabel,
   confidenceLabel,

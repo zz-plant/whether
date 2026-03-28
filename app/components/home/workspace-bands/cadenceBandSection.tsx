@@ -10,8 +10,8 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
       <HomeBandHeader
         step="03"
         kicker="Only if a question remains"
-        title="Pick one downstream surface and stop widening the workflow."
-        description="Decision Tools handles owner-specific translation, Evidence handles replay, and Toolkits stay supporting. Do not duplicate those flows on home."
+        title="Pick one downstream surface only if the brief still leaves a question open."
+        description="Use one follow-on surface for the remaining question instead of reopening the whole brief."
         icon={<HistoryIcon className="h-5 w-5 text-violet-100" />}
         toneClass="border-violet-400/40 text-violet-200"
       />
@@ -20,7 +20,7 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
           <CardEyebrow icon={<LayoutGridIcon className="h-3.5 w-3.5" />} label={workspaceModel.translate.primaryPath.kicker} accentClass="text-amber-200" />
           <p className="mt-2 text-sm font-semibold">{workspaceModel.translate.primaryPath.title}</p>
           <p className="mt-1 text-xs text-slate-300">{workspaceModel.translate.primaryPath.detail}</p>
-          <p className="mt-3 text-xs text-slate-200">Open Decision Tools only when the weekly plan is already directionally right and one concrete path still needs resolution.</p>
+          <p className="mt-3 text-xs text-slate-200">Use this when the weekly plan is clear but one concrete owner decision still needs translation.</p>
         </Link>
 
         <Link href={workspaceModel.replay.openFullHref as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
@@ -39,8 +39,8 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
 
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Supporting surfaces" accentClass="text-slate-300" />
-          <p className="mt-2 text-sm font-semibold text-slate-100">Do not widen into broad browse unless one bounded question is still open.</p>
-          <p className="mt-1 text-xs text-slate-300">Toolkits are runnable instruments, not a parallel place to interpret the weekly brief. If you still need help, start with one utility or trust check.</p>
+          <p className="mt-2 text-sm font-semibold text-slate-100">Keep support surfaces narrow.</p>
+          <p className="mt-1 text-xs text-slate-300">Toolkits and trust checks should answer one bounded follow-up, not become a second weekly brief.</p>
           <article className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-3">
             <p className="text-xs font-semibold text-slate-100">{workspaceModel.translate.fallbackUtility.title}</p>
             <p className="mt-1 text-xs text-slate-300">{workspaceModel.translate.fallbackUtility.detail}</p>

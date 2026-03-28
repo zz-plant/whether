@@ -49,67 +49,50 @@ export function RouteLoadingShell({
             <Skeleton className="h-7 w-28 rounded-full bg-slate-500/38" />
             <Skeleton className="h-7 w-36 rounded-full bg-slate-500/30" />
           </div>
-          <div className="space-y-3">
-            <Skeleton className="h-12 w-full max-w-3xl rounded-2xl bg-slate-500/50" />
-            <Skeleton className="h-5 w-11/12 max-w-2xl rounded-full bg-slate-500/38" />
-            <Skeleton className="h-5 w-8/12 max-w-xl rounded-full bg-slate-500/30" />
+          <div className="space-y-2.5">
+            <Skeleton className="h-10 w-full max-w-3xl rounded-2xl bg-slate-500/48" />
+            <Skeleton className="h-4 w-11/12 max-w-2xl rounded-full bg-slate-500/36" />
           </div>
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.18fr)_minmax(18rem,0.82fr)]">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.22fr)_minmax(18rem,0.78fr)]">
             <section className="grid gap-3 sm:grid-cols-2">
               <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Summary
                 </p>
-                <div className="mt-3 space-y-2">
-                  <Skeleton className="h-5 w-10/12 rounded-full bg-slate-500/40" />
-                  <Skeleton className="h-5 w-8/12 rounded-full bg-slate-500/34" />
-                </div>
+                <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/38" />
               </article>
               <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  Actions
+                  Action
                 </p>
-                <div className="mt-3 space-y-2">
-                  <Skeleton className="h-5 w-11/12 rounded-full bg-slate-500/38" />
-                  <Skeleton className="h-5 w-7/12 rounded-full bg-slate-500/32" />
-                </div>
+                <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/38" />
               </article>
               <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Evidence
                 </p>
-                <div className="mt-3 space-y-2">
-                  <Skeleton className="h-5 w-10/12 rounded-full bg-slate-500/36" />
-                  <Skeleton className="h-5 w-9/12 rounded-full bg-slate-500/30" />
-                </div>
+                <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/34" />
               </article>
               <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Next step
                 </p>
-                <div className="mt-3 space-y-2">
-                  <Skeleton className="h-5 w-11/12 rounded-full bg-slate-500/34" />
-                  <Skeleton className="h-5 w-8/12 rounded-full bg-slate-500/28" />
-                </div>
+                <Skeleton className="mt-3 h-5 w-8/12 rounded-full bg-slate-500/30" />
               </article>
             </section>
 
             <section className="space-y-3 rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Trust and status
+                  Trust
                 </p>
                 <Skeleton className="h-6 w-24 rounded-full bg-slate-500/32" />
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
-                <Skeleton className="h-20 w-full rounded-xl bg-slate-500/36" />
-                <Skeleton className="h-20 w-full rounded-xl bg-slate-500/30" />
-                <Skeleton className="h-20 w-full rounded-xl bg-slate-500/28" />
-                <Skeleton className="h-20 w-full rounded-xl bg-slate-500/24" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-10/12 rounded-full bg-slate-500/32" />
-                <Skeleton className="h-4 w-9/12 rounded-full bg-slate-500/26" />
+                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/36" />
+                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/30" />
+                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/28" />
+                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/24" />
               </div>
             </section>
           </div>

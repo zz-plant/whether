@@ -532,7 +532,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
   const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
   const trustStateLabel = inlineTrustMarker.label.toUpperCase();
-  const trustStateDetail = inlineTrustMarker.degraded ? inlineTrustMarker.detail : "";
+  const trustStateDetail = inlineTrustMarker.detail;
   const decisionBullets = [
     { label: "What changed", detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim() },
     { label: "What that changes", detail: immediateDecision.trim() },

@@ -61,8 +61,8 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
               Use on home
             </span>
           </div>
-          <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.trustStatusLabel}</p>
-          <p className="mt-1 text-sm text-slate-300">{workspaceModel.audit.trustStatusAction}</p>
+          <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.trustStatusAction}</p>
+          <p className="mt-1 text-xs leading-5 text-slate-300">{workspaceModel.audit.trustMarkerDetail}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             <div className="rounded-lg border border-slate-700/70 bg-slate-950/45 px-2.5 py-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Fresh</p>

@@ -13,8 +13,8 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <HomeBandHeader
         step="02"
         kicker="Planning"
-        title="Commit the weekly plan here, then open Planning for approval detail."
-        description="Weekly Brief should only carry the operating summary. Planning owns guardrails, finance posture, and the final aligned brief."
+        title="Commit the weekly plan here. Open Planning only for approval detail."
+        description="Use this section to lock the weekly operating line, hold line, and reopen conditions before you widen the workflow."
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Open Planning</span></Link>}
@@ -99,9 +99,9 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         </article>
       </div>
       <div className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3 text-sm text-slate-300">
-        <p className="font-semibold text-slate-100">Only open Decision Tools if one bounded question remains.</p>
+        <p className="font-semibold text-slate-100">Need more detail?</p>
         <p className="mt-2">
-          Stay in Planning for approvals, guardrails, finance posture, and sharing. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only when the weekly plan is already directionally clear but one owner-specific, situation-specific, or launch-specific call is still unresolved.
+          Stay in Planning for approvals and guardrails. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only if one owner-specific question is still unresolved.
         </p>
       </div>
     </section>

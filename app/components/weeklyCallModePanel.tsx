@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 
 type PolicyDetails = {
@@ -96,10 +97,10 @@ export function WeeklyCallModePanel({
     .slice(0, 3);
   const changedThisWeekDetail = decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.";
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
-  const revisitLabel = revisitDecisions ? "YES — revise this week." : "NO — hold posture.";
+  const revisitLabel = revisitDecisions ? "YES — Regime shift detected." : "NO — Hold posture.";
   const revisitDetail = revisitDecisions
     ? "Recheck last week's approvals before adding fixed cost."
-    : "No regime shift detected; keep last week's approvals in force.";
+    : "";
   const revisitToneClass = revisitDecisions
     ? "border-amber-400/25 bg-amber-500/8 text-amber-50"
     : "border-emerald-400/25 bg-emerald-500/8 text-emerald-50";
@@ -115,7 +116,7 @@ export function WeeklyCallModePanel({
             <div className="space-y-1">
               <h2 className={tierOneHeadingClassName}>Decision contract</h2>
               <p className="text-xs leading-5 text-slate-300">
-                One action, one hold line, one flip condition. Read this as the weekly operating baseline.
+                Weekly baseline: posture, change, revisit, action, guardrail, flip.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
@@ -131,9 +132,10 @@ export function WeeklyCallModePanel({
             <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit decisions?</p>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
+              {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
             <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Trend + confidence</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture read</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{trendLabel} · {confidenceLabel} {Math.round(confidencePercent)}%</p>
             </article>
           </div>
@@ -160,40 +162,23 @@ export function WeeklyCallModePanel({
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
-          <div className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Weekly implication</p>
-            <p className="mt-1 text-sm text-slate-100">{revisitDetail}</p>
-          </div>
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
                 <span className={needsTrustWarning ? "text-amber-100" : "text-emerald-100"}>{needsTrustWarning ? "Readiness watch" : "Readiness clear"}</span>
                 <span className={`rounded-full border px-2 py-0.5 ${trustToneClass}`}>{trustStateLabel}</span>
-                <span className="rounded-full border border-slate-600/70 bg-slate-950/70 px-2 py-0.5 text-slate-200">{selectedModeLabel}</span>
               </div>
               <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">As of {trustTimestamp}</p>
             </div>
-            <div className="mt-2 grid gap-2 md:grid-cols-3">
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Signal</p>
-                <p className="mt-1 text-xs font-semibold text-slate-100">{confidenceLabel} {Math.round(confidencePercent)}%</p>
-              </div>
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trend</p>
-                <p className="mt-1 text-xs font-semibold text-slate-100">{trendLabel}</p>
-              </div>
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Rule</p>
-                <p className="mt-1 text-xs font-semibold text-slate-100">{needsTrustWarning ? "Stage approvals" : "Normal cadence"}</p>
-              </div>
-            </div>
-            {needsTrustWarning && trustStateDetail ? <p className="mt-2 text-[11px] leading-5 text-amber-50/90">{trustStateDetail}</p> : null}
+            <p className="mt-2 text-sm leading-6 text-slate-100">
+              {trustStateDetail}
+            </p>
           </div>
         </article>
 
         <details className={`${detailDisclosureBase} mt-3`}>
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Policy detail
+            More context
           </summary>
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
@@ -204,6 +189,12 @@ export function WeeklyCallModePanel({
                   <span key={chip} className={compactInsetClassName}>{chip}</span>
                 ))}
               </div>
+            </article>
+
+            <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Variant</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
@@ -234,7 +225,6 @@ export function WeeklyCallModePanel({
             </summary>
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? <p className="mt-2 text-[11px] leading-5 text-slate-400">Reason: {trustReason}</p> : null}
-            {stabilityRule ? <p className="mt-2 text-[11px] leading-5 text-slate-400">{stabilityRule}</p> : null}
             {compactDecisionBullets.length > 0 ? (
               <ul className="mt-3 grid gap-2 md:grid-cols-3">
                 {compactDecisionBullets.map((item) => (
@@ -255,7 +245,7 @@ export function WeeklyCallModePanel({
                       return (
                         <Link
                           key={role.id}
-                          href={roleHrefs[role.id]}
+                          href={roleHrefs[role.id] as Route}
                           className={active
                             ? "min-h-[44px] rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100"
                             : "min-h-[44px] rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"}
