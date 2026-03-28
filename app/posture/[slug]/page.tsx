@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/decisionDomainCatalog";
+import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../../components/secondaryPageShell";
+import { ButtonLink } from "../../components/ui/buttonLink";
 type Params = { slug: string };
 
 export const dynamicParams = false;
@@ -36,23 +37,27 @@ export default async function PostureDetailPage({ params }: { params: Promise<Pa
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <Link href="/posture" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-        ← Back to posture overview
-      </Link>
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{posture.title}</h1>
-        <p className="text-sm text-slate-300">{posture.summary}</p>
-        <p className="text-sm text-slate-200"><span className="font-semibold">Trigger:</span> {posture.trigger}</p>
-      </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What to do by default</h2>
+    <SecondaryPageShell width="compact">
+      <ButtonLink href="/posture" variant="pill" className="w-fit">
+        Back to posture overview
+      </ButtonLink>
+      <SecondaryPageHeader
+        title={posture.title}
+        description={posture.summary}
+        aside={(
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trigger</p>
+            <p className="text-sm text-slate-200">{posture.trigger}</p>
+          </div>
+        )}
+      />
+      <SecondaryPageSection title="What to do by default">
         <ul className="space-y-2 text-sm text-slate-300">
           {posture.defaults.map((item) => (
             <li key={item}>• {item}</li>
           ))}
         </ul>
-      </section>
-    </main>
+      </SecondaryPageSection>
+    </SecondaryPageShell>
   );
 }

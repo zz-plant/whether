@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { serializeJsonLd } from "../../lib/seo";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -6,6 +5,8 @@ import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers"
 import { answerPages, findDecisionPage } from "./decisionPages";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { ButtonLink } from "../components/ui/buttonLink";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -18,7 +19,7 @@ export async function DecisionAnswerPageContent({
   if (!page) notFound();
 
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
-  const { assessment, recordDateLabel, reportDynamics, treasury, fetchedAtLabel } = reportData;
+  const { assessment, recordDateLabel, reportDynamics, fetchedAtLabel } = reportData;
   const { homeBriefModel, displayRegime, callCitation } = snapshot;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
   const payload = buildSeoDecisionPayload({
@@ -65,28 +66,31 @@ export async function DecisionAnswerPageContent({
         : `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <SecondaryPageShell width="narrow">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqData) }} />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Direct answer</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
-        <p className="text-base text-sky-200">{liveShortAnswer}</p>
-        <p className="text-sm text-slate-300">{liveDirectAnswer}</p>
-        {payload.noindex ? (
-          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-            Degraded signal quality: this answer is shown in fallback mode and marked noindex until freshness, completeness, and provenance checks pass.
-          </p>
-        ) : null}
-      </section>
+      <SecondaryPageHeader
+        eyebrow="Direct answer"
+        title={page.title}
+        description={liveDirectAnswer}
+        aside={(
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Short answer</p>
+            <p className="text-sm font-semibold text-sky-200">{liveShortAnswer}</p>
+            {payload.noindex ? (
+              <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                Degraded signal quality: fallback mode and noindex remain active until freshness, completeness, and provenance checks pass.
+              </p>
+            ) : null}
+          </div>
+        )}
+      />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Current posture context</h2>
+      <SecondaryPageSection title="Current posture context">
         <p className="text-sm text-slate-200">Posture: {displayRegime.label} ({displayRegime.canonicalRegime}) · Weekly momentum: {reportDynamics.directionLabel} · Revisit decisions: {homeBriefModel.revisitDecisions ? "YES" : "NO"}</p>
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Bounded recommendations</h2>
+      <SecondaryPageSection title="Bounded recommendations">
         <div className="grid gap-3 sm:grid-cols-2">
           {mappedRules.map((rule) => (
             <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
@@ -98,35 +102,30 @@ export async function DecisionAnswerPageContent({
             </article>
           ))}
         </div>
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Threshold trigger</h2>
+      <SecondaryPageSection title="Threshold trigger">
         <p className="text-sm text-slate-200">{thresholdTrigger}</p>
         <p className="text-sm text-slate-200">Current risk appetite: {assessment.scores.riskAppetite.toFixed(0)} / 100 · current tightness: {assessment.scores.tightness.toFixed(0)} / 100.</p>
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Citation</h2>
+      <SecondaryPageSection title="Citation">
         <p className="text-xs text-slate-300">{callCitation}</p>
         <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
         {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {(payload.noindexReasons ?? []).join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
-      </section>
+      </SecondaryPageSection>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
+      <SecondaryPageSection title="Continue decision flow">
         <div className="flex flex-wrap gap-2">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly brief</Link>
-          <Link href="/decide" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Role decisions</Link>
-          <Link href="/operations" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Operating guardrails</Link>
-          <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">All answers</Link>
+          <ButtonLink href="/" variant="pill">Weekly brief</ButtonLink>
+          <ButtonLink href="/decide" variant="pill">Role decisions</ButtonLink>
+          <ButtonLink href="/operations" variant="pill">Operating guardrails</ButtonLink>
+          <ButtonLink href="/answers" variant="pill">All answers</ButtonLink>
           {relatedPages.map((related) => (
-            <Link key={related.slug} href={`/answers/${related.slug}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-              {related.title}
-            </Link>
+            <ButtonLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ButtonLink>
           ))}
         </div>
-      </section>
-    </main>
+      </SecondaryPageSection>
+    </SecondaryPageShell>
   );
 }

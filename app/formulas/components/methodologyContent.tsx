@@ -1,4 +1,7 @@
+import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../../components/secondaryPageShell";
+
 const formulaCard = "rounded-2xl border border-slate-800 bg-slate-900/40 p-6";
+
 const formulaSections = [
   {
     id: "base-rate",
@@ -59,17 +62,21 @@ export const MethodologyContent = () => {
   const contextFormulas = formulaSections.filter((item) => contextFormulaIds.includes(item.id));
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <header className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Formula notes</p>
-          <h1 className="text-3xl font-semibold text-slate-100">Methodology</h1>
-          <p className="text-sm text-slate-300">Deep technical reference: each signal includes a plain-English formula, model role, and direct source.</p>
-          <p className="mt-4 text-xs text-slate-400">Canonical Treasury feed: FRED CSV Treasury series. Secondary validation source: US Treasury Fiscal Data API when running provenance checks.</p>
+    <SecondaryPageShell width="wide">
+      <SecondaryPageHeader
+        eyebrow="Formula notes"
+        title="Methodology"
+        description="Deep technical reference: each signal includes a plain-English formula, model role, and direct source."
+        aside={(
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Source baseline</p>
+            <p className="text-sm text-slate-300">Canonical Treasury feed: FRED CSV Treasury series. Secondary validation source: US Treasury Fiscal Data API when running provenance checks.</p>
+          </div>
+        )}
+      />
 
-        </header>
-
-        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="Methodology scope">
+      <SecondaryPageSection title="Methodology scope">
+        <div className="grid gap-4 md:grid-cols-3" aria-label="Methodology scope">
           <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What this model does</p>
             <p className="mt-3 text-sm text-slate-200">
@@ -88,10 +95,12 @@ export const MethodologyContent = () => {
               Hiring, spending, fundraising, and product-tempo guidance are translation-layer defaults. They are designed to be bounded and reversible, not presented as bespoke certainty.
             </p>
           </article>
-        </section>
+        </div>
+      </SecondaryPageSection>
 
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="Methodology formulas">
+      <SecondaryPageSection title="Methodology formulas">
+        <div className="grid gap-4 md:grid-cols-3" aria-label="Methodology formulas">
           {primaryFormulas.concat(contextFormulas).map((item) => (
             <article key={item.id} id={item.id} className={`${formulaCard} ${item.accentClass}`}>
               <h2 className="text-lg font-semibold text-slate-100">{item.label}</h2>
@@ -100,10 +109,11 @@ export const MethodologyContent = () => {
               <a href={item.sourceHref} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] underline decoration-slate-500 underline-offset-4 hover:text-white">{item.sourceLabel}</a>
             </article>
           ))}
-        </section>
+        </div>
+      </SecondaryPageSection>
 
-        <section className="mt-8 rounded-2xl border border-slate-700 bg-slate-900/50 p-6" aria-label="Policy pilot details">
-          <h2 className="text-lg font-semibold text-slate-100">Policy pilot (v1) details</h2>
+      <SecondaryPageSection title="Policy pilot (v1) details">
+        <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-6" aria-label="Policy pilot details">
           <p className="mt-2 text-sm text-slate-300">
             The policy pilot publishes normalized signal traces and composite scores alongside the legacy model.
           </p>
@@ -119,8 +129,8 @@ export const MethodologyContent = () => {
           <p className="mt-4 text-xs leading-6 text-slate-400">
             Practical reading rule: the formulas improve transparency, but they do not expand the underlying data universe. Treat the composites as a compact macro interpretation layer, then pressure-test the output against your own company metrics before acting.
           </p>
-        </section>
-      </div>
-    </main>
+        </div>
+      </SecondaryPageSection>
+    </SecondaryPageShell>
   );
 };
