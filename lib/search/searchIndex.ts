@@ -2,10 +2,12 @@ import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCat
 import { productConceptArticles } from "../productCanon";
 
 export type SearchEntityType = "toolkit" | "failure-mode" | "concept" | "doc";
+export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
 
 export type SearchEntity = {
   id: string;
   type: SearchEntityType;
+  job: SearchEntityJob;
   title: string;
   href: string;
   summary: string;
@@ -13,10 +15,27 @@ export type SearchEntity = {
   keywords: string[];
 };
 
+export const searchJobLabels: Record<SearchEntityJob, string> = {
+  check: "Check what changed",
+  approve: "Approve or hold this week",
+  resolve: "Resolve one remaining edge case",
+  risk: "Diagnose what could break",
+  trust: "Defend the call",
+};
+
+export const searchJobDescriptions: Record<SearchEntityJob, string> = {
+  check: "Evidence, replay, and provenance surfaces for understanding why the weekly call moved.",
+  approve: "Planning and leadership-artifact surfaces for approving, holding, and sharing the weekly plan.",
+  resolve: "Decision aids, toolkits, and one-question pages for the one unresolved call that remains.",
+  risk: "Failure modes and framework context for pressure-testing the current posture.",
+  trust: "Freshness, confidence, source, and formula checks for defending the call.",
+};
+
 const keyDocs: SearchEntity[] = [
   {
     id: "doc-signals",
     type: "doc",
+    job: "check",
     title: "Check what changed and why",
     href: "/signals",
     summary: "Review macro evidence, thresholds, and the context behind current posture.",
@@ -26,6 +45,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method",
     type: "doc",
+    job: "trust",
     title: "Run a trust check",
     href: "/method",
     summary: "See scoring, data cadence, source quality, and transparency notes.",
@@ -35,6 +55,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-evidence",
     type: "doc",
+    job: "check",
     title: "Audit evidence and provenance",
     href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
@@ -44,6 +65,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-guides",
     type: "doc",
+    job: "resolve",
     title: "Translate the call by role or stage",
     href: "/guides",
     summary: "Downstream helper guides for translating weekly brief posture into role- and stage-specific calls.",
@@ -53,6 +75,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-answers",
     type: "doc",
+    job: "resolve",
     title: "Get a direct answer",
     href: "/answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
@@ -62,6 +85,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-resources",
     type: "doc",
+    job: "approve",
     title: "Prepare a board-ready artifact",
     href: "/resources",
     summary: "Board-ready long-form helper artifacts for leadership reviews after weekly posture is set.",
@@ -71,6 +95,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-concepts",
     type: "doc",
+    job: "risk",
     title: "Pressure-test a framework",
     href: "/concepts",
     summary: "Framework helper pages that contextualize product canon against current macro regime evidence.",
@@ -80,6 +105,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method-formulas",
     type: "doc",
+    job: "trust",
     title: "Inspect scoring and formulas",
     href: "/method#formula-reference",
     summary: "Open the formula reference section from the canonical Trust hub.",
@@ -94,6 +120,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
   const toolkitEntities: SearchEntity[] = toolkitDefinitions.map((toolkit) => ({
     id: `toolkit-${toolkit.slug}`,
     type: "toolkit",
+    job: "resolve",
     title: toolkit.title,
     href: `/toolkits/${toolkit.slug}`,
     summary: toolkit.decisionThisSession,
@@ -110,6 +137,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
   const failureModeEntities: SearchEntity[] = failureModeDefinitions.map((failureMode) => ({
     id: `failure-mode-${failureMode.slug}`,
     type: "failure-mode",
+    job: "risk",
     title: failureMode.title,
     href: `/learn/failure-modes/${formatFailureModeSlug(failureMode.slug)}`,
     summary: failureMode.summary,
@@ -120,6 +148,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
   const conceptEntities: SearchEntity[] = productConceptArticles.map((concept) => ({
     id: `concept-${concept.slug}`,
     type: "concept",
+    job: "risk",
     title: concept.title,
     href: `/concepts/${concept.slug}`,
     summary: concept.summary,
@@ -173,16 +202,17 @@ export const searchIndex = (query: string): SearchEntity[] => {
     .map((entry) => entry.entity);
 };
 
-export const groupSearchResultsByType = (results: SearchEntity[]) => {
-  const grouped: Record<SearchEntityType, SearchEntity[]> = {
-    toolkit: [],
-    "failure-mode": [],
-    concept: [],
-    doc: [],
+export const groupSearchResultsByJob = (results: SearchEntity[]) => {
+  const grouped: Record<SearchEntityJob, SearchEntity[]> = {
+    check: [],
+    approve: [],
+    resolve: [],
+    risk: [],
+    trust: [],
   };
 
   results.forEach((result) => {
-    grouped[result.type].push(result);
+    grouped[result.job].push(result);
   });
 
   return grouped;

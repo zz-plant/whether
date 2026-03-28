@@ -113,6 +113,30 @@ export default async function DecidePage() {
       </HubSection>
 
       <HubSection
+        id="continue-only-if-needed"
+        title="Continue only if one bounded question remains"
+        description="Return to Planning when approvals, guardrails, or finance posture are still unsettled. Use this page only when those are already directionally clear."
+        className="scroll-mt-28"
+      >
+        <div className="grid gap-3 md:grid-cols-3">
+          <article className="weather-hub-card space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">Good use</p>
+            <p className="text-sm text-slate-200">One launch, staffing, roadmap, or company-context question still needs a bounded answer.</p>
+          </article>
+          <article className="weather-hub-card space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Do not use</p>
+            <p className="text-sm text-slate-200">Re-reading the weekly plan, collecting broad context, or rebuilding trust and evidence from scratch.</p>
+          </article>
+          <article className="weather-hub-card space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">If not ready</p>
+            <Link href="/operations#ops-monthly-action-summary" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              Return to Planning
+            </Link>
+          </article>
+        </div>
+      </HubSection>
+
+      <HubSection
         id="run-this-now"
         title="Fastest bounded tools"
         description="Start with the shortest runnable tool only after the weekly call already tells you the direction and you just need owner-specific translation."
@@ -223,31 +247,30 @@ export default async function DecidePage() {
         </div>
       </HubSection>
 
-      <HubSection
-        id="explore-by-role"
-        title="Open an owner-specific path"
-        description="Use these when the remaining question belongs to one function or executive owner."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-3">
-          {useCaseRoles.map((role) => (
-            <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
-          ))}
-        </div>
-      </HubSection>
+      <details className="weather-panel scroll-mt-28 space-y-3 px-6 py-6">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Open full edge-case library
+        </summary>
+        <div className="mt-4 space-y-6">
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Owner-specific paths</h2>
+            <div className="weather-page-grid-3">
+              {useCaseRoles.map((role) => (
+                <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
+              ))}
+            </div>
+          </section>
 
-      <HubSection
-        id="explore-by-situation"
-        title="Open a situation-specific path"
-        description="Use these when the remaining question is a concrete operating moment, not a role handoff."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-2">
-          {situationUseCaseDefinitions.map((situation) => (
-            <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>
-          ))}
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Situation-specific paths</h2>
+            <div className="weather-page-grid-2">
+              {situationUseCaseDefinitions.map((situation) => (
+                <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>
+              ))}
+            </div>
+          </section>
         </div>
-      </HubSection>
+      </details>
     </HubPageShell>
   );
 }

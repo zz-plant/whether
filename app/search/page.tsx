@@ -2,10 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import {
-  groupSearchResultsByType,
-  searchEntityTypeLabels,
+  groupSearchResultsByJob,
+  searchJobDescriptions,
+  searchJobLabels,
   searchIndex,
-  type SearchEntityType,
+  type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 
@@ -19,18 +20,18 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether search",
 });
 
-const searchTypeOrder: SearchEntityType[] = ["toolkit", "failure-mode", "concept", "doc"];
+const searchJobOrder: SearchEntityJob[] = ["check", "approve", "resolve", "risk", "trust"];
 
-const isSearchEntityType = (value: string): value is SearchEntityType =>
-  searchTypeOrder.includes(value as SearchEntityType);
+const isSearchEntityJob = (value: string): value is SearchEntityJob =>
+  searchJobOrder.includes(value as SearchEntityJob);
 
-const buildSearchHref = (query: string, type?: SearchEntityType) => {
+const buildSearchHref = (query: string, job?: SearchEntityJob) => {
   const params = new URLSearchParams();
   if (query) {
     params.set("q", query);
   }
-  if (type) {
-    params.set("type", type);
+  if (job) {
+    params.set("job", job);
   }
   const queryString = params.toString();
   return queryString ? `/search?${queryString}` : "/search";
@@ -58,18 +59,18 @@ const searchIntentPrompts = [
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; type?: string }>;
+  searchParams: Promise<{ q?: string; job?: string }>;
 }) {
-  const { q = "", type = "" } = await searchParams;
+  const { q = "", job = "" } = await searchParams;
   const query = q.trim();
-  const normalizedType = type.trim().toLowerCase();
-  const activeType = isSearchEntityType(normalizedType) ? normalizedType : undefined;
+  const normalizedJob = job.trim().toLowerCase();
+  const activeJob = isSearchEntityJob(normalizedJob) ? normalizedJob : undefined;
   const matchingResults = searchIndex(query);
-  const results = activeType
-    ? matchingResults.filter((entry) => entry.type === activeType)
+  const results = activeJob
+    ? matchingResults.filter((entry) => entry.job === activeJob)
     : matchingResults;
-  const groupedResults = groupSearchResultsByType(results);
-  const countsByType = groupSearchResultsByType(matchingResults);
+  const groupedResults = groupSearchResultsByJob(results);
+  const countsByJob = groupSearchResultsByJob(matchingResults);
 
   return (
     <HubPageShell>
@@ -118,9 +119,9 @@ export default async function SearchPage({
             <Link href={buildSearchHref(query)} className="weather-hub-chip">
               {query}
             </Link>
-            {activeType ? (
+            {activeJob ? (
               <Link href={buildSearchHref(query)} className="weather-hub-chip">
-                Type: {searchEntityTypeLabels[activeType]}
+                Job: {searchJobLabels[activeJob]}
               </Link>
             ) : null}
           </div>
@@ -149,26 +150,27 @@ export default async function SearchPage({
               <Link href={buildSearchHref(query)} className="weather-hub-chip">
                 All ({matchingResults.length})
               </Link>
-              {searchTypeOrder.map((resultType) => {
-                const count = countsByType[resultType].length;
+              {searchJobOrder.map((resultJob) => {
+                const count = countsByJob[resultJob].length;
                 if (count === 0) return null;
                 return (
-                  <Link key={resultType} href={buildSearchHref(query, resultType)} className="weather-hub-chip">
-                    {searchEntityTypeLabels[resultType]} ({count})
+                  <Link key={resultJob} href={buildSearchHref(query, resultJob)} className="weather-hub-chip">
+                    {searchJobLabels[resultJob]} ({count})
                   </Link>
                 );
               })}
             </div>
           ) : null}
 
-          {Object.entries(groupedResults).map(([type, entries]) => {
+          {searchJobOrder.map((jobKey) => {
+            const entries = groupedResults[jobKey];
             if (entries.length === 0) return null;
 
             return (
               <HubSection
-                key={type}
-                title={searchEntityTypeLabels[type as keyof typeof groupedResults]}
-                description="Each result points to one workflow, decision aid, risk pattern, or trust check you can use immediately."
+                key={jobKey}
+                title={searchJobLabels[jobKey]}
+                description={searchJobDescriptions[jobKey]}
               >
                 <ul className="grid gap-3">
                   {entries.map((entry) => (

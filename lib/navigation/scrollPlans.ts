@@ -73,7 +73,7 @@ export const operationsScrollPlan: ScrollPlan = {
   eyebrow: "Execution path",
   title: "Use Planning as a controlled review sequence",
   description:
-    "Approve the weekly plan first, then validate guardrails, finance posture, sharing output, and optional implementation handoffs.",
+    "Approve the weekly plan first, then validate guardrails, finance posture, sharing output, and only then open deeper escalation paths if needed.",
   items: [
     {
       href: "#ops-monthly-action-summary",
@@ -96,9 +96,9 @@ export const operationsScrollPlan: ScrollPlan = {
       summary: "Copy the aligned brief and operator asks once the plan is set.",
     },
     {
-      href: "#ops-implementation-handoffs",
-      label: "Handoffs",
-      summary: "Open delivery, data, or terminal handoffs only if needed.",
+      href: "#ops-edge-case-gate",
+      label: "Escalate",
+      summary: "Open Decision Tools or deeper artifacts only when one bounded question still remains.",
     },
   ],
 };
@@ -107,7 +107,7 @@ export const decideScrollPlan: ScrollPlan = {
   eyebrow: "Decision path",
   title: "Use Decision Tools only for unresolved edge cases",
   description:
-    "Start with the fastest bounded tool, then widen into role or situation paths only if the weekly plan still leaves an owner-specific question.",
+    "Start with the fastest bounded tool or exact answer, then widen into translation paths only if the weekly plan still leaves one unresolved question.",
   items: [
     {
       href: "#run-this-now",
@@ -115,19 +115,19 @@ export const decideScrollPlan: ScrollPlan = {
       summary: "Open the fastest weekly toolkit shortcut first.",
     },
     {
+      href: "#direct-answers",
+      label: "Answer",
+      summary: "Use a one-question answer when the unresolved issue is already crisp.",
+    },
+    {
       href: "#decision-utilities",
       label: "Validate",
-      summary: "Use decision utilities only when the weekly call needs a second pass.",
+      summary: "Use utilities only when the weekly call needs one more bounded check.",
     },
     {
-      href: "#explore-by-role",
-      label: "Role",
-      summary: "Browse role-specific paths after the fast paths are exhausted.",
-    },
-    {
-      href: "#explore-by-situation",
-      label: "Situation",
-      summary: "Use scenario paths when you need broader discovery.",
+      href: "#guided-translation",
+      label: "Translate",
+      summary: "Widen into owner or company-stage paths only after the fast paths are exhausted.",
     },
   ],
 };

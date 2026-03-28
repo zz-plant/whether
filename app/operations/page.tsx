@@ -389,8 +389,27 @@ export default async function OperationsPage({
         ]}
       />
 
-      <section id="ops-developer-reference" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-developer-reference-title">
-        <div className="space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
+      <section id="ops-edge-case-gate" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-edge-case-gate-title">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Stop here unless one bounded question remains</p>
+          <h2 id="ops-edge-case-gate-title" className="text-lg font-semibold text-slate-100">Escalate only when the weekly plan is already clear</h2>
+          <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open Decision Tools only when one owner-specific or situation-specific call still needs a bounded answer after this review.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            Open Decision Tools
+          </Link>
+          <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Return to share brief
+          </Link>
+        </div>
+      </section>
+
+      <details className="weather-panel scroll-mt-28 space-y-3 px-5 py-5">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Need deeper board or governance artifacts?
+        </summary>
+        <div className="mt-4 space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Governance library</p>
             <h2 className="text-lg font-semibold text-slate-100">Board-ready artifacts and deeper planning resources</h2>
@@ -424,7 +443,9 @@ export default async function OperationsPage({
             </Link>
           </div>
         </div>
+      </details>
 
+      <section id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-developer-reference-title">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
           <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Endpoint, terminal, and integration handoffs</h2>

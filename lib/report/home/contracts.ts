@@ -107,12 +107,13 @@ export type HomePageWorkspaceModel = {
     }>;
   };
   translate: {
-    rolePath: {
+    primaryPath: {
       href: string;
       title: string;
       detail: string;
+      kicker: string;
     };
-    situationPath: {
+    fallbackUtility: {
       href: string;
       title: string;
       detail: string;
@@ -121,15 +122,6 @@ export type HomePageWorkspaceModel = {
       href: string;
       title: string;
       detail: string;
-    }>;
-    decisionUtilities: Array<{
-      href: string;
-      title: string;
-      detail: string;
-    }>;
-    browseActions: Array<{
-      href: string;
-      label: string;
     }>;
   };
 };

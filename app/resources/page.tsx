@@ -110,33 +110,37 @@ export default async function ResourcesPage() {
         </div>
       </SecondaryPageSection>
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        {resourcePillarPages.map((pillar) => (
-          <Link key={pillar.slug} href={`/resources/${pillar.slug}`} className="weather-panel space-y-2 px-4 py-4">
-            <Tag tone="amber">Pillar</Tag>
-            <h2 className="text-base font-semibold text-slate-100">{pillar.h1}</h2>
-            <p className="text-sm text-slate-200">{pillar.description}</p>
-          </Link>
-        ))}
-      </section>
-
-      <SecondaryPageSection title="Templates and supporting pages">
-        <ul className="space-y-2 text-sm text-slate-200">
-          {toolPages.map((page) => (
-            <li key={page.path}>
-              <Link href={page.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-                {page.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </SecondaryPageSection>
-
       <details className="weather-panel space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open extended governance library ({resourceArticles.length + authorityPages.length})
+          Open deeper governance library ({resourcePillarPages.length + toolPages.length + resourceArticles.length + authorityPages.length})
         </summary>
         <div className="mt-4 space-y-6">
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Governance pillars</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {resourcePillarPages.map((pillar) => (
+                <Link key={pillar.slug} href={`/resources/${pillar.slug}`} className="weather-panel space-y-2 px-4 py-4">
+                  <Tag tone="amber">Pillar</Tag>
+                  <h2 className="text-base font-semibold text-slate-100">{pillar.h1}</h2>
+                  <p className="text-sm text-slate-200">{pillar.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Templates and supporting pages</h2>
+            <ul className="space-y-2 text-sm text-slate-200">
+              {toolPages.map((page) => (
+                <li key={page.path}>
+                  <Link href={page.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Authority briefs</h2>
             <div className="grid gap-3 sm:grid-cols-2">

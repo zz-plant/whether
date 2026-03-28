@@ -98,8 +98,11 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           </p>
         </article>
       </div>
-      <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3 text-sm text-slate-300">
-        If the weekly plan is clear but one owner-specific edge case still is not, stop widening Planning and open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link>.
+      <div className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3 text-sm text-slate-300">
+        <p className="font-semibold text-slate-100">Only open Decision Tools if one bounded question remains.</p>
+        <p className="mt-2">
+          Stay in Planning for approvals, guardrails, finance posture, and sharing. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only when the weekly plan is already directionally clear but one owner-specific, situation-specific, or launch-specific call is still unresolved.
+        </p>
       </div>
     </section>
   );

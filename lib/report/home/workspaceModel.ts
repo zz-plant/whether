@@ -2,7 +2,6 @@ import {
   decideHomeRecommendedToolkitSlugs,
   findToolkitDefinition,
   situationUseCaseDefinitions,
-  useCaseRoles,
 } from "../../decisionDomainCatalog";
 import { formatSourceFreshnessLabel, formatSourceModeLabel } from "../sourceHealth";
 import type { buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
@@ -76,7 +75,6 @@ export const buildHomeWorkspaceModel = ({
   const financeSummaryItems = actionStripItems.filter((item) =>
     item.lever === "investment-pace" || item.lever === "risk-tolerance"
   );
-  const currentRolePath = useCaseRoles.find((role) => role.slug === "ceo") ?? useCaseRoles[0];
   const currentSituationPath = diagnosticsLane.weeklyMovement.direction === "defensive"
     ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
     : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
@@ -169,37 +167,28 @@ export const buildHomeWorkspaceModel = ({
       ],
     },
     translate: {
-      rolePath: {
-        href: `/decide/${currentRolePath.slug}`,
-        title: currentRolePath.title,
-        detail: currentRolePath.decisions[0],
-      },
-      situationPath: {
+      primaryPath: {
         href: `/decide/${currentSituationPath.slug}`,
         title: currentSituationPath.title,
-        detail: "Fastest route to this week's next action.",
+        detail: "Use the most concrete operating path first before widening into broader browse.",
+        kicker: "Recommended unresolved path",
       },
+      fallbackUtility: diagnosticsLane.revisitDecisions
+        ? {
+            href: "/decide/team-context",
+            title: "Team context profile",
+            detail: "Adjust the weekly call for your company profile without reopening the whole brief.",
+          }
+        : {
+            href: "/decide/ship-checklist",
+            title: "Whether to ship checklist",
+            detail: "Score one go / wait / kill launch decision against the current regime.",
+          },
       toolkitShortcuts: toolkitShortcuts.map((toolkit) => ({
         href: `/toolkits/${toolkit.slug}`,
         title: toolkit.title,
         detail: toolkit.decisionThisSession,
       })),
-      decisionUtilities: [
-        {
-          href: "/decide/ship-checklist",
-          title: "Whether to ship checklist",
-          detail: "Score a go / wait / kill launch decision against the current regime.",
-        },
-        {
-          href: "/decide/team-context",
-          title: "Team context profile",
-          detail: "Tailor the weekly mandate by stage, sector, and operating profile.",
-        },
-      ],
-      browseActions: [
-        { href: "/decide", label: "Browse role and situation hubs" },
-        { href: "/toolkits", label: "Browse all toolkits" },
-      ],
     },
   };
 };

@@ -36,8 +36,10 @@ This contract keeps secondary pages indexable/discoverable while reinforcing the
 - Keep the global nav limited to the five primary hubs.
 - Order the workflow hubs to match the operator loop users are asked to follow in-product: **Weekly Brief → Evidence → Planning → Decision Tools → Trust**.
 - Surface helper-library discovery inside the parent hubs first:
-  - `/decide` should expose role guides, stage guides, direct answers, and toolkit shortcuts before users need `/guides` or `/answers`.
-  - `/operations` should expose board-ready artifact and governance-resource discovery before users need `/resources`.
+  - `/decide` should expose fast tools, direct answers, and one curated translation layer before users ever need the full role or situation library.
+  - Full role and situation browse inside `/decide` should stay collapsed behind a secondary “open library” affordance.
+  - `/operations` should expose the live approval sequence first and keep governance-resource discovery behind an explicit “need deeper board material?” gate.
 - Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decision Tools`, `Learn` → `Trust`).
+- Prefer search result grouping by operator job (`check`, `approve`, `resolve`, `diagnose`, `trust`) instead of by content type.
 - Keep first-party CTAs pointed at primary hubs unless the user already needs a supporting surface.
 - Use sitemap and metadata to distinguish canonical workflow hubs from supporting or distribution pages.
