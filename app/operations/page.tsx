@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { Metadata } from "next";
+import type { Route } from "../../lib/navigation/routeType";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
@@ -29,6 +31,7 @@ import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
 import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
+import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 
 
 export const runtime = "edge";
@@ -160,6 +163,12 @@ export default async function OperationsPage({
       scores: assessment.scores,
     }),
   );
+  const operationsResourceLibrary = [
+    resourceSupportingPages.capitalPostureTemplate,
+    resourceSupportingPages.reversalTriggerChecklist,
+    resourceSupportingPages.quarterlyCapitalPostureMemoExample,
+    resourceSupportingPages.decisionShieldOverview,
+  ] as const;
 
   return (
     <ReportShell
@@ -381,6 +390,41 @@ export default async function OperationsPage({
       />
 
       <section id="ops-developer-reference" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-developer-reference-title">
+        <div className="space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Governance library</p>
+            <h2 className="text-lg font-semibold text-slate-100">Board-ready artifacts and deeper planning resources</h2>
+            <p className="text-sm text-slate-300">Stay in Planning for the live weekly approval flow. Open these deeper artifacts only when leadership needs more governance depth than the in-page brief already provides.</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {resourcePillarPages.map((pillar) => (
+              <Link
+                key={pillar.slug}
+                href={`/resources/${pillar.slug}` as Route}
+                className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Governance pillar</p>
+                <p className="mt-2 font-semibold text-slate-100">{pillar.h1}</p>
+                <p className="mt-2 text-sm text-slate-300">{pillar.description}</p>
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {operationsResourceLibrary.map((resource) => (
+              <Link
+                key={resource.path}
+                href={resource.path}
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
+              >
+                {resource.title}
+              </Link>
+            ))}
+            <Link href="/resources" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              Open resources library
+            </Link>
+          </div>
+        </div>
+
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
           <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Endpoint, terminal, and integration handoffs</h2>

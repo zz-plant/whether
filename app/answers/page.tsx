@@ -11,8 +11,8 @@ import { ButtonLink } from "../components/ui/buttonLink";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Operator decision answers",
-  description: "Downstream direct-answer helper pages for single operating questions after this week’s brief and posture review.",
+  title: "Answers — one operating question at a time",
+  description: "Direct answers for one operating question after this week’s brief, plan, and posture are already clear.",
   path: "/answers",
   imageAlt: "Whether operator answer cluster",
   imagePath: "/social/answers.svg",
@@ -38,9 +38,9 @@ export default async function AnswersHubPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(listData) }} />
       <SecondarySurfaceStartBlock surface="answers" />
       <SecondaryPageHeader
-        eyebrow="Operator answer hub"
-        title="Direct answers mapped to canonical decisions"
-        description={`Answer first, then bounded policy + threshold triggers + weekly brief linkback. Total pages: ${answerPages.length}.`}
+        eyebrow="One-question answer library"
+        title="Get a direct answer without reopening the whole workflow"
+        description={`Use this surface when the operating question is already crisp and you want a shareable answer with bounded policy, trigger, and weekly-brief linkback. Total pages: ${answerPages.length}.`}
         actions={(
           <>
             <ButtonLink href="/" variant="ghost">
@@ -76,7 +76,7 @@ export default async function AnswersHubPage() {
 
       <SecondaryPageSection
         title="Distribution-ready direct pages"
-        description="Answer exact operator queries and route back to the weekly brief artifact."
+        description="These are the highest-signal direct answers. Use `/decide` for discovery; use this page when you already know the exact question you need answered."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {featuredAnswerPages.map((page) => (
@@ -85,24 +85,37 @@ export default async function AnswersHubPage() {
             </Link>
           ))}
         </div>
+        <div className="flex flex-wrap gap-2">
+          <ButtonLink href="/decide#direct-answers" variant="pill">
+            Browse from Decision Tools
+          </ButtonLink>
+        </div>
       </SecondaryPageSection>
 
-      {answerCategories.map((category) => {
-        const pages = answerPages.filter((page) => page.category === category.key);
-        if (pages.length === 0) return null;
-        return (
-          <SecondaryPageSection key={category.key} title={category.label}>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {pages.map((page) => (
-                <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-100 transition hover:border-sky-300/40 hover:bg-slate-900/80">
-                  <p className="font-semibold text-slate-100">{page.keyword}</p>
-                  <p className="text-slate-300">{page.shortAnswer}</p>
-                </Link>
-              ))}
-            </div>
-          </SecondaryPageSection>
-        );
-      })}
+      <details className="weather-panel space-y-3 px-6 py-6">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Open full one-question library ({answerPages.length})
+        </summary>
+        <div className="mt-4 space-y-6">
+          {answerCategories.map((category) => {
+            const pages = answerPages.filter((page) => page.category === category.key);
+            if (pages.length === 0) return null;
+            return (
+              <section key={category.key} className="space-y-3">
+                <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">{category.label}</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {pages.map((page) => (
+                    <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-100 transition hover:border-sky-300/40 hover:bg-slate-900/80">
+                      <p className="font-semibold text-slate-100">{page.keyword}</p>
+                      <p className="text-slate-300">{page.shortAnswer}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </details>
     </SecondaryPageShell>
   );
 }

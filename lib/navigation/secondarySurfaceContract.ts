@@ -12,7 +12,7 @@ export type SecondarySurfaceContract = {
 export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["surfaceKey"], SecondarySurfaceContract> = {
   guides: {
     surfaceKey: "guides",
-    intentLabel: "Role and stage translation",
+    intentLabel: "Translate the call by role or stage",
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
@@ -20,7 +20,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
   },
   resources: {
     surfaceKey: "resources",
-    intentLabel: "Board-ready long-form artifacts",
+    intentLabel: "Prepare a deeper board or governance artifact",
     parentHubHref: "/operations",
     parentHubLabel: "Planning",
     returnCtaLabel: "Return to Planning",
@@ -28,7 +28,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
   },
   answers: {
     surfaceKey: "answers",
-    intentLabel: "Single-question decision extracts",
+    intentLabel: "Get a direct answer to one question",
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
@@ -36,7 +36,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
   },
   concepts: {
     surfaceKey: "concepts",
-    intentLabel: "Framework context for current regime",
+    intentLabel: "Pressure-test a framework against this regime",
     parentHubHref: "/method",
     parentHubLabel: "Trust",
     returnCtaLabel: "Return to Trust",

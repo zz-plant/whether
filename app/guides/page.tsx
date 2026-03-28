@@ -9,9 +9,9 @@ import { ButtonLink } from "../components/ui/buttonLink";
 import { ActionLink } from "../components/ui/actionLink";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Role & Stage Guides — Whether",
+  title: "Guides — translate the call for one team",
   description:
-    "Downstream role and stage helper guides for translating the weekly brief into bounded team decisions and review-ready operating calls.",
+    "Translate the weekly brief into bounded calls for one function, leader, or company stage after the main decision is already set.",
   path: "/guides",
   imageAlt: "Whether guides overview",
   imagePath: "/social/guides.svg",
@@ -33,9 +33,9 @@ export default function GuidesPage() {
     <SecondaryPageShell>
       <SecondarySurfaceStartBlock surface="guides" />
       <SecondaryPageHeader
-        eyebrow="Guides overview"
-        title="Pick the fastest guide for this week&apos;s operating decision"
-        description="Use stakeholder guides only after the weekly brief and Decision Tools narrowed the question. Use stage guides when you need company-maturity context for pacing, spend, and planning discipline."
+        eyebrow="Translation library"
+        title="Translate the call for one team or company stage"
+        description="Use this page as a lightweight guide shelf after Decision Tools narrowed the question. It is a library shell for translation work, not the primary discovery workflow."
         actions={(
           <>
             <ButtonLink href="/" variant="primary">
@@ -49,11 +49,11 @@ export default function GuidesPage() {
       />
 
       <SecondaryPageSection
-        title="Stakeholder guides"
-        description="Role-level pages with bounded actions you can use in leadership meetings and planning reviews."
+        title="Owner-specific paths"
+        description="Featured paths for the most common translation jobs."
         actions={(
-          <ActionLink href="/guides/stage" variant="inline">
-            Browse by company stage
+          <ActionLink href="/decide#guided-translation" variant="inline">
+            Browse from Decision Tools
           </ActionLink>
         )}
       >
@@ -71,11 +71,11 @@ export default function GuidesPage() {
         </div>
       </SecondaryPageSection>
 
-      <SecondaryPageSection
-        title="Company stage guides"
-        description="Stage-level pages to calibrate operating intensity and planning cadence as coordination cost increases."
-      >
-        <ul className="space-y-2 text-sm text-slate-200">
+      <details className="weather-panel space-y-3 px-6 py-6">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Open company-stage paths ({stageGuides.length})
+        </summary>
+        <ul className="mt-4 space-y-2 text-sm text-slate-200">
           {stageGuides.map((stage) => (
             <li key={stage.slug} className="weather-surface flex items-center justify-between gap-4 px-4 py-3">
               <span>
@@ -87,7 +87,7 @@ export default function GuidesPage() {
             </li>
           ))}
         </ul>
-      </SecondaryPageSection>
+      </details>
     </SecondaryPageShell>
   );
 }

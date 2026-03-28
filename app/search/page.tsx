@@ -12,9 +12,9 @@ import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Search — find workflows, toolkits, concepts, and trust docs",
+  title: "Search — decisions, guardrails, and trust checks",
   description:
-    "Search the operator corpus across primary workflows, supporting toolkits, concepts, and key evidence/trust docs.",
+    "Search the operator corpus by decision job: what changed, what to do, what could break, and how to defend the call.",
   path: "/search",
   imageAlt: "Whether search",
 });
@@ -76,21 +76,21 @@ export default async function SearchPage({
       <HubHero
         eyebrow="Global search"
         title="Find the decision surface you need for this week."
-        description="Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Evidence/Trust docs."
+        description="Search by the job you need done: check what changed, approve a plan, resolve an edge case, diagnose risk, or validate trust."
         aside={(
           <div className="weather-hub-card space-y-3 px-5 py-5">
             <p className="weather-hub-section-eyebrow">Search scope</p>
             <ul className="space-y-2 text-sm text-slate-200">
-              <li>Primary workflows and decision paths</li>
-              <li>Supporting toolkits and utilities</li>
-              <li>Failure modes and concepts</li>
-              <li>Evidence and trust reference docs</li>
+              <li>What changed and why</li>
+              <li>What to approve or hold this week</li>
+              <li>What could break the call</li>
+              <li>How to defend the call with trust checks</li>
             </ul>
           </div>
         )}
       />
 
-      <HubSection title="Search the operating system" description="Start with your decision question, then narrow by result type if you need a tighter path.">
+      <HubSection title="Search by decision job" description="Start with the question you need answered, then narrow by result type only if you need a tighter path.">
         <form action="/search" className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
             <label htmlFor="global-search-input" className="sr-only">Search all Whether content</label>
             <input
@@ -168,7 +168,7 @@ export default async function SearchPage({
               <HubSection
                 key={type}
                 title={searchEntityTypeLabels[type as keyof typeof groupedResults]}
-                description="Each result points to one decision surface, trust reference, or tool you can act on quickly."
+                description="Each result points to one workflow, decision aid, risk pattern, or trust check you can use immediately."
               >
                 <ul className="grid gap-3">
                   {entries.map((entry) => (
@@ -202,7 +202,7 @@ export default async function SearchPage({
         </section>
       ) : (
         <section className="weather-hub-section text-sm text-slate-300">
-          Enter a query to surface workflow hubs, decision tools, risks, concepts, and evidence or trust docs.
+          Enter a query to surface the workflow, decision aid, risk pattern, or trust check you need.
         </section>
       )}
     </HubPageShell>

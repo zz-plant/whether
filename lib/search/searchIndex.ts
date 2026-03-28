@@ -17,7 +17,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-signals",
     type: "doc",
-    title: "Evidence — drivers and thresholds",
+    title: "Check what changed and why",
     href: "/signals",
     summary: "Review macro evidence, thresholds, and the context behind current posture.",
     intentLabel: "Check what changed",
@@ -26,7 +26,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method",
     type: "doc",
-    title: "Trust — freshness, confidence, and sources",
+    title: "Run a trust check",
     href: "/method",
     summary: "See scoring, data cadence, source quality, and transparency notes.",
     intentLabel: "Validate trust",
@@ -35,7 +35,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-evidence",
     type: "doc",
-    title: "Evidence — audit checklist",
+    title: "Audit evidence and provenance",
     href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
     intentLabel: "Audit provenance",
@@ -44,7 +44,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-guides",
     type: "doc",
-    title: "Guides — role and stage helper pages",
+    title: "Translate the call by role or stage",
     href: "/guides",
     summary: "Downstream helper guides for translating weekly brief posture into role- and stage-specific calls.",
     intentLabel: "Translate decision by role",
@@ -53,7 +53,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-answers",
     type: "doc",
-    title: "Answers — direct decision extracts",
+    title: "Get a direct answer",
     href: "/answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
     intentLabel: "Get one-question answer",
@@ -62,7 +62,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-resources",
     type: "doc",
-    title: "Resources — governance helper library",
+    title: "Prepare a board-ready artifact",
     href: "/resources",
     summary: "Board-ready long-form helper artifacts for leadership reviews after weekly posture is set.",
     intentLabel: "Prepare governance artifact",
@@ -71,7 +71,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-concepts",
     type: "doc",
-    title: "Concepts — canon in regime context",
+    title: "Pressure-test a framework",
     href: "/concepts",
     summary: "Framework helper pages that contextualize product canon against current macro regime evidence.",
     intentLabel: "Pressure-test framework language",
@@ -80,7 +80,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method-formulas",
     type: "doc",
-    title: "Trust — formula reference",
+    title: "Inspect scoring and formulas",
     href: "/method#formula-reference",
     summary: "Open the formula reference section from the canonical Trust hub.",
     intentLabel: "Inspect scoring",
@@ -138,10 +138,10 @@ export const buildSearchIndex = (): SearchEntity[] => {
 };
 
 export const searchEntityTypeLabels: Record<SearchEntityType, string> = {
-  toolkit: "Toolkits",
-  "failure-mode": "Failure modes",
-  concept: "Concepts",
-  doc: "Workflow & trust docs",
+  toolkit: "Toolkits to run",
+  "failure-mode": "Risk patterns to diagnose",
+  concept: "Framework context",
+  doc: "Workflow surfaces",
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();

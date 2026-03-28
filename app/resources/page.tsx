@@ -15,9 +15,9 @@ import { ButtonLink } from "../components/ui/buttonLink";
 import { Tag } from "../components/ui/tag";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Resources — board governance pillars",
+  title: "Resources — deeper governance artifacts",
   description:
-    "Downstream governance helper library for operators who need board-ready long-form artifacts after setting this week’s posture.",
+    "Deeper governance artifacts for operators who need board-ready material after this week’s posture and plan are already set.",
   path: "/resources",
   imageAlt: "Whether resources hub",
   imagePath: "/social/resources.svg",
@@ -62,8 +62,8 @@ export default async function ResourcesPage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
       <SecondarySurfaceStartBlock surface="resources" />
       <SecondaryPageHeader
-        title="Resources"
-        description="Board-ready governance resources for capital allocation, escalation controls, reversibility discipline, and operating strategy under pressure. Use Planning for the live approval and export workflow; use Resources when you need the deeper library behind it."
+        title="Deeper governance artifacts"
+        description="Use Planning for the live approval and export workflow. Open Resources only when leadership needs deeper board, governance, or reversibility material behind that weekly plan."
         actions={(
           <>
             <ButtonLink href="/" variant="primary">
@@ -99,14 +99,14 @@ export default async function ResourcesPage() {
         </div>
       </SecondaryPageSection>
 
-      <SecondaryPageSection eyebrow="Decision briefs" title="Start from the operating question">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {featuredAnswerPages.slice(0, 4).map((page) => (
-            <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface space-y-2 px-4 py-4">
-              <p className="text-base font-semibold text-slate-100">{page.title}</p>
-              <p className="text-sm text-slate-300">{page.shortAnswer}</p>
-            </Link>
-          ))}
+      <SecondaryPageSection eyebrow="Deeper planning artifacts" title="Start from the operating question">
+        <p className="text-sm text-slate-300">
+          Use Planning for live approval and export. If you need a deeper artifact or a one-question governance answer, open one of the focused resources below.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <ButtonLink href="/operations" variant="pill">
+            Return to Planning
+          </ButtonLink>
         </div>
       </SecondaryPageSection>
 
@@ -120,34 +120,7 @@ export default async function ResourcesPage() {
         ))}
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        {authorityPages.map((page) => (
-          <Link key={page.path} href={page.path} className="weather-panel space-y-2 px-4 py-4">
-            <Tag tone="cyan">VC authority</Tag>
-            <h2 className="text-base font-semibold text-slate-100">{page.title}</h2>
-            <p className="text-sm text-slate-200">{page.description}</p>
-          </Link>
-        ))}
-      </section>
-
-      <details className="weather-panel space-y-3 px-6 py-6">
-        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open extended briefs ({resourceArticles.length})
-        </summary>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {resourceArticles.map((article) => (
-            <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4" data-page-cluster={article.cluster} data-page-intent={article.intent}>
-              <Tag tone="rose">
-                {article.format === "case-example" ? "Case example" : article.cluster === "vc" ? "VC brief" : "Pain-driven brief"}
-              </Tag>
-              <h2 className="text-base font-semibold text-slate-100">{article.title}</h2>
-              <p className="text-sm text-slate-200">{article.description}</p>
-            </Link>
-          ))}
-        </div>
-      </details>
-
-      <SecondaryPageSection title="Tools and supporting pages">
+      <SecondaryPageSection title="Templates and supporting pages">
         <ul className="space-y-2 text-sm text-slate-200">
           {toolPages.map((page) => (
             <li key={page.path}>
@@ -158,6 +131,53 @@ export default async function ResourcesPage() {
           ))}
         </ul>
       </SecondaryPageSection>
+
+      <details className="weather-panel space-y-3 px-6 py-6">
+        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+          Open extended governance library ({resourceArticles.length + authorityPages.length})
+        </summary>
+        <div className="mt-4 space-y-6">
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Authority briefs</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {authorityPages.map((page) => (
+                <Link key={page.path} href={page.path} className="weather-panel space-y-2 px-4 py-4">
+                  <Tag tone="cyan">VC authority</Tag>
+                  <h2 className="text-base font-semibold text-slate-100">{page.title}</h2>
+                  <p className="text-sm text-slate-200">{page.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Extended briefs</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {resourceArticles.map((article) => (
+                <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4" data-page-cluster={article.cluster} data-page-intent={article.intent}>
+                  <Tag tone="rose">
+                    {article.format === "case-example" ? "Case example" : article.cluster === "vc" ? "VC brief" : "Pain-driven brief"}
+                  </Tag>
+                  <h2 className="text-base font-semibold text-slate-100">{article.title}</h2>
+                  <p className="text-sm text-slate-200">{article.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Direct answers</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {featuredAnswerPages.slice(0, 4).map((page) => (
+                <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface space-y-2 px-4 py-4">
+                  <p className="text-base font-semibold text-slate-100">{page.title}</p>
+                  <p className="text-sm text-slate-300">{page.shortAnswer}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+      </details>
     </SecondaryPageShell>
   );
 }
