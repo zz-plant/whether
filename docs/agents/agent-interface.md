@@ -97,4 +97,4 @@ Current app-level skills in the payload:
   - Returns `200` for `ok` and `503` for `degraded`/`down`.
   - Includes treasury data freshness metadata (`fetchedAt`, `ageHours`, `staleAfterHours`).
 - `scripts/prod-synthetic-smoke.mjs` runs baseline route + schema assertions against a deployed site.
-  - CI schedule: `.github/workflows/prod-synthetic-smoke.yml` (every 10 minutes + manual dispatch).
+  - Run manually with `bun run smoke:prod`, or from any external scheduler that can invoke repo commands.

@@ -93,6 +93,12 @@ const buildCommandBarPayload = ({
         ...homeBriefModel.compactFlipConditionLabels,
       ], 4),
   updatedAt,
+  postureLabel: weeklyDecisionCardModel.status.postureWithStageLabel ?? weeklyDecisionCardModel.status.statusLabel,
+  trendLabel: weeklyDecisionCardModel.status.trendLabel,
+  confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
+  confidencePercent: weeklyDecisionCardModel.status.confidencePercent,
+  postureTrajectory: weeklyDecisionCardModel.diagnostics.postureTrajectory,
+  regimeDistance: weeklyDecisionCardModel.diagnostics.regimeDistance,
 });
 
 export const assembleHomePage = async ({

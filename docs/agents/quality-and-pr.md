@@ -39,9 +39,9 @@ Decision-delta prompts to include when relevant:
 - What should be revisited now?
 - What would flip/reverse the call?
 
-Automation notes:
-- `.github/workflows/review-hotspot-preflight.yml` runs on pull requests to catch risky decision-logic edits without tests and newly added unsafe type assertions before review.
-- `.github/workflows/pr-review-hotspot-checklist.yml` enforces that all required items in the PR template's **Review hotspot checklist** are explicitly checked before merge.
+Workflow notes:
+- `bun run review:hotspot-preflight` remains part of `bun run check` and should be run locally before opening or updating a PR.
+- The **Review hotspot checklist** in `.github/pull_request_template.md` is now a manual review discipline rather than an enforced GitHub Actions gate.
 
 Recent trend context:
 - `docs/research/2026-03-06-pr-patterns-and-adjustments.md` summarizes recurring merge churn patterns and proposes low-overhead workflow guardrails.
@@ -52,7 +52,7 @@ Recent trend context:
 - [ ] Tests/docs updated where behavior/workflows changed.
 - [ ] Known limitations and follow-ups are explicit.
 
-## CI dependency-install contract
-- CI jobs must run `bun install --frozen-lockfile` exactly once before any build/package/upload steps.
+## Local verification and deploy contract
+- Local validation should run `bun install --frozen-lockfile` exactly once before build/package/deploy steps when you are testing a clean environment.
 - Build and deploy steps must use repo-local CLIs via Bun scripts (for example `bun run check:vinext`, `bun run build:cloudflare`, and `bun run deploy:cloudflare`) instead of `bunx` to avoid implicit re-install and lockfile rewrites.
 - For Cloudflare flows, validate Vinext compatibility before deploy and keep deploy evidence tied to the same build lane used in production.

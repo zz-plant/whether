@@ -130,7 +130,7 @@ These actions operationalize migration outcomes after the near-term spike and ga
 - [ ] Run Wave 1 framework-core production migration.
 - [ ] Run Wave 2 Tailwind v4 migration with visual QA sign-off.
 - [ ] Run Wave 3 supporting dependency upgrades.
-- [x] Add CI pages-targeted build gating and compatibility evidence requirement (`.github/workflows/upgrade-guardrails.yml`, `.github/pull_request_template.md`).
+- [x] Add pages-targeted build validation and compatibility evidence requirement (`.github/pull_request_template.md`, local `bun run check:vinext`, and `bun run build:cloudflare` verification).
 - [x] Add/expand data fallback and metadata parity tests (`tests/treasuryClient.test.ts`).
 - [ ] Publish post-upgrade runbook updates and ownership handoff notes.
 

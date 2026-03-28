@@ -22,7 +22,7 @@ Each refreshed page should include a `Changelog` section with:
 This improves trust and recency for boards/operators reviewing the same page repeatedly.
 
 ## Automated queue artifact
-Run `bun run seo:refresh-queue` (or the scheduled GitHub workflow) to produce machine-readable outputs for editorial/ops:
+Run `bun run seo:refresh-queue` to produce machine-readable outputs for editorial/ops:
 
 - `data/seo-refresh/queue.json` — pages currently queued for refresh, including `noindexNow` for stale pages.
 - `data/seo-refresh/status.json` — per-page status ledger with `lastEvaluatedAtIso`, refresh request/refreshed timestamps, `slaDueAtIso`, and `slaState`.
