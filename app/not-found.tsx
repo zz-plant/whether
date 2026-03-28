@@ -10,7 +10,7 @@ export default function NotFound() {
         </h1>
         <p className="text-sm leading-7 text-slate-300 sm:text-base">
           Some older routes were replaced during the IA update. Continue with the current command surface,
-          review Signals first, or open Operations without losing intent.
+          review Evidence first, or open Planning without losing intent.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -23,13 +23,13 @@ export default function NotFound() {
             href="/signals"
             className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
-            Review signals
+            Review evidence
           </Link>
           <Link
             href="/operations"
             className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
-            Open Operations
+            Open Planning
           </Link>
         </div>
       </section>

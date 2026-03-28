@@ -13,31 +13,31 @@ export type ScrollPlan = {
 
 export const homeScrollPlan: ScrollPlan = {
   eyebrow: "Scroll path",
-  title: "Move through the weekly brief in one pass",
+  title: "Keep the brief as the only source of truth",
   description:
-    "Confirm why the call changed, lock the operating plan, then use replay only when continuity helps this week’s decision.",
+    "Share from home, then open exactly one downstream surface only if evidence, planning, or translation still needs work.",
   items: [
     {
       href: "#audit-this-call",
-      label: "Audit",
-      summary: "Confirm the delta, trust status, and top evidence movers first.",
+      label: "Evidence",
+      summary: "Open Evidence or Trust only when the brief needs proof or a trust audit.",
     },
     {
       href: "#approve-this-weeks-plan",
-      label: "Approve",
-      summary: "Lock the weekly operating summary before opening deeper execution views.",
+      label: "Planning",
+      summary: "Commit the weekly plan before you widen into company-specific translation.",
     },
     {
       href: "#historical-replay-workspace",
-      label: "Replay",
-      summary: "Compare against prior months only after the live call is settled.",
+      label: "Depth",
+      summary: "Use Decision Tools, replay, or toolkits only for the one unresolved question that remains.",
     },
   ],
 };
 
 export const signalsScrollPlan: ScrollPlan = {
   eyebrow: "Evidence path",
-  title: "Read Signals from decision to proof",
+  title: "Read Evidence from decision to proof",
   description:
     "Start with the decision delta, then move through replay, live scores, priority drivers, and threshold logic in that order.",
   items: [
@@ -71,7 +71,7 @@ export const signalsScrollPlan: ScrollPlan = {
 
 export const operationsScrollPlan: ScrollPlan = {
   eyebrow: "Execution path",
-  title: "Use Operations as a controlled review sequence",
+  title: "Use Planning as a controlled review sequence",
   description:
     "Approve the weekly plan first, then validate guardrails, finance posture, sharing output, and optional implementation handoffs.",
   items: [
@@ -105,9 +105,9 @@ export const operationsScrollPlan: ScrollPlan = {
 
 export const decideScrollPlan: ScrollPlan = {
   eyebrow: "Decision path",
-  title: "Start fast, then widen only if the call needs it",
+  title: "Use Decision Tools only for unresolved edge cases",
   description:
-    "Begin with runnable tools, use utilities when validation is required, and browse role or situation paths only after that.",
+    "Start with the fastest bounded tool, then widen into role or situation paths only if the weekly plan still leaves an owner-specific question.",
   items: [
     {
       href: "#run-this-now",
@@ -134,7 +134,7 @@ export const decideScrollPlan: ScrollPlan = {
 
 export const methodScrollPlan: ScrollPlan = {
   eyebrow: "Trust path",
-  title: "Audit trust from surfaces to reversal conditions",
+  title: "Audit Trust from freshness to reversal conditions",
   description:
     "Open the primary trust surfaces first, confirm the current status, then review flip conditions and optional glossary support.",
   items: [

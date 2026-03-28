@@ -14,7 +14,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Search — find workflows, toolkits, concepts, and trust docs",
   description:
-    "Search the operator corpus across primary workflows, supporting toolkits, concepts, and key method/signal docs.",
+    "Search the operator corpus across primary workflows, supporting toolkits, concepts, and key evidence/trust docs.",
   path: "/search",
   imageAlt: "Whether search",
 });
@@ -76,7 +76,7 @@ export default async function SearchPage({
       <HubHero
         eyebrow="Global search"
         title="Find the decision surface you need for this week."
-        description="Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Signals/Method docs."
+        description="Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Evidence/Trust docs."
         aside={(
           <div className="weather-hub-card space-y-3 px-5 py-5">
             <p className="weather-hub-section-eyebrow">Search scope</p>
@@ -84,7 +84,7 @@ export default async function SearchPage({
               <li>Primary workflows and decision paths</li>
               <li>Supporting toolkits and utilities</li>
               <li>Failure modes and concepts</li>
-              <li>Signals and method reference docs</li>
+              <li>Evidence and trust reference docs</li>
             </ul>
           </div>
         )}
@@ -190,7 +190,7 @@ export default async function SearchPage({
               <p>
                 No results matched. Try terms like <span className="font-semibold text-slate-100">rollback</span>,{" "}
                 <span className="font-semibold text-slate-100">PMF</span>, or{" "}
-                <span className="font-semibold text-slate-100">method</span>.
+                <span className="font-semibold text-slate-100">trust</span>.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link href="/search?q=rollback" className="weather-hub-chip">Try rollback</Link>
@@ -202,7 +202,7 @@ export default async function SearchPage({
         </section>
       ) : (
         <section className="weather-hub-section text-sm text-slate-300">
-          Enter a query to surface workflow hubs, decision tools, risks, concepts, and trust docs.
+          Enter a query to surface workflow hubs, decision tools, risks, concepts, and evidence or trust docs.
         </section>
       )}
     </HubPageShell>

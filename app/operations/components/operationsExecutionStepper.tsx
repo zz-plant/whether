@@ -71,11 +71,11 @@ export function OperationsExecutionStepper({
   const activeIndex = Math.max(steps.findIndex((step) => step.id === activeStepId), 0);
 
   return (
-    <section className="space-y-4" aria-label="Operations execution stepper">
+    <section className="space-y-4" aria-label="Planning execution stepper">
       <div className="weather-panel space-y-3 px-4 py-4">
         <div>
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Execution flow</p>
-          <h2 className="text-sm font-semibold text-slate-100">Use Operations in one linear pass</h2>
+          <h2 className="text-sm font-semibold text-slate-100">Use Planning in one linear pass</h2>
         </div>
         <ol className="grid gap-3 md:grid-cols-4">
           {steps.map((step, index) => {

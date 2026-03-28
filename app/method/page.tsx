@@ -17,11 +17,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Method — trust, sources, and limits",
+  title: "Trust — freshness, confidence, and sources",
   description:
-    "Canonical trust surfaces for Whether: confidence, freshness, source coverage, and method limits.",
+    "Canonical trust surfaces for Whether: freshness, confidence, source coverage, and formula limits.",
   path: "/method",
-  imageAlt: "Whether method hub",
+  imageAlt: "Whether trust hub",
 });
 
 export default async function MethodPage() {
@@ -109,9 +109,9 @@ export default async function MethodPage() {
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
       trustStatusAction="If trust checks pass, return to the weekly brief and execute the operating call."
       trustStatusTone={trustStatusTone}
-      pageTitle="Method"
+      pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Trust, source, and confidence checks in the same shell used by the weekly operating surfaces."
+      pageSummary="Freshness, confidence, source, and formula checks for defending the weekly call."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -134,7 +134,7 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Method as a fast trust gate, then move back to execution.",
+        call: "Use Trust as a fast audit gate, then move back to the weekly brief or plan.",
         doNow: [
           `Confirm freshness: ${reportData.fetchedAtLabel}.`,
           `Confirm confidence: ${confidenceLabel}.`,
@@ -147,8 +147,8 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Method" }]} />
-      <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Method quick start">
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust" }]} />
+      <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Trust quick start">
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
           Trust audit hub
         </p>
@@ -156,7 +156,7 @@ export default async function MethodPage() {
           Trust the weekly call fast: confidence, freshness, and flip conditions.
         </h1>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Use Method only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here.
+          Use Trust only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center">
@@ -213,7 +213,7 @@ export default async function MethodPage() {
       <HubSection
         id="formula-reference"
         title="Formula reference"
-        description="Methodology permanently redirects to this Method trust-hub formula reference."
+        description="Methodology permanently redirects to this Trust formula reference."
         className="scroll-mt-28"
       >
         <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">

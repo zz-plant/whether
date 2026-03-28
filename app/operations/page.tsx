@@ -34,11 +34,11 @@ import { PageFlowNav } from "../components/pageFlowNav";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Operations",
+  title: "Whether Report — Planning",
   description:
-    "Playbook moves, finance posture, and operator requests tuned to the current regime.",
+    "Approve the weekly plan, guardrails, finance posture, and final brief for the current regime.",
   path: "/operations",
-  imageAlt: "Whether operations plan view",
+  imageAlt: "Whether planning view",
   imagePath: "/social/operations.svg",
 });
 
@@ -76,10 +76,10 @@ export default async function OperationsPage({
     "@graph": [
       {
         "@type": "WebPage",
-        name: "Whether Report — Operations",
+        name: "Whether Report — Planning",
         url: `${siteUrl}/operations`,
         description:
-          "Playbook moves, finance posture, and operator requests tuned to the current regime.",
+          "Approve the weekly plan, guardrails, finance posture, and final brief for the current regime.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -173,19 +173,19 @@ export default async function OperationsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Operations"
+      pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Detailed execution depth for the weekly workspace: move through plan, guardrails, finance, and share in one pass."
-      pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open execution flow ↓" }}
+      pageSummary="Approve the weekly operating plan, then confirm guardrails, finance posture, and the final aligned brief."
+      pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open planning flow ↓" }}
       primaryCta={{
         href: "/",
         label: "Return to Weekly Brief",
       }}
-      secondaryCta={{ href: "#ops-monthly-action-summary", label: "Open execution flow" }}
-      exportCta={{ href: "#ops-export-briefs", label: "Copy aligned brief" }}
+      secondaryCta={{ href: "#ops-monthly-action-summary", label: "Open planning flow" }}
+      exportCta={{ href: "#ops-export-briefs", label: "Open final brief" }}
       nextStep={{
         href: "/",
-        description: "Return to Weekly Brief when the detailed execution review is complete",
+        description: "Return to Weekly Brief when the planning review is complete",
       }}
       pageNavVariant="compact"
       showPageNavigation={true}

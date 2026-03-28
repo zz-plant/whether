@@ -30,11 +30,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Signals",
+  title: "Whether Report — Evidence",
   description:
-    "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
+    "Evidence appendix for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
   path: "/signals",
-  imageAlt: "Whether Report signals overview",
+  imageAlt: "Whether Report evidence overview",
   imagePath: "/social/signals.svg",
 });
 
@@ -73,10 +73,10 @@ export default async function SignalsPage({
       {
         "@type": "WebPage",
         "@id": `${siteUrl}/signals#webpage`,
-        name: "Whether Report — Signals",
+        name: "Whether Report — Evidence",
         url: `${siteUrl}/signals`,
         description:
-          "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
+          "Evidence appendix for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -323,12 +323,12 @@ export default async function SignalsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Signals"
+      pageTitle="Evidence"
       currentPath="/signals"
-      pageSummary="Deep evidence appendix for the Weekly Brief: drivers, thresholds, timestamps, and historical context."
+      pageSummary="Why the weekly call moved: drivers, thresholds, timestamps, and historical replay."
       pageSummaryLink={{
         href: "#thresholds",
-        label: "See thresholds",
+        label: "Open evidence path ↓",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}

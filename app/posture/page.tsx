@@ -27,9 +27,9 @@ export default async function PosturePage() {
         <p className="text-xs text-sky-200">Current weekly brief posture: {displayRegime.label} <span className="text-slate-400">({displayRegime.canonicalRegime})</span></p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Start core loop: Weekly Brief →</Link>
-          <Link href="/signals" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Signals</Link>
-          <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Decide</Link>
-          <Link href="/operations" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Operations</Link>
+          <Link href="/signals" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Evidence</Link>
+          <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Decision Tools</Link>
+          <Link href="/operations" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Planning</Link>
         </div>
         <p className="text-xs text-slate-400">Use this page as the canonical posture reference surface.</p>
       </section>

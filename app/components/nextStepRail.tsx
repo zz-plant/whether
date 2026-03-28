@@ -14,7 +14,7 @@ const PRIMARY_ACTIONS = primaryNavigationLayers.map((layer) => ({
 
 const recommendedPrimaryHrefByKey = {
   "weekly-brief": "/operations",
-  signals: "/operations",
+  signals: "/",
   operations: "/",
   decide: "/operations",
   method: "/",
@@ -34,7 +34,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
   const recommendedAction = PRIMARY_ACTIONS.find((action) => action.href === recommendedHref) ?? PRIMARY_ACTIONS[0];
   const introCopy = currentLayer?.tier === "supporting" && parentLayer
     ? `${currentLayer.label} is a supporting surface under ${parentLayer.label}. Use the primary workflow for orientation, then come here only when you need this deeper library.`
-    : "Use Weekly Brief as the canonical workspace. Open depth pages only when the decision needs more detail.";
+    : "Use Weekly Brief as the anchor. Each downstream surface should answer exactly one unresolved question before you return.";
 
   return (
     <section className="weather-hub-section" aria-label="Next step rail">

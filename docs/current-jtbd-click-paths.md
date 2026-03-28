@@ -12,7 +12,7 @@ Validation note: click labels in this document were verified from the current ro
 **Clicks**
 1. Open `/` or click `Weekly Brief` in global navigation.
 2. Read the `This week in 15 seconds` block.
-3. If execution detail is needed, click `Open Operations`.
+3. If execution detail is needed, click `Open Planning`.
 
 **Current output**
 - Current posture
@@ -52,14 +52,14 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When someone challenges the weekly call, show me the evidence, freshness, and trust status fast.
 
 **Clicks**
-1. Click `Signals` in global navigation.
+1. Click `Evidence` in global navigation.
 2. Click `Review evidence`.
 3. Use the in-page actions that matter:
    - `Open tightness`
    - `Open risk appetite`
    - `Open curve slope`
    - `Inspect threshold logic`
-4. If the question is about provenance or uncertainty, click `Method`.
+4. If the question is about provenance or uncertainty, click `Trust`.
 5. On `/method`, open:
    - `Sources and freshness`
    - `Confidence and limits`
@@ -77,7 +77,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When I want context from an earlier month, let me replay historical posture before revisiting current bets.
 
 **Clicks**
-1. Click `Signals`.
+1. Click `Evidence`.
 2. In `Advanced filters and historical tools`, click `Open Time Machine`.
 3. In `Historical regime replay`, pick a date.
 4. If needed, review the advanced `Time Machine` and `Regime timeline` panels.
@@ -93,7 +93,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When I need to approve or hold changes to team pace, roadmap, and spend, translate the posture into bounded operating rules.
 
 **Clicks**
-1. Click `Operations` in global navigation.
+1. Click `Planning` in global navigation.
 2. Click `Start with weekly plan`.
 3. Click `Open guardrails`.
 4. Review `Weekly plan` and `Approve or hold moves`.
@@ -111,7 +111,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When finance or leadership asks what this regime means for cash posture, help me test runway decisions against the current call.
 
 **Clicks**
-1. Click `Operations`.
+1. Click `Planning`.
 2. Open the `Finance strategy` section.
 3. In `Runway planner`, set:
    - `Runway (months)`
@@ -136,7 +136,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When different leaders need different decision framing, let me translate the same call into a role-specific path.
 
 **Clicks**
-1. Click `Decide` in global navigation.
+1. Click `Decision Tools` in global navigation.
 2. Review the `Start from this week's live call` block.
 3. Under `Explore by role`, click the relevant role card.
 3. Review:
@@ -155,7 +155,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When I already know the decision situation, take me straight to the right operating instrument.
 
 **Clicks**
-1. Click `Decide`.
+1. Click `Decision Tools`.
 2. Review the `Start from this week's live call` block.
 3. Under `Explore by situation`, click the relevant situation card.
 4. Click a toolkit in `Start here` or `Run this now`.
@@ -174,7 +174,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When the base weekly call is directionally right but too generic for my company, tailor it to stage, sector, and operating shape.
 
 **Clicks**
-1. Click `Decide`.
+1. Click `Decision Tools`.
 2. Review the `Start from this week's live call` block.
 3. In `Decision utilities`, click `Team context profile`.
 3. Set:
@@ -198,7 +198,7 @@ Validation note: click labels in this document were verified from the current ro
 **JTBD:** When I need a bounded launch decision, help me turn the macro call into a go, wait, or kill recommendation.
 
 **Clicks**
-1. Click `Decide`.
+1. Click `Decision Tools`.
 2. Review the `Start from this week's live call` block.
 3. In `Decision utilities`, click `Whether to ship checklist`.
 3. Set:

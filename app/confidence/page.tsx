@@ -47,7 +47,7 @@ export default async function ConfidencePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Method", href: "/method" }, { label: "Confidence & Limits" }]} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust", href: "/method" }, { label: "Confidence & Limits" }]} />
 
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Confidence &amp; Limits</h1>
@@ -86,7 +86,7 @@ export default async function ConfidencePage() {
         <div className="flex flex-wrap gap-2">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly brief</Link>
           <Link href="/method" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Back to trust snapshot</Link>
-          <Link href="/method#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Formula reference (Method)</Link>
+          <Link href="/method#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Formula reference (Trust)</Link>
           <Link href="/sources" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Sources and freshness</Link>
         </div>
       </section>

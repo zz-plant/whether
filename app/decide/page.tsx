@@ -16,10 +16,10 @@ import { PageFlowNav } from "../components/pageFlowNav";
 import { decideScrollPlan } from "../../lib/navigation/scrollPlans";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decide — role and situation paths",
-  description: "Start from this week’s live call, then translate it by role, situation, or runnable tool.",
+  title: "Decision Tools — role and situation paths",
+  description: "Use bounded utilities, role paths, and situation paths only when the weekly brief leaves an edge case unresolved.",
   path: "/decide",
-  imageAlt: "Whether decision paths",
+  imageAlt: "Whether decision tools",
   imagePath: "/social/decide.svg",
 });
 
@@ -45,11 +45,11 @@ export default async function DecidePage() {
   return (
     <HubPageShell width="standard">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decide" }]} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero
-        eyebrow="Decision translation"
-        title="Use Decide only when the weekly call needs role or situation translation."
-        description="If Weekly Brief already resolved the decision, stay there or continue to Operations. Open Decide when the direction is clear but the owner-specific translation still needs work."
+        eyebrow="Edge-case translation"
+        title="Use Decision Tools only when the weekly brief does not settle the edge case."
+        description="If Weekly Brief and Planning already resolved the decision, stop there. Open Decision Tools only when one owner-specific translation or bounded utility still needs work."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">Return to Weekly Brief</Link>
@@ -101,8 +101,8 @@ export default async function DecidePage() {
 
       <HubSection
         id="run-this-now"
-        title="Run this now"
-        description="Use the shortest runnable path only after the weekly call already tells you the direction and you just need execution translation."
+        title="Fastest bounded tools"
+        description="Start with the shortest runnable tool only after the weekly call already tells you the direction and you just need owner-specific translation."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-3">
@@ -123,7 +123,7 @@ export default async function DecidePage() {
 
       <HubSection
         id="decision-utilities"
-        title="Decision utilities"
+        title="Validation utilities"
         description="Use these only when the weekly call needs bounded validation or company context before you act."
         className="scroll-mt-28"
       >
@@ -139,7 +139,7 @@ export default async function DecidePage() {
         </div>
       </HubSection>
 
-      <HubSection id="explore-by-role" title="Explore by role" className="scroll-mt-28">
+      <HubSection id="explore-by-role" title="Browse by role" className="scroll-mt-28">
         <div className="weather-page-grid-3">
           {useCaseRoles.map((role) => (
             <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
@@ -147,7 +147,7 @@ export default async function DecidePage() {
         </div>
       </HubSection>
 
-      <HubSection id="explore-by-situation" title="Explore by situation" className="scroll-mt-28">
+      <HubSection id="explore-by-situation" title="Browse by situation" className="scroll-mt-28">
         <div className="weather-page-grid-2">
           {situationUseCaseDefinitions.map((situation) => (
             <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>

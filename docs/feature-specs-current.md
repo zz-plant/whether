@@ -10,14 +10,14 @@ Positioning summary: Whether is an operator briefing system for leadership teams
 ### 1.0 Rationalized IA (primary vs supporting)
 Primary IA is now the five-surface operator loop:
 - `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact
-- `/signals` — **Signals**: evidence depth for thresholds, freshness, and replay
-- `/decide` — **Decide**: role, situation, and utility-based decision translation
-- `/operations` — **Operations**: execution guardrails, finance posture, and export actions
-- `/method` — **Method**: trust, source, formula, and confidence audit
+- `/signals` — **Evidence**: evidence depth for thresholds, freshness, and replay
+- `/decide` — **Decision Tools**: role, situation, and utility-based decision translation
+- `/operations` — **Planning**: execution guardrails, finance posture, and final-brief approval
+- `/method` — **Trust**: trust, source, formula, and confidence audit
 
 Supporting surfaces are intentionally subordinate:
-- `/toolkits` is a supporting instrument library under **Decide**
-- `/learn/failure-modes` is a supporting diagnostic reference under **Method**
+- `/toolkits` is a supporting instrument library under **Decision Tools**
+- `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
@@ -31,11 +31,10 @@ includes status metadata (data freshness, confidence label, offline badges), fix
 links, and section anchors used across the report experience.
 
 The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
-hero plus share/copy actions, then the page continues in a fixed operator sequence:
-- weekly call,
-- audit this call,
-- approve this week’s plan,
-- historical replay.
+hero plus share/copy actions, then the page continues as a compact handoff sequence:
+- evidence handoff,
+- planning handoff,
+- deeper-surface chooser.
 
 The home top fold now separates metadata from decision contract: a compact current-outlook strip
 shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
@@ -43,12 +42,12 @@ once below it with explicit `Action now`, `Guardrail`, and `Flip condition` fiel
 stays artifact-first with the weekly operator brief as the default handoff, while company-specific
 override controls remain separated from routine sharing.
 
-The audit band keeps trust compact on home by showing one trust summary, one decision pressure-test
-card, and a single deeper-evidence path (`/signals`) instead of reproducing the full evidence lane.
-The operations band now compresses the weekly action, one hold-the-line summary, and direct export
-entry points before deeper review in `/operations`. Historical replay still uses the same
-time-machine date-picker pattern as `/signals`, but starts directly on home. Deeper role, situation,
-and toolkit paths are now handled as a compact handoff after replay instead of a full extra home band.
+The evidence handoff keeps trust compact on home by showing one summary plus explicit route
+ownership for `/signals` and `/method` instead of reproducing those workflows inline.
+The planning handoff compresses the weekly action, guardrail, and finance/share summary before
+deeper review in `/operations`. Historical replay now belongs to `/signals` rather than running as
+an inline home interaction. Role, situation, and toolkit paths are handled as explicit downstream
+surfaces after planning rather than as a parallel home workflow.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
 labels, embedded threshold context, and restrained accent usage for outlier conditions.
@@ -62,8 +61,8 @@ decision, flip condition, and core rate context instead of falling back to a gen
 Cold opens into `/` now use a share-card-aligned loading state before the full report resolves, so
 social clicks land on the same action-first artifact structure rather than a generic skeleton.
 
-### 1.2 Signals report (/signals)
-The signals report is the deep evidence appendix for the weekly workspace, with sections for:
+### 1.2 Evidence report (/signals)
+The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
 - Macro signal snapshot (CPI, unemployment, BBB spreads)
 - Time Machine (historical month selector + cached summaries) visible without advanced-mode gating
@@ -73,8 +72,8 @@ The signals report is the deep evidence appendix for the weekly workspace, with 
 Advanced controls remain available for threshold tuning and diagnostics expansion, but historical
 replay is no longer treated as an expert-only action.
 
-### 1.3 Operations overview (/operations)
-Operations is the detailed execution depth page for the home workspace. The default surface is a
+### 1.3 Planning overview (/operations)
+Planning is the detailed execution depth page for the home workspace. The default surface is a
 four-step progressive flow:
 - weekly plan,
 - guardrails,
@@ -92,13 +91,13 @@ implementation depth (integrations, API contracts, and CLI fallback) is linked f
 
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
-glossary support lives under the Method hub so operators can pull term translation without leaving
+glossary support lives under the Trust hub so operators can pull term translation without leaving
 the weekly brief flow.
 
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
 
-### 1.6 Method hub (/method) and formula reference
+### 1.6 Trust hub (/method) and formula reference
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
 confidence, freshness, source coverage, and revisit conditions, then links out to `/sources`,
 `/confidence`, `/method#formula-reference`, and `/learn/failure-modes`.
@@ -221,7 +220,7 @@ action-first top fold anchored to the live weekly call:
 - team-context profiling,
 - then role and situation browsing below.
 
-`/toolkits` remains available as the supporting instrument library for Decide, but it is no longer treated as a peer primary hub in navigation.
+`/toolkits` remains available as the supporting instrument library for Decision Tools, but it is no longer treated as a peer primary hub in navigation.
 
 Decision Shield logic/components remain integrated through decision and operations surfaces.
 

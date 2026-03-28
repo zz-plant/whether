@@ -9,8 +9,8 @@ import { NextStepRail } from "../components/nextStepRail";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Toolkits — supporting instruments for Decide",
-  description: "Supporting instrument library for Decide with practical toolkits, checklists, templates, and misuse warnings.",
+  title: "Toolkits — supporting instruments for Decision Tools",
+  description: "Supporting instrument library for Decision Tools with practical toolkits, checklists, templates, and misuse warnings.",
   path: "/toolkits",
   imageAlt: "Whether toolkits",
 });
@@ -45,10 +45,10 @@ export default async function ToolkitsPage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
       <HubHero
-        eyebrow="Supporting surface under Decide"
-        title="Run one instrument only after Weekly Brief or Decide has already set the direction."
+        eyebrow="Supporting surface under Decision Tools"
+        title="Run one instrument only after Weekly Brief or Decision Tools has already set the direction."
         description="Toolkits are execution helpers, not the canonical workflow. Use them when the call is clear and you need one runnable instrument end to end."
-        actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>}
+        actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decision Tools</Link>}
         stats={[
           { label: "Results", value: `${filteredToolkits.length} toolkit${filteredToolkits.length === 1 ? "" : "s"}` },
           { label: "Best use", value: "Action after direction" },
@@ -112,7 +112,7 @@ export default async function ToolkitsPage({
         <section className="weather-hub-section space-y-3 text-sm text-slate-200">
           <p>No toolkits matched “{query}”. Try broader keywords.</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/decide" className="weather-hub-chip">Open Decide for guided routing</Link>
+            <Link href="/decide" className="weather-hub-chip">Open Decision Tools for guided routing</Link>
           </div>
           {closestToolkits.length > 0 ? (
             <div className="flex flex-wrap gap-2">

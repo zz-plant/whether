@@ -28,8 +28,8 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
 
   if (pathMatchesLink("/", normalizedPathname)) {
     return {
-      title: "Startup market weather: weekly posture for hiring, fundraising, and runway.",
-      description: "Scan the call, lock the decision, and open the right execution surface.",
+      title: "Weekly operating brief for hiring, spend, and pace.",
+      description: "Share from home, then open exactly one downstream surface only if a question remains.",
     } as const;
   }
 

@@ -17,7 +17,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-signals",
     type: "doc",
-    title: "Signals — evidence and thresholds",
+    title: "Evidence — drivers and thresholds",
     href: "/signals",
     summary: "Review macro evidence, thresholds, and the context behind current posture.",
     intentLabel: "Check what changed",
@@ -26,7 +26,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method",
     type: "doc",
-    title: "Method — formulas, cadence, and sources",
+    title: "Trust — freshness, confidence, and sources",
     href: "/method",
     summary: "See scoring, data cadence, source quality, and transparency notes.",
     intentLabel: "Validate trust",
@@ -35,7 +35,7 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-evidence",
     type: "doc",
-    title: "Signals — evidence checklist",
+    title: "Evidence — audit checklist",
     href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
     intentLabel: "Audit provenance",
@@ -80,9 +80,9 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-method-formulas",
     type: "doc",
-    title: "Method — formula reference",
+    title: "Trust — formula reference",
     href: "/method#formula-reference",
-    summary: "Open the formula reference section from the canonical Method trust hub.",
+    summary: "Open the formula reference section from the canonical Trust hub.",
     intentLabel: "Inspect scoring",
     keywords: ["formulas", "scoring", "thresholds", "regime", "methodology", "trust"],
   },
@@ -141,7 +141,7 @@ export const searchEntityTypeLabels: Record<SearchEntityType, string> = {
   toolkit: "Toolkits",
   "failure-mode": "Failure modes",
   concept: "Concepts",
-  doc: "Signals & method docs",
+  doc: "Workflow & trust docs",
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();

@@ -54,8 +54,8 @@ export const HomePageReportContent = async ({
           treasurySource: homepage.reportShell.treasurySource,
         },
         page: {
-          pageTitle: "Weekly Operating Posture Brief",
-          pageSummary: "Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual.",
+          pageTitle: "Weekly Brief",
+          pageSummary: "The canonical weekly call and share artifact. Open another surface only if evidence, planning, or trust still needs work.",
           pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",
@@ -85,15 +85,15 @@ export const HomePageReportContent = async ({
         actions: {
           primaryCta: {
             href: "#approve-this-weeks-plan",
-            label: "Open execution guardrails",
+            label: "Open planning handoff",
           },
           secondaryCta: {
             href: "#audit-this-call",
-            label: "See why this call changed",
+            label: "Open evidence handoff",
           },
           nextStep: {
             href: "/signals",
-            description: "Open Signals only when the home workspace needs deeper evidence",
+            description: "Open Evidence only when the brief needs proof, replay, or threshold review",
           },
         },
         payloads: {
