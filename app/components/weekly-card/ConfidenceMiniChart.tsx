@@ -24,6 +24,17 @@ const buildAreaPath = (points: Array<{ x: number; y: number }>, chartHeight: num
   return `${buildLinePath(points)} L ${last.x} ${chartHeight} L ${first.x} ${chartHeight} Z`;
 };
 
+const buildForecastBandPath = ({
+  from,
+  to,
+  bandHalfWidth,
+}: {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  bandHalfWidth: number;
+}) =>
+  `M ${from.x} ${from.y - bandHalfWidth * 0.45} L ${to.x} ${to.y - bandHalfWidth} L ${to.x} ${to.y + bandHalfWidth} L ${from.x} ${from.y + bandHalfWidth * 0.45} Z`;
+
 export const ConfidenceMiniChart = ({
   confidenceHistory,
   confidenceTrend,
@@ -64,6 +75,24 @@ export const ConfidenceMiniChart = ({
     .map((point) => ({ x: point.x, y: point.y }));
   const linePath = buildLinePath(linePoints);
   const areaPath = buildAreaPath(linePoints, chartHeight - insetY);
+  const trendDelta = confidenceTrend === "strengthening" ? -5 : confidenceTrend === "weakening" ? 7 : 2;
+  const forecastBandWidth = confidenceTrend === "unstable" ? 12 : confidenceTrend === "weakening" ? 10 : 8;
+  const forecastPoint = currentPoint
+    ? {
+        x: chartWidth - insetX,
+        y: insetY + ((chartHeight - insetY * 2) * (100 - clamp(currentPoint.confidencePercent - trendDelta, 0, 100))) / 100,
+      }
+    : null;
+  const forecastBandPath = currentPoint && forecastPoint
+    ? buildForecastBandPath({
+        from: {
+          x: insetX + ((chartWidth - insetX * 2) * ((confidenceHistory.length - 1) / Math.max(1, confidenceHistory.length + 1))),
+          y: linePoints[linePoints.length - 1]?.y ?? forecastPoint.y,
+        },
+        to: forecastPoint,
+        bandHalfWidth: forecastBandWidth,
+      })
+    : "";
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
@@ -89,6 +118,8 @@ export const ConfidenceMiniChart = ({
           <line x1={insetX} y1={chartHeight / 2} x2={chartWidth - insetX} y2={chartHeight / 2} stroke="rgba(71,85,105,0.45)" strokeWidth="1" strokeDasharray="3 3" />
           {areaPath ? <path d={areaPath} fill="rgba(125,211,252,0.08)" /> : null}
           {linePath ? <path d={linePath} fill="none" stroke="rgba(125,211,252,0.95)" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" /> : null}
+          {forecastBandPath ? <path d={forecastBandPath} fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.28)" strokeWidth="1" /> : null}
+          {forecastPoint ? <line x1={linePoints[linePoints.length - 1]?.x ?? forecastPoint.x} y1={linePoints[linePoints.length - 1]?.y ?? forecastPoint.y} x2={forecastPoint.x} y2={forecastPoint.y} stroke="rgba(251,191,36,0.7)" strokeWidth="1.5" strokeDasharray="4 3" /> : null}
           {renderedPoints.map((point) => (
             point.kind === "value" ? (
               <circle
@@ -107,9 +138,10 @@ export const ConfidenceMiniChart = ({
               </g>
             )
           ))}
+          {forecastPoint ? <circle cx={forecastPoint.x} cy={forecastPoint.y} r={2.5} fill="rgb(251 191 36)" stroke="rgba(15,23,42,0.95)" strokeWidth="1.1" /> : null}
         </svg>
       </div>
-      <p className="text-[11px] text-slate-400">Solid line = reported confidence. Hollow markers = missing weeks. Wider swings imply lower forecast reliability.</p>
+      <p className="text-[11px] text-slate-400">Solid line = reported confidence. Dashed tail + amber band = short-term stability cone. Hollow markers = missing weeks.</p>
     </article>
   );
 };

@@ -81,44 +81,51 @@ function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h2 className={tierOneHeading}>How inputs move this call</h2>
-          <p className="mt-1 text-xs leading-5 text-slate-300">Bars show contribution share. Marker strips keep the current read anchored to its flip line.</p>
+          <p className="mt-1 text-xs leading-5 text-slate-300">Each driver card shows pressure, direction, and distance to the next threshold so likely drift is visible without reading the full rationale.</p>
         </div>
-        <p className="text-[11px] text-slate-400">Longer bars = bigger share of the weekly call.</p>
+        <p className="text-[11px] text-slate-400">Higher share = bigger influence on the weekly call.</p>
       </div>
-      <ul className="mt-3 grid gap-2">
+      <ul className="mt-3 grid gap-3 lg:grid-cols-2">
         {items.map((item, index) => {
           const tone = inputInfluenceToneClasses[item.tone];
           const thresholdMarker = buildThresholdMarkerState(item.valueLabel, item.watchLabel);
+          const forceLabel = item.influencePercent >= 32 ? "High force" : item.influencePercent >= 18 ? "Medium force" : "Low force";
 
           return (
-            <li key={item.key} className="border-b border-slate-800/60 px-1 py-3 last:border-b-0">
+            <li key={item.key} className="rounded-xl border border-slate-700/70 bg-slate-950/65 p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                    <p className="text-sm font-semibold text-slate-100">{index + 1}. {item.label}</p>
                     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] ${tone.badge}`}>
                       {item.pressureLabel}
                     </span>
+                    <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+                      {forceLabel}
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs leading-5 text-slate-300">{item.effectDetail}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">
-                    {item.trendArrow} {item.trendLabel}
-                    <span className="px-1" aria-hidden="true">·</span>
-                    {item.watchLabel}
-                  </p>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{item.effectDetail}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-100">{item.valueLabel}</p>
-                  {index === 0 ? <p className="text-[11px] text-slate-400">{item.influencePercentLabel} share</p> : null}
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Current read</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{item.valueLabel}</p>
                 </div>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800/90" aria-hidden="true">
-                <div
-                  className={`h-full origin-left rounded-full ${tone.fill}`}
-                  style={{ transform: `scaleX(${Math.max(0.06, item.influencePercent / 100)})` }}
-                />
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Direction</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.trendArrow} {item.trendLabel}</p>
+                </div>
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Call share</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.influencePercentLabel}</p>
+                </div>
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Watch line</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.watchLabel}</p>
+                </div>
               </div>
-              <div className="mt-2">
+              <div className="mt-3">
                 <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                   <span>Current vs trigger</span>
                   <span>{item.watchLabel}</span>
@@ -137,6 +144,12 @@ function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
                 ) : (
                   <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>
                 )}
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800/90" aria-hidden="true">
+                <div
+                  className={`h-full origin-left rounded-full ${tone.fill}`}
+                  style={{ transform: `scaleX(${Math.max(0.06, item.influencePercent / 100)})` }}
+                />
               </div>
             </li>
           );
@@ -475,6 +488,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     evidenceItems,
     failureModes = [],
     inputInfluence = [],
+    currentScores,
   } = diagnostics;
   const { historicalTimeline } = history;
   const sinceLastReview = model.sinceLastReview;
@@ -517,10 +531,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     ? structuredFlipLabels
     : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
   const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
-  const trustStateLabel = isFallbackSnapshot ? "FALLBACK SNAPSHOT" : "LIVE";
-  const trustStateDetail = isFallbackSnapshot
-    ? "Cached weekly read. Defer irreversible approvals until live data returns."
-    : "";
+  const trustStateLabel = inlineTrustMarker.label.toUpperCase();
+  const trustStateDetail = inlineTrustMarker.degraded ? inlineTrustMarker.detail : "";
   const decisionBullets = [
     { label: "What changed", detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim() },
     { label: "What that changes", detail: immediateDecision.trim() },
@@ -553,7 +565,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     product: buildRoleHref("product", searchParams),
   };
 
-  const hasMaterialTrustDelta = isFallbackSnapshot || freshnessMeta.maxAge === "stale";
+  const hasMaterialTrustDelta = inlineTrustMarker.degraded;
   const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
     selectedMode: "series-a",
     options: [
@@ -733,6 +745,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
                 decisionMatrix={decisionMatrix}
                 decisionRules={decisionRules}
                 startupVariantPolicy={resolvedStartupVariantPolicy}
+                currentScores={currentScores}
               />
             </div>
           </details>

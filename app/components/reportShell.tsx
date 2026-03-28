@@ -7,7 +7,6 @@ import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
-import { CanonicalTrustModule } from "./canonicalTrustModule";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import {
   ReportMobileNavigation,
@@ -173,6 +172,27 @@ export const resolveTrustProvenance = ({
   };
 };
 
+const trustPanelToneClass: Record<"stable" | "warning" | "historical", string> = {
+  stable: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100",
+  warning: "border-amber-400/40 bg-amber-500/10 text-amber-100",
+  historical: "border-slate-500/45 bg-slate-800/60 text-slate-200",
+};
+
+const trustHeadlineByTone: Record<"stable" | "warning" | "historical", string> = {
+  stable: "Readiness clear",
+  warning: "Readiness watch",
+  historical: "Historical mode",
+};
+
+const sourceReadinessScore = (modeLabel: string, freshnessStatus: string) => {
+  const mode = modeLabel.toLowerCase();
+  const freshness = freshnessStatus.toLowerCase();
+  let score = mode.includes("live") ? 100 : mode.includes("snapshot") ? 62 : 38;
+  if (freshness.includes("stale")) score -= 22;
+  if (freshness.includes("degraded")) score -= 26;
+  return Math.max(18, Math.min(100, score));
+};
+
 export function HeroTrustProvenanceBlock({
   trustStatusTone,
   trustStatusLabel,
@@ -211,43 +231,166 @@ export function HeroTrustProvenanceBlock({
   provenance?: DataProvenance;
 }) {
   const trustProvenance = resolveTrustProvenance({ provenance, sourceLabel, sourceHref, degradedSourceRows });
+  const trustToneClass = trustPanelToneClass[trustStatusTone];
+  const controlHeadline = trustHeadlineByTone[trustStatusTone];
+  const currentApprovalLane = approvalBuckets?.[0];
+  const secondaryApprovalLanes = approvalBuckets?.slice(1, 3) ?? [];
+  const exitProgressPercent = outageExitGate
+    ? Math.max(8, Math.min(100, (outageExitGate.metCount / Math.max(1, outageExitGate.totalCount)) * 100))
+    : 100;
 
   return (
     <>
-      <CanonicalTrustModule
-        tone={trustStatusTone}
-        label={trustStatusLabel}
-        detail={trustStatusDetail}
-        action={trustStatusAction}
-        outageType={outageType}
-        outageSeverity={outageSeverity}
-        decisionImpactWindow={decisionImpactWindow}
-        approvalBuckets={approvalBuckets}
-        recoveryPlan={recoveryPlan}
-        outageExitGate={outageExitGate}
-        degradedSourceRows={degradedSourceRows}
-        sourceDetails={
-          trustProvenance ? (
-            <DataProvenanceStrip provenance={trustProvenance} variant="compact" />
-          ) : (
-            <dl className="grid gap-2 text-xs text-slate-300">
-              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
-              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Confidence</dt><dd className="text-slate-200">{trustStatusLabel}</dd></div>
-              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Updated</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
-              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Next refresh</dt><dd className="text-slate-200">{resolvedNextRefreshLabel}</dd></div>
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-slate-400">Source</dt>
-                <dd className="text-right text-slate-200">
-                  <span>{sourceLabel}</span>
-                  {sourceHref ? (
-                    <a href={sourceHref} target="_blank" rel="noreferrer" className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100">View source</a>
-                  ) : null}
-                </dd>
+      <section className="weather-panel flex flex-col gap-3 px-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${trustToneClass}`}>
+              {controlHeadline}
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">Trust control panel</span>
+          </div>
+          {outageSeverity ? (
+            <span className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+              outageSeverity === "critical"
+                ? "border-rose-400/45 bg-rose-500/10 text-rose-100"
+                : outageSeverity === "blocking"
+                  ? "border-amber-400/45 bg-amber-500/10 text-amber-100"
+                  : "border-emerald-400/35 bg-emerald-500/10 text-emerald-100"
+            }`}>
+              {outageSeverity} · {(outageType ?? "live-data").replaceAll("-", " ")}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Current readiness</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
+            </div>
+            <div className="text-right text-[11px] text-slate-400">
+              <p>Updated {fetchedAtLabel}</p>
+              <p>Next refresh {resolvedNextRefreshLabel}</p>
+            </div>
+          </div>
+          <p className="mt-2 text-sm text-slate-200">{trustStatusAction}</p>
+          {decisionImpactWindow ? <p className="mt-1 text-xs leading-5 text-slate-400">{decisionImpactWindow}</p> : null}
+        </div>
+
+        <div className="grid gap-3">
+          <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Approval lane</p>
+              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}>
+                {currentApprovalLane?.label ?? "Allowed now"}
+              </span>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-slate-100">{currentApprovalLane?.detail ?? trustStatusDetail}</p>
+            {secondaryApprovalLanes.length > 0 ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {secondaryApprovalLanes.map((lane) => (
+                  <div key={lane.label} className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{lane.label}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-300">{lane.detail}</p>
+                  </div>
+                ))}
               </div>
-            </dl>
-          )
-        }
-      />
+            ) : null}
+          </article>
+
+          <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recovery progress</p>
+              <span className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+                {outageExitGate ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear` : "Live"}
+              </span>
+            </div>
+            {outageExitGate ? (
+              <>
+                <div className="mt-2 h-2 rounded-full bg-slate-800/90">
+                  <div className="h-2 rounded-full bg-gradient-to-r from-amber-300 via-sky-300 to-emerald-300" style={{ width: `${exitProgressPercent}%` }} />
+                </div>
+                <p className="mt-2 text-xs leading-5 text-slate-300">{outageExitGate.label}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">{outageExitGate.summary}</p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-slate-300">No active recovery sequence. Live trust controls are clear.</p>
+            )}
+            {recoveryPlan ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Owner</p>
+                  <p className="mt-1 text-xs text-slate-100">{recoveryPlan.owner}</p>
+                </div>
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Checkpoint</p>
+                  <p className="mt-1 text-xs text-slate-100">{recoveryPlan.nextCheckpoint}</p>
+                </div>
+                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Exit</p>
+                  <p className="mt-1 text-xs text-slate-100">{recoveryPlan.exitCondition}</p>
+                </div>
+              </div>
+            ) : null}
+          </article>
+
+          <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Source readiness</p>
+              <span className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+                {(degradedSourceRows?.length ?? 0) > 0 ? `${degradedSourceRows?.length} degraded` : "All core feeds live"}
+              </span>
+            </div>
+            {(degradedSourceRows && degradedSourceRows.length > 0) ? (
+              <ul className="mt-3 space-y-2">
+                {degradedSourceRows.slice(0, 4).map((row) => {
+                  const score = sourceReadinessScore(row.modeLabel, row.freshnessStatus);
+                  return (
+                    <li key={`${row.sourceName}-${row.modeLabel}`} className="space-y-1">
+                      <div className="flex items-center justify-between gap-2 text-xs">
+                        <span className="font-semibold text-slate-100">{row.sourceName}</span>
+                        <span className="text-slate-400">{row.modeLabel} · {row.freshnessStatus}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-800/90">
+                        <div className="h-2 rounded-full bg-gradient-to-r from-rose-300 via-amber-300 to-sky-300" style={{ width: `${score}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-slate-300">No degraded source rows this refresh. Core sources are usable for standard approval cadence.</p>
+            )}
+          </article>
+        </div>
+
+        <details className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2">
+          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            Data source details
+          </summary>
+          <div className="mt-2">
+            {trustProvenance ? (
+              <DataProvenanceStrip provenance={trustProvenance} variant="compact" />
+            ) : (
+              <dl className="grid gap-2 text-xs text-slate-300">
+                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Confidence</dt><dd className="text-slate-200">{trustStatusLabel}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Updated</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Next refresh</dt><dd className="text-slate-200">{resolvedNextRefreshLabel}</dd></div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Source</dt>
+                  <dd className="text-right text-slate-200">
+                    <span>{sourceLabel}</span>
+                    {sourceHref ? (
+                      <a href={sourceHref} target="_blank" rel="noreferrer" className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100">View source</a>
+                    ) : null}
+                  </dd>
+                </div>
+              </dl>
+            )}
+          </div>
+        </details>
+      </section>
       <p className="mt-3 text-xs text-slate-300">Keep the decision path moving; for methodology details, see <Link href="/method" className="underline decoration-slate-500/80 underline-offset-2">/method</Link>.</p>
     </>
   );

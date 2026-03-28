@@ -103,6 +103,9 @@ export function WeeklyCallModePanel({
   const revisitToneClass = revisitDecisions
     ? "border-amber-400/25 bg-amber-500/8 text-amber-50"
     : "border-emerald-400/25 bg-emerald-500/8 text-emerald-50";
+  const compactTrustToneClass = needsTrustWarning
+    ? "border-amber-400/25 bg-amber-500/8"
+    : "border-emerald-400/25 bg-emerald-500/8";
 
   return (
     <>
@@ -161,19 +164,31 @@ export function WeeklyCallModePanel({
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Weekly implication</p>
             <p className="mt-1 text-sm text-slate-100">{revisitDetail}</p>
           </div>
-          {needsTrustWarning ? (
-            <div className={`mt-3 rounded-xl border px-3 py-2 ${trustToneClass}`}>
+          <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                <span>{trustStateLabel}</span>
-                <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
-                <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
-                <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
-                <span className="rounded-full border border-current/20 px-2 py-0.5">Trend {trendLabel}</span>
+                <span className={needsTrustWarning ? "text-amber-100" : "text-emerald-100"}>{needsTrustWarning ? "Readiness watch" : "Readiness clear"}</span>
+                <span className={`rounded-full border px-2 py-0.5 ${trustToneClass}`}>{trustStateLabel}</span>
+                <span className="rounded-full border border-slate-600/70 bg-slate-950/70 px-2 py-0.5 text-slate-200">{selectedModeLabel}</span>
               </div>
-              {trustStateDetail ? <p className="mt-1 text-xs leading-5">{trustStateDetail}</p> : null}
-              {stabilityRule ? <p className="mt-1 text-[11px] leading-5 text-current/80">{stabilityRule}</p> : null}
+              <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">As of {trustTimestamp}</p>
             </div>
-          ) : null}
+            <div className="mt-2 grid gap-2 md:grid-cols-3">
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Signal</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{confidenceLabel} {Math.round(confidencePercent)}%</p>
+              </div>
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trend</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{trendLabel}</p>
+              </div>
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Rule</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{needsTrustWarning ? "Stage approvals" : "Normal cadence"}</p>
+              </div>
+            </div>
+            {needsTrustWarning && trustStateDetail ? <p className="mt-2 text-[11px] leading-5 text-amber-50/90">{trustStateDetail}</p> : null}
+          </div>
         </article>
 
         <details className={`${detailDisclosureBase} mt-3`}>
@@ -219,6 +234,7 @@ export function WeeklyCallModePanel({
             </summary>
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? <p className="mt-2 text-[11px] leading-5 text-slate-400">Reason: {trustReason}</p> : null}
+            {stabilityRule ? <p className="mt-2 text-[11px] leading-5 text-slate-400">{stabilityRule}</p> : null}
             {compactDecisionBullets.length > 0 ? (
               <ul className="mt-3 grid gap-2 md:grid-cols-3">
                 {compactDecisionBullets.map((item) => (

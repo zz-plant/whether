@@ -319,6 +319,10 @@ export type WeeklyDecisionCardViewModel = {
     regimeSignalIndicators: RegimeSignalIndicator[];
     inputInfluence: InputInfluenceItem[];
     postureTrajectory?: PostureTrajectoryState;
+    currentScores: {
+      tightness: number;
+      riskAppetite: number;
+    };
     startupClimateIndex: StartupClimateIndex;
     regimeDistance: {
       dimensionLabel: string;
@@ -1420,7 +1424,11 @@ export const buildHomeBriefModel = (
     },
   };
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
-  const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules);
+  const currentScores = {
+    tightness: assessment.scores.tightness,
+    riskAppetite: assessment.scores.riskAppetite,
+  };
+  const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules, currentScores);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
   const conciseActionNow = actionNowShort?.trim();
@@ -1489,6 +1497,7 @@ export const buildHomeBriefModel = (
     regimeSignalIndicators,
     inputInfluence,
     postureTrajectory,
+    currentScores,
     operatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
       operatingStanceLine,
@@ -1648,6 +1657,7 @@ export const buildWeeklyDecisionCardViewModel = ({
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,
       inputInfluence: homeBriefModel.inputInfluence,
       postureTrajectory: homeBriefModel.postureTrajectory,
+      currentScores: homeBriefModel.currentScores,
       startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
       flipRiskMeter: buildFlipRiskMeterState(homeBriefModel.regimeDistance),

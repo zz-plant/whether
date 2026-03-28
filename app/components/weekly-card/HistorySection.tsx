@@ -2,6 +2,30 @@ import Link from "next/link";
 import { sectionSpacing, tierOneHeading, tierOnePanel } from "./shared";
 import type { HistorySectionProps } from "./types";
 
+const buildHistoryStreaks = (historicalTimeline: HistorySectionProps["historicalTimeline"]) => {
+  if (historicalTimeline.length === 0) {
+    return { currentStreak: 0, shiftCount: 0 };
+  }
+
+  const latestPosture = historicalTimeline[historicalTimeline.length - 1]?.posture;
+  let currentStreak = 0;
+  for (let index = historicalTimeline.length - 1; index >= 0; index -= 1) {
+    if (historicalTimeline[index]?.posture !== latestPosture) {
+      break;
+    }
+    currentStreak += 1;
+  }
+
+  let shiftCount = 0;
+  for (let index = 1; index < historicalTimeline.length; index += 1) {
+    if (historicalTimeline[index - 1]?.posture !== historicalTimeline[index]?.posture) {
+      shiftCount += 1;
+    }
+  }
+
+  return { currentStreak, shiftCount };
+};
+
 export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySectionProps, "historicalTimeline">) {
   return (
     <ol className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4" aria-label="Posture change timeline">
@@ -50,11 +74,39 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
 }
 
 export function HistorySection({ historicalTimeline, title = "Regime history (recent)", subtitle = "Last 2 checkpoints" }: HistorySectionProps) {
+  const { currentStreak, shiftCount } = buildHistoryStreaks(historicalTimeline);
+  const driftLabel = shiftCount >= 3 ? "High drift" : shiftCount >= 1 ? "Active drift" : "Settling";
+  const driftPercent = historicalTimeline.length <= 1 ? 18 : Math.max(18, Math.min(100, (shiftCount / (historicalTimeline.length - 1)) * 100));
+
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className={tierOneHeading}>{title}</h2>
-        <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">{subtitle}</p>
+        <div>
+          <h2 className={tierOneHeading}>{title}</h2>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em]">
+            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-slate-300">{subtitle}</span>
+            <span className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-sky-100">
+              {currentStreak > 1 ? `${currentStreak} straight in current posture` : "Fresh posture read"}
+            </span>
+            <span className="rounded-full border border-amber-400/25 bg-amber-500/8 px-2 py-0.5 text-amber-100">
+              {shiftCount === 0 ? "No recent shifts" : `${shiftCount} shift${shiftCount > 1 ? "s" : ""} in window`}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Drift strip</p>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{driftLabel}</span>
+        </div>
+        <div className="mt-2 h-2 rounded-full bg-slate-800/90">
+          <div className="h-2 rounded-full bg-gradient-to-r from-emerald-300 via-amber-300 to-rose-300" style={{ width: `${driftPercent}%` }} />
+        </div>
+        <p className="mt-2 text-[11px] leading-5 text-slate-400">
+          {shiftCount === 0
+            ? "No recent posture shifts in the current window, which suggests the call is settling."
+            : `${shiftCount} recent posture shift${shiftCount > 1 ? "s" : ""} in this window. Higher drift means weaker continuity and less implicit stability.`}
+        </p>
       </div>
       <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
     </article>
