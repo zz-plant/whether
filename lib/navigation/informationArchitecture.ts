@@ -21,8 +21,8 @@ export type NavigationLayer = {
 
 export const navigationGroupLabels = {
   core: "Now",
-  workflow: "Workflows",
-  reference: "Reference",
+  workflow: "Decisions",
+  reference: "Sources",
 } as const;
 
 export const navigationLayers: NavigationLayer[] = [
