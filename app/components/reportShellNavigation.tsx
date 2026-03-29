@@ -148,18 +148,22 @@ export const ReportInterpretationNotes = () => (
 export const ReportSectionNavigation = ({
   sectionLinks,
   className,
+  maxItems,
 }: {
   sectionLinks: ReportSectionLink[];
   className?: string;
+  maxItems?: number;
 }) => {
   if (!sectionLinks.length) {
     return null;
   }
+  const visibleSectionLinks = sectionLinks.slice(0, Math.max(1, maxItems ?? sectionLinks.length));
+  const hiddenSectionCount = Math.max(sectionLinks.length - visibleSectionLinks.length, 0);
 
   return (
     <nav aria-label="Section index" className={className}>
       <ol className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-3">
-        {sectionLinks.map((section, index) => (
+        {visibleSectionLinks.map((section, index) => (
           <li key={section.href}>
             <Link
               href={section.href}
@@ -171,6 +175,11 @@ export const ReportSectionNavigation = ({
           </li>
         ))}
       </ol>
+      {hiddenSectionCount > 0 ? (
+        <p className="px-3 pb-3 pt-2 text-[11px] text-slate-400">
+          {hiddenSectionCount} more section{hiddenSectionCount === 1 ? "" : "s"} below.
+        </p>
+      ) : null}
     </nav>
   );
 };
@@ -181,12 +190,14 @@ export const ReportMobileNavigation = ({
   currentPath,
   className,
   sectionLinks = [],
+  maxItems,
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
   currentPath?: string;
   className?: string;
   sectionLinks?: ReportSectionLink[];
+  maxItems?: number;
 }) => {
   const { currentLink, adjacentLinks, currentStep, totalSteps } = getPageNavigationState(
     pageLinks,
@@ -195,8 +206,14 @@ export const ReportMobileNavigation = ({
   );
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
-  const mobileSectionLinks = sectionLinks.slice(0, 4);
+  const mobileSectionLinkLimit = Math.max(1, maxItems ?? 4);
+  const mobileSectionLinks = sectionLinks.slice(0, mobileSectionLinkLimit);
   const hiddenSectionCount = Math.max(sectionLinks.length - mobileSectionLinks.length, 0);
+  const maxSuggestedAdjacentLinks = 2;
+  const visibleAdjacentLinks = adjacentLinks.slice(0, maxSuggestedAdjacentLinks + 1);
+  const primaryAdjacentLink = visibleAdjacentLinks[0];
+  const suggestedAdjacentLinks = visibleAdjacentLinks.slice(1);
+  const hiddenAdjacentCount = Math.max(adjacentLinks.length - visibleAdjacentLinks.length, 0);
 
   return (
     <nav aria-label="Mobile report navigation" className={className}>
@@ -249,20 +266,20 @@ export const ReportMobileNavigation = ({
               <p className="mt-1 truncate text-[11px] text-slate-400">{pageCountLabel}</p>
             </div>
           </div>
-          {adjacentLinks[0] ? (
+          {primaryAdjacentLink ? (
             <Link
-              href={adjacentLinks[0].href}
+              href={primaryAdjacentLink.href}
               className="weather-pill inline-flex min-h-[44px] max-w-[160px] flex-col items-start justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{adjacentLinks[0].label}</span>
-              <span className="mt-1 text-[10px] text-slate-300">{adjacentLinks[0].description}</span>
+              <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{primaryAdjacentLink.label}</span>
+              <span className="mt-1 text-[10px] text-slate-300">{primaryAdjacentLink.description}</span>
             </Link>
           ) : null}
         </div>
 
-        {adjacentLinks.slice(1).length > 0 ? (
+        {suggestedAdjacentLinks.length > 0 ? (
           <div aria-label="Suggested destinations" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
-            {adjacentLinks.slice(1).map((link) => (
+            {suggestedAdjacentLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -273,6 +290,11 @@ export const ReportMobileNavigation = ({
               </Link>
             ))}
           </div>
+        ) : null}
+        {hiddenAdjacentCount > 0 ? (
+          <p className="mt-2 text-[11px] text-slate-400">
+            +{hiddenAdjacentCount} more destination{hiddenAdjacentCount === 1 ? "" : "s"} available.
+          </p>
         ) : null}
       </div>
     </nav>

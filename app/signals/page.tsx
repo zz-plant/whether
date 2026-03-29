@@ -405,6 +405,7 @@ export default async function SignalsPage({
         title={signalsScrollPlan.title}
         description={signalsScrollPlan.description}
         items={signalsScrollPlan.items}
+        maxItems={3}
       />
 
       <section className="weather-panel space-y-3 px-5 py-4" aria-label="Signals view mode">

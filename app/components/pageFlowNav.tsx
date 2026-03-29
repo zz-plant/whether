@@ -30,6 +30,7 @@ export function PageFlowNav({
   actions,
   className,
   compact = false,
+  maxItems,
 }: {
   eyebrow: string;
   title: string;
@@ -38,10 +39,13 @@ export function PageFlowNav({
   actions?: ReactNode;
   className?: string;
   compact?: boolean;
+  maxItems?: number;
 }) {
   if (!items.length) {
     return null;
   }
+  const visibleItems = items.slice(0, Math.max(1, maxItems ?? items.length));
+  const hiddenItemCount = Math.max(items.length - visibleItems.length, 0);
 
   return (
     <section className={`weather-hub-section space-y-3 ${className ?? ""}`} aria-label={title}>
@@ -60,7 +64,7 @@ export function PageFlowNav({
       </div>
 
       <ol className={`grid gap-3 ${compact ? "" : "xl:grid-cols-3"}`}>
-        {items.map((item, index) => {
+        {visibleItems.map((item, index) => {
           const status = checkpointStatus(index);
           const tone = statusClasses[status];
           return (
@@ -103,6 +107,11 @@ export function PageFlowNav({
           );
         })}
       </ol>
+      {hiddenItemCount > 0 ? (
+        <p className="px-1 text-xs text-slate-400">
+          +{hiddenItemCount} more checkpoint{hiddenItemCount === 1 ? "" : "s"} below.
+        </p>
+      ) : null}
     </section>
   );
 }

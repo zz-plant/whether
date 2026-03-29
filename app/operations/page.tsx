@@ -253,6 +253,7 @@ export default async function OperationsPage({
         title={operationsScrollPlan.title}
         description={operationsScrollPlan.description}
         items={operationsScrollPlan.items}
+        maxItems={3}
       />
 
       <LiteracyAssistRouter

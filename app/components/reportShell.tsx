@@ -656,6 +656,8 @@ export const ReportShell = (props: ReportShellProps) => {
     trustStatusTone: resolvedTrustStatusTone,
     degradedSourceRows: resolvedDegradedSourceRows,
   });
+  const maxSectionNavItemsDesktop = 4;
+  const maxSectionNavItemsMobile = 4;
   const controlHeadline = trustReadiness.headline;
   const trustStatusDetailForDisplay = trustReadiness.tone === "warning"
     ? "Decision impact: keep the do now / hold / revisit path, but do not treat this as a clear read until freshness and confidence recover."
@@ -690,7 +692,36 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
 
           <div className={`mt-5 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{resolvedSectionLinks.length ? <ReportSectionNavigation sectionLinks={resolvedSectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustReadiness.tone} trustStatusLabel={controlHeadline} trustStatusDetail={trustStatusDetailForDisplay} trustStatusAction={trustStatusActionForDisplay} outageType={resolvedOutageType} outageSeverity={resolvedOutageSeverity} decisionImpactWindow={resolvedDecisionImpactWindow} approvalBuckets={resolvedApprovalBuckets} recoveryPlan={resolvedRecoveryPlan} outageExitGate={resolvedOutageExitGate} degradedSourceRows={resolvedDegradedSourceRows} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></aside> : null}
+            {hasSidebar ? (
+              <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">
+                {resolvedSectionLinks.length ? (
+                  <ReportSectionNavigation
+                    sectionLinks={resolvedSectionLinks}
+                    className="hidden xl:block"
+                    maxItems={maxSectionNavItemsDesktop}
+                  />
+                ) : null}
+                <HeroTrustProvenanceBlock
+                  trustStatusTone={trustReadiness.tone}
+                  trustStatusLabel={controlHeadline}
+                  trustStatusDetail={trustStatusDetailForDisplay}
+                  trustStatusAction={trustStatusActionForDisplay}
+                  outageType={resolvedOutageType}
+                  outageSeverity={resolvedOutageSeverity}
+                  decisionImpactWindow={resolvedDecisionImpactWindow}
+                  approvalBuckets={resolvedApprovalBuckets}
+                  recoveryPlan={resolvedRecoveryPlan}
+                  outageExitGate={resolvedOutageExitGate}
+                  degradedSourceRows={resolvedDegradedSourceRows}
+                  statusLabel={resolvedStatusLabel}
+                  fetchedAtLabel={resolvedFetchedAtLabel}
+                  resolvedNextRefreshLabel={resolvedNextRefreshLabel}
+                  sourceLabel={sourceLabel}
+                  sourceHref={sourceHref}
+                  provenance={resolvedProvenance}
+                />
+              </aside>
+            ) : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
               {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
@@ -710,7 +741,7 @@ export const ReportShell = (props: ReportShellProps) => {
 
         {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{resolvedDecisionBanner?.decision ?? `${resolvedPrimaryCta.label}.`}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
 
-        {resolvedShowPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={resolvedPageLinks} pageTitle={resolvedPageTitle} currentPath={resolvedCurrentPath} className="mt-3 px-4 pb-6" sectionLinks={resolvedSectionLinks} /></div> : null}
+        {resolvedShowPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={resolvedPageLinks} pageTitle={resolvedPageTitle} currentPath={resolvedCurrentPath} className="mt-3 px-4 pb-6" sectionLinks={resolvedSectionLinks} maxItems={maxSectionNavItemsMobile} /></div> : null}
 
         {enableTvAmbientMode && resolvedPrimaryCta ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{resolvedPrimaryCta.label}</ReportCta>{resolvedSecondaryCta ? <InternalAwareLink href={resolvedSecondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{resolvedSecondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
       </main>
