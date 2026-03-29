@@ -33,6 +33,7 @@ import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 import { LiteracyAssistRouter, PersistedAssistPanel } from "../components/literacyAssistControls";
+import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
 
 export const runtime = "edge";
@@ -246,6 +247,7 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      <OperatorWorkflowRouteTracker />
       <PageFlowNav
         eyebrow={operationsScrollPlan.eyebrow}
         title={operationsScrollPlan.title}

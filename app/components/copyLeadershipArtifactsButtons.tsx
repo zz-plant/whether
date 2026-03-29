@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState, type ButtonHTMLAttributes } from "react";
+import { usePathname } from "next/navigation";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { artifactModeLabels, literacyAssistStorageKeys, type ArtifactMode } from "../../lib/literacyAssist";
+import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
 
 type PrimaryActionType = "copy_weekly_brief";
 
@@ -69,6 +71,7 @@ export function CopyLeadershipArtifactsButtons({
   citation: string;
   fallbackActive?: boolean;
 }) {
+  const pathname = usePathname();
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const [artifactMode, setArtifactMode] = useState<ArtifactMode>("operator");
   const [overrideReason, setOverrideReason] = useState("");
@@ -203,6 +206,13 @@ export function CopyLeadershipArtifactsButtons({
                   window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, mode);
                 } catch {
                   // Ignore storage errors.
+                }
+                if (mode !== artifactMode) {
+                  trackOperatorWorkflowEvent({
+                    type: "artifact_mode_selected",
+                    path: pathname,
+                    artifactMode: mode,
+                  });
                 }
               }}
               aria-pressed={active}

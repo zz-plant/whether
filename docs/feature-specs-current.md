@@ -46,6 +46,8 @@ packaging, print/export, and company-specific exception controls sit inside a se
 The Weekly Brief now also includes a lightweight translation router so users can jump straight to
 the kind of help they need: evidence, decision, trust, or share translation. Section-level help
 panels persist by literacy type instead of forcing one global simplified mode for every user.
+Operator-workflow telemetry now also logs assist-panel opens, artifact-mode selection, and route
+transitions across the core weekly loop so mixed-literacy friction can be measured directly.
 The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share-ready artifact -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.

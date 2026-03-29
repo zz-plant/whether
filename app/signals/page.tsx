@@ -25,6 +25,7 @@ import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
 import { PersistedAssistPanel } from "../components/literacyAssistControls";
+import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -398,6 +399,7 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <OperatorWorkflowRouteTracker />
       <PageFlowNav
         eyebrow={signalsScrollPlan.eyebrow}
         title={signalsScrollPlan.title}

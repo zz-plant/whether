@@ -13,6 +13,7 @@ import {
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { LiteracyAssistRouter } from "../components/literacyAssistControls";
+import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
@@ -78,6 +79,7 @@ export default async function DecidePage() {
 
   return (
     <HubPageShell width="standard">
+      <OperatorWorkflowRouteTracker />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero

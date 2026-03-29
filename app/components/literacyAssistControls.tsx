@@ -1,13 +1,14 @@
 "use client";
 
 import { startTransition, useEffect, useState, type ReactNode } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   literacyAssistOptions,
   literacyAssistStorageKeys,
   literacyFocusLabels,
   type LiteracyAssistMode,
 } from "../../lib/literacyAssist";
+import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
 
 const sectionToneClass = {
   decision: "border-emerald-400/25 bg-emerald-500/8 text-emerald-100",
@@ -129,6 +130,7 @@ export function PersistedAssistPanel({
   summary,
   children,
 }: PersistedAssistPanelProps) {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const storageKey = literacyAssistStorageKeys[assistMode];
@@ -139,14 +141,20 @@ export function PersistedAssistPanel({
     const shouldOpenFromStorage = readBoolPreference(storageKey);
     const nextOpen = shouldOpenFromQuery || shouldOpenFromStorage;
 
-    if (nextOpen) {
+    if (!open && nextOpen) {
       setOpen(true);
+      trackOperatorWorkflowEvent({
+        type: "assist_panel_opened",
+        path: pathname,
+        assistMode,
+        source: shouldOpenFromQuery ? "query" : "stored_preference",
+      });
     }
 
     if (shouldOpenFromQuery) {
       writeBoolPreference(storageKey, true);
     }
-  }, [assistMode, searchParams, storageKey]);
+  }, [assistMode, open, pathname, searchParams, storageKey]);
 
   return (
     <div className="space-y-2">
@@ -156,6 +164,14 @@ export function PersistedAssistPanel({
           const nextValue = !open;
           setOpen(nextValue);
           writeBoolPreference(storageKey, nextValue);
+          if (nextValue) {
+            trackOperatorWorkflowEvent({
+              type: "assist_panel_opened",
+              path: pathname,
+              assistMode,
+              source: "click",
+            });
+          }
         }}
         aria-expanded={open}
         className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100"

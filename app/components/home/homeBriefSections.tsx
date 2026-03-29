@@ -8,6 +8,7 @@ import { HomeInterpretationPanel } from "../homeInterpretationPanel";
 import { LiveDataFallbackAlert } from "../liveDataFallbackAlert";
 import { ReturningVisitorDeltaStrip } from "../changeSinceLastReadPanel";
 import { LiteracyAssistRouter } from "../literacyAssistControls";
+import { OperatorWorkflowRouteTracker } from "../operatorWorkflowRouteTracker";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
@@ -79,6 +80,7 @@ export const HomeWhatChangedSection = ({
   recordDate: string;
 }) => (
   <>
+    <OperatorWorkflowRouteTracker />
     <ReturningVisitorDeltaStrip
       assessment={assessment}
       recordDate={recordDate}
