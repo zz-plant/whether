@@ -58,7 +58,7 @@ export const HomePageReportContent = async ({
         },
         page: {
           pageTitle: "Weekly Brief",
-          pageSummary: "This week's call, what to do now, and a share-ready summary. Open another surface only if you need proof, planning, or a trust check.",
+          pageSummary: "This week's call, what to do now, and a summary you can share right away. Open other pages only if you need supporting evidence, planning details, or data status.",
           pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",

@@ -45,7 +45,7 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
   if (!artifactPayload) {
     return (
       <p className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
-        Artifact export is temporarily unavailable. Use the weekly call card for source-of-truth guidance while we recover.
+        Sharing tools are temporarily unavailable. Use the weekly call card as your decision reference while we restore exports.
       </p>
     );
   }
@@ -116,7 +116,7 @@ export const HomeWhatChangedSection = ({
     />
     <LiteracyAssistRouter
       title="What do you need translated right now?"
-      description="Pick the layer you want help with. The brief stays the source of truth, but the page can guide you through evidence, decision, trust, or sharing."
+      description="Choose the part you want help with. The brief remains the main decision view, and this guide can walk you through evidence, decision, data status, or sharing."
       targets={{
         decision: { href: buildAssistHref({ assist: "decision", hash: "#weekly-call-core", searchParams: interpretationSearchParams }) },
         evidence: { href: buildAssistHref({ assist: "evidence", hash: "#deep-evidence", searchParams: interpretationSearchParams }) },
