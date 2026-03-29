@@ -327,7 +327,25 @@ body::after {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgb(226 232 240);
+  cursor: pointer;
   touch-action: manipulation;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.weather-hub-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(250, 204, 21, 0.42);
+  color: rgb(248 250 252);
+  box-shadow: 0 12px 22px -18px rgba(15, 23, 42, 0.85);
+}
+
+.weather-hub-chip:focus-visible {
+  outline: 2px solid rgba(253, 224, 71, 0.85);
+  outline-offset: 2px;
 }
 
 .weather-hub-chip-active {
@@ -1799,7 +1817,26 @@ html {
 }
 
 .home-band-link-card {
+  display: block;
   text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease);
+}
+
+.home-band-link-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(125, 211, 252, 0.35);
+  box-shadow:
+    0 16px 28px -22px rgba(15, 23, 42, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.home-band-link-card:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.85);
+  outline-offset: 3px;
 }
 
 .home-band-list-item {
