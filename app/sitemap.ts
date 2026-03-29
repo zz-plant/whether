@@ -9,12 +9,9 @@ import {
   useCaseRoles,
 } from "../lib/decisionDomainCatalog";
 import { productConceptArticles } from "../lib/productCanon";
-import { conceptAudiences, conceptFocuses, toConceptTaxonomySlug } from "../lib/productCanon";
 import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
 import { tierOneDecisionPages } from "./answers/decisionPages";
-import { stageGuides } from "./guides/stageGuides";
-import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 import { signalScenarioRoutes } from "./seoRouteClusters";
@@ -104,7 +101,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/operations", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
-    { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },
@@ -194,34 +190,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.58,
   }));
 
-  const stageGuideEntries: SitemapEntryDescriptor[] = stageGuides.map((stageGuide) => ({
-    path: `/guides/stage/${stageGuide.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.56,
-  }));
-
-  const stakeholderGuideEntries: SitemapEntryDescriptor[] = stakeholderGuides.map((stakeholderGuide) => ({
-    path: `/guides/${stakeholderGuide.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.58,
-  }));
-
-  const conceptFocusEntries: SitemapEntryDescriptor[] = conceptFocuses.map((focus) => ({
-    path: `/concepts/focus/${toConceptTaxonomySlug(focus)}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.52,
-  }));
-
-  const conceptAudienceEntries: SitemapEntryDescriptor[] = conceptAudiences.map((audience) => ({
-    path: `/concepts/audience/${toConceptTaxonomySlug(audience)}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.52,
-  }));
-
   const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioRoutes.map((clusterRoute) => ({
     path: `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}`,
     lastModified: reportLastModified,
@@ -256,10 +224,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...resourceArticleEntries,
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
-    ...stageGuideEntries,
-    ...stakeholderGuideEntries,
-    ...conceptFocusEntries,
-    ...conceptAudienceEntries,
     ...signalsClusterEntries,
     ...decideClusterEntries,
     ...toolkitClusterEntries,

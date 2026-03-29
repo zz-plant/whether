@@ -19,6 +19,7 @@ Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decision Tools**
 - `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
+- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
@@ -145,13 +146,14 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/decide`
 - `/resources`
 - `/startup-macro-posture` and `/startup-macro-posture/index`
-- `/guides` and `/guides/stage`
+- `/guides`
 - `/answers` and `/answers/[slug]`
 
 The `/answers` hub now opens with live weekly posture context (current posture, immediate implication, flip condition, and direct return path to `/`) before the answer directory grid so operators can orient quickly before browsing distribution pages.
 Secondary hubs (`/answers`, `/guides`, `/resources`, `/toolkits`) now lead with immediate value and
 focused next actions rather than leading with backtracking copy about where the user should have
 started. Full libraries remain below the featured paths.
+`/guides` now owns both stakeholder and stage detail states behind query-selected panels, and `/concepts` now owns focus, audience, and conflict-map browsing behind query-selected states, which keeps those secondary surfaces canonical without parallel route implementations.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 

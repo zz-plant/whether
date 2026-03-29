@@ -163,7 +163,7 @@ export default async function DecidePage() {
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
                   key={guide.slug}
-                  href={`/guides/${guide.slug}` as Route}
+                  href={{ pathname: "/guides", query: { stakeholder: guide.slug } }}
                   className="weather-hub-link-card space-y-1"
                 >
                   <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
@@ -173,7 +173,7 @@ export default async function DecidePage() {
               {recommendedStageGuides.map((stage) => (
                 <Link
                   key={stage.slug}
-                  href={`/guides/stage/${stage.slug}` as Route}
+                  href={{ pathname: "/guides", query: { stage: stage.slug } }}
                   className="weather-hub-link-card space-y-1"
                 >
                   <p className="text-sm font-semibold text-slate-100">{stage.title}</p>

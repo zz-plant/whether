@@ -97,6 +97,36 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/guides/stage/:stage",
+        destination: "/guides?stage=:stage",
+        permanent: true,
+      },
+      {
+        source: "/guides/stage",
+        destination: "/guides?library=stages",
+        permanent: true,
+      },
+      {
+        source: "/guides/:stakeholder",
+        destination: "/guides?stakeholder=:stakeholder",
+        permanent: true,
+      },
+      {
+        source: "/concepts/conflicts",
+        destination: "/concepts?view=conflicts",
+        permanent: true,
+      },
+      {
+        source: "/concepts/focus/:focus",
+        destination: "/concepts?focus=:focus",
+        permanent: true,
+      },
+      {
+        source: "/concepts/audience/:audience",
+        destination: "/concepts?audience=:audience",
+        permanent: true,
+      },
+      {
         source: "/operations/data",
         destination: "/operations",
         permanent: true,

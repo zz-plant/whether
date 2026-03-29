@@ -11,13 +11,8 @@ import {
   useCaseRoles,
 } from "../lib/decisionDomainCatalog";
 import {
-  conceptAudiences,
-  conceptFocuses,
   productConceptArticles,
-  toConceptTaxonomySlug,
 } from "../lib/productCanon";
-import { stageGuides } from "../app/guides/stageGuides";
-import { stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { retiredSitemapPaths } from "../app/sitemapExclusions";
 
 describe("sitemap", () => {
@@ -66,23 +61,8 @@ describe("sitemap", () => {
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
     }
 
-
-    for (const stageGuide of stageGuides) {
-      assert.ok(urls.has(`${siteUrl}/guides/stage/${stageGuide.slug}`));
-    }
-
-    for (const stakeholderGuide of stakeholderGuides) {
-      assert.ok(urls.has(`${siteUrl}/guides/${stakeholderGuide.slug}`));
-    }
-
-
-    for (const focus of conceptFocuses) {
-      assert.ok(urls.has(`${siteUrl}/concepts/focus/${toConceptTaxonomySlug(focus)}`));
-    }
-
-    for (const audience of conceptAudiences) {
-      assert.ok(urls.has(`${siteUrl}/concepts/audience/${toConceptTaxonomySlug(audience)}`));
-    }
+    assert.ok(!urls.has(`${siteUrl}/guides/stage`));
+    assert.ok(!urls.has(`${siteUrl}/concepts/conflicts`));
   });
 
   it("uses valid last modified dates for root, static pages, and canon article pages", async () => {

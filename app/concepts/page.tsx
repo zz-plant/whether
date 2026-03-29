@@ -13,7 +13,8 @@ import {
   productConceptArticles,
   productConceptEras,
   regimeToneByKey,
-  toConceptTaxonomySlug,
+  findConceptAudienceBySlug,
+  findConceptFocusBySlug,
 } from "../../lib/productCanon";
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../lib/conceptRegime";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -21,6 +22,7 @@ import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { formatConceptPublishedLabel } from "../../lib/formatters";
 import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
+import { getConceptConflicts } from "../../lib/conceptConflicts";
 
 export const dynamic = "force-static";
 
@@ -74,19 +76,30 @@ type ProductConceptTimelinePageProps = {
     q?: string;
     era?: string;
     audience?: string;
+    focus?: string;
     regime?: string;
     volatility?: string;
+    view?: string;
   }>;
 };
 
 export default async function ProductConceptTimelinePage({
   searchParams,
 }: ProductConceptTimelinePageProps) {
-  const { q = "", era = "all", audience = "all", regime = "all", volatility = "all" } = await searchParams;
+  const {
+    q = "",
+    era = "all",
+    audience = "all",
+    focus = "all",
+    regime = "all",
+    volatility = "all",
+    view = "all",
+  } = await searchParams;
 
   const searchQuery = q.trim().toLowerCase();
   const currentRegime = getCurrentRegimeContext();
   const audienceOptions = [...new Set(productConceptArticles.map((article) => article.audience))].sort();
+  const focusOptions = [...new Set(productConceptArticles.map((article) => article.focus))].sort();
   const regimeOptions = [
     ...new Set(
       productConceptArticles
@@ -94,6 +107,9 @@ export default async function ProductConceptTimelinePage({
         .filter((label): label is string => Boolean(label)),
     ),
   ].sort();
+  const resolvedAudienceFilter = audience === "all" ? "all" : (findConceptAudienceBySlug(audience) ?? audience);
+  const resolvedFocusFilter = focus === "all" ? "all" : (findConceptFocusBySlug(focus) ?? focus);
+  const conflicts = getConceptConflicts();
 
   const filteredArticles = productConceptArticles.filter((article) => {
     const articleMacroContext = getMacroContextForArticle(article);
@@ -101,13 +117,14 @@ export default async function ProductConceptTimelinePage({
       searchQuery.length === 0 ||
       [article.title, article.author, article.focus].join(" ").toLowerCase().includes(searchQuery);
     const matchesEra = era === "all" || article.era === era;
-    const matchesAudience = audience === "all" || article.audience === audience;
+    const matchesAudience = resolvedAudienceFilter === "all" || article.audience === resolvedAudienceFilter;
+    const matchesFocus = resolvedFocusFilter === "all" || article.focus === resolvedFocusFilter;
     const matchesRegime =
       regime === "all" || articleMacroContext?.primary.summary.regimeLabel === regime;
     const articleVolatility = getConceptVolatility(article);
     const matchesVolatility = volatility === "all" || articleVolatility === volatility;
 
-    return matchesSearch && matchesEra && matchesAudience && matchesRegime && matchesVolatility;
+    return matchesSearch && matchesEra && matchesAudience && matchesFocus && matchesRegime && matchesVolatility;
   });
 
   const totalMatches = filteredArticles.length;
@@ -282,7 +299,7 @@ export default async function ProductConceptTimelinePage({
       </HubSection>
 
       <HubSection title="Find relevant concepts faster">
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" action="/concepts" method="get">
+        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" action="/concepts" method="get">
           <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
             Search
             <input
@@ -313,13 +330,29 @@ export default async function ProductConceptTimelinePage({
             Audience
             <select
               name="audience"
-              defaultValue={audience}
+              defaultValue={resolvedAudienceFilter}
               className="weather-control rounded-md border-slate-700 bg-slate-900"
             >
               <option value="all">All audiences</option>
               {audienceOptions.map((audienceOption) => (
                 <option key={audienceOption} value={audienceOption}>
                   {audienceOption}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
+            Focus
+            <select
+              name="focus"
+              defaultValue={resolvedFocusFilter}
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
+            >
+              <option value="all">All focuses</option>
+              {focusOptions.map((focusOption) => (
+                <option key={focusOption} value={focusOption}>
+                  {focusOption}
                 </option>
               ))}
             </select>
@@ -354,7 +387,7 @@ export default async function ProductConceptTimelinePage({
             </select>
           </label>
 
-          <div className="sm:col-span-2 lg:col-span-5 flex flex-wrap gap-3">
+          <div className="sm:col-span-2 lg:col-span-6 flex flex-wrap gap-3">
             <button
               type="submit"
               className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
@@ -374,10 +407,39 @@ export default async function ProductConceptTimelinePage({
         </form>
       </HubSection>
 
+      {view === "conflicts" ? (
+        <HubSection
+          id="concept-conflict-map"
+          title="Concept conflict map"
+          description="Use this only when two frameworks point in different directions and you need a regime-aware tiebreaker."
+        >
+          <div className="space-y-4">
+            {conflicts.map((entry) => (
+              <article key={entry.id} className="weather-hub-card space-y-3 px-4 py-4">
+                <h3 className="text-base font-semibold text-slate-100">
+                  {entry.left.title} vs {entry.right.title}
+                </h3>
+                <p className="text-sm text-slate-300">{entry.conflict}</p>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const).map((regimeKey) => (
+                    <div key={regimeKey} className="weather-surface px-3 py-3 text-sm text-slate-200">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{regimeKey}</p>
+                      <p className="mt-1">
+                        Winner: {entry.winnerByRegime[regimeKey] === entry.left.slug ? entry.left.title : entry.right.title}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </HubSection>
+      ) : null}
+
 
       <HubSection title="Explore concept maps">
         <Link
-          href="/concepts/conflicts"
+          href={{ pathname: "/concepts", query: { view: "conflicts" }, hash: "concept-conflict-map" }}
           className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
         >
           Open conflict map
@@ -389,7 +451,7 @@ export default async function ProductConceptTimelinePage({
               {conceptFocuses.map((focusOption) => (
                 <Link
                   key={focusOption}
-                  href={`/concepts/focus/${toConceptTaxonomySlug(focusOption)}`}
+                  href={{ pathname: "/concepts", query: { focus: focusOption } }}
                   className="weather-pill inline-flex min-h-[38px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
                 >
                   {focusOption}
@@ -403,7 +465,7 @@ export default async function ProductConceptTimelinePage({
               {conceptAudiences.map((audienceOption) => (
                 <Link
                   key={audienceOption}
-                  href={`/concepts/audience/${toConceptTaxonomySlug(audienceOption)}`}
+                  href={{ pathname: "/concepts", query: { audience: audienceOption } }}
                   className="weather-pill inline-flex min-h-[38px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
                 >
                   {audienceOption}
