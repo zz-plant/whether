@@ -187,10 +187,10 @@ const ThisWeeksOperatingImplication = async () => {
           Open weekly brief
         </Link>
         <Link
-          href="/answers"
+          href="/decide#direct-answers"
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
         >
-          Browse answer pages
+          Open direct answers
         </Link>
       </div>
     </section>

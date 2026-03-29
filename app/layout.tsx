@@ -1,8 +1,23 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl } from "../lib/seo";
+
+const weatherSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-weather-sans",
+  display: "swap",
+});
+
+const weatherDisplay = Fraunces({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-weather-display",
+  display: "swap",
+});
 
 const siteName = "Whether — Capital Posture Governance Standard";
 const siteDescription =
@@ -83,7 +98,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${weatherSans.variable} ${weatherDisplay.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content

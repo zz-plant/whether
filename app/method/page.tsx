@@ -5,7 +5,7 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubSection } from "../components/hubPageShell";
 import { BeginnerGlossaryPanel } from "../components/appendixSections";
-import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
+import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { ReportShell } from "../components/reportShell";
@@ -43,13 +43,28 @@ export default async function MethodPage() {
   });
   const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
   const sourceCoverage = `${reportData.treasuryProvenance.statusLabel} · ${reportData.macroProvenance.statusLabel}`;
+  const citationLine = buildWeeklyCitationMetaLine({
+    statusLabel: reportData.statusLabel,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    recordDateLabel: reportData.recordDateLabel,
+    freshnessLabel: reportData.fetchedAtLabel,
+  });
+  const warnings = buildFailureModeWarnings({
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch,
+    freshnessLabel: reportData.fetchedAtLabel,
+    isFallbackSnapshot: isFallback,
+    provenanceStatusLabel: reportData.treasuryProvenance.statusLabel,
+    changedSignals: reportData.reportDynamics.changedSignals,
+    anomalySignals: reportData.reportDynamics.anomalySignals,
+  });
   const meetingSnippet = `Posture: ${reportData.statusLabel} (${reportData.recordDateLabel})\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
 
   const revisitBullets = [
     {
       label: "Trigger",
       detail: reportData.flipThreshold,
-      href: "#revisit-call",
+      href: "#confidence-limits",
     },
     {
       label: "Impact",
@@ -61,21 +76,21 @@ export default async function MethodPage() {
       detail: isFallback
         ? "Recovery condition: one live refresh with no fallback flags before escalating irreversible approvals."
         : "Recovery condition: confidence returns to HIGH and transition watch is OFF before expanding fixed-cost commitments.",
-      href: "#formula-reference",
+      href: "#sources-freshness",
     },
   ];
   const trustActions = [
     {
-      title: "Run the trust snapshot",
-      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Confirm freshness, confidence, and call context in one scan before you open raw appendices.`,
-      href: "#trust-snapshot",
-      cta: "Open trust snapshot",
+      title: "Review source freshness",
+      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Check source status and citation context here before opening external proof.`,
+      href: "#sources-freshness",
+      cta: "Open sources appendix",
     },
     {
-      title: "Review revisit triggers",
-      detail: `Current confidence: ${confidenceLabel}. Check what would change the call before approving irreversible spend.`,
-      href: "#revisit-call",
-      cta: "Open revisit triggers",
+      title: "Review confidence limits",
+      detail: `Current confidence: ${confidenceLabel}. Check pause, flip, and warning conditions before approving irreversible spend.`,
+      href: "#confidence-limits",
+      cta: "Open confidence appendix",
     },
     {
       title: "Review formulas and appendices",
@@ -109,6 +124,8 @@ export default async function MethodPage() {
   const sectionLinks = [
     { href: "#trust-snapshot", label: "60-second trust check" },
     { href: "#trust-hub-links", label: "Audit workflow" },
+    { href: "#sources-freshness", label: "Sources & freshness" },
+    { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
@@ -211,7 +228,7 @@ export default async function MethodPage() {
         </div>
       </HubSection>
 
-      <HubSection id="trust-hub-links" title="Audit workflow" description="Open each surface only when that exact question appears in review." className="scroll-mt-28">
+      <HubSection id="trust-hub-links" title="Audit workflow" description="Open an appendix only when that exact question appears in review." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">
           {trustActions.map((item) => (
             <article key={item.title} className="weather-hub-link-card space-y-2">
@@ -233,6 +250,71 @@ export default async function MethodPage() {
       </HubSection>
 
       <HubSection
+        id="sources-freshness"
+        title="Sources and freshness appendix"
+        description="Use this appendix when a reviewer asks where the current call came from and how current the evidence is."
+        className="scroll-mt-28"
+      >
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current source coverage</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
+              <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.statusLabel} · {reportData.macroProvenance.timestampLabel}</li>
+              <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
+            </ul>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <a href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Treasury source</a>
+              <a href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Macro source</a>
+            </div>
+          </article>
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Citation-ready summary</p>
+            <p className="text-sm text-slate-200">{citationLine}</p>
+            <p className="text-xs text-slate-400">Keep this appendix as proof only. The operating decision still belongs to Weekly Brief and Planning.</p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Back to trust snapshot</Link>
+              <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula reference</Link>
+            </div>
+          </article>
+        </div>
+      </HubSection>
+
+      <HubSection
+        id="confidence-limits"
+        title="Confidence and limits appendix"
+        description="Use this appendix when a reviewer asks how fragile the call is, what pauses it, or what would force a change."
+        className="scroll-mt-28"
+      >
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Bounded decision checks</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
+              <li><span className="text-slate-400">Change course if:</span> {reportData.flipThreshold}</li>
+              <li><span className="text-slate-400">Pause if:</span> {reportData.guardrailThreshold}</li>
+              <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and transition watch turns OFF before expanding fixed-cost approvals.</li>
+            </ul>
+          </article>
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Failure-mode checks</p>
+            {warnings.length === 0 ? (
+              <p className="text-sm text-slate-300">No active compact failure-mode warning. Continue with staged approvals.</p>
+            ) : (
+              <ul className="space-y-3 text-sm text-slate-200">
+                {warnings.map((warning) => (
+                  <li key={warning.id} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                    <p className="font-semibold text-slate-100">{warning.warning}</p>
+                    <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+        </div>
+      </HubSection>
+
+      <HubSection
         id="formula-reference"
         title="Formula reference"
         description="Methodology permanently redirects to this Trust formula reference."
@@ -248,8 +330,8 @@ export default async function MethodPage() {
             <li>• Document reversal conditions before reopening fixed-cost approvals.</li>
           </ul>
           <div className="flex flex-wrap gap-2 text-xs">
-            <Link href="/confidence" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View confidence limits</Link>
-            <Link href="/sources" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View source provenance</Link>
+            <Link href="#confidence-limits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View confidence limits</Link>
+            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View source provenance</Link>
           </div>
         </div>
       </HubSection>

@@ -11,12 +11,14 @@ import {
   useCaseRoles,
 } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
-import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
+import { HubHero, HubSection } from "../components/hubPageShell";
 import { LiteracyAssistRouter } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
+import { ReportShell } from "../components/reportShell";
+import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 const featuredStakeholderSlugs = [
   "founders-ceos",
@@ -76,11 +78,61 @@ export default async function DecidePage() {
   const recommendedAnswerPages = featuredAnswerPages.slice(0, 2);
   const recommendedStakeholderGuides = featuredStakeholders.slice(0, 2);
   const recommendedStageGuides = stageGuides.slice(0, 2);
+  const sectionLinks = [
+    { href: "#unresolved-question-router", label: "Question router" },
+    { href: "#direct-answers", label: "Direct answers" },
+    { href: "#guided-translation", label: "Translations" },
+    { href: "#toolkit-library", label: "Toolkit library" },
+  ];
 
   return (
-    <HubPageShell width="standard">
+    <ReportShell
+      statusLabel={reportData.statusLabel}
+      recordDateLabel={reportData.recordDateLabel}
+      fetchedAtLabel={reportData.fetchedAtLabel}
+      treasurySource={reportData.treasury.source}
+      trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
+      trustStatusDetail="Route one unresolved question into the smallest downstream help."
+      trustStatusAction="Return to Weekly Brief or Planning once the question is resolved."
+      trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
+      pageTitle="Decision Tools"
+      currentPath="/decide"
+      pageSummary="Route one remaining question into the smallest downstream help: direct answer, translation, or toolkit."
+      pageSummaryLink={{ href: "#unresolved-question-router", label: "Route the question ↓" }}
+      pageLinks={reportPageLinks}
+      sectionLinks={sectionLinks}
+      heroVariant="compact"
+      pageNavVariant="compact"
+      showPageNavigation={true}
+      primaryCta={{ href: "#unresolved-question-router", label: "Route my question" }}
+      secondaryCta={{ href: "/operations", label: "Return to Planning" }}
+      nextStep={{
+        href: "/operations",
+        description: "Return to Planning once this edge case is resolved",
+      }}
+      decisionBanner={{
+        label: "Start here",
+        decision: "Resolve one remaining team-specific or situation-specific question without reopening the weekly brief.",
+        horizon: "This week",
+        confidence: homeBriefModel.confidenceLabel,
+        effectiveDate: reportData.recordDateLabel,
+        evidenceHref: "#unresolved-question-router",
+      }}
+      commandBar={{
+        regime: reportData.assessment.regime,
+        call: "Use Decision Tools to close the one question the weekly brief and plan do not settle.",
+        doNow: [
+          liveCall.action,
+          shouldStartWithChecker
+            ? "Run one go / wait / kill check before opening broader libraries."
+            : "Open one direct answer, translation, or toolkit path only after the question type is clear.",
+        ],
+        flipConditions: [liveCall.guardrail, liveCall.flip],
+        updatedAt: reportData.fetchedAtLabel,
+      }}
+      structuredData={breadcrumbStructuredData}
+    >
       <OperatorWorkflowRouteTracker />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero
         eyebrow="Resolve the one question still blocking action"
@@ -151,7 +203,7 @@ export default async function DecidePage() {
                 </Link>
               ))}
             </div>
-            <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
+            <Link href="/decide#direct-answers" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
               Open direct answers
             </Link>
           </article>
@@ -181,7 +233,7 @@ export default async function DecidePage() {
                 </Link>
               ))}
             </div>
-            <Link href="/guides" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
+            <Link href="/decide#guided-translation" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
               Open role translations
             </Link>
           </article>
@@ -196,7 +248,7 @@ export default async function DecidePage() {
           <p className="text-sm text-slate-300">
             These are downstream libraries, not parallel starting points. Use them only after the route above tells you the question needs an instrument, an exact answer, or a team-specific translation.
           </p>
-          <section className="space-y-3">
+          <section id="toolkit-library" className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Toolkit library</h2>
             <div className="weather-page-grid-3">
               {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
@@ -250,6 +302,6 @@ export default async function DecidePage() {
           </section>
         </div>
       </details>
-    </HubPageShell>
+    </ReportShell>
   );
 }

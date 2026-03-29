@@ -44,15 +44,15 @@ export function ReportShellHeader({
                 className="h-9 w-auto"
                 priority
               />
-              <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
+              <span className="rounded-full border border-amber-300/35 bg-amber-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-50">
                 Weekly operating brief
               </span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100">
                 {statusLabel}
               </span>
             </div>
             <div className="space-y-1.5">
-              <p className="max-w-3xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
+              <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.4rem] font-semibold leading-[1.02] tracking-[-0.04em] text-slate-50 sm:text-[1.7rem]">
                 This week&apos;s posture, action, and flip risk in one scan.
               </p>
               <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
@@ -61,7 +61,7 @@ export function ReportShellHeader({
             </div>
           </div>
           <div className="xl:min-w-[30rem]">
-            <div className="weather-surface flex min-h-[44px] flex-wrap items-center gap-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+            <div className="weather-surface flex min-h-[48px] flex-wrap items-center gap-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">As of {recordDateLabel}</span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Updated {fetchedAtLabel}</span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Posture {statusLabel}</span>
@@ -80,7 +80,7 @@ export function ReportShellHeader({
                 className="h-7 w-auto"
                 priority
               />
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100">
                 {statusLabel}
               </span>
             </div>

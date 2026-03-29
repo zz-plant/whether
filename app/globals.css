@@ -4,6 +4,8 @@
 
 :root {
   color-scheme: dark;
+  --weather-font-sans: var(--font-weather-sans), "IBM Plex Sans", system-ui, sans-serif;
+  --weather-font-display: var(--font-weather-display), "Fraunces", Georgia, serif;
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
   --weather-interactive-duration: 200ms;
@@ -11,35 +13,35 @@
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --weather-focus-ring: rgba(125, 211, 252, 0.88);
   --weather-focus-halo: rgba(14, 165, 233, 0.32);
-  --weather-primary-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
+  --weather-primary-gradient: linear-gradient(135deg, rgba(103, 232, 249, 0.95), rgba(59, 130, 246, 0.92) 46%, rgba(45, 212, 191, 0.82));
   --weather-primary-shadow:
-    0 20px 36px -22px rgba(14, 165, 233, 0.75),
-    0 6px 16px -12px rgba(125, 211, 252, 0.4),
+    0 22px 40px -24px rgba(14, 165, 233, 0.62),
+    0 10px 24px -18px rgba(125, 211, 252, 0.34),
     inset 0 0 0 1px rgba(2, 6, 23, 0.35);
   --weather-primary-shadow-hover:
-    0 20px 40px -24px rgba(14, 165, 233, 0.75),
-    0 8px 18px -14px rgba(125, 211, 252, 0.4),
+    0 24px 44px -24px rgba(14, 165, 233, 0.68),
+    0 12px 26px -18px rgba(125, 211, 252, 0.38),
     inset 0 0 0 1px rgba(2, 6, 23, 0.35);
   --weather-secondary-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.42),
-    0 12px 20px -16px rgba(2, 6, 23, 0.82);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.08),
+    0 16px 28px -22px rgba(2, 6, 23, 0.84);
   --weather-secondary-shadow-hover:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-    0 20px 32px -22px rgba(2, 6, 23, 0.9),
-    0 8px 18px -14px rgba(99, 102, 241, 0.24);
-  --shell-glow: rgba(188, 222, 255, 0.42);
-  --shell-glow-secondary: rgba(147, 230, 196, 0.3);
-  --shell-glow-tertiary: rgba(167, 243, 255, 0.24);
-  --surface-edge: rgba(226, 247, 255, 0.34);
-  --surface-sheen: rgba(255, 255, 255, 0.3);
-  --surface-elevated: rgba(76, 200, 255, 0.22);
-  --panel-bg: rgba(19, 67, 114, 0.44);
-  --panel-border: rgba(199, 236, 255, 0.29);
-  --panel-highlight: rgba(118, 209, 255, 0.34);
-  --surface-bg: rgba(14, 74, 124, 0.36);
-  --surface-border: rgba(191, 231, 255, 0.24);
-  --surface-nested-bg: rgba(11, 58, 96, 0.34);
-  --surface-nested-border: rgba(176, 221, 251, 0.2);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.12),
+    0 22px 36px -24px rgba(2, 6, 23, 0.9),
+    0 12px 24px -18px rgba(14, 165, 233, 0.16);
+  --shell-glow: rgba(125, 211, 252, 0.26);
+  --shell-glow-secondary: rgba(45, 212, 191, 0.18);
+  --shell-glow-tertiary: rgba(251, 191, 36, 0.14);
+  --surface-edge: rgba(226, 247, 255, 0.18);
+  --surface-sheen: rgba(255, 255, 255, 0.16);
+  --surface-elevated: rgba(76, 200, 255, 0.12);
+  --panel-bg: rgba(12, 24, 45, 0.74);
+  --panel-border: rgba(165, 188, 216, 0.18);
+  --panel-highlight: rgba(110, 231, 183, 0.14);
+  --surface-bg: rgba(9, 18, 34, 0.68);
+  --surface-border: rgba(163, 184, 208, 0.14);
+  --surface-nested-bg: rgba(5, 13, 27, 0.54);
+  --surface-nested-border: rgba(148, 163, 184, 0.14);
 }
 
 html {
@@ -54,12 +56,44 @@ html {
 
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  position: relative;
+  isolation: isolate;
+  font-family: var(--weather-font-sans);
   min-height: 100dvh;
   overflow-x: clip;
   background-image:
-    radial-gradient(110% 58% at 50% -8%, rgba(186, 230, 253, 0.22), transparent 55%),
-    linear-gradient(180deg, rgba(6, 23, 46, 0.98) 0%, rgba(8, 37, 71, 0.96) 38%, rgba(9, 49, 86, 0.92) 100%);
+    radial-gradient(70rem 32rem at 50% -12%, rgba(56, 189, 248, 0.22), transparent 58%),
+    radial-gradient(34rem 22rem at 12% 14%, rgba(251, 191, 36, 0.14), transparent 72%),
+    radial-gradient(38rem 24rem at 88% 8%, rgba(45, 212, 191, 0.14), transparent 74%),
+    linear-gradient(180deg, rgba(5, 11, 22, 0.98) 0%, rgba(7, 17, 32, 0.98) 36%, rgba(5, 12, 24, 1) 100%);
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  z-index: -2;
+  background:
+    radial-gradient(28rem 20rem at 12% 18%, rgba(251, 191, 36, 0.08), transparent 72%),
+    radial-gradient(42rem 26rem at 86% 12%, rgba(34, 211, 238, 0.08), transparent 74%),
+    radial-gradient(40rem 26rem at 50% 100%, rgba(59, 130, 246, 0.08), transparent 82%);
+  filter: blur(24px);
+}
+
+body::after {
+  z-index: -1;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+  background-size: 72px 72px, 72px 72px;
+  mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
 }
 
 ::selection {
@@ -68,10 +102,12 @@ body {
 }
 
 .weather-shell {
-  background-color: #0a3d78;
+  background-color: #081121;
   background-image:
-    radial-gradient(980px 480px at 50% -6%, rgba(227, 242, 255, 0.34), transparent 60%),
-    linear-gradient(180deg, rgba(10, 53, 104, 0.95) 0%, rgba(9, 49, 96, 0.95) 42%, rgba(8, 38, 82, 0.98) 100%);
+    radial-gradient(56rem 22rem at 50% -4%, rgba(56, 189, 248, 0.18), transparent 62%),
+    radial-gradient(28rem 16rem at 10% 14%, rgba(251, 191, 36, 0.12), transparent 72%),
+    radial-gradient(32rem 18rem at 92% 16%, rgba(45, 212, 191, 0.12), transparent 74%),
+    linear-gradient(180deg, rgba(9, 21, 40, 0.96) 0%, rgba(7, 17, 33, 0.98) 48%, rgba(5, 12, 24, 1) 100%);
 }
 
 .weather-grid {
@@ -102,41 +138,49 @@ body {
   @apply rounded-2xl border backdrop-blur-lg;
   border-color: var(--panel-border);
   background-color: var(--panel-bg);
-  background-image: linear-gradient(176deg, rgba(221, 244, 255, 0.14) 0%, rgba(50, 131, 185, 0.18) 48%, rgba(8, 42, 78, 0.44) 100%);
+  background-image:
+    radial-gradient(140% 100% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 42%),
+    radial-gradient(120% 120% at 100% 0%, rgba(34, 211, 238, 0.08), transparent 46%),
+    linear-gradient(180deg, rgba(18, 35, 61, 0.86) 0%, rgba(10, 20, 40, 0.86) 55%, rgba(6, 12, 25, 0.92) 100%);
   box-shadow:
-    0 20px 34px -24px rgba(7, 31, 72, 0.48),
-    0 8px 20px -16px rgba(126, 210, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 0 0 1px rgba(11, 62, 105, 0.36);
+    0 28px 48px -34px rgba(2, 6, 23, 0.92),
+    0 10px 24px -18px rgba(14, 165, 233, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05);
 }
 
 .weather-appbar {
   @apply rounded-2xl border backdrop-blur-lg;
-  border-color: rgba(219, 241, 255, 0.28);
-  background-color: rgba(11, 56, 100, 0.5);
-  background-image: linear-gradient(165deg, rgba(224, 242, 255, 0.2), rgba(90, 170, 240, 0.16) 42%, rgba(7, 39, 84, 0.46));
+  border-color: rgba(165, 188, 216, 0.22);
+  background-color: rgba(12, 28, 51, 0.72);
+  background-image:
+    radial-gradient(120% 140% at 18% 0%, rgba(251, 191, 36, 0.12), transparent 36%),
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.16), transparent 44%),
+    linear-gradient(180deg, rgba(24, 48, 82, 0.9) 0%, rgba(14, 30, 55, 0.9) 56%, rgba(8, 17, 34, 0.94) 100%);
   box-shadow:
-    0 20px 38px -24px rgba(6, 30, 72, 0.56),
-    0 10px 22px -16px rgba(141, 212, 255, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.36),
-    inset 0 0 0 1px rgba(10, 50, 92, 0.4);
+    0 26px 46px -32px rgba(2, 6, 23, 0.94),
+    0 10px 24px -18px rgba(14, 165, 233, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05);
 }
 
 .weather-panel-static {
   @apply rounded-[22px] border border-slate-700/60 bg-slate-950/65;
-  background-image: linear-gradient(156deg, rgba(245, 158, 11, 0.08), rgba(15, 23, 42, 0.22) 70%);
+  background-image:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.1), transparent 42%),
+    linear-gradient(156deg, rgba(20, 27, 43, 0.92), rgba(8, 13, 25, 0.92) 72%);
   box-shadow:
-    0 16px 30px -24px rgba(2, 6, 23, 0.68),
-    0 0 0 1px rgba(56, 189, 248, 0.05),
-    inset 0 1px 0 rgba(148, 163, 184, 0.1),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.38);
+    0 18px 34px -26px rgba(2, 6, 23, 0.82),
+    0 0 0 1px rgba(251, 191, 36, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(148, 163, 184, 0.08);
 }
 
 .weather-page-shell {
   @apply mx-auto flex w-full flex-col;
-  gap: clamp(1.25rem, 1rem + 1vw, 2rem);
-  padding-inline: clamp(1rem, 0.7rem + 1.5vw, 2rem);
-  padding-block: clamp(2rem, 1.5rem + 2vw, 3rem);
+  gap: clamp(1.35rem, 1rem + 1vw, 2.1rem);
+  padding-inline: clamp(1rem, 0.72rem + 1.4vw, 2.25rem);
+  padding-block: clamp(2.2rem, 1.7rem + 2vw, 3.4rem);
 }
 
 .weather-page-shell-compact {
@@ -172,10 +216,10 @@ body {
   z-index: 0;
   border-radius: 2.25rem;
   background:
-    radial-gradient(38rem 18rem at 8% 2%, rgba(251, 191, 36, 0.16), transparent 62%),
-    radial-gradient(32rem 20rem at 100% 6%, rgba(45, 212, 191, 0.14), transparent 60%),
-    linear-gradient(180deg, rgba(7, 18, 38, 0.7) 0%, rgba(8, 27, 47, 0.2) 100%);
-  filter: blur(0.2px);
+    radial-gradient(38rem 18rem at 8% 2%, rgba(251, 191, 36, 0.2), transparent 62%),
+    radial-gradient(32rem 20rem at 100% 6%, rgba(45, 212, 191, 0.16), transparent 60%),
+    linear-gradient(180deg, rgba(7, 18, 38, 0.78) 0%, rgba(8, 27, 47, 0.24) 100%);
+  filter: blur(0.6px);
   pointer-events: none;
 }
 
@@ -189,10 +233,10 @@ body {
 }
 
 .weather-hub-title {
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-family: var(--weather-font-display);
   font-size: clamp(2.3rem, 1.8rem + 2.1vw, 4.35rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
   color: white;
   text-wrap: balance;
 }
@@ -202,11 +246,13 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 1.75rem;
   background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(11, 28, 52, 0.72) 56%, rgba(17, 24, 39, 0.92) 100%);
+    radial-gradient(130% 120% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 42%),
+    radial-gradient(120% 120% at 100% 0%, rgba(56, 189, 248, 0.08), transparent 44%),
+    linear-gradient(145deg, rgba(12, 19, 35, 0.9), rgba(8, 17, 31, 0.82) 56%, rgba(7, 13, 25, 0.94) 100%);
   box-shadow:
     0 28px 60px -38px rgba(2, 6, 23, 0.96),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 0 0 1px rgba(250, 204, 21, 0.03);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(250, 204, 21, 0.04);
 }
 
 .weather-hub-hero {
@@ -229,9 +275,9 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 1.35rem;
   background:
-    linear-gradient(160deg, rgba(15, 23, 42, 0.66), rgba(12, 74, 110, 0.16) 42%, rgba(15, 23, 42, 0.78));
+    linear-gradient(160deg, rgba(14, 22, 40, 0.78), rgba(9, 38, 57, 0.22) 42%, rgba(9, 17, 31, 0.84));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
     inset 0 0 0 1px rgba(14, 165, 233, 0.04);
 }
 
@@ -348,13 +394,16 @@ body {
 .weather-route-card {
   @apply rounded-[1.25rem] border px-4 py-4 text-left;
   touch-action: manipulation;
-  border-color: rgba(191, 231, 255, 0.22);
-  background-color: rgba(10, 62, 104, 0.4);
-  background-image: linear-gradient(162deg, rgba(214, 240, 255, 0.14), rgba(66, 165, 245, 0.12) 48%, rgba(8, 38, 82, 0.2) 100%);
+  border-color: rgba(163, 184, 208, 0.16);
+  background-color: rgba(10, 19, 36, 0.78);
+  background-image:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 38%),
+    radial-gradient(120% 120% at 100% 0%, rgba(56, 189, 248, 0.08), transparent 42%),
+    linear-gradient(162deg, rgba(18, 33, 56, 0.9), rgba(9, 18, 34, 0.92) 48%, rgba(6, 12, 24, 0.96) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 0 0 1px rgba(8, 54, 96, 0.24),
-    0 18px 28px -24px rgba(2, 6, 23, 0.8);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04),
+    0 18px 28px -24px rgba(2, 6, 23, 0.84);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -364,10 +413,10 @@ body {
 
 .weather-route-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(125, 211, 252, 0.5);
+  border-color: rgba(251, 191, 36, 0.34);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 0 0 1px rgba(8, 54, 96, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(251, 191, 36, 0.04),
     0 22px 34px -26px rgba(2, 6, 23, 0.84);
 }
 
@@ -378,9 +427,13 @@ body {
 
 .weather-stat-card {
   @apply rounded-xl border px-3 py-3;
-  border-color: rgba(148, 163, 184, 0.24);
-  background-color: rgba(2, 6, 23, 0.34);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.26);
+  border-color: rgba(148, 163, 184, 0.2);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(14, 24, 42, 0.88), rgba(7, 14, 28, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
   font-variant-numeric: tabular-nums;
 }
 
@@ -409,17 +462,18 @@ body {
 }
 
 .weather-secondary-title {
+  font-family: var(--weather-font-display);
   font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
   color: white;
   text-wrap: balance;
 }
 
 .weather-secondary-description {
-  max-width: 52rem;
-  font-size: 0.95rem;
-  line-height: 1.8;
+  max-width: 54rem;
+  font-size: 1rem;
+  line-height: 1.75;
   color: rgb(226 232 240 / 0.92);
 }
 
@@ -446,8 +500,10 @@ body {
 }
 
 .weather-secondary-section-title {
+  font-family: var(--weather-font-display);
   font-size: 1.2rem;
   font-weight: 600;
+  letter-spacing: -0.03em;
   color: rgb(248 250 252);
 }
 
@@ -512,13 +568,15 @@ body {
 
 .weather-tile {
   @apply rounded-2xl border border-slate-700/70 bg-slate-950/70 backdrop-blur-xl;
-  border-color: rgba(205, 235, 255, 0.22);
-  background-color: rgba(10, 62, 104, 0.42);
-  background-image: linear-gradient(162deg, rgba(214, 240, 255, 0.18), rgba(66, 165, 245, 0.14) 48%, rgba(12, 80, 139, 0.24) 100%);
+  border-color: rgba(163, 184, 208, 0.16);
+  background-color: rgba(10, 19, 36, 0.82);
+  background-image:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 38%),
+    linear-gradient(162deg, rgba(18, 33, 56, 0.88), rgba(9, 18, 34, 0.92) 52%, rgba(6, 12, 24, 0.96) 100%);
   box-shadow:
-    0 20px 32px -22px rgba(7, 33, 72, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 0 0 1px rgba(8, 54, 96, 0.3);
+    0 20px 32px -22px rgba(2, 6, 23, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
 }
 
 .weather-bento-grid {
@@ -641,10 +699,13 @@ body {
   @apply rounded-2xl border backdrop-blur;
   border-color: var(--surface-border);
   background-color: var(--surface-bg);
-  background-image: linear-gradient(180deg, rgba(214, 240, 255, 0.18), rgba(52, 146, 198, 0.2) 50%, rgba(14, 90, 145, 0.24));
+  background-image:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.05), transparent 42%),
+    radial-gradient(120% 120% at 100% 0%, rgba(56, 189, 248, 0.08), transparent 44%),
+    linear-gradient(180deg, rgba(15, 29, 51, 0.78), rgba(8, 16, 31, 0.88) 58%, rgba(5, 11, 23, 0.92) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 0 0 1px rgba(11, 58, 105, 0.26);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
 }
 
 
@@ -704,20 +765,20 @@ body {
 :where(.weather-surface > .weather-surface) {
   border-color: var(--surface-nested-border);
   background-color: var(--surface-nested-bg);
-  background-image: none;
+  background-image: linear-gradient(180deg, rgba(8, 15, 29, 0.84), rgba(5, 10, 22, 0.92));
   box-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.2),
-    inset 0 1px 0 rgba(148, 163, 184, 0.03);
+    inset 0 0 0 1px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 rgba(148, 163, 184, 0.04);
 }
 
 :where(.weather-panel > .weather-panel),
 :where(.weather-surface > .weather-panel) {
   border-color: rgba(71, 85, 105, 0.3);
-  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.04), rgba(99, 102, 241, 0.03) 44%, rgba(2, 6, 23, 0.14) 78%);
+  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.05), rgba(45, 212, 191, 0.04) 44%, rgba(2, 6, 23, 0.18) 78%);
   box-shadow:
-    0 12px 22px -24px rgba(2, 6, 23, 0.7),
-    0 0 0 1px rgba(99, 102, 241, 0.04),
-    inset 0 1px 0 rgba(148, 163, 184, 0.08),
+    0 12px 22px -24px rgba(2, 6, 23, 0.74),
+    0 0 0 1px rgba(45, 212, 191, 0.03),
+    inset 0 1px 0 rgba(148, 163, 184, 0.06),
     inset 0 0 0 1px rgba(15, 23, 42, 0.25);
 }
 
@@ -731,9 +792,11 @@ body {
 
 .weather-chip {
   @apply rounded-full border border-slate-700/70 bg-slate-900/70 text-slate-100;
-  border-color: rgba(216, 240, 255, 0.34);
-  background-image: linear-gradient(180deg, rgba(224, 242, 255, 0.24), rgba(40, 125, 184, 0.34));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  border-color: rgba(216, 240, 255, 0.18);
+  background-image: linear-gradient(180deg, rgba(19, 35, 58, 0.9), rgba(8, 16, 31, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
 }
 
 
@@ -1048,7 +1111,11 @@ body {
   @apply rounded-full border border-slate-700/70 bg-slate-950/75 backdrop-blur;
   min-height: 44px;
   padding-inline: 0.9rem;
-  background-image: linear-gradient(180deg, rgba(51, 40, 31, 0.5), rgba(2, 6, 23, 0.78));
+  border-color: rgba(148, 163, 184, 0.18);
+  background-image: linear-gradient(180deg, rgba(20, 34, 56, 0.9), rgba(8, 15, 30, 0.94));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
 }
 
 .weather-pill-muted {
@@ -1060,10 +1127,14 @@ body {
   @apply rounded-full border border-slate-700/70 bg-slate-950/75 backdrop-blur;
   min-height: 44px;
   padding-inline: 0.95rem;
+  border-color: rgba(148, 163, 184, 0.18);
+  background-image:
+    radial-gradient(120% 140% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(20, 37, 62, 0.9), rgba(8, 15, 30, 0.94));
   box-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.35),
-    0 18px 30px -20px rgba(2, 6, 23, 0.66),
-    0 6px 14px -12px rgba(245, 158, 11, 0.16);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 18px 30px -20px rgba(2, 6, 23, 0.72),
+    0 6px 14px -12px rgba(245, 158, 11, 0.12);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -1076,7 +1147,12 @@ body {
   @apply rounded-2xl border border-slate-800/70 bg-slate-950/70 text-slate-100;
   min-height: 44px;
   font-size: 16px;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.45);
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(9, 18, 34, 0.94), rgba(6, 12, 24, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 12px 22px -20px rgba(2, 6, 23, 0.8);
 }
 
 .weather-control {
@@ -1087,7 +1163,7 @@ body {
 }
 
 .weather-input::placeholder {
-  color: rgba(203, 213, 225, 0.8);
+  color: rgba(191, 219, 254, 0.68);
 }
 
 .weather-button {
@@ -1095,10 +1171,12 @@ body {
   min-height: 44px;
   padding-inline: 1rem;
   font-weight: 500;
-  background: linear-gradient(180deg, rgba(15, 75, 122, 0.62), rgba(6, 39, 78, 0.78));
+  border-color: rgba(148, 163, 184, 0.2);
+  background:
+    linear-gradient(180deg, rgba(19, 40, 69, 0.9), rgba(8, 16, 32, 0.94));
   box-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.5),
-    0 10px 18px -16px rgba(2, 6, 23, 0.84);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.06),
+    0 14px 26px -20px rgba(2, 6, 23, 0.86);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -1193,20 +1271,20 @@ body {
   .weather-tab:hover,
   .weather-pill:hover {
     transform: translateY(-1px);
-    border-color: rgba(129, 140, 248, 0.62);
+    border-color: rgba(251, 191, 36, 0.48);
     box-shadow:
-      inset 0 0 0 1px rgba(15, 23, 42, 0.35),
-      0 20px 36px -24px rgba(2, 6, 23, 0.7),
-      0 10px 20px -14px rgba(99, 102, 241, 0.28);
+      inset 0 0 0 1px rgba(251, 191, 36, 0.08),
+      0 20px 36px -24px rgba(2, 6, 23, 0.74),
+      0 10px 20px -14px rgba(251, 191, 36, 0.18);
   }
 
   .weather-button:hover {
     transform: translateY(-1px);
-    border-color: rgba(129, 140, 248, 0.42);
+    border-color: rgba(103, 232, 249, 0.36);
     box-shadow:
-      inset 0 0 0 1px rgba(15, 23, 42, 0.45),
+      inset 0 0 0 1px rgba(125, 211, 252, 0.08),
       0 20px 32px -22px rgba(2, 6, 23, 0.9),
-      0 8px 18px -14px rgba(99, 102, 241, 0.24);
+      0 8px 18px -14px rgba(14, 165, 233, 0.18);
   }
 
   .weather-button-primary:hover {
@@ -1278,6 +1356,63 @@ body {
   transform: translateY(0);
 }
 
+.weather-brand-mark {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.72rem 1.1rem;
+  font-family: var(--weather-font-display);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(248 250 252);
+  background:
+    radial-gradient(140% 140% at 0% 0%, rgba(251, 191, 36, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(19, 35, 58, 0.94), rgba(8, 16, 31, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 18px 32px -26px rgba(2, 6, 23, 0.9);
+  transition:
+    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
+    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
+    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
+    color var(--weather-interactive-duration) var(--weather-interactive-ease);
+}
+
+.weather-brand-mark:hover {
+  transform: translateY(-1px);
+  border-color: rgba(251, 191, 36, 0.36);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(251, 191, 36, 0.08),
+    0 22px 36px -28px rgba(2, 6, 23, 0.92);
+}
+
+.weather-topbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.04)),
+    radial-gradient(48rem 18rem at 0% 0%, rgba(251, 191, 36, 0.12), transparent 60%),
+    radial-gradient(42rem 18rem at 100% 0%, rgba(56, 189, 248, 0.12), transparent 62%);
+}
+
+.weather-topbar-search {
+  position: relative;
+  z-index: 1;
+}
+
 .mono {
   font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
@@ -1286,10 +1421,14 @@ body {
 
 .type-headline {
   @apply text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl md:text-6xl;
+  font-family: var(--weather-font-display);
+  letter-spacing: -0.05em;
 }
 
 .type-section {
   @apply text-2xl font-semibold leading-snug md:text-3xl;
+  font-family: var(--weather-font-display);
+  letter-spacing: -0.04em;
 }
 
 .type-label {
@@ -1311,6 +1450,10 @@ body {
 :where(h1, h2, h3, h4, h5, h6) {
   scroll-margin-top: 96px;
   text-wrap: balance;
+}
+
+:where(h1, h2) {
+  font-family: var(--weather-font-display);
 }
 
 button,
@@ -2381,8 +2524,19 @@ body::-webkit-scrollbar-thumb,
 }
 
 :root[data-theme="light"] body {
-  background: #f3f6fb;
+  background:
+    radial-gradient(48rem 24rem at 50% -10%, rgba(56, 189, 248, 0.12), transparent 58%),
+    radial-gradient(24rem 18rem at 12% 16%, rgba(251, 191, 36, 0.1), transparent 70%),
+    linear-gradient(180deg, #f7fbff 0%, #eef4fb 58%, #f8fbff 100%);
   color: #0f172a;
+}
+
+:root[data-theme="light"] body::before {
+  opacity: 0.42;
+}
+
+:root[data-theme="light"] body::after {
+  opacity: 0.08;
 }
 
 :root[data-theme="light"] .weather-shell {
@@ -2396,6 +2550,7 @@ body::-webkit-scrollbar-thumb,
 :root[data-theme="light"] .weather-panel,
 :root[data-theme="light"] .weather-surface,
 :root[data-theme="light"] .weather-appbar,
+:root[data-theme="light"] .weather-brand-mark,
 :root[data-theme="light"] .weather-pill,
 :root[data-theme="light"] .weather-input,
 :root[data-theme="light"] .weather-button {
@@ -2489,6 +2644,13 @@ body::-webkit-scrollbar-thumb,
   box-shadow:
     inset 0 0 0 1px rgba(148, 163, 184, 0.35),
     0 14px 24px -20px rgba(15, 23, 42, 0.28);
+}
+
+:root[data-theme="light"] .weather-brand-mark {
+  color: #0f172a;
+  background:
+    radial-gradient(140% 140% at 0% 0%, rgba(251, 191, 36, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
 }
 
 :root[data-theme="light"] .weather-button-primary {

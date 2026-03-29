@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { answerCategories, answerPages } from "./decisionPages";
 import { featuredAnswerPages } from "./selectors";
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function AnswersHubPage() {
+  redirect("/decide#direct-answers");
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/answers" });
   const { displayRegime, weeklyDecisionCardModel } = snapshot;
   const listData = {

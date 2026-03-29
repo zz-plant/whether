@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import { findStageGuide, stageGuides } from "./stageGuides";
 import { findStakeholderGuide, stakeholderGuides } from "./stakeholderGuides";
@@ -43,6 +44,9 @@ type GuidesPageProps = {
 
 export default async function GuidesPage({ searchParams }: GuidesPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  if (!resolvedSearchParams?.stakeholder && !resolvedSearchParams?.stage && !resolvedSearchParams?.library) {
+    redirect("/decide#guided-translation");
+  }
   const selectedStakeholder = resolvedSearchParams?.stakeholder
     ? findStakeholderGuide(resolvedSearchParams.stakeholder)
     : undefined;

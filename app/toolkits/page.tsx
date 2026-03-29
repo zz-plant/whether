@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { toolkitDefinitions } from "../../lib/decisionDomainCatalog";
@@ -21,6 +22,9 @@ export default async function ToolkitsPage({
   searchParams?: Promise<{ q?: string }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  if (!resolvedSearchParams?.q) {
+    redirect("/decide#toolkit-library");
+  }
   const query = resolvedSearchParams?.q?.trim().toLowerCase() ?? "";
   const suggestedIntents = ["rollback", "roadmap", "pmf", "pricing", "capacity"] as const;
   const filteredToolkits = toolkitDefinitions.filter((toolkit) => {

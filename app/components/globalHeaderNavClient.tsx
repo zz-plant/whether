@@ -20,16 +20,18 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
         href={link.href}
         aria-current={link.isActive ? "page" : undefined}
         title={link.boundary}
-        className={`weather-pill group inline-flex min-h-[72px] min-w-[144px] flex-col items-start justify-start rounded-[1.1rem] px-3 py-3 text-left transition-colors touch-manipulation sm:h-full sm:min-w-0 ${
+        className={`weather-pill group inline-flex min-h-[78px] min-w-[148px] flex-col items-start justify-start rounded-[1.2rem] px-3.5 py-3.5 text-left transition-colors touch-manipulation sm:h-full sm:min-w-0 ${
           link.isActive
-            ? "border-sky-300/90 bg-sky-500/25 text-sky-50"
-            : "text-slate-100 hover:border-sky-400/70"
+            ? "border-sky-300/80 bg-sky-500/18 text-sky-50 shadow-[0_18px_34px_-26px_rgba(56,189,248,0.46)]"
+            : "text-slate-100 hover:border-amber-300/45"
         }`}
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300/90">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
           {globalHeaderGroupLabels[link.group]}
         </span>
-        <span className="mt-1 text-xs font-semibold tracking-[0.06em] sm:text-sm">{link.label}</span>
+        <span className="mt-1 font-[family:var(--weather-font-display)] text-sm font-semibold tracking-[-0.02em] sm:text-[1.02rem]">
+          {link.label}
+        </span>
         <span
           className={`mt-2 hidden text-[11px] leading-relaxed xl:block ${
             link.isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"
@@ -57,7 +59,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <div className="mb-2 sm:hidden">
         <button
           type="button"
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold tracking-[0.08em]"
+          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 text-xs font-semibold tracking-[0.14em]"
           aria-controls="global-header-nav-list"
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((current) => !current)}

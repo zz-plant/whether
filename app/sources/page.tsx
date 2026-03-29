@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { buildCompactTrustSummary, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function SourcesPage() {
+  redirect("/method#sources-freshness");
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sources" });
   const homeBriefModel = snapshot.homeBriefModel;
   const isFallback = snapshot.isFallback;

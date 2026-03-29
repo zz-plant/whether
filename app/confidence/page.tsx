@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { buildCompactTrustSummary, buildFailureModeWarnings } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function ConfidencePage() {
+  redirect("/method#confidence-limits");
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/confidence" });
   const homeBriefModel = snapshot.homeBriefModel;
   const isFallback = snapshot.isFallback;

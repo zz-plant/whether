@@ -3,4 +3,4 @@ import { primaryNavigation } from "../navigation/primaryNavigation";
 
 export const reportPageLinks: ReportPageLink[] = primaryNavigation;
 
-export const reportShellCorePaths = ["/", "/signals", "/operations"] as const;
+export const reportShellCorePaths = ["/", "/signals", "/operations", "/decide", "/method"] as const;
