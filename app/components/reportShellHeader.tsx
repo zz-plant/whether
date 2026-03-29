@@ -55,16 +55,26 @@ export function ReportShellHeader({
               <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.4rem] font-semibold leading-[1.02] tracking-[-0.04em] text-slate-50 sm:text-[1.7rem]">
                 This week&apos;s posture, action, and flip risk in one scan.
               </p>
-              <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
-                Decide now, keep commitments reversible, and open deeper evidence only when the call needs it.
-              </p>
+              <ul className="max-w-3xl space-y-1 text-xs leading-relaxed text-slate-300">
+                <li>
+                  <span className="font-semibold text-slate-100">Do now:</span> execute the bounded moves for this posture.
+                </li>
+                <li>
+                  <span className="font-semibold text-slate-100">Watch threshold:</span> track the nearest trigger that changes pacing.
+                </li>
+                <li>
+                  <span className="font-semibold text-slate-100">Flip condition:</span> reverse only when the trigger confirms.
+                </li>
+              </ul>
             </div>
           </div>
           <div className="xl:min-w-[30rem]">
-            <div className="weather-surface flex min-h-[48px] flex-wrap items-center gap-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">As of {recordDateLabel}</span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Updated {fetchedAtLabel}</span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Posture {statusLabel}</span>
+            <div className="weather-surface flex min-h-[44px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">{statusLabel}</span>
+              <span className="text-slate-500">•</span>
+              <span>As of {recordDateLabel}</span>
+              <span className="text-slate-500">•</span>
+              <span>Updated {fetchedAtLabel}</span>
             </div>
           </div>
         </div>
