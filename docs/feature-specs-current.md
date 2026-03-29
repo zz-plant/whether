@@ -24,6 +24,7 @@ The homepage keeps interpretation layers optional and query-driven: the default 
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/`, `/signals`, `/operations` and nested report paths) also use a reduced global header mode: brand/home anchor, global search entry, and compact route-orientation cues stay available without restoring the full navigation chrome above the brief.
+Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
@@ -32,17 +33,19 @@ links, and section anchors used across the report experience.
 
 The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
 hero plus share/copy actions, then the page continues as a compact handoff sequence:
+- returning-visitor delta strip (only when the current read changed since the last visit),
 - planning handoff,
 - evidence/trust exception handoff,
 - deeper-surface chooser.
 
 The home top fold now separates metadata from decision contract: a compact current-outlook strip
 shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
-once below it with explicit `Action now`, `Guardrail`, and `Flip condition` fields. The share rail
-stays artifact-first with the weekly operator brief as the default handoff, while company-specific
-override controls remain separated from routine sharing.
+once below it with explicit `Action now`, `Pause if`, and `Change course if` fields. The share rail
+now keeps the weekly operator brief and short snapshot as the only default-scan actions, while board
+packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
 The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
+The weekly brief sequence now favors `current call -> operating levers -> share-ready artifact -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
@@ -87,7 +90,9 @@ four-step progressive flow:
 - finance strategy,
 - share brief.
 
-Only one step is expanded at a time, while the other steps collapse into summary cards. Existing
+Only one step is expanded at a time, while the other steps collapse into summary cards. The home
+Planning handoff also now uses a more stateful board treatment with explicit owner, approval-state,
+and change-course cues instead of sentence-only summaries. Existing
 hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
 implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
 
@@ -226,11 +231,9 @@ This pilot is additive and backward-compatible: existing regime labels and thres
 ### 4.1 Decisions workstream status
 Decisions is an active first-class workflow surface in shipped navigation (`/decide`) with an
 action-first top fold anchored to the live weekly call:
-- current posture, action, guardrail, and flip condition,
-- direct toolkit shortcuts,
-- ship checklist,
-- team-context profiling,
-- then role and situation browsing below.
+- one recommended next path derived from the live weekly call,
+- direct-answer and team-translation alternatives at lower visual weight,
+- then ship checklist, team-context profiling, and role/situation browsing below the primary chooser.
 
 `/toolkits` remains available as the supporting instrument library for Decision Tools, but it is no longer treated as a peer primary hub in navigation.
 

@@ -43,6 +43,40 @@ const hasAssessmentChanged = (
   previous.assessment.scores.baseRate !== current.scores.baseRate ||
   previous.assessment.scores.curveSlope !== current.scores.curveSlope;
 
+const readStoredSnapshot = () => {
+  try {
+    const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
+    if (!stored) {
+      return null;
+    }
+    const parsed = JSON.parse(stored) as LastReadSnapshot;
+    return parsed?.recordDate && parsed?.assessment?.regime ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredSnapshot = ({
+  assessment,
+  recordDate,
+}: {
+  assessment: RegimeAssessment;
+  recordDate: string;
+}) => {
+  try {
+    window.localStorage.setItem(
+      LAST_READ_SNAPSHOT_STORAGE_KEY,
+      JSON.stringify({
+        recordDate,
+        assessment,
+        readAt: new Date().toISOString(),
+      } satisfies LastReadSnapshot),
+    );
+  } catch {
+    // Ignore storage errors to keep console clean.
+  }
+};
+
 
 const DeltaSparkline = ({ previous, current }: { previous: number | null; current: number | null }) => {
   if (previous === null || current === null) {
@@ -77,26 +111,12 @@ export const ChangeSinceLastReadPanel = ({
   const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
 
   useEffect(() => {
-    let storedSnapshot: LastReadSnapshot | null = null;
-    try {
-      const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as LastReadSnapshot;
-        if (parsed?.recordDate && parsed?.assessment?.regime) {
-          storedSnapshot = parsed;
-          setPrevious(parsed);
-        }
-      }
-    } catch {
-      // Ignore storage errors to keep console clean.
+    const storedSnapshot = readStoredSnapshot();
+    if (storedSnapshot) {
+      setPrevious(storedSnapshot);
     }
 
     const loggedAt = new Date().toISOString();
-    const nextSnapshot: LastReadSnapshot = {
-      recordDate,
-      assessment,
-      readAt: loggedAt,
-    };
 
     if (storedSnapshot && hasAssessmentChanged(storedSnapshot, assessment, recordDate)) {
       const reasons = buildRegimeChangeReasons(storedSnapshot.assessment, assessment);
@@ -163,11 +183,7 @@ export const ChangeSinceLastReadPanel = ({
       }
     }
 
-    try {
-      window.localStorage.setItem(LAST_READ_SNAPSHOT_STORAGE_KEY, JSON.stringify(nextSnapshot));
-    } catch {
-      // Ignore storage errors to keep console clean.
-    }
+    writeStoredSnapshot({ assessment, recordDate });
   }, [assessment, recordDate]);
 
   const timeMachineLink = useMemo(() => {
@@ -397,28 +413,23 @@ export const ReturningVisitorDeltaStrip = ({
   recordDate,
   impactLinks,
   openPanelHref = "#change-since-last-read",
+  openPanelLabel = "Open full delta panel",
 }: {
   assessment: RegimeAssessment;
   recordDate: string;
   impactLinks?: Array<{ label: string; href: string; metric: DeltaMetricKey }>;
   openPanelHref?: string;
+  openPanelLabel?: string;
 }) => {
   const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
-      if (!stored) {
-        return;
-      }
-      const parsed = JSON.parse(stored) as LastReadSnapshot;
-      if (parsed?.recordDate && parsed?.assessment?.regime) {
-        setPrevious(parsed);
-      }
-    } catch {
-      // Ignore storage errors to keep console clean.
+    const storedSnapshot = readStoredSnapshot();
+    if (storedSnapshot) {
+      setPrevious(storedSnapshot);
     }
-  }, []);
+    writeStoredSnapshot({ assessment, recordDate });
+  }, [assessment, recordDate]);
 
   if (!previous) {
     return null;
@@ -468,7 +479,7 @@ export const ReturningVisitorDeltaStrip = ({
           href={openPanelHref}
           className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
-          Open full delta panel
+          {openPanelLabel}
         </a>
       </div>
       <ul className="mt-3 flex flex-wrap gap-2" aria-label="Returning visitor impact tags">

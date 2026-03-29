@@ -230,6 +230,8 @@ export function HeroTrustProvenanceBlock({
     trustStatusTone,
     degradedSourceRows,
   });
+  const hasDegradedSourceRows = Boolean(degradedSourceRows && degradedSourceRows.length > 0);
+  const isCompactStableState = trustReadiness.tone === "stable" && !outageSeverity && !hasDegradedSourceRows;
   const trustToneClass = trustPanelToneClass[trustReadiness.tone];
   const controlHeadline = trustStatusLabel;
   const trustStatusDetailForDisplay = trustReadiness.tone === "warning"
@@ -283,6 +285,22 @@ export function HeroTrustProvenanceBlock({
           {decisionImpactWindow ? <p className="mt-1 text-xs leading-5 text-slate-400">{decisionImpactWindow}</p> : null}
         </div>
 
+        {isCompactStableState ? (
+          <div className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trust summary</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">Standard approval cadence is available.</p>
+              </div>
+              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}>
+                Allowed now
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-300">
+              Live inputs are current enough for the weekly call. Open full details only if the room challenges freshness, provenance, or source coverage.
+            </p>
+          </div>
+        ) : (
         <div className="grid gap-3">
           <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
@@ -369,6 +387,7 @@ export function HeroTrustProvenanceBlock({
             )}
           </article>
         </div>
+        )}
 
         <details className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2">
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">

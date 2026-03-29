@@ -68,8 +68,6 @@ export function CopyLeadershipArtifactsButtons({
   fallbackActive?: boolean;
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
-  const [moreActionsOpen, setMoreActionsOpen] = useState(false);
-  const [advancedOverrideOpen, setAdvancedOverrideOpen] = useState(false);
   const [overrideReason, setOverrideReason] = useState("");
   const [overrideIndicator, setOverrideIndicator] = useState("");
   const [overrideOwner, setOverrideOwner] = useState("");
@@ -126,7 +124,7 @@ export function CopyLeadershipArtifactsButtons({
 
   return (
     <div className="space-y-2">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label="Primary weekly brief actions">
+      <div className="grid gap-2 sm:grid-cols-2" aria-label="Primary weekly brief actions">
         <ActionButton
           variant="primary"
           type="button"
@@ -151,27 +149,17 @@ export function CopyLeadershipArtifactsButtons({
         >
           {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
         </ActionButton>
-
-        <ActionButton
-          variant="secondary"
-          type="button"
-          className="w-auto gap-1.5 px-4 text-slate-200"
-          aria-expanded={moreActionsOpen}
-          onClick={() => setMoreActionsOpen((open) => !open)}
-        >
-          More share actions
-          <span aria-hidden="true" className="text-sm">
-            ▾
-          </span>
-        </ActionButton>
       </div>
 
       <p className="px-1 text-[11px] leading-5 text-slate-400">
         Default share path: copy the weekly operator brief. Use the snapshot for short chat context; keep board variants and exception handling secondary.
       </p>
 
-      {moreActionsOpen ? (
-        <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-950/98 p-2 shadow-2xl">
+      <details className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
+        <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+          Board, print, and company exceptions
+        </summary>
+        <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
           <div>
             <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
               <ActionButton
@@ -215,7 +203,7 @@ export function CopyLeadershipArtifactsButtons({
               </ActionButton>
             </div>
             <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400">
-              Extended actions are for board packaging, citation, or print handoff after the default brief is aligned.
+              Use these after the default weekly brief is aligned and ready to be repackaged.
             </p>
           </div>
 
@@ -224,39 +212,24 @@ export function CopyLeadershipArtifactsButtons({
               Cached snapshot active: confirm irreversible sharing actions before export.
             </p>
           ) : null}
-        </div>
-      ) : null}
 
-      <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Company-specific exception
-            </p>
-            <p className="max-w-2xl text-xs leading-5 text-slate-300">
-              Keep this separate from routine sharing. Use it only when leadership needs the copied artifact to carry an explicit local override.
-            </p>
-          </div>
-          <ActionButton
-            variant="secondary"
-            type="button"
-            className="w-auto px-4 text-slate-200"
-            aria-expanded={advancedOverrideOpen}
-            onClick={() => setAdvancedOverrideOpen((open) => !open)}
-          >
-            {advancedOverrideOpen ? "Hide exception controls" : "Open exception controls"}
-          </ActionButton>
-        </div>
+          <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+            <div className="space-y-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Company-specific exception
+              </p>
+              <p className="max-w-2xl text-xs leading-5 text-slate-300">
+                Keep this separate from routine sharing. Use it only when leadership needs the copied artifact to carry an explicit local override.
+              </p>
+            </div>
 
-        {hasOverride ? (
-          <div className="mt-3 rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-100">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
-            <p className="mt-1">{overrideLine}</p>
-          </div>
-        ) : null}
+            {hasOverride ? (
+              <div className="mt-3 rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-100">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
+                <p className="mt-1">{overrideLine}</p>
+              </div>
+            ) : null}
 
-        {advancedOverrideOpen ? (
-          <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
             <p className="text-xs leading-5 text-slate-400">
               Appropriate when a board- or exec-level call needs an explicit local exception, not for routine sharing or formatting tweaks.
             </p>
@@ -295,8 +268,8 @@ export function CopyLeadershipArtifactsButtons({
               </label>
             </div>
           </div>
-        ) : null}
-      </div>
+        </div>
+      </details>
     </div>
   );
 }

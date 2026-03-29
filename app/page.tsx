@@ -42,6 +42,9 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
+  const reportSource = homepage.reportResult.ok
+    ? homepage.reportResult.data
+    : homepage.reportResult.fallback;
 
   return (
     <ReportShell
@@ -115,6 +118,8 @@ export const HomePageReportContent = async ({
         interpretationSearchParams={homepage.interpretationSearchParams}
         leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
         fallbackActive={homepage.fallbackActive}
+        assessment={reportSource.assessment}
+        recordDate={reportSource.treasury.record_date}
       />
 
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />

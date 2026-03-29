@@ -32,8 +32,10 @@ const getPageNavigationState = (
   const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
   const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
   const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href);
+  const currentStep = currentIndex >= 0 ? currentIndex + 1 : 1;
+  const totalSteps = pageLinks.length;
 
-  return { currentLink, adjacentLinks };
+  return { currentLink, adjacentLinks, currentStep, totalSteps };
 };
 
 const basePageLinkClassName =
@@ -68,10 +70,24 @@ export const ReportPageNavigation = ({
   variant?: "full" | "compact";
 }) => {
   const groupedPageLinks = groupPageLinks(pageLinks);
+  const { currentLink, currentStep, totalSteps } = getPageNavigationState(
+    pageLinks,
+    pageTitle,
+    currentPath,
+  );
 
   return (
     <nav aria-label="Report paths" className={className}>
       <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Workflow progress</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{currentStep} of {totalSteps} · {currentLink.label}</p>
+          </div>
+          <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            {navigationGroupLabels[currentLink.group]}
+          </span>
+        </div>
         {groupedPageLinks.map((groupSection) => (
           <div key={groupSection.group} className="space-y-2">
             <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
@@ -172,7 +188,7 @@ export const ReportMobileNavigation = ({
   className?: string;
   sectionLinks?: ReportSectionLink[];
 }) => {
-  const { currentLink, adjacentLinks } = getPageNavigationState(
+  const { currentLink, adjacentLinks, currentStep, totalSteps } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -189,6 +205,9 @@ export const ReportMobileNavigation = ({
           <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-3">
             <div className="flex items-start justify-between gap-3">
               <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  Step {currentStep} of {totalSteps}
+                </p>
                 <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
                   {`${sectionLinks.length} sections`}
                 </p>

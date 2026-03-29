@@ -43,12 +43,31 @@ export default async function DecidePage() {
   };
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/decide" });
   const { homeBriefModel } = snapshot;
+  const recommendedSituation = homeBriefModel.weeklyMovement.direction === "defensive"
+    ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
+    : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
+  const shouldStartWithChecker = homeBriefModel.revisitDecisions;
   const liveCall = {
     posture: homeBriefModel.postureWithStageLabel,
     action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
     guardrail: homeBriefModel.guardrail,
     flip: reportData.flipThreshold ?? homeBriefModel.reversalTrigger,
   };
+  const recommendedPath = shouldStartWithChecker
+    ? {
+        href: "/decide/ship-checklist" as Route,
+        kicker: "Recommended next path",
+        title: "Start with one go / wait / kill check",
+        detail: "This week has enough movement that you should pressure-test one concrete decision before widening into broader role translation.",
+        cta: "Open ship checklist",
+      }
+    : {
+        href: `/decide/${recommendedSituation.slug}` as Route,
+        kicker: "Recommended next path",
+        title: `Start with ${recommendedSituation.title}`,
+        detail: "The weekly call is clear enough to translate directly into one focused decision path instead of browsing the whole library first.",
+        cta: "Open recommended path",
+      };
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
     featuredStakeholderSlugs.includes(guide.slug as (typeof featuredStakeholderSlugs)[number]),
   );
@@ -75,9 +94,9 @@ export default async function DecidePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Current weekly call</p>
             <p className="text-sm font-semibold text-slate-100">{liveCall.posture}</p>
             <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="font-semibold text-slate-100">Do now:</span> {liveCall.action}</li>
-              <li><span className="font-semibold text-slate-100">Guardrail:</span> {liveCall.guardrail}</li>
-              <li><span className="font-semibold text-slate-100">Flip when:</span> {liveCall.flip}</li>
+              <li><span className="font-semibold text-slate-100">Action now:</span> {liveCall.action}</li>
+              <li><span className="font-semibold text-slate-100">Pause if:</span> {liveCall.guardrail}</li>
+              <li><span className="font-semibold text-slate-100">Change course if:</span> {liveCall.flip}</li>
             </ul>
           </div>
         )}
@@ -86,13 +105,30 @@ export default async function DecidePage() {
       <HubSection
         id="unresolved-question-router"
         title="What remains unresolved?"
-        description="Choose the plain-language job that still blocks action. This page should route you to one next move, not make you browse the whole library."
+        description="Take the recommended next path first. Only widen into alternatives if that path does not close the decision."
         className="scroll-mt-28"
       >
-        <div className="grid gap-3 lg:grid-cols-3">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
+          <article className="weather-hub-card space-y-4 border-sky-400/30 bg-sky-500/10">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{recommendedPath.kicker}</p>
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
+              <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
+            </div>
+            <div className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-4 py-3 text-sm text-slate-200">
+              <p><span className="font-semibold text-slate-100">Current call:</span> {liveCall.posture}</p>
+              <p className="mt-2"><span className="font-semibold text-slate-100">Action now:</span> {liveCall.action}</p>
+              <p className="mt-2"><span className="font-semibold text-slate-100">Pause if:</span> {liveCall.guardrail}</p>
+              <p className="mt-2"><span className="font-semibold text-slate-100">Change course if:</span> {liveCall.flip}</p>
+            </div>
+            <Link href={recommendedPath.href} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              {recommendedPath.cta}
+            </Link>
+          </article>
+
           <article id="direct-answers" className="weather-hub-card scroll-mt-28 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">I need a yes/no call</p>
-            <p className="text-sm text-slate-200">Start here when the question is already crisp and you want one direct answer you can share immediately.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Alternative: direct answer</p>
+            <p className="text-sm text-slate-200">Use this when the question is already crisp and you want one yes / no answer you can share immediately.</p>
             <div className="space-y-2">
               {recommendedAnswerPages.map((page) => (
                 <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
@@ -105,26 +141,10 @@ export default async function DecidePage() {
               Open direct answers
             </Link>
           </article>
-          <article className="weather-hub-card space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">I need a checker before committing</p>
-            <p className="text-sm text-slate-200">Use a quick check when you know the likely move but still need a go / wait / kill read before you commit.</p>
-            <div className="grid gap-2">
-              <Link href="/decide/ship-checklist" className="weather-hub-link-card space-y-1">
-                <p className="text-sm font-semibold text-slate-100">Whether to ship checklist</p>
-                <p className="text-xs text-slate-300">Get a go / wait / kill recommendation tied to the current regime.</p>
-              </Link>
-              <Link href="/decide/team-context" className="weather-hub-link-card space-y-1">
-                <p className="text-sm font-semibold text-slate-100">Team context profile</p>
-                <p className="text-xs text-slate-300">Adjust the weekly call for your company profile without reopening the whole brief.</p>
-              </Link>
-            </div>
-            <Link href="/decide/ship-checklist" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
-              Start with a checker
-            </Link>
-          </article>
+
           <article id="guided-translation" className="weather-hub-card scroll-mt-28 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">I need this adapted for one team</p>
-            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner, function, or company stage still needs a tailored version.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Alternative: team translation</p>
+            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner or stage still needs a tailored version.</p>
             <div className="grid gap-2">
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
@@ -150,29 +170,6 @@ export default async function DecidePage() {
             <Link href="/guides" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
               Open role translations
             </Link>
-          </article>
-        </div>
-      </HubSection>
-
-      <HubSection
-        id="current-call"
-        title="Current weekly call"
-        description="Keep the live brief visible while you choose a single next path."
-        className="scroll-mt-28"
-      >
-        <div className="weather-page-grid-3">
-          <article className="weather-hub-card space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Posture</p>
-            <p className="text-sm font-semibold text-slate-100">{liveCall.posture}</p>
-          </article>
-          <article className="weather-hub-card space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Action now</p>
-            <p className="text-sm text-slate-200">{liveCall.action}</p>
-          </article>
-          <article className="weather-hub-card space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Guardrail and flip</p>
-            <p className="text-sm text-slate-200">{liveCall.guardrail}</p>
-            <p className="text-xs text-slate-400">Flip: {liveCall.flip}</p>
           </article>
         </div>
       </HubSection>

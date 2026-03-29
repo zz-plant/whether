@@ -6,8 +6,10 @@ import { StreamedSectionReveal } from "../streamedSectionReveal";
 import { HomeWorkspaceBands } from "./homeWorkspaceBands";
 import { HomeInterpretationPanel } from "../homeInterpretationPanel";
 import { LiveDataFallbackAlert } from "../liveDataFallbackAlert";
+import { ReturningVisitorDeltaStrip } from "../changeSinceLastReadPanel";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
 
 type ArtifactActionsProps = {
   artifactPayloadPromise: Promise<ArtifactPayload | null>;
@@ -44,24 +46,41 @@ export const HomeWhatChangedSection = ({
   interpretationSearchParams,
   leadershipArtifactPayloadPromise,
   fallbackActive,
+  assessment,
+  recordDate,
 }: {
   weeklyDecisionCardModel: HomePageAssembly["weeklyDecisionCardModel"];
   interpretationSearchParams?: Record<string, string | undefined>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
+  assessment: RegimeAssessment;
+  recordDate: string;
 }) => (
-  <WeeklyDecisionCard
-    model={weeklyDecisionCardModel}
-    searchParams={interpretationSearchParams}
-    actions={(
-      <Suspense fallback={<ArtifactActionsFallback />}>
-        <LeadershipArtifactActions
-          artifactPayloadPromise={leadershipArtifactPayloadPromise}
-          fallbackActive={fallbackActive}
-        />
-      </Suspense>
-    )}
-  />
+  <>
+    <ReturningVisitorDeltaStrip
+      assessment={assessment}
+      recordDate={recordDate}
+      impactLinks={[
+        { label: "Current call", href: "#weekly-call-core", metric: "tightness" },
+        { label: "Planning", href: "#approve-this-weeks-plan", metric: "riskAppetite" },
+        { label: "Evidence", href: "#deep-evidence", metric: "baseRate" },
+      ]}
+      openPanelHref="#weekly-call-core"
+      openPanelLabel="Open current call"
+    />
+    <WeeklyDecisionCard
+      model={weeklyDecisionCardModel}
+      searchParams={interpretationSearchParams}
+      actions={(
+        <Suspense fallback={<ArtifactActionsFallback />}>
+          <LeadershipArtifactActions
+            artifactPayloadPromise={leadershipArtifactPayloadPromise}
+            fallbackActive={fallbackActive}
+          />
+        </Suspense>
+      )}
+    />
+  </>
 );
 
 export const HomeDecisionSection = ({

@@ -6,17 +6,17 @@ This backlog tracks the six mobile-first improvements. P0/P1 items are now imple
 
 If we only pick three areas for the next UX/design cycle, prioritize these:
 
-1. **Returning-visitor delta layer (what changed since last review)**
-   - Why rethink: repeat visitors need immediate signal change detection; current flow still requires scanning multiple sections.
-   - Rethink direction: make the delta strip the first content block on return visits, with impact-coded tags and one-tap jump links to changed sections.
+1. **Decision Tools chooser compression**
+   - Why rethink: `/decide` is clearer than before, but advanced browse paths still compete with the recommended path when a user only needs one next move.
+   - Rethink direction: keep one recommended path primary, keep alternatives secondary, and push the full library behind explicit browse intent.
 
-2. **Context-preserving mobile navigation model**
-   - Why rethink: section chips solve basic jumps, but long reports still create orientation loss once users scroll deeply or open nested panels.
-   - Rethink direction: add a compact progress + breadcrumb state (e.g., "3/7 · Execution") and keep chip labels decision-oriented rather than document-oriented.
+2. **Planning state board**
+   - Why rethink: Planning now routes better, but the handoff still leans on sentence summaries where owner/state cues could do more work.
+   - Rethink direction: push further toward owner, status, and reopen-signal cards before adding more explanatory copy.
 
-3. **First-screen rewrite for “decision in 5 seconds” clarity**
-   - Why rethink: this panel improved first-read clarity, but it can still over-index on narrative versus explicit recommended action confidence.
-   - Rethink direction: tighten to a stricter decision card format: posture, confidence score, one primary action, one fallback action, and explicit time horizon.
+3. **Stable-state trust compression**
+   - Why rethink: degraded weeks need the full control layout, but stable weeks still spend too much space on trust mechanics.
+   - Rethink direction: keep a compact readiness summary by default and reveal detailed trust controls only when challenged or degraded.
 
 ## Priority definitions
 - **P0 (High / immediate):** fixes first-visit blockers that prevent comprehension or action.
@@ -43,11 +43,11 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
 
 5. **P1 — Context-preserving mobile navigation model** ✅ Implemented
    - Added top-of-page mobile section jump chips with URL-hash state.
-   - Highlighted active section chip based on current hash for return/context continuity.
+   - Added compact workflow progress state (`step / total`) so long report routes preserve sequence context while scrolling.
 
-6. **P2 — Returning-visitor delta layer (what changed since last visit)** ⏳ Pending
-   - Add a dedicated “Since your last review” strip with only decision-relevant changes.
-   - Label updates by impact level and collapse unchanged content by default.
+6. **P2 — Returning-visitor delta layer (what changed since last visit)** ✅ Implemented
+   - Added a dedicated “Since your last review” strip with decision-relevant impact tags and jump links.
+   - The strip only appears when a prior snapshot exists and the current read changed.
 
 ## Added design standard: dense evidence mode (dashboard)
 

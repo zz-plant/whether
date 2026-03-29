@@ -4,6 +4,16 @@ import type { HomePageWorkspaceModel } from "../../../../lib/report/homePageAsse
 import { BoltIcon, CheckIcon, DocumentIcon, ShieldIcon } from "../../uiIcons";
 import { CardEyebrow, HomeBandHeader } from "./primitives";
 
+const ownerLabelByKey: Record<string, string> = {
+  "investment-pace": "CFO",
+  "risk-tolerance": "CEO / Finance",
+  hiring: "CEO",
+  "product-tempo": "CPO",
+  "capital-raising": "CEO / Finance",
+  "burn-discipline": "CFO",
+  "expansion-bets": "CEO",
+};
+
 export function OperationsBandSection({ workspaceModel }: { workspaceModel: HomePageWorkspaceModel }) {
   const financeSnapshot = workspaceModel.operations.financeSnapshot[0];
   const reopenItems = workspaceModel.operations.financeSnapshot.slice(0, 2);
@@ -36,15 +46,28 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
 
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <section className="rounded-xl border border-emerald-400/20 bg-emerald-500/8 px-3 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Commit now</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Commit now</p>
+              <span className="rounded-full border border-emerald-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
+                Approve now
+              </span>
+            </div>
             <div className="mt-3 space-y-2">
               <article className="rounded-lg border border-emerald-400/20 bg-slate-950/45 px-2.5 py-2">
-                <p className="text-xs font-semibold text-slate-100">Weekly call</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold text-slate-100">Weekly call</p>
+                  <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">Owner Leadership</span>
+                </div>
                 <p className="mt-1 text-xs leading-5 text-slate-300">{workspaceModel.operations.approvalHeadline}</p>
               </article>
               {financeSnapshot ? (
                 <article className="rounded-lg border border-emerald-400/20 bg-slate-950/45 px-2.5 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{financeSnapshot.label}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-slate-100">{financeSnapshot.label}</p>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">
+                      Owner {ownerLabelByKey[financeSnapshot.key] ?? "Finance"}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs leading-5 text-slate-300">{financeSnapshot.actionNow}</p>
                 </article>
               ) : null}
@@ -52,11 +75,21 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           </section>
 
           <section className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Hold line</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
+              <span className="rounded-full border border-amber-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-100">
+                Keep active
+              </span>
+            </div>
             <div className="mt-3 space-y-2">
               {workspaceModel.operations.topGuardrails.slice(0, 3).map((guardrail) => (
                 <article key={guardrail.key} className="rounded-lg border border-amber-400/20 bg-slate-950/45 px-2.5 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{guardrail.label}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-slate-100">{guardrail.label}</p>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">
+                      Owner {ownerLabelByKey[guardrail.key] ?? "Operator"}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs leading-5 text-slate-300">{guardrail.detail}</p>
                 </article>
               ))}
@@ -64,11 +97,21 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           </section>
 
           <section className="rounded-xl border border-sky-400/20 bg-sky-500/8 px-3 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Reopen when</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Change course if</p>
+              <span className="rounded-full border border-sky-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
+                Watch
+              </span>
+            </div>
             <div className="mt-3 space-y-2">
               {reopenItems.length > 0 ? reopenItems.map((item) => (
                 <article key={item.key} className="rounded-lg border border-sky-400/20 bg-slate-950/45 px-2.5 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{item.label}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-slate-100">{item.label}</p>
+                    <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">
+                      Owner {ownerLabelByKey[item.key] ?? "Leadership"}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs leading-5 text-slate-300">{item.reversalCondition}</p>
                 </article>
               )) : (
