@@ -43,6 +43,9 @@ shows posture, trend, confidence, and flip-window context, and the canonical wee
 once below it with explicit `Action now`, `Pause if`, and `Change course if` fields. The share rail
 now keeps the weekly operator brief and short snapshot as the only default-scan actions, while board
 packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
+The Weekly Brief now also includes a lightweight translation router so users can jump straight to
+the kind of help they need: evidence, decision, trust, or share translation. Section-level help
+panels persist by literacy type instead of forcing one global simplified mode for every user.
 The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share-ready artifact -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
@@ -81,6 +84,14 @@ Advanced controls remain available for threshold tuning and diagnostics expansio
 replay is no longer treated as an expert-only action.
 The entry sequence now opens with a compact `what this means now` summary before the denser
 diagnostic stack so cold visitors get the operating implication before the appendix depth.
+`/signals` now also supports two explicit evidence modes:
+- `What this means now` for action-first implication reading and compact scorecards
+- `Evidence detail` for prioritized diagnostics, replay, threshold tuning, and advanced controls
+
+The section navigation now follows the active evidence mode so implication-first visitors are not
+routed toward hidden detail-only sections. The top summary also includes persisted evidence and
+trust translation helpers for first-use definitions of `tightness`, `risk appetite`, `curve slope`,
+`confidence`, and `freshness`.
 
 ### 1.3 Planning overview (/operations)
 Planning is the detailed execution depth page for the home workspace. The default surface is a
@@ -95,6 +106,10 @@ Planning handoff also now uses a more stateful board treatment with explicit own
 and change-course cues instead of sentence-only summaries. Existing
 hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
 implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
+`/operations` now exposes the same mixed-literacy translation model as the Weekly Brief: a
+top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
+assist panels explain only the planning layer the user needs. The execution stepper itself now shows
+owner, approval state, and `reopen when` metadata on both the active step and collapsed summaries.
 
 ### 1.4 Planning workstreams
 - **Weekly plan** (`/operations`): the default execution

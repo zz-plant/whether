@@ -32,6 +32,7 @@ import { OperationsExecutionStepper } from "./components/operationsExecutionStep
 import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
+import { LiteracyAssistRouter, PersistedAssistPanel } from "../components/literacyAssistControls";
 
 
 export const runtime = "edge";
@@ -169,6 +170,19 @@ export default async function OperationsPage({
     resourceSupportingPages.quarterlyCapitalPostureMemoExample,
     resourceSupportingPages.decisionShieldOverview,
   ] as const;
+  const buildAssistHref = (assist: "decision" | "evidence" | "trust" | "share", hash: string) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "assist") {
+          params.set(key, value);
+        }
+      });
+    }
+    params.set("assist", assist);
+    const query = params.toString();
+    return query ? `/operations?${query}${hash}` : `/operations${hash}`;
+  };
 
   return (
     <ReportShell
@@ -239,6 +253,17 @@ export default async function OperationsPage({
         items={operationsScrollPlan.items}
       />
 
+      <LiteracyAssistRouter
+        title="What do you need translated in Planning?"
+        description="Open the planning layer that matches your gap instead of reading every section at full density."
+        targets={{
+          decision: { href: buildAssistHref("decision", "#ops-monthly-action-summary") },
+          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
+          trust: { href: buildAssistHref("trust", "#ops-finance-strategy") },
+          share: { href: buildAssistHref("share", "#ops-export-briefs") },
+        }}
+      />
+
       {!historicalSelection && isFallback ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}
@@ -248,6 +273,46 @@ export default async function OperationsPage({
         />
       ) : null}
 
+      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Planning translation help">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Planning help</p>
+          <h2 className="text-base font-semibold text-slate-100">Translate the plan only where you need support.</h2>
+          <p className="text-sm text-slate-300">These helpers persist by section, so you can keep Planning dense where you are already fluent.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <PersistedAssistPanel
+            assistMode="decision"
+            buttonLabel="Translate this plan"
+            title="How to read the weekly planning flow"
+            summary="Use this when you understand the weekly call but need the execution review translated into concrete approvals."
+          >
+            <p><span className="font-semibold text-slate-50">Weekly plan</span> = what to approve or hold for team pace and priority changes this week.</p>
+            <p><span className="font-semibold text-slate-50">Guardrails</span> = the limits that should pause new work before it becomes hard to reverse.</p>
+            <p><span className="font-semibold text-slate-50">Finance strategy</span> = the cash and budget posture that should stay aligned with the current call.</p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="trust"
+            buttonLabel="Translate approval readiness"
+            title="How to read owner and approval state"
+            summary="Use this when the work is clear but you need a faster answer to whether the plan is ready to circulate."
+          >
+            <p><span className="font-semibold text-slate-50">Owner</span> = the function that should drive the step to completion.</p>
+            <p><span className="font-semibold text-slate-50">Approval state</span> = the minimum outcome this step should reach before you move on.</p>
+            <p><span className="font-semibold text-slate-50">Reopen when</span> = the signal that sends you back into this step even after approval.</p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="share"
+            buttonLabel="Translate the final brief"
+            title="How to choose the share format"
+            summary="Use this when Planning is approved and you only need the right artifact for the room."
+          >
+            <p><span className="font-semibold text-slate-50">Operator brief</span> = the default terse artifact for leaders who already know the framework.</p>
+            <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with one-line term translation for mixed-literacy audiences.</p>
+            <p><span className="font-semibold text-slate-50">Board and governance artifacts</span> = secondary packaging when the default weekly brief is not enough.</p>
+          </PersistedAssistPanel>
+        </div>
+      </section>
+
       <OperationsExecutionStepper
         steps={[
           {
@@ -256,6 +321,9 @@ export default async function OperationsPage({
             title: "Weekly plan",
             description: "Read this before changing team pace, spend, or priorities.",
             summary: "Confirm what you should approve, hold, or revisit for this cycle.",
+            owner: "CEO / COO",
+            approvalStatus: "Approve this week's plan",
+            changeSignal: "The current call or priority posture changes",
             hashAliases: ["ops-monthly-action-summary-panel"],
             children: (
               <SectionedReportPanel
@@ -280,6 +348,9 @@ export default async function OperationsPage({
             title: "Guardrails",
             description: "Use start, stop, and fence rules before you commit new work.",
             summary: "Apply the top guardrails before approving new commitments.",
+            owner: "Function leads",
+            approvalStatus: "Set pause conditions",
+            changeSignal: "A pause-if or change-course condition is hit",
             hashAliases: ["ops-playbook-panel"],
             children: (
               <SectionedReportPanel
@@ -321,6 +392,9 @@ export default async function OperationsPage({
             title: "Finance strategy",
             description: "Budget posture and cash timing guidance for the quarter.",
             summary: "Validate runway timing and budget posture before sharing the brief.",
+            owner: "CFO / finance lead",
+            approvalStatus: "Validate cash posture",
+            changeSignal: "Runway assumptions or financing windows move",
             hashAliases: ["ops-finance-strategy-panel"],
             children: (
               <SectionedReportPanel
@@ -345,6 +419,9 @@ export default async function OperationsPage({
             title: "Share brief",
             description: "Copy-ready narratives for leadership updates and stakeholder syncs.",
             summary: "Copy or export the aligned brief after plan and finance review are complete.",
+            owner: "Chief of staff / exec comms",
+            approvalStatus: "Ready to circulate",
+            changeSignal: "The room needs an explainer or governance pack",
             hashAliases: ["ops-export-briefs-panel", "ops-operator-requests", "ops-operator-requests-panel"],
             children: (
               <div className="space-y-6">

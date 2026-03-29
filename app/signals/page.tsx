@@ -24,6 +24,7 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
+import { PersistedAssistPanel } from "../components/literacyAssistControls";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -193,17 +194,13 @@ export default async function SignalsPage({
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
   type FocusTab = (typeof focusTabs)[number];
+  type SignalsView = "implication" | "detail";
   const requestedFocus = resolvedSearchParams?.focus;
+  const activeSignalsView: SignalsView = resolvedSearchParams?.signalsView === "detail" ? "detail" : "implication";
   const activeFocus: FocusTab =
     requestedFocus && focusTabs.includes(requestedFocus as FocusTab)
       ? (requestedFocus as FocusTab)
       : "all";
-  const sectionLinks = [
-    { href: "#decision-summary", label: "Decision summary" },
-    { href: "#evidence-priorities", label: "Evidence priorities" },
-    { href: "#current-scores", label: "Current scores" },
-    { href: "#thresholds", label: "Thresholds" },
-  ];
   const buildAdvancedHref = (advanced: boolean) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -235,6 +232,33 @@ export default async function SignalsPage({
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
   };
+  const buildSignalsViewHref = (view: SignalsView) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "signalsView") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (view === "detail") {
+      params.set("signalsView", "detail");
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}` : "/signals";
+  };
+  const sectionLinks =
+    activeSignalsView === "detail"
+      ? [
+          { href: "#decision-summary", label: "Decision summary" },
+          { href: "#evidence-priorities", label: "Evidence priorities" },
+          { href: "#current-scores", label: "Current scores" },
+          { href: "#advanced-controls", label: "Advanced controls" },
+        ]
+      : [
+          { href: "#decision-summary", label: "What this means now" },
+          { href: "#current-scores", label: "Current scores" },
+        ];
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
       { label: "Tightness", why: "How hard current conditions make new long-payback commitments", href: "#current-scores" },
@@ -326,8 +350,8 @@ export default async function SignalsPage({
       currentPath="/signals"
       pageSummary="See what changed underneath the weekly call: drivers, thresholds, freshness, and replay."
       pageSummaryLink={{
-        href: "#thresholds",
-        label: "Open evidence path ↓",
+        href: activeSignalsView === "detail" ? "#evidence-priorities" : "#decision-summary",
+        label: activeSignalsView === "detail" ? "Open evidence path ↓" : "Open implication summary ↓",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -381,6 +405,37 @@ export default async function SignalsPage({
         items={signalsScrollPlan.items}
       />
 
+      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Signals view mode">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Evidence mode</p>
+          <h2 className="text-base font-semibold text-slate-100">Choose whether you need implication or full evidence depth.</h2>
+          <p className="text-sm text-slate-300">Start with the operating implication. Open detail mode only when you need the full diagnostic appendix, replay, or threshold audit.</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {([
+            { id: "implication", label: "What this means now", detail: "Default action-first read with just enough scorecard context to confirm the weekly call." },
+            { id: "detail", label: "Evidence detail", detail: "Full diagnostics, historical replay, and advanced controls for deeper validation." },
+          ] as const).map((item) => {
+            const active = item.id === activeSignalsView;
+            return (
+              <a
+                key={item.id}
+                href={buildSignalsViewHref(item.id)}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-xl border px-3 py-3 text-left transition-colors ${
+                  active
+                    ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
+                    : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">{item.label}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-300">{item.detail}</p>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
       <ReturningVisitorDeltaStrip
         assessment={assessment}
         recordDate={treasury.record_date}
@@ -400,6 +455,28 @@ export default async function SignalsPage({
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
           {decisionDeltaLabel}
         </p>
+        <div className="flex flex-wrap gap-2">
+          <PersistedAssistPanel
+            assistMode="evidence"
+            buttonLabel="Translate the signals"
+            title="How to read the three main evidence terms"
+            summary="Use this when you want the diagnostic layer translated into plain operating language before you open the full appendix."
+          >
+            <p><span className="font-semibold text-slate-50">Tightness</span> = how hard conditions make new long-payback commitments.</p>
+            <p><span className="font-semibold text-slate-50">Risk appetite</span> = how willing markets are to fund faster expansion and risk.</p>
+            <p><span className="font-semibold text-slate-50">Curve slope</span> = an early read on whether the current posture is likely to persist or deteriorate.</p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="trust"
+            buttonLabel="Translate reliability"
+            title="How to read freshness and confidence"
+            summary="Use this when the evidence is not the problem, but you need to know whether it is safe to rely on right now."
+          >
+            <p><span className="font-semibold text-slate-50">Confidence</span> = how far the current read sits from the nearest flip threshold.</p>
+            <p><span className="font-semibold text-slate-50">Freshness</span> = when the underlying inputs last refreshed.</p>
+            <p>If either degrades, keep decisions reversible even if the current call still looks directionally right.</p>
+          </PersistedAssistPanel>
+        </div>
         <article className="weather-surface space-y-3 p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">What this means now</p>
           <div className="grid gap-3 lg:grid-cols-3">
@@ -503,7 +580,7 @@ export default async function SignalsPage({
           </article>
         </div>
       </section>
-
+      {activeSignalsView === "detail" ? (
       <section id="historical-replay" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Historical regime replay</p>
@@ -516,6 +593,7 @@ export default async function SignalsPage({
         </header>
         <HistoricalReplayDatePicker initialDate={`${selectedYear}-${String(selectedMonth).padStart(2, "0")}-01`} />
       </section>
+      ) : null}
 
       <section id="current-scores" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
         <header className="space-y-2">
@@ -545,7 +623,23 @@ export default async function SignalsPage({
           ))}
         </div>
       </section>
+      {activeSignalsView === "implication" ? (
+        <section className="weather-panel space-y-3 px-6 py-5">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Need more proof?</p>
+            <h2 className="text-lg font-semibold text-slate-100">Open the full evidence appendix only when this call still needs defending.</h2>
+            <p className="text-sm text-slate-300">Detail mode adds prioritized diagnostics, historical replay, threshold tuning, and advanced filters. Use it when the room asks “why?” or “what would change this?”</p>
+          </div>
+          <a
+            href={buildSignalsViewHref("detail") + "#evidence-priorities"}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+          >
+            Open evidence detail
+          </a>
+        </section>
+      ) : null}
 
+      {activeSignalsView === "detail" ? (
       <section id="evidence-priorities" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Evidence priorities</p>
@@ -601,7 +695,9 @@ export default async function SignalsPage({
           </details>
         ) : null}
       </section>
+      ) : null}
 
+      {activeSignalsView === "detail" ? (
       <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -641,7 +737,9 @@ export default async function SignalsPage({
           />
         ) : null}
       </section>
+      ) : null}
 
+      {activeSignalsView === "detail" ? (
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
         <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="space-y-3">
@@ -674,8 +772,9 @@ export default async function SignalsPage({
           </div>
         </div>
       </section>
+      ) : null}
 
-      {showAdvanced && AdvancedThresholdsSection && TimeMachinePanel && RegimeTimelinePanel && summaryArchive ? (
+      {activeSignalsView === "detail" && showAdvanced && AdvancedThresholdsSection && TimeMachinePanel && RegimeTimelinePanel && summaryArchive ? (
         <>
           <AdvancedThresholdsSection
             currentThresholds={assessment.thresholds}

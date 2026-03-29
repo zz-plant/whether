@@ -26,6 +26,7 @@ import {
   buildWeeklyCitationMetaLine,
   buildTrustMarker,
 } from "../../lib/report/trustStatus";
+import { PersistedAssistPanel } from "./literacyAssistControls";
 
 /**
  * Loop stage owner: presentation/artifact.
@@ -288,16 +289,23 @@ function DecisionTransmissionRail({
   actions,
 }: DecisionTransmissionRailProps) {
   return (
-    <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
+    <article id="share-ready-artifact" className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
       <div className="flex items-center justify-between gap-3">
         <h2 className={tierOneHeading}>Transmit this call</h2>
         <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
           Share-ready
         </span>
       </div>
-      <p className="text-xs leading-5 text-slate-300">
-        Default handoff: copy the weekly operator brief once the team agrees on the call. Use the short snapshot for chat, and keep board-specific versions secondary.
-      </p>
+      <PersistedAssistPanel
+        assistMode="share"
+        buttonLabel="Translate for sharing"
+        title="Which artifact should you use?"
+        summary="Use the shortest artifact that still fits the audience. The point is to keep the call aligned, not to over-package it."
+      >
+        <p><span className="font-semibold text-slate-50">Operator brief</span> = the default handoff for leadership alignment and weekly execution.</p>
+        <p><span className="font-semibold text-slate-50">Explainer brief</span> = use when the recipient needs the rationale and plain-English signal translation, not just the call.</p>
+        <p><span className="font-semibold text-slate-50">Snapshot</span> = short chat context when the room already understands the weekly call.</p>
+      </PersistedAssistPanel>
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact preview</p>

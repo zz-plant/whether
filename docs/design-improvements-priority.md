@@ -48,6 +48,13 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
 6. **P2 — Returning-visitor delta layer (what changed since last visit)** ✅ Implemented
    - Added a dedicated “Since your last review” strip with decision-relevant impact tags and jump links.
    - The strip only appears when a prior snapshot exists and the current read changed.
+   - The strip now also adapts its framing and jump targets to the user’s saved literacy focus so it behaves more like “what changed for me,” not just “what changed globally.”
+
+7. **P0/P1 — Mixed-literacy translation support across core routes** ✅ Implemented
+   - Added a lightweight “what do you need translated?” router on the Weekly Brief and Decision Tools, then extended the same selective-assistance model into Planning.
+   - Added persisted section-level translation helpers for evidence, decision, trust, and sharing instead of one global beginner mode.
+   - Added `Operator brief` and `Explainer brief` share modes so artifact density can match the audience.
+   - Split Evidence into `What this means now` and `Evidence detail` so action-first users are not dropped into the full appendix by default.
 
 ## Added design standard: dense evidence mode (dashboard)
 

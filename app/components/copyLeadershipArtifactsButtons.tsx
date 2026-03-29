@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, type ButtonHTMLAttributes } from "react";
+import { useEffect, useState, type ButtonHTMLAttributes } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
+import { artifactModeLabels, literacyAssistStorageKeys, type ArtifactMode } from "../../lib/literacyAssist";
 
 type PrimaryActionType = "copy_weekly_brief";
 
 type CopyTarget =
   | "Board snippet"
   | "Meeting pack"
+  | "Explainer brief"
   | "Weekly call snapshot"
   | "Weekly operator brief"
   | "Board"
@@ -68,6 +70,7 @@ export function CopyLeadershipArtifactsButtons({
   fallbackActive?: boolean;
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
+  const [artifactMode, setArtifactMode] = useState<ArtifactMode>("operator");
   const [overrideReason, setOverrideReason] = useState("");
   const [overrideIndicator, setOverrideIndicator] = useState("");
   const [overrideOwner, setOverrideOwner] = useState("");
@@ -90,7 +93,40 @@ export function CopyLeadershipArtifactsButtons({
     ? `OVERRIDE ACTIVE: ${overrideReason.trim()} · Indicator: ${overrideIndicator.trim()} · Owner: ${overrideOwner.trim()} · Reverse when: ${overrideReversal.trim()}`
     : "";
 
+  useEffect(() => {
+    try {
+      const storedMode = window.localStorage.getItem(literacyAssistStorageKeys.artifactMode);
+      if (storedMode === "operator" || storedMode === "explainer") {
+        setArtifactMode(storedMode);
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+  }, []);
+
   const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
+  const explainerBriefContent = [
+    "EXPLAINER BRIEF",
+    "",
+    "What this call is saying",
+    applyOverride(boardSummary),
+    "",
+    "Plain-English guide",
+    "• Tightness = how hard conditions make new long-payback commitments.",
+    "• Risk appetite = how willing markets are to fund risk and faster expansion.",
+    "• Pause if = the threshold that should stop new commitments.",
+    "• Change course if = the signal that reopens this week’s call.",
+    "",
+    "Weekly operator brief",
+    applyOverride(weeklyOperatorBrief),
+    "",
+    "Citation",
+    citation,
+  ].join("\n");
+  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Weekly operator brief";
+  const primaryBriefContent = artifactMode === "explainer"
+    ? explainerBriefContent
+    : applyOverride(weeklyOperatorBrief);
 
   const meetingPackContent = [
     "BOARD SNIPPET",
@@ -130,12 +166,12 @@ export function CopyLeadershipArtifactsButtons({
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(applyOverride(weeklyOperatorBrief), "Weekly operator brief");
+            copyToClipboard(primaryBriefContent, primaryBriefTarget);
           }}
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel("Weekly operator brief", "Copy weekly operator brief")}
+          {copyLabel(primaryBriefTarget, `Copy ${artifactModeLabels[artifactMode].toLowerCase()}`)}
         </ActionButton>
         <ActionButton
           variant="secondary"
@@ -152,8 +188,33 @@ export function CopyLeadershipArtifactsButtons({
       </div>
 
       <p className="px-1 text-[11px] leading-5 text-slate-400">
-        Default share path: copy the weekly operator brief. Use the snapshot for short chat context; keep board variants and exception handling secondary.
+        Default share path: use the {artifactModeLabels[artifactMode].toLowerCase()}. Use the snapshot for short chat context; keep board variants and exception handling secondary.
       </p>
+      <div className="flex flex-wrap gap-2" aria-label="Artifact mode">
+        {(["operator", "explainer"] as const).map((mode) => {
+          const active = mode === artifactMode;
+          return (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                setArtifactMode(mode);
+                try {
+                  window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, mode);
+                } catch {
+                  // Ignore storage errors.
+                }
+              }}
+              aria-pressed={active}
+              className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                active ? "border-sky-300/80 text-slate-100" : "text-slate-300"
+              }`}
+            >
+              {artifactModeLabels[mode]}
+            </button>
+          );
+        })}
+      </div>
 
       <details className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
         <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">

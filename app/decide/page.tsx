@@ -12,6 +12,7 @@ import {
 } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
+import { LiteracyAssistRouter } from "../components/literacyAssistControls";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
@@ -100,6 +101,17 @@ export default async function DecidePage() {
             </ul>
           </div>
         )}
+      />
+
+      <LiteracyAssistRouter
+        title="What do you need translated before you commit?"
+        description="Decision Tools can answer four different kinds of gaps. Pick the one that matches your missing literacy instead of browsing the whole library first."
+        targets={{
+          decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
+          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
+          trust: { href: "/method?assist=trust" },
+          share: { href: "/operations?assist=share#ops-export-briefs" },
+        }}
       />
 
       <HubSection

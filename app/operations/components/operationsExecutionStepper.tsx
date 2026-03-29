@@ -8,6 +8,9 @@ type OperationsExecutionStep = {
   title: string;
   description: string;
   summary: string;
+  owner: string;
+  approvalStatus: string;
+  changeSignal: string;
   hashAliases?: string[];
   children: ReactNode;
 };
@@ -76,6 +79,7 @@ export function OperationsExecutionStepper({
         <div>
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Execution flow</p>
           <h2 className="text-sm font-semibold text-slate-100">Use Planning in one linear pass</h2>
+          <p className="mt-1 text-xs text-slate-300">Each step shows who owns it, what approval state it should reach, and what would reopen it.</p>
         </div>
         <ol className="grid gap-3 md:grid-cols-4">
           {steps.map((step, index) => {
@@ -106,6 +110,8 @@ export function OperationsExecutionStepper({
                   </span>
                   <span className="text-sm font-semibold tracking-[0.08em]">{step.title}</span>
                   <span className="text-xs text-slate-300">{stepStateLabel(index, activeIndex)}</span>
+                  <span className="text-[11px] text-slate-300">Owner: {step.owner}</span>
+                  <span className="text-[11px] text-slate-300">{step.approvalStatus}</span>
                 </button>
               </li>
             );
@@ -125,6 +131,17 @@ export function OperationsExecutionStepper({
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
                     <h3 className="text-lg font-semibold text-slate-100">{step.title}</h3>
                     <p className="text-sm text-slate-300">{step.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        Owner: {step.owner}
+                      </span>
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        {step.approvalStatus}
+                      </span>
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        Reopen when: {step.changeSignal}
+                      </span>
+                    </div>
                   </div>
                   <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100">
                     Current step
@@ -141,6 +158,17 @@ export function OperationsExecutionStepper({
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
                 <h3 className="text-base font-semibold text-slate-100">{step.title}</h3>
                 <p className="text-sm text-slate-300">{step.summary}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                    Owner: {step.owner}
+                  </span>
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                    {step.approvalStatus}
+                  </span>
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                    Reopen when: {step.changeSignal}
+                  </span>
+                </div>
               </div>
               <button
                 type="button"

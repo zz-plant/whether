@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import { PersistedAssistPanel } from "./literacyAssistControls";
 
 type PolicyDetails = {
   summary: string;
@@ -127,13 +128,35 @@ export function WeeklyCallModePanel({
             </div>
           </div>
           {glossaryHref ? (
-            <p className="mt-2 text-xs leading-5 text-slate-300">
-              New to terms like <span className="font-semibold text-slate-100">tightness</span>, <span className="font-semibold text-slate-100">risk appetite</span>, or <span className="font-semibold text-slate-100">flip condition</span>?{" "}
-              <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                Open plain-English help
-              </Link>
-              .
-            </p>
+            <div className="mt-2 space-y-2">
+              <PersistedAssistPanel
+                assistMode="decision"
+                buttonLabel="Translate this call"
+                title="How to read the current call"
+                summary="Use this when you understand the business context but need the macro terms converted into operating language."
+              >
+                <p><span className="font-semibold text-slate-50">Tightness</span> = how hard current conditions make new long-payback commitments.</p>
+                <p><span className="font-semibold text-slate-50">Risk appetite</span> = how willing markets are to fund faster expansion and risk.</p>
+                <p><span className="font-semibold text-slate-50">Action now / Pause if / Change course if</span> = the current move, the stop line, and the pre-committed signal that reopens the call.</p>
+                <p>
+                  Need the fuller glossary?{" "}
+                  <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                    Open plain-English help
+                  </Link>
+                  .
+                </p>
+              </PersistedAssistPanel>
+              <PersistedAssistPanel
+                assistMode="trust"
+                buttonLabel="Translate trust status"
+                title="How to use the trust state"
+                summary="Use this when you want to know whether this week’s call is safe to rely on now or should be treated cautiously."
+              >
+                <p><span className="font-semibold text-slate-50">Confidence</span> = how far the current read is from the nearest flip line.</p>
+                <p><span className="font-semibold text-slate-50">Freshness</span> = how recently the core inputs updated.</p>
+                <p><span className="font-semibold text-slate-50">Ready to use</span> means standard weekly approvals are reasonable; <span className="font-semibold text-slate-50">Use caution</span> means keep decisions reversible until confidence or freshness improves.</p>
+              </PersistedAssistPanel>
+            </div>
           ) : null}
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
