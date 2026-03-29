@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 
 type DecisionContractBlockProps = {
   call: string;
@@ -23,11 +24,11 @@ export function DecisionContractBlock({
     <section className="weather-panel space-y-3 px-6 py-6" aria-label="Decision contract">
       <h2 className="text-lg font-semibold text-slate-100">Decision contract</h2>
       <ul className="space-y-2 text-sm text-slate-200">
-        <li>• <span className="font-semibold text-slate-100">Call:</span> {call}</li>
-        <li>• <span className="font-semibold text-slate-100">Action:</span> {action}</li>
-        <li>• <span className="font-semibold text-slate-100">Threshold:</span> {threshold}</li>
-        <li>• <span className="font-semibold text-slate-100">Reversal:</span> {reversal}</li>
-        <li>• <span className="font-semibold text-slate-100">Evidence:</span> {evidence}</li>
+        <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {call}</li>
+        <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {action}</li>
+        <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {threshold}</li>
+        <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {reversal}</li>
+        <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.evidence}:</span> {evidence}</li>
       </ul>
       <Link href={handoffHref} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         Weekly-brief handoff: {handoffLabel}

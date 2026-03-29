@@ -7,6 +7,7 @@ import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
 import { decideCanonicalClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
 import { findDecisionScenario } from "../../../seoRouteClusters";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
+import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
 
 type Params = { slug: string; cluster: string };
 
@@ -96,10 +97,10 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Decision contract</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li>• <span className="font-semibold text-slate-100">Call:</span> {payload.currentCall}</li>
-          <li>• <span className="font-semibold text-slate-100">Action:</span> {payload.immediateAction}</li>
-          <li>• <span className="font-semibold text-slate-100">Threshold:</span> {payload.triggerThreshold}</li>
-          <li>• <span className="font-semibold text-slate-100">Reversal:</span> {payload.reversalCondition}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {payload.triggerThreshold}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {payload.reversalCondition}</li>
         </ul>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">

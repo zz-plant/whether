@@ -188,7 +188,7 @@ export default async function SignalsPage({
     ? "Historical snapshot for review only — switch to live data before approving new bets."
     : isFallback
       ? "Live update delayed — avoid irreversible decisions until signals refresh."
-      : "Decision check: use these deltas to confirm this week's call or revise it now.";
+      : "Use this evidence to confirm this week's call or change it now.";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
@@ -237,9 +237,9 @@ export default async function SignalsPage({
   };
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
-      { label: "Tightness", why: "Primary liquidity constraint for near-term execution", href: "#current-scores" },
-      { label: "Risk appetite", why: "Capital posture changes funding and launch tolerance", href: "#current-scores" },
-      { label: "Curve slope", why: "Forward growth signal to validate regime durability", href: "#current-scores" },
+      { label: "Tightness", why: "How hard current conditions make new long-payback commitments", href: "#current-scores" },
+      { label: "Risk appetite", why: "How willing markets are to fund risk and faster expansion", href: "#current-scores" },
+      { label: "Curve slope", why: "Early growth signal for whether this posture is likely to hold", href: "#current-scores" },
     ],
     growth: [
       { label: "Curve slope", why: "Best early growth stress read in current framework", href: "#current-scores" },
@@ -284,14 +284,14 @@ export default async function SignalsPage({
       label: "Tightness",
       value: `${assessment.scores.tightness}/100`,
       threshold: `${assessment.thresholds.tightnessRegime}/100`,
-      description: "Higher values indicate tighter funding conditions.",
+      description: "Higher values mean market conditions are less forgiving for new long-payback bets.",
       href: "#current-scores",
     },
     {
       label: "Risk appetite",
       value: `${assessment.scores.riskAppetite}/100`,
       threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
-      description: "Higher values indicate more risk-on market behavior.",
+      description: "Higher values mean markets are acting more willing to fund risk.",
       href: "#current-scores",
     },
     {
@@ -301,7 +301,7 @@ export default async function SignalsPage({
           ? "N/A"
           : `${assessment.scores.curveSlope.toFixed(2)}%`,
       threshold: "0.00%",
-      description: "10Y minus 2Y Treasury yield spread.",
+      description: "10Y minus 2Y Treasury yield spread, used here as a forward-looking growth read.",
       href: "#current-scores",
     },
   ];
@@ -324,7 +324,7 @@ export default async function SignalsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Evidence"
       currentPath="/signals"
-      pageSummary="Why the weekly call moved: drivers, thresholds, timestamps, and historical replay."
+      pageSummary="See what changed underneath the weekly call: drivers, thresholds, freshness, and replay."
       pageSummaryLink={{
         href: "#thresholds",
         label: "Open evidence path ↓",

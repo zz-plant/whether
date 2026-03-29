@@ -68,15 +68,15 @@ export const WeeklyActionSummaryPanel = ({
 
         <div className="grid gap-2 md:grid-cols-3">
           <article className="weather-surface rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Action now</p>
             <p className="mt-1 text-sm text-slate-100">{actionGuidance}</p>
           </article>
           <article className="weather-surface rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Pause if</p>
             <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
           </article>
           <article className="weather-surface rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Change course if</p>
             <p className="mt-1 text-sm text-slate-100">{flipCondition}</p>
           </article>
         </div>
@@ -214,7 +214,7 @@ export const ExecutiveSnapshotPanel = ({
                 <p className="mt-1 text-xs font-semibold text-slate-100">{weeklyLockCommitment.currentCall}</p>
               </article>
               <article className="rounded-md border border-sky-500/45 bg-sky-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip conditions</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Change-course signals</p>
                 <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-slate-100">
                   {weeklyLockCommitment.flipConditions.map((condition) => (
                     <li key={condition}>{condition}</li>

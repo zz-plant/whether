@@ -10,6 +10,14 @@ export type DecisionPhraseTriplet = {
   reversal: string;
 };
 
+export const publicDecisionLabels = {
+  call: "Current call",
+  action: "Action now",
+  threshold: "Pause if",
+  reversal: "Change course if",
+  evidence: "Evidence",
+} as const;
+
 export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
   threshold: "Pause if thresholds weaken",

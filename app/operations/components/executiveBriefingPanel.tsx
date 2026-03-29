@@ -26,13 +26,13 @@ const buildExecutiveMemo = (
     "",
     `Summary: ${template.executiveSummary}`,
     "",
-    "Decision guardrails:",
+    "Pause-if checks:",
     ...template.decisionGuardrails.map((item) => `• ${item}`),
     "",
     "Decision templates:",
     ...template.decisionTemplates.map((item) => `• ${item}`),
     "",
-    "Reversal triggers:",
+    "Change-course signals:",
     ...template.reversalTriggers.map((item) => `• ${item}`),
   ].join("\n");
 };
@@ -43,11 +43,11 @@ const buildGuardrailChecklist = (
 ) => {
 
   if (!template) {
-    return "Guardrail checklist unavailable.";
+    return "Pause-if checklist unavailable.";
   }
 
   return [
-    `Guardrail Checklist — ${assessment.regime}`,
+    `Pause-if Checklist — ${assessment.regime}`,
     ...template.decisionGuardrails.map((item) => `• ${item}`),
   ].join("\n");
 };
@@ -55,7 +55,7 @@ const buildGuardrailChecklist = (
 const visualSections = [
   {
     key: "decisionGuardrails",
-    title: "Guardrails",
+    title: "Pause-if checks",
     subtitle: "Do this by default",
     badge: "Operate",
     icon: "🛡️",
@@ -71,7 +71,7 @@ const visualSections = [
   },
   {
     key: "reversalTriggers",
-    title: "Reversal triggers",
+    title: "Change-course signals",
     subtitle: "Evidence to pivot quickly",
     badge: "Watch",
     icon: "↩",
@@ -186,7 +186,7 @@ export const ExecutiveBriefingPanel = ({
               <div className="weather-surface p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    Guardrail checklist
+                    Pause-if checklist
                   </p>
                   <ClipboardActionRow
                     label="Copy checklist"

@@ -16,7 +16,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
-    helperSummary: "Use guides after reviewing the weekly brief to turn posture into role- and stage-specific calls.",
+    helperSummary: "Use guides after reviewing the weekly brief to adapt the call for one role or company stage.",
   },
   resources: {
     surfaceKey: "resources",
@@ -32,7 +32,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
-    helperSummary: "Use answers after the weekly brief for one-question, shareable downstream decision support.",
+    helperSummary: "Use answers after the weekly brief when one specific yes-or-no question still needs a shareable answer.",
   },
   concepts: {
     surfaceKey: "concepts",
@@ -40,6 +40,6 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/method",
     parentHubLabel: "Trust",
     returnCtaLabel: "Return to Trust",
-    helperSummary: "Use concepts after the weekly brief to pressure-test language and frameworks against current regime evidence.",
+    helperSummary: "Use concepts after the weekly brief to check whether a framework still holds under current evidence.",
   },
 };

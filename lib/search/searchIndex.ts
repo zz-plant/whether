@@ -49,7 +49,7 @@ export const searchPrimaryHubByJob: Record<SearchEntityJob, { href: SearchPrimar
   resolve: {
     href: "/decide",
     label: "Open Decision Tools",
-    summary: "Start with the edge-case hub when one bounded question still needs an answer.",
+    summary: "Start here when one team-specific question still needs an answer.",
   },
   risk: {
     href: "/method",

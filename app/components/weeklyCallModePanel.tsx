@@ -45,6 +45,7 @@ type WeeklyCallModePanelProps = {
   roleTranslations: RoleTranslation[];
   activeRole: RoleTranslation["id"];
   roleHrefs: Record<RoleTranslation["id"], string>;
+  glossaryHref?: string;
 };
 
 export function WeeklyCallModePanel({
@@ -77,6 +78,7 @@ export function WeeklyCallModePanel({
   roleTranslations,
   activeRole,
   roleHrefs,
+  glossaryHref,
 }: WeeklyCallModePanelProps) {
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
@@ -114,9 +116,9 @@ export function WeeklyCallModePanel({
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <h2 className={tierOneHeadingClassName}>Decision contract</h2>
+              <h2 className={tierOneHeadingClassName}>This week in one screen</h2>
               <p className="text-xs leading-5 text-slate-300">
-                Weekly baseline: posture, change, revisit, action, guardrail, flip.
+                Start here: what changed, whether to revisit decisions, what to do now, what to avoid, and what would change the call.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
@@ -124,6 +126,15 @@ export function WeeklyCallModePanel({
               <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
             </div>
           </div>
+          {glossaryHref ? (
+            <p className="mt-2 text-xs leading-5 text-slate-300">
+              New to terms like <span className="font-semibold text-slate-100">tightness</span>, <span className="font-semibold text-slate-100">risk appetite</span>, or <span className="font-semibold text-slate-100">flip condition</span>?{" "}
+              <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                Open plain-English help
+              </Link>
+              .
+            </p>
+          ) : null}
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
@@ -135,7 +146,7 @@ export function WeeklyCallModePanel({
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
             <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Posture read</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Current read</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{trendLabel} · {confidenceLabel} {Math.round(confidencePercent)}%</p>
             </article>
           </div>
@@ -149,14 +160,14 @@ export function WeeklyCallModePanel({
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail / pause if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition / change course if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
@@ -165,7 +176,7 @@ export function WeeklyCallModePanel({
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                <span className={needsTrustWarning ? "text-amber-100" : "text-emerald-100"}>{needsTrustWarning ? "Readiness watch" : "Readiness clear"}</span>
+                <span className={needsTrustWarning ? "text-amber-100" : "text-emerald-100"}>{needsTrustWarning ? "Use caution" : "Ready to use"}</span>
                 <span className={`rounded-full border px-2 py-0.5 ${trustToneClass}`}>{trustStateLabel}</span>
               </div>
               <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">As of {trustTimestamp}</p>
@@ -182,7 +193,7 @@ export function WeeklyCallModePanel({
           </summary>
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail detail</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this is the hold line</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {guardrailPolicyDetails.chips.map((chip) => (
@@ -198,7 +209,7 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip detail</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What would change the call</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">

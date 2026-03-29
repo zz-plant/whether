@@ -104,7 +104,7 @@ export default async function MethodPage() {
         }
       : {
           label: "Use cautiously before approving irreversible moves",
-          detail: "Trust is degraded enough that the current brief needs an explicit freshness and confidence check before you treat it as planning authority.",
+          detail: "Trust is degraded enough that the current brief needs an explicit freshness and confidence check before you rely on it for this week's decision.",
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
   const sectionLinks = [
@@ -127,7 +127,7 @@ export default async function MethodPage() {
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Freshness, confidence, source, and formula checks for defending the weekly call."
+      pageSummary="Check freshness, confidence, sources, and formulas before relying on the weekly call."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -142,7 +142,7 @@ export default async function MethodPage() {
       }}
       decisionBanner={{
         label: "Start here",
-        decision: "Validate freshness, confidence, and flip conditions before approving irreversible moves.",
+        decision: "Check freshness, confidence, and change-the-call triggers before approving irreversible moves.",
         horizon: "This week",
         confidence: trustSummary,
         effectiveDate: reportData.recordDateLabel,
@@ -150,7 +150,7 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Trust as a fast audit gate, then move back to the weekly brief or plan.",
+        call: "Use Trust as a quick reliability check, then move back to the weekly brief or plan.",
         doNow: [
           `Confirm freshness: ${reportData.fetchedAtLabel}.`,
           `Confirm confidence: ${confidenceLabel}.`,
@@ -169,7 +169,7 @@ export default async function MethodPage() {
           Trust audit hub
         </p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Trust the weekly call fast: confidence, freshness, and flip conditions.
+          Check whether this week&apos;s call is fresh, reliable, and safe to use.
         </h1>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
           Start with the verdict below, then run the short trust check only if someone still needs proof before acting on the brief.
@@ -205,7 +205,7 @@ export default async function MethodPage() {
             <p className="mt-2 text-xs text-slate-400">Latest refresh: {reportData.fetchedAtLabel}</p>
           </article>
           <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Decision boundary</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What would change the call</p>
             <p className="mt-2 text-sm text-slate-200">{reportData.flipThreshold}</p>
             <p className="mt-2 text-sm text-slate-300">{reportData.actionNowShort}</p>
           </article>
@@ -241,7 +241,7 @@ export default async function MethodPage() {
       >
         <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className="text-sm text-slate-200">
-            Use this section when reviewers ask how posture scoring works, which thresholds trigger pauses, and what would reverse the call.
+            Use this section when reviewers ask how the scoring works, what would make you pause, and what would change the call.
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
             <li>• Tie formula review to the current confidence and freshness labels before making irreversible decisions.</li>

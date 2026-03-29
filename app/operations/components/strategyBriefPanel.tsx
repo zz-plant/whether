@@ -32,7 +32,7 @@ const buildStrategyBrief = (
     "Watchlist:",
     ...template.watchlist.map((item) => `• ${item}`),
     "",
-    "Reversal triggers:",
+    "Change-course signals:",
     ...template.reversalTriggers.map((item) => `• ${item}`),
   ].join("\n");
 };
@@ -54,7 +54,7 @@ const strategySections = [
   },
   {
     key: "reversalTriggers",
-    title: "Pivot signals",
+    title: "Change-course signals",
     badge: "Trigger",
     icon: "↩",
     surfaceClass: "border-violet-400/35 bg-violet-500/10",

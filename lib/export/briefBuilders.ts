@@ -58,16 +58,16 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
 
   if (topActionStripItems.length > 0) {
     return topActionStripItems.flatMap((item) => [
-      `• Action: ${item.actionNow}`,
-      `• Trigger threshold: ${item.triggerThreshold}`,
-      `• Reversal condition: ${item.reversalCondition}`,
+      `• Action now: ${item.actionNow}`,
+      `• Pause if: ${item.triggerThreshold}`,
+      `• Change course if: ${item.reversalCondition}`,
     ]);
   }
 
   return [
-    `• Action: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
-    `• Trigger threshold: ${modeled.guardrailThreshold ?? assessment.constraints[1] ?? "Do not approve irreversible commitments without trigger confirmation."}`,
-    `• Reversal condition: ${modeled.reversalTrigger ?? assessment.constraints[2] ?? "Re-open approvals when confidence and trend stabilize."}`,
+    `• Action now: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
+    `• Pause if: ${modeled.guardrailThreshold ?? assessment.constraints[1] ?? "Do not approve irreversible commitments without trigger confirmation."}`,
+    `• Change course if: ${modeled.reversalTrigger ?? assessment.constraints[2] ?? "Re-open approvals when confidence and trend stabilize."}`,
   ];
 };
 
@@ -86,8 +86,8 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   const actionStrip = (modeled.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
     `• ${item.label}`,
     `  Action now: ${item.actionNow}`,
-    `  Trigger/threshold to tighten or loosen: ${item.triggerThreshold}`,
-    `  Reversal condition: ${item.reversalCondition}`,
+    `  Pause if: ${item.triggerThreshold}`,
+    `  Change course if: ${item.reversalCondition}`,
   ]);
 
   return [
@@ -98,7 +98,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• Distance to regime change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options?.transitionWatch ?? "OFF"}`,
     `• Current call: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
-    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Flip if: ${condition}`),
+    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Change course if: ${condition}`),
     `• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.`,
     ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
     `• Operating posture: ${modeled.operatingStanceLine}`,
@@ -220,7 +220,7 @@ export const buildSlackBrief = (
     "Macro signals:",
     ...macroLines,
     "",
-    "Bounded decision (action / trigger / reversal):",
+    "Bounded decision (action now / pause if / change course if):",
     ...decisionHighlights,
     "",
     "Constraints:",

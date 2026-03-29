@@ -14,7 +14,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         step="01"
         kicker="Planning"
         title="Open Planning next unless this week's call needs an exception review."
-        description="This is the default next move after the weekly brief: lock the operating line, hold line, and reopen conditions before you widen the workflow."
+        description="This is the default next move after the weekly brief: lock what to do now, what to avoid, and what would make you reopen the plan."
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Open Planning</span></Link>}

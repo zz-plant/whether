@@ -106,7 +106,7 @@ export default async function TeamContextPage({
           <p className="mt-1 text-slate-300">
             Action bias: <span className="font-semibold text-slate-100">{mandate.sectorOverlay.actionBias}</span>
             {" · "}
-            Flip condition: {mandate.sectorOverlay.reversalCondition}
+            Change course if: {mandate.sectorOverlay.reversalCondition}
           </p>
           {mandate.profileInterpretation.profileCompleteness === "partial" ? (
             <p className="mt-2 text-amber-200">Missing inputs defaulted: {mandate.profileInterpretation.fallbackFields.join(", ")}.</p>

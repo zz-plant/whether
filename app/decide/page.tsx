@@ -25,7 +25,7 @@ const featuredStakeholderSlugs = [
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Tools — resolve one remaining edge case",
-  description: "Resolve one owner-specific or situation-specific decision only after Weekly Brief and Planning leave a bounded question open.",
+  description: "Use role guides, direct answers, and quick checks when Weekly Brief and Planning leave one team-specific question open.",
   path: "/decide",
   imageAlt: "Whether decision tools",
   imagePath: "/social/decide.svg",
@@ -62,8 +62,8 @@ export default async function DecidePage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero
         eyebrow="Resolve the one question still blocking action"
-        title="Find the smallest decision aid that closes this week's remaining gap."
-        description="Use this page to get one direct answer, one bounded checker, or one role-specific translation tied to the live weekly call. If that closes the gap, stop here and execute."
+        title="Find the smallest help needed to close this week's last open question."
+        description="Use this page for one direct answer, one quick check before you commit, or one team-specific version of the weekly call. If that closes the gap, stop here and execute."
         actions={(
           <>
             <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Find my next path</Link>
@@ -107,7 +107,7 @@ export default async function DecidePage() {
           </article>
           <article className="weather-hub-card space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">I need a checker before committing</p>
-            <p className="text-sm text-slate-200">Use a bounded utility when you know the move but still need a go / wait / kill check before you commit.</p>
+            <p className="text-sm text-slate-200">Use a quick check when you know the likely move but still need a go / wait / kill read before you commit.</p>
             <div className="grid gap-2">
               <Link href="/decide/ship-checklist" className="weather-hub-link-card space-y-1">
                 <p className="text-sm font-semibold text-slate-100">Whether to ship checklist</p>
@@ -123,8 +123,8 @@ export default async function DecidePage() {
             </Link>
           </article>
           <article id="guided-translation" className="weather-hub-card scroll-mt-28 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">I need this translated for one team</p>
-            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner, function, or company stage still needs a tailored operating frame.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">I need this adapted for one team</p>
+            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner, function, or company stage still needs a tailored version.</p>
             <div className="grid gap-2">
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
@@ -179,7 +179,7 @@ export default async function DecidePage() {
 
       <details className="weather-panel scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open full edge-case library
+          Open all role, situation, and toolkit paths
         </summary>
         <div className="mt-4 space-y-6">
           <section className="space-y-3">
@@ -218,7 +218,7 @@ export default async function DecidePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Owner-specific paths</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Browse by team</h2>
             <div className="weather-page-grid-3">
               {useCaseRoles.map((role) => (
                 <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
@@ -227,7 +227,7 @@ export default async function DecidePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Situation-specific paths</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Browse by situation</h2>
             <div className="weather-page-grid-2">
               {situationUseCaseDefinitions.map((situation) => (
                 <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>

@@ -183,7 +183,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Approve the weekly operating plan, then confirm guardrails, finance posture, and the final aligned brief."
+      pageSummary="Turn the weekly call into this week's plan, then confirm guardrails, finance decisions, and the final brief."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open planning flow ↓" }}
       primaryCta={{
         href: "/",
@@ -207,7 +207,7 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Turn the weekly posture into a few explicit operating decisions and keep each move reversible.",
+        call: "Turn the weekly call into a few explicit decisions and keep each move reversible.",
         doNow: [
           actionNowShort,
           actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",

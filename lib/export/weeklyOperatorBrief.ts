@@ -102,9 +102,9 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   "Do now:",
   ...payload.doNowBullets.map((bullet) => `• ${bullet}`),
   "",
-  `Flip trigger: ${payload.flipTrigger}`,
+  `Change course if: ${payload.flipTrigger}`,
   ...(payload.flipConditionLabels.length > 0
-    ? ["", "Flip conditions:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+    ? ["", "Supporting change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
     : []),
 ].join("\n");
 

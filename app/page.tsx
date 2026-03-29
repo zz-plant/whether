@@ -55,7 +55,7 @@ export const HomePageReportContent = async ({
         },
         page: {
           pageTitle: "Weekly Brief",
-          pageSummary: "The canonical weekly call and share artifact. Open another surface only if evidence, planning, or trust still needs work.",
+          pageSummary: "This week's call, what to do now, and a share-ready summary. Open another surface only if you need proof, planning, or a trust check.",
           pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",
@@ -85,15 +85,15 @@ export const HomePageReportContent = async ({
         actions: {
           primaryCta: {
             href: "#approve-this-weeks-plan",
-            label: "Open planning handoff",
+            label: "Open next-step plan",
           },
           secondaryCta: {
             href: "#audit-this-call",
-            label: "Open evidence handoff",
+            label: "See supporting evidence",
           },
           nextStep: {
             href: "/operations",
-            description: "Open Planning next for approvals, guardrails, finance posture, and the final aligned brief",
+            description: "Open Planning next to approve this week's hiring, spending, roadmap, and finance moves",
           },
         },
         payloads: {

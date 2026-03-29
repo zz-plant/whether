@@ -29,7 +29,7 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Start with Action, Guardrail, and Flip condition, then use posture and regime-score context to pressure-test the call.",
+    detail: "Start with Action now, Pause if, and Change course if, then use posture and regime-score context to pressure-test the call.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
@@ -45,7 +45,7 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
-  { text: "Top fold leads with Action + Guardrail + Flip condition for fast operating decisions." },
+  { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
   { text: "Confidence and trend indicate pacing quality before score context." },
   { text: "Startup Climate Index remains available as contextual continuity metadata." },
 ];

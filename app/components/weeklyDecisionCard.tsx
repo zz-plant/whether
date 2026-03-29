@@ -296,7 +296,7 @@ function DecisionTransmissionRail({
         </span>
       </div>
       <p className="text-xs leading-5 text-slate-300">
-        Default handoff: copy the weekly operator brief once the call is aligned. Use the snapshot for short chat context; keep board variants and exceptions secondary.
+        Default handoff: copy the weekly operator brief once the team agrees on the call. Use the short snapshot for chat, and keep board-specific versions secondary.
       </p>
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
         <div className="flex items-center justify-between gap-3">
@@ -481,6 +481,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = decision;
   const {
     whyItMattersLine,
+    glossaryHref,
   } = presentation ?? {};
   const {
     regimeDistance,
@@ -689,6 +690,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             roleTranslations={roleTranslations}
             activeRole={activeRole}
             roleHrefs={roleHrefs}
+            glossaryHref={glossaryHref}
           />
         )}
         influenceSection={inputInfluence.length > 0 ? (

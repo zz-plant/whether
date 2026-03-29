@@ -57,9 +57,9 @@ export default async function ConfidencePage() {
 
       <SecondaryPageSection title="Bounded decision checks">
         <ul className="space-y-2 text-sm text-slate-200">
-          <li><span className="text-slate-400">Flip trigger:</span> {reportData.flipThreshold}</li>
-          <li><span className="text-slate-400">Pause trigger:</span> {reportData.guardrailThreshold}</li>
-          <li><span className="text-slate-400">Reversal condition:</span> Confidence returns to HIGH and shift watch turns OFF before expanding fixed-cost approvals.</li>
+          <li><span className="text-slate-400">Change course if:</span> {reportData.flipThreshold}</li>
+          <li><span className="text-slate-400">Pause if:</span> {reportData.guardrailThreshold}</li>
+          <li><span className="text-slate-400">Change course if confidence stays weak:</span> Confidence returns to HIGH and shift watch turns OFF before expanding fixed-cost approvals.</li>
           <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
         </ul>
       </SecondaryPageSection>

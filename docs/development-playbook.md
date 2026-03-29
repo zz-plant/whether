@@ -141,5 +141,7 @@ Use these canon terms across `/` and `/operations` unless a section is explicitl
 | Regime logic + score classification | `regime` | The score-derived classification (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`) and boundary math. | climate state, mode bucket |
 | Weekly operator recommendation copy | `posture` | The operating stance leaders should apply this week based on the current regime. | stance (as primary label), weather mode |
 | Macro context and supporting evidence | `environment` | External market conditions that inform confidence and pacing, not the call itself. | backdrop climate (as primary label) |
+| Public decision contract | `Current call` / `Action now` / `Pause if` / `Change course if` | The shared user-facing labels for the weekly decision, the immediate move, the hold line, and the reversal signal. | guardrail, flip condition, reversal trigger, threshold (as the primary scan label) |
 
 Rule: write `regime -> posture -> environment` in that order when all three appear together in one artifact.
+For decision artifacts, prefer `Current call -> Action now -> Pause if -> Change course if`.

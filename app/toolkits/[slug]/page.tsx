@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -48,11 +49,11 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Bounded operating rules</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li>• <span className="font-semibold text-slate-100">Tighten:</span> {toolkit.tightenNow}</li>
-          <li>• <span className="font-semibold text-slate-100">Loosen:</span> {toolkit.loosenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">Do now in tighter conditions:</span> {toolkit.tightenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">Do now in easier conditions:</span> {toolkit.loosenNow}</li>
           <li>• <span className="font-semibold text-slate-100">Proceed threshold:</span> {toolkit.proceedThreshold}</li>
-          <li>• <span className="font-semibold text-slate-100">Stop trigger:</span> {toolkit.stopTrigger}</li>
-          <li>• <span className="font-semibold text-slate-100">Reversal trigger:</span> {toolkit.reversalTrigger}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {toolkit.stopTrigger}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {toolkit.reversalTrigger}</li>
         </ul>
         <p className="text-sm text-slate-300"><span className="font-semibold">Posture split:</span> {toolkit.byPosture}</p>
         <p className="text-sm text-slate-300"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>

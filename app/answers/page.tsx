@@ -40,7 +40,7 @@ export default async function AnswersHubPage() {
       <SecondaryPageHeader
         eyebrow="One-question answer library"
         title="Get one direct answer tied to this week's call"
-        description={`Start with a featured answer below when you need one bounded operating answer fast. Each answer stays linked to the live weekly posture, immediate implication, and flip condition. Featured answers: ${featuredAnswerPages.length}.`}
+        description={`Start with a featured answer below when you need one bounded operating answer fast. Each answer stays linked to the live weekly posture, immediate implication, and change-course signal. Featured answers: ${featuredAnswerPages.length}.`}
         actions={(
           <>
             <ButtonLink href="#featured-answers" variant="primary">
@@ -68,7 +68,7 @@ export default async function AnswersHubPage() {
             <p className="mt-2 text-sm text-slate-200">{weeklyDecisionCardModel.decision.immediateDecision}</p>
           </article>
           <article className="weather-surface px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Flip condition</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Change course if</p>
             <p className="mt-2 text-sm text-slate-200">{weeklyDecisionCardModel.decision.reversalTrigger}</p>
           </article>
         </div>

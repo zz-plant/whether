@@ -7,6 +7,7 @@ import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -97,8 +98,8 @@ export async function DecisionAnswerPageContent({
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
               <p className="font-semibold text-slate-100">{rule.recommendation}</p>
               <p className="text-xs text-slate-300">Scope: {rule.scope}</p>
-              <p className="text-xs text-rose-200">Pause: {rule.pauseTrigger}</p>
-              <p className="text-xs text-emerald-200">Resume: {rule.resumeTrigger}</p>
+              <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
+              <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
             </article>
           ))}
         </div>

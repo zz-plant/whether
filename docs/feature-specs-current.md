@@ -41,6 +41,8 @@ shows posture, trend, confidence, and flip-window context, and the canonical wee
 once below it with explicit `Action now`, `Guardrail`, and `Flip condition` fields. The share rail
 stays artifact-first with the weekly operator brief as the default handoff, while company-specific
 override controls remain separated from routine sharing.
+The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
+Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
@@ -55,6 +57,7 @@ The optional `?view=evidence` mode still renders the high-density analytical mat
 labels, embedded threshold context, and restrained accent usage for outlier conditions.
 
 Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
+Route summaries and hero copy favor user-job phrasing over internal product nouns, especially on Evidence, Planning, Decision Tools, and Trust.
 
 Weekly Brief URLs now emit week-specific Open Graph and Twitter preview cards. Shared links for the
 current brief or a historical Time Machine selection preview the selected week’s posture, immediate
