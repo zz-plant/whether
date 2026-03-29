@@ -7,57 +7,44 @@ const staticGenerationWorkers = parsePositiveInt(process.env.NEXT_STATIC_GENERAT
 const staticGenerationMinPagesPerWorker = parsePositiveInt(process.env.NEXT_STATIC_GENERATION_MIN_PAGES_PER_WORKER);
 const buildCpus = parsePositiveInt(process.env.NEXT_BUILD_CPUS);
 
-const solutionRedirects = [
-  {
-    source: "/solutions/engineering-capacity",
-    destination: "/toolkits/ops-capacity",
-    permanent: true,
-  },
-  {
-    source: "/solutions/product-roadmapping",
-    destination: "/toolkits/focus",
-    permanent: true,
-  },
-  {
-    source: "/solutions/market-regime-playbook",
-    destination: "/decide/ops-risk",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths",
-    destination: "/decide/product",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths/senior-product-manager",
-    destination: "/decide/product",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths/group-product-manager",
-    destination: "/decide/product",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths/director-of-product",
-    destination: "/decide/product",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths/vp-product",
-    destination: "/decide/ceo",
-    permanent: true,
-  },
-  {
-    source: "/solutions/career-paths/product-strategy-chief-of-staff",
-    destination: "/decide/ops-risk",
-    permanent: true,
-  },
-  {
-    source: "/solutions/:path*",
-    destination: "/decide",
-    permanent: true,
-  },
+const permanentRedirect = (source, destination) => ({ source, destination, permanent: true });
+
+const buildPermanentRedirects = (pairs) =>
+  pairs.map(([source, destination]) => permanentRedirect(source, destination));
+
+export const solutionRedirectPairs = [
+  ["/solutions/engineering-capacity", "/toolkits/ops-capacity"],
+  ["/solutions/product-roadmapping", "/toolkits/focus"],
+  ["/solutions/market-regime-playbook", "/decide/ops-risk"],
+  ["/solutions/career-paths", "/decide/product"],
+  ["/solutions/career-paths/senior-product-manager", "/decide/product"],
+  ["/solutions/career-paths/group-product-manager", "/decide/product"],
+  ["/solutions/career-paths/director-of-product", "/decide/product"],
+  ["/solutions/career-paths/vp-product", "/decide/ceo"],
+  ["/solutions/career-paths/product-strategy-chief-of-staff", "/decide/ops-risk"],
+  ["/solutions/:path*", "/decide"],
+];
+
+export const canonicalSurfaceRedirectPairs = [
+  ["/startup-macro-posture/index", "/method#formula-reference"],
+  ["/startup-macro-posture/:regime", "/posture/:regime"],
+  ["/startup-macro-posture", "/posture"],
+  ["/methodology", "/method#formula-reference"],
+  ["/learn", "/learn/failure-modes"],
+  ["/guides/stage/:stage", "/guides?stage=:stage"],
+  ["/guides/stage", "/guides?library=stages"],
+  ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
+  ["/concepts/conflicts", "/concepts?view=conflicts"],
+  ["/concepts/focus/:focus", "/concepts?focus=:focus"],
+  ["/concepts/audience/:audience", "/concepts?audience=:audience"],
+  ["/operations/data", "/operations"],
+  ["/operations/cli", "/operations"],
+  ["/operations/integrations", "/operations"],
+];
+
+export const redirectEntries = [
+  ...buildPermanentRedirects(solutionRedirectPairs),
+  ...buildPermanentRedirects(canonicalSurfaceRedirectPairs),
 ];
 
 /** @type {import('next').NextConfig} */
@@ -69,79 +56,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   async redirects() {
-    return [
-      ...solutionRedirects,
-      {
-        source: "/startup-macro-posture/index",
-        destination: "/method#formula-reference",
-        permanent: true,
-      },
-      {
-        source: "/startup-macro-posture/:regime",
-        destination: "/posture/:regime",
-        permanent: true,
-      },
-      {
-        source: "/startup-macro-posture",
-        destination: "/posture",
-        permanent: true,
-      },
-      {
-        source: "/methodology",
-        destination: "/method#formula-reference",
-        permanent: true,
-      },
-      {
-        source: "/learn",
-        destination: "/learn/failure-modes",
-        permanent: true,
-      },
-      {
-        source: "/guides/stage/:stage",
-        destination: "/guides?stage=:stage",
-        permanent: true,
-      },
-      {
-        source: "/guides/stage",
-        destination: "/guides?library=stages",
-        permanent: true,
-      },
-      {
-        source: "/guides/:stakeholder",
-        destination: "/guides?stakeholder=:stakeholder",
-        permanent: true,
-      },
-      {
-        source: "/concepts/conflicts",
-        destination: "/concepts?view=conflicts",
-        permanent: true,
-      },
-      {
-        source: "/concepts/focus/:focus",
-        destination: "/concepts?focus=:focus",
-        permanent: true,
-      },
-      {
-        source: "/concepts/audience/:audience",
-        destination: "/concepts?audience=:audience",
-        permanent: true,
-      },
-      {
-        source: "/operations/data",
-        destination: "/operations",
-        permanent: true,
-      },
-      {
-        source: "/operations/cli",
-        destination: "/operations",
-        permanent: true,
-      },
-      {
-        source: "/operations/integrations",
-        destination: "/operations",
-        permanent: true,
-      },
-    ];
+    return redirectEntries;
   },
   experimental: {
     ...(staticGenerationWorkers ? { staticGenerationMaxConcurrency: staticGenerationWorkers } : {}),
