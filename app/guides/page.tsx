@@ -10,7 +10,7 @@ import { ActionLink } from "../components/ui/actionLink";
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides — translate the call for one team",
   description:
-    "Translate the weekly brief into bounded calls for one function, leader, or company stage after the main decision is already set.",
+    "Downstream translation library for one function, leader, or company stage after Decision Tools has already narrowed the translation need.",
   path: "/guides",
   imageAlt: "Whether guides overview",
   imagePath: "/social/guides.svg",
@@ -75,16 +75,16 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
     <SecondaryPageShell>
       <SecondarySurfaceStartBlock surface="guides" />
       <SecondaryPageHeader
-        eyebrow="Translation library"
-        title="Translate this week's call for one team or stage"
-        description="Start with the owner or stage that needs a tailored operating frame right now. Each guide translates the live call into bounded actions without reopening the whole brief."
+        eyebrow="Downstream translation library"
+        title="Use this only when you already know who needs translation."
+        description="Decision Tools should route you here after the question is narrowed to one team or one stage. Each guide translates the live call into bounded actions without reopening the whole brief."
         actions={(
           <>
-            <ButtonLink href="#featured-owner-paths" variant="primary">
-              Open featured paths
+            <ButtonLink href="/decide#guided-translation" variant="primary">
+              Return to Decision Tools
             </ButtonLink>
-            <ButtonLink href="/decide" variant="pill">
-              Decision Tools
+            <ButtonLink href="#featured-owner-paths" variant="pill">
+              Open pinned translations
             </ButtonLink>
           </>
         )}
@@ -211,7 +211,7 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
       <SecondaryPageSection
         className="scroll-mt-28"
         title="Featured owner paths"
-        description="Pick the team or leader that needs the call translated now."
+        description="Pick the team or leader that already needs the call translated now."
         actions={(
           <ActionLink href="/decide#guided-translation" variant="inline">
             Need help choosing a path?

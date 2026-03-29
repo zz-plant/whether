@@ -12,7 +12,7 @@ export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Answers — one operating question at a time",
-  description: "Direct answers for one operating question after this week’s brief, plan, and posture are already clear.",
+  description: "Downstream answer library for one operating question after Decision Tools has already narrowed what needs answering.",
   path: "/answers",
   imageAlt: "Whether operator answer cluster",
   imagePath: "/social/answers.svg",
@@ -38,16 +38,16 @@ export default async function AnswersHubPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(listData) }} />
       <SecondarySurfaceStartBlock surface="answers" />
       <SecondaryPageHeader
-        eyebrow="One-question answer library"
-        title="Get one direct answer tied to this week's call"
-        description={`Start with a featured answer below when you need one bounded operating answer fast. Each answer stays linked to the live weekly posture, immediate implication, and change-course signal. Featured answers: ${featuredAnswerPages.length}.`}
+        eyebrow="Downstream direct-answer library"
+        title="Use this only when the question is already crisp."
+        description={`Decision Tools should route you here after the question type is clear. Each answer stays linked to the live weekly posture, immediate implication, and change-course signal. Featured answers: ${featuredAnswerPages.length}.`}
         actions={(
           <>
-            <ButtonLink href="#featured-answers" variant="primary">
-              Open featured answers
+            <ButtonLink href="/decide#direct-answers" variant="primary">
+              Return to Decision Tools
             </ButtonLink>
-            <ButtonLink href="/decide" variant="pill">
-              Decision Tools
+            <ButtonLink href="#featured-answers" variant="pill">
+              Open pinned answers
             </ButtonLink>
           </>
         )}
@@ -55,7 +55,7 @@ export default async function AnswersHubPage() {
 
       <SecondaryPageSection className="scroll-mt-28" title="Current weekly posture">
         <p className="text-sm text-slate-300">
-          Use the answer cards below when one question needs a direct answer right now. If you still need help deciding which question to ask, go back to Decision Tools.
+          Use the answer cards below only when one question needs a direct answer right now. If you still need help deciding which question to ask, go back to Decision Tools instead of browsing the library.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-surface px-4 py-4">
@@ -76,8 +76,8 @@ export default async function AnswersHubPage() {
 
       <SecondaryPageSection
         className="scroll-mt-28"
-        title="Featured answers"
-        description="Pick the answer that matches the decision you need to make now."
+        title="Pinned answers from Decision Tools"
+        description="Pick the answer that matches the decision you already know you need to make now."
       >
         <div id="featured-answers" className="grid gap-3 sm:grid-cols-2">
           {featuredAnswerPages.map((page) => (
@@ -96,7 +96,7 @@ export default async function AnswersHubPage() {
 
       <details className="weather-panel space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open the rest of the answer library ({answerPages.length})
+          Open the rest of the downstream answer library ({answerPages.length})
         </summary>
         <div className="mt-4 space-y-6">
           {answerCategories.map((category) => {

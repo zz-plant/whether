@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { Route } from "../../lib/navigation/routeType";
 import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
@@ -18,7 +17,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Trust — freshness, confidence, and sources",
   description:
-    "Canonical trust surfaces for Whether: freshness, confidence, source coverage, and formula limits.",
+    "Canonical trust entrypoint for Whether: run freshness, confidence, source coverage, and formula checks here before opening deeper appendices.",
   path: "/method",
   imageAlt: "Whether trust hub",
 });
@@ -50,38 +49,38 @@ export default async function MethodPage() {
     {
       label: "Trigger",
       detail: reportData.flipThreshold,
-      href: "/confidence" as Route,
+      href: "#revisit-call",
     },
     {
       label: "Impact",
       detail: reportData.actionNowShort,
-      href: "/" as Route,
+      href: "#trust-snapshot",
     },
     {
       label: "Recovery",
       detail: isFallback
         ? "Recovery condition: one live refresh with no fallback flags before escalating irreversible approvals."
         : "Recovery condition: confidence returns to HIGH and transition watch is OFF before expanding fixed-cost commitments.",
-      href: "/sources" as Route,
+      href: "#formula-reference",
     },
   ];
   const trustActions = [
     {
-      title: "Validate freshness",
-      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Confirm this still matches your meeting window.`,
-      href: "/sources" as Route,
-      cta: "Open freshness checks",
+      title: "Run the trust snapshot",
+      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Confirm freshness, confidence, and call context in one scan before you open raw appendices.`,
+      href: "#trust-snapshot",
+      cta: "Open trust snapshot",
     },
     {
-      title: "Validate confidence limits",
-      detail: `Current confidence: ${confidenceLabel}. Review uncertainty before approving irreversible spend.`,
-      href: "/confidence" as Route,
-      cta: "Open confidence limits",
+      title: "Review revisit triggers",
+      detail: `Current confidence: ${confidenceLabel}. Check what would change the call before approving irreversible spend.`,
+      href: "#revisit-call",
+      cta: "Open revisit triggers",
     },
     {
-      title: "Validate model assumptions",
-      detail: "Audit formulas and fallback behavior if you need to defend this posture externally.",
-      href: "/method#formula-reference" as Route,
+      title: "Review formulas and appendices",
+      detail: "Open formula and appendix material only if a reviewer still needs deeper proof after the on-page trust check.",
+      href: "#formula-reference",
       cta: "Open formula reference",
     },
   ];
@@ -127,7 +126,7 @@ export default async function MethodPage() {
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Check freshness, confidence, sources, and formulas before relying on the weekly call."
+      pageSummary="Run the trust check here first, then open appendix pages only if someone still needs deeper proof."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -150,7 +149,7 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Trust as a quick reliability check, then move back to the weekly brief or plan.",
+        call: "Use Trust as the single audit entrypoint, then move back to the weekly brief or plan.",
         doNow: [
           `Confirm freshness: ${reportData.fetchedAtLabel}.`,
           `Confirm confidence: ${confidenceLabel}.`,
@@ -225,7 +224,7 @@ export default async function MethodPage() {
           ))}
           <article className="weather-hub-link-card space-y-2">
             <h2 className="text-lg font-semibold text-slate-100">Optional context only</h2>
-            <p className="text-sm text-slate-300">Use failure-mode diagnostics for conceptual context after you have already made the operating call.</p>
+            <p className="text-sm text-slate-300">Use failure-mode diagnostics only after the on-page trust check is complete and someone still needs conceptual context.</p>
             <Link href="/learn/failure-modes" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
               Open failure modes
             </Link>

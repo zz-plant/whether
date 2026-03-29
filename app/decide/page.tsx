@@ -27,7 +27,7 @@ const featuredStakeholderSlugs = [
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Tools — resolve one remaining edge case",
-  description: "Use role guides, direct answers, and quick checks when Weekly Brief and Planning leave one team-specific question open.",
+  description: "Primary routing surface for one unresolved question after Weekly Brief and Planning. Open direct answers, translations, or toolkits only after the question type is clear.",
   path: "/decide",
   imageAlt: "Whether decision tools",
   imagePath: "/social/decide.svg",
@@ -84,11 +84,11 @@ export default async function DecidePage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
       <HubHero
         eyebrow="Resolve the one question still blocking action"
-        title="Find the smallest help needed to close this week's last open question."
-        description="Use this page for one direct answer, one quick check before you commit, or one team-specific version of the weekly call. If that closes the gap, stop here and execute."
+        title="Route the last open question before you open another library."
+        description="Start here when Weekly Brief and Planning still leave one edge case open. This page should route you to the smallest help needed. Open Answers, Guides, or Toolkits only after the question type is already clear."
         actions={(
           <>
-            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Find my next path</Link>
+            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Route my question</Link>
             <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Weekly Brief</Link>
           </>
         )}
@@ -119,7 +119,7 @@ export default async function DecidePage() {
       <HubSection
         id="unresolved-question-router"
         title="What remains unresolved?"
-        description="Take the recommended next path first. Only widen into alternatives if that path does not close the decision."
+        description="Take the recommended next path first. Open a downstream library only when you already know you need a direct answer, a translation, or a runnable instrument."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
@@ -190,11 +190,14 @@ export default async function DecidePage() {
 
       <details className="weather-panel scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open all role, situation, and toolkit paths
+          Open downstream libraries only if routing still is not clear
         </summary>
         <div className="mt-4 space-y-6">
+          <p className="text-sm text-slate-300">
+            These are downstream libraries, not parallel starting points. Use them only after the route above tells you the question needs an instrument, an exact answer, or a team-specific translation.
+          </p>
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Fastest bounded tools</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Toolkit library</h2>
             <div className="weather-page-grid-3">
               {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
                 const toolkit = findToolkitDefinition(toolkitSlug);
@@ -212,7 +215,7 @@ export default async function DecidePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Exact answers</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Answer library</h2>
             <div className="weather-page-grid-2">
               {featuredAnswerPages.map((page) => (
                 <Link
@@ -229,7 +232,7 @@ export default async function DecidePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Browse by team</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Translation library by team</h2>
             <div className="weather-page-grid-3">
               {useCaseRoles.map((role) => (
                 <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
@@ -238,7 +241,7 @@ export default async function DecidePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Browse by situation</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Translation library by situation</h2>
             <div className="weather-page-grid-2">
               {situationUseCaseDefinitions.map((situation) => (
                 <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>

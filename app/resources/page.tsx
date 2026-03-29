@@ -7,7 +7,6 @@ import { resourcePillarPages, resourceSupportingPages } from "../../lib/resource
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { featuredAnswerPages } from "../answers/selectors";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartBlock";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
@@ -17,7 +16,7 @@ import { Tag } from "../components/ui/tag";
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — deeper governance artifacts",
   description:
-    "Deeper governance artifacts for operators who need board-ready material after this week’s posture and plan are already set.",
+    "Downstream governance artifact library for operators who need board-ready material after Planning is already set.",
   path: "/resources",
   imageAlt: "Whether resources hub",
   imagePath: "/social/resources.svg",
@@ -62,15 +61,15 @@ export default async function ResourcesPage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
       <SecondarySurfaceStartBlock surface="resources" />
       <SecondaryPageHeader
-        title="Deeper governance artifacts"
-        description="Use this page when leadership needs one deeper board, governance, or reversibility artifact behind the current weekly plan. Start with the focused artifact that matches the review you are in."
+        title="Use this only for deeper governance artifacts after Planning."
+        description="This page is for board, governance, and reversibility material after the weekly plan is already clear. It should not compete with Decision Tools or direct-answer routing."
         actions={(
           <>
-            <ButtonLink href="#resource-decision-extract" variant="primary">
-              Open the decision extract
+            <ButtonLink href="/operations" variant="primary">
+              Return to Planning
             </ButtonLink>
-            <ButtonLink href="/operations" variant="pill">
-              Planning
+            <ButtonLink href="#resource-decision-extract" variant="pill">
+              Open decision extract
             </ButtonLink>
           </>
         )}
@@ -104,7 +103,7 @@ export default async function ResourcesPage() {
 
       <SecondaryPageSection eyebrow="Deeper planning artifacts" title="Start from the operating question">
         <p className="text-sm text-slate-300">
-          If you need deeper material, open one focused artifact below instead of browsing the whole library first.
+          If you need deeper material, open one focused governance artifact below instead of browsing the whole library first. For direct answers or routing help, go back to Planning or Decision Tools.
         </p>
         <div className="flex flex-wrap gap-2">
           <ButtonLink href="/operations" variant="pill">
@@ -172,17 +171,6 @@ export default async function ResourcesPage() {
             </div>
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Direct answers</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {featuredAnswerPages.slice(0, 4).map((page) => (
-                <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface space-y-2 px-4 py-4">
-                  <p className="text-base font-semibold text-slate-100">{page.title}</p>
-                  <p className="text-sm text-slate-300">{page.shortAnswer}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
         </div>
       </details>
     </SecondaryPageShell>
