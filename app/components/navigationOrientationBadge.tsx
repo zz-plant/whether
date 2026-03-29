@@ -63,7 +63,7 @@ export function NavigationOrientationBadge({
 
   return (
     <div
-      className={`flex max-w-full flex-wrap items-center gap-1 rounded-2xl border border-slate-700/80 bg-slate-950/70 p-1 sm:rounded-full ${className ?? ""}`}
+      className={`flex max-w-full flex-nowrap items-center gap-1 overflow-x-auto rounded-xl border border-slate-700/80 bg-slate-950/70 p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:rounded-full ${className ?? ""}`}
       aria-label="Navigation zone orientation (not macro posture)"
     >
       {zoneOrder.map((zone) => {
@@ -76,7 +76,7 @@ export function NavigationOrientationBadge({
             href={zoneDefaultHref[zone]}
             aria-label={zoneLabels[zone]}
             aria-current={isExactCurrentLink ? "page" : undefined}
-            className={`inline-flex min-h-[38px] items-center rounded-full border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
+            className={`inline-flex min-h-[36px] min-w-[84px] flex-shrink-0 items-center justify-center rounded-full border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
             title={zoneDescriptors[zone]}
           >
             <span>{zoneCompactLabels[zone]}</span>

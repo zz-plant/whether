@@ -39,30 +39,36 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
 
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Supporting surfaces" accentClass="text-slate-300" />
-          <p className="mt-2 text-sm font-semibold text-slate-100">Keep support surfaces narrow.</p>
-          <p className="mt-1 text-xs text-slate-300">Toolkits and trust checks should answer one bounded follow-up, not become a second weekly brief.</p>
+          <p className="mt-2 text-sm font-semibold text-slate-100">Open one recommended follow-up only.</p>
+          <p className="mt-1 text-xs text-slate-300">Use a single utility to unblock one owner decision. Keep trust and extra tools collapsed unless challenged.</p>
           <article className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recommended utility</p>
             <p className="text-xs font-semibold text-slate-100">{workspaceModel.translate.fallbackUtility.title}</p>
             <p className="mt-1 text-xs text-slate-300">{workspaceModel.translate.fallbackUtility.detail}</p>
           </article>
-          {workspaceModel.translate.toolkitShortcuts.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {workspaceModel.translate.toolkitShortcuts.slice(0, 2).map((toolkit) => (
-                <Link key={toolkit.href} href={toolkit.href as Route} className="weather-pill inline-flex min-h-[40px] items-center gap-2 px-3 py-2 text-[11px] font-semibold text-slate-100">
-                  <LayoutGridIcon className="h-3.5 w-3.5" />
-                  <span>{toolkit.title}</span>
-                </Link>
-              ))}
-            </div>
-          ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href={workspaceModel.translate.fallbackUtility.href as Route} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-              Open one utility
+            <Link href={workspaceModel.translate.fallbackUtility.href as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              Open recommended utility
             </Link>
             <Link href={"/method" as Route} className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100">
-              Open Trust
+              View trust details
             </Link>
           </div>
+          {workspaceModel.translate.toolkitShortcuts.length > 0 ? (
+            <details className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+              <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                More utilities
+              </summary>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {workspaceModel.translate.toolkitShortcuts.slice(0, 2).map((toolkit) => (
+                  <Link key={toolkit.href} href={toolkit.href as Route} className="weather-pill inline-flex min-h-[40px] items-center gap-2 px-3 py-2 text-[11px] font-semibold text-slate-100">
+                    <LayoutGridIcon className="h-3.5 w-3.5" />
+                    <span>{toolkit.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </details>
+          ) : null}
         </article>
       </div>
     </section>
