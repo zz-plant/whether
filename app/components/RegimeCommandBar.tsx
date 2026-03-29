@@ -194,7 +194,6 @@ export const RegimeCommandBar = ({
   call,
   doNow,
   flipConditions,
-  updatedAt,
   postureLabel,
   trendLabel,
   confidenceLabel,
@@ -220,9 +219,6 @@ export const RegimeCommandBar = ({
           <div className="flex flex-wrap items-center gap-2">
             <span className={`inline-flex min-h-[30px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${regimeStyle.toneClass}`}>
               {regimeStyle.label} outlook
-            </span>
-            <span className="inline-flex min-h-[30px] items-center rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-medium text-slate-300">
-              Updated {updatedAt}
             </span>
           </div>
           <div className="mt-3 space-y-2">
