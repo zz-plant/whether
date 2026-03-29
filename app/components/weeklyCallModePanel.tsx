@@ -110,6 +110,7 @@ export function WeeklyCallModePanel({
   const compactTrustToneClass = needsTrustWarning
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
+  const assistChipClass = "rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold tracking-[0.02em] text-slate-100";
 
   return (
     <>
@@ -118,9 +119,6 @@ export function WeeklyCallModePanel({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               <h2 className={tierOneHeadingClassName}>This week in one screen</h2>
-              <p className="text-xs leading-5 text-slate-300">
-                Start here: what changed, whether to revisit decisions, what to do now, what to avoid, and what would change the call.
-              </p>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{postureLabel}</span>
@@ -135,9 +133,11 @@ export function WeeklyCallModePanel({
                 title="How to read the current call"
                 summary="Use this when you understand the business context but need the macro terms converted into operating language."
               >
-                <p><span className="font-semibold text-slate-50">Tightness</span> = how hard current conditions make new long-payback commitments.</p>
-                <p><span className="font-semibold text-slate-50">Risk appetite</span> = how willing markets are to fund faster expansion and risk.</p>
-                <p><span className="font-semibold text-slate-50">Action now / Pause if / Change course if</span> = the current move, the stop line, and the pre-committed signal that reopens the call.</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <span className={assistChipClass}>Tightness = harder long-payback commitments</span>
+                  <span className={assistChipClass}>Risk appetite = markets fund faster expansion</span>
+                  <span className={assistChipClass}>Action / Pause / Change course = move, stop line, reopen line</span>
+                </div>
                 <p>
                   Need the fuller glossary?{" "}
                   <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
@@ -152,13 +152,15 @@ export function WeeklyCallModePanel({
                 title="How to use the trust state"
                 summary="Use this when you want to know whether this week’s call is safe to rely on now or should be treated cautiously."
               >
-                <p><span className="font-semibold text-slate-50">Confidence</span> = how far the current read is from the nearest flip line.</p>
-                <p><span className="font-semibold text-slate-50">Freshness</span> = how recently the core inputs updated.</p>
-                <p><span className="font-semibold text-slate-50">Ready to use</span> means standard weekly approvals are reasonable; <span className="font-semibold text-slate-50">Use caution</span> means keep decisions reversible until confidence or freshness improves.</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <span className={assistChipClass}>Confidence = distance from the nearest flip line</span>
+                  <span className={assistChipClass}>Freshness = recency of core inputs</span>
+                  <span className={assistChipClass}>Ready to use = standard approvals okay; Use caution = keep commitments reversible</span>
+                </div>
               </PersistedAssistPanel>
             </div>
           ) : null}
-          <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
+          <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
@@ -167,10 +169,6 @@ export function WeeklyCallModePanel({
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit decisions?</p>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
-            </article>
-            <article className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Current read</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">{trendLabel} · {confidenceLabel} {Math.round(confidencePercent)}%</p>
             </article>
           </div>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
@@ -197,16 +195,23 @@ export function WeeklyCallModePanel({
             </article>
           </div>
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                <span className={needsTrustWarning ? "text-amber-100" : "text-emerald-100"}>{needsTrustWarning ? "Use caution" : "Ready to use"}</span>
-                <span className={`rounded-full border px-2 py-0.5 ${trustToneClass}`}>{trustStateLabel}</span>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Decision use</p>
+                <p className={`mt-1 text-xs font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>
+                  {needsTrustWarning ? "Use caution" : "Ready to use"}
+                </p>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">As of {trustTimestamp}</p>
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trust state</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{trustStateLabel}</p>
+              </div>
+              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Freshness</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{trustTimestamp}</p>
+              </div>
             </div>
-            <p className="mt-2 text-sm leading-6 text-slate-100">
-              {trustStateDetail}
-            </p>
+            <p className="mt-2 text-[11px] leading-5 text-slate-200">{trustStateDetail}</p>
           </div>
         </article>
 

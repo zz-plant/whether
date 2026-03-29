@@ -141,7 +141,20 @@ export const ConfidenceMiniChart = ({
           {forecastPoint ? <circle cx={forecastPoint.x} cy={forecastPoint.y} r={2.5} fill="rgb(251 191 36)" stroke="rgba(15,23,42,0.95)" strokeWidth="1.1" /> : null}
         </svg>
       </div>
-      <p className="text-[11px] text-slate-400">Solid line = reported confidence. Dashed tail + amber band = short-term stability cone. Hollow markers = missing weeks.</p>
+      <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
+          <span className="h-px w-4 bg-sky-300" aria-hidden="true" />
+          Reported
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
+          <span className="h-0 w-4 border-t border-dashed border-amber-300" aria-hidden="true" />
+          Stability cone
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
+          <span className="h-2 w-2 rounded-full border border-amber-300 bg-slate-950" aria-hidden="true" />
+          Missing week
+        </span>
+      </div>
     </article>
   );
 };

@@ -35,7 +35,6 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h3 className={tierTwoHeading}>Operating levers this week</h3>
-          <p className="mt-1 text-xs leading-5 text-slate-300">Each lever shows the current openness level, the line that tightens it, and the condition that reopens it.</p>
         </div>
       </div>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -58,9 +57,17 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                 <StepRail currentStep={currentStep} />
               </div>
               {(item.tightenDistanceLabel || item.reopenDistanceLabel) ? (
-                <div className="mt-3 grid gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                  {item.tightenDistanceLabel ? <p>{item.tightenDistanceLabel}</p> : null}
-                  {item.reopenDistanceLabel ? <p>{item.reopenDistanceLabel}</p> : null}
+                <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+                  {item.tightenDistanceLabel ? (
+                    <span className="rounded-full border border-amber-400/25 bg-amber-500/8 px-2 py-1">
+                      {item.tightenDistanceLabel}
+                    </span>
+                  ) : null}
+                  {item.reopenDistanceLabel ? (
+                    <span className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-1">
+                      {item.reopenDistanceLabel}
+                    </span>
+                  ) : null}
                 </div>
               ) : null}
               <div className="mt-3 space-y-2 text-[11px] leading-5">
