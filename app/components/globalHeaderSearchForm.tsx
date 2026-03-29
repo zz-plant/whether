@@ -2,9 +2,10 @@ import { GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME } from "./globalHeaderShared";
 
 type GlobalHeaderSearchFormProps = {
   className?: string;
+  compact?: boolean;
 };
 
-export function GlobalHeaderSearchForm({ className }: GlobalHeaderSearchFormProps) {
+export function GlobalHeaderSearchForm({ className, compact = false }: GlobalHeaderSearchFormProps) {
   const resolvedClassName = ["weather-topbar-search", className].filter(Boolean).join(" ");
 
   return (
@@ -16,13 +17,13 @@ export function GlobalHeaderSearchForm({ className }: GlobalHeaderSearchFormProp
         id="global-header-search"
         type="search"
         name="q"
-        className="weather-input min-h-[48px] min-w-[13rem] px-4 text-sm"
+        className={`weather-input px-4 text-sm ${compact ? "min-h-[44px] min-w-[12rem]" : "min-h-[48px] min-w-[13rem]"}`}
         placeholder="Search decisions, toolkits, concepts…"
         autoComplete="off"
       />
       <button
         type="submit"
-        className={`${GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME} shrink-0`}
+        className={`${GLOBAL_HEADER_SEARCH_BUTTON_CLASSNAME} ${compact ? "min-h-[44px] px-4 text-xs" : "shrink-0"}`}
         aria-label="Run global search"
       >
         Search
