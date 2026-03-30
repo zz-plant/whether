@@ -58,7 +58,7 @@ export default async function MethodPage() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Posture: ${reportData.statusLabel} (${reportData.recordDateLabel})\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
+  const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
 
   const revisitBullets = [
     {
@@ -82,7 +82,7 @@ export default async function MethodPage() {
   const trustActions = [
     {
       title: "Review source freshness",
-      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Check source status and citation context here before opening external proof.`,
+      detail: `Data refreshed: ${reportData.fetchedAtLabel}. Check source status and citation context here before opening external proof.`,
       href: "#sources-freshness",
       cta: "Open sources appendix",
     },
@@ -219,20 +219,20 @@ export default async function MethodPage() {
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-hub-card rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current call</p>
-            <p className="mt-2 text-sm text-slate-200">Posture: <span className="font-semibold text-slate-100">{reportData.statusLabel}</span> (effective {reportData.recordDateLabel})</p>
+            <p className="mt-2 text-sm text-slate-200">Posture: <span className="font-semibold text-slate-100">{reportData.statusLabel}</span> (decision as-of {reportData.recordDateLabel})</p>
             <p className="mt-2 text-sm text-slate-200">Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></p>
           </article>
           <article className="weather-hub-card rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Trust status</p>
             <p className="mt-2 text-sm text-slate-200">{trustSummary}</p>
             <p className="mt-2 text-sm text-slate-300">Coverage: {sourceCoverage}</p>
-            <p className="mt-2 text-xs text-slate-400">Latest refresh: {reportData.fetchedAtLabel}</p>
+            <p className="mt-2 text-xs text-slate-400">Data refreshed: {reportData.fetchedAtLabel}</p>
             <div className="mt-3 border-t border-slate-700/70 pt-3">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Trust check</p>
               <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
                 <li className="flex items-start gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
-                  <span>Freshness: {reportData.fetchedAtLabel}</span>
+                  <span>Data refreshed: {reportData.fetchedAtLabel}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />

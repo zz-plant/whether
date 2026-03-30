@@ -524,7 +524,7 @@ export default async function SignalsPage({
             </div>
           </div>
         </article>
-        <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Posture</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
@@ -534,7 +534,11 @@ export default async function SignalsPage({
             <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Updated</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Decision as-of</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Data refreshed</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
           </div>
           <div>
