@@ -41,7 +41,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Evidence",
     description: "Why the weekly call moved: drivers, thresholds, freshness, and replay.",
     boundary: "Evidence depth only; Weekly Brief remains the source of truth for the live call.",
-    group: "workflow",
+    group: "reference",
     tier: "primary",
   },
   {
