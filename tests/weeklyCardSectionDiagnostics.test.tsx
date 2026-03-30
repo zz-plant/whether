@@ -29,8 +29,8 @@ describe("DiagnosticsSection", () => {
       />,
     );
 
-    assert.match(html, /Need deeper analysis\?/);
-    assert.match(html, /Audit trail/);
+    assert.match(html, /Want the backing detail\?/);
+    assert.match(html, /Decision detail/);
     assert.match(html, /Delta/);
     assert.match(html, /Evidence pack/);
     assert.doesNotMatch(html, /Regime history \(recent\)/);

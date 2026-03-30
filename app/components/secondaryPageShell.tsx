@@ -39,8 +39,9 @@ export function SecondaryPageShell({
     <main
       id="main-content"
       tabIndex={-1}
-      className={joinClasses("weather-page-shell", widthClassNames[width])}
+      className={joinClasses("weather-page-shell weather-secondary-shell", widthClassNames[width])}
     >
+      <div className="weather-secondary-shell-backdrop" aria-hidden="true" />
       {children}
     </main>
   );
