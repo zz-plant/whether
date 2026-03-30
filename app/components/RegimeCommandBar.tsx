@@ -6,6 +6,10 @@ export type RegimeCommandBarProps = {
   call: string;
   doNow: string[];
   flipConditions: string[];
+  trustChecklist?: {
+    label?: string;
+    items: string[];
+  };
   updatedAt: string;
   postureLabel?: string;
   trendLabel?: WeeklyDecisionCardViewModel["status"]["trendLabel"];
@@ -206,6 +210,7 @@ export const RegimeCommandBar = ({
   call,
   doNow,
   flipConditions,
+  trustChecklist,
   postureLabel,
   trendLabel,
   confidenceLabel,
@@ -325,6 +330,21 @@ export const RegimeCommandBar = ({
               ))}
             </ul>
           </div>
+          {trustChecklist?.items.length ? (
+            <div className="border-t border-slate-800/70 pt-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-violet-200">
+                {trustChecklist.label ?? "Trust check"}
+              </p>
+              <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
+                {trustChecklist.items.slice(0, 2).map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="border-t border-slate-800/70 pt-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-200">Watch next</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
