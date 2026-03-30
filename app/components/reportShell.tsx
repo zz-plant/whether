@@ -276,7 +276,7 @@ export function HeroTrustProvenanceBlock({
               <p className="mt-1 text-sm font-semibold text-slate-100">{controlHeadline}</p>
             </div>
             <div className="text-right text-[11px] text-slate-400">
-              <p>Updated {fetchedAtLabel}</p>
+              <p>Data refreshed {fetchedAtLabel}</p>
               <p>Next refresh {resolvedNextRefreshLabel}</p>
             </div>
           </div>
@@ -400,7 +400,7 @@ export function HeroTrustProvenanceBlock({
               <dl className="grid gap-2 text-xs text-slate-300">
                 <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
                 <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Confidence</dt><dd className="text-slate-200">{controlHeadline}</dd></div>
-                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Updated</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Data refreshed</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
                 <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Next refresh</dt><dd className="text-slate-200">{resolvedNextRefreshLabel}</dd></div>
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-400">Source</dt>
@@ -522,7 +522,7 @@ export function CommandCenterNavBlock({
           <dl className="weather-surface weather-meta-list min-h-[44px] flex-1 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
             <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
             <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
-            <div className="weather-meta-list__item"><dt className="text-slate-400">Updated</dt><dd>{fetchedAtLabel}</dd></div>
+            <div className="weather-meta-list__item"><dt className="text-slate-400">Data refreshed</dt><dd>{fetchedAtLabel}</dd></div>
             <div className="weather-meta-list__item"><dt className="text-slate-400">Next refresh</dt><dd>{resolvedNextRefreshLabel}</dd></div>
           </dl>
           <ManualRefreshButton title="Request the latest weekly brief snapshot." />
@@ -710,7 +710,7 @@ export const ReportShell = (props: ReportShellProps) => {
             </section>
           ) : null}
 
-          {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{resolvedStatusLabel}</span><span className="ml-2 text-slate-400">Updated {resolvedRecordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
+          {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{resolvedStatusLabel}</span><span className="ml-2 text-slate-400">Decision as-of {resolvedRecordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
           {resolvedHistoricalBanner}
           {resolvedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
 

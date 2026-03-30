@@ -339,7 +339,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Posture ${statusLabel} · Signal reliability ${confidenceLabel} · Effective ${recordDateLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Posture ${statusLabel} · Signal reliability ${confidenceLabel} · Decision as-of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 export const buildTrustStatus = ({
   historicalSelection,

@@ -98,9 +98,9 @@ export function ReportShellHeader({
             <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Posture {statusLabel}</span>
               <span className="text-slate-500">•</span>
-              <span>As of {recordDateLabel}</span>
+              <span>Decision as-of {recordDateLabel}</span>
               <span className="text-slate-500">•</span>
-              <span>Refreshed {fetchedAtLabel}</span>
+              <span>Data refreshed {fetchedAtLabel}</span>
             </div>
           </div>
         </div>
@@ -134,12 +134,12 @@ export function ReportShellHeader({
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
             <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Evidence updated</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Decision as-of</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
             </div>
             <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Data refreshed</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
             </div>
           </div>
         </div>

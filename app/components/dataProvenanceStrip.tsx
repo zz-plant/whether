@@ -116,11 +116,11 @@ export const DataProvenanceStrip = ({
       ),
     },
     {
-      label: "Record date",
+      label: "Decision as-of",
       value: <span className="mono text-slate-100">{provenance.recordDateLabel}</span>,
     },
     {
-      label: "Updated",
+      label: "Data refreshed",
       value: <span className="mono text-slate-100">{provenance.timestampLabel}</span>,
     },
     {
@@ -155,13 +155,13 @@ export const DataProvenanceStrip = ({
                 <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
                   <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">Trust snapshot</p>
                   <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
-                  <div className="mt-2 space-y-1 text-[11px] text-slate-300">
-                    <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
-                    <p><span className="text-slate-500">Record date:</span> {provenance.recordDateLabel}</p>
-                    <p><span className="text-slate-500">Updated:</span> {provenance.timestampLabel}</p>
-                  </div>
-                </Popover.Popup>
-              </Popover.Positioner>
+                <div className="mt-2 space-y-1 text-[11px] text-slate-300">
+                  <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
+                    <p><span className="text-slate-500">Decision as-of:</span> {provenance.recordDateLabel}</p>
+                    <p><span className="text-slate-500">Data refreshed:</span> {provenance.timestampLabel}</p>
+                </div>
+              </Popover.Popup>
+            </Popover.Positioner>
             </Popover.Portal>
           </Popover.Root>
           <ManualRefreshButton
