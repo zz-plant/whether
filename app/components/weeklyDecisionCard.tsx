@@ -8,6 +8,7 @@ import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
+import { YearAgoComparator } from "./weekly-card/YearAgoComparator";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading } from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
@@ -255,6 +256,7 @@ type MoreContextDisclosureProps = {
   memoryRail: WeeklyDecisionCardModel["memoryRail"];
   historicalTimeline: WeeklyDecisionCardModel["historicalTimeline"];
   historicalAnalogs: WeeklyDecisionCardModel["historicalAnalogs"];
+  lastYearComparison: WeeklyDecisionCardModel["lastYearComparison"];
   macroOverlay: WeeklyDecisionCardModel["macroOverlay"];
 };
 
@@ -265,6 +267,7 @@ export function MoreContextDisclosureBody({
   memoryRail,
   historicalTimeline,
   historicalAnalogs,
+  lastYearComparison,
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
@@ -332,6 +335,7 @@ export function MoreContextDisclosureBody({
             <h3 id="posture-history-and-overlays" className={tierThreeHeading}>Posture history and overlays</h3>
             <div className="mt-1.5 space-y-2">
               <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
+              {lastYearComparison ? <YearAgoComparator comparison={lastYearComparison} /> : null}
               {historicalAnalogs.length > 0 ? (
                 <div>
                   <p className={tierThreeHeading}>Closest historical analogs</p>
@@ -613,7 +617,13 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     startupClimateIndex,
     whyThisCall,
   } = diagnostics;
-  const { memoryRail, historicalTimeline, historicalAnalogs, macroOverlay } = history;
+  const {
+    memoryRail,
+    historicalTimeline,
+    historicalAnalogs,
+    lastYearComparison,
+    macroOverlay,
+  } = history;
   const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel, fetchedAtLabel } = artifact;
   const freshnessMeta = buildCompactFreshnessMeta({
@@ -881,6 +891,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             memoryRail={memoryRail}
             historicalTimeline={historicalTimeline}
             historicalAnalogs={historicalAnalogs}
+            lastYearComparison={lastYearComparison}
             macroOverlay={macroOverlay}
           />
         )}

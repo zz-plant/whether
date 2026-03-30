@@ -56,6 +56,7 @@ describe("home route render contract", () => {
               memoryRail: [],
               historicalTimeline: [],
               historicalAnalogs: [],
+              lastYearComparison: null,
               macroOverlay: [],
             },
             artifact: {

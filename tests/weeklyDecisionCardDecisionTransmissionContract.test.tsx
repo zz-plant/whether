@@ -89,6 +89,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             memoryRail: [],
             historicalTimeline: [],
             historicalAnalogs: [],
+            lastYearComparison: null,
             macroOverlay: [],
           },
           artifact: {
@@ -105,7 +106,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Cloudy/);
-    assert.match(html, /We are close to a flip/i);
+    assert.match(html, /Flip risk is in play/i);
   });
 
   it("keeps top-fold sequence canonical: posture, call, do now, flip when", () => {
@@ -181,6 +182,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             memoryRail: [],
             historicalTimeline: [],
             historicalAnalogs: [],
+            lastYearComparison: null,
             macroOverlay: [],
           },
           artifact: {
@@ -195,7 +197,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     const regimeIndex = html.indexOf("Current outlook");
     const callIndex = html.indexOf("Weekly call snapshot");
     const doNowIndex = html.indexOf("Action now");
-    const flipIndex = html.indexOf("Flip condition");
+    const flipIndex = html.indexOf("Reversal / change course if");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -268,6 +270,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             memoryRail: [],
             historicalTimeline: [],
             historicalAnalogs: [],
+            lastYearComparison: null,
             macroOverlay: [],
           },
           artifact: {
@@ -279,8 +282,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, /<summary[^>]*>Policy detail<\/summary>/);
-    assert.match(html, /<summary[^>]*>Supporting rationale<\/summary>/);
-    assert.doesNotMatch(html, /<summary[^>]*>More context<\/summary>/);
+    assert.match(html, />Diagnostics</);
+    assert.match(html, />More context and continuity</);
+    assert.match(html, />Supporting rationale</);
   });
 });

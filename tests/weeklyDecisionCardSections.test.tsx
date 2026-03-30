@@ -282,6 +282,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
             memoryRail: [],
             historicalTimeline: [],
             historicalAnalogs: [],
+            lastYearComparison: null,
             macroOverlay: [],
           },
           artifact: {
@@ -357,10 +358,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Decision snapshot for leadership this week/);
-    assert.match(html, /↑ Now/);
-    assert.match(html, /∥ Hold/);
-    assert.match(html, /↺ Flip/);
+    assert.match(html, /Decision rules/);
+    assert.match(html, /Allowed now/);
+    assert.match(html, /Caution line/);
+    assert.match(html, /Reopen \/ flip/);
 
   });
 
@@ -378,15 +379,14 @@ describe("WeeklyDecisionCard extracted sections", () => {
           { label: "Feb 28, 2026", posture: "Scarcity", month: 2, year: 2026, recordDate: "2026-02-28", summary: "Tighten hiring" },
         ]}
         historicalAnalogs={[]}
+        lastYearComparison={null}
         macroOverlay={[{ label: "VC", detail: "Muted" }]}
       />,
     );
 
     assert.match(detailsHtml, /Posture change timeline/);
-    assert.match(detailsHtml, /→/);
     assert.match(detailsHtml, /\/?month=1&amp;year=2026/);
-    assert.match(detailsHtml, /group-hover:block/);
-    assert.match(detailsHtml, /2026-01-31 • Hold approvals/);
+    assert.match(detailsHtml, /2026-01-31 · Hold approvals/);
   });
 
   it("renders collapsed context and keeps share and cite content consolidated", () => {
@@ -398,6 +398,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         memoryRail={[{ label: "W-1", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
         historicalAnalogs={[]}
+        lastYearComparison={null}
         macroOverlay={[{ label: "VC", detail: "Muted" }]}
       />,
     );

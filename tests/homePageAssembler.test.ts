@@ -71,7 +71,9 @@ describe("assembleHomePage streaming contract", () => {
     assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
-    assert.equal(workspaceModel.translate.decisionUtilities.length, 2);
+    assert.match(workspaceModel.translate.primaryPath.href, /^\/decide\//);
+    assert.match(workspaceModel.translate.fallbackUtility.href, /^\/decide\//);
+    assert.ok(workspaceModel.translate.toolkitShortcuts.length > 0);
   });
 
   it("parses interpretation view from search params without changing the canonical weekly call", async () => {

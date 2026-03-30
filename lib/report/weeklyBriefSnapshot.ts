@@ -54,6 +54,7 @@ const buildHomeBriefInput = (
   fetchedAtLabel: reportData.fetchedAtLabel,
   historicalSelection: reportData.historicalSelection,
   historicalAnalogs: reportData.historicalAnalogs,
+  lastYearComparison: reportData.lastYearComparison,
   recordDateLabel: reportData.recordDateLabel,
   regimeAlert: reportData.regimeAlert,
   reportDynamics: reportData.reportDynamics,

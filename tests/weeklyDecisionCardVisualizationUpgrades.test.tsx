@@ -36,10 +36,13 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
         memoryRail={model.history.memoryRail}
         historicalTimeline={model.history.historicalTimeline}
         historicalAnalogs={model.history.historicalAnalogs}
+        lastYearComparison={model.history.lastYearComparison}
         macroOverlay={model.history.macroOverlay}
       />,
     );
 
+    assert.match(html, /Year-ago comparator/);
+    assert.match(html, /Year-ago posture score comparison/);
     assert.match(html, /Closest historical analogs/);
     assert.match(html, /84% match/);
     assert.match(html, /Oct 3, 2025/);

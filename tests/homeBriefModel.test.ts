@@ -62,6 +62,7 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
+    assert.equal(model.lastYearComparison, null);
     assert.equal(model.macroOverlay.length, 5);
     assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
@@ -130,6 +131,7 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
+    assert.equal(model.lastYearComparison, null);
     assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
@@ -527,7 +529,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(matrix.rows[0]?.cells.approve.text, "Stage approvals on short-cycle proof");
     assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
     assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
-    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /Re-tighten if/);
+    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /resumes tighten stance/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
     assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
     assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Tightness ≤/);

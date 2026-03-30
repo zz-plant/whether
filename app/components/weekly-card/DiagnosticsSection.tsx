@@ -13,6 +13,50 @@ const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
   </Accordion.Header>
 );
 
+const regimeProbabilityTone = {
+  Scarcity: "bg-rose-400/80 text-rose-50",
+  Defensive: "bg-amber-400/80 text-amber-950",
+  Mixed: "bg-sky-400/80 text-sky-950",
+  Expansion: "bg-emerald-400/80 text-emerald-950",
+} as const;
+
+function RegimeProbabilityStrip({
+  transitionProbabilities,
+}: Pick<DiagnosticsSectionProps, "transitionProbabilities">) {
+  const orderedStates = (["Scarcity", "Defensive", "Mixed", "Expansion"] as const).map((label) => ({
+    label,
+    value: Math.max(0, transitionProbabilities[label] ?? 0),
+  }));
+  const total = orderedStates.reduce((sum, state) => sum + state.value, 0) || 1;
+  const leadingState = orderedStates.reduce((highest, state) => (state.value > highest.value ? state : highest), orderedStates[0]);
+
+  return (
+    <article className="mt-2 border-t border-slate-800/50 pt-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className={`text-xs ${neutralLabel}`}>Risk distribution</p>
+        <p className="text-[11px] text-slate-400">Most likely: {leadingState.label} {formatProbabilityPercent(leadingState.value)}</p>
+      </div>
+      <div className="mt-2 flex h-3 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
+        {orderedStates.map((state) => (
+          <div
+            key={state.label}
+            className={`${regimeProbabilityTone[state.label]} h-full`}
+            style={{ width: `${(state.value / total) * 100}%` }}
+          />
+        ))}
+      </div>
+      <ul className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
+        {orderedStates.map((state) => (
+          <li key={state.label} className="flex items-center justify-between gap-2 rounded-lg border border-slate-800/70 bg-slate-950/40 px-2.5 py-2">
+            <span>{state.label}</span>
+            <span className="font-semibold text-slate-100">{formatProbabilityPercent(state.value)}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
 export function DiagnosticsSection({
   weeklyMemoLines,
   immediateDecision,
@@ -64,7 +108,7 @@ export function DiagnosticsSection({
             <Accordion.Panel className={disclosurePanelClass}>
               <article className="py-1"><p className={`text-xs ${neutralLabel}`}>Evidence</p><ul className="mt-1 space-y-1 text-xs text-slate-200">{evidenceItems.map((item) => <li key={item.key}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>)}</ul></article>
               <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Drivers</p><p className="mt-1 text-xs text-slate-300">Top contributors: {topContributors}</p><p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary.replace(/\.$/, "")}</p></article>
-              <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Risk check</p><p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p></article>
+              <RegimeProbabilityStrip transitionProbabilities={transitionProbabilities} />
               {failureModes.length > 0 ? <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>False-signal warnings</p><ul className="mt-1 space-y-1 text-xs text-slate-300">{failureModes.slice(0, 2).map((mode) => <li key={mode.id}>• {mode.warning}</li>)}</ul></article> : null}
             </Accordion.Panel>
           </Accordion.Item>

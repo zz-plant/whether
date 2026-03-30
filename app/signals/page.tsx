@@ -20,6 +20,7 @@ import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
+import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
@@ -657,6 +658,10 @@ export default async function SignalsPage({
           ))}
         </div>
       </section>
+      {activeSignalsView === "implication" ? (
+        <SignalInversionPreview yieldCurveSeries={yieldCurveSeries} />
+      ) : null}
+
       {activeSignalsView === "implication" ? (
         <section className="weather-panel space-y-3 px-6 py-5">
           <div className="space-y-2">

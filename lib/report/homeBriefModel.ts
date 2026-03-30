@@ -3,7 +3,12 @@ import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "./opera
 import { getWeeklyPostureHistory } from "../summary/weeklyPostureHistory";
 import type { MacroSeriesReading } from "../types";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "./confidence";
-import { isImprovingSignalDelta, type HistoricalAnalog, type ReportEvidenceItem } from "./reportData";
+import {
+  isImprovingSignalDelta,
+  type HistoricalAnalog,
+  type LastYearComparison,
+  type ReportEvidenceItem,
+} from "./reportData";
 import { normalizeSignalContributions } from "./signalFormatting";
 import {
   REGIME_SEVERITY_RANK,
@@ -87,6 +92,7 @@ type HomeReportData = {
   macroSeries?: MacroSeriesReading[];
   forecast?: ForecastModel;
   historicalAnalogs?: HistoricalAnalog[];
+  lastYearComparison?: LastYearComparison | null;
   regimeSeries?: TimeMachineRegimeEntry[];
   treasuryProvenance?: { statusLabel?: string };
   treasury?: { fallback_at?: string | null; fallback_reason?: string | null };
@@ -343,6 +349,7 @@ export type WeeklyDecisionCardViewModel = {
     memoryRail: MemoryRailItem[];
     historicalTimeline: HistoricalTimelineItem[];
     historicalAnalogs: HomeBriefHistoricalAnalog[];
+    lastYearComparison: LastYearComparison | null;
     macroOverlay: MacroOverlayItem[];
   };
   sinceLastReview: StartRouteDeltaBlock;
@@ -1539,6 +1546,7 @@ export const buildHomeBriefModel = (
     historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline,
+    lastYearComparison: data.lastYearComparison ?? null,
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,
@@ -1672,6 +1680,7 @@ export const buildWeeklyDecisionCardViewModel = ({
       memoryRail: homeBriefModel.memoryRail,
       historicalTimeline: homeBriefModel.historicalTimeline,
       historicalAnalogs: homeBriefModel.historicalAnalogs,
+      lastYearComparison: homeBriefModel.lastYearComparison,
       macroOverlay: homeBriefModel.macroOverlay,
     },
     sinceLastReview: homeBriefModel.sinceLastReview,
