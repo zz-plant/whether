@@ -6,8 +6,8 @@ type NavigationZone = "core" | "workflow" | "reference";
 
 const zoneLabels: Record<NavigationZone, string> = {
   core: "Now",
-  workflow: "Decisions",
-  reference: "Sources",
+  workflow: "Evidence",
+  reference: "Trust",
 };
 
 const zoneDescriptors: Record<NavigationZone, string> = {
@@ -18,8 +18,8 @@ const zoneDescriptors: Record<NavigationZone, string> = {
 
 const zoneCompactLabels: Record<NavigationZone, string> = {
   core: "Now",
-  workflow: "Decisions",
-  reference: "Sources",
+  workflow: "Evidence",
+  reference: "Trust",
 };
 
 const zoneBadgeStyles: Record<NavigationZone, string> = {
