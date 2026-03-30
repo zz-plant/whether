@@ -12,7 +12,7 @@ export function SecondarySurfaceStartBlock({ surface }: SecondarySurfaceStartBlo
   return (
     <SecondaryPageSection
       eyebrow={`Secondary surface · ${contract.intentLabel}`}
-      title="Start from Weekly Brief, then use this helper surface."
+      title={contract.startInstruction}
       description={contract.helperSummary}
       actions={(
         <>

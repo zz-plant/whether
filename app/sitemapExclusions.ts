@@ -1,4 +1,5 @@
 export const retiredSitemapPaths = [
+  "/answers",
   "/guides",
   "/solutions",
   "/learn/concepts",
@@ -10,6 +11,7 @@ export const retiredSitemapPaths = [
   "/operate",
   "/templates",
   "/toolkit",
+  "/toolkits",
   "/operations/briefings",
   "/operations/plan",
   "/operations/decisions",

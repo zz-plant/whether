@@ -1,23 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+type ThemeMode = "dark" | "light";
+const STORAGE_KEY = "whether-theme";
+
+const getBootstrappedThemeMode = (): ThemeMode => {
+  if (typeof document !== "undefined") {
+    const bootstrappedTheme = document.documentElement.dataset.theme;
+    if (bootstrappedTheme === "dark" || bootstrappedTheme === "light") {
+      return bootstrappedTheme;
+    }
+  }
+
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+
+  try {
+    const savedTheme = window.localStorage.getItem(STORAGE_KEY);
+    if (savedTheme === "light" || savedTheme === "dark") {
+      return savedTheme;
+    }
+  } catch {
+    // Ignore storage errors.
+  }
+
+  return "dark";
+};
 
 export function ThemeToggleButton() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<ThemeMode>(getBootstrappedThemeMode);
   const isDark = theme === "dark";
 
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem("whether-theme");
-    const nextTheme = savedTheme === "light" ? "light" : "dark";
-    setTheme(nextTheme);
-    document.documentElement.dataset.theme = nextTheme;
-  }, []);
-
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
+    const nextTheme: ThemeMode = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
-    window.localStorage.setItem("whether-theme", nextTheme);
+    document.documentElement.style.colorScheme = nextTheme;
+
+    try {
+      window.localStorage.setItem(STORAGE_KEY, nextTheme);
+    } catch {
+      // Ignore storage errors.
+    }
   };
 
   return (
@@ -27,6 +53,7 @@ export function ThemeToggleButton() {
       className="weather-pill inline-flex min-h-[48px] w-full items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] sm:w-auto"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={!isDark}
+      suppressHydrationWarning
     >
       {isDark ? "Light" : "Dark"}
     </button>

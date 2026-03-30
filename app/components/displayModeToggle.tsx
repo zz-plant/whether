@@ -10,22 +10,58 @@ const getAutoDatasetMode = () => {
   return coarse || wide ? "tv" : "auto";
 };
 
-const getInitialToggleMode = (): "auto" | "tv" => {
+const getBootstrappedToggleMode = (): "auto" | "tv" | null => {
+  if (typeof document !== "undefined") {
+    const bootstrappedMode = document.documentElement.dataset.displayMode;
+    if (bootstrappedMode === "tv" || bootstrappedMode === "auto") {
+      return bootstrappedMode;
+    }
+  }
+
+  return null;
+};
+
+const getResolvedToggleMode = (): "auto" | "tv" | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const urlMode = new URLSearchParams(window.location.search).get("display");
-  if (urlMode === "tv" || urlMode === "auto") {
-    return urlMode;
+  if (urlMode === "tv") {
+    return "tv";
   }
 
-  const persisted = window.localStorage.getItem(STORAGE_KEY);
-  if (persisted === "tv" || persisted === "auto") {
-    return persisted;
+  if (urlMode === "auto") {
+    return getAutoDatasetMode();
   }
 
-  return "auto";
+  const bootstrapped = getBootstrappedToggleMode();
+  if (bootstrapped) {
+    return bootstrapped;
+  }
+
+  try {
+    const persisted = window.localStorage.getItem(STORAGE_KEY);
+    if (persisted === "tv") {
+      return "tv";
+    }
+
+    if (persisted === "auto") {
+      return getAutoDatasetMode();
+    }
+  } catch {
+    // Ignore storage errors.
+  }
+
+  return null;
+};
+
+const getInitialToggleMode = (): "auto" | "tv" => {
+  return getResolvedToggleMode() ?? "auto";
 };
 
 export const DisplayModeToggle = () => {
-  const [mode, setMode] = useState<"auto" | "tv">("auto");
+  const [mode, setMode] = useState<"auto" | "tv">(getInitialToggleMode);
 
   const triggerToggleHaptic = () => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -35,7 +71,7 @@ export const DisplayModeToggle = () => {
 
   useEffect(() => {
     const syncFromLocation = () => {
-      setMode(getInitialToggleMode());
+      setMode(getResolvedToggleMode() ?? "auto");
     };
 
     syncFromLocation();
@@ -50,7 +86,11 @@ export const DisplayModeToggle = () => {
 
   const updateMode = (nextMode: "auto" | "tv") => {
     setMode(nextMode);
-    window.localStorage.setItem(STORAGE_KEY, nextMode);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, nextMode);
+    } catch {
+      // Ignore storage errors.
+    }
 
     const nextUrl = new URL(window.location.href);
     if (nextMode === "tv") {
@@ -74,6 +114,7 @@ export const DisplayModeToggle = () => {
       aria-pressed={isTv}
       aria-label={isTv ? "Switch to auto display mode" : "Switch to TV display mode"}
       className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+      suppressHydrationWarning
     >
       {isTv ? "Use auto display mode" : "Force TV display mode"}
     </button>

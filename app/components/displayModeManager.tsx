@@ -18,6 +18,10 @@ const hasCoarsePointer = () => {
 };
 
 const getUrlMode = (): DisplayMode | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const searchParams = new URLSearchParams(window.location.search);
   const mode = searchParams.get("display");
 
@@ -32,21 +36,50 @@ const getUrlMode = (): DisplayMode | null => {
   return null;
 };
 
+const getBootstrappedMode = (): DisplayMode | null => {
+  if (typeof document !== "undefined") {
+    const bootstrappedMode = document.documentElement.dataset.displayMode;
+
+    if (bootstrappedMode === "tv" || bootstrappedMode === "auto") {
+      return bootstrappedMode;
+    }
+  }
+
+  return null;
+};
+
 const getInitialMode = (): DisplayMode => {
+  const bootstrapped = getBootstrappedMode();
+  if (bootstrapped) {
+    return bootstrapped;
+  }
+
   const urlMode = getUrlMode();
   if (urlMode) {
     return urlMode;
   }
 
-  const persisted = window.localStorage.getItem(STORAGE_KEY);
-  if (persisted === "tv" || persisted === "auto") {
-    return persisted;
+  if (typeof window === "undefined") {
+    return "auto";
+  }
+
+  try {
+    const persisted = window.localStorage.getItem(STORAGE_KEY);
+    if (persisted === "tv" || persisted === "auto") {
+      return persisted;
+    }
+  } catch {
+    // Ignore storage errors.
   }
 
   return "auto";
 };
 
 const getRenderedMode = (): DisplayMode | null => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
   const currentMode = document.documentElement.dataset.displayMode;
   if (currentMode === "tv" || currentMode === "auto") {
     return currentMode;
@@ -66,6 +99,10 @@ const applyMode = (mode: DisplayMode) => {
 };
 
 const persistMode = (mode: DisplayMode) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   if (window.localStorage.getItem(STORAGE_KEY) === mode) {
     return;
   }
@@ -74,6 +111,10 @@ const persistMode = (mode: DisplayMode) => {
 };
 
 const syncUrl = (mode: DisplayMode) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   const currentMode = getUrlMode();
 
   if (mode === "auto" && currentMode === null) {
@@ -105,12 +146,9 @@ export const initializeDisplayMode = (): DisplayMode => {
 };
 
 export const useDisplayMode = () => {
-  const [mode, setMode] = useState<DisplayMode>("auto");
+  const [mode, setMode] = useState<DisplayMode>(getInitialMode);
 
   useEffect(() => {
-    const initialMode = initializeDisplayMode();
-    setMode(initialMode);
-
     const onMediaChange = () => {
       if (window.localStorage.getItem(STORAGE_KEY) === "auto") {
         applyMode("auto");
@@ -128,11 +166,14 @@ export const useDisplayMode = () => {
     };
   }, []);
 
+  useEffect(() => {
+    applyMode(mode);
+    persistMode(mode);
+    syncUrl(mode);
+  }, [mode]);
+
   const updateMode = (nextMode: DisplayMode) => {
     setMode(nextMode);
-    applyMode(nextMode);
-    persistMode(nextMode);
-    syncUrl(nextMode);
   };
 
   return { mode, setMode: updateMode };

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type OrientationDestination = {
   href: string;
@@ -32,6 +32,25 @@ type HomeFirstRunOrientationProps = {
 
 const DISMISS_KEY = "whether.home.orientation.dismissed";
 
+const getBootstrappedDismissedState = () => {
+  if (typeof document !== "undefined") {
+    const bootstrappedDismissed = document.documentElement.dataset.homeOrientationDismissed;
+    if (bootstrappedDismissed === "true" || bootstrappedDismissed === "false") {
+      return bootstrappedDismissed === "true";
+    }
+  }
+
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(DISMISS_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 export function HomeFirstRunOrientation({
   changeSummary,
   decisionNow,
@@ -40,15 +59,15 @@ export function HomeFirstRunOrientation({
   featuredConcepts = [],
   currentPath = "/",
 }: HomeFirstRunOrientationProps) {
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    const hasDismissed = window.localStorage.getItem(DISMISS_KEY) === "1";
-    setDismissed(hasDismissed);
-  }, []);
+  const [dismissed, setDismissed] = useState(getBootstrappedDismissedState);
 
   const handleDismiss = () => {
-    window.localStorage.setItem(DISMISS_KEY, "1");
+    try {
+      window.localStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      // Ignore storage errors.
+    }
+    document.documentElement.dataset.homeOrientationDismissed = "true";
     setDismissed(true);
   };
 
@@ -56,9 +75,11 @@ export function HomeFirstRunOrientation({
     <section className="space-y-4" aria-label="Decision handoff">
       {!dismissed ? (
         <section
+          data-weather-first-run-orientation="true"
           className="weather-panel space-y-4 px-4 py-4 sm:px-5"
           aria-label="First-run orientation"
           data-testid="first-run-orientation"
+          suppressHydrationWarning
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
@@ -66,11 +87,11 @@ export function HomeFirstRunOrientation({
               <h2 className="text-sm font-semibold text-slate-100 sm:text-base">Fast orientation for this week</h2>
               <p className="text-xs text-slate-300">Scan delta, lock the call, then jump to execution surfaces.</p>
             </div>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="weather-button min-h-11 min-w-11 px-3 py-2 text-xs font-semibold"
-            >
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="weather-button min-h-11 min-w-11 px-3 py-2 text-xs font-semibold"
+              >
               Skip intro
             </button>
           </div>

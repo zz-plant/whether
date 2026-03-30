@@ -8,7 +8,7 @@ import {
 } from "../app/components/copyLeadershipArtifactsButtons";
 
 describe("CopyLeadershipArtifactsButtons", () => {
-  it("keeps primary copy actions ahead of secondary share actions", () => {
+  it("renders share and export actions in the artifact rail", () => {
     const html = renderToStaticMarkup(
       <CopyLeadershipArtifactsButtons
         boardSnippet="snippet"
@@ -19,16 +19,13 @@ describe("CopyLeadershipArtifactsButtons", () => {
       />,
     );
 
-    const boardSnippetIndex = html.indexOf("Copy board snippet");
+    const shareIndex = html.indexOf("Share brief");
     const snapshotIndex = html.indexOf("Copy weekly call snapshot");
-    const briefIndex = html.indexOf("Copy Weekly Operator Brief");
-    const moreActionsIndex = html.indexOf("More share actions");
+    const boardSnippetIndex = html.indexOf("Copy board snippet");
 
-    assert.ok(boardSnippetIndex >= 0);
-    assert.ok(snapshotIndex > boardSnippetIndex);
+    assert.ok(shareIndex >= 0);
     assert.ok(snapshotIndex >= 0);
-    assert.ok(briefIndex > snapshotIndex);
-    assert.ok(moreActionsIndex > briefIndex);
+    assert.ok(boardSnippetIndex >= 0);
   });
 
   it("maps copy states and preserves focus/disabled/touch button utility classes", () => {

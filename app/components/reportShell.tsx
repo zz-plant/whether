@@ -28,6 +28,7 @@ import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar
 import { ReportShellHeader, type ReportShellHeaderVariant } from "./reportShellHeader";
 import { ManualRefreshButton } from "./manualRefreshButton";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
+import { WebVitalsTracker } from "./webVitalsTracker";
 
 type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarget?: string };
 type SecondaryCtaProps = { href: string; label: string };
@@ -676,6 +677,7 @@ export const ReportShell = (props: ReportShellProps) => {
     <>
       <main id="main-content" tabIndex={-1} className="weather-shell relative isolate min-h-screen overflow-x-clip text-slate-100">
         <ClimateBackdrop regime={resolvedRegime || "NEUTRAL"} />
+        <WebVitalsTracker />
         {resolvedStructuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(resolvedStructuredData) }} /> : null}
         {enableTvAmbientMode ? <DisplayModeManager /> : null}
         {enableTvAmbientMode ? <AnchorFeedback /> : null}

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import type { Route } from "next";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   resolveGlobalHeaderNavigationLinks,
@@ -13,7 +14,13 @@ type GlobalHeaderNavClientProps = {
   variant?: "default" | "compact";
 };
 
-function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
+function NavigationLinkCard({
+  link,
+  onIntent,
+}: {
+  link: GlobalHeaderNavigationLink;
+  onIntent: (href: string) => void;
+}) {
   const eyebrow = link.href === "/" ? "Start here" : "Support path";
 
   return (
@@ -22,6 +29,8 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
         href={link.href}
         aria-current={link.isActive ? "page" : undefined}
         title={link.boundary}
+        onMouseEnter={() => onIntent(link.href)}
+        onFocus={() => onIntent(link.href)}
         className={`weather-pill group inline-flex min-h-[78px] min-w-[148px] flex-col items-start justify-start rounded-[1.2rem] px-3.5 py-3.5 text-left transition-colors touch-manipulation sm:h-full sm:min-w-0 ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/18 text-sky-50 shadow-[0_18px_34px_-26px_rgba(56,189,248,0.46)]"
@@ -46,7 +55,13 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
   );
 }
 
-function CompactNavigationLink({ link }: { link: GlobalHeaderNavigationLink }) {
+function CompactNavigationLink({
+  link,
+  onIntent,
+}: {
+  link: GlobalHeaderNavigationLink;
+  onIntent: (href: string) => void;
+}) {
   const isAnchor = link.href === "/";
 
   return (
@@ -54,6 +69,8 @@ function CompactNavigationLink({ link }: { link: GlobalHeaderNavigationLink }) {
       <Link
         href={link.href}
         aria-current={link.isActive ? "page" : undefined}
+        onMouseEnter={() => onIntent(link.href)}
+        onFocus={() => onIntent(link.href)}
         className={`inline-flex min-h-[40px] items-center justify-center rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/20 text-sky-50"
@@ -73,9 +90,14 @@ export function GlobalHeaderNavClient({
   variant = "default",
 }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
+  const router = useRouter();
   const resolvedPathname = pathname ?? currentPathname;
   const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleIntentPrefetch = (href: string) => {
+    router.prefetch(href as Route);
+  };
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -86,7 +108,7 @@ export function GlobalHeaderNavClient({
       <nav aria-label="Primary routes">
         <ul className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navigationLinks.map((link) => (
-            <CompactNavigationLink key={link.href} link={link} />
+            <CompactNavigationLink key={link.href} link={link} onIntent={handleIntentPrefetch} />
           ))}
         </ul>
       </nav>
@@ -111,7 +133,7 @@ export function GlobalHeaderNavClient({
         className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
       >
         {navigationLinks.map((link) => (
-          <NavigationLinkCard key={link.href} link={link} />
+          <NavigationLinkCard key={link.href} link={link} onIntent={handleIntentPrefetch} />
         ))}
       </ul>
       <div

@@ -1,0 +1,61 @@
+{
+  "url": "/decide/engineering/capital-raising",
+  "kind": "decide",
+  "title": "Engineering · Capital raising",
+  "generatedAtIso": "2026-03-27T00:00:00.000Z",
+  "snapshot": {
+    "recordDate": "2026-03-27",
+    "fetchedAtIso": "2026-03-30T21:49:12.015Z",
+    "previousRecordDate": "2025-02-28"
+  },
+  "delta": {
+    "regimeChanged": true,
+    "directionLabel": "deteriorating",
+    "changedSignals": [
+      {
+        "key": "riskAppetite",
+        "label": "Risk appetite",
+        "delta": -25
+      },
+      {
+        "key": "curveSlope",
+        "label": "Curve slope",
+        "delta": -0.17999999999999927
+      },
+      {
+        "key": "baseRate",
+        "label": "Base rate",
+        "delta": 0.020000000000000018
+      }
+    ]
+  },
+  "payload": {
+    "currentCall": "Begin raise planning early and optimize for durability over speed.",
+    "immediateAction": "Prepare raise materials and launch planning early to preserve process control.",
+    "triggerThreshold": "Pause acceleration if risk appetite falls below 44 or tightness rises above 76.",
+    "reversalCondition": "Resume full process when risk appetite > 54 and tightness < 66.",
+    "evidence": [
+      {
+        "title": "Capital conditions",
+        "summary": "No material operating change this week.",
+        "confidenceLabel": "Low (near threshold, stage decisions)"
+      },
+      {
+        "title": "Risk appetite",
+        "summary": "Bias toward proof-first launches and smaller bet sizes.",
+        "confidenceLabel": "High (safe for near-term operating cadence)"
+      },
+      {
+        "title": "Policy rate pressure",
+        "summary": "Shorten payback windows before approving net-new spend.",
+        "confidenceLabel": "Low (near threshold, stage decisions)"
+      }
+    ],
+    "freshness": "Mar 30, 2026 at 9:49 PM UTC",
+    "degraded": false,
+    "noindex": false,
+    "noindexReasons": [],
+    "trustSummary": "Signal reliability LOW (Mar 30, 2026 at 9:49 PM UTC): keep approvals staged until reliability returns to HIGH.",
+    "citationMeta": "Posture VOLATILE · Signal reliability LOW · Decision as-of Mar 27, 2026 · Data refreshed Mar 30, 2026 at 9:49 PM UTC"
+  }
+}

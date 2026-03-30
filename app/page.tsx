@@ -6,6 +6,7 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
+import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
@@ -110,6 +111,7 @@ export const HomePageReportContent = async ({
         },
       }}
     >
+      <HomeRoutePrefetch />
       <HomeWhatChangedSection
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
         leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}

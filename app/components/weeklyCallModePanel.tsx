@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import { CompactDisclosure } from "./compactDisclosure";
 import { PersistedAssistPanel } from "./literacyAssistControls";
 
 type PolicyDetails = {
@@ -209,10 +210,12 @@ export function WeeklyCallModePanel({
           </div>
         </article>
 
-        <details className={`${detailDisclosureBase} weather-auto-chevron mt-3`}>
-          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            More context
-          </summary>
+        <CompactDisclosure
+          queryKey="moreContext"
+          summary="More context"
+          className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
+          summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
+        >
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this is the hold line</p>
@@ -249,13 +252,15 @@ export function WeeklyCallModePanel({
               </div>
             </article>
           </div>
-        </details>
+        </CompactDisclosure>
 
         {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
-          <details className="weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
-            <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Supporting rationale
-            </summary>
+          <CompactDisclosure
+            queryKey="supportingRationale"
+            summary="Supporting rationale"
+            className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3"
+            summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
+          >
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? <p className="mt-2 text-[11px] leading-5 text-slate-400">Reason: {trustReason}</p> : null}
             {compactDecisionBullets.length > 0 ? (
@@ -301,7 +306,7 @@ export function WeeklyCallModePanel({
                 </div>
               </div>
             ) : null}
-          </details>
+          </CompactDisclosure>
         ) : null}
       </article>
     </>

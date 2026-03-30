@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
@@ -23,6 +24,44 @@ const siteName = "Whether — Capital Posture Governance Standard";
 const siteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
 const socialImageUrl = buildSocialImageUrl();
+const themeStorageKey = "whether-theme";
+const displayModeStorageKey = "whether-display-mode";
+const orientationDismissKey = "whether.home.orientation.dismissed";
+
+export const buildPersistedUiBootstrapScript = () => `
+(() => {
+  try {
+    const root = document.documentElement;
+    const storage = window.localStorage;
+    const theme = storage.getItem(${JSON.stringify(themeStorageKey)});
+    const nextTheme = theme === "light" ? "light" : "dark";
+    const displayModeParam = new URL(window.location.href).searchParams.get("display");
+    const persistedDisplayMode = storage.getItem(${JSON.stringify(displayModeStorageKey)});
+    const requestedDisplayMode = displayModeParam === "tv" || displayModeParam === "auto"
+      ? displayModeParam
+      : persistedDisplayMode === "tv" || persistedDisplayMode === "auto"
+        ? persistedDisplayMode
+        : "auto";
+    const coarsePointer = window.matchMedia("(min-width: 1280px) and (pointer: coarse)").matches || window.matchMedia("(min-width: 1920px)").matches;
+    const nextDisplayMode = requestedDisplayMode === "auto" && coarsePointer ? "tv" : requestedDisplayMode;
+    const dismissed = storage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
+
+    root.dataset.theme = nextTheme;
+    root.dataset.displayMode = nextDisplayMode;
+    root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
+    root.style.colorScheme = nextTheme;
+
+    if (!document.head.querySelector('style[data-weather-ui-bootstrap="orientation"]')) {
+      const style = document.createElement("style");
+      style.setAttribute("data-weather-ui-bootstrap", "orientation");
+      style.textContent = 'html[data-home-orientation-dismissed="true"] [data-weather-first-run-orientation="true"]{display:none !important;}';
+      document.head.appendChild(style);
+    }
+  } catch {
+    // Ignore bootstrap errors and let the server-rendered shell remain usable.
+  }
+})();
+`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -89,7 +128,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#020617",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#020617" },
+    { media: "(prefers-color-scheme: light)", color: "#f7fbff" },
+  ],
 };
 
 export default function RootLayout({
@@ -98,7 +140,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${weatherSans.variable} ${weatherDisplay.variable}`}>
+    <html lang="en" className={`${weatherSans.variable} ${weatherDisplay.variable}`} suppressHydrationWarning>
+      <head>
+        <Script id="whether-persisted-ui-bootstrap" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: buildPersistedUiBootstrapScript() }} />
+      </head>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content

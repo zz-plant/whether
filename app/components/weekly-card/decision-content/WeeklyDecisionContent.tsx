@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CompactDisclosure } from "../../compactDisclosure";
 import { disclosureSummaryClass } from "../shared";
 
 type WeeklyDecisionContentProps = {
@@ -30,17 +31,19 @@ export function WeeklyDecisionContent({
       </aside>
 
       <section className="xl:col-span-2">
-        <details id="deep-evidence" className="group rounded-xl border border-slate-800/70 bg-slate-950/45 px-3 py-2">
-          <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-            <span>Deep evidence</span>
-            <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-          </summary>
+        <CompactDisclosure
+          id="deep-evidence"
+          queryKey="deepEvidence"
+          summary="Deep evidence"
+          className="group rounded-xl border border-slate-800/70 bg-slate-950/45 px-3 py-2"
+          summaryClassName={disclosureSummaryClass}
+        >
           <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-4">
             {influenceSection}
             {diagnosticsSection}
             {matrixSection}
           </div>
-        </details>
+        </CompactDisclosure>
       </section>
     </div>
   );

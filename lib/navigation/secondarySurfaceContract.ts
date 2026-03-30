@@ -7,6 +7,7 @@ export type SecondarySurfaceContract = {
   parentHubLabel: string;
   returnCtaLabel: string;
   helperSummary: string;
+  startInstruction: string;
 };
 
 export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["surfaceKey"], SecondarySurfaceContract> = {
@@ -16,7 +17,8 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
-    helperSummary: "Use guides after reviewing the weekly brief to adapt the call for one role or company stage.",
+    helperSummary: "Use guides only after Decision Tools has narrowed the open question to one team, leader, or stage translation.",
+    startInstruction: "Route the question in Decision Tools, then open this helper surface.",
   },
   resources: {
     surfaceKey: "resources",
@@ -24,7 +26,8 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/operations",
     parentHubLabel: "Planning",
     returnCtaLabel: "Return to Planning",
-    helperSummary: "Use resources after the weekly brief when leadership needs deeper governance artifacts and templates.",
+    helperSummary: "Use resources only after Planning is already directionally clear and leadership still needs a deeper governance artifact or template.",
+    startInstruction: "Approve the plan in Planning, then open this helper surface.",
   },
   answers: {
     surfaceKey: "answers",
@@ -32,7 +35,8 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/decide",
     parentHubLabel: "Decision Tools",
     returnCtaLabel: "Return to Decision Tools",
-    helperSummary: "Use answers after the weekly brief when one specific yes-or-no question still needs a shareable answer.",
+    helperSummary: "Use answers only after Decision Tools has narrowed the remaining question to one direct, shareable yes-or-no answer.",
+    startInstruction: "Route the question in Decision Tools, then open this helper surface.",
   },
   concepts: {
     surfaceKey: "concepts",
@@ -40,6 +44,7 @@ export const secondarySurfaceContractByKey: Record<SecondarySurfaceContract["sur
     parentHubHref: "/method",
     parentHubLabel: "Trust",
     returnCtaLabel: "Return to Trust",
-    helperSummary: "Use concepts after the weekly brief to check whether a framework still holds under current evidence.",
+    helperSummary: "Use concepts only after the weekly call is clear and you need supporting framework context to pressure-test language, not to replace the call itself.",
+    startInstruction: "Confirm the live call first, then open this helper surface.",
   },
 };

@@ -6,6 +6,13 @@ import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { artifactModeLabels, literacyAssistStorageKeys, type ArtifactMode } from "../../lib/literacyAssist";
 import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
+import {
+  buildArtifactModeHref,
+  buildArtifactShareText,
+  buildArtifactShareTitle,
+  isArtifactMode,
+  parseArtifactModeFromSearch,
+} from "../../lib/shareArtifacts";
 
 type PrimaryActionType = "copy_weekly_brief";
 
@@ -20,6 +27,7 @@ type CopyTarget =
 
 type CopyState = "idle" | "copying" | "copied" | "error";
 type ActionButtonVariant = "primary" | "secondary" | "confirm" | "danger";
+type ShareState = "idle" | "sharing" | "shared" | "copied" | "error";
 
 const actionButtonBaseClassName =
   "inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation";
@@ -74,6 +82,7 @@ export function CopyLeadershipArtifactsButtons({
   const pathname = usePathname();
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const [artifactMode, setArtifactMode] = useState<ArtifactMode>("operator");
+  const [shareState, setShareState] = useState<ShareState>("idle");
   const [overrideReason, setOverrideReason] = useState("");
   const [overrideIndicator, setOverrideIndicator] = useState("");
   const [overrideOwner, setOverrideOwner] = useState("");
@@ -97,15 +106,56 @@ export function CopyLeadershipArtifactsButtons({
     : "";
 
   useEffect(() => {
-    try {
-      const storedMode = window.localStorage.getItem(literacyAssistStorageKeys.artifactMode);
-      if (storedMode === "operator" || storedMode === "explainer") {
-        setArtifactMode(storedMode);
+    const syncArtifactModeFromLocation = () => {
+      const urlMode = parseArtifactModeFromSearch(window.location.search);
+
+      if (urlMode) {
+        setArtifactMode(urlMode);
+        try {
+          window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, urlMode);
+        } catch {
+          // Ignore storage errors.
+        }
+        return;
       }
-    } catch {
-      // Ignore storage errors.
-    }
+
+      try {
+        const storedMode = window.localStorage.getItem(literacyAssistStorageKeys.artifactMode);
+        if (isArtifactMode(storedMode)) {
+          setArtifactMode(storedMode);
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.set("artifactMode", storedMode);
+          window.history.replaceState({}, "", nextUrl);
+        }
+      } catch {
+        // Ignore storage errors.
+      }
+    };
+
+    syncArtifactModeFromLocation();
+
+    const onPopState = () => {
+      syncArtifactModeFromLocation();
+    };
+
+    window.addEventListener("popstate", onPopState);
+
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+    };
   }, []);
+
+  useEffect(() => {
+    try {
+      const nextUrl = buildArtifactModeHref(window.location.href, artifactMode);
+      if (nextUrl !== window.location.href) {
+        window.history.replaceState({}, "", nextUrl);
+      }
+      window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, artifactMode);
+    } catch {
+      // Ignore storage/history errors.
+    }
+  }, [artifactMode]);
 
   const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
   const explainerBriefContent = [
@@ -159,13 +209,83 @@ export function CopyLeadershipArtifactsButtons({
     runExportPdf();
   };
 
+  const handleNativeShare = async () => {
+    if (shareState === "sharing") {
+      return;
+    }
+
+    trackContentCtaConversion({
+      pagePath: "/",
+      cluster: "tool",
+      intent: "board",
+      ctaId: "homepage_top_fold_share_weekly_brief",
+    });
+
+    const currentUrl = buildArtifactModeHref(window.location.href, artifactMode);
+    const shareText = buildArtifactShareText({
+      mode: artifactMode,
+      summary: "Share-ready weekly brief",
+      brief: applyOverride(primaryBriefContent),
+      url: currentUrl,
+    });
+    const payload = {
+      title: buildArtifactShareTitle(artifactMode),
+      text: shareText,
+      url: currentUrl,
+    };
+
+    const shareApi = navigator.share;
+    if (typeof shareApi !== "function") {
+      setShareState("sharing");
+      const copied = await copyToClipboard(shareText, "Share brief");
+      setShareState(copied ? "copied" : "error");
+      return;
+    }
+
+    try {
+      setShareState("sharing");
+      if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
+        throw new Error("Native share payload not supported.");
+      }
+
+      await shareApi.call(navigator, payload);
+      setShareState("shared");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setShareState("idle");
+        return;
+      }
+
+      const copied = await copyToClipboard(shareText, "Share brief");
+      setShareState(copied ? "copied" : "error");
+    }
+  };
+
   const copyLabel = (target: CopyTarget, label: string) => resolveCopyActionLabel(copyState(target), label);
+  const shareLabel = shareState === "sharing"
+    ? "Sharing…"
+    : shareState === "shared"
+      ? "Shared"
+      : shareState === "copied"
+        ? "Copied link"
+      : shareState === "error"
+        ? "Retry share"
+        : "Share brief";
 
   return (
     <div className="space-y-2">
-      <div className="grid gap-2 sm:grid-cols-2" aria-label="Primary weekly brief actions">
+      <div className="grid gap-2 sm:grid-cols-3" aria-label="Primary weekly brief actions">
         <ActionButton
           variant="primary"
+          type="button"
+          onClick={handleNativeShare}
+          disabled={shareState === "sharing" || isCopying}
+          aria-busy={shareState === "sharing"}
+        >
+          {shareLabel}
+        </ActionButton>
+        <ActionButton
+          variant="secondary"
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
@@ -189,9 +309,19 @@ export function CopyLeadershipArtifactsButtons({
           {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
         </ActionButton>
       </div>
+      <p className="px-1 text-[11px] leading-5 text-slate-400" role="status" aria-live="polite">
+        {shareState === "shared"
+          ? "Shared with the current artifact mode and link."
+          : shareState === "copied"
+            ? "Copied share link for the current artifact mode."
+          : shareState === "error"
+            ? "Share failed. Copy fallback is available."
+            : "Default share path: use the share button on mobile or the copy buttons on desktop."
+        }
+      </p>
 
       <p className="px-1 text-[11px] leading-5 text-slate-400">
-        Default share path: use the {artifactModeLabels[artifactMode].toLowerCase()}. Use the snapshot for short chat context; keep board variants and exception handling secondary.
+        Default share path: use the {artifactModeLabels[artifactMode].toLowerCase()}. The URL keeps the selected artifact mode so shared links reopen the same brief.
       </p>
       <div className="flex flex-wrap gap-2" aria-label="Artifact mode">
         {(["operator", "explainer"] as const).map((mode) => {
@@ -204,9 +334,12 @@ export function CopyLeadershipArtifactsButtons({
                 setArtifactMode(mode);
                 try {
                   window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, mode);
+                  const nextUrl = buildArtifactModeHref(window.location.href, mode);
+                  window.history.replaceState({}, "", nextUrl);
                 } catch {
                   // Ignore storage errors.
                 }
+                setShareState("idle");
                 if (mode !== artifactMode) {
                   trackOperatorWorkflowEvent({
                     type: "artifact_mode_selected",
