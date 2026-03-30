@@ -114,6 +114,7 @@ export const HomePageReportContent = async ({
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
         leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
         fallbackActive={homepage.fallbackActive}
+        searchParams={resolvedSearchParams}
       />
 
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
