@@ -7,7 +7,6 @@ import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
-import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading } from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
@@ -26,7 +25,6 @@ import {
   buildWeeklyCitationMetaLine,
   buildTrustMarker,
 } from "../../lib/report/trustStatus";
-import { PersistedAssistPanel } from "./literacyAssistControls";
 
 /**
  * Loop stage owner: presentation/artifact.
@@ -296,16 +294,6 @@ function DecisionTransmissionRail({
           Share-ready
         </span>
       </div>
-      <PersistedAssistPanel
-        assistMode="share"
-        buttonLabel="Translate for sharing"
-        title="Which artifact should you use?"
-        summary="Use the shortest artifact that still fits the audience. The point is to keep the call aligned, not to over-package it."
-      >
-        <p><span className="font-semibold text-slate-50">Operator brief</span> = the default handoff for leadership alignment and weekly execution.</p>
-        <p><span className="font-semibold text-slate-50">Explainer brief</span> = use when the recipient needs the rationale and plain-English signal translation, not just the call.</p>
-        <p><span className="font-semibold text-slate-50">Snapshot</span> = short chat context when the room already understands the weekly call.</p>
-      </PersistedAssistPanel>
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact preview</p>
@@ -459,8 +447,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     confidenceLabel,
     confidencePercent,
     trendLabel,
-    confidenceHistory = [],
-    confidenceTrend = "unstable",
     isFallbackSnapshot = false,
   } = status;
   const {
@@ -762,7 +748,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
         asideContent={(
           <>
-            <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
             <DecisionTransmissionRail
               actionNow={snapshotDoNow}
               guardrail={snapshotGuardrail}
