@@ -124,7 +124,7 @@ export const ReportPageNavigation = ({
 };
 
 export const ReportInterpretationNotes = () => (
-  <details className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3">
+  <details className="weather-auto-chevron rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3">
     <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-200">
       How to interpret this week
     </summary>

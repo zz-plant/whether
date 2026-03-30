@@ -134,7 +134,7 @@ export function HomeFirstRunOrientation({
         </div>
       </section>
 
-      <details className="weather-panel space-y-4 px-5 py-4" id="why-whether">
+      <details className="weather-panel weather-auto-chevron space-y-4 px-5 py-4" id="why-whether">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
           Optional context and decision playbooks
         </summary>

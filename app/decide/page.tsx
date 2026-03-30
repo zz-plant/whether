@@ -240,7 +240,7 @@ export default async function DecidePage() {
         </div>
       </HubSection>
 
-      <details className="weather-panel scroll-mt-28 space-y-3 px-6 py-6">
+      <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           Open downstream libraries only if routing still is not clear
         </summary>

@@ -226,7 +226,7 @@ export function CopyLeadershipArtifactsButtons({
         })}
       </div>
 
-      <details className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
+      <details className="weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
         <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
           Board, print, and company exceptions
         </summary>

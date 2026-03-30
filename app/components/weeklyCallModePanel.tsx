@@ -209,7 +209,7 @@ export function WeeklyCallModePanel({
           </div>
         </article>
 
-        <details className={`${detailDisclosureBase} mt-3`}>
+        <details className={`${detailDisclosureBase} weather-auto-chevron mt-3`}>
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
             More context
           </summary>
@@ -252,7 +252,7 @@ export function WeeklyCallModePanel({
         </details>
 
         {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
-          <details className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+          <details className="weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
             <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               Supporting rationale
             </summary>

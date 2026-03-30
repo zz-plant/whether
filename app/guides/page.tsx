@@ -236,7 +236,7 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
         </div>
       </SecondaryPageSection>
 
-      <details className="weather-panel space-y-3 px-6 py-6">
+      <details className="weather-panel weather-auto-chevron space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           {showStageLibrary ? "Browse the rest of the stage library" : `Open the rest of the stage library (${stageGuides.length})`}
         </summary>
