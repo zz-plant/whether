@@ -30,6 +30,11 @@ export function ReportShellHeader({
   pageTitle,
   pageNavVariant,
 }: ReportShellHeaderProps) {
+  const hideCanonicalPositioningLineOnMobile = currentPath === "/signals" ||
+    currentPath.startsWith("/signals/") ||
+    currentPath === "/method" ||
+    currentPath.startsWith("/method/");
+
   const contextBadge = variant === "evidence"
     ? {
         label: "Evidence appendix",
@@ -123,7 +128,7 @@ export function ReportShellHeader({
             <p className="max-w-2xl text-xs leading-relaxed text-slate-300">
               {contextBadge?.copy ?? "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."}
             </p>
-            <p className="max-w-2xl text-[11px] leading-relaxed text-slate-400">
+            <p className={`max-w-2xl text-[11px] leading-relaxed text-slate-400 ${hideCanonicalPositioningLineOnMobile ? "hidden sm:block" : ""}`}>
               {canonicalPositioningLine}
             </p>
           </div>
