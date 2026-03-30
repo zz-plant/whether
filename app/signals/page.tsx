@@ -26,6 +26,7 @@ import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
 import { PersistedAssistPanel } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
+import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -134,6 +135,7 @@ export default async function SignalsPage({
     statusLabel,
     stopItems,
     actionNowShort,
+    guardrailThreshold,
     flipThreshold,
     treasury,
     treasuryProvenance,
@@ -191,6 +193,12 @@ export default async function SignalsPage({
     : isFallback
       ? "Live update delayed — avoid irreversible decisions until signals refresh."
       : "Use this evidence to confirm this week's call or change it now.";
+  const triggerCondition = guardrailThreshold?.trim().length ? guardrailThreshold : "Pause if thresholds weaken.";
+  const reversalCondition = flipThreshold?.trim().length ? flipThreshold : "Resume once reversal thresholds recover.";
+  const showMicroDecisionRows = shouldSplitDecisionConditionRows({
+    trigger: triggerCondition,
+    reversal: reversalCondition,
+  });
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
@@ -494,7 +502,25 @@ export default async function SignalsPage({
             </div>
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reopen the call when</p>
-              <p className="mt-2 text-sm text-slate-200">{flipThreshold}</p>
+              {showMicroDecisionRows ? (
+                <div className="mt-2 space-y-2 text-sm text-slate-200">
+                  <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</p>
+                    <p className="mt-1">{triggerCondition}</p>
+                  </div>
+                  <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</p>
+                    <p className="mt-1">{reversalCondition}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-slate-200">
+                  <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</span>
+                  {triggerCondition}
+                  <span className="ml-2 mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</span>
+                  {reversalCondition}
+                </p>
+              )}
             </div>
           </div>
         </article>

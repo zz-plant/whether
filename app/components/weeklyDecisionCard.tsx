@@ -18,7 +18,7 @@ import type {
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
-import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
+import { buildCompactFreshnessMeta, shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
 import { buildThresholdMarkerState } from "../../lib/report/homeBriefPresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
@@ -286,6 +286,11 @@ function DecisionTransmissionRail({
   citation,
   actions,
 }: DecisionTransmissionRailProps) {
+  const showMicroRows = shouldSplitDecisionConditionRows({
+    trigger: guardrail,
+    reversal: flipWhen,
+  });
+
   return (
     <article id="share-ready-artifact" className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
       <div className="flex items-center justify-between gap-3">
@@ -308,14 +313,25 @@ function DecisionTransmissionRail({
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-emerald-200">Action</span>
               {actionNow}
             </p>
-            <p className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Threshold</span>
-              {guardrail}
-            </p>
-            <p className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</span>
-              {flipWhen}
-            </p>
+            {showMicroRows ? (
+              <div className="space-y-2 rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
+                <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</p>
+                  <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
+                </div>
+                <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</p>
+                  <p className="mt-1 text-sm text-slate-100">{flipWhen}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
+                <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</span>
+                {guardrail}
+                <span className="ml-2 mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</span>
+                {flipWhen}
+              </p>
+            )}
           </div>
         </div>
       </div>
