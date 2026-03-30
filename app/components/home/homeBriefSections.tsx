@@ -8,14 +8,20 @@ import { HomeInterpretationPanel } from "../homeInterpretationPanel";
 import { LiveDataFallbackAlert } from "../liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../operatorWorkflowRouteTracker";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
+import type { ArtifactMode } from "../../../lib/literacyAssist";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
 
 type ArtifactActionsProps = {
   artifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
+  initialArtifactMode?: ArtifactMode;
 };
 
-const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActive }: ArtifactActionsProps) => {
+const LeadershipArtifactActions = async ({
+  artifactPayloadPromise,
+  fallbackActive,
+  initialArtifactMode,
+}: ArtifactActionsProps) => {
   const artifactPayload = await artifactPayloadPromise;
 
   if (!artifactPayload) {
@@ -35,6 +41,7 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
         boardSummary={artifactPayload.boardSummary}
         citation={artifactPayload.callCitation}
         fallbackActive={fallbackActive}
+        initialArtifactMode={initialArtifactMode}
       />
     </StreamedSectionReveal>
   );
@@ -45,11 +52,13 @@ export const HomeWhatChangedSection = ({
   leadershipArtifactPayloadPromise,
   fallbackActive,
   searchParams,
+  initialArtifactMode,
 }: {
   weeklyDecisionCardModel: HomePageAssembly["weeklyDecisionCardModel"];
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
   searchParams?: Record<string, string | undefined>;
+  initialArtifactMode?: ArtifactMode;
 }) => (
   <>
     <OperatorWorkflowRouteTracker />
@@ -61,6 +70,7 @@ export const HomeWhatChangedSection = ({
           <LeadershipArtifactActions
             artifactPayloadPromise={leadershipArtifactPayloadPromise}
             fallbackActive={fallbackActive}
+            initialArtifactMode={initialArtifactMode}
           />
         </Suspense>
       )}

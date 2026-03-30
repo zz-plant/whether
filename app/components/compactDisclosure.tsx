@@ -90,6 +90,12 @@ export function CompactDisclosure({
         }
 
         const nextHref = buildDisclosureHref(window.location.pathname, new URLSearchParams(window.location.search), queryKey, nextOpen, queryValue);
+        const currentHref = `${window.location.pathname}${window.location.search}`;
+
+        if (nextHref === currentHref) {
+          return;
+        }
+
         window.history.pushState({}, "", `${nextHref}${window.location.hash}`);
       }}
       className={className}

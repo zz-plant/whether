@@ -5,6 +5,7 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
+import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import {
@@ -43,6 +44,9 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
+  const initialArtifactMode = isArtifactMode(resolvedSearchParams?.artifactMode)
+    ? resolvedSearchParams.artifactMode
+    : undefined;
 
   return (
     <ReportShell
@@ -117,6 +121,7 @@ export const HomePageReportContent = async ({
         leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
         fallbackActive={homepage.fallbackActive}
         searchParams={resolvedSearchParams}
+        initialArtifactMode={initialArtifactMode}
       />
 
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />

@@ -12,7 +12,7 @@ const getAutoDatasetMode = () => {
 
 const getBootstrappedToggleMode = (): "auto" | "tv" | null => {
   if (typeof document !== "undefined") {
-    const bootstrappedMode = document.documentElement.dataset.displayMode;
+    const bootstrappedMode = document.documentElement.dataset.displayPreference;
     if (bootstrappedMode === "tv" || bootstrappedMode === "auto") {
       return bootstrappedMode;
     }
@@ -96,9 +96,11 @@ export const DisplayModeToggle = () => {
     if (nextMode === "tv") {
       nextUrl.searchParams.set("display", "tv");
       document.documentElement.dataset.displayMode = "tv";
+      document.documentElement.dataset.displayPreference = "tv";
     } else {
       nextUrl.searchParams.delete("display");
       document.documentElement.dataset.displayMode = getAutoDatasetMode();
+      document.documentElement.dataset.displayPreference = "auto";
     }
 
     window.history.replaceState({}, "", nextUrl);

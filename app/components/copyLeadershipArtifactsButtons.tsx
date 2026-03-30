@@ -71,6 +71,7 @@ export function CopyLeadershipArtifactsButtons({
   boardSummary,
   citation,
   fallbackActive = false,
+  initialArtifactMode = "operator",
 }: {
   boardSnippet: string;
   weeklyCallSnapshot: string;
@@ -78,10 +79,11 @@ export function CopyLeadershipArtifactsButtons({
   boardSummary: string;
   citation: string;
   fallbackActive?: boolean;
+  initialArtifactMode?: ArtifactMode;
 }) {
   const pathname = usePathname();
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
-  const [artifactMode, setArtifactMode] = useState<ArtifactMode>("operator");
+  const [artifactMode, setArtifactMode] = useState<ArtifactMode>(initialArtifactMode);
   const [shareState, setShareState] = useState<ShareState>("idle");
   const [overrideReason, setOverrideReason] = useState("");
   const [overrideIndicator, setOverrideIndicator] = useState("");
@@ -123,8 +125,7 @@ export function CopyLeadershipArtifactsButtons({
         const storedMode = window.localStorage.getItem(literacyAssistStorageKeys.artifactMode);
         if (isArtifactMode(storedMode)) {
           setArtifactMode(storedMode);
-          const nextUrl = new URL(window.location.href);
-          nextUrl.searchParams.set("artifactMode", storedMode);
+          const nextUrl = buildArtifactModeHref(window.location.href, storedMode);
           window.history.replaceState({}, "", nextUrl);
         }
       } catch {
@@ -143,7 +144,7 @@ export function CopyLeadershipArtifactsButtons({
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, []);
+  }, [initialArtifactMode]);
 
   useEffect(() => {
     try {

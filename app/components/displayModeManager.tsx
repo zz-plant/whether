@@ -38,7 +38,7 @@ const getUrlMode = (): DisplayMode | null => {
 
 const getBootstrappedMode = (): DisplayMode | null => {
   if (typeof document !== "undefined") {
-    const bootstrappedMode = document.documentElement.dataset.displayMode;
+    const bootstrappedMode = document.documentElement.dataset.displayPreference;
 
     if (bootstrappedMode === "tv" || bootstrappedMode === "auto") {
       return bootstrappedMode;
@@ -92,10 +92,12 @@ const applyMode = (mode: DisplayMode) => {
   const nextMode = mode === "auto" && hasCoarsePointer() ? "tv" : mode;
 
   if (getRenderedMode() === nextMode) {
+    document.documentElement.dataset.displayPreference = mode;
     return;
   }
 
   document.documentElement.dataset.displayMode = nextMode;
+  document.documentElement.dataset.displayPreference = mode;
 };
 
 const persistMode = (mode: DisplayMode) => {

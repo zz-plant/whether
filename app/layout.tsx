@@ -48,6 +48,7 @@ export const buildPersistedUiBootstrapScript = () => `
 
     root.dataset.theme = nextTheme;
     root.dataset.displayMode = nextDisplayMode;
+    root.dataset.displayPreference = requestedDisplayMode;
     root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
     root.style.colorScheme = nextTheme;
 
