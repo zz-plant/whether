@@ -50,10 +50,10 @@ export function ReportShellHeader({
       : null;
 
   return (
-    <header className="weather-appbar relative z-20 border-slate-800/70 px-4 py-3 sm:px-6 sm:py-4 lg:sticky lg:top-4">
+    <header className="weather-appbar relative z-20 border-slate-800/60 px-4 py-2.5 sm:px-5 sm:py-3 lg:sticky lg:top-4">
       {variant === "home-brief" ? (
-        <div className="flex flex-col gap-2.5 xl:flex-row xl:items-end xl:justify-between">
-          <div className="min-w-0 space-y-2">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0 space-y-2.5">
             <div className="flex flex-wrap items-center gap-2.5">
               <Image
                 src="/whether-logo.svg"
@@ -74,24 +74,9 @@ export function ReportShellHeader({
               <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.05rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[1.4rem]">
                 Decide this week&apos;s pace in one screen.
               </p>
-              <div className="hidden gap-1.5 text-[11px] leading-relaxed text-slate-300 sm:grid sm:grid-cols-2 xl:max-w-[48rem]">
-                <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
-                  <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-100">Posture</span>
-                  Keep this week&apos;s regime as the operating baseline.
-                </p>
-                <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
-                  <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-100">Do now</span>
-                  Execute only the bounded moves already approved for this posture.
-                </p>
-                <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
-                  <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-100">Watch threshold</span>
-                  Track the nearest trigger that changes pacing.
-                </p>
-                <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
-                  <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-100">Flip condition</span>
-                  Reverse only when the trigger confirms.
-                </p>
-              </div>
+              <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
+                Stay on this screen for the call, the immediate move, the closest threshold, and the flip condition. Open a support path only if a specific question remains.
+              </p>
             </div>
           </div>
           <div className="xl:min-w-[30rem]">
@@ -105,7 +90,7 @@ export function ReportShellHeader({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0 space-y-2.5">
             <div className="flex flex-wrap items-center gap-3">
               <Image
@@ -132,14 +117,11 @@ export function ReportShellHeader({
               {canonicalPositioningLine}
             </p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
-            <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Decision as-of</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
-            </div>
-            <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Data refreshed</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+          <div className="xl:min-w-[23rem]">
+            <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+              <span>Decision as-of {recordDateLabel}</span>
+              <span className="text-slate-500">•</span>
+              <span>Data refreshed {fetchedAtLabel}</span>
             </div>
           </div>
         </div>

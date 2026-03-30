@@ -201,15 +201,11 @@ export default async function OperationsPage({
       pageSummary="Turn the weekly call into this week's plan, then confirm guardrails, finance decisions, and the final brief."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open planning flow ↓" }}
       primaryCta={{
-        href: "/",
-        label: "Return to Weekly Brief",
+        href: "#ops-monthly-action-summary",
+        label: "Start planning review",
       }}
-      secondaryCta={{ href: "#ops-monthly-action-summary", label: "Open planning flow" }}
+      secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       exportCta={{ href: "#ops-export-briefs", label: "Open final brief" }}
-      nextStep={{
-        href: "/",
-        description: "Return to Weekly Brief when the planning review is complete",
-      }}
       pageNavVariant="compact"
       showPageNavigation={true}
       decisionBanner={{

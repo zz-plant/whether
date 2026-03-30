@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { Children, type ReactNode, isValidElement } from "react";
+import type { Route } from "../../lib/navigation/routeType";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
@@ -32,7 +33,7 @@ type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarg
 type SecondaryCtaProps = { href: string; label: string };
 type ExportCtaProps = { href: string; label: string };
 
-const isInternalHref = (href: string) => href.startsWith("/") || href.startsWith("#");
+const isRouteHref = (href: string) => href.startsWith("/");
 const InternalAwareLink = ({
   href,
   className,
@@ -44,9 +45,9 @@ const InternalAwareLink = ({
   children: ReactNode;
   ariaCurrent?: "page" | "step";
 }) => {
-  if (isInternalHref(href)) {
+  if (isRouteHref(href)) {
     return (
-      <Link href={href} className={className} aria-current={ariaCurrent}>
+      <Link href={href as Route} className={className} aria-current={ariaCurrent}>
         {children}
       </Link>
     );
@@ -76,7 +77,7 @@ type ActionSequence = {
 
 type RoleSwitcher = {
   active: string;
-  options: Array<{ key: string; label: string; href: string }>;
+  options: Array<{ key: string; label: string; href: Route }>;
 };
 
 type DecisionDiff = { label: string; tone?: "neutral" | "positive" | "warning" };
@@ -471,8 +472,8 @@ export function CommandCenterNavBlock({
   const primaryDecisionText = decisionBanner?.decision ?? (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   return (
     <>
-      <section className="weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5">
-        <div className="space-y-3 sm:space-y-4">
+      <section className="weather-panel-static min-w-0 space-y-3 px-4 py-4 sm:space-y-4 sm:px-5">
+        <div className="space-y-3">
           {roleSwitcher ? (
             <div className="space-y-2">
               <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Role view</p>
@@ -491,13 +492,16 @@ export function CommandCenterNavBlock({
         </div>
 
         {primaryCta ? (
-          <div id="report-primary-actions" className="flex w-full min-w-0">
-            <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
+          <div id="report-primary-actions" className="space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">On this page</p>
+            <div className="flex w-full min-w-0">
+              <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
+            </div>
           </div>
         ) : null}
         {secondaryCta || nextStep || exportCta ? (
-          <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">
-            Continue:
+          <p className="text-[11px] font-semibold tracking-[0.08em] text-slate-400">
+            Elsewhere:
             {secondaryCta ? (
               <>
                 {" "}
@@ -519,7 +523,7 @@ export function CommandCenterNavBlock({
           </p>
         ) : null}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dl className="weather-surface weather-meta-list min-h-[44px] flex-1 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
+          <dl className="weather-surface weather-meta-list min-h-[40px] flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.06em] text-slate-100" aria-label="Current report status">
             <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
             <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
             <div className="weather-meta-list__item"><dt className="text-slate-400">Data refreshed</dt><dd>{fetchedAtLabel}</dd></div>
@@ -527,21 +531,21 @@ export function CommandCenterNavBlock({
           </dl>
           <ManualRefreshButton title="Request the latest weekly brief snapshot." />
         </div>
-        <p className="text-sm text-slate-200">{trustStatusAction}</p>
+        <p className="text-xs leading-relaxed text-slate-300">{trustStatusAction}</p>
         {showOfflineBadge ? <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">{offlineBadgeLabel}</p> : null}
       </section>
 
-      <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Decision snapshot">
+      <section className="weather-panel space-y-4 px-4 py-5 sm:px-5" aria-label="Decision snapshot">
         <div className="grid gap-3 lg:grid-cols-[1.6fr,1.4fr]">
-          <article className="weather-surface space-y-3 p-4">
+          <article className="weather-surface space-y-3 border-sky-400/25 bg-sky-500/8 p-4">
             <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
-            <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{primaryDecisionText}</h2>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-[1.45rem]">{primaryDecisionText}</h2>
             <p className="text-sm text-slate-300">{missionSupportText}</p>
             {decisionDiffs?.length ? <ul className="mt-2 flex flex-wrap gap-2" aria-label="Decision deltas">{decisionDiffs.map((item) => <li key={item.label} className="inline-flex min-h-[28px] items-center rounded-full border border-slate-700/80 bg-slate-900/60 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-slate-200">{item.label}</li>)}</ul> : null}
             {decisionBanner?.evidenceHref ? <InternalAwareLink href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">See supporting evidence<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></InternalAwareLink> : null}
           </article>
           <article className="weather-surface space-y-3 p-4">
-            <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{missionSequenceTitle}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{missionSequenceTitle}</p>
             <ol className="space-y-2">{missionSequenceItems.map((item) => <li key={item.title} className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3"><p className="text-xs font-semibold tracking-[0.1em] text-slate-400">{item.phase}</p><p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p><p className="mt-1 text-xs text-slate-300">{item.detail}</p></li>)}</ol>
           </article>
         </div>
@@ -690,7 +694,7 @@ export const ReportShell = (props: ReportShellProps) => {
           />
           {resolvedCommandBar ? (
             <section
-              className="sticky top-1 z-30 mt-3 rounded-xl border border-slate-700/75 bg-slate-950/92 px-3 py-2.5 sm:top-2 sm:px-3.5"
+              className="sticky top-1 z-30 mt-3 rounded-xl border border-slate-700/60 bg-slate-950/82 px-3 py-2 sm:top-2 sm:px-3.5"
               aria-label="Decision snapshot"
             >
               <div className="grid gap-1.5 text-[11px] leading-5 text-slate-200 sm:grid-cols-3">

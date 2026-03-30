@@ -368,11 +368,11 @@ export default async function SignalsPage({
       pageNavVariant="compact"
       headerVariant="evidence"
       showPageNavigation={true}
-      primaryCta={{ href: "/", label: "Return to Weekly Brief" }}
-      secondaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
+      primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
+      secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       nextStep={{
-        href: "/",
-        description: "Return to Weekly Brief once the evidence check is complete",
+        href: "/operations",
+        description: "Open Planning once the evidence check is complete",
       }}
       decisionBanner={{
         label: "Decision",

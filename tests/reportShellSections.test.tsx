@@ -44,9 +44,9 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Data provenance/);
-    assert.match(html, /Outage approvals/);
-    assert.match(html, /Recovery runbook/);
+    assert.match(html, /Data trust/);
+    assert.match(html, /Approval status/);
+    assert.match(html, /Recovery progress/);
     assert.match(html, /Data source details/);
     assert.match(html, /\/method/);
   });
@@ -95,7 +95,8 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Whether report/);
-    assert.match(html, /Mission control/);
+    assert.match(html, /On this page/);
+    assert.match(html, /Elsewhere/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
   });

@@ -1,11 +1,12 @@
 import Link from "next/link";
+import type { Route } from "../../lib/navigation/routeType";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { getCompactSectionLabel } from "../../lib/report/homeSections";
 import { defaultPageLinkIcon, pageLinkIcons } from "./reportShellPageIcons";
 
 export type ReportPageLink = {
   id: string;
-  href: string;
+  href: Route;
   label: string;
   description: string;
   group: "core" | "workflow" | "reference";
@@ -182,13 +183,13 @@ export const ReportSectionNavigation = ({
       <ol className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-3">
         {visibleSectionLinks.map((section, index) => (
           <li key={section.href}>
-            <Link
+            <a
               href={section.href}
               className="inline-flex min-h-[42px] w-full items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/50 px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               <span>{resolveCompactSectionLabel(section)}</span>
               <span className="text-[10px] text-slate-400">{index + 1}</span>
-            </Link>
+            </a>
           </li>
         ))}
       </ol>
@@ -270,13 +271,13 @@ export const ReportMobileNavigation = ({
             <ol className="mt-3 grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
               {mobileSectionLinks.map((section, index) => (
                 <li key={section.href}>
-                  <Link
+                  <a
                     href={section.href}
                     className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{resolveCompactSectionLabel(section)}</span>
                     <span className="text-[10px] text-slate-400">{index + 1}</span>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ol>

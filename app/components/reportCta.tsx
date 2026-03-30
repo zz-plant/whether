@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
+import type { Route } from "../../lib/navigation/routeType";
 import { useClipboardCopy } from "./useClipboardCopy";
 
 type ReportCtaProps = {
@@ -17,7 +18,7 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;
-  const isInternalHref = href.startsWith("/") || href.startsWith("#");
+  const isRouteHref = href.startsWith("/");
 
   const handleCopyClick = async (event: MouseEvent<HTMLAnchorElement>) => {
     if (!copyText) {
@@ -35,9 +36,9 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
     }
   };
 
-  if (!copyText && isInternalHref) {
+  if (!copyText && isRouteHref) {
     return (
-      <Link href={href} className={className}>
+      <Link href={href as Route} className={className}>
         {children ?? label}
       </Link>
     );
