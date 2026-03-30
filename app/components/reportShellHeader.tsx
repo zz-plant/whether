@@ -37,13 +37,13 @@ export function ReportShellHeader({
 
   const contextBadge = variant === "evidence"
     ? {
-        label: "Evidence appendix",
+        label: "Screen: Evidence",
         className: "border-sky-300/35 bg-sky-400/10 text-sky-100",
         copy: "Signal thresholds, score movement, and replay context to validate or challenge this week's call.",
       }
     : variant === "trust"
       ? {
-          label: "Trust audit hub",
+          label: "Screen: Trust",
           className: "border-emerald-300/35 bg-emerald-400/10 text-emerald-100",
           copy: "Freshness, confidence, and source checks before approving irreversible decisions.",
         }
