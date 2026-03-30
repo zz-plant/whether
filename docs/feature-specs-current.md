@@ -34,7 +34,6 @@ links, and section anchors used across the report experience.
 
 The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
 hero plus share/copy actions, then the page continues as a compact handoff sequence:
-- returning-visitor delta strip (only when the current read changed since the last visit),
 - planning handoff,
 - evidence/trust exception handoff,
 - deeper-surface chooser.
@@ -44,11 +43,8 @@ shows posture, trend, confidence, and flip-window context, and the canonical wee
 once below it with explicit `Action now`, `Pause if`, and `Change course if` fields. The share rail
 now keeps the weekly operator brief and short snapshot as the only default-scan actions, while board
 packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
-The Weekly Brief now also includes a lightweight translation router so users can jump straight to
-the kind of help they need: evidence, decision, trust, or share translation. Section-level help
-panels persist by literacy type instead of forcing one global simplified mode for every user.
-Operator-workflow telemetry now also logs assist-panel opens, artifact-mode selection, and route
-transitions across the core weekly loop so mixed-literacy friction can be measured directly.
+Operator-workflow telemetry still logs artifact-mode selection and route transitions across the core
+weekly loop.
 The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share-ready artifact -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.

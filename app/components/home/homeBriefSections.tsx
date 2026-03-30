@@ -6,33 +6,9 @@ import { StreamedSectionReveal } from "../streamedSectionReveal";
 import { HomeWorkspaceBands } from "./homeWorkspaceBands";
 import { HomeInterpretationPanel } from "../homeInterpretationPanel";
 import { LiveDataFallbackAlert } from "../liveDataFallbackAlert";
-import { ReturningVisitorDeltaStrip } from "../changeSinceLastReadPanel";
-import { LiteracyAssistRouter } from "../literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../operatorWorkflowRouteTracker";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
-import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import type { LiteracyAssistMode } from "../../../lib/literacyAssist";
-
-const buildAssistHref = ({
-  assist,
-  hash,
-  searchParams,
-}: {
-  assist: LiteracyAssistMode;
-  hash: string;
-  searchParams?: Record<string, string | undefined>;
-}) => {
-  const params = new URLSearchParams();
-  Object.entries(searchParams ?? {}).forEach(([key, value]) => {
-    if (typeof value === "string" && value.length > 0) {
-      params.set(key, value);
-    }
-  });
-  params.set("assist", assist);
-  const query = params.toString();
-  return `/${query ? `?${query}` : ""}${hash}`;
-};
 
 type ArtifactActionsProps = {
   artifactPayloadPromise: Promise<ArtifactPayload | null>;
@@ -66,67 +42,17 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
 
 export const HomeWhatChangedSection = ({
   weeklyDecisionCardModel,
-  interpretationSearchParams,
   leadershipArtifactPayloadPromise,
   fallbackActive,
-  assessment,
-  recordDate,
 }: {
   weeklyDecisionCardModel: HomePageAssembly["weeklyDecisionCardModel"];
-  interpretationSearchParams?: Record<string, string | undefined>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
-  assessment: RegimeAssessment;
-  recordDate: string;
 }) => (
   <>
     <OperatorWorkflowRouteTracker />
-    <ReturningVisitorDeltaStrip
-      assessment={assessment}
-      recordDate={recordDate}
-      impactLinks={[
-        { label: "Current call", href: "#weekly-call-core", metric: "tightness" },
-        { label: "Planning", href: "#approve-this-weeks-plan", metric: "riskAppetite" },
-        { label: "Evidence", href: "#deep-evidence", metric: "baseRate" },
-      ]}
-      openPanelHref="#weekly-call-core"
-      openPanelLabel="Open current call"
-      focusImpactLinks={{
-        decision: [
-          { label: "Current call", href: "#weekly-call-core", metric: "tightness" },
-          { label: "Planning", href: "#approve-this-weeks-plan", metric: "riskAppetite" },
-          { label: "Change course", href: "#deep-evidence", metric: "baseRate" },
-        ],
-        evidence: [
-          { label: "Evidence", href: "#deep-evidence", metric: "tightness" },
-          { label: "Current call", href: "#weekly-call-core", metric: "riskAppetite" },
-          { label: "Planning", href: "#approve-this-weeks-plan", metric: "baseRate" },
-        ],
-        trust: [
-          { label: "Trust state", href: "#weekly-call-core", metric: "tightness" },
-          { label: "Evidence", href: "#deep-evidence", metric: "riskAppetite" },
-          { label: "Planning", href: "#approve-this-weeks-plan", metric: "baseRate" },
-        ],
-        share: [
-          { label: "Share brief", href: "#share-ready-artifact", metric: "tightness" },
-          { label: "Current call", href: "#weekly-call-core", metric: "riskAppetite" },
-          { label: "Planning", href: "#approve-this-weeks-plan", metric: "baseRate" },
-        ],
-      }}
-    />
-    <LiteracyAssistRouter
-      title="What do you need translated right now?"
-      description="Choose the part you want help with. The brief remains the main decision view, and this guide can walk you through evidence, decision, data status, or sharing."
-      targets={{
-        decision: { href: buildAssistHref({ assist: "decision", hash: "#weekly-call-core", searchParams: interpretationSearchParams }) },
-        evidence: { href: buildAssistHref({ assist: "evidence", hash: "#deep-evidence", searchParams: interpretationSearchParams }) },
-        trust: { href: buildAssistHref({ assist: "trust", hash: "#weekly-call-core", searchParams: interpretationSearchParams }) },
-        share: { href: buildAssistHref({ assist: "share", hash: "#share-ready-artifact", searchParams: interpretationSearchParams }) },
-      }}
-    />
     <WeeklyDecisionCard
       model={weeklyDecisionCardModel}
-      searchParams={interpretationSearchParams}
       actions={(
         <Suspense fallback={<ArtifactActionsFallback />}>
           <LeadershipArtifactActions
