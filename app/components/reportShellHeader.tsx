@@ -31,10 +31,10 @@ export function ReportShellHeader({
   pageNavVariant,
 }: ReportShellHeaderProps) {
   return (
-    <header className="weather-appbar relative z-20 border-slate-800/70 px-4 py-4 sm:px-6 sm:py-5 lg:sticky lg:top-4">
+    <header className="weather-appbar relative z-20 border-slate-800/70 px-4 py-3 sm:px-6 sm:py-4 lg:sticky lg:top-4">
       {variant === "home-brief" ? (
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-          <div className="min-w-0 space-y-2.5">
+        <div className="flex flex-col gap-2.5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <Image
                 src="/whether-logo.svg"
@@ -51,11 +51,11 @@ export function ReportShellHeader({
                 {statusLabel}
               </span>
             </div>
-            <div className="space-y-2">
-              <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.25rem] font-semibold leading-[1.05] tracking-[-0.035em] text-slate-50 sm:text-[1.55rem]">
+            <div className="space-y-1.5">
+              <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.05rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[1.4rem]">
                 Decide this week&apos;s pace in one screen.
               </p>
-              <div className="grid gap-1.5 text-[11px] leading-relaxed text-slate-300 sm:grid-cols-2 xl:max-w-[48rem]">
+              <div className="hidden gap-1.5 text-[11px] leading-relaxed text-slate-300 sm:grid sm:grid-cols-2 xl:max-w-[48rem]">
                 <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
                   <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-100">Posture</span>
                   Keep this week&apos;s regime as the operating baseline.
@@ -76,7 +76,7 @@ export function ReportShellHeader({
             </div>
           </div>
           <div className="xl:min-w-[30rem]">
-            <div className="weather-surface flex min-h-[40px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+            <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Posture {statusLabel}</span>
               <span className="text-slate-500">•</span>
               <span>As of {recordDateLabel}</span>

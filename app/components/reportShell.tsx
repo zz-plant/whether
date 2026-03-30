@@ -665,6 +665,8 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustStatusActionForDisplay = trustReadiness.tone === "warning"
     ? "Pause irreversible approvals until one verified live refresh lands."
     : resolvedTrustStatusAction;
+  const decisionSnapshotAction = resolvedCommandBar?.doNow[0]?.trim() ?? "";
+  const decisionSnapshotFlip = resolvedCommandBar?.flipConditions[0]?.trim() ?? "";
 
   return (
     <>
@@ -686,6 +688,27 @@ export const ReportShell = (props: ReportShellProps) => {
             pageTitle={resolvedPageTitle}
             pageNavVariant={resolvedPageNavVariant}
           />
+          {resolvedCommandBar ? (
+            <section
+              className="sticky top-1 z-30 mt-3 rounded-xl border border-slate-700/75 bg-slate-950/92 px-3 py-2.5 sm:top-2 sm:px-3.5"
+              aria-label="Decision snapshot"
+            >
+              <div className="grid gap-1.5 text-[11px] leading-5 text-slate-200 sm:grid-cols-3">
+                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
+                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">Posture</span>
+                  <span className="font-semibold text-slate-50">{resolvedCommandBar.postureLabel ?? resolvedStatusLabel}</span>
+                </p>
+                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
+                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Action</span>
+                  <span className="font-medium text-slate-100">{decisionSnapshotAction || "Hold this week’s approved posture actions."}</span>
+                </p>
+                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
+                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Flip trigger</span>
+                  <span className="font-medium text-slate-100">{decisionSnapshotFlip || "Re-open posture if primary trigger confirms."}</span>
+                </p>
+              </div>
+            </section>
+          ) : null}
 
           {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{resolvedStatusLabel}</span><span className="ml-2 text-slate-400">Updated {resolvedRecordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
           {resolvedHistoricalBanner}

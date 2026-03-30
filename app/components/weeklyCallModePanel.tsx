@@ -35,7 +35,6 @@ type WeeklyCallModePanelProps = {
   needsTrustWarning?: boolean;
   trustStateLabel: string;
   trustStateDetail: string;
-  trustTimestamp: string;
   trustReason?: string;
   inlineTrustLabel: string;
   inlineTrustTone: "stable" | "warning" | "historical";
@@ -68,7 +67,6 @@ export function WeeklyCallModePanel({
   needsTrustWarning = false,
   trustStateLabel,
   trustStateDetail,
-  trustTimestamp,
   trustReason,
   inlineTrustLabel,
   inlineTrustTone,
@@ -181,21 +179,21 @@ export function WeeklyCallModePanel({
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail / pause if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Threshold / pause if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition / change course if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Reversal / change course if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-2">
               <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Decision use</p>
                 <p className={`mt-1 text-xs font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>
@@ -205,10 +203,6 @@ export function WeeklyCallModePanel({
               <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trust state</p>
                 <p className="mt-1 text-xs font-semibold text-slate-100">{trustStateLabel}</p>
-              </div>
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Freshness</p>
-                <p className="mt-1 text-xs font-semibold text-slate-100">{trustTimestamp}</p>
               </div>
             </div>
             <p className="mt-2 text-[11px] leading-5 text-slate-200">{trustStateDetail}</p>
