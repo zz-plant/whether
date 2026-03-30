@@ -193,6 +193,32 @@ export const formatDecisionTriplet = ({
   reversal: formatDecisionReversal(reversal ?? "", fallbacks.reversal),
 });
 
+const countConditionComplexityMarkers = (value: string): number => {
+  const matches = value.match(/[,;:]|\b(and|or|unless|until|after)\b/gi);
+  return matches ? matches.length : 0;
+};
+
+export const shouldSplitDecisionConditionRows = ({
+  trigger,
+  reversal,
+  maxInlineCharacters = 160,
+  maxInlineComplexity = 4,
+}: {
+  trigger: string;
+  reversal: string;
+  maxInlineCharacters?: number;
+  maxInlineComplexity?: number;
+}): boolean => {
+  const normalizedTrigger = trigger.trim();
+  const normalizedReversal = reversal.trim();
+  const totalCharacters = normalizedTrigger.length + normalizedReversal.length;
+  const complexityScore =
+    countConditionComplexityMarkers(normalizedTrigger)
+    + countConditionComplexityMarkers(normalizedReversal);
+
+  return totalCharacters > maxInlineCharacters || complexityScore > maxInlineComplexity;
+};
+
 export type CompactFreshnessMeta = {
   updatedAtLabel: string;
   confidenceCue: string;
