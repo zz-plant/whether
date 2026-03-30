@@ -29,7 +29,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
   if (pathMatchesLink("/", normalizedPathname)) {
     return {
       title: "Weekly operating brief for hiring, spend, and pace.",
-      description: "Share from home, then open exactly one downstream surface only if a question remains.",
+      description: "Start here, share from here, and open a support path only if a specific question remains.",
     } as const;
   }
 
@@ -45,10 +45,10 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
   const parentLayer = activeLayer.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
   const actionDescriptionByKey: Partial<Record<NavigationLayer["key"], string>> = {
     "weekly-brief": "Read the weekly call, then leave home only if proof, planning, translation, or trust still needs work.",
-    signals: "Check what changed, why it changed, and where thresholds or replay alter this week's decision.",
+    signals: "Validate what changed, why it changed, and which thresholds or replay history would alter this week's decision.",
     operations: "Approve the weekly plan, guardrails, finance posture, and share-ready artifact in one pass.",
-    decide: "Resolve one remaining owner-specific or situation-specific edge case after the plan is already directionally clear.",
-    method: "Run a fast trust check on freshness, confidence, sources, and reversal conditions before irreversible moves.",
+    decide: "Resolve one remaining edge case after the weekly brief and plan are already directionally clear.",
+    method: "Run a fast trust check on freshness, confidence, source coverage, and reversal conditions before irreversible moves.",
     toolkits: "Run one bounded instrument only after Decision Tools has already narrowed the decision.",
   };
 

@@ -22,9 +22,9 @@ describe("navigation information architecture", () => {
   });
 
   it("defines passive group labels from IA as single source of truth", () => {
-    assert.equal(navigationGroupLabels.core, "Now");
-    assert.equal(navigationGroupLabels.workflow, "Workflows");
-    assert.equal(navigationGroupLabels.reference, "Reference");
+    assert.equal(navigationGroupLabels.core, "Anchor");
+    assert.equal(navigationGroupLabels.workflow, "Action");
+    assert.equal(navigationGroupLabels.reference, "Verify");
 
     for (const layer of navigationLayers) {
       assert.ok(navigationGroupLabels[layer.group]);
@@ -39,11 +39,11 @@ describe("navigation information architecture", () => {
     assert.equal(labels.size, navigationLayers.length);
 
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/signals"], "Signals");
-    assert.equal(navigationLabelByPath["/operations"], "Operations");
-    assert.equal(navigationLabelByPath["/decide"], "Decide");
+    assert.equal(navigationLabelByPath["/signals"], "Evidence");
+    assert.equal(navigationLabelByPath["/operations"], "Planning");
+    assert.equal(navigationLabelByPath["/decide"], "Decision Tools");
     assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
-    assert.equal(navigationLabelByPath["/method"], "Method");
+    assert.equal(navigationLabelByPath["/method"], "Trust");
   });
 
   it("keeps canonical route transitions for Decide and Method", () => {
@@ -60,7 +60,7 @@ describe("navigation information architecture", () => {
     assert.equal(primaryNavigationLayers.length, 5);
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.key),
-      ["weekly-brief", "signals", "decide", "operations", "method"],
+      ["weekly-brief", "signals", "operations", "decide", "method"],
     );
 
     assert.deepEqual(

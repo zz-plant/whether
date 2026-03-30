@@ -9,9 +9,9 @@ describe("NavigationOrientationBadge", () => {
       <NavigationOrientationBadge currentPath="/operations" />,
     );
 
-    assert.match(html, /href="\/"[^>]*aria-label="Now section"/);
-    assert.match(html, /href="\/signals"[^>]*aria-label="Workflow section"/);
-    assert.match(html, /href="\/method"[^>]*aria-label="Reference section"/);
+    assert.match(html, /href="\/"[^>]*aria-label="Anchor"/);
+    assert.match(html, /href="\/signals"[^>]*aria-label="Action"/);
+    assert.match(html, /href="\/method"[^>]*aria-label="Verify"/);
     assert.match(html, /title="Weekly call and bounded actions for this week"/);
   });
 

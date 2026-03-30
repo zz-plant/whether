@@ -1,0 +1,429 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - link "Whether" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e10]: Trust
+        - link "Search" [ref=e12] [cursor=pointer]:
+          - /url: /search
+      - generic "Navigation zone orientation (not macro posture)" [ref=e13]:
+        - link "Now" [ref=e14] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e15]: Now
+        - link "Decisions" [ref=e16] [cursor=pointer]:
+          - /url: /signals
+          - generic [ref=e17]: Decisions
+        - link "Evidence" [ref=e18] [cursor=pointer]:
+          - /url: /method
+          - generic [ref=e19]: Evidence
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - img "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" [ref=e26]
+            - generic [ref=e27]: "Screen: Trust"
+            - generic [ref=e28]: Volatile
+          - paragraph [ref=e29]: Freshness, confidence, and source checks before approving irreversible decisions.
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Decision as-of
+            - paragraph [ref=e33]: Mar 27, 2026
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Data refreshed
+            - paragraph [ref=e36]: Mar 30, 2026, 8:32 PM UTC
+      - region "Decision snapshot" [ref=e37]:
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: PostureVolatile
+          - paragraph [ref=e40]: ActionTighten approvals now; keep new spend reversible.
+          - paragraph [ref=e41]: "Flip triggerFlip watch: Tightness > 70.0 or Risk appetite > 50.0."
+      - region "Weekly command bar" [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e47]: Volatile outlook
+            - generic [ref=e48]:
+              - paragraph [ref=e49]: Current conditions
+              - heading "Use Trust as the single audit entrypoint, then move back to the weekly brief or plan." [level=2] [ref=e50]
+              - paragraph [ref=e51]: Volatile
+              - generic [ref=e53]: Confidence MED 0%
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Weekly direction
+            - paragraph [ref=e56]: Read the current call as the operating baseline for this cycle.
+            - generic [ref=e57]:
+              - generic [ref=e58]: Trend Stable
+              - generic [ref=e59]: Volatile
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: Do now
+              - list [ref=e63]:
+                - listitem [ref=e64]:
+                  - generic [ref=e66]: Tighten approvals now; keep new spend reversible.
+                - listitem [ref=e67]:
+                  - generic [ref=e69]: Return to the weekly brief and execute this operating move once trust checks are complete.
+            - generic [ref=e70]:
+              - paragraph [ref=e71]: Trust check
+              - list [ref=e72]:
+                - listitem [ref=e73]:
+                  - generic [ref=e75]: "Confirm freshness: Mar 30, 2026, 8:32 PM UTC."
+                - listitem [ref=e76]:
+                  - generic [ref=e78]: "Confirm confidence: Low (near threshold, stage decisions)."
+            - generic [ref=e79]:
+              - paragraph [ref=e80]: Watch next
+              - list [ref=e81]:
+                - listitem [ref=e82]:
+                  - generic [ref=e84]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                - listitem [ref=e85]:
+                  - generic [ref=e87]: If trust degrades, hold irreversible approvals until live evidence stabilizes.
+      - generic [ref=e88]:
+        - complementary [ref=e89]:
+          - generic [ref=e90]:
+            - generic [ref=e92]:
+              - generic [ref=e93]: Readiness clear
+              - generic [ref=e94]: Data trust
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e98]: Current readiness
+                  - paragraph [ref=e99]: Readiness clear
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: Data refreshed Mar 30, 2026, 8:32 PM UTC
+                  - paragraph [ref=e102]: Next refresh 15m cadence
+              - paragraph [ref=e103]: If trust checks pass, return to the weekly brief and execute the operating call.
+              - paragraph [ref=e104]: "Coverage: Live (high confidence) · Live (high confidence)"
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - generic [ref=e107]:
+                  - paragraph [ref=e108]: Trust summary
+                  - paragraph [ref=e109]: Standard approval cadence is available.
+                - generic [ref=e110]: Allowed now
+              - paragraph [ref=e111]: Inputs are fresh enough for this week's decision. Open more detail only if someone questions freshness or source coverage.
+            - group [ref=e112]:
+              - generic "Data source details▾" [ref=e113] [cursor=pointer]
+          - paragraph [ref=e114]:
+            - text: Keep the decision path moving; for methodology details, see
+            - link "/method" [ref=e115] [cursor=pointer]:
+              - /url: /method
+            - text: .
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - generic [ref=e118]:
+              - paragraph [ref=e119]: Whether report
+              - heading "Trust" [level=1] [ref=e120]
+              - paragraph [ref=e121]:
+                - generic [ref=e122]: Run the trust check here first, then open appendix pages only if someone still needs deeper proof.
+                - link "Start trust check ↓" [ref=e123] [cursor=pointer]:
+                  - /url: "#trust-snapshot"
+            - link "Run trust check" [ref=e125] [cursor=pointer]:
+              - /url: "#trust-snapshot"
+              - generic [ref=e126]: Run trust check
+            - paragraph [ref=e127]:
+              - text: "Continue:"
+              - link "Return to Weekly Brief" [ref=e128] [cursor=pointer]:
+                - /url: /
+              - text: •
+              - link "Return to Weekly Brief after validating trust and confidence" [ref=e129] [cursor=pointer]:
+                - /url: /
+              - text: •
+              - link "Generate executive brief" [ref=e130] [cursor=pointer]:
+                - /url: /operations#ops-export-briefs
+            - generic [ref=e131]:
+              - generic "Current report status" [ref=e132]:
+                - generic [ref=e133]:
+                  - term [ref=e134]: Posture
+                  - definition [ref=e135]: Volatile
+                  - text: ·
+                - generic [ref=e136]:
+                  - term [ref=e137]: Confidence
+                  - definition [ref=e138]: Readiness clear
+                  - text: ·
+                - generic [ref=e139]:
+                  - term [ref=e140]: Data refreshed
+                  - definition [ref=e141]: Mar 30, 2026, 8:32 PM UTC
+                  - text: ·
+                - generic [ref=e142]:
+                  - term [ref=e143]: Next refresh
+                  - definition [ref=e144]: 15m cadence
+              - button "Refresh now" [ref=e145] [cursor=pointer]
+            - paragraph [ref=e146]: If trust checks pass, return to the weekly brief and execute the operating call.
+          - region "Decision snapshot" [ref=e147]:
+            - generic [ref=e148]:
+              - article [ref=e149]:
+                - paragraph [ref=e150]: Start here
+                - heading "Check freshness, confidence, and change-the-call triggers before approving irreversible moves." [level=2] [ref=e151]
+                - paragraph [ref=e152]: "Coverage: Live (high confidence) · Live (high confidence)"
+                - link "See supporting evidence" [ref=e153] [cursor=pointer]:
+                  - /url: "#trust-snapshot"
+                  - text: See supporting evidence
+                  - img [ref=e154]
+              - article [ref=e156]:
+                - paragraph [ref=e157]: Plan
+                - list
+          - generic [ref=e158]:
+            - navigation "Breadcrumb" [ref=e160]:
+              - list [ref=e161]:
+                - listitem [ref=e162]:
+                  - link "Home" [ref=e163] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e164]:
+                  - generic [ref=e165]: /
+                  - generic [ref=e166]: Trust
+            - region "Trust quick start" [ref=e168]:
+              - paragraph [ref=e169]: Trust audit hub
+              - heading "Check whether this week's call is fresh, reliable, and safe to use." [level=1] [ref=e170]
+              - paragraph [ref=e171]: Start with the verdict below, then run the short trust check only if someone still needs proof before acting on the brief.
+              - generic [ref=e172]:
+                - link "Run 60-second trust check" [ref=e173] [cursor=pointer]:
+                  - /url: "#trust-snapshot"
+                - link "Return to Weekly Brief" [ref=e174] [cursor=pointer]:
+                  - /url: /
+            - region "Trust verdict" [ref=e176]:
+              - paragraph [ref=e177]: Safe to use for this week's operating call
+              - paragraph [ref=e178]: Freshness, confidence, and source coverage are strong enough to defend the current brief without escalating to a deeper trust review.
+            - generic [ref=e180]:
+              - generic [ref=e182]:
+                - heading "60-second trust check" [level=2] [ref=e183]
+                - paragraph [ref=e184]: Read top-to-bottom before acting on this week's posture.
+              - generic [ref=e185]:
+                - article [ref=e186]:
+                  - paragraph [ref=e187]: Current call
+                  - paragraph [ref=e188]: "Posture: Volatile (decision as-of Mar 27, 2026)"
+                  - paragraph [ref=e189]: "Confidence: Low (near threshold, stage decisions)"
+                - article [ref=e190]:
+                  - paragraph [ref=e191]: Trust status
+                  - paragraph [ref=e192]: "Signal reliability LOW (Mar 30, 2026, 8:32 PM UTC): keep approvals staged until reliability returns to HIGH."
+                  - paragraph [ref=e193]: "Coverage: Live (high confidence) · Live (high confidence)"
+                  - paragraph [ref=e194]: "Data refreshed: Mar 30, 2026, 8:32 PM UTC"
+                  - generic [ref=e195]:
+                    - paragraph [ref=e196]: Trust check
+                    - list [ref=e197]:
+                      - listitem [ref=e198]:
+                        - generic [ref=e200]: "Data refreshed: Mar 30, 2026, 8:32 PM UTC"
+                      - listitem [ref=e201]:
+                        - generic [ref=e203]: "Trust summary: Signal reliability LOW (Mar 30, 2026, 8:32 PM UTC): keep approvals staged until reliability returns to HIGH."
+                - article [ref=e204]:
+                  - paragraph [ref=e205]: What would change the call
+                  - paragraph [ref=e206]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                  - paragraph [ref=e207]: Tighten approvals now; keep new spend reversible.
+            - generic [ref=e209]:
+              - generic [ref=e211]:
+                - heading "Audit workflow" [level=2] [ref=e212]
+                - paragraph [ref=e213]: Open an appendix only when that exact question appears in review.
+              - generic [ref=e214]:
+                - article [ref=e215]:
+                  - heading "Review source freshness" [level=2] [ref=e216]
+                  - paragraph [ref=e217]: "Data refreshed: Mar 30, 2026, 8:32 PM UTC. Check source status and citation context here before opening external proof."
+                  - link "Open sources appendix" [ref=e218] [cursor=pointer]:
+                    - /url: "#sources-freshness"
+                - article [ref=e219]:
+                  - heading "Review confidence limits" [level=2] [ref=e220]
+                  - paragraph [ref=e221]: "Current confidence: Low (near threshold, stage decisions). Check pause, flip, and warning conditions before approving irreversible spend."
+                  - link "Open confidence appendix" [ref=e222] [cursor=pointer]:
+                    - /url: "#confidence-limits"
+                - article [ref=e223]:
+                  - heading "Review formulas and appendices" [level=2] [ref=e224]
+                  - paragraph [ref=e225]: Open formula and appendix material only if a reviewer still needs deeper proof after the on-page trust check.
+                  - link "Open formula reference" [ref=e226] [cursor=pointer]:
+                    - /url: "#formula-reference"
+                - article [ref=e227]:
+                  - heading "Optional context only" [level=2] [ref=e228]
+                  - paragraph [ref=e229]: Use failure-mode diagnostics only after the on-page trust check is complete and someone still needs conceptual context.
+                  - link "Open failure modes" [ref=e230] [cursor=pointer]:
+                    - /url: /learn/failure-modes
+            - generic [ref=e232]:
+              - generic [ref=e234]:
+                - heading "Sources and freshness appendix" [level=2] [ref=e235]
+                - paragraph [ref=e236]: Use this appendix when a reviewer asks where the current call came from and how current the evidence is.
+              - generic [ref=e237]:
+                - article [ref=e238]:
+                  - paragraph [ref=e239]: Current source coverage
+                  - list [ref=e240]:
+                    - listitem [ref=e241]: "Treasury: Live (high confidence) · Mar 30, 2026, 8:32 PM UTC"
+                    - listitem [ref=e242]: "Macro: Live (high confidence) · Mar 30, 2026, 8:32 PM UTC"
+                    - listitem [ref=e243]: "Trust summary: Signal reliability LOW (Mar 30, 2026, 8:32 PM UTC): keep approvals staged until reliability returns to HIGH."
+                  - generic [ref=e244]:
+                    - link "Treasury source" [ref=e245] [cursor=pointer]:
+                      - /url: https://fred.stlouisfed.org
+                    - link "Macro source" [ref=e246] [cursor=pointer]:
+                      - /url: https://api.bls.gov/publicAPI/v2/timeseries/data/
+                - article [ref=e247]:
+                  - paragraph [ref=e248]: Citation-ready summary
+                  - paragraph [ref=e249]: Posture Volatile · Signal reliability LOW · Decision as-of Mar 27, 2026 · Data refreshed Mar 30, 2026, 8:32 PM UTC
+                  - paragraph [ref=e250]: Keep this appendix as proof only. The operating decision still belongs to Weekly Brief and Planning.
+                  - generic [ref=e251]:
+                    - link "Back to trust snapshot" [ref=e252] [cursor=pointer]:
+                      - /url: "#trust-snapshot"
+                    - link "Formula reference" [ref=e253] [cursor=pointer]:
+                      - /url: "#formula-reference"
+            - generic [ref=e255]:
+              - generic [ref=e257]:
+                - heading "Confidence and limits appendix" [level=2] [ref=e258]
+                - paragraph [ref=e259]: Use this appendix when a reviewer asks how fragile the call is, what pauses it, or what would force a change.
+              - generic [ref=e260]:
+                - article [ref=e261]:
+                  - paragraph [ref=e262]: Bounded decision checks
+                  - list [ref=e263]:
+                    - listitem [ref=e264]: "Confidence now: Low (near threshold, stage decisions)"
+                    - listitem [ref=e265]: "Change course if: Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                    - listitem [ref=e266]: "Pause if: Rebrands or identity pivots"
+                    - listitem [ref=e267]: "Recovery condition: Confidence returns to HIGH and transition watch turns OFF before expanding fixed-cost approvals."
+                - article [ref=e268]:
+                  - paragraph [ref=e269]: Failure-mode checks
+                  - list [ref=e270]:
+                    - listitem [ref=e271]:
+                      - paragraph [ref=e272]: "Boundary whipsaw risk: call is near a flip threshold with unstable weekly motion."
+                      - paragraph [ref=e273]: "Mitigation check: require one confirming read before escalating fixed-cost commitments."
+            - generic [ref=e275]:
+              - generic [ref=e277]:
+                - heading "Formula reference" [level=2] [ref=e278]
+                - paragraph [ref=e279]: Methodology permanently redirects to this Trust formula reference.
+              - generic [ref=e280]:
+                - paragraph [ref=e281]: Use this section when reviewers ask how the scoring works, what would make you pause, and what would change the call.
+                - list [ref=e282]:
+                  - listitem [ref=e283]: • Tie formula review to the current confidence and freshness labels before making irreversible decisions.
+                  - listitem [ref=e284]: • Verify flip and guardrail thresholds align with the weekly brief before changing operating tempo.
+                  - listitem [ref=e285]: • Document reversal conditions before reopening fixed-cost approvals.
+                - generic [ref=e286]:
+                  - link "View confidence limits" [ref=e287] [cursor=pointer]:
+                    - /url: "#confidence-limits"
+                  - link "View source provenance" [ref=e288] [cursor=pointer]:
+                    - /url: "#sources-freshness"
+            - generic [ref=e290]:
+              - heading "When to distrust or revisit this call" [level=2] [ref=e293]
+              - list [ref=e294]:
+                - listitem [ref=e295]:
+                  - paragraph [ref=e296]: Trigger
+                  - paragraph [ref=e297]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                  - link "Review evidence" [ref=e298] [cursor=pointer]:
+                    - /url: "#confidence-limits"
+                - listitem [ref=e299]:
+                  - paragraph [ref=e300]: Impact
+                  - paragraph [ref=e301]: Tighten approvals now; keep new spend reversible.
+                  - link "Review evidence" [ref=e302] [cursor=pointer]:
+                    - /url: "#trust-snapshot"
+                - listitem [ref=e303]:
+                  - paragraph [ref=e304]: Recovery
+                  - paragraph [ref=e305]: "Recovery condition: confidence returns to HIGH and transition watch is OFF before expanding fixed-cost commitments."
+                  - link "Review evidence" [ref=e306] [cursor=pointer]:
+                    - /url: "#sources-freshness"
+            - generic [ref=e308]:
+              - generic [ref=e310]:
+                - heading "Meeting-ready trust snippet" [level=2] [ref=e311]
+                - paragraph [ref=e312]: Copy this into Slack, notes, or the meeting agenda.
+              - code [ref=e314]: "Posture: Volatile Decision as-of: Mar 27, 2026 Data refreshed: Mar 30, 2026, 8:32 PM UTC Confidence: Low (near threshold, stage decisions) Trust: Signal reliability LOW (Mar 30, 2026, 8:32 PM UTC): keep approvals staged until reliability returns to HIGH. Flip trigger: Flip watch: Tightness > 70.0 or Risk appetite > 50.0. Action now: Tighten approvals now; keep new spend reversible."
+            - region "Translate finance terms into day-to-day product decisions" [ref=e316]:
+              - generic [ref=e317]:
+                - generic [ref=e318]:
+                  - generic [ref=e319]:
+                    - paragraph [ref=e320]: Glossary
+                    - heading "Translate finance terms into day-to-day product decisions" [level=3] [ref=e321]
+                    - paragraph [ref=e322]: New to Treasury data? Reference this glossary as needed to translate jargon into concrete product moves before you share the report.
+                  - generic [ref=e323]:
+                    - paragraph [ref=e324]: Onboarding lens
+                    - paragraph [ref=e325]: Plain English over jargon
+                    - paragraph [ref=e326]: Focus on constraints
+                - generic [ref=e327]:
+                  - complementary "Glossary sidebar" [ref=e328]:
+                    - paragraph [ref=e329]: Glossary terms
+                    - region [ref=e330]:
+                      - heading "Cash availability (tightness) How hard it is to access funding. Higher tightness means conserve cash and focus on runway. Select to expand or collapse" [level=3] [ref=e332]:
+                        - button "Cash availability (tightness) How hard it is to access funding. Higher tightness means conserve cash and focus on runway. Select to expand or collapse" [ref=e333] [cursor=pointer]:
+                          - generic [ref=e334]:
+                            - text: Cash availability (tightness)
+                            - generic [ref=e335]: How hard it is to access funding. Higher tightness means conserve cash and focus on runway.
+                            - generic [ref=e336]: Select to expand or collapse
+                          - img [ref=e338]
+                      - heading "Market risk appetite How willing the market is to take risk. Lower appetite means de-risk launches and hiring. Select to expand or collapse" [level=3] [ref=e341]:
+                        - button "Market risk appetite How willing the market is to take risk. Lower appetite means de-risk launches and hiring. Select to expand or collapse" [ref=e342] [cursor=pointer]:
+                          - generic [ref=e343]:
+                            - text: Market risk appetite
+                            - generic [ref=e344]: How willing the market is to take risk. Lower appetite means de-risk launches and hiring.
+                            - generic [ref=e345]: Select to expand or collapse
+                          - img [ref=e347]
+                      - heading "Curve slope (recession risk) A read on recession risk. Inversion signals caution and favors defensive planning. Select to expand or collapse" [level=3] [ref=e350]:
+                        - button "Curve slope (recession risk) A read on recession risk. Inversion signals caution and favors defensive planning. Select to expand or collapse" [ref=e351] [cursor=pointer]:
+                          - generic [ref=e352]:
+                            - text: Curve slope (recession risk)
+                            - generic [ref=e353]: A read on recession risk. Inversion signals caution and favors defensive planning.
+                            - generic [ref=e354]: Select to expand or collapse
+                          - img [ref=e356]
+                      - heading "Fallback mode When live data is unavailable, the report uses the latest cached Treasury snapshot. Select to expand or collapse" [level=3] [ref=e359]:
+                        - button "Fallback mode When live data is unavailable, the report uses the latest cached Treasury snapshot. Select to expand or collapse" [ref=e360] [cursor=pointer]:
+                          - generic [ref=e361]:
+                            - text: Fallback mode
+                            - generic [ref=e362]: When live data is unavailable, the report uses the latest cached Treasury snapshot.
+                            - generic [ref=e363]: Select to expand or collapse
+                          - img [ref=e365]
+                  - generic [ref=e367]:
+                    - generic [ref=e368]:
+                      - paragraph [ref=e369]: How to use this glossary
+                      - list [ref=e370]:
+                        - listitem [ref=e371]: Start with current environment to anchor this week's posture.
+                        - listitem [ref=e372]: Translate terms into constraints before discussing bets.
+                        - listitem [ref=e373]: Use linked sections to pull supporting evidence fast.
+                    - generic [ref=e374]:
+                      - paragraph [ref=e375]: Reading notes
+                      - list [ref=e376]:
+                        - listitem [ref=e377]: Posture badge summarizes current operating posture.
+                        - listitem [ref=e378]: Evidence maps to constraints rather than forecasts.
+                        - listitem [ref=e379]: Exports support alignment across teams.
+          - paragraph [ref=e381]: Governance artifact; not investment advice.
+    - navigation "Mobile report navigation" [ref=e383]:
+      - generic [ref=e384]:
+        - generic [ref=e385]:
+          - generic [ref=e386]:
+            - generic [ref=e387]:
+              - paragraph [ref=e388]: Step 5 of 5
+              - paragraph [ref=e389]: 7 sections
+              - paragraph [ref=e390]: Jump straight to the part of Trust you need.
+            - generic [ref=e391]: Trust
+          - list [ref=e392]:
+            - listitem [ref=e393]:
+              - link "60-second trust check 1" [ref=e394] [cursor=pointer]:
+                - /url: "#trust-snapshot"
+                - generic [ref=e395]: 60-second trust check
+                - generic [ref=e396]: "1"
+            - listitem [ref=e397]:
+              - link "Audit workflow 2" [ref=e398] [cursor=pointer]:
+                - /url: "#trust-hub-links"
+                - generic [ref=e399]: Audit workflow
+                - generic [ref=e400]: "2"
+            - listitem [ref=e401]:
+              - link "Sources & freshness 3" [ref=e402] [cursor=pointer]:
+                - /url: "#sources-freshness"
+                - generic [ref=e403]: Sources & freshness
+                - generic [ref=e404]: "3"
+            - listitem [ref=e405]:
+              - link "Confidence & limits 4" [ref=e406] [cursor=pointer]:
+                - /url: "#confidence-limits"
+                - generic [ref=e407]: Confidence & limits
+                - generic [ref=e408]: "4"
+          - paragraph [ref=e409]: +3 more sections below.
+        - generic [ref=e410]:
+          - generic [ref=e411]:
+            - img [ref=e413]
+            - generic [ref=e416]:
+              - paragraph [ref=e417]: Trust
+              - paragraph [ref=e418]: Evidence
+              - paragraph [ref=e419]: Check whether the call is fresh, confident, and safe to rely on.
+              - paragraph [ref=e420]: 5 pages
+          - link "Weekly Brief This week's call, what to do now, and a share-ready summary." [ref=e421] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e422]: Weekly Brief
+            - generic [ref=e423]: This week's call, what to do now, and a share-ready summary.
+        - generic "Suggested destinations" [ref=e424]:
+          - 'link "Evidence Why the weekly call moved: drivers, thresholds, freshness, and replay." [ref=e425] [cursor=pointer]':
+            - /url: /signals
+            - generic [ref=e426]: Evidence
+            - generic [ref=e427]: "Why the weekly call moved: drivers, thresholds, freshness, and replay."
+          - link "Planning Approve this week's plan for hiring, spending, roadmap, finance, and the final brief." [ref=e428] [cursor=pointer]:
+            - /url: /operations
+            - generic [ref=e429]: Planning
+            - generic [ref=e430]: Approve this week's plan for hiring, spending, roadmap, finance, and the final brief.
+        - paragraph [ref=e431]: +1 more destination available.
+  - button "Open Next.js Dev Tools" [ref=e437] [cursor=pointer]:
+    - img [ref=e438]
+  - alert [ref=e441]

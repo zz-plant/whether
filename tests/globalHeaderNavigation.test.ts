@@ -17,13 +17,13 @@ describe("global header navigation helpers", () => {
     assert.equal(isReportShellRoute("/"), true);
     assert.equal(isReportShellRoute("/signals/overview"), true);
     assert.equal(isReportShellRoute("/operations/plan"), true);
-    assert.equal(isReportShellRoute("/decide"), false);
-    assert.equal(isReportShellRoute("/method"), false);
+    assert.equal(isReportShellRoute("/decide"), true);
+    assert.equal(isReportShellRoute("/method"), true);
   });
 
   it("uses canonical IA labels for condensed report route context", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Signals");
-    assert.equal(resolveGlobalHeaderRouteLabel("/operations/cli"), "Operations");
+    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
+    assert.equal(resolveGlobalHeaderRouteLabel("/operations/cli"), "Planning");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Report");
   });
 

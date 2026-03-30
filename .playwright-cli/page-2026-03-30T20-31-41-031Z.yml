@@ -1,0 +1,135 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - link "Whether" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e10]: Trust
+        - link "Search" [ref=e12] [cursor=pointer]:
+          - /url: /search
+      - generic "Navigation zone orientation (not macro posture)" [ref=e13]:
+        - link "Now" [ref=e14] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e15]: Now
+        - link "Decisions" [ref=e16] [cursor=pointer]:
+          - /url: /signals
+          - generic [ref=e17]: Decisions
+        - link "Evidence" [ref=e18] [cursor=pointer]:
+          - /url: /method
+          - generic [ref=e19]: Evidence
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - img "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" [ref=e26]
+            - generic [ref=e27]: Loading page
+          - paragraph [ref=e28]: "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."
+          - paragraph [ref=e29]: Whether translates macro conditions into weekly operating posture for founders.
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Decision as-of
+            - paragraph [ref=e33]: Updating now
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Data refreshed
+            - paragraph [ref=e36]: Refreshing
+      - generic [ref=e37]:
+        - complementary [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: Readiness clear
+              - generic [ref=e43]: Data trust
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e46]:
+                  - paragraph [ref=e47]: Current readiness
+                  - paragraph [ref=e48]: Readiness clear
+                - generic [ref=e49]:
+                  - paragraph [ref=e50]: Data refreshed Refreshing
+                  - paragraph [ref=e51]: Next refresh 15m cadence
+              - paragraph [ref=e52]: Keep this page open while the latest brief is prepared.
+              - paragraph [ref=e53]: Evidence is still loading.
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e56]:
+                  - paragraph [ref=e57]: Trust summary
+                  - paragraph [ref=e58]: Standard approval cadence is available.
+                - generic [ref=e59]: Allowed now
+              - paragraph [ref=e60]: Inputs are fresh enough for this week's decision. Open more detail only if someone questions freshness or source coverage.
+            - group [ref=e61]:
+              - generic "Data source details▾" [ref=e62] [cursor=pointer]
+          - paragraph [ref=e63]:
+            - text: Keep the decision path moving; for methodology details, see
+            - link "/method" [ref=e64] [cursor=pointer]:
+              - /url: /method
+            - text: .
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - paragraph [ref=e68]: Whether report
+              - heading "Weekly Brief" [level=1] [ref=e69]
+              - paragraph [ref=e70]:
+                - generic [ref=e71]: Content is loading.
+              - generic [ref=e72]: Evidence stamped Updating now
+            - link "This week" [ref=e74] [cursor=pointer]:
+              - /url: "#weekly-action-summary"
+              - generic [ref=e75]: This week
+            - paragraph [ref=e76]:
+              - text: "Continue:"
+              - link "Generate executive brief" [ref=e77] [cursor=pointer]:
+                - /url: /operations#ops-export-briefs
+            - generic [ref=e78]:
+              - generic "Current report status" [ref=e79]:
+                - generic [ref=e80]:
+                  - term [ref=e81]: Posture
+                  - definition [ref=e82]: Loading page
+                  - text: ·
+                - generic [ref=e83]:
+                  - term [ref=e84]: Confidence
+                  - definition [ref=e85]: Readiness clear
+                  - text: ·
+                - generic [ref=e86]:
+                  - term [ref=e87]: Data refreshed
+                  - definition [ref=e88]: Refreshing
+                  - text: ·
+                - generic [ref=e89]:
+                  - term [ref=e90]: Next refresh
+                  - definition [ref=e91]: 15m cadence
+              - button "Refresh now" [ref=e92] [cursor=pointer]
+            - paragraph [ref=e93]: Keep this page open while the latest brief is prepared.
+          - region "Decision snapshot" [ref=e94]:
+            - generic [ref=e95]:
+              - article [ref=e96]:
+                - paragraph [ref=e97]: Decide now
+                - heading "This week." [level=2] [ref=e98]
+                - paragraph [ref=e99]: Evidence is still loading.
+              - article [ref=e100]:
+                - paragraph [ref=e101]: Plan
+                - list
+          - region "Loading page" [ref=e104]:
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - generic [ref=e107]:
+                  - generic [ref=e108]: Loading page
+                  - generic [ref=e109]: In progress
+                - paragraph [ref=e110]: Content is loading.
+              - paragraph [ref=e112]: Loading
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - article [ref=e127]:
+                  - paragraph [ref=e128]: Summary
+                - article [ref=e131]:
+                  - paragraph [ref=e132]: Action
+                - article [ref=e135]:
+                  - paragraph [ref=e136]: Evidence
+                - article [ref=e139]:
+                  - paragraph [ref=e140]: Next step
+              - paragraph [ref=e145]: Trust
+          - paragraph [ref=e158]: Governance artifact; not investment advice.
+  - text: ▾ · · ·
+  - button "Open Next.js Dev Tools" [ref=e164] [cursor=pointer]:
+    - img [ref=e165]
+  - alert [ref=e168]

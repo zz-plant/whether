@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   isReportShellRoute,
   normalizePathname,
+  resolveGlobalHeaderTagline,
   resolveGlobalHeaderRouteLabel,
 } from "../../lib/navigation/globalHeader";
-import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME } from "./globalHeaderShared";
+import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 
 import type { ReactNode } from "react";
 
@@ -18,6 +19,7 @@ type GlobalHeaderRouteGateProps = {
 
 export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGateProps) {
   const pathname = normalizePathname(usePathname() ?? "/");
+  const tagline = resolveGlobalHeaderTagline(pathname);
 
   if (!isReportShellRoute(pathname)) {
     return <>{defaultHeader}</>;
@@ -39,6 +41,11 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
                 <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
                   {resolveGlobalHeaderRouteLabel(pathname)}
                 </p>
+                {tagline.description ? (
+                  <p className="hidden text-[11px] leading-relaxed text-slate-400 sm:block">
+                    {tagline.description}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -52,7 +59,9 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
             </Link>
           </div>
         </div>
-        <NavigationOrientationBadge currentPath={pathname} className="max-w-full" />
+        <div className="mt-2">
+          <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+        </div>
       </div>
     </header>
   );

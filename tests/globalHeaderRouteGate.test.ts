@@ -12,7 +12,7 @@ describe("isReportShellRoute", () => {
 
   it("preserves the full header on non-report routes", () => {
     assert.equal(isReportShellRoute("/search"), false);
-    assert.equal(isReportShellRoute("/method"), false);
-    assert.equal(isReportShellRoute("/decide/founder"), false);
+    assert.equal(isReportShellRoute("/guides"), false);
+    assert.equal(isReportShellRoute("/answers/should-we-hire"), false);
   });
 });

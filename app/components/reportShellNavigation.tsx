@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
-import { navigationGroupLabels } from "../../lib/navigation/informationArchitecture";
 import { getCompactSectionLabel } from "../../lib/report/homeSections";
 import { defaultPageLinkIcon, pageLinkIcons } from "./reportShellPageIcons";
 
@@ -31,11 +30,10 @@ const getPageNavigationState = (
   const currentIndexByLabel = pageLinks.findIndex((link) => link.label === pageTitle);
   const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
   const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
-  const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href);
-  const currentStep = currentIndex >= 0 ? currentIndex + 1 : 1;
-  const totalSteps = pageLinks.length;
+  const anchorLink = pageLinks.find((link) => link.href === "/") ?? pageLinks[0];
+  const supportLinks = pageLinks.filter((link) => link.href !== anchorLink.href);
 
-  return { currentLink, adjacentLinks, currentStep, totalSteps };
+  return { currentLink, anchorLink, supportLinks };
 };
 
 const basePageLinkClassName =
@@ -46,22 +44,39 @@ const getPageLinkStateClassName = (isActive: boolean) =>
     ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
     : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 
-const navigationGroupOrder: Array<keyof typeof navigationGroupLabels> = ["core", "workflow", "reference"];
+const routeSwitcherIntro = "Start from Weekly Brief. Open a support path only if you need proof, planning depth, an edge-case answer, or a trust check.";
 
-const groupPageLinks = (pageLinks: ReportPageLink[]) =>
-  navigationGroupOrder
-    .map((group) => ({
-      group,
-      label: navigationGroupLabels[group],
-      links: pageLinks.filter((link) => link.group === group),
-    }))
-    .filter((groupSection) => groupSection.links.length > 0);
+const renderPageLink = ({
+  link,
+  isActive,
+}: {
+  link: ReportPageLink;
+  isActive: boolean;
+}) => (
+  <Link
+    key={link.href}
+    href={link.href}
+    aria-current={isActive ? "page" : undefined}
+    className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName(isActive)}`}
+  >
+    <span className="inline-flex items-center gap-2">
+      <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
+        {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
+      </span>
+      <span>{link.label}</span>
+    </span>
+    <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
+      {link.description}
+    </span>
+  </Link>
+);
 
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
   currentPath,
   className,
+  variant = "full",
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
@@ -69,55 +84,57 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const groupedPageLinks = groupPageLinks(pageLinks);
-  const { currentLink, currentStep, totalSteps } = getPageNavigationState(
+  const { currentLink, anchorLink, supportLinks } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
   );
+  const isAnchorRoute = currentLink.href === anchorLink.href;
+  const supportGridClassName = variant === "compact"
+    ? "grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4"
+    : "grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4";
 
   return (
     <nav aria-label="Report paths" className={className}>
-      <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2">
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Workflow progress</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{currentStep} of {totalSteps} · {currentLink.label}</p>
-          </div>
-          <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            {navigationGroupLabels[currentLink.group]}
-          </span>
-        </div>
-        {groupedPageLinks.map((groupSection) => (
-          <div key={groupSection.group} className="space-y-2">
-            <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              {groupSection.label}
+      <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,2.05fr)]">
+          <div className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              {isAnchorRoute ? "Anchor route" : "Return to anchor"}
             </p>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {groupSection.links.map((link) => {
-                const isActive = currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName(isActive)}`}
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
-                        {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
-                      </span>
-                      <span>{link.label}</span>
-                    </span>
-                    <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
-                      {link.description}
-                    </span>
-                  </Link>
-                );
-              })}
+            <Link
+              href={anchorLink.href}
+              aria-current={isAnchorRoute ? "page" : undefined}
+              className={`mt-2 inline-flex min-h-[44px] items-center rounded-xl border px-3 py-2 text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+                isAnchorRoute
+                  ? "border-amber-300/65 bg-amber-400/10 text-amber-50"
+                  : "border-slate-700/80 bg-slate-950/70 text-slate-100 hover:border-amber-300/55 hover:text-amber-50"
+              }`}
+            >
+              {anchorLink.label}
+            </Link>
+            <p className="mt-3 text-xs leading-relaxed text-slate-300">
+              {routeSwitcherIntro}
+            </p>
+          </div>
+
+          <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              {isAnchorRoute ? "Support paths" : `Current support path · ${currentLink.label}`}
+            </p>
+            <p className="text-xs leading-relaxed text-slate-300">
+              {isAnchorRoute
+                ? "Each path below exists to help the Weekly Brief, not replace it."
+                : `Use ${currentLink.label} only while you need this help: ${currentLink.description}`}
+            </p>
+            <div className={supportGridClassName}>
+              {supportLinks.map((link) => renderPageLink({
+                link,
+                isActive: currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle,
+              }))}
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </nav>
   );
@@ -199,34 +216,50 @@ export const ReportMobileNavigation = ({
   sectionLinks?: ReportSectionLink[];
   maxItems?: number;
 }) => {
-  const { currentLink, adjacentLinks, currentStep, totalSteps } = getPageNavigationState(
+  const { currentLink, anchorLink, supportLinks } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
   );
-  const pageCountLabel =
-    pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
+  const isAnchorRoute = currentLink.href === anchorLink.href;
   const mobileSectionLinkLimit = Math.max(1, maxItems ?? 4);
   const mobileSectionLinks = sectionLinks.slice(0, mobileSectionLinkLimit);
   const hiddenSectionCount = Math.max(sectionLinks.length - mobileSectionLinks.length, 0);
-  const maxSuggestedAdjacentLinks = 2;
-  const visibleAdjacentLinks = adjacentLinks.slice(0, maxSuggestedAdjacentLinks + 1);
-  const primaryAdjacentLink = visibleAdjacentLinks[0];
-  const suggestedAdjacentLinks = visibleAdjacentLinks.slice(1);
-  const hiddenAdjacentCount = Math.max(adjacentLinks.length - visibleAdjacentLinks.length, 0);
+  const visibleSupportLinks = supportLinks.slice(0, 3);
+  const hiddenSupportCount = Math.max(supportLinks.length - visibleSupportLinks.length, 0);
 
   return (
     <nav aria-label="Mobile report navigation" className={className}>
       <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+            {isAnchorRoute ? "Anchor route" : "Return to Weekly Brief"}
+          </p>
+          <Link
+            href={anchorLink.href}
+            aria-current={isAnchorRoute ? "page" : undefined}
+            className={`mt-2 inline-flex min-h-[44px] items-center rounded-2xl border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+              isAnchorRoute
+                ? "border-amber-300/65 bg-amber-400/10 text-amber-50"
+                : "border-slate-700/80 bg-slate-950/80 text-slate-100"
+            }`}
+          >
+            {anchorLink.label}
+          </Link>
+          <p className="mt-2 text-xs leading-relaxed text-slate-300">
+            {routeSwitcherIntro}
+          </p>
+        </div>
+
         {sectionLinks.length ? (
           <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-3">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                  Step {currentStep} of {totalSteps}
+                  Current page
                 </p>
                 <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
-                  {`${sectionLinks.length} sections`}
+                  {currentLink.label}
                 </p>
                 <p className="mt-1 text-xs text-slate-400">Jump straight to the part of {currentLink.label} you need.</p>
               </div>
@@ -252,7 +285,7 @@ export const ReportMobileNavigation = ({
             ) : null}
           </div>
         ) : null}
-        <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
               {pageLinkIcons[currentLink.id] ?? defaultPageLinkIcon}
@@ -261,28 +294,18 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{navigationGroupLabels[currentLink.group]}</p>
               <p className="mt-1 line-clamp-2 text-xs text-slate-300">{currentLink.description}</p>
-              <p className="mt-1 truncate text-[11px] text-slate-400">{pageCountLabel}</p>
             </div>
           </div>
-          {primaryAdjacentLink ? (
-            <Link
-              href={primaryAdjacentLink.href}
-              className="weather-pill inline-flex min-h-[44px] max-w-[160px] flex-col items-start justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{primaryAdjacentLink.label}</span>
-              <span className="mt-1 text-[10px] text-slate-300">{primaryAdjacentLink.description}</span>
-            </Link>
-          ) : null}
         </div>
 
-        {suggestedAdjacentLinks.length > 0 ? (
-          <div aria-label="Suggested destinations" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
-            {suggestedAdjacentLinks.map((link) => (
+        {visibleSupportLinks.length > 0 ? (
+          <div aria-label="Support paths" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+            {visibleSupportLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={currentPath ? (pathMatchesLink(link.href, currentPath) ? "page" : undefined) : undefined}
                 className="weather-pill inline-flex min-h-[44px] w-full flex-col items-start justify-center rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
@@ -291,9 +314,9 @@ export const ReportMobileNavigation = ({
             ))}
           </div>
         ) : null}
-        {hiddenAdjacentCount > 0 ? (
+        {hiddenSupportCount > 0 ? (
           <p className="mt-2 text-[11px] text-slate-400">
-            +{hiddenAdjacentCount} more destination{hiddenAdjacentCount === 1 ? "" : "s"} available.
+            +{hiddenSupportCount} more support path{hiddenSupportCount === 1 ? "" : "s"} available.
           </p>
         ) : null}
       </div>

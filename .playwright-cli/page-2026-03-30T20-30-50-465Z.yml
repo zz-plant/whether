@@ -1,0 +1,506 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - link "Whether" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e10]: Planning
+        - link "Search" [ref=e12] [cursor=pointer]:
+          - /url: /search
+      - generic "Navigation zone orientation (not macro posture)" [ref=e13]:
+        - link "Now" [ref=e14] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e15]: Now
+        - link "Decisions" [ref=e16] [cursor=pointer]:
+          - /url: /signals
+          - generic [ref=e17]: Decisions
+        - link "Evidence" [ref=e18] [cursor=pointer]:
+          - /url: /method
+          - generic [ref=e19]: Evidence
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - img "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" [ref=e26]
+            - generic [ref=e27]: Volatile
+          - paragraph [ref=e28]: "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."
+          - paragraph [ref=e29]: Whether translates macro conditions into weekly operating posture for founders.
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Decision as-of
+            - paragraph [ref=e33]: Mar 27, 2026
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Data refreshed
+            - paragraph [ref=e36]: Mar 30, 2026, 8:30 PM UTC
+      - region "Decision snapshot" [ref=e37]:
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: PostureVolatile
+          - paragraph [ref=e40]: ActionTighten approvals now; keep new spend reversible.
+          - paragraph [ref=e41]: "Flip triggerFlip watch: Tightness > 70.0 or Risk appetite > 50.0."
+      - region "Weekly command bar" [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e47]: Volatile outlook
+            - generic [ref=e48]:
+              - paragraph [ref=e49]: Current conditions
+              - heading "Turn the weekly call into a few explicit decisions and keep each move reversible." [level=2] [ref=e50]
+              - paragraph [ref=e51]: Volatile
+              - generic [ref=e53]: Confidence MED 0%
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Weekly direction
+            - paragraph [ref=e56]: Read the current call as the operating baseline for this cycle.
+            - generic [ref=e57]:
+              - generic [ref=e58]: Trend Stable
+              - generic [ref=e59]: Volatile
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: Do now
+              - list [ref=e63]:
+                - listitem [ref=e64]:
+                  - generic [ref=e66]: Tighten approvals now; keep new spend reversible.
+                - listitem [ref=e67]:
+                  - generic [ref=e69]: Limit hiring to backfills and mission-critical roles tied to delivery risk
+            - generic [ref=e70]:
+              - paragraph [ref=e71]: Watch next
+              - list [ref=e72]:
+                - listitem [ref=e73]:
+                  - generic [ref=e75]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                - listitem [ref=e76]:
+                  - generic [ref=e78]: Rebrands or identity pivots
+      - generic [ref=e79]:
+        - complementary [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e83]:
+              - generic [ref=e84]: Readiness clear
+              - generic [ref=e85]: Data trust
+            - generic [ref=e86]:
+              - generic [ref=e87]:
+                - generic [ref=e88]:
+                  - paragraph [ref=e89]: Current readiness
+                  - paragraph [ref=e90]: Readiness clear
+                - generic [ref=e91]:
+                  - paragraph [ref=e92]: Data refreshed Mar 30, 2026, 8:30 PM UTC
+                  - paragraph [ref=e93]: Next refresh 15m cadence
+              - paragraph [ref=e94]: Evidence feed is live; use it to confirm playbook moves and decision shields.
+              - paragraph [ref=e95]: "Live refresh healthy. Next expected update: 15m."
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - paragraph [ref=e99]: Trust summary
+                  - paragraph [ref=e100]: Standard approval cadence is available.
+                - generic [ref=e101]: Allowed now
+              - paragraph [ref=e102]: Inputs are fresh enough for this week's decision. Open more detail only if someone questions freshness or source coverage.
+            - group [ref=e103]:
+              - generic "Data source details▾" [ref=e104] [cursor=pointer]
+          - paragraph [ref=e105]:
+            - text: Keep the decision path moving; for methodology details, see
+            - link "/method" [ref=e106] [cursor=pointer]:
+              - /url: /method
+            - text: .
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - paragraph [ref=e110]: Whether report
+              - heading "Planning" [level=1] [ref=e111]
+              - paragraph [ref=e112]:
+                - generic [ref=e113]: Turn the weekly call into this week's plan, then confirm guardrails, finance decisions, and the final brief.
+                - link "Open planning flow ↓" [ref=e114] [cursor=pointer]:
+                  - /url: "#ops-monthly-action-summary"
+              - generic [ref=e115]: Evidence stamped Mar 27, 2026
+            - link "Return to Weekly Brief" [ref=e117] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e118]: Return to Weekly Brief
+            - paragraph [ref=e119]:
+              - text: "Continue:"
+              - link "Open planning flow" [ref=e120] [cursor=pointer]:
+                - /url: "#ops-monthly-action-summary"
+              - text: •
+              - link "Return to Weekly Brief when the planning review is complete" [ref=e121] [cursor=pointer]:
+                - /url: /
+              - text: •
+              - link "Open final brief" [ref=e122] [cursor=pointer]:
+                - /url: "#ops-export-briefs"
+            - generic [ref=e123]:
+              - generic "Current report status" [ref=e124]:
+                - generic [ref=e125]:
+                  - term [ref=e126]: Posture
+                  - definition [ref=e127]: Volatile
+                  - text: ·
+                - generic [ref=e128]:
+                  - term [ref=e129]: Confidence
+                  - definition [ref=e130]: Readiness clear
+                  - text: ·
+                - generic [ref=e131]:
+                  - term [ref=e132]: Data refreshed
+                  - definition [ref=e133]: Mar 30, 2026, 8:30 PM UTC
+                  - text: ·
+                - generic [ref=e134]:
+                  - term [ref=e135]: Next refresh
+                  - definition [ref=e136]: 15m cadence
+              - button "Refresh now" [ref=e137] [cursor=pointer]
+            - paragraph [ref=e138]: Evidence feed is live; use it to confirm playbook moves and decision shields.
+          - region "Decision snapshot" [ref=e139]:
+            - generic [ref=e140]:
+              - article [ref=e141]:
+                - paragraph [ref=e142]: Start here
+                - heading "Approve or hold the week's hiring, spend, and roadmap moves." [level=2] [ref=e143]
+                - paragraph [ref=e144]: "Live refresh healthy. Next expected update: 15m."
+                - link "See supporting evidence" [ref=e145] [cursor=pointer]:
+                  - /url: "#ops-monthly-action-summary"
+                  - text: See supporting evidence
+                  - img [ref=e146]
+              - article [ref=e148]:
+                - paragraph [ref=e149]: Plan
+                - list
+          - generic [ref=e150]:
+            - region "Use Planning as a controlled review sequence" [ref=e152]:
+              - generic [ref=e154]:
+                - generic [ref=e155]:
+                  - paragraph [ref=e156]: Execution path
+                  - generic [ref=e157] [cursor=pointer]: 5 checkpoints
+                - heading "Use Planning as a controlled review sequence" [level=2] [ref=e158]
+                - paragraph [ref=e159]: Approve the weekly plan first, then validate guardrails, finance posture, sharing output, and only then open deeper escalation paths if needed.
+              - list [ref=e160]:
+                - listitem [ref=e161]:
+                  - link "1 Plan Current Confirm what to approve, hold, or revisit this cycle. Start here before widening the workflow. Jump to section" [ref=e162] [cursor=pointer]:
+                    - /url: "#ops-monthly-action-summary"
+                    - generic [ref=e163]:
+                      - generic [ref=e165]: "1"
+                      - generic [ref=e166]:
+                        - generic [ref=e167]:
+                          - paragraph [ref=e168]: Plan
+                          - generic [ref=e169]: Current
+                        - paragraph [ref=e170]: Confirm what to approve, hold, or revisit this cycle.
+                        - paragraph [ref=e171]: Start here before widening the workflow.
+                        - generic [ref=e172]: Jump to section
+                - listitem [ref=e173]:
+                  - link "2 Guardrails Next Apply start, stop, and fence rules before committing work. Open this only if the current checkpoint is no longer enough. Jump to section" [ref=e174] [cursor=pointer]:
+                    - /url: "#ops-playbook"
+                    - generic [ref=e175]:
+                      - generic [ref=e177]: "2"
+                      - generic [ref=e178]:
+                        - generic [ref=e179]:
+                          - paragraph [ref=e180]: Guardrails
+                          - generic [ref=e181]: Next
+                        - paragraph [ref=e182]: Apply start, stop, and fence rules before committing work.
+                        - paragraph [ref=e183]: Open this only if the current checkpoint is no longer enough.
+                        - generic [ref=e184]: Jump to section
+                - listitem [ref=e185]:
+                  - link "3 Finance Later Validate runway timing and budget posture before publishing. Keep this in reserve for the final unresolved question. Jump to section" [ref=e186] [cursor=pointer]:
+                    - /url: "#ops-finance-strategy"
+                    - generic [ref=e187]:
+                      - generic [ref=e189]: "3"
+                      - generic [ref=e190]:
+                        - generic [ref=e191]:
+                          - paragraph [ref=e192]: Finance
+                          - generic [ref=e193]: Later
+                        - paragraph [ref=e194]: Validate runway timing and budget posture before publishing.
+                        - paragraph [ref=e195]: Keep this in reserve for the final unresolved question.
+                        - generic [ref=e196]: Jump to section
+              - paragraph [ref=e197]: +2 more checkpoints below.
+            - region "Translation router" [ref=e199]:
+              - generic [ref=e200]:
+                - paragraph [ref=e201]: Translation help
+                - heading "What do you need translated in Planning?" [level=2] [ref=e202]
+                - paragraph [ref=e203]: Open the planning layer that matches your gap instead of reading every section at full density.
+              - generic [ref=e204]:
+                - button "Recommend the move Translate the current read into what to do now, what to pause, and what would change the call." [pressed] [ref=e205] [cursor=pointer]:
+                  - paragraph [ref=e206]: Recommend the move
+                  - paragraph [ref=e207]: Translate the current read into what to do now, what to pause, and what would change the call.
+                - button "Explain the evidence Translate the main signals and thresholds into plain operating language before you act." [ref=e208] [cursor=pointer]:
+                  - paragraph [ref=e209]: Explain the evidence
+                  - paragraph [ref=e210]: Translate the main signals and thresholds into plain operating language before you act.
+                - button "Show why this is reliable Translate freshness, confidence, and fallback state into a clear use-or-caution read." [ref=e211] [cursor=pointer]:
+                  - paragraph [ref=e212]: Show why this is reliable
+                  - paragraph [ref=e213]: Translate freshness, confidence, and fallback state into a clear use-or-caution read.
+                - button "Help me share this Translate the current call into the right brief, snapshot, or leadership artifact." [ref=e214] [cursor=pointer]:
+                  - paragraph [ref=e215]: Help me share this
+                  - paragraph [ref=e216]: Translate the current call into the right brief, snapshot, or leadership artifact.
+            - region "Planning translation help" [ref=e218]:
+              - generic [ref=e219]:
+                - paragraph [ref=e220]: Planning help
+                - heading "Translate the plan only where you need support." [level=2] [ref=e221]
+                - paragraph [ref=e222]: These helpers persist by section, so you can keep Planning dense where you are already fluent.
+              - generic [ref=e223]:
+                - button "Translate this plan" [ref=e225] [cursor=pointer]:
+                  - generic [ref=e226]: Translate this plan
+                  - generic [ref=e227]: ▾
+                - button "Translate approval readiness" [ref=e229] [cursor=pointer]:
+                  - generic [ref=e230]: Translate approval readiness
+                  - generic [ref=e231]: ▾
+                - button "Translate the final brief" [ref=e233] [cursor=pointer]:
+                  - generic [ref=e234]: Translate the final brief
+                  - generic [ref=e235]: ▾
+            - region "Planning execution stepper" [ref=e237]:
+              - generic [ref=e238]:
+                - generic [ref=e239]:
+                  - paragraph [ref=e240]: Execution flow
+                  - heading "Use Planning in one linear pass" [level=2] [ref=e241]
+                  - paragraph [ref=e242]: Each step shows who owns it, what approval state it should reach, and what would reopen it.
+                - list [ref=e243]:
+                  - listitem [ref=e244]:
+                    - 'button "1 Plan Weekly plan Current Owner: CEO / COO Approve this week''s plan" [ref=e245] [cursor=pointer]':
+                      - generic [ref=e246]:
+                        - generic [ref=e247]: "1"
+                        - text: Plan
+                      - generic [ref=e248]: Weekly plan
+                      - generic [ref=e249]: Current
+                      - generic [ref=e250]: "Owner: CEO / COO"
+                      - generic [ref=e251]: Approve this week's plan
+                  - listitem [ref=e252]:
+                    - 'button "2 Guardrails Guardrails Up next Owner: Function leads Set pause conditions" [ref=e253] [cursor=pointer]':
+                      - generic [ref=e254]:
+                        - generic [ref=e255]: "2"
+                        - text: Guardrails
+                      - generic [ref=e256]: Guardrails
+                      - generic [ref=e257]: Up next
+                      - generic [ref=e258]: "Owner: Function leads"
+                      - generic [ref=e259]: Set pause conditions
+                  - listitem [ref=e260]:
+                    - 'button "3 Finance Finance strategy Up next Owner: CFO / finance lead Validate cash posture" [ref=e261] [cursor=pointer]':
+                      - generic [ref=e262]:
+                        - generic [ref=e263]: "3"
+                        - text: Finance
+                      - generic [ref=e264]: Finance strategy
+                      - generic [ref=e265]: Up next
+                      - generic [ref=e266]: "Owner: CFO / finance lead"
+                      - generic [ref=e267]: Validate cash posture
+                  - listitem [ref=e268]:
+                    - 'button "4 Share Share brief Up next Owner: Chief of staff / exec comms Ready to circulate" [ref=e269] [cursor=pointer]':
+                      - generic [ref=e270]:
+                        - generic [ref=e271]: "4"
+                        - text: Share
+                      - generic [ref=e272]: Share brief
+                      - generic [ref=e273]: Up next
+                      - generic [ref=e274]: "Owner: Chief of staff / exec comms"
+                      - generic [ref=e275]: Ready to circulate
+              - generic [ref=e276]:
+                - generic [ref=e277]:
+                  - generic [ref=e278]:
+                    - generic [ref=e279]:
+                      - paragraph [ref=e280]: Plan
+                      - heading "Weekly plan" [level=3] [ref=e281]
+                      - paragraph [ref=e282]: Read this before changing team pace, spend, or priorities.
+                      - generic [ref=e283]:
+                        - generic [ref=e284]: "Owner: CEO / COO"
+                        - generic [ref=e285]: Approve this week's plan
+                        - generic [ref=e286]: "Reopen when: The current call or priority posture changes"
+                    - generic [ref=e287]: Current step
+                  - generic [ref=e289]:
+                    - button "Start Weekly plan Read this before changing team pace, spend, or priorities." [expanded] [ref=e290] [cursor=pointer]:
+                      - generic [ref=e291]:
+                        - text: Start
+                        - generic [ref=e292]: Weekly plan
+                        - generic [ref=e293]: Read this before changing team pace, spend, or priorities.
+                      - img [ref=e295]
+                    - region "Monthly action summary" [ref=e298]:
+                      - generic [ref=e299]:
+                        - paragraph [ref=e300]: What should I do this month?
+                        - heading "Monthly action summary" [level=2] [ref=e301]
+                        - paragraph [ref=e302]: "This month, operate in Volatile mode: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Use these constraints to align staffing, sequencing, and approval cadence before you lock the next sprint slate."
+                        - generic [ref=e303]:
+                          - paragraph [ref=e304]: Monthly focus (at a glance)
+                          - list [ref=e305]:
+                            - listitem [ref=e306]:
+                              - generic [ref=e307]: •
+                              - generic [ref=e308]: Ship reliability and security before novelty.
+                            - listitem [ref=e309]:
+                              - generic [ref=e310]: •
+                              - generic [ref=e311]: Avoid disruptive pivots that spook buyers.
+                            - listitem [ref=e312]:
+                              - generic [ref=e313]: •
+                              - generic [ref=e314]: Lean into proof, references, and guarantees.
+                        - generic [ref=e315]:
+                          - generic [ref=e316]:
+                            - paragraph [ref=e318]: Summary card
+                            - generic [ref=e319]:
+                              - button "Copy summary" [ref=e320] [cursor=pointer]
+                              - link "View monthly API" [ref=e321] [cursor=pointer]:
+                                - /url: /api/monthly
+                          - generic [ref=e322]:
+                            - paragraph [ref=e323]: Structured data
+                            - generic [ref=e324]:
+                              - generic [ref=e325]:
+                                - paragraph [ref=e326]: Execution constraints
+                                - list [ref=e327]:
+                                  - listitem [ref=e328]:
+                                    - generic [ref=e329]: •
+                                    - generic [ref=e330]: Ship reliability and security before novelty.
+                                  - listitem [ref=e331]:
+                                    - generic [ref=e332]: •
+                                    - generic [ref=e333]: Avoid disruptive pivots that spook buyers.
+                                  - listitem [ref=e334]:
+                                    - generic [ref=e335]: •
+                                    - generic [ref=e336]: Lean into proof, references, and guarantees.
+                              - generic [ref=e337]:
+                                - paragraph [ref=e338]: Provenance
+                                - list [ref=e339]:
+                                  - listitem [ref=e340]:
+                                    - generic [ref=e341]: •
+                                    - generic [ref=e342]: "Source: Federal Reserve Economic Data (FRED) (https://fred.stlouisfed.org)"
+                                  - listitem [ref=e343]:
+                                    - generic [ref=e344]: •
+                                    - generic [ref=e345]: "Timestamp: Mar 30, 2026, 8:30 PM UTC"
+                                  - listitem [ref=e346]:
+                                    - generic [ref=e347]: •
+                                    - generic [ref=e348]: "Data age: 0s."
+                          - region [ref=e349]:
+                            - heading "Raw summary text" [level=3] [ref=e351]:
+                              - button "Raw summary text" [ref=e352] [cursor=pointer]:
+                                - generic [ref=e353]: Raw summary text
+                                - img [ref=e355]
+                          - status [ref=e357]
+                        - generic [ref=e358]:
+                          - generic [ref=e359]:
+                            - generic [ref=e360]:
+                              - paragraph [ref=e361]: Delta
+                              - paragraph [ref=e362]: Weekly-to-monthly shifts in regime posture, constraints, and data freshness.
+                            - link "View delta API" [ref=e363] [cursor=pointer]:
+                              - /url: /api/summary-delta
+                          - list [ref=e364]:
+                            - listitem [ref=e365]:
+                              - generic [ref=e366]: •
+                              - generic [ref=e367]: Regime steady in Guarded Expand.
+                            - listitem [ref=e368]:
+                              - generic [ref=e369]: •
+                              - generic [ref=e370]: No constraint changes.
+                            - listitem [ref=e371]:
+                              - generic [ref=e372]: •
+                              - generic [ref=e373]: Provenance age unchanged at 0s..
+                        - generic [ref=e374]:
+                          - generic [ref=e375]:
+                            - paragraph [ref=e376]: Cadence alignment
+                            - generic [ref=e377]: Aligned
+                          - paragraph [ref=e378]: Weekly and monthly guidance align on Experiment control, Reliability & security, +1 more.
+                        - generic [ref=e379]:
+                          - generic [ref=e380]:
+                            - paragraph [ref=e381]: Monthly leadership asks sound like
+                            - list [ref=e382]:
+                              - listitem [ref=e383]:
+                                - generic [ref=e384]: •
+                                - generic [ref=e385]: “These three bets can still pay back within the operating guardrails.”
+                              - listitem [ref=e386]:
+                                - generic [ref=e387]: •
+                                - generic [ref=e388]: “We’re sequencing roadmap work to reduce risk before expanding scope.”
+                          - generic [ref=e389]:
+                            - paragraph [ref=e390]: Monthly constraints should force
+                            - list [ref=e391]:
+                              - listitem [ref=e392]:
+                                - generic [ref=e393]: •
+                                - generic [ref=e394]: “Only one major growth bet at a time until cash availability improves.”
+                              - listitem [ref=e395]:
+                                - generic [ref=e396]: •
+                                - generic [ref=e397]: “Move hires to contingency approval and revisit after the next Treasury refresh.”
+                - generic [ref=e398]:
+                  - generic [ref=e399]:
+                    - paragraph [ref=e400]: Guardrails
+                    - heading "Guardrails" [level=3] [ref=e401]
+                    - paragraph [ref=e402]: Apply the top guardrails before approving new commitments.
+                    - generic [ref=e403]:
+                      - generic [ref=e404]: "Owner: Function leads"
+                      - generic [ref=e405]: Set pause conditions
+                      - generic [ref=e406]: "Reopen when: A pause-if or change-course condition is hit"
+                  - button "Open step" [ref=e407] [cursor=pointer]
+                - generic [ref=e408]:
+                  - generic [ref=e409]:
+                    - paragraph [ref=e410]: Finance
+                    - heading "Finance strategy" [level=3] [ref=e411]
+                    - paragraph [ref=e412]: Validate runway timing and budget posture before sharing the brief.
+                    - generic [ref=e413]:
+                      - generic [ref=e414]: "Owner: CFO / finance lead"
+                      - generic [ref=e415]: Validate cash posture
+                      - generic [ref=e416]: "Reopen when: Runway assumptions or financing windows move"
+                  - button "Open step" [ref=e417] [cursor=pointer]
+                - generic [ref=e418]:
+                  - generic [ref=e419]:
+                    - paragraph [ref=e420]: Share
+                    - heading "Share brief" [level=3] [ref=e421]
+                    - paragraph [ref=e422]: Copy or export the aligned brief after plan and finance review are complete.
+                    - generic [ref=e423]:
+                      - generic [ref=e424]: "Owner: Chief of staff / exec comms"
+                      - generic [ref=e425]: Ready to circulate
+                      - generic [ref=e426]: "Reopen when: The room needs an explainer or governance pack"
+                  - button "Open step" [ref=e427] [cursor=pointer]
+            - region "Escalate only when the weekly plan is already clear" [ref=e429]:
+              - generic [ref=e430]:
+                - paragraph [ref=e431]: Stop here unless one bounded question remains
+                - heading "Escalate only when the weekly plan is already clear" [level=2] [ref=e432]
+                - paragraph [ref=e433]: Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open Decision Tools only when one owner-specific or situation-specific call still needs a bounded answer after this review.
+              - generic [ref=e434]:
+                - link "Open Decision Tools" [ref=e435] [cursor=pointer]:
+                  - /url: /decide
+                - link "Return to share brief" [ref=e436] [cursor=pointer]:
+                  - /url: /operations#ops-export-briefs
+            - group [ref=e438]:
+              - generic "Need deeper board or governance artifacts?▾" [ref=e439] [cursor=pointer]
+            - group [ref=e441]:
+              - generic "Need implementation handoffs?▾" [ref=e442] [cursor=pointer]
+          - paragraph [ref=e444]: Governance artifact; not investment advice.
+    - generic [ref=e446]:
+      - paragraph [ref=e447]: Current posture
+      - generic [ref=e448]:
+        - paragraph [ref=e449]: Approve or hold the week's hiring, spend, and roadmap moves.
+        - link "Return to Weekly Brief" [ref=e450] [cursor=pointer]:
+          - /url: /
+    - navigation "Mobile report navigation" [ref=e452]:
+      - generic [ref=e453]:
+        - generic [ref=e454]:
+          - generic [ref=e455]:
+            - generic [ref=e456]:
+              - paragraph [ref=e457]: Step 3 of 5
+              - paragraph [ref=e458]: 5 sections
+              - paragraph [ref=e459]: Jump straight to the part of Planning you need.
+            - generic [ref=e460]: Planning
+          - list [ref=e461]:
+            - listitem [ref=e462]:
+              - link "Monthly 1" [ref=e463] [cursor=pointer]:
+                - /url: "#ops-monthly-action-summary"
+                - generic [ref=e464]: Monthly
+                - generic [ref=e465]: "1"
+            - listitem [ref=e466]:
+              - link "Playbook 2" [ref=e467] [cursor=pointer]:
+                - /url: "#ops-playbook"
+                - generic [ref=e468]: Playbook
+                - generic [ref=e469]: "2"
+            - listitem [ref=e470]:
+              - link "Finance 3" [ref=e471] [cursor=pointer]:
+                - /url: "#ops-finance-strategy"
+                - generic [ref=e472]: Finance
+                - generic [ref=e473]: "3"
+            - listitem [ref=e474]:
+              - link "Export 4" [ref=e475] [cursor=pointer]:
+                - /url: "#ops-export-briefs"
+                - generic [ref=e476]: Export
+                - generic [ref=e477]: "4"
+          - paragraph [ref=e478]: +1 more section below.
+        - generic [ref=e479]:
+          - generic [ref=e480]:
+            - img [ref=e482]
+            - generic [ref=e486]:
+              - paragraph [ref=e487]: Planning
+              - paragraph [ref=e488]: Decisions
+              - paragraph [ref=e489]: Approve this week's plan for hiring, spending, roadmap, finance, and the final brief.
+              - paragraph [ref=e490]: 5 pages
+          - link "Weekly Brief This week's call, what to do now, and a share-ready summary." [ref=e491] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e492]: Weekly Brief
+            - generic [ref=e493]: This week's call, what to do now, and a share-ready summary.
+        - generic "Suggested destinations" [ref=e494]:
+          - 'link "Evidence Why the weekly call moved: drivers, thresholds, freshness, and replay." [ref=e495] [cursor=pointer]':
+            - /url: /signals
+            - generic [ref=e496]: Evidence
+            - generic [ref=e497]: "Why the weekly call moved: drivers, thresholds, freshness, and replay."
+          - link "Decision Tools Role guides and quick checks for the one team-specific question the weekly plan does not settle." [ref=e498] [cursor=pointer]:
+            - /url: /decide
+            - generic [ref=e499]: Decision Tools
+            - generic [ref=e500]: Role guides and quick checks for the one team-specific question the weekly plan does not settle.
+        - paragraph [ref=e501]: +1 more destination available.
+  - button "Open Next.js Dev Tools" [ref=e507] [cursor=pointer]:
+    - img [ref=e508]
+  - alert [ref=e511]
+  - generic:
+    - region "Notifications"

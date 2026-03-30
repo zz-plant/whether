@@ -4,16 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
-  globalHeaderGroupLabels,
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 
 type GlobalHeaderNavClientProps = {
   pathname?: string;
+  variant?: "default" | "compact";
 };
 
 function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
+  const eyebrow = link.href === "/" ? "Start here" : "Support path";
+
   return (
     <li className="flex-shrink-0 sm:min-w-0">
       <Link
@@ -27,7 +29,7 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
         }`}
       >
         <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
-          {globalHeaderGroupLabels[link.group]}
+          {eyebrow}
         </span>
         <span className="mt-1 font-[family:var(--weather-font-display)] text-sm font-semibold tracking-[-0.02em] sm:text-[1.02rem]">
           {link.label}
@@ -44,7 +46,32 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
   );
 }
 
-export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
+function CompactNavigationLink({ link }: { link: GlobalHeaderNavigationLink }) {
+  const isAnchor = link.href === "/";
+
+  return (
+    <li className="flex-shrink-0">
+      <Link
+        href={link.href}
+        aria-current={link.isActive ? "page" : undefined}
+        className={`inline-flex min-h-[40px] items-center justify-center rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+          link.isActive
+            ? "border-sky-300/80 bg-sky-500/20 text-sky-50"
+            : isAnchor
+              ? "border-amber-300/45 bg-amber-400/10 text-amber-50 hover:border-amber-300/70"
+              : "border-slate-700/80 bg-slate-950/65 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+        }`}
+      >
+        {link.label}
+      </Link>
+    </li>
+  );
+}
+
+export function GlobalHeaderNavClient({
+  pathname,
+  variant = "default",
+}: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
   const resolvedPathname = pathname ?? currentPathname;
   const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
@@ -53,6 +80,18 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
   useEffect(() => {
     setIsMenuOpen(false);
   }, [resolvedPathname]);
+
+  if (variant === "compact") {
+    return (
+      <nav aria-label="Primary routes">
+        <ul className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {navigationLinks.map((link) => (
+            <CompactNavigationLink key={link.href} link={link} />
+          ))}
+        </ul>
+      </nav>
+    );
+  }
 
   return (
     <div className="relative">

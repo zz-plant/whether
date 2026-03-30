@@ -1,0 +1,638 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - link "Whether" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e9]:
+            - paragraph [ref=e10]: Weekly Brief
+            - paragraph [ref=e11]: Start here, share from here, and open a support path only if a specific question remains.
+        - link "Search" [ref=e13] [cursor=pointer]:
+          - /url: /search
+      - navigation "Primary routes" [ref=e15]:
+        - list [ref=e16]:
+          - listitem [ref=e17]:
+            - link "Weekly Brief" [ref=e18] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=e19]:
+            - link "Evidence" [ref=e20] [cursor=pointer]:
+              - /url: /signals
+          - listitem [ref=e21]:
+            - link "Planning" [ref=e22] [cursor=pointer]:
+              - /url: /operations
+          - listitem [ref=e23]:
+            - link "Decision Tools" [ref=e24] [cursor=pointer]:
+              - /url: /decide
+          - listitem [ref=e25]:
+            - link "Trust" [ref=e26] [cursor=pointer]:
+              - /url: /method
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - img "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" [ref=e33]
+            - generic [ref=e34]: Weekly operating brief
+            - generic [ref=e35]: Volatile
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Decide this week's pace in one screen.
+            - generic [ref=e38]:
+              - paragraph [ref=e39]:
+                - generic [ref=e40]: Posture
+                - text: Keep this week's regime as the operating baseline.
+              - paragraph [ref=e41]:
+                - generic [ref=e42]: Do now
+                - text: Execute only the bounded moves already approved for this posture.
+              - paragraph [ref=e43]:
+                - generic [ref=e44]: Watch threshold
+                - text: Track the nearest trigger that changes pacing.
+              - paragraph [ref=e45]:
+                - generic [ref=e46]: Flip condition
+                - text: Reverse only when the trigger confirms.
+        - generic [ref=e48]:
+          - generic [ref=e49]: Posture Volatile
+          - generic [ref=e50]: •
+          - generic [ref=e51]: Decision as-of Mar 27, 2026
+          - generic [ref=e52]: •
+          - generic [ref=e53]: Data refreshed Mar 30, 2026, 8:27 PM UTC
+      - region "Decision snapshot" [ref=e54]:
+        - generic [ref=e55]:
+          - paragraph [ref=e56]: PostureTransitional Mixed — Mid (Fragile)
+          - paragraph [ref=e57]: ActionTighten approvals now; keep new spend reversible.
+          - paragraph [ref=e58]: "Flip triggerFlip watch: Tightness > 70.0 or Risk appetite > 50.0."
+      - region "Weekly command bar" [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e64]: Volatile outlook
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: Current conditions
+              - 'heading "De-risk the call: ship reliability, trust, and short-payback releases." [level=2] [ref=e67]'
+              - paragraph [ref=e68]: Transitional Mixed — Mid (Fragile)
+              - generic [ref=e69]:
+                - generic [ref=e70]: Risk appetite 5.0 pts from flip
+                - generic [ref=e71]: Confidence LOW 70%
+          - text: ▾
+          - figure [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: Posture map
+              - generic [ref=e76]: Tail = last week, cone = near-term drift
+            - generic [ref=e77]:
+              - img "Posture map. Tightness 0.0 and risk appetite 45.0. 5.0 points from the nearest flip line." [ref=e78]
+              - generic:
+                - generic: Cautious
+                - generic: Bold
+                - generic: Loose
+                - generic: Tight
+            - generic [ref=e86]:
+              - generic [ref=e87]: Trend Deteriorating
+              - generic [ref=e88]: Tightness 0.0 (0.0)
+              - generic [ref=e89]: Risk appetite 45.0 (-25.0)
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - paragraph [ref=e92]: Decision runways
+              - generic [ref=e93]:
+                - generic [ref=e95]:
+                  - generic [ref=e96]: Tightness
+                  - generic [ref=e97]: 0.0 vs 70.0
+                - generic [ref=e102]:
+                  - generic [ref=e103]: Risk appetite
+                  - generic [ref=e104]: 45.0 vs 50.0
+            - generic [ref=e108]:
+              - paragraph [ref=e109]: Do now
+              - list [ref=e110]:
+                - listitem [ref=e111]:
+                  - generic [ref=e113]: Tighten approvals now; keep new spend reversible.
+                - listitem [ref=e114]:
+                  - generic [ref=e116]: Limit hiring to backfills and mission-critical roles tied to delivery risk
+            - generic [ref=e117]:
+              - paragraph [ref=e118]: Watch next
+              - list [ref=e119]:
+                - listitem [ref=e120]:
+                  - generic [ref=e122]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                - listitem [ref=e123]:
+                  - generic [ref=e125]: Tightness < 66
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - region "Orientation Week of Mar 27, 2026 Transitional Mixed · Mid Stormy. Flip risk is in play. Keep approvals reversible and review weekly." [ref=e130]:
+              - generic "Weekly regime banner" [ref=e131]:
+                - generic [ref=e132]:
+                  - generic [ref=e133]:
+                    - img [ref=e135]
+                    - generic [ref=e138]:
+                      - generic [ref=e139]:
+                        - generic [ref=e140]: Orientation
+                        - generic [ref=e141]: Week of Mar 27, 2026
+                      - paragraph [ref=e142]: Transitional Mixed · Mid
+                      - paragraph [ref=e143]: Stormy. Flip risk is in play. Keep approvals reversible and review weekly.
+                  - generic "Current outlook metadata" [ref=e144]:
+                    - generic [ref=e145]:
+                      - img [ref=e146]
+                      - generic [ref=e148]: Trend Deteriorating
+                    - generic [ref=e149]: Confidence LOW 70%
+                    - generic [ref=e150]: Flip window 5 pts
+                    - generic [ref=e151]: Risk appetite above 50.0.
+              - generic [ref=e152]:
+                - main "Weekly decision transmission order" [ref=e153]:
+                  - article "Weekly call snapshot" [ref=e154]:
+                    - article [ref=e155]:
+                      - generic [ref=e156]:
+                        - heading "This week in one screen" [level=2] [ref=e158]
+                        - generic [ref=e159]:
+                          - generic [ref=e160]: Transitional Mixed — Mid (Fragile)
+                          - generic [ref=e161]: Degraded trust
+                      - generic [ref=e162]:
+                        - button "Translate this call" [ref=e164] [cursor=pointer]:
+                          - generic [ref=e165]: Translate this call
+                          - generic [ref=e166]: ▾
+                        - button "Translate trust status" [ref=e168] [cursor=pointer]:
+                          - generic [ref=e169]: Translate trust status
+                          - generic [ref=e170]: ▾
+                      - generic [ref=e171]:
+                        - article [ref=e172]:
+                          - paragraph [ref=e173]: Changed vs last week
+                          - paragraph [ref=e174]: "pressure rose versus last week. Do now: slow approvals, narrow experiments, and require tighter payback windows. Flip: Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                        - article [ref=e175]:
+                          - paragraph [ref=e176]: Revisit decisions?
+                          - paragraph [ref=e177]: YES — Regime shift detected.
+                          - paragraph [ref=e178]: Recheck last week's approvals before adding fixed cost.
+                      - generic [ref=e179]:
+                        - article [ref=e180]:
+                          - generic [ref=e181]:
+                            - paragraph [ref=e182]: Action now
+                            - generic [ref=e183]: Degraded trust
+                          - paragraph [ref=e184]: Tighten approvals now; keep new spend reversible.
+                        - article [ref=e185]:
+                          - generic [ref=e186]:
+                            - paragraph [ref=e187]: Threshold / pause if
+                            - generic [ref=e188]: Degraded trust
+                          - paragraph [ref=e189]: Rebrands or identity pivots
+                        - article [ref=e190]:
+                          - generic [ref=e191]:
+                            - paragraph [ref=e192]: Reversal / change course if
+                            - generic [ref=e193]: Degraded trust
+                          - paragraph [ref=e194]: "Flip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                      - generic [ref=e195]:
+                        - generic [ref=e196]:
+                          - generic [ref=e197]:
+                            - paragraph [ref=e198]: Decision use
+                            - paragraph [ref=e199]: Use caution
+                          - generic [ref=e200]:
+                            - paragraph [ref=e201]: Trust state
+                            - paragraph [ref=e202]: DEGRADED TRUST
+                        - paragraph [ref=e203]: "Signal reliability LOW (Mar 30, 2026, 8:27 PM UTC): keep approvals staged until reliability returns to HIGH."
+                    - group [ref=e204]:
+                      - generic "More context▾" [ref=e205] [cursor=pointer]
+                    - group [ref=e206]:
+                      - generic "Supporting rationale▾" [ref=e207] [cursor=pointer]
+                  - region "Action strip" [ref=e208]:
+                    - heading "Operating levers this week" [level=3] [ref=e211]
+                    - list [ref=e212]:
+                      - listitem [ref=e213]:
+                        - generic [ref=e214]:
+                          - generic [ref=e215]:
+                            - paragraph [ref=e216]: Hiring stance
+                            - paragraph [ref=e217]: Guarded
+                          - generic [ref=e218]: Current
+                        - generic [ref=e220]:
+                          - generic [ref=e223]: Closed
+                          - generic [ref=e226]: Guarded
+                          - generic [ref=e229]: Staged
+                          - generic [ref=e232]: Open
+                        - generic [ref=e233]:
+                          - generic [ref=e234]: Risk appetite 1.0 pts to caution.
+                          - generic [ref=e235]: Tightness already clears the reopen line.
+                        - generic [ref=e236]:
+                          - generic [ref=e237]:
+                            - paragraph [ref=e238]: What stays open
+                            - paragraph [ref=e239]: Limit hiring to backfills and mission-critical roles tied to delivery risk
+                          - generic [ref=e240]:
+                            - paragraph [ref=e241]: Tighten if
+                            - paragraph [ref=e242]: net-new hiring if tightness > 76 or risk appetite < 44
+                          - generic [ref=e243]:
+                            - paragraph [ref=e244]: Reopen when
+                            - paragraph [ref=e245]: staged approvals when tightness < 66 and risk appetite > 54
+                      - listitem [ref=e246]:
+                        - generic [ref=e247]:
+                          - generic [ref=e248]:
+                            - paragraph [ref=e249]: Investment pace
+                            - paragraph [ref=e250]: Open
+                          - generic [ref=e251]: Current
+                        - generic [ref=e253]:
+                          - generic [ref=e256]: Closed
+                          - generic [ref=e259]: Guarded
+                          - generic [ref=e262]: Staged
+                          - generic [ref=e265]: Open
+                        - generic [ref=e266]:
+                          - generic [ref=e267]: Tightness 76.0 pts to caution.
+                          - generic [ref=e268]: Tightness already clears the reopen line.
+                        - generic [ref=e269]:
+                          - generic [ref=e270]:
+                            - paragraph [ref=e271]: What stays open
+                            - paragraph [ref=e272]: Gate discretionary spend by measurable short-cycle payback proof
+                          - generic [ref=e273]:
+                            - paragraph [ref=e274]: Tighten if
+                            - paragraph [ref=e275]: discretionary burn expansion if tightness > 76
+                          - generic [ref=e276]:
+                            - paragraph [ref=e277]: Reopen when
+                            - paragraph [ref=e278]: controlled burn expansion when tightness < 66 and budget payback proof is intact
+                      - listitem [ref=e279]:
+                        - generic [ref=e280]:
+                          - generic [ref=e281]:
+                            - paragraph [ref=e282]: Sales posture
+                            - paragraph [ref=e283]: Guarded
+                          - generic [ref=e284]: Current
+                        - generic [ref=e286]:
+                          - generic [ref=e289]: Closed
+                          - generic [ref=e292]: Guarded
+                          - generic [ref=e295]: Staged
+                          - generic [ref=e298]: Open
+                        - generic [ref=e299]:
+                          - generic [ref=e300]: Risk appetite 1.0 pts to caution.
+                          - generic [ref=e301]: Tightness already clears the reopen line.
+                        - generic [ref=e302]:
+                          - generic [ref=e303]:
+                            - paragraph [ref=e304]: What stays open
+                            - paragraph [ref=e305]: Prepare raise materials and launch planning early to preserve process control
+                          - generic [ref=e306]:
+                            - paragraph [ref=e307]: Tighten if
+                            - paragraph [ref=e308]: acceleration if risk appetite falls below 44 or tightness rises above 76
+                          - generic [ref=e309]:
+                            - paragraph [ref=e310]: Reopen when
+                            - paragraph [ref=e311]: full process when risk appetite > 54 and tightness < 66
+                      - listitem [ref=e312]:
+                        - generic [ref=e313]:
+                          - generic [ref=e314]:
+                            - paragraph [ref=e315]: Product priorities
+                            - paragraph [ref=e316]: Guarded
+                          - generic [ref=e317]: Current
+                        - generic [ref=e319]:
+                          - generic [ref=e322]: Closed
+                          - generic [ref=e325]: Guarded
+                          - generic [ref=e328]: Staged
+                          - generic [ref=e331]: Open
+                        - generic [ref=e332]:
+                          - generic [ref=e333]: Risk appetite 1.0 pts to caution.
+                          - generic [ref=e334]: Risk appetite 9.0 pts to reopen.
+                        - generic [ref=e335]:
+                          - generic [ref=e336]:
+                            - paragraph [ref=e337]: What stays open
+                            - paragraph [ref=e338]: Protect core roadmap tempo and prioritize near-term customer value slices
+                          - generic [ref=e339]:
+                            - paragraph [ref=e340]: Tighten if
+                            - paragraph [ref=e341]: long-payback bets if risk appetite < 44 or two consecutive weaker weekly reads print
+                          - generic [ref=e342]:
+                            - paragraph [ref=e343]: Reopen when
+                            - paragraph [ref=e344]: tempo on deferred bets when risk appetite > 54 and weekly direction stabilizes/improves
+                      - listitem [ref=e345]:
+                        - generic [ref=e346]:
+                          - generic [ref=e347]:
+                            - paragraph [ref=e348]: Risk tolerance
+                            - paragraph [ref=e349]: Guarded
+                          - generic [ref=e350]: Current
+                        - generic [ref=e352]:
+                          - generic [ref=e355]: Closed
+                          - generic [ref=e358]: Guarded
+                          - generic [ref=e361]: Staged
+                          - generic [ref=e364]: Open
+                        - generic [ref=e365]:
+                          - generic [ref=e366]: Risk appetite 1.0 pts to caution.
+                          - generic [ref=e367]: Tightness already clears the reopen line.
+                        - generic [ref=e368]:
+                          - generic [ref=e369]:
+                            - paragraph [ref=e370]: What stays open
+                            - paragraph [ref=e371]: Keep only reversible expansion experiments active with clear checkpoints
+                          - generic [ref=e372]:
+                            - paragraph [ref=e373]: Tighten if
+                            - paragraph [ref=e374]: expansion bets if risk appetite < 44 or tightness > 76
+                          - generic [ref=e375]:
+                            - paragraph [ref=e376]: Reopen when
+                            - paragraph [ref=e377]: in tranches when risk appetite > 54 and tightness < 66
+                - complementary [ref=e378]:
+                  - article "Decision transmission rail" [ref=e379]:
+                    - generic [ref=e380]:
+                      - heading "Transmit this call" [level=2] [ref=e381]
+                      - generic [ref=e382]: Share-ready
+                    - generic [ref=e383]:
+                      - generic [ref=e384]:
+                        - paragraph [ref=e385]: Artifact preview
+                        - generic [ref=e386]: Ready to share
+                      - generic [ref=e387]:
+                        - paragraph [ref=e388]: Whether weekly call
+                        - generic [ref=e389]:
+                          - paragraph [ref=e390]: ActionTighten approvals now; keep new spend reversible.
+                          - paragraph [ref=e391]: "TriggerRebrands or identity pivotsReversalFlip watch: Tightness > 70.0 or Risk appetite > 50.0."
+                    - generic [ref=e392]:
+                      - paragraph [ref=e393]: Share & cite
+                      - paragraph [ref=e394]: Posture Transitional Mixed · Signal reliability LOW · Decision as-of Mar 27, 2026 · Data refreshed Mar 30, 2026, 8:27 PM UTC
+                      - generic [ref=e395]: "Whether call — 2026-03-27 Posture: Transitional Mixed — Mid (Fragile) (VOLATILE) Confidence: Score-based posture confidence Signal refresh cadence: 15m Source: https://fred.stlouisfed.org"
+                      - generic [ref=e398]:
+                        - generic "Primary weekly brief actions" [ref=e399]:
+                          - button "Copy operator brief" [ref=e400] [cursor=pointer]
+                          - button "Copy weekly call snapshot" [ref=e401] [cursor=pointer]
+                        - paragraph [ref=e402]: "Default share path: use the operator brief. Use the snapshot for short chat context; keep board variants and exception handling secondary."
+                        - generic "Artifact mode" [ref=e403]:
+                          - button "Operator brief" [pressed] [ref=e404] [cursor=pointer]
+                          - button "Explainer brief" [ref=e405] [cursor=pointer]
+                        - group [ref=e406]:
+                          - generic "Board, print, and company exceptions▾" [ref=e407] [cursor=pointer]
+                - group [ref=e409]:
+                  - generic "Deep evidence" [ref=e410] [cursor=pointer]:
+                    - generic [ref=e411]: Deep evidence
+                    - generic [ref=e412]: ▾
+            - generic [ref=e414]:
+              - generic [ref=e415]:
+                - generic [ref=e416]:
+                  - generic [ref=e417]:
+                    - generic [ref=e418]: Readiness watch
+                    - generic [ref=e419]: Data trust
+                  - generic [ref=e420]: advisory · live data
+                - generic [ref=e421]:
+                  - generic [ref=e422]:
+                    - generic [ref=e423]:
+                      - paragraph [ref=e424]: Current readiness
+                      - paragraph [ref=e425]: Readiness watch
+                    - generic [ref=e426]:
+                      - paragraph [ref=e427]: Data refreshed Mar 30, 2026, 8:27 PM UTC
+                      - paragraph [ref=e428]: Next refresh 15m cadence
+                  - paragraph [ref=e429]: Pause irreversible approvals until one verified live refresh lands.
+                  - paragraph [ref=e430]: "Decision impact: keep the do now / hold / revisit path, but do not treat this as a clear read until freshness and confidence recover."
+                  - paragraph [ref=e431]: "Live window: safe for near-term operating approvals under standard guardrails."
+                - generic [ref=e432]:
+                  - article [ref=e433]:
+                    - generic [ref=e434]:
+                      - paragraph [ref=e435]: Approval status
+                      - generic [ref=e436]: Allowed now
+                    - paragraph [ref=e437]: Standard weekly approvals under the current operating call.
+                    - generic [ref=e438]:
+                      - generic [ref=e439]:
+                        - paragraph [ref=e440]: Hold
+                        - paragraph [ref=e441]: No additional holds required while trust remains stable.
+                      - generic [ref=e442]:
+                        - paragraph [ref=e443]: Blocked
+                        - paragraph [ref=e444]: No outage-specific blocks in this state.
+                  - article [ref=e445]:
+                    - generic [ref=e446]:
+                      - paragraph [ref=e447]: Recovery progress
+                      - generic [ref=e448]: 2/3 clear
+                    - paragraph [ref=e451]: Outage mode exits when 3/3 checks pass.
+                    - paragraph [ref=e452]: 2/3 checks passed this refresh.
+                    - generic [ref=e453]:
+                      - generic [ref=e454]:
+                        - paragraph [ref=e455]: Owner
+                        - paragraph [ref=e456]: CEO + Finance lead
+                      - generic [ref=e457]:
+                        - paragraph [ref=e458]: Checkpoint
+                        - paragraph [ref=e459]: Weekly planning cadence
+                      - generic [ref=e460]:
+                        - paragraph [ref=e461]: Exit
+                        - paragraph [ref=e462]: Keep standard approvals while confidence remains above LOW.
+                  - article [ref=e463]:
+                    - generic [ref=e464]:
+                      - paragraph [ref=e465]: Source status
+                      - generic [ref=e466]: 1 degraded
+                    - list [ref=e467]:
+                      - listitem [ref=e468]:
+                        - generic [ref=e469]:
+                          - generic [ref=e470]: Startup/private markets
+                          - generic [ref=e471]: Snapshot-backed · Stale · Curated snapshot
+                - group [ref=e474]:
+                  - generic "Data source details▾" [ref=e475] [cursor=pointer]
+              - paragraph [ref=e476]:
+                - text: Keep the decision path moving; for methodology details, see
+                - link "/method" [ref=e477] [cursor=pointer]:
+                  - /url: /method
+                - text: .
+          - generic [ref=e480]:
+            - region [ref=e481]:
+              - generic [ref=e482]:
+                - generic [ref=e483]:
+                  - img [ref=e485]
+                  - generic [ref=e487]:
+                    - generic [ref=e488]:
+                      - generic [ref=e489]: "01"
+                      - paragraph [ref=e490]: Planning
+                    - heading "Open Planning next unless this week's call needs an exception review." [level=2] [ref=e495]
+                    - paragraph [ref=e496]: "This is the default next move after the weekly brief: lock what to do now, what to avoid, and what would make you reopen the plan."
+                - link "Open Planning" [ref=e498] [cursor=pointer]:
+                  - /url: /operations#ops-monthly-action-summary
+                  - img [ref=e499]
+                  - generic [ref=e501]: Open Planning
+              - article [ref=e502]:
+                - generic [ref=e503]:
+                  - generic [ref=e504]:
+                    - paragraph [ref=e505]:
+                      - img [ref=e507]
+                      - generic [ref=e509]: Weekly operating board
+                    - paragraph [ref=e510]: Tighten approvals now; keep new spend reversible.
+                    - paragraph [ref=e511]: Revisit last week's approvals before you add fixed cost or sequence new bets.
+                  - link "Open share brief" [ref=e512] [cursor=pointer]:
+                    - /url: /operations#ops-export-briefs
+                    - img [ref=e513]
+                    - generic [ref=e516]: Open share brief
+                - generic [ref=e517]:
+                  - generic [ref=e518]:
+                    - generic [ref=e519]:
+                      - paragraph [ref=e520]: Commit now
+                      - generic [ref=e521]: Approve now
+                    - generic [ref=e522]:
+                      - article [ref=e523]:
+                        - generic [ref=e524]:
+                          - paragraph [ref=e525]: Weekly call
+                          - generic [ref=e526]: Owner Leadership
+                        - paragraph [ref=e527]: Tighten approvals now; keep new spend reversible.
+                      - article [ref=e528]:
+                        - generic [ref=e529]:
+                          - paragraph [ref=e530]: Investment pace
+                          - generic [ref=e531]: Owner CFO
+                        - paragraph [ref=e532]: Gate discretionary spend by measurable short-cycle payback proof
+                  - generic [ref=e533]:
+                    - generic [ref=e534]:
+                      - paragraph [ref=e535]: Pause if
+                      - generic [ref=e536]: Keep active
+                    - generic [ref=e537]:
+                      - article [ref=e538]:
+                        - generic [ref=e539]:
+                          - paragraph [ref=e540]: Hiring stance
+                          - generic [ref=e541]: Owner Operator
+                        - paragraph [ref=e542]: net-new hiring if tightness > 76 or risk appetite < 44
+                      - article [ref=e543]:
+                        - generic [ref=e544]:
+                          - paragraph [ref=e545]: Investment pace
+                          - generic [ref=e546]: Owner CFO
+                        - paragraph [ref=e547]: discretionary burn expansion if tightness > 76
+                      - article [ref=e548]:
+                        - generic [ref=e549]:
+                          - paragraph [ref=e550]: Sales posture
+                          - generic [ref=e551]: Owner Operator
+                        - paragraph [ref=e552]: acceleration if risk appetite falls below 44 or tightness rises above 76
+                  - generic [ref=e553]:
+                    - generic [ref=e554]:
+                      - paragraph [ref=e555]: Change course if
+                      - generic [ref=e556]: Watch
+                    - generic [ref=e557]:
+                      - article [ref=e558]:
+                        - generic [ref=e559]:
+                          - paragraph [ref=e560]: Investment pace
+                          - generic [ref=e561]: Owner CFO
+                        - paragraph [ref=e562]: controlled burn expansion when tightness < 66 and budget payback proof is intact
+                      - article [ref=e563]:
+                        - generic [ref=e564]:
+                          - paragraph [ref=e565]: Risk tolerance
+                          - generic [ref=e566]: Owner CEO / Finance
+                        - paragraph [ref=e567]: in tranches when risk appetite > 54 and tightness < 66
+              - generic [ref=e568]:
+                - article [ref=e569]:
+                  - paragraph [ref=e570]:
+                    - img [ref=e572]
+                    - generic [ref=e574]: Guardrail owner
+                  - paragraph [ref=e575]: Hiring stance
+                  - paragraph [ref=e576]: net-new hiring if tightness > 76 or risk appetite < 44
+                - article [ref=e577]:
+                  - paragraph [ref=e578]:
+                    - img [ref=e580]
+                    - generic [ref=e583]: Finance posture
+                  - paragraph [ref=e584]: Investment pace
+                  - paragraph [ref=e585]: Gate discretionary spend by measurable short-cycle payback proof
+              - generic [ref=e586]:
+                - paragraph [ref=e587]: Need more detail?
+                - paragraph [ref=e588]:
+                  - text: Stay in Planning for approvals and guardrails. Open
+                  - link "Decision Tools" [ref=e589] [cursor=pointer]:
+                    - /url: /decide
+                  - text: only if one owner-specific question is still unresolved after the plan is clear.
+            - region [ref=e590]:
+              - generic [ref=e591]:
+                - generic [ref=e592]:
+                  - img [ref=e594]
+                  - generic [ref=e601]:
+                    - generic [ref=e602]:
+                      - generic [ref=e603]: "02"
+                      - paragraph [ref=e604]: Exception paths
+                    - heading "Open Evidence or Trust only when the weekly call still needs proof." [level=2] [ref=e609]
+                    - paragraph [ref=e610]: Planning stays the default path. Leave home for Evidence when the drivers need checking, or Trust when a reviewer needs freshness, confidence, or formula defense.
+                - generic [ref=e611]:
+                  - link "Open Evidence" [ref=e612] [cursor=pointer]:
+                    - /url: /signals
+                    - img [ref=e613]
+                    - generic [ref=e616]: Open Evidence
+                  - link "Open Trust" [ref=e617] [cursor=pointer]:
+                    - /url: /method
+                    - img [ref=e618]
+                    - generic [ref=e620]: Open Trust
+              - generic [ref=e621]:
+                - article [ref=e622]:
+                  - paragraph [ref=e623]:
+                    - img [ref=e625]
+                    - generic [ref=e632]: Readiness board
+                  - generic [ref=e633]:
+                    - generic [ref=e634]: Degraded trust
+                    - generic [ref=e635]: Exception only
+                  - paragraph [ref=e636]: "Safe to use for near-term planning; proceed with normal approval flow. Trigger: confidence drops. Reversal: return to standard cadence once reliability recovers."
+                  - paragraph [ref=e637]: "Signal reliability LOW (Mar 30, 2026, 8:27 PM UTC): keep approvals staged until reliability returns to HIGH."
+                  - generic [ref=e638]:
+                    - generic [ref=e639]:
+                      - paragraph [ref=e640]: Fresh
+                      - paragraph [ref=e641]: Updated Mar 30, 2026, 8:27 PM UTC (<1h old) · live · low-reliability
+                    - generic [ref=e642]:
+                      - paragraph [ref=e643]: Coverage
+                      - paragraph [ref=e644]: "Live: Treasury, Market stress, Inflation, Labor · Slower cadence: Startup/private markets"
+                    - generic [ref=e645]:
+                      - paragraph [ref=e646]: Decision state
+                      - paragraph [ref=e647]: YES — revisit this week's approvals now.
+                  - generic [ref=e648]:
+                    - generic [ref=e649]:
+                      - paragraph [ref=e650]: Source readiness
+                      - generic [ref=e651]: 5 sources
+                    - list [ref=e652]:
+                      - listitem [ref=e653]:
+                        - generic [ref=e654]:
+                          - generic [ref=e655]: Treasury
+                          - generic [ref=e656]: Live · Fresh · Intraday rates
+                      - listitem [ref=e659]:
+                        - generic [ref=e660]:
+                          - generic [ref=e661]: Market stress
+                          - generic [ref=e662]: Live · Fresh · Intraday market
+                      - listitem [ref=e665]:
+                        - generic [ref=e666]:
+                          - generic [ref=e667]: Inflation
+                          - generic [ref=e668]: Live · Fresh · Monthly release
+                      - listitem [ref=e671]:
+                        - generic [ref=e672]:
+                          - generic [ref=e673]: Labor
+                          - generic [ref=e674]: Live · Fresh · Monthly release
+                - generic [ref=e677]:
+                  - link "Evidence owns Why the call moved Use this only when the compact home readout is not enough and you need the driver stack, thresholds, or replay before approving the plan. Capital conditions No material operating change this week. Risk appetite Bias toward proof-first launches and smaller bet sizes." [ref=e678] [cursor=pointer]:
+                    - /url: /signals
+                    - paragraph [ref=e679]: Evidence owns
+                    - paragraph [ref=e680]: Why the call moved
+                    - paragraph [ref=e681]: Use this only when the compact home readout is not enough and you need the driver stack, thresholds, or replay before approving the plan.
+                    - list [ref=e682]:
+                      - listitem [ref=e683]:
+                        - paragraph [ref=e684]: Capital conditions
+                        - paragraph [ref=e685]: No material operating change this week.
+                      - listitem [ref=e686]:
+                        - paragraph [ref=e687]: Risk appetite
+                        - paragraph [ref=e688]: Bias toward proof-first launches and smaller bet sizes.
+                  - 'link "Trust owns Whether you can defend the call Use this only when someone challenges readiness and you need a fast trust verdict, source coverage check, or formula explanation. Operating implication Live window: safe for near-term operating approvals under standard guardrails." [ref=e689] [cursor=pointer]':
+                    - /url: /method
+                    - paragraph [ref=e690]: Trust owns
+                    - paragraph [ref=e691]: Whether you can defend the call
+                    - paragraph [ref=e692]: Use this only when someone challenges readiness and you need a fast trust verdict, source coverage check, or formula explanation.
+                    - generic [ref=e693]:
+                      - paragraph [ref=e694]: Operating implication
+                      - paragraph [ref=e695]: "Live window: safe for near-term operating approvals under standard guardrails."
+            - region [ref=e696]:
+              - generic [ref=e698]:
+                - img [ref=e700]
+                - generic [ref=e704]:
+                  - generic [ref=e705]:
+                    - generic [ref=e706]: "03"
+                    - paragraph [ref=e707]: Only if a question remains
+                  - heading "Choose one follow-on surface only after the plan is already clear." [level=2] [ref=e712]
+                  - paragraph [ref=e713]: Use one downstream surface for the remaining question instead of reopening the brief or turning helper surfaces into a second workflow.
+              - generic [ref=e714]:
+                - link "Recommended unresolved path Avoid Premature Scaling Use the most concrete operating path first before widening into broader browse. Use this when the weekly plan is clear but one concrete owner decision still needs translation." [ref=e715] [cursor=pointer]:
+                  - /url: /decide/avoid-premature-scaling
+                  - paragraph [ref=e716]:
+                    - img [ref=e718]
+                    - generic [ref=e720]: Recommended unresolved path
+                  - paragraph [ref=e721]: Avoid Premature Scaling
+                  - paragraph [ref=e722]: Use the most concrete operating path first before widening into broader browse.
+                  - paragraph [ref=e723]: Use this when the weekly plan is clear but one concrete owner decision still needs translation.
+                - link "Evidence owns replay Historical replay and baseline comparison Choose any date to swap the home workspace to the closest cached monthly snapshot. Nov 28, 2025 11/2025 Capital is cheap and risk appetite is healthy. Move quickly to capture share. Dec 31, 2025 12/2025 Capital is cheap and risk appetite is healthy. Move quickly to capture share." [ref=e724] [cursor=pointer]:
+                  - /url: /signals?advanced=1#time-machine
+                  - paragraph [ref=e725]:
+                    - img [ref=e727]
+                    - generic [ref=e731]: Evidence owns replay
+                  - paragraph [ref=e732]: Historical replay and baseline comparison
+                  - paragraph [ref=e733]: Choose any date to swap the home workspace to the closest cached monthly snapshot.
+                  - list [ref=e734]:
+                    - listitem [ref=e735]:
+                      - paragraph [ref=e736]: Nov 28, 2025 11/2025
+                      - paragraph [ref=e737]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+                    - listitem [ref=e738]:
+                      - paragraph [ref=e739]: Dec 31, 2025 12/2025
+                      - paragraph [ref=e740]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+                - article [ref=e741]:
+                  - paragraph [ref=e742]:
+                    - img [ref=e744]
+                    - generic [ref=e746]: Supporting surfaces
+                  - paragraph [ref=e747]: Open one recommended follow-up only.
+                  - paragraph [ref=e748]: Use a single utility to unblock one owner decision. Keep trust and extra tools collapsed unless challenged.
+                  - article [ref=e749]:
+                    - paragraph [ref=e750]: Recommended utility
+                    - paragraph [ref=e751]: Team context profile
+                    - paragraph [ref=e752]: Adjust the weekly call for your company profile without reopening the whole brief.
+                  - generic [ref=e753]:
+                    - link "Open recommended utility" [ref=e754] [cursor=pointer]:
+                      - /url: /decide/team-context
+                    - link "View trust details" [ref=e755] [cursor=pointer]:
+                      - /url: /method
+                  - group [ref=e756]:
+                    - generic "More utilities▾" [ref=e757] [cursor=pointer]
+        - paragraph [ref=e760]: Governance artifact; not investment advice.
+  - alert [ref=e761]
