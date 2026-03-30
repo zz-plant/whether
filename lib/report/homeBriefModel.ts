@@ -196,6 +196,7 @@ export type InputInfluenceItem = {
   trendArrow: "↑" | "↓" | "→";
   trendLabel: string;
   watchLabel: string;
+  sparkline: number[];
   tone: InputInfluenceTone;
 };
 
@@ -1223,6 +1224,7 @@ const buildInputInfluenceItems = ({
       trendArrow: indicator?.trendArrow ?? "→",
       trendLabel: indicator?.isFallback ? "No fresh weekly delta yet." : indicator?.trendDeltaLabel ?? "Weekly delta unavailable.",
       watchLabel: description.watchLabel,
+      sparkline: indicator?.sparkline ?? [],
       tone: description.tone,
     };
   });

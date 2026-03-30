@@ -7,6 +7,7 @@ type WeeklyDecisionContentProps = {
   influenceSection: ReactNode;
   diagnosticsSection: ReactNode;
   matrixSection: ReactNode;
+  contextSection: ReactNode;
   actionStripSection: ReactNode;
   asideContent: ReactNode;
 };
@@ -16,6 +17,7 @@ export function WeeklyDecisionContent({
   influenceSection,
   diagnosticsSection,
   matrixSection,
+  contextSection,
   actionStripSection,
   asideContent,
 }: WeeklyDecisionContentProps) {
@@ -42,6 +44,7 @@ export function WeeklyDecisionContent({
             {influenceSection}
             {diagnosticsSection}
             {matrixSection}
+            {contextSection}
           </div>
         </CompactDisclosure>
       </section>

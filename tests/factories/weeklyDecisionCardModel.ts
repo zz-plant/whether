@@ -172,6 +172,7 @@ export const buildWeeklyDecisionCardModel = (
         trendArrow: "↑",
         trendLabel: "+1.0 vs last week",
         watchLabel: "Regime line 70.0",
+        sparkline: [61, 62, 63, 64],
         tone: "positive",
       },
       {
@@ -185,6 +186,7 @@ export const buildWeeklyDecisionCardModel = (
         trendArrow: "↓",
         trendLabel: "-1.0 vs last week",
         watchLabel: "Regime line 50.0",
+        sparkline: [56, 54, 53, 52],
         tone: "positive",
       },
       {
@@ -198,6 +200,7 @@ export const buildWeeklyDecisionCardModel = (
         trendArrow: "→",
         trendLabel: "No fresh weekly delta yet.",
         watchLabel: "Cost-of-money line 5.0%",
+        sparkline: [5.2, 5.3, 5.3],
         tone: "warning",
       },
       {
@@ -211,9 +214,14 @@ export const buildWeeklyDecisionCardModel = (
         trendArrow: "↑",
         trendLabel: "+0.1 vs last week",
         watchLabel: "Below 0.0% = inversion",
+        sparkline: [-0.4, -0.3, -0.2],
         tone: "warning",
       },
     ],
+    currentScores: {
+      tightness: 64,
+      riskAppetite: 52,
+    },
     startupClimateIndex: { score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] },
     regimeDistance: { dimensionLabel: "Tightness", currentValue: 64, thresholdValue: 70, pointsToFlip: 6, dimensionKey: "tightness", thresholdDirection: "riseAbove" },
     flipRiskMeter: {
@@ -231,7 +239,13 @@ export const buildWeeklyDecisionCardModel = (
   history: {
     memoryRail: [{ label: "Now", posture: "Defensive" }],
     historicalTimeline: [{ label: "2026", posture: "Defensive" }],
-    historicalAnalogs: [],
+    historicalAnalogs: [
+      {
+        date: "2025-10-03",
+        similarityScore: 0.84,
+        implication: "Comparable operating setup; preserve bounded rules and revisit if trend direction diverges next update.",
+      },
+    ],
     macroOverlay: [{ label: "VC funding", detail: "-4.5 · ↑ improving" }],
     ...overrides.history,
   },

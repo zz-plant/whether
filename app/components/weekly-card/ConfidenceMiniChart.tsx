@@ -130,11 +130,14 @@ export const ConfidenceMiniChart = ({
                 fill={currentPoint?.recordDate === point.recordDate ? "rgb(251 191 36)" : "rgb(186 230 253)"}
                 stroke="rgba(15,23,42,0.95)"
                 strokeWidth="1.2"
-              />
+              >
+                <title>{point.label}</title>
+              </circle>
             ) : (
               <g key={point.label}>
                 <line x1={point.x} y1={point.y - 12} x2={point.x} y2={point.y} stroke="rgba(251,191,36,0.85)" strokeWidth="1.4" strokeDasharray="3 2" />
                 <circle cx={point.x} cy={point.y} r="2.1" fill="rgba(15,23,42,0.95)" stroke="rgba(251,191,36,0.95)" strokeWidth="1.1" />
+                <title>{point.label}</title>
               </g>
             )
           ))}
@@ -155,6 +158,7 @@ export const ConfidenceMiniChart = ({
           Missing week
         </span>
       </div>
+      <p className="text-[10px] text-slate-400">Missing weeks are dashed markers. The stability cone shows the near-term confidence range.</p>
     </article>
   );
 };

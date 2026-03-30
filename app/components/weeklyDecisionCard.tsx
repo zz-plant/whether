@@ -7,6 +7,7 @@ import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
+import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading } from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
@@ -70,6 +71,94 @@ const inputInfluenceToneClasses: Record<InputInfluenceItem["tone"], { badge: str
   },
 };
 
+const clampSparklineValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const buildSparklinePath = (values: number[], width: number, height: number) => {
+  if (values.length === 0) {
+    return "";
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const yDomainPadding = max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
+  const domainMin = min - yDomainPadding;
+  const domainMax = max + yDomainPadding;
+
+  return values.map((value, index) => {
+    const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width;
+    const normalized = (clampSparklineValue(value, domainMin, domainMax) - domainMin) / (domainMax - domainMin || 1);
+    const y = height - (normalized * height);
+    return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+  }).join(" ");
+};
+
+function InputInfluenceSparkline({
+  values,
+  tone,
+  label,
+}: {
+  values: number[];
+  tone: InputInfluenceItem["tone"];
+  label: string;
+}) {
+  if (values.length === 0) {
+    return (
+      <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Recent path</p>
+        <p className="mt-1 text-[11px] text-slate-400">Recent movement unavailable.</p>
+      </div>
+    );
+  }
+
+  const strokeClass = tone === "warning"
+    ? "stroke-rose-300"
+    : tone === "positive"
+      ? "stroke-emerald-300"
+      : "stroke-slate-300";
+  const fillClass = tone === "warning"
+    ? "fill-rose-300"
+    : tone === "positive"
+      ? "fill-emerald-300"
+      : "fill-slate-300";
+  const chartWidth = 84;
+  const chartHeight = 22;
+  const path = buildSparklinePath(values, chartWidth, chartHeight);
+  const currentValue = values[values.length - 1];
+
+  return (
+    <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Recent path</p>
+        <p className="text-[10px] text-slate-400">{values.length}-read view</p>
+      </div>
+      <svg
+        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+        className="mt-2 h-7 w-full"
+        role="img"
+        aria-label={`${label} recent movement sparkline`}
+      >
+        <path d={path} fill="none" className={strokeClass} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        {path ? (
+          <circle
+            cx={values.length === 1 ? chartWidth / 2 : chartWidth}
+            cy={(() => {
+              const min = Math.min(...values);
+              const max = Math.max(...values);
+              const yDomainPadding = max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
+              const domainMin = min - yDomainPadding;
+              const domainMax = max + yDomainPadding;
+              const normalized = (clampSparklineValue(currentValue, domainMin, domainMax) - domainMin) / (domainMax - domainMin || 1);
+              return chartHeight - (normalized * chartHeight);
+            })()}
+            r="2.6"
+            className={fillClass}
+          />
+        ) : null}
+      </svg>
+    </div>
+  );
+}
+
 function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
   if (items.length === 0) {
     return null;
@@ -110,7 +199,7 @@ function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.valueLabel}</p>
                 </div>
               </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Direction</p>
                   <p className="mt-1 text-xs font-semibold text-slate-100">{item.trendArrow} {item.trendLabel}</p>
@@ -123,6 +212,7 @@ function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Watch line</p>
                   <p className="mt-1 text-xs font-semibold text-slate-100">{item.watchLabel}</p>
                 </div>
+                <InputInfluenceSparkline values={item.sparkline} tone={item.tone} label={item.label} />
               </div>
               <div className="mt-3">
                 <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
@@ -174,7 +264,7 @@ export function MoreContextDisclosureBody({
   whyThisCall,
   memoryRail,
   historicalTimeline,
-  historicalAnalogs: _historicalAnalogs,
+  historicalAnalogs,
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
@@ -241,26 +331,44 @@ export function MoreContextDisclosureBody({
           <section aria-labelledby="posture-history-and-overlays">
             <h3 id="posture-history-and-overlays" className={tierThreeHeading}>Posture history and overlays</h3>
             <div className="mt-1.5 space-y-2">
-          <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
-          <div>
-            <p className={tierThreeHeading}>Historical memory rail</p>
-            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
-              {memoryRail.map((item) => (
-                <li key={`${item.label}-${item.posture}`} className={`${compactInset} text-xs text-slate-200`}>
-                  <p className="text-slate-400">{item.label}</p>
-                  <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <ul className="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-            {macroOverlay.map((item) => (
-              <li key={item.label} className={compactInset}>
-                <p className="font-semibold text-slate-200">{item.label}</p>
-                <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
-              </li>
-            ))}
-          </ul>
+              <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
+              {historicalAnalogs.length > 0 ? (
+                <div>
+                  <p className={tierThreeHeading}>Closest historical analogs</p>
+                  <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                    {historicalAnalogs.map((analog) => (
+                      <li key={`${analog.date}-${analog.similarityScore}`} className={`${compactInset} text-xs text-slate-200`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-semibold text-slate-100">{formatDateUTC(analog.date)}</p>
+                          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+                            {Math.round(analog.similarityScore * 100)}% match
+                          </span>
+                        </div>
+                        <p className="mt-1 leading-5 text-slate-300">{analog.implication}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              <div>
+                <p className={tierThreeHeading}>Historical memory rail</p>
+                <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
+                  {memoryRail.map((item) => (
+                    <li key={`${item.label}-${item.posture}`} className={`${compactInset} text-xs text-slate-200`}>
+                      <p className="text-slate-400">{item.label}</p>
+                      <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <ul className="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+                {macroOverlay.map((item) => (
+                  <li key={item.label} className={compactInset}>
+                    <p className="font-semibold text-slate-200">{item.label}</p>
+                    <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
         </div>
@@ -462,6 +570,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     postureWithStageLabel,
     confidenceLabel,
     confidencePercent,
+    confidenceHistory = [],
+    confidenceTrend,
     trendLabel,
     isFallbackSnapshot = false,
   } = status;
@@ -500,8 +610,10 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     failureModes = [],
     inputInfluence = [],
     currentScores,
+    startupClimateIndex,
+    whyThisCall,
   } = diagnostics;
-  const { historicalTimeline } = history;
+  const { memoryRail, historicalTimeline, historicalAnalogs, macroOverlay } = history;
   const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel, fetchedAtLabel } = artifact;
   const freshnessMeta = buildCompactFreshnessMeta({
@@ -761,6 +873,17 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             </div>
           </details>
         )}
+        contextSection={(
+          <MoreContextDisclosureBody
+            startupClimateIndex={startupClimateIndex}
+            evidenceItems={evidenceItems}
+            whyThisCall={whyThisCall}
+            memoryRail={memoryRail}
+            historicalTimeline={historicalTimeline}
+            historicalAnalogs={historicalAnalogs}
+            macroOverlay={macroOverlay}
+          />
+        )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
         asideContent={(
           <>
@@ -772,6 +895,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               citation={citation}
               actions={actions}
             />
+            {confidenceHistory.length > 0 && confidenceTrend ? (
+              <ConfidenceMiniChart
+                confidenceHistory={confidenceHistory}
+                confidenceTrend={confidenceTrend}
+              />
+            ) : null}
           </>
         )}
       />
