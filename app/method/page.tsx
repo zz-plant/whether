@@ -149,6 +149,7 @@ export default async function MethodPage() {
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
+      headerVariant="trust"
       showPageNavigation={true}
       primaryCta={{ href: "#trust-snapshot", label: "Run trust check" }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}

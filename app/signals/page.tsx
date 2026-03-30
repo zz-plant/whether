@@ -358,6 +358,7 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
+      headerVariant="evidence"
       showPageNavigation={true}
       primaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       secondaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
