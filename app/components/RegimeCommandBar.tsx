@@ -224,6 +224,14 @@ export const RegimeCommandBar = ({
   const resolvedConfidenceLabel = confidenceLabel ?? "MED";
   const resolvedConfidencePercent = confidencePercent ?? 0;
   const hasTrajectoryView = Boolean(postureTrajectory && regimeDistance && trendLabel && confidenceLabel);
+  const trajectoryViewProps = hasTrajectoryView && postureTrajectory && regimeDistance && trendLabel && confidenceLabel
+    ? {
+        postureTrajectory,
+        regimeDistance,
+        trendLabel: resolvedTrendLabel,
+        confidenceLabel: resolvedConfidenceLabel,
+      }
+    : null;
 
   return (
     <section
@@ -257,7 +265,7 @@ export const RegimeCommandBar = ({
           </div>
         </div>
 
-        {hasTrajectoryView ? (
+        {trajectoryViewProps ? (
           <>
             <div className="sm:hidden rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
               <details className="weather-auto-chevron">
@@ -265,15 +273,15 @@ export const RegimeCommandBar = ({
                   Posture map (tap to expand)
                 </summary>
                 <div className="mt-2">
-                  <PostureMapSummary trendLabel={resolvedTrendLabel} postureTrajectory={postureTrajectory} />
+                  <PostureMapSummary trendLabel={trajectoryViewProps.trendLabel} postureTrajectory={trajectoryViewProps.postureTrajectory} />
                 </div>
                 <div className="mt-3">
                   <TrajectoryMap
                     regime={regime}
-                    postureTrajectory={postureTrajectory}
-                    regimeDistance={regimeDistance}
-                    trendLabel={resolvedTrendLabel}
-                    confidenceLabel={resolvedConfidenceLabel}
+                    postureTrajectory={trajectoryViewProps.postureTrajectory}
+                    regimeDistance={trajectoryViewProps.regimeDistance}
+                    trendLabel={trajectoryViewProps.trendLabel}
+                    confidenceLabel={trajectoryViewProps.confidenceLabel}
                   />
                 </div>
               </details>
@@ -281,10 +289,10 @@ export const RegimeCommandBar = ({
             <div className="hidden sm:block">
               <TrajectoryMap
                 regime={regime}
-                postureTrajectory={postureTrajectory}
-                regimeDistance={regimeDistance}
-                trendLabel={resolvedTrendLabel}
-                confidenceLabel={resolvedConfidenceLabel}
+                postureTrajectory={trajectoryViewProps.postureTrajectory}
+                regimeDistance={trajectoryViewProps.regimeDistance}
+                trendLabel={trajectoryViewProps.trendLabel}
+                confidenceLabel={trajectoryViewProps.confidenceLabel}
               />
             </div>
           </>

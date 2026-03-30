@@ -57,6 +57,10 @@ import { buildSourceHealthRows, getLatestParseableTimestamp } from "./sourceHeal
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 import { resolveConfidencePercent as resolveConfidencePercentFromAssessment, resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
+import {
+  buildFallbackReportDataInternal,
+  loadReportDataUncachedInternal,
+} from "./reportDataLoader";
 
 export type ReportSearchParams = {
   month?: string;
@@ -715,266 +719,55 @@ export const buildSnapshotFallbackTreasury = (snapshot: TreasuryData, now = new 
 const loadReportDataUncached = async (
   searchParams?: ReportSearchParams,
   options?: ReportDataLoadOptions,
-) => {
-  const liveFetcher: typeof fetch = (input, init) =>
-    fetch(input, {
-      ...init,
-      next: {
-        ...((init as RequestInit & { next?: { revalidate?: number } })?.next ?? {}),
-        revalidate: REPORT_DATA_REVALIDATE_SECONDS,
-      },
-    });
-  const historicalSelection = resolveTimeMachineSelection(searchParams);
-  const requestedSelection = parseTimeMachineRequest(searchParams);
-  const shouldLoadHistoricalLiveComparison =
-    options?.includeHistoricalLiveComparison !== false && Boolean(historicalSelection);
-  const canonicalInputs = historicalSelection
-    ? null
-    : await loadCanonicalReportInputsIfAvailable({ fetcher: liveFetcher });
-  const treasuryPromise = canonicalInputs
-    ? Promise.resolve(canonicalInputs.treasury)
-    : fetchTreasuryData({
-        fetcher: liveFetcher,
-        snapshotFallback: snapshotData,
-        asOf: historicalSelection?.asOf,
-      });
-  const liveTreasuryPromise = canonicalInputs
-    ? Promise.resolve(canonicalInputs.treasury)
-    : shouldLoadHistoricalLiveComparison
-      ? fetchTreasuryData({ snapshotFallback: snapshotData, fetcher: liveFetcher })
-      : null;
-  const now = new Date();
-  const latestCache = getLatestTimeMachineSnapshot();
-  const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
-  const defaultYear = latestCache?.year ?? now.getUTCFullYear();
-  const cacheCoverage = getTimeMachineCoverage();
-  const cacheMonthsByYear = getTimeMachineMonthsByYear();
-  const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
-  const selectedMonth = requestedSelection?.month ?? defaultMonth;
-  const selectedYear = requestedSelection?.year ?? defaultYear;
-  const thresholds = parseThresholdsFromSearchParams(searchParams);
-  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
-  const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const timeMachineSnapshots = getTimeMachineSnapshots();
-  const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
-    treasuryPromise,
-    liveTreasuryPromise ?? Promise.resolve(null),
-    canonicalInputs ? Promise.resolve(canonicalInputs.macroSeries) : loadMacroSeries(liveFetcher),
-  ]);
-
-  if (treasuryResult.status === "rejected") {
-    throw withDependencyContext("treasury", treasuryResult.reason);
-  }
-
-  if (shouldLoadHistoricalLiveComparison && liveTreasuryResult.status === "rejected") {
-    throw withDependencyContext("treasury", liveTreasuryResult.reason);
-  }
-
-  if (macroResult.status === "rejected") {
-    throw withDependencyContext("macro", macroResult.reason);
-  }
-
-  const treasury = treasuryResult.value;
-  const liveTreasury = liveTreasuryResult.status === "fulfilled" && liveTreasuryResult.value
-    ? liveTreasuryResult.value
-    : treasury;
-  const macroSeries = macroResult.value;
-  const recordDateLabel = formatDateUTC(treasury.record_date);
-  const weeklyRecordDate = resolveWeekEndingIsoDateUTC(treasury.record_date);
-  const weeklyRecordDateLabel = formatWeekEndingUTC(treasury.record_date);
-  const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
-  const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
-  const sensors = buildSensorReadings(treasury);
-  const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
-  const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
-  const liveAssessment = shouldLoadHistoricalLiveComparison
-    ? evaluateRegime(liveTreasury, thresholds, macroSeries)
-    : null;
-  const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
-  const fenceItems = assessment.constraints;
-  const previousSnapshot = historicalSelection
-    ? null
-    : getPreviousTimeMachineSnapshot(treasury.record_date);
-  const recordDate = new Date(treasury.record_date);
-  const comparisonDate = new Date(treasury.record_date);
-  comparisonDate.setUTCFullYear(recordDate.getUTCFullYear() - 1);
-  const lastYearSnapshot = findTimeMachineSnapshot(comparisonDate.toISOString());
-  const previousAssessment = previousSnapshot
-    ? evaluateRegime(previousSnapshot, thresholds)
-    : null;
-  const lastYearAssessment = lastYearSnapshot ? evaluateRegime(lastYearSnapshot, thresholds) : null;
-  const confidenceLabel = historicalSelection
-    ? "Simulated (low)"
-    : canonicalInputs
-      ? "Canonical snapshot (high confidence)"
-      : treasury.isLive
-      ? "Live (high confidence)"
-      : "Cached (medium)";
-  const treasuryProvenance = {
-    sourceLabel: canonicalInputs ? "Canonical ingestion (FRED/BLS)" : "Federal Reserve Economic Data (FRED)",
-    sourceUrl: treasury.source,
-    recordDateLabel,
-    timestampLabel: fetchedAtLabel,
-    ageLabel: treasuryAgeLabel,
-    statusLabel: confidenceLabel,
-  };
-  const freshestMacroSeries = [...macroSeries]
-    .filter((series) => typeof series.fetched_at === "string")
-    .sort((left, right) => Date.parse(right.fetched_at) - Date.parse(left.fetched_at))[0];
-  const macroTimestamp = getLatestParseableTimestamp(macroSeries.map((series) => series.fetched_at)) ?? treasury.fetched_at;
-  const macroRecordDate = getLatestRecordDate(macroSeries.map((series) => series.record_date)) ?? treasury.record_date;
-  const macroAgeLabel = formatAgeHours(macroTimestamp, now);
-  const macroProvenance = {
-    sourceLabel: "FRED & US Treasury",
-    sourceUrl: freshestMacroSeries?.sourceUrl ?? macroSeries[0]?.sourceUrl,
-    recordDateLabel: formatDateUTC(macroRecordDate),
-    timestampLabel: formatTimestampUTC(macroTimestamp),
-    ageLabel: macroAgeLabel,
-    statusLabel: historicalSelection
-      ? "Simulated (low)"
-      : canonicalInputs
-        ? "Canonical snapshot (high confidence)"
-        : macroSeries.some((signal) => signal.isLive)
-        ? "Live (high confidence)"
-        : "Cached (medium)",
-  };
-  const internalProvenance = {
-    sourceLabel: "Whether curated playbook catalog",
-    recordDateLabel: "Static",
-    timestampLabel: "Static catalog",
-    ageLabel: "Static.",
-    statusLabel: "Simulated (low)",
-  };
-  const statusLabel = formatRegimeLabel(assessment.regime);
-  const historicalComparison =
-    shouldLoadHistoricalLiveComparison && liveAssessment
-      ? {
-          then: {
-            regime: assessment.regime,
-            recordDate: treasury.record_date,
-            baseRate: assessment.scores.baseRate,
-            curveSlope: assessment.scores.curveSlope,
-            tightness: assessment.scores.tightness,
-            riskAppetite: assessment.scores.riskAppetite,
-          },
-          now: {
-            regime: liveAssessment.regime,
-            recordDate: liveTreasury.record_date,
-            baseRate: liveAssessment.scores.baseRate,
-            curveSlope: liveAssessment.scores.curveSlope,
-            tightness: liveAssessment.scores.tightness,
-            riskAppetite: liveAssessment.scores.riskAppetite,
-          },
-        }
-      : null;
-  const regimeAlert =
-    previousAssessment && previousSnapshot
-      ? buildRegimeAlert(
-          assessment,
-          previousAssessment,
-          treasury.record_date,
-          previousSnapshot.record_date
-        )
-      : null;
-  const reportDynamics = buildReportDynamics({
-    current: assessment,
-    previous: previousAssessment,
+) =>
+  loadReportDataUncachedInternal({
+    searchParams,
+    options,
+    deps: {
+      REPORT_DATA_REVALIDATE_SECONDS,
+      snapshotData,
+      fetchTreasuryData,
+      loadMacroSeries,
+      buildSensorReadings,
+      evaluateRegime,
+      deriveRegimeTrend,
+      parseThresholdsFromSearchParams,
+      resolveTimeMachineSelection,
+      parseTimeMachineRequest,
+      getLatestTimeMachineSnapshot,
+      getTimeMachineCoverage,
+      getTimeMachineMonthsByYear,
+      getTimeMachineRegimeSeries,
+      getTimeMachineYieldCurveSeries,
+      getTimeMachineSnapshots,
+      getPreviousTimeMachineSnapshot,
+      findTimeMachineSnapshot,
+      DEFAULT_REGIME_SERIES_MONTHS,
+      loadCanonicalReportInputsIfAvailable,
+      withDependencyContext,
+      formatDateUTC,
+      formatWeekEndingUTC,
+      resolveWeekEndingIsoDateUTC,
+      formatTimestampUTC,
+      formatAgeHours,
+      formatRegimeLabel,
+      getLatestParseableTimestamp,
+      buildGuidanceBundleFromAssessment,
+      buildRegimeAlert,
+      buildReportDynamics,
+      buildForecastModel,
+      buildLastYearComparison,
+      buildWeeklyConfidenceSeries,
+      classifyConfidenceTrend,
+      buildHistoricalAnalogs,
+      buildActionNowShort,
+      buildFlipThreshold,
+      buildReportEvidenceItems,
+      buildSourceHealthRows,
+      buildSnapshotFallbackTreasury,
+      buildFallbackForecastModel,
+    },
   });
-  const regimeTrend = deriveRegimeTrend(previousAssessment, assessment);
-  const forecast = buildForecastModel({
-    assessment,
-    reportDynamics,
-    macroSeries,
-  });
-  const lastYearComparison =
-    lastYearSnapshot && lastYearAssessment
-      ? buildLastYearComparison({
-          current: assessment,
-          currentRecordDate: treasury.record_date,
-          prior: lastYearAssessment,
-          priorRecordDate: lastYearSnapshot.record_date,
-        })
-      : null;
-  const confidenceHistory = buildWeeklyConfidenceSeries({
-    snapshots: timeMachineSnapshots.map(({ year: _year, month: _month, ...snapshot }) => snapshot),
-    currentSnapshot: treasury,
-    thresholds,
-    asOf: treasury.record_date,
-    window: 8,
-  });
-  const confidenceTrend = classifyConfidenceTrend(confidenceHistory);
-
-  const historicalAnalogs = buildHistoricalAnalogs({
-    current: assessment,
-    snapshots: timeMachineSnapshots
-      .filter((snapshot) => new Date(snapshot.record_date).getTime() <= new Date(treasury.record_date).getTime())
-      .map(({ year: _year, month: _month, ...snapshot }) => snapshot),
-    thresholds,
-    currentTrendDirection: reportDynamics.directionLabel,
-  });
-
-  const actionNowShort = buildActionNowShort(reportDynamics);
-  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
-  const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({
-    reportDynamics,
-    assessment,
-    lastUpdated: treasury.record_date,
-  });
-  const sourceHealth = buildSourceHealthRows({
-    treasury,
-    macroSeries,
-    macroStatusLabel: macroProvenance.statusLabel,
-    now,
-  });
-
-  return {
-    assessment,
-    cacheCoverage,
-    cacheMonthsByYear,
-    fetchedAtLabel,
-    fenceItems,
-    forecast,
-    historicalComparison,
-    historicalSelection,
-    historicalAnalogs,
-    internalProvenance,
-    invalidHistoricalSelection,
-    lastYearComparison,
-    liveAssessment,
-    liveTreasury,
-    macroProvenance,
-    macroSeries,
-    playbook,
-    recordDateLabel,
-    weeklyRecordDate,
-    weeklyRecordDateLabel,
-    reportDynamics,
-    requestedSelection,
-    regimeSeries,
-    regimeAlert,
-    yieldCurveSeries,
-    regimeTrend,
-    selectedMonth,
-    selectedYear,
-    sensors,
-    startItems,
-    statusLabel,
-    stopItems,
-    actionStripItems,
-    actionNowShort,
-    reportEvidenceItems,
-    guardrailThreshold,
-    flipThreshold,
-    confidenceHistory,
-    confidenceTrend,
-    thresholds,
-    treasury,
-    treasuryProvenance,
-    sourceHealth,
-    materializedSignals: canonicalInputs?.materializedSignals ?? null,
-  };
-};
 
 export type ReportData = Awaited<ReturnType<typeof loadReportDataUncached>>;
 
@@ -1028,123 +821,54 @@ export const loadReportData = (searchParams?: ReportSearchParams, options?: Repo
 };
 
 
-const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataFallback => {
-  const now = new Date();
-  const fallbackTreasury = buildSnapshotFallbackTreasury(snapshotData, now);
-  const historicalSelection = resolveTimeMachineSelection(searchParams);
-  const requestedSelection = parseTimeMachineRequest(searchParams);
-  const latestCache = getLatestTimeMachineSnapshot();
-  const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
-  const defaultYear = latestCache?.year ?? now.getUTCFullYear();
-  const selectedMonth = requestedSelection?.month ?? defaultMonth;
-  const selectedYear = requestedSelection?.year ?? defaultYear;
-  const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
-  const thresholds = parseThresholdsFromSearchParams(searchParams);
-  const cacheCoverage = getTimeMachineCoverage();
-  const cacheMonthsByYear = getTimeMachineMonthsByYear();
-  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
-  const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const assessment = evaluateRegime(fallbackTreasury, thresholds, []);
-  const liveAssessment = evaluateRegime(fallbackTreasury, thresholds, []);
-  const sensors = buildSensorReadings(fallbackTreasury);
-  const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
-  const weeklyRecordDate = resolveWeekEndingIsoDateUTC(fallbackTreasury.record_date);
-  const weeklyRecordDateLabel = formatWeekEndingUTC(fallbackTreasury.record_date);
-  const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
-  const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
-  const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
-
-  const fallbackReportDynamics: ReportDynamics = {
-    changedSignals: [],
-    anomalySignals: [],
-    totalSignalChanges: 0,
-    regimeChanged: false,
-    directionLabel: "stable",
-  };
-  const actionNowShort = buildActionNowShort(fallbackReportDynamics);
-  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
-  const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({
-    reportDynamics: fallbackReportDynamics,
-    assessment,
-    lastUpdated: fallbackTreasury.record_date,
-  });
-  const sourceHealth = buildSourceHealthRows({
-    treasury: fallbackTreasury,
-    macroSeries: [],
-    macroStatusLabel: "Unavailable (fallback)",
-    now,
-  });
-
-  return {
-    assessment,
-    cacheCoverage,
-    cacheMonthsByYear,
-    fetchedAtLabel,
-    fenceItems: assessment.constraints,
-    forecast: buildFallbackForecastModel(),
-    historicalComparison: null,
-    historicalSelection,
-    historicalAnalogs: [],
-    internalProvenance: {
-      sourceLabel: "Whether curated playbook catalog",
-      recordDateLabel: "Static",
-      timestampLabel: "Static catalog",
-      ageLabel: "Static.",
-      statusLabel: "Simulated (low)",
+const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataFallback =>
+  buildFallbackReportDataInternal({
+    searchParams,
+    deps: {
+      REPORT_DATA_REVALIDATE_SECONDS,
+      snapshotData,
+      fetchTreasuryData,
+      loadMacroSeries,
+      buildSensorReadings,
+      evaluateRegime,
+      deriveRegimeTrend,
+      parseThresholdsFromSearchParams,
+      resolveTimeMachineSelection,
+      parseTimeMachineRequest,
+      getLatestTimeMachineSnapshot,
+      getTimeMachineCoverage,
+      getTimeMachineMonthsByYear,
+      getTimeMachineRegimeSeries,
+      getTimeMachineYieldCurveSeries,
+      getTimeMachineSnapshots,
+      getPreviousTimeMachineSnapshot,
+      findTimeMachineSnapshot,
+      DEFAULT_REGIME_SERIES_MONTHS,
+      loadCanonicalReportInputsIfAvailable,
+      withDependencyContext,
+      formatDateUTC,
+      formatWeekEndingUTC,
+      resolveWeekEndingIsoDateUTC,
+      formatTimestampUTC,
+      formatAgeHours,
+      formatRegimeLabel,
+      getLatestParseableTimestamp,
+      buildGuidanceBundleFromAssessment,
+      buildRegimeAlert,
+      buildReportDynamics,
+      buildForecastModel,
+      buildLastYearComparison,
+      buildWeeklyConfidenceSeries,
+      classifyConfidenceTrend,
+      buildHistoricalAnalogs,
+      buildActionNowShort,
+      buildFlipThreshold,
+      buildReportEvidenceItems,
+      buildSourceHealthRows,
+      buildSnapshotFallbackTreasury,
+      buildFallbackForecastModel,
     },
-    invalidHistoricalSelection,
-    lastYearComparison: null,
-    liveAssessment,
-    liveTreasury: fallbackTreasury,
-    macroProvenance: {
-      sourceLabel: "FRED & US Treasury",
-      sourceUrl: fallbackTreasury.source,
-      recordDateLabel,
-      timestampLabel: fetchedAtLabel,
-      ageLabel,
-      statusLabel: "Unavailable (fallback)",
-    },
-    macroSeries: [],
-    playbook,
-    recordDateLabel,
-    weeklyRecordDate,
-    weeklyRecordDateLabel,
-    reportDynamics: fallbackReportDynamics,
-    requestedSelection,
-    regimeSeries,
-    regimeAlert: null,
-    yieldCurveSeries,
-    regimeTrend: "STABLE",
-    selectedMonth,
-    selectedYear,
-    sensors,
-    startItems,
-    statusLabel: formatRegimeLabel(assessment.regime),
-    stopItems,
-    actionStripItems,
-    actionNowShort,
-    reportEvidenceItems,
-    guardrailThreshold,
-    flipThreshold,
-    confidenceHistory: [],
-    confidenceTrend: "unstable" as const,
-    thresholds,
-    treasury: fallbackTreasury,
-    materializedSignals: null,
-    sourceHealth,
-    treasuryProvenance: {
-      sourceLabel: "Federal Reserve Economic Data (FRED)",
-      sourceUrl: fallbackTreasury.source,
-      recordDateLabel,
-      timestampLabel: fetchedAtLabel,
-      ageLabel,
-      statusLabel: "Cached (fallback)",
-    },
-    stale: true,
-    lastCachedTimestamp: fallbackTreasury.fetched_at,
-  };
-};
+  }) as ReportDataFallback;
 
 export const loadReportDataSafe = async (
   searchParams?: ReportSearchParams,
