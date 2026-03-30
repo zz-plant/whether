@@ -44,15 +44,18 @@ export const HomeWhatChangedSection = ({
   weeklyDecisionCardModel,
   leadershipArtifactPayloadPromise,
   fallbackActive,
+  searchParams,
 }: {
   weeklyDecisionCardModel: HomePageAssembly["weeklyDecisionCardModel"];
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
+  searchParams?: Record<string, string | undefined>;
 }) => (
   <>
     <OperatorWorkflowRouteTracker />
     <WeeklyDecisionCard
       model={weeklyDecisionCardModel}
+      searchParams={searchParams}
       actions={(
         <Suspense fallback={<ArtifactActionsFallback />}>
           <LeadershipArtifactActions
