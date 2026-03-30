@@ -139,8 +139,8 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             {
               type: "mrkdwn",
               text: payload.flipConditionLabels.length > 0
-                ? `*Flip trigger:* ${payload.flipTrigger}\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
-                : `*Flip trigger:* ${payload.flipTrigger}`,
+                ? `*Change course if:* ${payload.flipTrigger}\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
+                : `*Change course if:* ${payload.flipTrigger}`,
             },
           ],
         },

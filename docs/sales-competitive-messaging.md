@@ -50,7 +50,7 @@ Use this page for internal sales enablement, demo prep, and objection handling.
 ### 1) Institutional macro terminals
 1. You already have strong macro visibility.
 2. Whether converts that visibility into a weekly operating posture for startup leadership.
-3. Think of it as signals → posture → action artifact.
+3. Think of it as signals → posture → decision → artifact.
 
 ### 2) Macro research subscriptions
 1. Research tells you what macro means.
