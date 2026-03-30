@@ -203,6 +203,21 @@ export const buildWeeklyConfidenceSeries = ({
     return [];
   }
 
+  const observedGaps = actualPoints
+    .slice(1)
+    .map((point, index) => new Date(point.recordDate).getTime() - new Date(actualPoints[index].recordDate).getTime())
+    .filter((gap) => Number.isFinite(gap) && gap > 0)
+    .sort((a, b) => a - b);
+  const medianObservedGap =
+    observedGaps.length === 0
+      ? WEEK_MS
+      : observedGaps[Math.floor(observedGaps.length / 2)] ?? WEEK_MS;
+  const shouldInjectMissingWeeks = observedGaps.length < 4 || medianObservedGap <= WEEK_MS * 1.6;
+
+  if (!shouldInjectMissingWeeks) {
+    return actualPoints.slice(-window);
+  }
+
   const withMissing: WeeklyConfidencePoint[] = [];
   for (let index = 0; index < actualPoints.length; index += 1) {
     const current = actualPoints[index];

@@ -343,6 +343,27 @@ describe("weekly confidence history", () => {
     assert.equal(missing?.confidencePercent, null);
   });
 
+  it("does not synthesize missing weekly markers when source cadence is monthly", () => {
+    const monthlySnapshots = [
+      makeTreasury("2025-10-31", 4.6, 4.2, 4.4),
+      makeTreasury("2025-11-28", 4.7, 4.3, 4.4),
+      makeTreasury("2025-12-31", 4.8, 4.4, 4.4),
+      makeTreasury("2026-01-30", 4.9, 4.5, 4.4),
+      makeTreasury("2026-02-27", 5.0, 4.6, 4.4),
+    ];
+
+    const series = buildWeeklyConfidenceSeries({
+      snapshots: monthlySnapshots,
+      currentSnapshot: makeTreasury("2026-03-27", 5.1, 4.7, 4.4),
+      thresholds,
+      asOf: "2026-03-27",
+      window: 8,
+    });
+
+    assert.equal(series.some((point) => point.isMissing), false);
+    assert.equal(series.at(-1)?.recordDate, "2026-03-27");
+  });
+
   it("classifies confidence trend from slope and volatility", () => {
     assert.equal(
       classifyConfidenceTrend([
