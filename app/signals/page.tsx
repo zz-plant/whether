@@ -409,11 +409,11 @@ export default async function SignalsPage({
         maxItems={3}
       />
 
-      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Signals view mode">
+      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence tab submode">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Evidence mode</p>
-          <h2 className="text-base font-semibold text-slate-100">Choose whether you need implication or full evidence depth.</h2>
-          <p className="text-sm text-slate-300">Start with the operating implication. Open detail mode only when you need the full diagnostic appendix, replay, or threshold audit.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Evidence tab submode</p>
+          <h2 className="text-base font-semibold text-slate-100">Stay in Evidence, then choose implication or full detail depth.</h2>
+          <p className="text-sm text-slate-300">This toggle changes how much evidence detail you see inside the Evidence tab. Start with the operating implication. Open detail mode only when you need the full diagnostic appendix, replay, or threshold audit.</p>
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           {([

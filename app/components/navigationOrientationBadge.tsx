@@ -1,25 +1,28 @@
-import { navigationLayers } from "../../lib/navigation/informationArchitecture";
+import {
+  navigationGroupLabels,
+  navigationLayers,
+} from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 
 type NavigationZone = "core" | "workflow" | "reference";
 
 const zoneLabels: Record<NavigationZone, string> = {
-  core: "Now",
-  workflow: "Evidence",
-  reference: "Trust",
+  core: navigationGroupLabels.core,
+  workflow: navigationGroupLabels.workflow,
+  reference: navigationGroupLabels.reference,
 };
 
 const zoneDescriptors: Record<NavigationZone, string> = {
   core: "Weekly call and bounded actions for this week",
-  workflow: "Evidence, execution, and decision depth pages that support the Weekly Brief",
-  reference: "Trust, provenance, and optional background reference pages",
+  workflow: "Execution and decision depth pages that support the Weekly Brief",
+  reference: "Trust, provenance, and evidence-reference pages",
 };
 
 const zoneCompactLabels: Record<NavigationZone, string> = {
-  core: "Now",
-  workflow: "Evidence",
-  reference: "Trust",
+  core: navigationGroupLabels.core,
+  workflow: navigationGroupLabels.workflow,
+  reference: navigationGroupLabels.reference,
 };
 
 const zoneBadgeStyles: Record<NavigationZone, string> = {
