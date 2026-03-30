@@ -409,7 +409,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                 })}
               </div>
               {isMobile ? (
-                <details className="weather-surface p-3">
+                <details className="weather-surface weather-auto-chevron p-3">
                   <summary className="cursor-pointer list-none text-xs font-semibold tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                     Input map
                   </summary>

@@ -55,7 +55,7 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
             </Link>
           </div>
           {workspaceModel.translate.toolkitShortcuts.length > 0 ? (
-            <details className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+            <details className="weather-auto-chevron mt-3 rounded-lg border border-slate-800/80 bg-slate-950/45 px-3 py-2">
               <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                 More utilities
               </summary>

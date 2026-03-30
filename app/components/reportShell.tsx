@@ -389,7 +389,7 @@ export function HeroTrustProvenanceBlock({
         </div>
         )}
 
-        <details className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2">
+        <details className="weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2">
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
             Data source details
           </summary>

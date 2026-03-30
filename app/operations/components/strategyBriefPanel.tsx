@@ -174,7 +174,7 @@ export const StrategyBriefPanel = ({
               </div>
             )}
 
-            <details className="weather-surface p-4">
+            <details className="weather-surface weather-auto-chevron p-4">
               <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300">
                 Full copy-ready narrative
               </summary>

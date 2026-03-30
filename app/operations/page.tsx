@@ -485,7 +485,7 @@ export default async function OperationsPage({
         </div>
       </section>
 
-      <details className="weather-panel scroll-mt-28 space-y-3 px-5 py-5">
+      <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           Need deeper board or governance artifacts?
         </summary>
@@ -525,7 +525,7 @@ export default async function OperationsPage({
         </div>
       </details>
 
-      <details id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-3 px-5 py-5">
+      <details id="ops-implementation-handoffs" className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           Need implementation handoffs?
         </summary>

@@ -78,7 +78,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
               <span className="font-semibold text-slate-100">Do now:</span> {immediateDecision}
             </p>
             {cardReadItems.length > 0 ? (
-              <details className="rounded-lg border border-slate-800/55 bg-slate-950/55 px-3 py-3">
+              <details className="weather-auto-chevron rounded-lg border border-slate-800/55 bg-slate-950/55 px-3 py-3">
                 <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Read this card</summary>
                 <ul className="mt-2 grid gap-1.5 text-xs text-slate-200">
                   {cardReadItems.slice(0, 3).map((item) => (
