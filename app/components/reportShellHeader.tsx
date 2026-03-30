@@ -5,7 +5,7 @@ import {
   type ReportPageLink,
 } from "./reportShellNavigation";
 
-export type ReportShellHeaderVariant = "standard" | "home-brief";
+export type ReportShellHeaderVariant = "standard" | "home-brief" | "evidence" | "trust";
 
 type ReportShellHeaderProps = {
   variant: ReportShellHeaderVariant;
@@ -30,6 +30,20 @@ export function ReportShellHeader({
   pageTitle,
   pageNavVariant,
 }: ReportShellHeaderProps) {
+  const contextBadge = variant === "evidence"
+    ? {
+        label: "Evidence appendix",
+        className: "border-sky-300/35 bg-sky-400/10 text-sky-100",
+        copy: "Signal thresholds, score movement, and replay context to validate or challenge this week's call.",
+      }
+    : variant === "trust"
+      ? {
+          label: "Trust audit hub",
+          className: "border-emerald-300/35 bg-emerald-400/10 text-emerald-100",
+          copy: "Freshness, confidence, and source checks before approving irreversible decisions.",
+        }
+      : null;
+
   return (
     <header className="weather-appbar relative z-20 border-slate-800/70 px-4 py-3 sm:px-6 sm:py-4 lg:sticky lg:top-4">
       {variant === "home-brief" ? (
@@ -97,12 +111,17 @@ export function ReportShellHeader({
                 className="h-7 w-auto"
                 priority
               />
+              {contextBadge ? (
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${contextBadge.className}`}>
+                  {contextBadge.label}
+                </span>
+              ) : null}
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100">
                 {statusLabel}
               </span>
             </div>
             <p className="max-w-2xl text-xs leading-relaxed text-slate-300">
-              Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away.
+              {contextBadge?.copy ?? "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."}
             </p>
             <p className="max-w-2xl text-[11px] leading-relaxed text-slate-400">
               {canonicalPositioningLine}
