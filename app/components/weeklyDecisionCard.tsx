@@ -321,11 +321,11 @@ function DecisionTransmissionRail({
               {actionNow}
             </p>
             <p className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Guardrail</span>
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Threshold</span>
               {guardrail}
             </p>
             <p className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Flip</span>
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</span>
               {flipWhen}
             </p>
           </div>
@@ -687,7 +687,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             needsTrustWarning={hasMaterialTrustDelta}
             trustStateLabel={trustStateLabel}
             trustStateDetail={trustStateDetail}
-            trustTimestamp={freshnessLabel}
             trustReason={isFallbackSnapshot ? artifact.freshnessLine : undefined}
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}

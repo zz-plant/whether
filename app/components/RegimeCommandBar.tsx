@@ -153,6 +153,18 @@ const TrajectoryMap = ({
   );
 };
 
+const PostureMapSummary = ({
+  trendLabel,
+  postureTrajectory,
+}: {
+  trendLabel: string;
+  postureTrajectory: NonNullable<RegimeCommandBarProps["postureTrajectory"]>;
+}) => (
+  <p className="text-xs leading-5 text-slate-200">
+    Trend {trendLabel} · Tightness {postureTrajectory.current.tightness.toFixed(1)} vs {postureTrajectory.thresholds.tightness.toFixed(1)} · Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} vs {postureTrajectory.thresholds.riskAppetite.toFixed(1)}
+  </p>
+);
+
 const ThresholdRail = ({
   label,
   current,
@@ -241,13 +253,36 @@ export const RegimeCommandBar = ({
         </div>
 
         {hasTrajectoryView ? (
-          <TrajectoryMap
-            regime={regime}
-            postureTrajectory={postureTrajectory}
-            regimeDistance={regimeDistance}
-            trendLabel={resolvedTrendLabel}
-            confidenceLabel={resolvedConfidenceLabel}
-          />
+          <>
+            <div className="sm:hidden rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
+              <details>
+                <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                  Posture map (tap to expand)
+                </summary>
+                <div className="mt-2">
+                  <PostureMapSummary trendLabel={resolvedTrendLabel} postureTrajectory={postureTrajectory} />
+                </div>
+                <div className="mt-3">
+                  <TrajectoryMap
+                    regime={regime}
+                    postureTrajectory={postureTrajectory}
+                    regimeDistance={regimeDistance}
+                    trendLabel={resolvedTrendLabel}
+                    confidenceLabel={resolvedConfidenceLabel}
+                  />
+                </div>
+              </details>
+            </div>
+            <div className="hidden sm:block">
+              <TrajectoryMap
+                regime={regime}
+                postureTrajectory={postureTrajectory}
+                regimeDistance={regimeDistance}
+                trendLabel={resolvedTrendLabel}
+                confidenceLabel={resolvedConfidenceLabel}
+              />
+            </div>
+          </>
         ) : (
           <div className="rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">Weekly direction</p>
