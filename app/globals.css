@@ -183,6 +183,28 @@ body::after {
   padding-block: clamp(2.2rem, 1.7rem + 2vw, 3.4rem);
 }
 
+.weather-secondary-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.weather-secondary-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.weather-secondary-shell-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 2.25rem;
+  background:
+    radial-gradient(35rem 18rem at 12% 0%, rgba(125, 211, 252, 0.12), transparent 64%),
+    radial-gradient(30rem 16rem at 100% 12%, rgba(251, 191, 36, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(7, 18, 38, 0.4) 0%, rgba(8, 27, 47, 0.12) 100%);
+  pointer-events: none;
+}
+
 .weather-page-shell-compact {
   max-width: 56rem;
 }
@@ -269,6 +291,22 @@ body::after {
 
 .weather-hub-sidecar {
   min-width: 0;
+}
+
+.weather-legal-content :where(section:not(:first-of-type)) {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.25rem;
+  padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.06), transparent 42%),
+    linear-gradient(160deg, rgba(12, 21, 37, 0.72), rgba(8, 16, 30, 0.84));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
+}
+
+.weather-legal-content :where(h2, h3) {
+  text-wrap: balance;
 }
 
 .weather-hub-card {

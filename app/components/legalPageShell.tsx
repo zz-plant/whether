@@ -8,7 +8,7 @@ type LegalPageShellProps = {
 
 export const LegalPageShell = ({ title, children }: LegalPageShellProps) => (
   <HubPageShell width="standard">
-    <div className="mx-auto w-full max-w-4xl space-y-8">
+    <div className="weather-legal-content mx-auto w-full max-w-4xl space-y-8">
       <header className="weather-hub-section space-y-3">
         <p className="weather-hub-section-eyebrow">Whether Legal</p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">{title}</h1>
