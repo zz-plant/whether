@@ -1,6 +1,6 @@
 # Vinext evaluation for Cloudflare Workers
 
-This repo remains Cloudflare-first. Vinext is now the production build/deploy lane, with a separate preview Worker retained for isolated validation.
+This repo remains Cloudflare-first. Vinext is now the production build/deploy lane, with preview handled as a named Wrangler environment inside the same Cloudflare config.
 
 ## Current repo shape (March 15, 2026)
 - Pages: 69
@@ -16,11 +16,12 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 
 ### `vinext-spike` (parallel evaluation)
 - Dev/start/build/check: `bun run dev:vinext`, `bun run start:vinext`, `bun run build:vinext`, `bun run check:vinext`
-- Cloudflare preview deploy wrapper: `bun run deploy:vinext`
+- Cloudflare preview deploy wrapper: `bun run deploy:cloudflare:preview`
 - Vite/Vinext config: [`vite.config.ts`](/Users/kanav/Documents/GitHub/whether-app/vite.config.ts)
-- Cloudflare spike config: [`wrangler.vinext.jsonc`](/Users/kanav/Documents/GitHub/whether-app/wrangler.vinext.jsonc)
+- Cloudflare preview environment: `env.preview` in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
 - Worker entry: [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts)
 - Node preflight: [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) fails fast outside Node 22+.
+- Cloudflare env coordination: [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs) applies the same target environment to both build and deploy.
 
 ## What upstream says now
 - Vinext is still explicitly experimental.
@@ -32,7 +33,7 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 
 ## Immediate repo implications
 - Production is now on Vinext.
-- Keep the preview spike isolated for rollback rehearsal and config experimentation.
+- Keep the preview spike isolated through `env.preview` for rollback rehearsal and config experimentation.
 - Do not assume `runtime = "edge"` semantics are authoritative under Vinext; validate actual runtime behavior in deployed preview/production environments.
 - Do not depend on Next-generated typed-route output in shared navigation/content modules. This repo now uses a local route-type compatibility layer for those modules.
 
@@ -47,9 +48,9 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
   - `bun run build`
   - `bun run build:cloudflare`
 - Preview lane passes:
-  - `bun run build:vinext`
+  - `bun run build:cloudflare:preview`
   - `bun run start:vinext`
-  - `bun run deploy:vinext:dry-run`
+  - `bun run deploy:cloudflare:preview:dry-run`
 
 ### Gate C — Route/runtime parity
 - Homepage, Signals, and Operations preserve decision-transmission behavior.
@@ -59,10 +60,10 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 - Search-param-driven navigation flows remain intact.
 
 ### Gate D — Cloudflare operations parity
-- Vinext worker boot validated in production config and preview config.
+- Vinext worker boot validated in the top-level production config and `env.preview`.
 - Asset and image routes resolve correctly.
 - Cache behavior for `revalidate`-sensitive paths is explicit and acceptable.
-- Rollback now means reverting to the last pre-cutover commit or re-pointing production deploy automation at the preview-isolated config.
+- Rollback now means reverting to the last pre-cutover commit or re-pointing production deploy automation at the top-level production target while keeping preview validation in `env.preview`.
 
 ## Decision rule
 - **Operate on Vinext** while the current gates stay green.

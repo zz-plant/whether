@@ -2,9 +2,9 @@
 
 ## Build + deploy commands
 
-This repo now has two explicit Cloudflare lanes:
-- `current-vinext`: production baseline using Vinext on Cloudflare Workers
-- `vinext-spike`: preview-only Vinext evaluation lane
+This repo now has one Wrangler source of truth with two deployment targets:
+- `production`: top-level config in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
+- `preview`: named `env.preview` in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
 
 Use this command sequence in CI to keep Cloudflare Workers deploys deterministic and auditable:
 
@@ -17,39 +17,52 @@ bun run deploy:cloudflare
 
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step and uses Vinext as the only build/deploy adapter.
 
-`bun run build`, `bun run build:cloudflare`, and `bun run build:pages` all route through the same Vinext build path so local, CI, and Cloudflare validation stay aligned.
+`bun run build:cloudflare` and `bun run deploy:cloudflare` now route through [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs), which sets `CLOUDFLARE_ENV` before the Vinext build step and then deploys with the matching Wrangler environment. This removes the old config-swapping preview wrapper and keeps build-time bindings/config aligned with the deploy target.
 
 ## Branch deploy commands
 
 - **Production deploy:** `bun run deploy:cloudflare`
 - **Production deploy dry run:** `bun run deploy:cloudflare:dry-run`
-- **Build-only validation:** `bun run deploy:cloudflare:nonprod`
-- **Preview spike:** `bun run deploy:vinext`
-- **Preview spike dry run:** `bun run deploy:vinext:dry-run`
+- **Preview build-only validation:** `bun run build:cloudflare:preview`
+- **Preview deploy:** `bun run deploy:cloudflare:preview`
+- **Preview deploy dry run:** `bun run deploy:cloudflare:preview:dry-run`
+- **Legacy alias:** `bun run deploy:vinext`
+- **Legacy alias dry run:** `bun run deploy:vinext:dry-run`
 
 ## Production lane
 
 - Production uses [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
 - Worker entrypoint is [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts)
-- All default `dev`, `build`, `start`, and Cloudflare deploy scripts route through [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs)
+- Generic Vinext commands still route through [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs)
+- Cloudflare-targeted build/deploy commands route through [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs)
 
-`deploy:cloudflare` maps directly to `vinext deploy` with the production Worker name in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml). `deploy:cloudflare:nonprod` is build-only validation without upload.
+`deploy:cloudflare` builds against the top-level Wrangler config and then runs `vinext deploy --skip-build`, so the build artifact and deploy target stay on the same environment contract.
 
 ## Preview lane
 
-The preview lane remains intentionally isolated from the production Cloudflare config:
-- production uses [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
-- preview uses [`wrangler.vinext.jsonc`](/Users/kanav/Documents/GitHub/whether-app/wrangler.vinext.jsonc)
-- `bun run deploy:vinext` runs through [`scripts/vinext-deploy.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-deploy.mjs), which temporarily activates the preview config for the deploy command and then restores the production config immediately after
+The preview lane now lives in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml) under `env.preview`. This keeps preview and production under one config file while still letting Wrangler isolate the deployment target.
+
+`bun run deploy:cloudflare:preview`:
+- sets `CLOUDFLARE_ENV=preview` for the build step
+- runs the Vinext build against `env.preview`
+- deploys with `--env preview`
 
 Validation commands for the preview lane:
 
 ```bash
 bun run check:vinext
-bun run build:vinext
+bun run build:cloudflare:preview
 bun run start:vinext
-bun run deploy:vinext:dry-run
+bun run deploy:cloudflare:preview:dry-run
 ```
+
+## Auth preflight
+
+Real deploys now run a lightweight Wrangler auth preflight before upload:
+- local interactive use: `wrangler login`
+- CI/non-interactive use: set `CLOUDFLARE_API_TOKEN`
+
+Dry-run commands skip this preflight because they do not upload.
 
 ## Expected warnings (non-blocking)
 

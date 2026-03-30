@@ -13,3 +13,12 @@ binding = "IMAGES"
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"
+
+[env.preview]
+preview_urls = true
+
+[env.preview.vars]
+NEXT_PUBLIC_SITE_URL = "https://whether.work"
+
+[env.preview.images]
+binding = "IMAGES"

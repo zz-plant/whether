@@ -18,7 +18,8 @@
 - **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Build & deployment pipeline
-- **Primary build entry:** [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) wraps the Vinext CLI and enforces Node `>=22` for build/dev/start/deploy commands.
+- **Primary Vinext entry:** [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) wraps the Vinext CLI and enforces Node `>=22` for generic build/dev/start/check commands.
+- **Cloudflare deploy entry:** [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs) aligns `CLOUDFLARE_ENV` with both the Vinext build step and the subsequent deploy step.
 - **Cloudflare output wiring:** [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml) targets [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts) with asset and image bindings enabled.
 
 ## App Router usage & runtimes
@@ -45,7 +46,7 @@
 
 ## Sources of truth
 - Tooling and versions: `package.json`.
-- Build pipeline: `scripts/vinext-run.mjs`.
+- Build pipeline: `scripts/vinext-run.mjs`, `scripts/cloudflare-run.mjs`.
 - Cloudflare wiring: `wrangler.toml`.
 - App runtime declarations: `app/**/page.tsx`, `app/api/og/route.ts`.
 - Data clients and metadata: `lib/treasury/treasuryClient.ts`, `lib/sensors.ts`, `lib/snapshot.ts`.

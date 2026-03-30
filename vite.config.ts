@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [
     vinext(),
     cloudflare({
-      configPath: "wrangler.vinext.jsonc",
       viteEnvironment: {
         name: "rsc",
         childEnvironments: ["ssr"],
