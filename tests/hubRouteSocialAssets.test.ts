@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Metadata } from "next";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
-import { metadata as answersHubMetadata } from "../app/answers/page";
 import { metadata as decideMetadata } from "../app/decide/page";
 import { metadata as guidesMetadata } from "../app/guides/page";
 import { metadata as operationsMetadata } from "../app/operations/page";
@@ -50,7 +49,6 @@ describe("hub route social assets", () => {
       { metadata: decideMetadata, imagePath: "/social/decide.svg" },
       { metadata: resourcesMetadata, imagePath: "/social/resources.svg" },
       { metadata: guidesMetadata, imagePath: "/social/guides.svg" },
-      { metadata: answersHubMetadata, imagePath: "/social/answers.svg" },
     ];
 
     for (const asset of expectedAssets) {

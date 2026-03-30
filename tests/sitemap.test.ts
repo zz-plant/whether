@@ -16,7 +16,7 @@ import {
 import { retiredSitemapPaths } from "../app/sitemapExclusions";
 
 describe("sitemap", () => {
-  it("returns canonical URLs and includes posture, decide, learn, and toolkit routes", async () => {
+  it("returns canonical URLs and includes canonical roots plus supporting detail routes", async () => {
     const entries = await sitemap({ programmaticEligible: true });
 
     assert.ok(entries.length > 0);
@@ -28,8 +28,9 @@ describe("sitemap", () => {
     assert.ok(urls.has(siteUrl));
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide`));
-    assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/operations`));
+    assert.ok(!urls.has(`${siteUrl}/toolkits`));
+    assert.ok(!urls.has(`${siteUrl}/answers`));
 
     for (const retiredPath of retiredSitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${retiredPath}`));
@@ -92,8 +93,9 @@ describe("sitemap", () => {
   it("keeps supporting and secondary surfaces below their primary parent priorities", async () => {
     const entries = await sitemap({ programmaticEligible: true });
     const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
+    const firstToolkit = toolkitDefinitions[0];
 
-    assert.ok((priorityByUrl.get(`${siteUrl}/decide`) ?? 0) > (priorityByUrl.get(`${siteUrl}/toolkits`) ?? 1));
+    assert.ok((priorityByUrl.get(`${siteUrl}/decide`) ?? 0) > (priorityByUrl.get(`${siteUrl}/toolkits/${firstToolkit.slug}`) ?? 1));
     assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn/failure-modes`) ?? 1));
     assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/concepts`) ?? 1));
   });

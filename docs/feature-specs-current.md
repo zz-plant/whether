@@ -19,8 +19,8 @@ Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decision Tools**
 - `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
-- `/answers`, `/guides`, and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
-- `/sources` and `/confidence` are Trust aliases that resolve to the canonical `/method` audit flow
+- `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
+- `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
@@ -129,8 +129,8 @@ The About page explicitly frames Whether as a small independent operator tool ra
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
 confidence, freshness, source coverage, and revisit conditions, then links out to
 `/method#formula-reference` and `/learn/failure-modes`. The legacy `/sources` and `/confidence`
-entry URLs now permanently resolve back into the canonical Trust anchors instead of acting as
-parallel trust pages.
+entry URLs now redirect at the routing layer back into the canonical Trust anchors instead of acting
+as parallel trust pages.
 The page now opens with a binary trust verdict (`safe to use`, `use cautiously`, or historical-only)
 before the detailed trust workflow so operators can decide whether a deeper audit is necessary.
 
@@ -150,7 +150,7 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/answers` and `/answers/[slug]`
 
 Secondary hubs (`/guides`, `/resources`, `/toolkits`) now lead with immediate value and
-focused next actions while reinforcing their parent workflow hub. `/answers` now resolves directly
+focused next actions while reinforcing their parent workflow hub. `/answers` now redirects directly
 back into the canonical Decision Tools answer router instead of maintaining a separate hub shell.
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, and `/concepts` now owns focus, audience, and conflict-map browsing behind query-selected states, which keeps those secondary surfaces canonical without parallel route implementations.
