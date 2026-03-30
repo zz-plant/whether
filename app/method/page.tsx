@@ -169,9 +169,16 @@ export default async function MethodPage() {
         regime: reportData.assessment.regime,
         call: "Use Trust as the single audit entrypoint, then move back to the weekly brief or plan.",
         doNow: [
-          `Confirm freshness: ${reportData.fetchedAtLabel}.`,
-          `Confirm confidence: ${confidenceLabel}.`,
+          reportData.actionNowShort,
+          "Return to the weekly brief and execute this operating move once trust checks are complete.",
         ],
+        trustChecklist: {
+          label: "Trust check",
+          items: [
+            `Confirm freshness: ${reportData.fetchedAtLabel}.`,
+            `Confirm confidence: ${confidenceLabel}.`,
+          ],
+        },
         flipConditions: [
           reportData.flipThreshold,
           "If trust degrades, hold irreversible approvals until live evidence stabilizes.",
@@ -220,6 +227,19 @@ export default async function MethodPage() {
             <p className="mt-2 text-sm text-slate-200">{trustSummary}</p>
             <p className="mt-2 text-sm text-slate-300">Coverage: {sourceCoverage}</p>
             <p className="mt-2 text-xs text-slate-400">Latest refresh: {reportData.fetchedAtLabel}</p>
+            <div className="mt-3 border-t border-slate-700/70 pt-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Trust check</p>
+              <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
+                <li className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
+                  <span>Freshness: {reportData.fetchedAtLabel}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
+                  <span>Trust summary: {trustSummary}</span>
+                </li>
+              </ul>
+            </div>
           </article>
           <article className="weather-hub-card rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What would change the call</p>
