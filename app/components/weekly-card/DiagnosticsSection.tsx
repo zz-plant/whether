@@ -35,9 +35,9 @@ export function DiagnosticsSection({
 
   return (
     <>
-      <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Audit trail">
-        <h2 className={tierTwoHeading}>Audit trail</h2>
-        <p className="text-xs leading-5 text-slate-300">Need deeper analysis? Open the supporting lanes below without leaving the weekly call.</p>
+      <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Decision detail">
+        <h2 className={tierTwoHeading}>Decision detail</h2>
+        <p className="text-xs leading-5 text-slate-300">Want the backing detail? Expand the sections below to see what changed, what to watch, and why.</p>
         <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
           <Accordion.Item value="since-last-review" className="group">
             <DiagnosticsAccordionTrigger label="Delta" />
@@ -64,7 +64,7 @@ export function DiagnosticsSection({
             <Accordion.Panel className={disclosurePanelClass}>
               <article className="py-1"><p className={`text-xs ${neutralLabel}`}>Evidence</p><ul className="mt-1 space-y-1 text-xs text-slate-200">{evidenceItems.map((item) => <li key={item.key}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>)}</ul></article>
               <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Drivers</p><p className="mt-1 text-xs text-slate-300">Top contributors: {topContributors}</p><p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary.replace(/\.$/, "")}</p></article>
-              <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Model inputs</p><p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p></article>
+              <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Risk check</p><p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p></article>
               {failureModes.length > 0 ? <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>False-signal warnings</p><ul className="mt-1 space-y-1 text-xs text-slate-300">{failureModes.slice(0, 2).map((mode) => <li key={mode.id}>• {mode.warning}</li>)}</ul></article> : null}
             </Accordion.Panel>
           </Accordion.Item>

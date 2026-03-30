@@ -73,7 +73,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
     return {
       key: rowKey,
       label: matrixRow?.label ?? (rule ? decisionAreaLabel(rule.area) : rowKey.charAt(0).toUpperCase() + rowKey.slice(1)),
-      context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
+      context: rule?.scope ?? "Use this rule for the related decision this week.",
       laneState,
       now: {
         text: compactActionCue(matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? fallbackDecisionTriplet.action),
@@ -103,8 +103,8 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className={tierOneHeading}>Decision corridors</h2>
-          <p className="text-xs leading-5 text-slate-300">Read each lane as a permission corridor: what stays open now, what triggers caution, and what fully blocks or flips the lane.</p>
+          <h2 className={tierOneHeading}>Decision rules</h2>
+          <p className="text-xs leading-5 text-slate-300">For each area: what you can do now, what should pause at the caution line, and what would force a full stop or reset.</p>
         </div>
         <div className="w-full max-w-[18rem]">
           <CorridorScale />
@@ -136,7 +136,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
             {corridor.laneState ? (
               <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
                 <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                  <span>Current lane {corridor.laneState.currentStateLabel}</span>
+                  <span>Current status {corridor.laneState.currentStateLabel}</span>
                   <span>{corridor.laneState.tightenDistanceLabel}</span>
                 </div>
                 <div className="relative mt-2 h-2 rounded-full bg-slate-800/90" aria-hidden="true">

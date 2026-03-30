@@ -254,7 +254,7 @@ export function HeroTrustProvenanceBlock({
             <span className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${trustToneClass}`}>
               {controlHeadline}
             </span>
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">Trust control panel</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">Data trust</span>
           </div>
           {outageSeverity ? (
             <span className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
@@ -297,14 +297,14 @@ export function HeroTrustProvenanceBlock({
               </span>
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-300">
-              Live inputs are current enough for the weekly call. Open full details only if the room challenges freshness, provenance, or source coverage.
+              Inputs are fresh enough for this week&apos;s decision. Open more detail only if someone questions freshness or source coverage.
             </p>
           </div>
         ) : (
         <div className="grid gap-3">
           <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Approval lane</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Approval status</p>
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}>
                 {currentApprovalLane?.label ?? "Allowed now"}
               </span>
@@ -326,7 +326,7 @@ export function HeroTrustProvenanceBlock({
             <div className="flex items-center justify-between gap-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recovery progress</p>
               <span className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
-                {outageExitGate ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear` : "Live"}
+                {outageExitGate ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear` : "Stable"}
               </span>
             </div>
             {outageExitGate ? (
@@ -360,7 +360,7 @@ export function HeroTrustProvenanceBlock({
 
           <article className="rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Source readiness</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Source status</p>
               <span className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
                 {(degradedSourceRows?.length ?? 0) > 0 ? `${degradedSourceRows?.length} degraded` : "All core feeds live"}
               </span>
@@ -531,14 +531,14 @@ export function CommandCenterNavBlock({
         {showOfflineBadge ? <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">{offlineBadgeLabel}</p> : null}
       </section>
 
-      <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Mission control">
+      <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Decision snapshot">
         <div className="grid gap-3 lg:grid-cols-[1.6fr,1.4fr]">
           <article className="weather-surface space-y-3 p-4">
             <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
             <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{primaryDecisionText}</h2>
             <p className="text-sm text-slate-300">{missionSupportText}</p>
             {decisionDiffs?.length ? <ul className="mt-2 flex flex-wrap gap-2" aria-label="Decision deltas">{decisionDiffs.map((item) => <li key={item.label} className="inline-flex min-h-[28px] items-center rounded-full border border-slate-700/80 bg-slate-900/60 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-slate-200">{item.label}</li>)}</ul> : null}
-            {decisionBanner?.evidenceHref ? <InternalAwareLink href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">Review evidence trail<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></InternalAwareLink> : null}
+            {decisionBanner?.evidenceHref ? <InternalAwareLink href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">See supporting evidence<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></InternalAwareLink> : null}
           </article>
           <article className="weather-surface space-y-3 p-4">
             <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{missionSequenceTitle}</p>
