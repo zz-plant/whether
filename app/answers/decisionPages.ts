@@ -15,7 +15,7 @@ export type DecisionPageDefinition = {
   featuredOrder?: number;
 };
 
-export const answerPages: DecisionPageDefinition[] = [
+const allAnswerPages: DecisionPageDefinition[] = [
   {
     slug: "startup-funding-climate-this-week",
     keyword: "startup funding climate this week",
@@ -363,6 +363,34 @@ export const answerPages: DecisionPageDefinition[] = [
     thresholdFocus: "both",
   },
 ];
+
+const activeAnswerSlugs = [
+  "startup-funding-climate-this-week",
+  "is-it-risk-on-or-risk-off-for-startups",
+  "should-startups-hire-engineers-right-now",
+  "should-startups-slow-roadmap-expansion",
+  "should-startups-raise-capital-now",
+  "when-should-startups-cut-burn",
+  "should-we-freeze-or-selectively-hire",
+  "should-we-expand-sales-headcount-now",
+  "should-we-delay-new-product-lines",
+  "how-fast-should-we-scale-go-to-market",
+  "how-to-brief-executives-on-market-conditions",
+] as const;
+
+const activeAnswerSlugSet = new Set<string>(activeAnswerSlugs);
+
+export const answerPages: DecisionPageDefinition[] = allAnswerPages.filter((page) =>
+  activeAnswerSlugSet.has(page.slug),
+);
+
+const retiredAnswerSlugSet = new Set<string>(
+  allAnswerPages
+    .map((page) => page.slug)
+    .filter((slug) => !activeAnswerSlugSet.has(slug)),
+);
+
+export const isRetiredAnswerSlug = (slug: string) => retiredAnswerSlugSet.has(slug);
 
 export const answerCategories: Array<{ key: AnswerCategory; label: string }> = [
   { key: "decision", label: "Decision calls" },

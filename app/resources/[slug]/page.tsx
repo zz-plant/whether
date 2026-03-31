@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   buildCanonicalUrl,
   buildPageMetadata,
@@ -25,6 +25,7 @@ import { buildResourceArticleMetadata, ResourceArticlePage } from "../components
 import {
   findResourceArticleBySlug,
   getResourceArticleDecisionAreas,
+  isRetiredResourceArticleSlug,
 } from "../../../lib/resourceArticles";
 import {
   findDownloadableResourceBySlug,
@@ -72,6 +73,17 @@ const splitParagraphForReadability = (paragraph: string) => {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
+  if (isRetiredResourceArticleSlug(slug)) {
+    return {
+      ...buildPageMetadata({
+        title: "Governance resource moved",
+        description: "This resource has been retired from the active library. Use the remaining governance artifacts from the canonical Resources flow.",
+        path: "/resources",
+        imageAlt: "Whether resources",
+      }),
+      robots: noindexRobots,
+    };
+  }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {
     return {
@@ -112,6 +124,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
+  if (isRetiredResourceArticleSlug(slug)) {
+    permanentRedirect("/resources");
+  }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {
     return <DownloadableResourcePage config={downloadableResource} />;

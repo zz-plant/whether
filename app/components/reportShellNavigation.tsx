@@ -86,6 +86,28 @@ const renderPageLink = ({
   </Link>
 );
 
+const renderCompactPageLink = ({
+  link,
+  isActive,
+}: {
+  link: ReportPageLink;
+  isActive: boolean;
+}) => (
+  <Link
+    key={link.href}
+    href={link.href}
+    aria-current={isActive ? "page" : undefined}
+    className={`weather-pill inline-flex min-h-[52px] w-full flex-col items-start justify-center rounded-2xl px-3 py-2 text-left transition-colors ${
+      isActive
+        ? "border-sky-300/80 bg-sky-500/16 text-slate-100"
+        : "text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+    }`}
+  >
+    <span className="text-xs font-semibold tracking-[0.08em] text-slate-100">{link.label}</span>
+    <span className="mt-1 line-clamp-2 text-[11px] leading-5 text-slate-400">{link.description}</span>
+  </Link>
+);
+
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
@@ -108,6 +130,62 @@ export const ReportPageNavigation = ({
   const supportGridClassName = variant === "compact"
     ? "grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4"
     : "grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4";
+
+  if (variant === "compact") {
+    return (
+      <nav aria-label="Report paths" className={className}>
+        <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3 sm:p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                {isAnchorRoute ? "Primary surface" : `Current support path · ${currentLink.label}`}
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={anchorLink.href}
+                  aria-current={isAnchorRoute ? "page" : undefined}
+                  className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] ${
+                    isAnchorRoute
+                      ? "border-amber-300/65 bg-amber-400/10 text-amber-50"
+                      : "text-slate-100 hover:border-amber-300/55 hover:text-amber-50"
+                  }`}
+                >
+                  {anchorLink.label}
+                </Link>
+                <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                  {currentPosition} of {totalCount}
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  {resolveNavigationRouteCue(currentLink.href)}
+                </span>
+              </div>
+              <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
+                {isAnchorRoute
+                  ? routeSwitcherIntro
+                  : `Stay here only while you need ${currentLink.label.toLowerCase()}: ${currentLink.description}`}
+              </p>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5 lg:w-44" aria-hidden="true">
+              {pageLinks.map((link, index) => (
+                <span
+                  key={link.href}
+                  className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
+                  title={`${index + 1}. ${link.label}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className={supportGridClassName}>
+            {supportLinks.map((link) => renderCompactPageLink({
+              link,
+              isActive: currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle,
+            }))}
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav aria-label="Report paths" className={className}>

@@ -6,7 +6,7 @@ import { getResourceArticleDecisionAreas } from "../lib/resourceArticles";
 
 describe("canonical content selectors", () => {
   it("keeps featured answer pages sourced from canonical answer registry", () => {
-    assert.ok(featuredAnswerPages.length >= 8);
+    assert.ok(featuredAnswerPages.length >= 6);
     assert.deepEqual(
       featuredAnswerPages.slice(0, 3).map((page) => page.slug),
       [
@@ -22,13 +22,13 @@ describe("canonical content selectors", () => {
   });
 
   it("maps resource article intents to bounded decision areas", () => {
-    const vpProductAreas = getResourceArticleDecisionAreas({
-      slug: "platform-rewrites-during-capital-tightening-risk-analysis",
+    const boardAreas = getResourceArticleDecisionAreas({
+      slug: "how-much-runway-do-we-need-tightening-market",
       title: "t",
       description: "d",
       keyword: "k",
       cluster: "pain",
-      intent: "vp-product",
+      intent: "board",
       format: "guide",
       boardSummary: [],
       sections: [],
@@ -36,7 +36,7 @@ describe("canonical content selectors", () => {
       toolLink: { href: "/resources/capital-posture-template", label: "Tool" },
     });
 
-    assert.ok(vpProductAreas.includes("product-tempo"));
-    assert.ok(vpProductAreas.includes("expansion-bets"));
+    assert.ok(boardAreas.includes("capital-raising"));
+    assert.ok(boardAreas.includes("expansion-bets"));
   });
 });

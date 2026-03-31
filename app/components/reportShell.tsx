@@ -2,7 +2,6 @@
  * Shared report shell layout for Whether Report pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
-import Link from "next/link";
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
@@ -193,7 +192,6 @@ export const ReportShell = (props: ReportShellProps) => {
   const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
   const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
-  const showPostureRibbon = resolvedCurrentPath !== "/";
   const resolvedHeaderVariant: ReportShellHeaderVariant = resolvedHeaderVariantInput ?? (resolvedHideHeroChrome ? "home-brief" : "standard");
   const headerExportCta = resolvedCurrentPath === "/" ? resolvedExportCta : null;
   const bodyExportCta = resolvedCurrentPath === "/" ? null : resolvedExportCta;
@@ -216,8 +214,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustStatusActionForDisplay = trustReadiness.tone === "warning"
     ? "Pause irreversible approvals until one verified live refresh lands."
     : resolvedTrustStatusAction;
-  const decisionSnapshotAction = resolvedCommandBar?.doNow[0]?.trim() ?? "";
-  const decisionSnapshotFlip = resolvedCommandBar?.flipConditions[0]?.trim() ?? "";
+  const showExtendedCommandBar = Boolean(resolvedCommandBar) && resolvedCurrentPath === "/";
   const trustBlockProps = {
     trustStatusTone: trustReadiness.tone,
     trustStatusLabel: controlHeadline,
@@ -260,33 +257,10 @@ export const ReportShell = (props: ReportShellProps) => {
             pageNavVariant={resolvedPageNavVariant}
             exportCta={headerExportCta}
           />
-          {resolvedCommandBar ? (
-            <section
-              className="sticky top-1 z-30 mt-3 rounded-xl border border-slate-700/60 bg-slate-950/82 px-3 py-2 sm:top-2 sm:px-3.5"
-              aria-label="Decision snapshot"
-            >
-              <div className="grid gap-1.5 text-[11px] leading-5 text-slate-200 sm:grid-cols-3">
-                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
-                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">Posture</span>
-                  <span className="font-semibold text-slate-50">{resolvedCommandBar.postureLabel ?? resolvedStatusLabel}</span>
-                </p>
-                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
-                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Action</span>
-                  <span className="font-medium text-slate-100">{decisionSnapshotAction || "Hold this week’s approved posture actions."}</span>
-                </p>
-                <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-1.5">
-                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Flip trigger</span>
-                  <span className="font-medium text-slate-100">{decisionSnapshotFlip || "Re-open posture if primary trigger confirms."}</span>
-                </p>
-              </div>
-            </section>
-          ) : null}
-
-          {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{resolvedStatusLabel}</span><span className="ml-2 text-slate-400">Decision as-of {resolvedRecordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
           {resolvedHistoricalBanner}
-          {resolvedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
+          {showExtendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
 
-          <div className={`mt-5 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
+          <div className={`mt-4 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
             {hasSidebar ? (
               <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">
                 {resolvedSectionLinks.length ? (

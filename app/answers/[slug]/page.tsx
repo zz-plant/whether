@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { findDecisionPage, highValueAnswerStaticParams, highValueStaticAnswerSlugs } from "../decisionPages";
+import {
+  findDecisionPage,
+  highValueAnswerStaticParams,
+  highValueStaticAnswerSlugs,
+  isRetiredAnswerSlug,
+} from "../decisionPages";
 import { DecisionAnswerPageContent } from "../decisionAnswerPageContent";
 import { buildSeoDecisionPayload } from "../../../lib/report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
@@ -45,6 +51,20 @@ export const buildDecisionAnswerMetadata = ({
 
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (isRetiredAnswerSlug(slug)) {
+    return {
+      ...buildPageMetadata({
+        title: "Operator answer moved",
+        description: "This long-tail answer has been retired from the active answer set. Use Decision Tools for the canonical direct-answer flow.",
+        path: "/decide",
+        imageAlt: "Whether decision tools",
+        imagePath: "/social/decide.svg",
+      }),
+      robots: {
+        ...noindexRobots,
+      },
+    };
+  }
   const page = findDecisionPage(slug);
   if (!page) {
     return buildPageMetadata({
@@ -83,6 +103,9 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
   const { slug } = await params;
+  if (isRetiredAnswerSlug(slug)) {
+    permanentRedirect("/decide#direct-answers");
+  }
 
   return <DecisionAnswerPageContent slug={slug} route={highValueStaticAnswerSlugs.includes(slug) ? "/answers/[slug]" : "/answers/[slug]:isr"} />;
 }

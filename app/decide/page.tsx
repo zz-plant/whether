@@ -5,8 +5,6 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
-  decideHomeRecommendedToolkitSlugs,
-  findToolkitDefinition,
   situationUseCaseDefinitions,
   useCaseRoles,
 } from "../../lib/decisionDomainCatalog";
@@ -20,6 +18,7 @@ import { stageGuides } from "../guides/stageGuides";
 import { ReportShell } from "../components/reportShell";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { buildGuidedTranslationHref, GuidedTranslationPanels, type GuidedTranslationSearchParams } from "./components/guidedTranslationPanels";
+import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 
 const featuredStakeholderSlugs = [
   "founders-ceos",
@@ -39,7 +38,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default async function DecidePage({
   searchParams,
 }: {
-  searchParams?: Promise<GuidedTranslationSearchParams>;
+  searchParams?: Promise<GuidedTranslationSearchParams & { toolkitQuery?: string }>;
 }) {
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
@@ -88,7 +87,7 @@ export default async function DecidePage({
     { href: "#unresolved-question-router", label: "Question router" },
     { href: "#direct-answers", label: "Direct answers" },
     { href: "#guided-translation", label: "Translations" },
-    { href: "#toolkit-library", label: "Toolkit library" },
+    { href: "#toolkit-library", label: "Toolkit shortlist" },
   ];
 
   return (
@@ -253,58 +252,29 @@ export default async function DecidePage({
         </summary>
         <div className="mt-4 space-y-6">
           <p className="text-sm text-slate-300">
-            These are downstream libraries, not parallel starting points. Use them only after the route above tells you the question needs an instrument, an exact answer, or a team-specific translation.
+            Keep this section as a reserve path only. If the top router and selected translation do not settle the question, choose one more routed path below instead of browsing broad libraries.
           </p>
-          <section id="toolkit-library" className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Toolkit library</h2>
-            <div className="weather-page-grid-3">
-              {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
-                const toolkit = findToolkitDefinition(toolkitSlug);
-                if (!toolkit) return null;
-
-                return (
-                  <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2 text-sm text-slate-100">
-                    <span className="weather-hub-chip w-fit">Toolkit</span>
-                    <p className="font-semibold">{toolkit.title}</p>
-                    <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
+          <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
+          <section className="grid gap-4 lg:grid-cols-2">
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More role paths</h2>
+              <div className="flex flex-wrap gap-2">
+                {useCaseRoles.map((role) => (
+                  <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-chip">
+                    {role.title}
                   </Link>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Answer library</h2>
-            <div className="weather-page-grid-2">
-              {featuredAnswerPages.map((page) => (
-                <Link
-                  key={page.slug}
-                  href={`/answers/${page.slug}` as Route}
-                  className="weather-hub-link-card space-y-2"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Direct answer</p>
-                  <h2 className="text-lg font-semibold text-slate-100">{page.title}</h2>
-                  <p className="text-sm text-slate-300">{page.shortAnswer}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Translation library by team</h2>
-            <div className="weather-page-grid-3">
-              {useCaseRoles.map((role) => (
-                <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-link-card text-sm font-semibold text-slate-100">{role.title}</Link>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Translation library by situation</h2>
-            <div className="weather-page-grid-2">
-              {situationUseCaseDefinitions.map((situation) => (
-                <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-link-card text-sm text-slate-100">{situation.title}</Link>
-              ))}
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More situation paths</h2>
+              <div className="flex flex-wrap gap-2">
+                {situationUseCaseDefinitions.map((situation) => (
+                  <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-chip">
+                    {situation.title}
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
         </div>

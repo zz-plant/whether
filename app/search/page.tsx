@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import {
   groupSearchResultsByJob,
+  searchEntityTypeLabels,
   searchJobDescriptions,
   searchJobLabels,
   searchPrimaryHubByJob,
@@ -11,13 +12,14 @@ import {
 } from "../../lib/search/searchIndex";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
+import { buildToolkitLibraryHref } from "../decide/components/toolkitLibraryPanels";
 
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Search — decisions, guardrails, and trust checks",
+  title: "Search — route the next workflow step",
   description:
-    "Search the operator corpus by decision job: what changed, what to do, what could break, and how to defend the call.",
+    "Use search as a command surface: route into Evidence, Planning, Decision Tools, or Trust instead of browsing the full corpus.",
   path: "/search",
   imageAlt: "Whether search",
 });
@@ -39,6 +41,41 @@ const buildSearchHref = (query: string, job?: SearchEntityJob) => {
   }
   const queryString = params.toString();
   return queryString ? `/search?${queryString}` : "/search";
+};
+
+export const resolveSearchCommandHref = (query: string, results: ReturnType<typeof searchIndex>, activeJob?: SearchEntityJob) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  const commandJob = activeJob
+    ?? (
+      (/(failure|risk|break|fragility)/.test(normalizedQuery) && results.some((entry) => entry.job === "risk"))
+        ? "risk"
+        : (/(trust|confidence|source|sources|formula|formulas)/.test(normalizedQuery) && results.some((entry) => entry.job === "trust"))
+            ? "trust"
+            : results[0]?.job
+    );
+  if (!commandJob) {
+    return null;
+  }
+
+  if (commandJob === "resolve") {
+    return results.some((entry) => entry.type === "toolkit")
+      ? buildToolkitLibraryHref(query)
+      : "/decide#unresolved-question-router";
+  }
+
+  if (commandJob === "risk") {
+    return "/method#revisit-call";
+  }
+
+  if (commandJob === "trust") {
+    return "/method#trust-snapshot";
+  }
+
+  if (commandJob === "approve") {
+    return "/operations#ops-monthly-action-summary";
+  }
+
+  return "/signals#decision-summary";
 };
 
 const searchIntentPrompts = [
@@ -73,23 +110,26 @@ export default async function SearchPage({
   const results = activeJob
     ? matchingResults.filter((entry) => entry.job === activeJob)
     : matchingResults;
-  const groupedResults = groupSearchResultsByJob(results);
   const countsByJob = groupSearchResultsByJob(matchingResults);
+  const commandJob = activeJob ?? results[0]?.job;
+  const commandHref = resolveSearchCommandHref(query, results, activeJob);
+  const commandHub = commandJob ? searchPrimaryHubByJob[commandJob] : null;
+  const supportingMatches = results.slice(0, 6);
 
   return (
     <HubPageShell>
       <HubHero
-        eyebrow="Global search"
-        title="Find the decision surface you need for this week."
-        description="Search by the job you need done: check what changed, approve a plan, resolve an edge case, diagnose risk, or validate trust."
+        eyebrow="Command search"
+        title="Route this query into the next surface, not a new library."
+        description="Use search when you know the operator question but not the right workflow surface. The goal is to send you to Evidence, Planning, Decision Tools, or Trust fast."
         aside={(
           <div className="weather-hub-card space-y-3 px-5 py-5">
             <p className="weather-hub-section-eyebrow">Search scope</p>
             <ul className="space-y-2 text-sm text-slate-200">
-              <li>What changed and why</li>
-              <li>What to approve or hold this week</li>
-              <li>What could break the call</li>
-              <li>How to defend the call with trust checks</li>
+              <li>Route into one primary workflow</li>
+              <li>Find the next bounded decision aid</li>
+              <li>Pressure-test risk or trust quickly</li>
+              <li>Avoid browsing secondary libraries first</li>
             </ul>
           </div>
         )}
@@ -166,43 +206,40 @@ export default async function SearchPage({
             </div>
           ) : null}
 
-          {searchJobOrder.map((jobKey) => {
-            const entries = groupedResults[jobKey];
-            if (entries.length === 0) return null;
-            const primaryHub = searchPrimaryHubByJob[jobKey];
+          {commandJob && commandHref && commandHub ? (
+            <HubSection title="Recommended next step" description={searchJobDescriptions[commandJob]}>
+              <div className="weather-hub-card space-y-3 px-5 py-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Command route</p>
+                <h3 className="text-lg font-semibold text-slate-100">{commandHub.label}</h3>
+                <p className="text-sm text-slate-300">{commandHub.summary}</p>
+                <p className="text-sm text-slate-200">
+                  This query reads most like <span className="font-semibold text-slate-100">{searchJobLabels[commandJob]}</span>.
+                </p>
+                <Link href={commandHref} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+                  Open recommended route
+                </Link>
+              </div>
+            </HubSection>
+          ) : null}
 
-            return (
-              <HubSection
-                key={jobKey}
-                title={searchJobLabels[jobKey]}
-                description={searchJobDescriptions[jobKey]}
-              >
-                <div className="weather-hub-card space-y-3 px-5 py-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Recommended next step</p>
-                  <h3 className="text-lg font-semibold text-slate-100">{primaryHub.label}</h3>
-                  <p className="text-sm text-slate-300">{primaryHub.summary}</p>
-                  <Link href={primaryHub.href} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-                    Open {searchJobLabels[jobKey]}
-                  </Link>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Supporting matches</p>
-                  <ul className="grid gap-3">
-                  {entries.map((entry) => (
-                    <li key={entry.id}>
-                      <Link href={entry.href} className="weather-hub-link-card space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-200">{entry.intentLabel}</p>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">{entry.recommendedHubLabel}</p>
-                        <p className="text-base font-semibold text-slate-100">{entry.title}</p>
-                        <p className="text-sm text-slate-300">{entry.summary}</p>
-                      </Link>
-                    </li>
-                  ))}
-                  </ul>
-                </div>
-              </HubSection>
-            );
-          })}
+          {supportingMatches.length > 0 ? (
+            <HubSection title="Best supporting matches" description="Use these only after the command route above is no longer enough.">
+              <ul className="grid gap-3">
+                {supportingMatches.map((entry) => (
+                  <li key={entry.id}>
+                    <Link href={entry.href} className="weather-hub-link-card space-y-1">
+                      <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-200">{entry.intentLabel}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+                        {searchEntityTypeLabels[entry.type]} · {entry.recommendedHubLabel}
+                      </p>
+                      <p className="text-base font-semibold text-slate-100">{entry.title}</p>
+                      <p className="text-sm text-slate-300">{entry.summary}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </HubSection>
+          ) : null}
 
           {results.length === 0 ? (
             <div className="weather-hub-section space-y-3 text-sm text-slate-300" role="status" aria-live="polite">
@@ -221,8 +258,14 @@ export default async function SearchPage({
           ) : null}
         </section>
       ) : (
-        <section className="weather-hub-section text-sm text-slate-300">
-          Enter a query to surface the workflow, decision aid, risk pattern, or trust check you need.
+        <section className="weather-hub-section space-y-3 text-sm text-slate-300">
+          <p>Enter a query to route into the next workflow surface, then open supporting matches only if the primary route is still not enough.</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/signals" className="weather-hub-chip">Evidence</Link>
+            <Link href="/operations" className="weather-hub-chip">Planning</Link>
+            <Link href="/decide" className="weather-hub-chip">Decision Tools</Link>
+            <Link href="/method" className="weather-hub-chip">Trust</Link>
+          </div>
         </section>
       )}
     </HubPageShell>

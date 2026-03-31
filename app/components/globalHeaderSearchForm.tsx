@@ -18,7 +18,7 @@ export function GlobalHeaderSearchForm({ className, compact = false }: GlobalHea
         type="search"
         name="q"
         className={`weather-input px-4 text-sm ${compact ? "min-h-[44px] min-w-[12rem]" : "min-h-[48px] min-w-[13rem]"}`}
-        placeholder="Search decisions, toolkits, concepts…"
+        placeholder="Search evidence, planning, trust…"
         autoComplete="off"
       />
       <button

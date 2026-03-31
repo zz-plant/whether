@@ -38,7 +38,7 @@ export type ResourceArticleSection = {
   embeds?: ResourceArticleEmbed[];
 };
 
-export const resourceArticles: ResourceArticle[] = [
+const allResourceArticles: ResourceArticle[] = [
   {
     slug: "should-we-freeze-hiring-high-interest-rate-environment",
     title: "Should we freeze hiring in a high-interest-rate environment?",
@@ -538,6 +538,25 @@ export const resourceArticles: ResourceArticle[] = [
     },
   },
 ];
+
+const activeResourceArticleSlugs = [
+  "should-we-freeze-hiring-high-interest-rate-environment",
+  "how-much-runway-do-we-need-tightening-market",
+] as const;
+
+const activeResourceArticleSlugSet = new Set<string>(activeResourceArticleSlugs);
+
+export const resourceArticles: ResourceArticle[] = allResourceArticles.filter((article) =>
+  activeResourceArticleSlugSet.has(article.slug),
+);
+
+const retiredResourceArticleSlugSet = new Set<string>(
+  allResourceArticles
+    .map((article) => article.slug)
+    .filter((slug) => !activeResourceArticleSlugSet.has(slug)),
+);
+
+export const isRetiredResourceArticleSlug = (slug: string) => retiredResourceArticleSlugSet.has(slug);
 
 export const findResourceArticleBySlug = (slug: string) => resourceArticles.find((article) => article.slug === slug);
 

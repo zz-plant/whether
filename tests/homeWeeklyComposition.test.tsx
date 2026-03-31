@@ -166,7 +166,7 @@ const workspaceModel: HomePageWorkspaceModel = {
     exportActions: [{ href: "/operations#ops-export-briefs", label: "Open share brief" }],
   },
   translate: {
-    primaryPath: { href: "/decide/team-context", title: "Team context profile", detail: "Adjust the weekly call for your company profile without reopening the whole brief.", kicker: "Recommended unresolved path" },
+    primaryPath: { href: "/decide/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime.", kicker: "Recommended unresolved path" },
     fallbackUtility: { href: "/decide/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime." },
     toolkitShortcuts: [],
   },

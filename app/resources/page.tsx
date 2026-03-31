@@ -37,6 +37,8 @@ const authorityPages: Array<{
   },
 ];
 
+const featuredResourceArticles = resourceArticles;
+
 const toolPages = [
   resourceSupportingPages.capitalPostureTemplate,
   resourceSupportingPages.reversalTriggerChecklist,
@@ -117,7 +119,7 @@ export default async function ResourcesPage() {
 
       <details className="weather-panel weather-auto-chevron space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open deeper governance library ({resourcePillarPages.length + toolPages.length + resourceArticles.length + authorityPages.length})
+          Open the focused governance set ({resourcePillarPages.length + toolPages.length + featuredResourceArticles.length + authorityPages.length})
         </summary>
         <div className="mt-4 space-y-6">
           <section className="space-y-3">
@@ -160,12 +162,12 @@ export default async function ResourcesPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Extended briefs</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Practical guides</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {resourceArticles.map((article) => (
+              {featuredResourceArticles.map((article) => (
                 <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4" data-page-cluster={article.cluster} data-page-intent={article.intent}>
                   <Tag tone="rose">
-                    {article.format === "case-example" ? "Case example" : article.cluster === "vc" ? "VC brief" : "Pain-driven brief"}
+                    {article.cluster === "vc" ? "VC brief" : "Operator guide"}
                   </Tag>
                   <h2 className="text-base font-semibold text-slate-100">{article.title}</h2>
                   <p className="text-sm text-slate-200">{article.description}</p>
@@ -173,7 +175,6 @@ export default async function ResourcesPage() {
               ))}
             </div>
           </section>
-
         </div>
       </details>
     </SecondaryPageShell>

@@ -173,17 +173,11 @@ export const buildHomeWorkspaceModel = ({
         detail: "Use the most concrete operating path first before widening into broader browse.",
         kicker: "Recommended unresolved path",
       },
-      fallbackUtility: diagnosticsLane.revisitDecisions
-        ? {
-            href: "/decide/team-context",
-            title: "Team context profile",
-            detail: "Adjust the weekly call for your company profile without reopening the whole brief.",
-          }
-        : {
-            href: "/decide/ship-checklist",
-            title: "Whether to ship checklist",
-            detail: "Score one go / wait / kill launch decision against the current regime.",
-          },
+      fallbackUtility: {
+        href: "/decide/ship-checklist",
+        title: "Whether to ship checklist",
+        detail: "Score one go / wait / kill launch decision against the current regime.",
+      },
       toolkitShortcuts: toolkitShortcuts.map((toolkit) => ({
         href: `/toolkits/${toolkit.slug}`,
         title: toolkit.title,

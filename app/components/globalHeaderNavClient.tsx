@@ -83,7 +83,7 @@ function CompactNavigationLink({
         aria-current={link.isActive ? "page" : undefined}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`inline-flex min-h-[40px] items-center justify-center rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+        className={`inline-flex min-h-[42px] items-center justify-center rounded-full border px-3.5 py-2 text-xs font-semibold tracking-[0.08em] transition-colors touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/20 text-sky-50"
             : isAnchor
@@ -109,6 +109,7 @@ export function GlobalHeaderNavRail({
   const railRef = useRef<HTMLUListElement | null>(null);
   const activeLink = navigationLinks.find((link) => link.isActive) ?? navigationLinks[0];
   const activeSurfaceCue = activeLink ? resolvePrimaryNavigationSurfaceCue(activeLink.href) : null;
+  const hasScrollableOverflow = canScrollPrev || canScrollNext;
 
   useEffect(() => {
     if (variant === "default") {
@@ -224,14 +225,16 @@ export function GlobalHeaderNavRail({
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
               Primary surfaces
             </p>
-            <p className="truncate text-xs text-slate-300">
+            <p className="truncate text-[13px] font-medium text-slate-200">
               {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
             </p>
           </div>
-          {controls}
+          {hasScrollableOverflow ? controls : null}
         </div>
-        <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">
-          Swipe or tap arrows to see every primary surface.
+        <p className="text-[11px] leading-relaxed text-slate-400">
+          {hasScrollableOverflow
+            ? "Swipe or use the arrows to move across the primary surfaces."
+            : "All primary surfaces are visible here."}
         </p>
         <nav aria-label="Primary routes">
           <ul
@@ -265,16 +268,18 @@ export function GlobalHeaderNavRail({
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
             Primary surfaces
           </p>
-          <p className="truncate text-xs text-slate-300">
+          <p className="truncate text-[13px] font-medium text-slate-200">
             {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
           </p>
-          <p className="pt-1 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">
-            {isMenuOpen
-              ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or tap arrows to see the other ${Math.max(primaryNavigationSurfaceCount - 1, 0)} primary surfaces.`
-              : "Open sections, then swipe or tap arrows to move across the primary surfaces."}
+          <p className="pt-1 text-[11px] leading-relaxed text-slate-400">
+            {hasScrollableOverflow
+              ? isMenuOpen
+                ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or use the arrows to move across the remaining primary surfaces.`
+                : "Open sections, then swipe or use the arrows to move across the primary surfaces."
+              : "All primary surfaces are visible once you open sections."}
           </p>
         </div>
-        {controls}
+        {hasScrollableOverflow ? controls : null}
       </div>
       <ul
         id="global-header-nav-list"
