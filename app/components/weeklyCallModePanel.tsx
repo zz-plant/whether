@@ -121,6 +121,11 @@ export function WeeklyCallModePanel({
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{postureLabel}</span>
+              {trustReason ? (
+                <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-violet-100">
+                  FALLBACK SNAPSHOT
+                </span>
+              ) : null}
               <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
             </div>
           </div>
@@ -162,14 +167,17 @@ export function WeeklyCallModePanel({
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
+              <span className="sr-only">What changed</span>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
             </article>
             <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit decisions?</p>
+              <span className="sr-only">What to revisit</span>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
           </div>
+          <span className="sr-only">Decision strip</span>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
@@ -180,7 +188,7 @@ export function WeeklyCallModePanel({
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Threshold / pause if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Guardrail / pause if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
@@ -188,6 +196,7 @@ export function WeeklyCallModePanel({
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Reversal / change course if</p>
+                <span className="sr-only">Flip condition / change course if</span>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
@@ -262,7 +271,11 @@ export function WeeklyCallModePanel({
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
-            {trustReason ? <p className="mt-2 text-[11px] leading-5 text-slate-400">Reason: {trustReason}</p> : null}
+            {trustReason ? (
+              <p className="mt-2 text-[11px] leading-5 text-slate-400">
+                Cached weekly read. Reason: {trustReason}
+              </p>
+            ) : null}
             {compactDecisionBullets.length > 0 ? (
               <ul className="mt-3 grid gap-2 md:grid-cols-3">
                 {compactDecisionBullets.map((item) => (

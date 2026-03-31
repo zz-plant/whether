@@ -28,6 +28,18 @@ import { PageFlowNav } from "../components/pageFlowNav";
 import { PersistedAssistPanel } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
+import {
+  buildDiagnosticsExpansionHref,
+  buildSignalsAdvancedHref,
+  buildSignalsFocusHref,
+  buildSignalsViewHref,
+  focusTabs,
+  resolveSignalsFocus,
+  resolveSignalsView,
+  type FocusTab,
+  type SignalsView,
+} from "./signalsQueryState";
+import { loadSignalsPagePanels } from "./signalsPagePanels";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -40,25 +52,6 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether Report evidence overview",
   imagePath: "/social/signals.svg",
 });
-
-export function buildDiagnosticsExpansionHref(
-  searchParams: Record<string, string | undefined> | undefined,
-  showAll: boolean,
-) {
-  const params = new URLSearchParams();
-  if (searchParams) {
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value && key !== "diagnostics") {
-        params.set(key, value);
-      }
-    });
-  }
-  if (showAll) {
-    params.set("diagnostics", "all");
-  }
-  const query = params.toString();
-  return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
-}
 
 export default async function SignalsPage({
   searchParams,
@@ -150,25 +143,16 @@ export default async function SignalsPage({
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
-  const [summaryArchive, signalDiagnostics, advancedPanels] = await Promise.all([
-    showAdvanced
-      ? import("../../lib/summary/summaryArchive").then((module) => module.getSummaryArchive())
-      : Promise.resolve(null),
-    showFullDiagnostics
-      ? import("./components/signalVisualizationSuite").then((module) => module.SignalVisualizationSuite)
-      : Promise.resolve(null),
-    showAdvanced
-      ? Promise.all([
-          import("./components/advancedThresholdsSection").then((module) => module.AdvancedThresholdsSection),
-          import("./components/timeMachinePanel").then((module) => module.TimeMachinePanel),
-          import("./components/regimeTimelinePanel").then((module) => module.RegimeTimelinePanel),
-        ])
-      : Promise.resolve(null),
-  ]);
-  const AdvancedThresholdsSection = advancedPanels?.[0] ?? null;
-  const TimeMachinePanel = advancedPanels?.[1] ?? null;
-  const RegimeTimelinePanel = advancedPanels?.[2] ?? null;
-  const SignalVisualizationSuite = signalDiagnostics;
+  const {
+    summaryArchive,
+    SignalVisualizationSuite,
+    AdvancedThresholdsSection,
+    TimeMachinePanel,
+    RegimeTimelinePanel,
+  } = await loadSignalsPagePanels({
+    showAdvanced,
+    showFullDiagnostics,
+  });
   const regimeLabel = REGIME_LABELS[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
@@ -202,61 +186,8 @@ export default async function SignalsPage({
   });
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
-  const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
-  type FocusTab = (typeof focusTabs)[number];
-  type SignalsView = "implication" | "detail";
-  const requestedFocus = resolvedSearchParams?.focus;
-  const activeSignalsView: SignalsView = resolvedSearchParams?.signalsView === "detail" ? "detail" : "implication";
-  const activeFocus: FocusTab =
-    requestedFocus && focusTabs.includes(requestedFocus as FocusTab)
-      ? (requestedFocus as FocusTab)
-      : "all";
-  const buildAdvancedHref = (advanced: boolean) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "advanced") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (advanced) {
-      params.set("advanced", "1");
-    }
-    const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
-  };
-
-  const buildFocusHref = (focus: FocusTab) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "focus") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (focus !== "all") {
-      params.set("focus", focus);
-    }
-    const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
-  };
-  const buildSignalsViewHref = (view: SignalsView) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "signalsView") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (view === "detail") {
-      params.set("signalsView", "detail");
-    }
-    const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
-  };
+  const activeSignalsView: SignalsView = resolveSignalsView(resolvedSearchParams);
+  const activeFocus: FocusTab = resolveSignalsFocus(resolvedSearchParams);
   const sectionLinks =
     activeSignalsView === "detail"
       ? [
@@ -433,7 +364,7 @@ export default async function SignalsPage({
             return (
               <a
                 key={item.id}
-                href={buildSignalsViewHref(item.id)}
+                href={buildSignalsViewHref(resolvedSearchParams, item.id)}
                 aria-current={active ? "page" : undefined}
                 className={`rounded-xl border px-3 py-3 text-left transition-colors ${
                   active
@@ -670,7 +601,7 @@ export default async function SignalsPage({
             <p className="text-sm text-slate-300">Detail mode adds prioritized diagnostics, historical replay, threshold tuning, and advanced filters. Use it when the room asks “why?” or “what would change this?”</p>
           </div>
           <a
-            href={buildSignalsViewHref("detail") + "#evidence-priorities"}
+            href={buildSignalsViewHref(resolvedSearchParams, "detail") + "#evidence-priorities"}
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
           >
             Open evidence detail
@@ -692,7 +623,7 @@ export default async function SignalsPage({
             return (
               <a
                 key={focus}
-                href={buildFocusHref(focus)}
+                href={buildSignalsFocusHref(resolvedSearchParams, focus)}
                 aria-current={isActive ? "page" : undefined}
                 className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
                   isActive
@@ -796,14 +727,14 @@ export default async function SignalsPage({
           <div className="flex flex-wrap items-center justify-end gap-2">
             {!showAdvanced ? (
               <a
-                href={buildAdvancedHref(true) + "#time-machine"}
+                href={buildSignalsAdvancedHref(resolvedSearchParams, true) + "#time-machine"}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
               >
                 Open Time Machine
               </a>
             ) : null}
             <a
-              href={buildAdvancedHref(!showAdvanced)}
+              href={buildSignalsAdvancedHref(resolvedSearchParams, !showAdvanced)}
               className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
             >
               {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}

@@ -29,8 +29,15 @@ import {
   formatPercent,
   formatScore,
   monthOptions,
-  parseMonthInput,
 } from "./timeMachineUtils";
+import {
+  buildTimeMachineClearDraftHref,
+  buildTimeMachineDraftHref,
+  buildTimeMachineJumpToLatestHref,
+  buildTimeMachineNowHref,
+  buildTimeMachineSnapshotHref,
+  buildTimeMachineSubmitHref,
+} from "../signalsQueryState";
 
 type TimeMachinePanelProps = {
   selectedYear: number;
@@ -318,73 +325,49 @@ export const TimeMachinePanel = ({
     }
     setErrorMessage(null);
     startTransition(() => {
-      const nextParams = new URLSearchParams(searchParams.toString());
-      nextParams.delete("draftMonth");
-      nextParams.delete("draftYear");
-      nextParams.set("month", String(month));
-      nextParams.set("year", String(year));
-      router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
+      router.push(
+        buildTimeMachineSubmitHref(pathname, searchParams, { month, year }) as Route,
+        { scroll: false },
+      );
     });
   };
 
   const handleMonthChange = (nextYear: number, nextMonth: number) => {
     setErrorMessage(null);
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("draftMonth", String(nextMonth));
-    nextParams.set("draftYear", String(nextYear));
-    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
+    router.push(
+      buildTimeMachineDraftHref(pathname, searchParams, {
+        month: nextMonth,
+        year: nextYear,
+      }) as Route,
+      { scroll: false },
+    );
   };
 
-  const clearDraftHref = useMemo(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("draftMonth");
-    nextParams.delete("draftYear");
-    const queryString = nextParams.toString();
-    return queryString ? `${pathname}?${queryString}` : pathname;
-  }, [pathname, searchParams]);
+  const clearDraftHref = useMemo(
+    () => buildTimeMachineClearDraftHref(pathname, searchParams),
+    [pathname, searchParams],
+  );
 
-  const jumpToLatestHref = useMemo(() => {
-    if (!latestMonthValue) {
-      return `${pathname}?${searchParams.toString()}`;
-    }
-    const parsed = parseMonthInput(latestMonthValue);
-    if (!parsed) {
-      return `${pathname}?${searchParams.toString()}`;
-    }
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("draftMonth");
-    nextParams.delete("draftYear");
-    nextParams.set("month", String(parsed.month));
-    nextParams.set("year", String(parsed.year));
-    const queryString = nextParams.toString();
-    return queryString ? `${pathname}?${queryString}` : pathname;
-  }, [latestMonthValue, pathname, searchParams]);
+  const jumpToLatestHref = useMemo(
+    () => buildTimeMachineJumpToLatestHref(pathname, searchParams, latestMonthValue),
+    [latestMonthValue, pathname, searchParams],
+  );
 
-  const nowHref = useMemo(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("draftMonth");
-    nextParams.delete("draftYear");
-    nextParams.delete("month");
-    nextParams.delete("year");
-    const queryString = nextParams.toString();
-    return queryString ? `${pathname}?${queryString}` : pathname;
-  }, [pathname, searchParams]);
+  const nowHref = useMemo(
+    () => buildTimeMachineNowHref(pathname, searchParams),
+    [pathname, searchParams],
+  );
 
-  const buildSnapshotHref = (selection: { year: number; month: number } | null) => {
-    if (!selection) {
-      return null;
-    }
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("draftMonth");
-    nextParams.delete("draftYear");
-    nextParams.set("month", String(selection.month));
-    nextParams.set("year", String(selection.year));
-    const queryString = nextParams.toString();
-    return queryString ? `${pathname}?${queryString}` : pathname;
-  };
-
-  const previousSnapshotHref = buildSnapshotHref(previousSnapshot);
-  const nextSnapshotHref = buildSnapshotHref(nextSnapshot);
+  const previousSnapshotHref = buildTimeMachineSnapshotHref(
+    pathname,
+    searchParams,
+    previousSnapshot,
+  );
+  const nextSnapshotHref = buildTimeMachineSnapshotHref(
+    pathname,
+    searchParams,
+    nextSnapshot,
+  );
   const nowDecisionHref = `${nowHref}#decision-summary`;
   const replayPreviousHref = !isHistorical ? previousSnapshotHref : null;
 

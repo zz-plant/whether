@@ -80,6 +80,7 @@ export function DiagnosticsSection({
   return (
     <>
       <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Decision detail">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Need deeper analysis?</p>
         <h2 className={tierTwoHeading}>Decision detail</h2>
         <p className="text-xs leading-5 text-slate-300">Want the backing detail? Expand the sections below to see what changed, what to watch, and why.</p>
         <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">

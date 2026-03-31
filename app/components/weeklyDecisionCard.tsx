@@ -1,32 +1,39 @@
 import type { ReactNode } from "react";
-import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
-import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
-import { YearAgoComparator } from "./weekly-card/YearAgoComparator";
+import { InputInfluenceSection } from "./weekly-card/InputInfluenceSection";
+import {
+  MoreContextDisclosureBody,
+} from "./weekly-card/MoreContextDisclosureBody";
+import { DecisionTransmissionRail } from "./weekly-card/DecisionTransmissionRail";
+import {
+  buildPolicyDetails,
+  buildRoleHref,
+  buildRoleTranslationCards,
+  getOwnerLabelForArea,
+  resolveRoleView,
+} from "./weekly-card/policySupport";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading } from "./weekly-card/shared";
+import {
+  compactInset,
+  disclosureSummaryClass,
+  sectionSpacing,
+  tierOneHeading,
+  tierOnePanel,
+} from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
 import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDecisionContent";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type {
-  FlipRiskMeterState,
-  InputInfluenceItem,
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
-import { buildCompactFreshnessMeta, shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
-import { buildThresholdMarkerState } from "../../lib/report/homeBriefPresentation";
-import { formatDateUTC } from "../../lib/formatters";
-import {
-  buildWeeklyCitationMetaLine,
-  buildTrustMarker,
-} from "../../lib/report/trustStatus";
+import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
+import { buildWeeklyCitationMetaLine, buildTrustMarker } from "../../lib/report/trustStatus";
 
 /**
  * Loop stage owner: presentation/artifact.
@@ -34,14 +41,6 @@ import {
  * This component renders decision-ready artifacts from view models and should
  * avoid deriving posture/threshold policy logic directly.
  */
-
-type WeeklyDecisionCardModel =
-  & WeeklyDecisionCardViewModel["status"]
-  & WeeklyDecisionCardViewModel["decision"]
-  & NonNullable<WeeklyDecisionCardViewModel["presentation"]>
-  & WeeklyDecisionCardViewModel["diagnostics"]
-  & WeeklyDecisionCardViewModel["history"]
-  & WeeklyDecisionCardViewModel["artifact"];
 
 export type WeeklyDecisionCardProps = {
   model: WeeklyDecisionCardViewModel;
@@ -55,513 +54,7 @@ export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
 // Legacy hero export retained for isolated section tests only.
 export const DecisionCallHeader = DecisionHeroSection;
 export { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
-
-
-const inputInfluenceToneClasses: Record<InputInfluenceItem["tone"], { badge: string; fill: string }> = {
-  warning: {
-    badge: "border-rose-400/35 bg-rose-500/10 text-rose-100",
-    fill: "bg-rose-300",
-  },
-  positive: {
-    badge: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
-    fill: "bg-emerald-300",
-  },
-  neutral: {
-    badge: "border-slate-600/75 bg-slate-950/60 text-slate-200",
-    fill: "bg-slate-300",
-  },
-};
-
-const clampSparklineValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-
-const buildSparklinePath = (values: number[], width: number, height: number) => {
-  if (values.length === 0) {
-    return "";
-  }
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const yDomainPadding = max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
-  const domainMin = min - yDomainPadding;
-  const domainMax = max + yDomainPadding;
-
-  return values.map((value, index) => {
-    const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width;
-    const normalized = (clampSparklineValue(value, domainMin, domainMax) - domainMin) / (domainMax - domainMin || 1);
-    const y = height - (normalized * height);
-    return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-  }).join(" ");
-};
-
-function InputInfluenceSparkline({
-  values,
-  tone,
-  label,
-}: {
-  values: number[];
-  tone: InputInfluenceItem["tone"];
-  label: string;
-}) {
-  if (values.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Recent path</p>
-        <p className="mt-1 text-[11px] text-slate-400">Recent movement unavailable.</p>
-      </div>
-    );
-  }
-
-  const strokeClass = tone === "warning"
-    ? "stroke-rose-300"
-    : tone === "positive"
-      ? "stroke-emerald-300"
-      : "stroke-slate-300";
-  const fillClass = tone === "warning"
-    ? "fill-rose-300"
-    : tone === "positive"
-      ? "fill-emerald-300"
-      : "fill-slate-300";
-  const chartWidth = 84;
-  const chartHeight = 22;
-  const path = buildSparklinePath(values, chartWidth, chartHeight);
-  const currentValue = values[values.length - 1];
-
-  return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Recent path</p>
-        <p className="text-[10px] text-slate-400">{values.length}-read view</p>
-      </div>
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="mt-2 h-7 w-full"
-        role="img"
-        aria-label={`${label} recent movement sparkline`}
-      >
-        <path d={path} fill="none" className={strokeClass} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        {path ? (
-          <circle
-            cx={values.length === 1 ? chartWidth / 2 : chartWidth}
-            cy={(() => {
-              const min = Math.min(...values);
-              const max = Math.max(...values);
-              const yDomainPadding = max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
-              const domainMin = min - yDomainPadding;
-              const domainMax = max + yDomainPadding;
-              const normalized = (clampSparklineValue(currentValue, domainMin, domainMax) - domainMin) / (domainMax - domainMin || 1);
-              return chartHeight - (normalized * chartHeight);
-            })()}
-            r="2.6"
-            className={fillClass}
-          />
-        ) : null}
-      </svg>
-    </div>
-  );
-}
-
-function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
-  if (items.length === 0) {
-    return null;
-  }
-
-  return (
-    <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="How inputs move this call">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className={tierOneHeading}>How inputs move this call</h2>
-          <p className="mt-1 text-xs leading-5 text-slate-300">Each driver card shows pressure, direction, and distance to the next threshold so likely drift is visible without reading the full rationale.</p>
-        </div>
-        <p className="text-[11px] text-slate-400">Higher share = bigger influence on the weekly call.</p>
-      </div>
-      <ul className="mt-3 grid gap-3 lg:grid-cols-2">
-        {items.map((item, index) => {
-          const tone = inputInfluenceToneClasses[item.tone];
-          const thresholdMarker = buildThresholdMarkerState(item.valueLabel, item.watchLabel);
-          const forceLabel = item.influencePercent >= 32 ? "High force" : item.influencePercent >= 18 ? "Medium force" : "Low force";
-
-          return (
-            <li key={item.key} className="rounded-xl border border-slate-700/70 bg-slate-950/65 p-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold text-slate-100">{index + 1}. {item.label}</p>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] ${tone.badge}`}>
-                      {item.pressureLabel}
-                    </span>
-                    <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
-                      {forceLabel}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-slate-300">{item.effectDetail}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Current read</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-100">{item.valueLabel}</p>
-                </div>
-              </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Direction</p>
-                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.trendArrow} {item.trendLabel}</p>
-                </div>
-                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Call share</p>
-                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.influencePercentLabel}</p>
-                </div>
-                <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Watch line</p>
-                  <p className="mt-1 text-xs font-semibold text-slate-100">{item.watchLabel}</p>
-                </div>
-                <InputInfluenceSparkline values={item.sparkline} tone={item.tone} label={item.label} />
-              </div>
-              <div className="mt-3">
-                <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                  <span>Current vs trigger</span>
-                  <span>{item.watchLabel}</span>
-                </div>
-                {thresholdMarker ? (
-                  <div className="relative mt-1.5 h-5 rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
-                    <span
-                      className="absolute inset-y-0 w-px bg-slate-500/90"
-                      style={{ left: `${thresholdMarker.thresholdPercent}%` }}
-                    />
-                    <span
-                      className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 ${tone.fill}`}
-                      style={{ left: `${thresholdMarker.currentPercent}%` }}
-                    />
-                  </div>
-                ) : (
-                  <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>
-                )}
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800/90" aria-hidden="true">
-                <div
-                  className={`h-full origin-left rounded-full ${tone.fill}`}
-                  style={{ transform: `scaleX(${Math.max(0.06, item.influencePercent / 100)})` }}
-                />
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </article>
-  );
-}
-
-type MoreContextDisclosureProps = {
-  startupClimateIndex: WeeklyDecisionCardModel["startupClimateIndex"];
-  evidenceItems: WeeklyDecisionCardModel["evidenceItems"];
-  whyThisCall: WeeklyDecisionCardModel["whyThisCall"];
-  memoryRail: WeeklyDecisionCardModel["memoryRail"];
-  historicalTimeline: WeeklyDecisionCardModel["historicalTimeline"];
-  historicalAnalogs: WeeklyDecisionCardModel["historicalAnalogs"];
-  lastYearComparison: WeeklyDecisionCardModel["lastYearComparison"];
-  macroOverlay: WeeklyDecisionCardModel["macroOverlay"];
-};
-
-export function MoreContextDisclosureBody({
-  startupClimateIndex,
-  evidenceItems,
-  whyThisCall,
-  memoryRail,
-  historicalTimeline,
-  historicalAnalogs,
-  lastYearComparison,
-  macroOverlay,
-}: MoreContextDisclosureProps) {
-  return (
-    <div className="space-y-2.5">
-      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
-        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>More context and continuity</span>
-          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-        </summary>
-        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-3">
-          <section aria-labelledby="why-this-posture-call">
-            <h3 id="why-this-posture-call" className={tierThreeHeading}>Why this posture call</h3>
-            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-3">
-              {whyThisCall.map((reason) => (
-                <li key={reason.label} className={`${compactInset} text-xs text-slate-200`}>
-                  <p className="font-semibold text-slate-300">{reason.label}</p>
-                  <p className="mt-1 leading-5 text-slate-300">{reason.detail}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="evidence-snapshot">
-            <h3 id="evidence-snapshot" className={tierThreeHeading}>Evidence snapshot</h3>
-            <ul className="mt-1.5 grid gap-2 lg:grid-cols-3">
-              {evidenceItems.map((item) => (
-                <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
-                  <p className="font-semibold text-slate-100">{item.title}</p>
-                  <p className="text-[11px] text-slate-400">Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}</p>
-                  <ul className="space-y-1 text-[11px] text-slate-300">
-                    {item.supportingBullets.slice(0, 3).map((bullet) => (
-                      <li key={`${item.key}-${bullet}`}>• {bullet}</li>
-                    ))}
-                  </ul>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="startup-climate-index-context">
-            <h3 id="startup-climate-index-context" className={tierThreeHeading}>Startup Climate Index (context)</h3>
-            <p className="mt-1.5 text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
-            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
-              {startupClimateIndex.breakdown.map((item) => (
-                <li key={item.label} className="space-y-1 text-xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <span>{item.label}</span>
-                    <span className="font-semibold text-slate-100">{item.score}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-slate-800">
-                    <div
-                      className="h-1.5 w-full origin-left rounded-full bg-sky-300/70"
-                      style={{ transform: `scaleX(${Math.max(0.05, Math.min(1, item.score / 100))})` }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="posture-history-and-overlays">
-            <h3 id="posture-history-and-overlays" className={tierThreeHeading}>Posture history and overlays</h3>
-            <div className="mt-1.5 space-y-2">
-              <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
-              {lastYearComparison ? <YearAgoComparator comparison={lastYearComparison} /> : null}
-              {historicalAnalogs.length > 0 ? (
-                <div>
-                  <p className={tierThreeHeading}>Closest historical analogs</p>
-                  <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
-                    {historicalAnalogs.map((analog) => (
-                      <li key={`${analog.date}-${analog.similarityScore}`} className={`${compactInset} text-xs text-slate-200`}>
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="font-semibold text-slate-100">{formatDateUTC(analog.date)}</p>
-                          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
-                            {Math.round(analog.similarityScore * 100)}% match
-                          </span>
-                        </div>
-                        <p className="mt-1 leading-5 text-slate-300">{analog.implication}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <div>
-                <p className={tierThreeHeading}>Historical memory rail</p>
-                <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
-                  {memoryRail.map((item) => (
-                    <li key={`${item.label}-${item.posture}`} className={`${compactInset} text-xs text-slate-200`}>
-                      <p className="text-slate-400">{item.label}</p>
-                      <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <ul className="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-                {macroOverlay.map((item) => (
-                  <li key={item.label} className={compactInset}>
-                    <p className="font-semibold text-slate-200">{item.label}</p>
-                    <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        </div>
-      </details>
-    </div>
-  );
-}
-
-type DecisionTransmissionRailProps = {
-  actionNow: string;
-  guardrail: string;
-  flipWhen: string;
-  citationMetaLine: string;
-  citation: string;
-  actions?: ReactNode;
-};
-
-function DecisionTransmissionRail({
-  actionNow,
-  guardrail,
-  flipWhen,
-  citationMetaLine,
-  citation,
-  actions,
-}: DecisionTransmissionRailProps) {
-  const showMicroRows = shouldSplitDecisionConditionRows({
-    trigger: guardrail,
-    reversal: flipWhen,
-  });
-
-  return (
-    <article id="share-ready-artifact" className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className={tierOneHeading}>Transmit this call</h2>
-        <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Share-ready
-        </span>
-      </div>
-      <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact preview</p>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">
-            Ready to share
-          </span>
-        </div>
-        <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/75 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Whether weekly call</p>
-          <div className="mt-2 space-y-2 text-sm">
-            <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-emerald-200">Action</span>
-              {actionNow}
-            </p>
-            {showMicroRows ? (
-              <div className="space-y-2 rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
-                <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</p>
-                  <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
-                </div>
-                <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</p>
-                  <p className="mt-1 text-sm text-slate-100">{flipWhen}</p>
-                </div>
-              </div>
-            ) : (
-              <p className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
-                <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">Trigger</span>
-                {guardrail}
-                <span className="ml-2 mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">Reversal</span>
-                {flipWhen}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Share &amp; cite</p>
-        <p className="mt-1 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
-        <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {actions}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-const ownerLabelByArea: Record<BoundedDecisionRule["area"], string> = {
-  hiring: "CEO",
-  "product-tempo": "CPO",
-  "capital-raising": "CEO / Finance",
-  "burn-discipline": "CFO",
-  "expansion-bets": "CEO",
-};
-
-const extractThresholdChips = (text: string): string[] => {
-  const match = text.match(/(tightness|risk appetite)\s*(>=|<=|>|<)\s*(-?\d+(?:\.\d+)?)/i);
-
-  if (!match) {
-    return [];
-  }
-
-  const metricLabel = match[1].toLowerCase() === "risk appetite" ? "Risk appetite" : "Tightness";
-  return [`Metric ${metricLabel}`, `Trigger ${match[2]} ${match[3]}`];
-};
-
-const buildPolicyDetails = ({
-  rule,
-  summary,
-  fallbackOwner,
-}: {
-  rule?: BoundedDecisionRule;
-  summary: string;
-  fallbackOwner: string;
-}) => {
-  if (!rule) {
-    return {
-      summary,
-      chips: [`Owner ${fallbackOwner}`],
-    };
-  }
-
-  const pauseChips = extractThresholdChips(rule.pauseTrigger);
-  const firstFlip = rule.flipConditions[0];
-
-  return {
-    summary,
-    chips: [
-      ...(pauseChips.length > 0
-        ? pauseChips
-        : firstFlip
-          ? [
-            `Metric ${firstFlip.metric === "riskAppetite" ? "Risk appetite" : "Tightness"}`,
-            `Trigger ${firstFlip.operator} ${firstFlip.value.toFixed(1)}`,
-          ]
-          : []),
-      `Owner ${ownerLabelByArea[rule.area]}`,
-    ],
-  };
-};
-
-const buildRoleTranslationCards = ({
-  decisionRules,
-}: {
-  decisionRules: BoundedDecisionRule[];
-}) => {
-  const financeRule = decisionRules.find((rule) => rule.area === "burn-discipline");
-  const productRule = decisionRules.find((rule) => rule.area === "product-tempo");
-
-  return [
-    {
-      id: "finance" as const,
-      label: "Finance",
-      implication: financeRule?.recommendation ?? "Translate posture into approval limits and commitment discipline.",
-      doLine: financeRule?.doNow[0] ?? "Keep new fixed-cost commitments reversible and staged.",
-      holdLine: financeRule?.avoidNow[0] ?? "Do not approve multi-quarter spend without clear payback proof.",
-    },
-    {
-      id: "product" as const,
-      label: "Product",
-      implication: productRule?.recommendation ?? "Translate posture into roadmap pacing and scope discipline.",
-      doLine: productRule?.doNow[0] ?? "Prioritize near-term customer value and reversible roadmap bets.",
-      holdLine: productRule?.avoidNow[0] ?? "Do not expand long-payback roadmap scope without stronger proof.",
-    },
-  ];
-};
-
-const resolveRoleView = (
-  role: string | undefined,
-): "finance" | "product" => (role === "product" ? "product" : "finance");
-
-const buildRoleHref = (
-  role: "finance" | "product",
-  searchParams?: Record<string, string | undefined>,
-) => {
-  const params = new URLSearchParams();
-
-  Object.entries(searchParams ?? {}).forEach(([key, value]) => {
-    if (typeof value === "string" && value.length > 0 && key !== "role") {
-      params.set(key, value);
-    }
-  });
-
-  if (role !== "finance") {
-    params.set("role", role);
-  }
-
-  const query = params.toString();
-  return query.length > 0 ? `/?${query}#weekly-call-core` : "/#weekly-call-core";
-};
+export { MoreContextDisclosureBody } from "./weekly-card/MoreContextDisclosureBody";
 
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const { model, actions, diagnosticsLane, searchParams } = props;
@@ -683,7 +176,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       chips: [
         `Metric ${canonicalFlipConditions[0].metric === "riskAppetite" ? "Risk appetite" : "Tightness"}`,
         `Trigger ${canonicalFlipConditions[0].operator} ${canonicalFlipConditions[0].value.toFixed(1)}`,
-        `Owner ${ownerLabelByArea[canonicalFlipConditions[0].area]}`,
+        `Owner ${getOwnerLabelForArea(canonicalFlipConditions[0].area)}`,
       ],
     }
     : buildPolicyDetails({
