@@ -3,12 +3,11 @@ import { describe, it } from "node:test";
 import { buildSearchIndex, groupSearchResultsByJob, searchIndex } from "../lib/search/searchIndex";
 
 describe("search index", () => {
-  it("aggregates toolkit, failure-mode, concept, and doc entities", () => {
+  it("aggregates toolkit, failure-mode, and doc entities", () => {
     const entities = buildSearchIndex();
 
     assert.ok(entities.some((entity) => entity.type === "toolkit"));
     assert.ok(entities.some((entity) => entity.type === "failure-mode"));
-    assert.ok(entities.some((entity) => entity.type === "concept"));
     assert.ok(entities.some((entity) => entity.type === "doc"));
   });
 

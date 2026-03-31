@@ -171,6 +171,7 @@ export default async function OperationsPage({
     resourceSupportingPages.quarterlyCapitalPostureMemoExample,
     resourceSupportingPages.decisionShieldOverview,
   ] as const;
+  const failureModes = snapshot.homeBriefModel.failureModes ?? [];
   const buildAssistHref = (assist: "decision" | "evidence" | "trust" | "share", hash: string) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -309,6 +310,36 @@ export default async function OperationsPage({
             <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with one-line term translation for mixed-literacy audiences.</p>
             <p><span className="font-semibold text-slate-50">Board and governance artifacts</span> = secondary packaging when the default weekly brief is not enough.</p>
           </PersistedAssistPanel>
+        </div>
+      </section>
+
+      <section id="ops-failure-patterns" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-failure-patterns-title">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Risk checks</p>
+          <h2 id="ops-failure-patterns-title" className="text-lg font-semibold text-slate-100">Watch the false-signal patterns before you approve the plan</h2>
+          <p className="text-sm text-slate-300">These warnings now live inside Planning so operators can pressure-test the weekly plan before they widen into deeper trust or decision routing.</p>
+        </div>
+        {failureModes.length === 0 ? (
+          <div className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-200">
+            No active compact false-signal warning. Keep the normal guardrails in force and reopen Trust only if freshness or confidence degrades.
+          </div>
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {failureModes.map((warning) => (
+              <article key={warning.id} className="weather-surface rounded-xl border px-4 py-4">
+                <p className="text-sm font-semibold text-slate-100">{warning.warning}</p>
+                <p className="mt-2 text-sm text-slate-300">{warning.mitigationCheck}</p>
+              </article>
+            ))}
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Link href="#ops-playbook" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            Recheck guardrails
+          </Link>
+          <Link href="/method#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Open Trust risk checks
+          </Link>
         </div>
       </section>
 

@@ -261,8 +261,8 @@ export default async function MethodPage() {
             </article>
           ))}
           <article className="weather-hub-link-card space-y-2">
-            <h2 className="text-lg font-semibold text-slate-100">Optional context only</h2>
-            <p className="text-sm text-slate-300">Use failure-mode diagnostics only after the on-page trust check is complete and someone still needs conceptual context.</p>
+            <h2 className="text-lg font-semibold text-slate-100">Revisit and false-signal checks</h2>
+            <p className="text-sm text-slate-300">Keep the active warning patterns here inside Trust so reviewers can see what would invalidate this week&apos;s call without opening a separate library.</p>
             <Link href="#revisit-call" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
               Open revisit triggers
             </Link>
@@ -318,19 +318,14 @@ export default async function MethodPage() {
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Failure-mode checks</p>
-            {warnings.length === 0 ? (
-              <p className="text-sm text-slate-300">No active compact failure-mode warning. Continue with staged approvals.</p>
-            ) : (
-              <ul className="space-y-3 text-sm text-slate-200">
-                {warnings.map((warning) => (
-                  <li key={warning.id} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                    <p className="font-semibold text-slate-100">{warning.warning}</p>
-                    <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Escalation rule</p>
+            <p className="text-sm text-slate-200">
+              If any revisit trigger or false-signal warning hits, move back to the weekly brief only after you confirm source freshness and restate the bounded approval rule.
+            </p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Recheck freshness</Link>
+              <Link href="#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Open risk checks</Link>
+            </div>
           </article>
         </div>
       </HubSection>
@@ -359,18 +354,38 @@ export default async function MethodPage() {
 
       <HubSection
         id="revisit-call"
-        title="When to distrust or revisit this call"
+        title="Revisit triggers and false-signal risks"
         className="scroll-mt-28"
       >
-        <ul className="space-y-3 text-sm text-slate-200">
-          {revisitBullets.map((item) => (
-            <li key={item.label} className="weather-hub-card rounded-xl px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
-              <p className="mt-1">{item.detail}</p>
-              <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Review evidence</Link>
-            </li>
-          ))}
-        </ul>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <article className="weather-hub-card space-y-3 rounded-xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>
+            {warnings.length === 0 ? (
+              <p className="text-sm text-slate-300">No active compact false-signal warning. Continue with staged approvals and keep the normal flip trigger in view.</p>
+            ) : (
+              <ul className="space-y-3 text-sm text-slate-200">
+                {warnings.map((warning) => (
+                  <li key={warning.id} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                    <p className="font-semibold text-slate-100">{warning.warning}</p>
+                    <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+          <article className="weather-hub-card rounded-xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Revisit checklist</p>
+            <ul className="mt-3 space-y-3 text-sm text-slate-200">
+              {revisitBullets.map((item) => (
+                <li key={item.label} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
+                  <p className="mt-1">{item.detail}</p>
+                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Review evidence</Link>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
       </HubSection>
 
       <HubSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Copy this into Slack, notes, or the meeting agenda." className="scroll-mt-28">

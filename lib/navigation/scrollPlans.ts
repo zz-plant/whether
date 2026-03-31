@@ -73,12 +73,17 @@ export const operationsScrollPlan: ScrollPlan = {
   eyebrow: "Execution path",
   title: "Use Planning as a controlled review sequence",
   description:
-    "Approve the weekly plan first, then validate guardrails, finance posture, sharing output, and only then open deeper escalation paths if needed.",
+    "Approve the weekly plan first, pressure-test false-signal risks, then validate guardrails, finance posture, sharing output, and only then open deeper escalation paths if needed.",
   items: [
     {
       href: "#ops-monthly-action-summary",
       label: "Plan",
       summary: "Confirm what to approve, hold, or revisit this cycle.",
+    },
+    {
+      href: "#ops-failure-patterns",
+      label: "Risk checks",
+      summary: "Pressure-test active false-signal patterns before you widen approvals.",
     },
     {
       href: "#ops-playbook",

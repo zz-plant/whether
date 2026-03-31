@@ -36,6 +36,7 @@ export const operationsDeveloperReferenceLinks = [
 export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
   plan: [
     { href: "#ops-monthly-action-summary", label: "Start here" },
+    { href: "#ops-failure-patterns", label: "Risk checks" },
     { href: "#ops-playbook", label: "Guardrails" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
     { href: "#ops-export-briefs", label: "Share brief" },

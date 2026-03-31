@@ -1,7 +1,6 @@
 import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCatalog";
-import { productConceptArticles } from "../productCanon";
 
-export type SearchEntityType = "toolkit" | "failure-mode" | "concept" | "doc";
+export type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
 export type SearchPrimaryHub = "/signals" | "/operations" | "/decide" | "/method";
 
@@ -207,34 +206,12 @@ export const buildSearchIndex = (): SearchEntity[] => {
     keywords: [failureMode.trigger, ...failureMode.symptoms, ...failureMode.firstMoves],
   }));
 
-  const conceptEntities: SearchEntity[] = productConceptArticles.map((concept) => ({
-    id: `concept-${concept.slug}`,
-    type: "concept",
-    job: "risk",
-    routePriority: 1,
-    recommendedHubHref: "/decide",
-    recommendedHubLabel: "Open Decision Tools",
-    title: concept.title,
-    href: `/decide#guided-translation`,
-    summary: concept.summary,
-    intentLabel: "Translate weekly call with concept context",
-    keywords: [
-      concept.author,
-      concept.focus,
-      concept.audience,
-      concept.era,
-      concept.whyItMattered,
-      concept.demystificationPrompt,
-    ],
-  }));
-
-  return [...toolkitEntities, ...failureModeEntities, ...conceptEntities, ...keyDocs];
+  return [...toolkitEntities, ...failureModeEntities, ...keyDocs];
 };
 
 export const searchEntityTypeLabels: Record<SearchEntityType, string> = {
   toolkit: "Toolkits to run",
   "failure-mode": "Risk patterns to diagnose",
-  concept: "Framework context",
   doc: "Workflow surfaces",
 };
 

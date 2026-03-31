@@ -22,6 +22,7 @@ Supporting surfaces are intentionally subordinate:
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary libraries such as `/guides`, `/toolkits`, `/posture`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
+- `/guides` now acts as a compatibility redirect into query-selected translation states on `/decide`, so role and stage translation live inside the canonical Decision Tools workflow rather than on a parallel library page.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
 - `/concepts` and `/learn/failure-modes` now permanently redirect into canonical decision/trust workflows rather than acting as independently indexable content hubs.
@@ -130,8 +131,8 @@ The About page explicitly frames Whether as a small independent operator tool ra
 
 ### 1.6 Trust hub (/method) and formula reference
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
-confidence, freshness, source coverage, and revisit conditions, then links out to
-`/method#formula-reference` and `/learn/failure-modes`. The legacy `/sources` and `/confidence`
+confidence, freshness, source coverage, and revisit conditions, then keeps active false-signal
+warnings inside the same Trust surface before linking out to `/method#formula-reference`. The legacy `/sources` and `/confidence`
 entry URLs now redirect at the routing layer back into the canonical Trust anchors instead of acting
 as parallel trust pages.
 The page now opens with a binary trust verdict (`safe to use`, `use cautiously`, or historical-only)
@@ -140,7 +141,7 @@ before the detailed trust workflow so operators can decide whether a deeper audi
 `/methodology` now permanently redirects to `/method#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
 The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
-Failure-mode diagnostics are now handled through the Trust workflow rather than as a standalone indexable library.
+Failure-mode diagnostics are now handled through the Trust and Planning workflows rather than as a standalone indexable library. Planning now exposes compact false-signal checks before guardrail approval so operators can pressure-test the weekly plan without leaving the core loop.
 
 ### 1.7 Share-preview assets for canonical hubs
 High-priority hub routes now ship dedicated static SVG social preview assets for:

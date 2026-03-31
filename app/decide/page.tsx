@@ -19,6 +19,7 @@ import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
 import { ReportShell } from "../components/reportShell";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
+import { buildGuidedTranslationHref, GuidedTranslationPanels, type GuidedTranslationSearchParams } from "./components/guidedTranslationPanels";
 
 const featuredStakeholderSlugs = [
   "founders-ceos",
@@ -35,7 +36,11 @@ export const metadata: Metadata = buildPageMetadata({
   imagePath: "/social/decide.svg",
 });
 
-export default async function DecidePage() {
+export default async function DecidePage({
+  searchParams,
+}: {
+  searchParams?: Promise<GuidedTranslationSearchParams>;
+}) {
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
     ...buildBreadcrumbList(
@@ -45,6 +50,7 @@ export default async function DecidePage() {
       ]),
     ),
   };
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/decide" });
   const { homeBriefModel } = snapshot;
   const recommendedSituation = homeBriefModel.weeklyMovement.direction === "defensive"
@@ -215,7 +221,7 @@ export default async function DecidePage() {
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
                   key={guide.slug}
-                  href={{ pathname: "/guides", query: { stakeholder: guide.slug } }}
+                  href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
                   className="weather-hub-link-card space-y-1"
                 >
                   <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
@@ -225,7 +231,7 @@ export default async function DecidePage() {
               {recommendedStageGuides.map((stage) => (
                 <Link
                   key={stage.slug}
-                  href={{ pathname: "/guides", query: { stage: stage.slug } }}
+                  href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
                   className="weather-hub-link-card space-y-1"
                 >
                   <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
@@ -238,6 +244,7 @@ export default async function DecidePage() {
             </Link>
           </article>
         </div>
+        <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </HubSection>
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">

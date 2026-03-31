@@ -14,19 +14,11 @@ type QuickAction = {
   label: string;
 };
 
-type FeaturedConcept = {
-  slug: string;
-  focus: string;
-  title: string;
-  audience: string;
-};
-
 type HomeFirstRunOrientationProps = {
   changeSummary: string;
   decisionNow: string;
   destinations: OrientationDestination[];
   quickActions?: QuickAction[];
-  featuredConcepts?: FeaturedConcept[];
   currentPath?: string;
 };
 
@@ -56,7 +48,6 @@ export function HomeFirstRunOrientation({
   decisionNow,
   destinations,
   quickActions = [],
-  featuredConcepts = [],
   currentPath = "/",
 }: HomeFirstRunOrientationProps) {
   const [dismissed, setDismissed] = useState(getBootstrappedDismissedState);
@@ -186,26 +177,6 @@ export function HomeFirstRunOrientation({
               <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
                 Inspect full evidence context
               </Link>
-            </div>
-          </section>
-
-          <section className="space-y-4" aria-label="Decision concept links">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
-              <h2 className="text-base font-semibold text-slate-100">Use these quick playbooks before finalizing this week&apos;s plan</h2>
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              {featuredConcepts.map((concept) => (
-                <Link
-                  key={concept.slug}
-                  href="/decide#guided-translation"
-                  className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
-                  <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
-                  <p className="text-xs text-slate-300">{concept.audience}</p>
-                </Link>
-              ))}
             </div>
           </section>
         </div>
