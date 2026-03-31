@@ -4,6 +4,54 @@ Whether (Regime Station) is a Next.js App Router product that turns Treasury mac
 operational guidance. The system is organized around a small number of deterministic pipelines:
 fetch/normalize data, score the regime, generate guidance, and render reports.
 
+## One-screen architecture diagram
+```mermaid
+flowchart LR
+  subgraph Ingestion["1) Ingestion + normalization"]
+    A1["Treasury API + macro sources"] --> A2["treasuryClient.ts\n(snapshot-aware fetch + source metadata)"]
+    A2 --> A3["treasuryNormalizer.ts\ncanonical typed payloads"]
+    A3 --> A4["sensors.ts\ntimestamped readings + derived measures"]
+  end
+
+  subgraph Decisioning["2) Regime + bounded decisioning"]
+    A4 --> B1["regimeEngine.ts\nregime score + constraints"]
+    B1 --> B2["playbook.ts\nposture recommendation"]
+    U1["Operator decision input\n(lifecycle + category + action)"] --> B3["decisionShield.ts\naction + threshold + reversal checks"]
+    B1 --> B3
+  end
+
+  subgraph Artifact["3) Parallel artifact assembly"]
+    B1 --> C1["report/reportData.ts\nreport dataset + trust framing"]
+    B2 --> C1
+    B1 --> C2["summary/* builders\nweekly/monthly/quarterly/yearly structured sections"]
+    B2 --> C2
+    C1 --> C4["app/* routes\nhome brief + signals + operations"]
+    C2 --> C3["app/api/*\nweekly/monthly/quarterly/yearly payloads"]
+    C2 --> C4
+    B3 --> C4
+    C3 --> C5["Transmission artifacts\nSlack-ready copy + meeting citation paths"]
+    C4 --> C5
+  end
+
+  subgraph Resilience["Trust + continuity overlays"]
+    D1["snapshot_fallback.json"] --> A2
+    D2["time_machine_cache.json"] --> C1
+    D3["summary_archive.json"] --> C2
+    D4["report/trustStatus.ts\nfreshness + fallback state"] --> C4
+    D4 --> C3
+  end
+```
+
+### Decision transmission path (operator view)
+```mermaid
+flowchart TD
+  W["What changed this week?"] --> P["Recommended posture"]
+  P --> A["Choose action\n(team decision input)"]
+  A --> D["Decision shield verdict\nsafe/risky/dangerous + reversal trigger"]
+  D --> R["Revisit queue\nwhat to re-open now"]
+  R --> S["Shareable artifact\nAPI/brief/export copy"]
+```
+
 ## Runtime data flow
 1. **Treasury fetch** via `lib/treasury/treasuryClient.ts`, with snapshot fallback and
    source metadata attached.
