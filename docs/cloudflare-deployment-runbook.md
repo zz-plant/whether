@@ -38,6 +38,12 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 `deploy:cloudflare` builds against the top-level Wrangler config and then runs `vinext deploy --skip-build`, so the build artifact and deploy target stay on the same environment contract.
 
+### Current toolchain notes
+
+- Tailwind now runs on v4 via [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) and [`postcss.config.js`](/Users/kanav/Documents/GitHub/whether-app/postcss.config.js) using `@tailwindcss/postcss`; the legacy `tailwind.config.ts` file was removed during the CSS-first migration.
+- Keep `vinext` pinned to `0.0.30` for now. A local validation run on `0.0.38` improved compatibility reporting but regressed the production build parser path, so do not bump that pin without re-running `bun run build` and `bun run check:vinext`.
+- Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
+
 ## Preview lane
 
 The preview lane now lives in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml) under `env.preview`. This keeps preview and production under one config file while still letting Wrangler isolate the deployment target.

@@ -6,7 +6,7 @@ This document consolidates delivery status across product roadmap audits, known 
 
 - Milestones 5–8 are largely complete, with one remaining UX item.
 - Summary-system follow-ups are complete.
-- Stack modernization cut over to Vinext on Cloudflare Workers; warning cleanup and long-tail validation remain open.
+- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, with framework-core upgrades and broader typecheck drift still open.
 
 ## Product roadmap (milestones 5–8)
 
@@ -44,11 +44,11 @@ This document consolidates delivery status across product roadmap audits, known 
 
 ### Mid-term checklist
 - [x] Run Wave 1 framework-core production migration.
-- [ ] Run Wave 2 Tailwind v4 migration with visual QA sign-off.
-- [ ] Run Wave 3 supporting dependency upgrades.
+- [x] Run Wave 2 Tailwind v4 migration with visual QA sign-off.
+- [x] Run Wave 3 supporting dependency upgrades.
 - [x] Add CI Pages-targeted build gating and compatibility evidence requirement.
 - [x] Add/expand data fallback and metadata parity tests.
-- [ ] Publish post-upgrade runbook updates and ownership handoff notes.
+- [x] Publish post-upgrade runbook updates and ownership handoff notes.
 
 
 ### Baseline command outputs (2026-03-12)
@@ -72,6 +72,16 @@ This document consolidates delivery status across product roadmap audits, known 
 | `bun test tests/cliContracts.test.ts tests/whetherCli.test.ts tests/weeklyCardSectionDiagnostics.test.tsx` | Pass | 31 tests passed; cutover-sensitive regression set clean. |
 | `bun run build` | Pass with known upstream warnings | Vinext build completes; remaining warnings are Rolldown/Vinext diagnostics. |
 | `bun run deploy:cloudflare:dry-run` | Pass | Production Worker config dry-run succeeds. |
+
+### Tailwind v4 + support dependency verification (2026-03-31)
+
+| Command | Outcome | Notes |
+| --- | --- | --- |
+| `bun run lint` | Pass | Tailwind v4 CSS-first migration and runtime telemetry swap lint cleanly. |
+| `bun test tests/reportShellSections.test.tsx tests/weeklyDecisionCardLayout.test.tsx tests/homeWeeklyComposition.test.tsx tests/navigationInformationArchitecture.test.ts tests/reportShellNavigation.test.tsx tests/navigationOrientationBadge.test.tsx tests/staticHubNav.test.tsx tests/nextStepRail.test.tsx tests/monthlySummary.test.ts tests/summaryCopyRenderer.test.ts tests/cadenceSummaryCardAdapter.test.tsx tests/apiSummaryContracts.test.ts tests/summaryArchive.test.ts tests/summaryArchiveMigration.test.ts` | Pass | 40/40 targeted regression tests passed after the dependency upgrade set. |
+| `bun run build` | Pass with known upstream warnings | Vinext production build succeeds on Tailwind v4. Rolldown warning classes remain expected noise. |
+| `bun run check:vinext` | Pass (98% compatible) | `next/web-vitals` issue removed by switching to `web-vitals`; only `next/font/google` remains partial. |
+| `bun run typecheck` | Fail | Pre-existing route-type/test drift remains unresolved and is not introduced by the Tailwind/support-dependency upgrade slice. |
 
 ## Proposed next milestone (not started)
 
