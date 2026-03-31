@@ -7,32 +7,45 @@ fetch/normalize data, score the regime, generate guidance, and render reports.
 ## One-screen architecture diagram
 ```mermaid
 flowchart LR
-  subgraph Ingestion["Ingestion + normalization"]
-    A1["Treasury API + macro sources"] --> A2["treasuryClient.ts\n(snapshot-aware fetch)"]
-    A2 --> A3["treasuryNormalizer.ts"]
-    A3 --> A4["sensors.ts\n(timestamped readings)"]
+  subgraph Ingestion["1) Ingestion + normalization"]
+    A1["Treasury API + macro sources"] --> A2["treasuryClient.ts\n(snapshot-aware fetch + source metadata)"]
+    A2 --> A3["treasuryNormalizer.ts\ncanonical typed payloads"]
+    A3 --> A4["sensors.ts\ntimestamped readings + derived measures"]
   end
 
-  subgraph Decisioning["Regime + decisioning"]
-    A4 --> B1["regimeEngine.ts\nscoring + climate classification"]
-    B1 --> B2["playbook.ts\nrecommended operating posture"]
-    B2 --> B3["decisionShield.ts\nbounded action validation"]
+  subgraph Decisioning["2) Regime + bounded decisioning"]
+    A4 --> B1["regimeEngine.ts\nregime score + constraints"]
+    B1 --> B2["playbook.ts\nposture recommendation"]
+    B2 --> B3["decisionShield.ts\naction + threshold + reversal checks"]
   end
 
-  subgraph Artifact["Brief + artifact assembly"]
-    B1 --> C1["report/reportData.ts\nhome brief model inputs"]
+  subgraph Artifact["3) Brief + artifact assembly"]
+    B1 --> C1["report/reportData.ts\nweekly decision model"]
     B2 --> C1
     B3 --> C1
-    C1 --> C2["summary/* builders\nweekly/monthly/quarterly/yearly"]
-    C2 --> C3["API routes under app/api/*\n(copy + structured + provenance)"]
-    C2 --> C4["App Router UI under app/*\nweekly brief + operations surfaces"]
+    C1 --> C2["summary/* builders\nstructured sections + copy"]
+    C2 --> C3["app/api/*\nweekly/monthly/quarterly/yearly payloads"]
+    C2 --> C4["app/* routes\nhome brief + signals + operations"]
+    C3 --> C5["Transmission artifacts\nSlack-ready copy + meeting citation paths"]
+    C4 --> C5
   end
 
-  subgraph Resilience["Trust + continuity"]
+  subgraph Resilience["Trust + continuity overlays"]
     D1["snapshot_fallback.json"] --> A2
     D2["time_machine_cache.json"] --> C2
     D3["summary_archive.json"] --> C2
+    D4["report/trustStatus.ts\nfreshness + fallback state"] --> C4
+    D4 --> C3
   end
+```
+
+### Decision transmission path (operator view)
+```mermaid
+flowchart TD
+  W["What changed this week?"] --> P["Recommended posture"]
+  P --> D["Bounded decision\n(action + trigger + reversal)"]
+  D --> R["Revisit queue\nwhat to re-open now"]
+  R --> S["Shareable artifact\nAPI/brief/export copy"]
 ```
 
 ## Runtime data flow
