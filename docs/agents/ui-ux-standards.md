@@ -74,3 +74,15 @@
   - `ghost`: tertiary button-style navigation (`weather-button`) for lower-emphasis actions.
   - `inline`: textual back-navigation links that still preserve focus-visible and touch-manipulation rules.
 - Keep touch/manipulation and min-height behavior intact; only add `className` overrides for layout positioning (e.g., `mt-auto`, `justify-center`, icon gaps), not to remove focus affordances.
+
+## XI. Report Shell Hierarchy
+- Scope: shared report-shell routes such as `/signals`, `/operations`, `/decide`, and `/method`.
+- MUST: get the first page-specific task block on screen quickly. Shared chrome should orient the user, not delay the workflow.
+- MUST: keep pre-content chrome to distinct tiers only:
+  - global route context,
+  - optional support-path navigation,
+  - one page intro block,
+  - then the first task block.
+- NEVER: restate the same posture, trust, or route-state information in multiple stacked cards before the first task block.
+- MUST: treat support-path navigation as secondary. It should help the user leave the page when needed, not compete visually with the current page’s primary decision or action.
+- MUST: on mobile, avoid stacked shell layers that force the user through repeated state summaries before they reach the page content.
