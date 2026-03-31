@@ -84,6 +84,15 @@ Runtime expectations:
 - Agent workflow: [AGENTS.md](AGENTS.md)
 - Documentation map: [docs/README.md](docs/README.md)
 
+## README guide
+
+Use these README files as entrypoints, then move to the linked canonical docs:
+
+- `README.md` (this file): repo mission, local commands, and high-signal code areas.
+- `docs/README.md`: canonical documentation map and source-of-truth boundaries.
+- `docs/agents/README.md`: task-routed instructions for coding agents.
+- `docs/developer/README.md`: external integration path for API and delivery workflows.
+
 ---
 
 ## High-signal repo areas

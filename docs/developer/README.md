@@ -48,6 +48,15 @@ Read `cli-fallback.md`.
 - **Operational safety**: block sends when `/api/health` is degraded or cadence alignment is broken
 - **Artifact quality**: keep the output shareable and citeable downstream
 
+## Fast contract sanity check
+
+Use this one-liner before wiring any new downstream consumer:
+
+```bash
+curl -fsS "http://localhost:3000/api/agent?cadence=weekly" \
+  | jq '{generatedAt, recordDateLabel, version, summaryHash, posture: .posture.label}'
+```
+
 ## Source-of-truth boundaries
 
 These docs cover external integration behavior.
