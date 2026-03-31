@@ -4,7 +4,7 @@ import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubSection } from "../components/hubPageShell";
-import { BeginnerGlossaryPanel } from "../components/appendixSections";
+import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";

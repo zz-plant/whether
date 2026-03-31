@@ -16,11 +16,11 @@ import {
   operationsSectionLinks,
 } from "../../lib/navigation/operationsNavigation";
 import {
-  FinanceStrategyPanel,
-  MonthlyActionSummaryPanel,
   OperatorRequestsPanel,
-  PlaybookPanel,
-} from "../components/appendixSections";
+} from "../components/appendix/ReferencePanels";
+import { MonthlyActionSummaryPanel } from "../components/appendix/monthlyActionSummaryPanel";
+import { PlaybookPanel } from "../components/appendix/playbookPanel";
+import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";

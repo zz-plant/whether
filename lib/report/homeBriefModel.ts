@@ -275,7 +275,7 @@ export type WeeklyDecisionCardViewModel = {
     transitionProbabilities: Record<ForecastRegimeLabel, number>;
     decisionRules: BoundedDecisionRule[];
     decisionMatrix?: DecisionMatrixPayload;
-    startupVariantPolicy?: StartupVariantPolicy;
+    startupVariantPolicy: StartupVariantPolicy;
     actionStripItems?: ActionStripItem[];
     roleAwareTemplates: RoleAwareOperatingTemplate[];
     executiveOperationalStance: { expand: string[]; avoid: string[] };
