@@ -9,8 +9,6 @@ import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
 import {
   evaluateDecision,
   formatDecisionAction,
@@ -28,6 +26,7 @@ import {
   type ClipboardCopyState,
 } from "../../components/useClipboardCopy";
 import { createClientId } from "./clientId";
+import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
 import {
   actionOptions,
   buildShareText,
@@ -38,6 +37,24 @@ import {
   verdictStyles,
 } from "./decisionShieldUtils";
 
+const decisionShieldFieldConfigs = {
+  lifecycle: {
+    queryParam: "lifecycle",
+    parse: (value: string | null) => parseParam(value, lifecycleOptions),
+    serialize: (value: LifecycleStage) => value,
+  },
+  category: {
+    queryParam: "category",
+    parse: (value: string | null) => parseParam(value, categoryOptions),
+    serialize: (value: DecisionCategory) => value,
+  },
+  action: {
+    queryParam: "action",
+    parse: (value: string | null) => parseParam(value, actionOptions),
+    serialize: (value: DecisionAction) => value,
+  },
+} as const;
+
 export const DecisionShieldPanel = ({
   assessment,
   provenance,
@@ -45,9 +62,18 @@ export const DecisionShieldPanel = ({
   assessment: RegimeAssessment;
   provenance: DataProvenance;
 }) => {
-  const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
-  const [category, setCategory] = useState<DecisionCategory>("HIRING");
-  const [action, setAction] = useState<DecisionAction>("HIRE");
+  const {
+    state: { lifecycle, category, action },
+    setField,
+  } = usePersistedQuerySelections({
+    initialState: {
+      lifecycle: "GROWTH" as LifecycleStage,
+      category: "HIRING" as DecisionCategory,
+      action: "HIRE" as DecisionAction,
+    },
+    storageKey: "whether.decisionShield",
+    fields: decisionShieldFieldConfigs,
+  });
   const [presets, setPresets] = useState<
     Array<{
       id: string;
@@ -63,37 +89,14 @@ export const DecisionShieldPanel = ({
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
   const [memoryStatus, setMemoryStatus] = useState<string | null>(null);
   const [isSavingMemory, setIsSavingMemory] = useState(false);
-  const storageKey = "whether.decisionShield";
   const presetStorageKey = "whether.decisionShieldPresets";
   const { add } = Toast.useToastManager();
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const restoredFromStorage = useRef(false);
   const presetInputRef = useRef<HTMLInputElement | null>(null);
   const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
   const lastAttemptedTargetRef = useRef<"verdict" | "link" | null>(null);
 
   const clientId = useMemo(() => createClientId(), []);
-
-  const urlLifecycle = useMemo(
-    () => parseParam(searchParams.get("lifecycle"), lifecycleOptions),
-    [searchParams]
-  );
-  const urlCategory = useMemo(
-    () => parseParam(searchParams.get("category"), categoryOptions),
-    [searchParams]
-  );
-  const urlAction = useMemo(
-    () => parseParam(searchParams.get("action"), actionOptions),
-    [searchParams]
-  );
-  const hasAnyUrlSelection =
-    searchParams.has("lifecycle") ||
-    searchParams.has("category") ||
-    searchParams.has("action");
-  const hasValidUrlSelection = Boolean(urlLifecycle || urlCategory || urlAction);
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -103,63 +106,6 @@ export const DecisionShieldPanel = ({
     () => buildShareText(assessment, lifecycle, category, action, output),
     [assessment, lifecycle, category, action, output]
   );
-
-  useEffect(() => {
-    if (hasValidUrlSelection) {
-      if (urlLifecycle && urlLifecycle !== lifecycle) {
-        setLifecycle(urlLifecycle);
-      }
-      if (urlCategory && urlCategory !== category) {
-        setCategory(urlCategory);
-      }
-      if (urlAction && urlAction !== action) {
-        setAction(urlAction);
-      }
-      return;
-    }
-    if (hasAnyUrlSelection) {
-      return;
-    }
-    if (restoredFromStorage.current) {
-      return;
-    }
-    restoredFromStorage.current = true;
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(stored) as {
-        lifecycle?: string;
-        category?: string;
-        action?: string;
-      };
-      const storedLifecycle = parseParam(parsed.lifecycle ?? null, lifecycleOptions);
-      const storedCategory = parseParam(parsed.category ?? null, categoryOptions);
-      const storedAction = parseParam(parsed.action ?? null, actionOptions);
-      if (storedLifecycle) {
-        setLifecycle(storedLifecycle);
-      }
-      if (storedCategory) {
-        setCategory(storedCategory);
-      }
-      if (storedAction) {
-        setAction(storedAction);
-      }
-    } catch {
-      // Intentionally ignore storage restore errors to keep console clean.
-    }
-  }, [
-    action,
-    category,
-    hasAnyUrlSelection,
-    hasValidUrlSelection,
-    lifecycle,
-    storageKey,
-    urlAction,
-    urlCategory,
-    urlLifecycle,
-  ]);
 
   useEffect(() => {
     try {
@@ -178,40 +124,11 @@ export const DecisionShieldPanel = ({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify({ lifecycle, category, action })
-      );
-    } catch {
-      // Intentionally ignore storage persistence errors to keep console clean.
-    }
-  }, [action, category, lifecycle, storageKey]);
-
-  useEffect(() => {
-    try {
       window.localStorage.setItem(presetStorageKey, JSON.stringify(presets));
     } catch {
       // Intentionally ignore storage persistence errors to keep console clean.
     }
   }, [presetStorageKey, presets]);
-
-  useEffect(() => {
-    const currentLifecycle = searchParams.get("lifecycle");
-    const currentCategory = searchParams.get("category");
-    const currentAction = searchParams.get("action");
-    if (
-      currentLifecycle === lifecycle &&
-      currentCategory === category &&
-      currentAction === action
-    ) {
-      return;
-    }
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("lifecycle", lifecycle);
-    nextParams.set("category", category);
-    nextParams.set("action", action);
-    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
-  }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
     if (!presetStatus) {
@@ -246,9 +163,9 @@ export const DecisionShieldPanel = ({
     if (!preset) {
       return;
     }
-    setLifecycle(preset.lifecycle);
-    setCategory(preset.category);
-    setAction(preset.action);
+    setField("lifecycle", preset.lifecycle);
+    setField("category", preset.category);
+    setField("action", preset.action);
     setPresetStatus("Preset applied.");
   };
 
@@ -464,7 +381,7 @@ export const DecisionShieldPanel = ({
               </Field.Label>
               <Select.Root
                 value={lifecycle}
-                onValueChange={(value) => setLifecycle(value as LifecycleStage)}
+                onValueChange={(value) => setField("lifecycle", value as LifecycleStage)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
                   <Select.Value placeholder="Select lifecycle" />
@@ -506,7 +423,7 @@ export const DecisionShieldPanel = ({
               </Field.Label>
               <Select.Root
                 value={category}
-                onValueChange={(value) => setCategory(value as DecisionCategory)}
+                onValueChange={(value) => setField("category", value as DecisionCategory)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
                   <Select.Value placeholder="Select category" />
@@ -548,7 +465,7 @@ export const DecisionShieldPanel = ({
               </Field.Label>
               <Select.Root
                 value={action}
-                onValueChange={(value) => setAction(value as DecisionAction)}
+                onValueChange={(value) => setField("action", value as DecisionAction)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
                   <Select.Value placeholder="Select action" />

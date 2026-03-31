@@ -41,6 +41,8 @@ import {
 } from "./signalsQueryState";
 import { loadSignalsPagePanels } from "./signalsPagePanels";
 
+export { buildDiagnosticsExpansionHref } from "./signalsQueryState";
+
 export const runtime = "edge";
 export const revalidate = 900;
 

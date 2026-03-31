@@ -1,7 +1,3 @@
-"use client";
-
-import { useId } from "react";
-import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { TreasuryData } from "../../lib/types";
 import { getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
@@ -9,6 +5,8 @@ import { formatTimestampUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { ArrowRightIcon } from "./uiIcons";
 import { buildWeeklyLockCommitment } from "../../lib/report/decisionKnobs";
+import { ConfidenceTooltipBadge } from "./board-brief/ConfidenceTooltipBadge";
+import { postureBlocksByRegime } from "./board-brief/postureBlocks";
 import {
   clampToRange,
   formatNumber,
@@ -16,29 +14,6 @@ import {
   getRegimeLabel,
   mapToPercent,
 } from "./reportSectionUtils";
-
-const postureBlocksByRegime: Record<RegimeAssessment["regime"], Array<{ title: string; bullets: string[] }>> = {
-  SCARCITY: [
-    { title: "Hiring posture", bullets: ["Restrict hiring to revenue-supporting or reliability-critical roles.", "Delay speculative team expansion until signals improve."] },
-    { title: "Roadmap posture", bullets: ["Prioritize reliability, retention, and near-term payback work.", "Defer long-cycle bets unless they are reversible."] },
-    { title: "Capital posture", bullets: ["Maintain burn discipline and tighten approval gates.", "Require short payback windows for incremental spend."] },
-  ],
-  DEFENSIVE: [
-    { title: "Hiring posture", bullets: ["Backfill only essential execution gaps.", "Gate net-new hires behind explicit ROI proof."] },
-    { title: "Roadmap posture", bullets: ["Protect core delivery and customer commitments.", "Stage expansionary initiatives behind milestones."] },
-    { title: "Capital posture", bullets: ["Preserve cash durability with measured spend.", "Keep optionality for downside scenarios."] },
-  ],
-  VOLATILE: [
-    { title: "Hiring posture", bullets: ["Keep hiring selective and reversible.", "Use short planning cycles before adding fixed costs."] },
-    { title: "Roadmap posture", bullets: ["Prioritize adaptable work that can be re-sequenced quickly.", "Avoid irreversible scope commitments."] },
-    { title: "Capital posture", bullets: ["Sequence spend in tranches tied to checkpoints.", "Protect downside while preserving upside options."] },
-  ],
-  EXPANSION: [
-    { title: "Hiring posture", bullets: ["Expand in proven demand areas first.", "Maintain quality bar and ramp discipline."] },
-    { title: "Roadmap posture", bullets: ["Advance growth initiatives with milestone gates.", "Preserve reliability and margin guardrails."] },
-    { title: "Capital posture", bullets: ["Deploy capital selectively with clear payback targets.", "Monitor burn as growth spend increases."] },
-  ],
-};
 
 export const WeeklyActionSummaryPanel = ({
   assessment,
@@ -135,7 +110,7 @@ export const ExecutiveSnapshotPanel = ({
   const curveIndicator = clampToRange(curveSlopePercent, 0, 100);
   const curveIndicatorColor =
     curveSlope === null ? "#94a3b8" : curveSlope < 0 ? "#fb7185" : "#38bdf8";
-  const curveMarkerId = useId().replace(/:/g, "");
+  const curveMarkerId = `${sectionId}-curve-marker`.replace(/[^a-zA-Z0-9_-]/g, "");
 
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const hasDataWarnings = assessment.dataWarnings.length > 0;
@@ -185,27 +160,10 @@ export const ExecutiveSnapshotPanel = ({
                 <span className="text-sm text-slate-200">{regimeLabel}</span>
               </div>
 
-              <Tooltip.Root>
-                <Tooltip.Trigger
-                  type="button"
-                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
-                  aria-label={`${confidenceLabel} confidence`}
-                >
-                  <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-                  {confidenceLabel} confidence
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Positioner side="bottom" sideOffset={8} className="z-30">
-                    <Tooltip.Popup className="weather-panel w-72 space-y-2 border border-slate-800/80 bg-slate-950/95 px-3 py-3 text-left text-xs text-slate-200 shadow-lg">
-                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                        Signal confidence
-                      </p>
-                      <p className="text-sm text-slate-200">Use compact trust markers inline; pause irreversible commitments when confidence or freshness is degraded.</p>
-                      <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
-                    </Tooltip.Popup>
-                  </Tooltip.Positioner>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <ConfidenceTooltipBadge
+                confidenceLabel={confidenceLabel}
+                confidenceTone={confidenceTone}
+              />
             </div>
 
             <div className="mt-3 grid gap-2 md:grid-cols-3">

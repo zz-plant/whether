@@ -11,7 +11,7 @@ import type {
   ReportDynamics,
   ReportEvidenceItem,
   WeeklyConfidencePoint,
-} from "./reportData";
+} from "./reportDataTypes";
 import type { TimeMachineRegimeEntry, TimeMachineYieldCurveEntry } from "../timeMachine/timeMachineCache";
 
 type ReportSearchParams = {

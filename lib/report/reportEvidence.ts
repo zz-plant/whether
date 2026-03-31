@@ -1,0 +1,278 @@
+import { DEFAULT_THRESHOLDS, buildSignalInfluence, evaluateRegime } from "../regimeEngine";
+import { getPlaybookGuidance } from "../playbook";
+import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
+import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
+import { formatConfidencePlainLabel } from "./reportFormatting";
+import { normalizeSignalContributions } from "./signalFormatting";
+import { buildActionStripItems } from "./operatingCalls";
+import type {
+  ReportDynamics,
+  ReportEvidenceItem,
+} from "./reportDataTypes";
+
+export const buildActionNowShort = ({
+  directionLabel,
+  regimeChanged,
+}: Pick<ReportDynamics, "directionLabel" | "regimeChanged">): string => {
+  if (regimeChanged || directionLabel === "deteriorating") {
+    return "Tighten approvals now; keep new spend reversible.";
+  }
+  if (directionLabel === "improving") {
+    return "Release selective bets now, but keep payback discipline.";
+  }
+  if (directionLabel === "mixed") {
+    return "Hold approval pace and gate decisions with explicit stop triggers.";
+  }
+  return "Hold last week's operating cadence; avoid irreversible commitments.";
+};
+
+export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime, {
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
+  const actionStripItems = buildActionStripItems(
+    buildCanonicalBoundedDecisionRules({
+      regime: assessment.regime,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+    }),
+  );
+
+  return {
+    playbook,
+    startItems,
+    stopItems,
+    actionStripItems,
+  };
+};
+
+export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
+  const tightnessThreshold = assessment.thresholds.tightnessRegime.toFixed(1);
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime.toFixed(1);
+
+  if (assessment.regime === "SCARCITY") {
+    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+  }
+
+  if (assessment.regime === "DEFENSIVE") {
+    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+  }
+
+  if (assessment.regime === "VOLATILE") {
+    return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+  }
+
+  return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+};
+
+const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
+  tightness: 90,
+  riskAppetite: 50,
+  baseRate: 1.5,
+  curveSlope: 1,
+};
+
+export const signalDeltaImprovesWhen: Record<ReportDynamics["changedSignals"][number]["key"], "positive" | "negative"> = {
+  tightness: "negative",
+  riskAppetite: "positive",
+  baseRate: "negative",
+  curveSlope: "positive",
+};
+
+export const isImprovingSignalDelta = (
+  key: ReportDynamics["changedSignals"][number]["key"],
+  delta: number,
+): boolean => (signalDeltaImprovesWhen[key] === "positive" ? delta > 0 : delta < 0);
+
+const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =>
+  normalizeSignalContributions(
+    assessment.signalInfluence ??
+      buildSignalInfluence({
+        tightness: assessment.scores.tightness,
+        riskAppetite: assessment.scores.riskAppetite,
+        baseRate: assessment.scores.baseRate,
+        curveSlope: assessment.scores.curveSlope,
+        thresholds: (assessment as { thresholds?: typeof DEFAULT_THRESHOLDS }).thresholds ?? DEFAULT_THRESHOLDS,
+      }),
+  );
+
+const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
+  tightness: "Cash tightness",
+  riskAppetite: "Risk appetite",
+  baseRate: "Base rate",
+  curveSlope: "Curve slope",
+};
+
+const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
+  tightness: "Capital conditions",
+  riskAppetite: "Risk appetite",
+  baseRate: "Policy rate pressure",
+  curveSlope: "Yield-curve signal",
+};
+
+const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {
+  const magnitude = Math.abs(delta);
+  if (magnitude >= 3) return "HIGH";
+  if (magnitude >= 1) return "MED";
+  return "LOW";
+};
+
+const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number]["key"], delta: number) => {
+  if (delta === 0) {
+    return "No material operating change this week.";
+  }
+
+  if (key === "tightness") {
+    return delta > 0
+      ? "Tighten approvals and protect runway for fixed-cost commitments."
+      : "Release selective approvals while keeping commitments reversible.";
+  }
+
+  if (key === "riskAppetite") {
+    return delta > 0
+      ? "Increase reversible experiments where payback stays visible."
+      : "Bias toward proof-first launches and smaller bet sizes.";
+  }
+
+  if (key === "baseRate") {
+    return delta > 0
+      ? "Shorten payback windows before approving net-new spend."
+      : "Maintain discipline while testing selective long-payback upside.";
+  }
+
+  return delta > 0
+    ? "Longer-payback work becomes incrementally safer if guardrails hold."
+    : "Keep commitments staged while macro risk remains elevated.";
+};
+
+export const buildReportEvidenceItems = ({
+  reportDynamics,
+  assessment,
+  lastUpdated,
+}: {
+  reportDynamics: ReportDynamics;
+  assessment: ReturnType<typeof evaluateRegime>;
+  lastUpdated: string | null;
+}): ReportEvidenceItem[] =>
+  signalOrder.map((key) => {
+    const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
+    const delta = movedSignal?.delta ?? 0;
+    const direction = resolveSignalDirection(delta);
+    const directionLabel =
+      direction === "tightening" ? "Tightening" : direction === "easing" ? "Easing" : "Unchanged";
+
+    const thresholdDistance =
+      key === "tightness"
+        ? Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime)
+        : key === "riskAppetite"
+          ? Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime)
+          : null;
+
+    const supportingBullets = [
+      `Weekly move: ${delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)} vs. prior snapshot.`,
+      `Signal direction: ${directionLabel.toLowerCase()} (${deltaLabelBySignal[key]}).`,
+      thresholdDistance === null
+        ? `Current level: ${signalLabels[key]} contributes to this week's call.`
+        : `Distance to regime threshold: ${thresholdDistance.toFixed(1)} points.`,
+    ];
+
+    return {
+      key,
+      title: evidenceTitleBySignal[key],
+      lastUpdated,
+      supportingBullets,
+      confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
+      directionLabel,
+      immediateImplication: signalImmediateImplication(key, delta),
+    };
+  });
+
+export const buildReportDynamics = ({
+  current,
+  previous,
+}: {
+  current: ReturnType<typeof evaluateRegime>;
+  previous: ReturnType<typeof evaluateRegime> | null;
+}): ReportDynamics => {
+  if (!previous) {
+    return {
+      changedSignals: [],
+      anomalySignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable",
+      signalContributions: resolveSignalInfluence(current),
+    };
+  }
+
+  const comparisons = [
+    {
+      key: "tightness" as const,
+      label: signalLabels.tightness,
+      delta: current.scores.tightness - previous.scores.tightness,
+    },
+    {
+      key: "riskAppetite" as const,
+      label: signalLabels.riskAppetite,
+      delta: current.scores.riskAppetite - previous.scores.riskAppetite,
+    },
+    {
+      key: "baseRate" as const,
+      label: signalLabels.baseRate,
+      delta: current.scores.baseRate - previous.scores.baseRate,
+    },
+    {
+      key: "curveSlope" as const,
+      label: signalLabels.curveSlope,
+      delta: (current.scores.curveSlope ?? 0) - (previous.scores.curveSlope ?? 0),
+    },
+  ].filter((item) => Math.abs(item.delta) >= 0.01);
+
+  const { anomalies, changes } = comparisons.reduce(
+    (accumulator, item) => {
+      const maxExpectedDelta = signalAnomalyThresholds[item.key];
+      if (Math.abs(item.delta) > maxExpectedDelta) {
+        accumulator.anomalies.push({
+          ...item,
+          reason: `Exceeded weekly sanity threshold of ±${maxExpectedDelta}.`,
+        });
+        return accumulator;
+      }
+
+      accumulator.changes.push(item);
+      return accumulator;
+    },
+    {
+      anomalies: [] as Array<{
+        key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+        label: string;
+        delta: number;
+        reason: string;
+      }>,
+      changes: [] as typeof comparisons,
+    },
+  );
+
+  const sortedChanges = changes.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+  const improvingMoves = sortedChanges.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
+  const deterioratingMoves = sortedChanges.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
+  const directionLabel: ReportDynamics["directionLabel"] =
+    sortedChanges.length === 0
+      ? "stable"
+      : improvingMoves > 0 && deterioratingMoves > 0
+        ? "mixed"
+        : improvingMoves > 0
+          ? "improving"
+          : "deteriorating";
+
+  return {
+    changedSignals: sortedChanges,
+    anomalySignals: anomalies,
+    totalSignalChanges: sortedChanges.length,
+    regimeChanged: current.regime !== previous.regime,
+    directionLabel,
+    signalContributions: resolveSignalInfluence(current),
+  };
+};

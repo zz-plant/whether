@@ -3,13 +3,12 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Field } from "@base-ui/react/field";
 import { Select } from "@base-ui/react/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
 import { formatDateUTC } from "../../../lib/formatters";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
 
 type AssumptionOption<T extends string> = {
   value: T;
@@ -82,149 +81,58 @@ const parseOption = <T extends string>(
 
 const formatDate = (value: string | null) => (value ? formatDateUTC(value) : null);
 
+const assumptionFieldConfigs = {
+  riskPosture: {
+    queryParam: "assumptionRisk",
+    parse: (value: string | null) => parseOption(value, riskPostureOptions),
+    serialize: (value: RiskPosture) => value,
+  },
+  thresholdTolerance: {
+    queryParam: "assumptionTolerance",
+    parse: (value: string | null) => parseOption(value, thresholdOptions),
+    serialize: (value: ThresholdTolerance) => value,
+  },
+  interpretationStance: {
+    queryParam: "assumptionStance",
+    parse: (value: string | null) => parseOption(value, stanceOptions),
+    serialize: (value: InterpretationStance) => value,
+  },
+  lockedAt: {
+    queryParam: "assumptionLockedAt",
+    parse: (value: string | null) => value,
+    serialize: (value: string | null) => value,
+  },
+} as const;
+
 export const AssumptionLockPanel = () => {
-  const [riskPosture, setRiskPosture] = useState<RiskPosture>("BALANCED");
-  const [thresholdTolerance, setThresholdTolerance] =
-    useState<ThresholdTolerance>("STANDARD");
-  const [interpretationStance, setInterpretationStance] =
-    useState<InterpretationStance>("LITERAL");
-  const [lockedAt, setLockedAt] = useState<string | null>(null);
+  const {
+    state: {
+      riskPosture,
+      thresholdTolerance,
+      interpretationStance,
+      lockedAt,
+    },
+    setField,
+  } = usePersistedQuerySelections({
+    initialState: {
+      riskPosture: "BALANCED" as RiskPosture,
+      thresholdTolerance: "STANDARD" as ThresholdTolerance,
+      interpretationStance: "LITERAL" as InterpretationStance,
+      lockedAt: null as string | null,
+    },
+    storageKey: "whether.assumptions",
+    fields: assumptionFieldConfigs,
+  });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const storageKey = "whether.assumptions";
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const restoredFromStorage = useRef(false);
-
-  const urlRisk = useMemo(
-    () => parseOption(searchParams.get("assumptionRisk"), riskPostureOptions),
-    [searchParams]
-  );
-  const urlTolerance = useMemo(
-    () => parseOption(searchParams.get("assumptionTolerance"), thresholdOptions),
-    [searchParams]
-  );
-  const urlStance = useMemo(
-    () => parseOption(searchParams.get("assumptionStance"), stanceOptions),
-    [searchParams]
-  );
-  const urlLockedAt = searchParams.get("assumptionLockedAt");
-  const hasAnyUrlSelection =
-    searchParams.has("assumptionRisk") ||
-    searchParams.has("assumptionTolerance") ||
-    searchParams.has("assumptionStance") ||
-    searchParams.has("assumptionLockedAt");
-  const hasValidUrlSelection = Boolean(urlRisk || urlTolerance || urlStance || urlLockedAt);
-
-  useEffect(() => {
-    if (hasValidUrlSelection) {
-      if (urlRisk && urlRisk !== riskPosture) {
-        setRiskPosture(urlRisk);
-      }
-      if (urlTolerance && urlTolerance !== thresholdTolerance) {
-        setThresholdTolerance(urlTolerance);
-      }
-      if (urlStance && urlStance !== interpretationStance) {
-        setInterpretationStance(urlStance);
-      }
-      if (urlLockedAt !== lockedAt) {
-        setLockedAt(urlLockedAt);
-      }
-      return;
-    }
-    if (hasAnyUrlSelection) {
-      return;
-    }
-    if (restoredFromStorage.current) {
-      return;
-    }
-    restoredFromStorage.current = true;
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(stored) as {
-        riskPosture?: string;
-        thresholdTolerance?: string;
-        interpretationStance?: string;
-        lockedAt?: string | null;
-      };
-      const storedRisk = parseOption(parsed.riskPosture ?? null, riskPostureOptions);
-      const storedTolerance = parseOption(parsed.thresholdTolerance ?? null, thresholdOptions);
-      const storedStance = parseOption(parsed.interpretationStance ?? null, stanceOptions);
-      if (storedRisk) {
-        setRiskPosture(storedRisk);
-      }
-      if (storedTolerance) {
-        setThresholdTolerance(storedTolerance);
-      }
-      if (storedStance) {
-        setInterpretationStance(storedStance);
-      }
-      if (parsed.lockedAt) {
-        setLockedAt(parsed.lockedAt);
-      }
-    } catch {
-      // Intentionally ignore storage restore errors to keep console clean.
-    }
-  }, [
-    hasAnyUrlSelection,
-    hasValidUrlSelection,
-    interpretationStance,
-    lockedAt,
-    riskPosture,
-    searchParams,
-    storageKey,
-    thresholdTolerance,
-    urlLockedAt,
-    urlRisk,
-    urlStance,
-    urlTolerance,
-  ]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          riskPosture,
-          thresholdTolerance,
-          interpretationStance,
-          lockedAt,
-        })
-      );
-    } catch {
-      // Intentionally ignore storage persistence errors to keep console clean.
-    }
-  }, [interpretationStance, lockedAt, riskPosture, storageKey, thresholdTolerance]);
-
-  useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("assumptionRisk", riskPosture);
-    nextParams.set("assumptionTolerance", thresholdTolerance);
-    nextParams.set("assumptionStance", interpretationStance);
-    if (lockedAt) {
-      nextParams.set("assumptionLockedAt", lockedAt);
-    } else {
-      nextParams.delete("assumptionLockedAt");
-    }
-    const nextSearch = nextParams.toString();
-    const currentSearch = searchParams.toString();
-    if (nextSearch === currentSearch) {
-      return;
-    }
-    router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
-  }, [interpretationStance, lockedAt, pathname, riskPosture, router, searchParams, thresholdTolerance]);
 
   const handleLock = () => {
     const nextLockedAt = new Date().toISOString();
-    setLockedAt(nextLockedAt);
+    setField("lockedAt", nextLockedAt);
     setStatusMessage("Assumptions locked.");
   };
 
   const handleUnlock = () => {
-    setLockedAt(null);
+    setField("lockedAt", null);
     setStatusMessage("Assumptions unlocked.");
   };
 
@@ -276,7 +184,7 @@ export const AssumptionLockPanel = () => {
               <Select.Root
                 id="assumption-risk"
                 value={riskPosture}
-                onValueChange={(value) => setRiskPosture(value as RiskPosture)}
+                onValueChange={(value) => setField("riskPosture", value as RiskPosture)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
                   <Select.Value placeholder="Select risk posture" />
@@ -324,7 +232,7 @@ export const AssumptionLockPanel = () => {
               <Select.Root
                 id="assumption-threshold"
                 value={thresholdTolerance}
-                onValueChange={(value) => setThresholdTolerance(value as ThresholdTolerance)}
+                onValueChange={(value) => setField("thresholdTolerance", value as ThresholdTolerance)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
                   <Select.Value placeholder="Select tolerance" />
@@ -372,7 +280,7 @@ export const AssumptionLockPanel = () => {
               <Select.Root
                 id="assumption-stance"
                 value={interpretationStance}
-                onValueChange={(value) => setInterpretationStance(value as InterpretationStance)}
+                onValueChange={(value) => setField("interpretationStance", value as InterpretationStance)}
               >
                 <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
                   <Select.Value placeholder="Select stance" />

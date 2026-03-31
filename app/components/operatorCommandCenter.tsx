@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useMemo, useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
 import { useHapticFeedback } from "./useHapticFeedback";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { useCommandCenterHotkeys } from "./operator-command-center/useCommandCenterHotkeys";
+import {
+  useCommandCenterPreferences,
+  type CommandFilter,
+} from "./operator-command-center/useCommandCenterPreferences";
 import { ArrowRightIcon, BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "./uiIcons";
 
 export type OperatorCommandAction = {
@@ -18,11 +23,6 @@ export type OperatorCommandAction = {
   copyTarget?: string;
 };
 
-type CommandFilter = "All" | OperatorCommandAction["group"];
-
-const STORAGE_KEY = "whether-command-center-query";
-const FILTER_STORAGE_KEY = "whether-command-center-filter";
-const VISITED_KEY = "whether-command-center-visited";
 const MAX_RESULTS = 12;
 const filterOrder: CommandFilter[] = ["All", "Playbook", "Pages", "Sections"];
 const groupOrder: OperatorCommandAction["group"][] = ["Playbook", "Pages", "Sections"];
@@ -60,7 +60,6 @@ const groupGlyph = {
 };
 
 const normalize = (value: string) => value.toLowerCase().trim();
-const isCommandFilter = (value: string): value is CommandFilter => filterOrder.includes(value as CommandFilter);
 
 const buildSearchTarget = (action: OperatorCommandAction) =>
   `${action.label} ${action.description} ${action.group} ${(action.keywords ?? []).join(" ")}`.toLowerCase();
@@ -75,36 +74,29 @@ const getTagLabel = (tag: OperatorCommandAction["group"]) => tagLabelMap[tag];
 
 const isInPageLink = (href: string) => href.startsWith("#") || href.includes("/#");
 
-const isTextInputTarget = (target: EventTarget | null) => {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-
-  const tagName = target.tagName.toLowerCase();
-  return (
-    tagName === "input" ||
-    tagName === "textarea" ||
-    tagName === "select" ||
-    target.isContentEditable
-  );
-};
-
 export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAction[] }) => {
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<CommandFilter>("All");
-  const [isMobile, setIsMobile] = useState(false);
-  const [isFirstSession, setIsFirstSession] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const {
+    query,
+    setQuery,
+    filter,
+    setFilter,
+    isMobile,
+    isFirstSession,
+    isExpanded,
+    searchInputRef,
+    queryRef,
+    isExpandedRef,
+    hasUserSetFilterRef,
+    persistQuery,
+    hasActiveRefinement,
+    handleExpand,
+    handleCollapse,
+    handleReset,
+  } = useCommandCenterPreferences();
   const commandCenterRef = useRef<HTMLElement | null>(null);
-  const queryRef = useRef(query);
-  const isExpandedRef = useRef(isExpanded);
-  const hasUserSetFilterRef = useRef(false);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
-  const persistQuery = (value: string) => {
-    sessionStorage.setItem(STORAGE_KEY, value);
-  };
+
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
   const triggerNavigationHaptic = () => haptic.navigate();
   const triggerDecisionCommitHaptic = () => haptic.confirm();
@@ -117,131 +109,16 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     handleDirectionalFocus(event, commandCenterRef.current, { wrap: true });
   };
 
-  useEffect(() => {
-    const initialQuery = sessionStorage.getItem(STORAGE_KEY);
-    if (initialQuery) {
-      setQuery(initialQuery);
-    }
-
-    const storedFilter = sessionStorage.getItem(FILTER_STORAGE_KEY);
-    if (storedFilter && isCommandFilter(storedFilter)) {
-      hasUserSetFilterRef.current = true;
-      setFilter(storedFilter);
-    }
-
-    const mobileMedia = window.matchMedia("(max-width: 639px)");
-    const applyViewport = () => setIsMobile(mobileMedia.matches);
-    applyViewport();
-
-    const visited = window.localStorage.getItem(VISITED_KEY) === "1";
-    if (!visited) {
-      setIsFirstSession(true);
-      setIsExpanded(false);
-    }
-
-    if (!storedFilter) {
-      setFilter(mobileMedia.matches ? "Playbook" : "All");
-    }
-
-    const onChange = () => {
-      applyViewport();
-      if (hasUserSetFilterRef.current) {
-        return;
-      }
-      setFilter((current) => {
-        if (current !== "All" && current !== "Playbook") {
-          return current;
-        }
-        return mobileMedia.matches ? "Playbook" : "All";
-      });
-    };
-
-    mobileMedia.addEventListener("change", onChange);
-    return () => {
-      mobileMedia.removeEventListener("change", onChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    queryRef.current = query;
-  }, [query]);
-
-  useEffect(() => {
-    const persistCurrentQuery = () => {
-      persistQuery(queryRef.current);
-    };
-    const persistOnHidden = () => {
-      if (document.visibilityState !== "hidden") {
-        return;
-      }
-      persistCurrentQuery();
-    };
-
-    window.addEventListener("pagehide", persistCurrentQuery);
-    document.addEventListener("visibilitychange", persistOnHidden);
-
-    return () => {
-      window.removeEventListener("pagehide", persistCurrentQuery);
-      document.removeEventListener("visibilitychange", persistOnHidden);
-      persistCurrentQuery();
-    };
-  }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
-  }, [filter]);
-
-  useEffect(() => {
-    isExpandedRef.current = isExpanded;
-  }, [isExpanded]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey) {
-        if (isTextInputTarget(event.target)) {
-          return;
-        }
-
-        event.preventDefault();
-        if (!isExpandedRef.current) {
-          setIsExpanded(true);
-        }
-        searchInputRef.current?.focus();
-      }
-
-      if (event.key === "Escape" && document.activeElement === searchInputRef.current) {
-        setQuery("");
-      }
-
-      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && queryRef.current.length === 0) {
-        setIsExpanded(false);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  useEffect(() => {
-    if (!isExpanded || !commandCenterRef.current) {
-      return;
-    }
-
-    const isTvMode = document.documentElement.dataset.displayMode === "tv";
-    if (!isTvMode) {
-      return;
-    }
-
-    const activeElement = document.activeElement;
-    if (activeElement && commandCenterRef.current.contains(activeElement)) {
-      return;
-    }
-
-    const firstFocusable = commandCenterRef.current.querySelector<HTMLElement>(
-      'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    firstFocusable?.focus();
-  }, [isExpanded]);
+  useCommandCenterHotkeys({
+    commandCenterRef,
+    searchInputRef,
+    queryRef,
+    isExpanded,
+    isExpandedRef,
+    expand: handleExpand,
+    collapse: handleCollapse,
+    setQuery,
+  });
 
   const groupedActions = useMemo(() => {
     const normalizedQuery = normalize(query);
@@ -270,31 +147,6 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const totalResults =
     groupedActions.Playbook.length + groupedActions.Pages.length + groupedActions.Sections.length;
   const topMatch = groupedActions.Playbook[0] ?? groupedActions.Pages[0] ?? groupedActions.Sections[0];
-
-  const handleExpand = () => {
-    setIsExpanded(true);
-    if (isFirstSession) {
-      setIsFirstSession(false);
-      window.localStorage.setItem(VISITED_KEY, "1");
-    }
-    window.setTimeout(() => searchInputRef.current?.focus(), 0);
-  };
-
-  const handleCollapse = () => {
-    persistQuery(queryRef.current);
-    setIsExpanded(false);
-  };
-
-  const handleReset = () => {
-    hasUserSetFilterRef.current = false;
-    setQuery("");
-    persistQuery("");
-    setFilter(isMobile ? "Playbook" : "All");
-    searchInputRef.current?.focus();
-  };
-
-  const defaultFilter = isMobile ? "Playbook" : "All";
-  const hasActiveRefinement = query.length > 0 || filter !== defaultFilter;
 
   return (
     <section
@@ -464,83 +316,83 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       {groupedActions[group].map((action) => {
                         const GroupIcon = groupGlyph[action.group];
                         return (
-                        <li key={`${group}-${action.href}-${action.label}`}>
-                          {action.copyText ? (
-                            <button
-                              type="button"
-                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                              title={action.description}
-                              aria-label={`${action.label} (copy action)`}
-                              onClick={() => {
-                                void (async () => {
-                                  const copied = await copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
-                                  if (!copied) {
-                                    if (action.group === "Playbook") {
-                                      triggerDecisionCommitHaptic();
-                                    } else {
-                                      triggerNavigationHaptic();
+                          <li key={`${group}-${action.href}-${action.label}`}>
+                            {action.copyText ? (
+                              <button
+                                type="button"
+                                className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                                title={action.description}
+                                aria-label={`${action.label} (copy action)`}
+                                onClick={() => {
+                                  void (async () => {
+                                    const copied = await copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
+                                    if (!copied) {
+                                      if (action.group === "Playbook") {
+                                        triggerDecisionCommitHaptic();
+                                      } else {
+                                        triggerNavigationHaptic();
+                                      }
+                                      window.location.assign(action.href);
                                     }
-                                    window.location.assign(action.href);
+                                  })();
+                                }}
+                              >
+                                <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                  <span aria-hidden="true" className="text-slate-400">
+                                    <GroupIcon className="h-3.5 w-3.5" />
+                                  </span>
+                                  {action.label}
+                                </span>
+                                <span className="inline-flex items-center gap-2">
+                                  <span className="flex flex-wrap justify-end gap-1">
+                                    {(action.tags ?? [action.group]).map((tag) => (
+                                      <span
+                                        key={`${action.href}-${tag}`}
+                                        className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                      >
+                                        {getTagLabel(tag)}
+                                      </span>
+                                    ))}
+                                  </span>
+                                  <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                                </span>
+                              </button>
+                            ) : (
+                              <Link
+                                href={action.href}
+                                className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                                title={action.description}
+                                aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
+                                onClick={() => {
+                                  if (action.group === "Playbook") {
+                                    triggerDecisionCommitHaptic();
+                                    return;
                                   }
-                                })();
-                              }}
-                            >
-                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
-                                <span aria-hidden="true" className="text-slate-400">
-                                  <GroupIcon className="h-3.5 w-3.5" />
+                                  triggerNavigationHaptic();
+                                }}
+                              >
+                                <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                  <span aria-hidden="true" className="text-slate-400">
+                                    <GroupIcon className="h-3.5 w-3.5" />
+                                  </span>
+                                  {action.label}
                                 </span>
-                                {action.label}
-                              </span>
-                              <span className="inline-flex items-center gap-2">
-                                <span className="flex flex-wrap justify-end gap-1">
-                                  {(action.tags ?? [action.group]).map((tag) => (
-                                    <span
-                                      key={`${action.href}-${tag}`}
-                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
-                                    >
-                                      {getTagLabel(tag)}
-                                    </span>
-                                  ))}
+                                <span className="inline-flex items-center gap-2">
+                                  <span className="flex flex-wrap justify-end gap-1">
+                                    {(action.tags ?? [action.group]).map((tag) => (
+                                      <span
+                                        key={`${action.href}-${tag}`}
+                                        className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                      >
+                                        {getTagLabel(tag)}
+                                      </span>
+                                    ))}
+                                  </span>
+                                  <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
                                 </span>
-                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
-                              </span>
-                            </button>
-                          ) : (
-                            <Link
-                              href={action.href}
-                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                              title={action.description}
-                              aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
-                              onClick={() => {
-                                if (action.group === "Playbook") {
-                                  triggerDecisionCommitHaptic();
-                                  return;
-                                }
-                                triggerNavigationHaptic();
-                              }}
-                            >
-                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
-                                <span aria-hidden="true" className="text-slate-400">
-                                  <GroupIcon className="h-3.5 w-3.5" />
-                                </span>
-                                {action.label}
-                              </span>
-                              <span className="inline-flex items-center gap-2">
-                                <span className="flex flex-wrap justify-end gap-1">
-                                  {(action.tags ?? [action.group]).map((tag) => (
-                                    <span
-                                      key={`${action.href}-${tag}`}
-                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
-                                    >
-                                      {getTagLabel(tag)}
-                                    </span>
-                                  ))}
-                                </span>
-                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
-                              </span>
-                            </Link>
-                          )}
-                        </li>
+                              </Link>
+                            )}
+                          </li>
                         );
                       })}
                     </ul>
