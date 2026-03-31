@@ -1,12 +1,12 @@
 {
   "source": "https://fred.stlouisfed.org",
-  "record_date": "2026-03-17",
-  "fetched_at": "2026-03-19T18:15:45.534Z",
+  "record_date": "2026-03-27",
+  "fetched_at": "2026-03-31T19:25:24.088Z",
   "isLive": false,
   "yields": {
     "oneMonth": 3.74,
-    "threeMonth": 3.72,
-    "twoYear": 3.68,
-    "tenYear": 4.2
+    "threeMonth": 3.73,
+    "twoYear": 3.88,
+    "tenYear": 4.44
   }
 }

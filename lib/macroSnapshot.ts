@@ -4,7 +4,7 @@
  */
 import macroSnapshot from "../data/macro_snapshot.json";
 import { fetchWithTimeout } from "./fetchWithTimeout";
-import type { MacroSeriesId, MacroSeriesReading } from "./types";
+import type { MacroSeriesId, MacroSeriesReading, SeriesHistoryPoint } from "./types";
 
 type MacroSnapshotPayload = {
   fetched_at: string;
@@ -22,6 +22,7 @@ type LiveSeriesValue = {
   recordDate: string;
   sourceLabel: string;
   sourceUrl: string;
+  history: SeriesHistoryPoint[];
 };
 
 type LiveSeriesDefinition = {
@@ -36,6 +37,8 @@ const payload = macroSnapshot as MacroSnapshotPayload;
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
 const BLS_YOY_LOOKBACK_YEARS = 2;
 const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
+const RECENT_HISTORY_WINDOW_DAYS = 92;
+const RECENT_HISTORY_WINDOW_MS = RECENT_HISTORY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
 const snapshotSeries: MacroSeriesReading[] = payload.series.map((series) => ({
   ...series,
@@ -45,7 +48,46 @@ const snapshotSeries: MacroSeriesReading[] = payload.series.map((series) => ({
 
 export const macroSeries: MacroSeriesReading[] = snapshotSeries;
 
-const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
+const sortHistoryAscending = (points: SeriesHistoryPoint[]) =>
+  [...points].sort((left, right) => {
+    const leftMs = Date.parse(`${left.date}T00:00:00.000Z`);
+    const rightMs = Date.parse(`${right.date}T00:00:00.000Z`);
+    return leftMs - rightMs;
+  });
+
+const dedupeHistoryByDate = (points: SeriesHistoryPoint[]) => {
+  const byDate = new Map<string, number | null>();
+  points.forEach((point) => {
+    byDate.set(point.date, point.value);
+  });
+
+  return sortHistoryAscending(
+    Array.from(byDate.entries()).map(([date, value]) => ({ date, value })),
+  );
+};
+
+const trimHistoryToRecentWindow = (points: SeriesHistoryPoint[]) => {
+  const deduped = dedupeHistoryByDate(points).filter(
+    (point): point is SeriesHistoryPoint & { value: number } => typeof point.value === "number",
+  );
+  const latest = deduped.at(-1);
+  if (!latest) {
+    return [];
+  }
+
+  const latestMs = Date.parse(`${latest.date}T00:00:00.000Z`);
+  if (Number.isNaN(latestMs)) {
+    return deduped;
+  }
+
+  const cutoffMs = latestMs - RECENT_HISTORY_WINDOW_MS;
+  return deduped.filter((point) => {
+    const pointMs = Date.parse(`${point.date}T00:00:00.000Z`);
+    return Number.isFinite(pointMs) && pointMs >= cutoffMs;
+  });
+};
+
+const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) => {
   const response = await fetchWithTimeout(
     fetcher,
     `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
@@ -57,51 +99,32 @@ const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   }
 
   const csv = await response.text();
-  const rows = csv.trim().split(/\r?\n/).slice(1);
-  const latestRow = rows
-    .map((row) => row.split(","))
-    .reverse()
-    .find((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])));
+  const history = trimHistoryToRecentWindow(
+    csv
+      .trim()
+      .split(/\r?\n/)
+      .slice(1)
+      .map((row) => row.split(","))
+      .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
+      .map((parts) => ({
+        date: parts[0] ?? "",
+        value: Number(parts[1]),
+      })),
+  );
+  const latest = history.at(-1);
 
-  if (!latestRow) {
+  if (!latest) {
     throw new Error(`No FRED rows for ${seriesId}`);
   }
 
   return {
-    recordDate: latestRow[0],
-    value: Number(latestRow[1]),
+    recordDate: latest.date,
+    value: latest.value,
+    history,
   };
 };
 
-const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
-    body: JSON.stringify({ seriesid: [seriesId], latest: true }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`BLS request failed for ${seriesId}`);
-  }
-
-  const payload = (await response.json()) as {
-    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
-  };
-
-  const point = payload.Results?.series?.[0]?.data?.[0];
-  if (!point?.year || !point.period || !point.value) {
-    throw new Error(`No BLS rows for ${seriesId}`);
-  }
-
-  const month = point.period.replace("M", "");
-  return {
-    recordDate: `${point.year}-${month}-01`,
-    value: Number(point.value),
-  };
-};
-
-const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
+const readBlsMonthlyPoints = async (seriesId: string, fetcher: typeof fetch) => {
   const currentYear = new Date().getUTCFullYear();
   const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
@@ -122,70 +145,124 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
     Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
   };
 
-  const points = (payload.Results?.series?.[0]?.data ?? [])
-    .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
-    .sort((a, b) => `${b.year}${b.period}`.localeCompare(`${a.year}${a.period}`));
-  const latest = points[0];
+  const points = trimHistoryToRecentWindow(
+    (payload.Results?.series?.[0]?.data ?? [])
+      .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
+      .map((point) => {
+        const month = point.period.replace("M", "").padStart(2, "0");
+        return {
+          date: `${point.year}-${month}-01`,
+          value: Number(point.value),
+        };
+      })
+      .filter((point) => Number.isFinite(point.value)),
+  );
 
-  if (!latest) {
+  if (!points.length) {
     throw new Error(`No BLS rows for ${seriesId}`);
   }
 
-  const previousYearPoint = points.find(
-    (point) => point.period === latest.period && point.year === String(Number(latest.year) - 1),
+  return {
+    recordDate: points[points.length - 1]?.date ?? "",
+    value: points[points.length - 1]?.value ?? Number.NaN,
+    history: points,
+  };
+};
+
+const readBlsYearOverYearPoints = async (seriesId: string, fetcher: typeof fetch) => {
+  const currentYear = new Date().getUTCFullYear();
+  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
+    body: JSON.stringify({
+      seriesid: [seriesId],
+      startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
+      endyear: String(currentYear),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`BLS request failed for ${seriesId}`);
+  }
+
+  const payload = (await response.json()) as {
+    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
+  };
+
+  const rawPoints = (payload.Results?.series?.[0]?.data ?? [])
+    .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
+    .sort((a, b) => `${a.year}${a.period}`.localeCompare(`${b.year}${b.period}`));
+
+  const history = trimHistoryToRecentWindow(
+    rawPoints.flatMap((point) => {
+      const previousYearPoint = rawPoints.find(
+        (candidate) => candidate.period === point.period && candidate.year === String(Number(point.year) - 1),
+      );
+      if (!previousYearPoint) {
+        return [];
+      }
+
+      const latestValue = Number(point.value);
+      const previousYearValue = Number(previousYearPoint.value);
+      if (!Number.isFinite(latestValue) || !Number.isFinite(previousYearValue) || previousYearValue === 0) {
+        return [];
+      }
+
+      const month = point.period.replace("M", "").padStart(2, "0");
+      return [{
+        date: `${point.year}-${month}-01`,
+        value: ((latestValue - previousYearValue) / previousYearValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
+      }];
+    }),
   );
 
-  if (!previousYearPoint) {
+  const latest = history.at(-1);
+  if (!latest) {
     throw new Error(`No prior year BLS row for ${seriesId}`);
   }
 
-  const latestValue = Number(latest.value);
-  const previousYearValue = Number(previousYearPoint.value);
-  if (!Number.isFinite(latestValue) || !Number.isFinite(previousYearValue) || previousYearValue === 0) {
-    throw new Error(`Invalid BLS rows for ${seriesId}`);
-  }
-
-  const month = latest.period.replace("M", "");
   return {
-    recordDate: `${latest.year}-${month}-01`,
-    value: ((latestValue - previousYearValue) / previousYearValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
+    recordDate: latest.date,
+    value: latest.value,
+    history,
   };
 };
 
 const liveSeriesDefinitions: LiveSeriesDefinition[] = [
   {
     id: "CPI_YOY",
-    load: (fetcher) => readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
+    load: (fetcher) => readBlsYearOverYearPoints("CUUR0000SA0", fetcher),
     sourceLabel: "BLS public API",
     sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
   },
   {
     id: "UNEMPLOYMENT_RATE",
-    load: (fetcher) => readBlsLatestValue("LNS14000000", fetcher),
+    load: (fetcher) => readBlsMonthlyPoints("LNS14000000", fetcher),
     sourceLabel: "BLS public API",
     sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
   },
   {
     id: "BBB_CREDIT_SPREAD",
-    load: (fetcher) => readFredLatestValue("BAA10Y", fetcher),
+    load: (fetcher) => readFredSeriesHistory("BAA10Y", fetcher),
     sourceLabel: "FRED",
     sourceUrl: "https://fred.stlouisfed.org/series/BAA10Y",
   },
   {
     id: "HY_CREDIT_SPREAD",
-    load: (fetcher) => readFredLatestValue("BAMLH0A0HYM2", fetcher),
+    load: (fetcher) => readFredSeriesHistory("BAMLH0A0HYM2", fetcher),
     sourceLabel: "FRED",
     sourceUrl: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
   },
   {
     id: "CHICAGO_FCI",
-    load: (fetcher) => readFredLatestValue("NFCI", fetcher),
+    load: (fetcher) => readFredSeriesHistory("NFCI", fetcher),
     sourceLabel: "FRED",
     sourceUrl: "https://fred.stlouisfed.org/series/NFCI",
   },
   {
     id: "VIX_INDEX",
-    load: (fetcher) => readFredLatestValue("VIXCLS", fetcher),
+    load: (fetcher) => readFredSeriesHistory("VIXCLS", fetcher),
     sourceLabel: "FRED",
     sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
   },
@@ -202,6 +279,7 @@ const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReadin
           recordDate: reading.recordDate,
           sourceLabel: definition.sourceLabel,
           sourceUrl: definition.sourceUrl,
+          history: reading.history,
         } satisfies LiveSeriesValue,
       ] as const;
     }),
@@ -236,6 +314,7 @@ const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReadin
       isLive: true,
       sourceLabel: live.sourceLabel,
       sourceUrl: live.sourceUrl,
+      history: live.history.length > 0 ? live.history : series.history,
     };
   });
 };

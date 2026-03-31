@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
@@ -17,6 +17,13 @@ import {
 type GlobalHeaderNavClientProps = {
   pathname?: string;
   variant?: "default" | "compact";
+};
+
+type GlobalHeaderNavRailProps = {
+  navigationLinks: GlobalHeaderNavigationLink[];
+  activeRouteLabel: string;
+  variant?: "default" | "compact";
+  onIntent: (href: string) => void;
 };
 
 function NavigationLinkCard({
@@ -90,36 +97,153 @@ function CompactNavigationLink({
   );
 }
 
-export function GlobalHeaderNavClient({
-  pathname,
+export function GlobalHeaderNavRail({
+  navigationLinks,
+  activeRouteLabel,
   variant = "default",
-}: GlobalHeaderNavClientProps) {
-  const currentPathname = usePathname() ?? "/";
-  const router = useRouter();
-  const resolvedPathname = pathname ?? currentPathname;
-  const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
+  onIntent,
+}: GlobalHeaderNavRailProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(navigationLinks.length > 1);
+  const railRef = useRef<HTMLUListElement | null>(null);
   const activeLink = navigationLinks.find((link) => link.isActive) ?? navigationLinks[0];
   const activeSurfaceCue = activeLink ? resolvePrimaryNavigationSurfaceCue(activeLink.href) : null;
-  const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
-
-  const handleIntentPrefetch = (href: string) => {
-    router.prefetch(href as Route);
-  };
 
   useEffect(() => {
-    setIsMenuOpen(false);
-  }, [resolvedPathname]);
+    if (variant === "default") {
+      setIsMenuOpen(false);
+    }
+  }, [activeLink?.href, variant]);
+
+  useEffect(() => {
+    if (variant === "default" && !isMenuOpen) {
+      setCanScrollPrev(false);
+      setCanScrollNext(navigationLinks.length > 1);
+      return;
+    }
+
+    const rail = railRef.current;
+    if (!rail) {
+      return;
+    }
+
+    const syncRailState = () => {
+      const maxScrollLeft = rail.scrollWidth - rail.clientWidth;
+      setCanScrollPrev(rail.scrollLeft > 8);
+      setCanScrollNext(maxScrollLeft - rail.scrollLeft > 8);
+    };
+
+    let frameId = 0;
+    const handleScroll = () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+
+      frameId = window.requestAnimationFrame(syncRailState);
+    };
+
+    syncRailState();
+    rail.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", syncRailState);
+
+    return () => {
+      rail.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", syncRailState);
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }, [isMenuOpen, navigationLinks.length, variant]);
+
+  useEffect(() => {
+    if (variant === "default" && !isMenuOpen) {
+      return;
+    }
+
+    const rail = railRef.current;
+    const activeItem = rail?.querySelector('[aria-current="page"]');
+    if (!(activeItem instanceof HTMLElement)) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      activeItem.scrollIntoView({
+        behavior: "auto",
+        block: "nearest",
+        inline: "center",
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [activeLink?.href, isMenuOpen, variant]);
+
+  const scrollRail = (direction: -1 | 1) => {
+    const rail = railRef.current;
+    if (!rail) {
+      return;
+    }
+
+    const step = Math.max(Math.round(rail.clientWidth * 0.82), 180);
+    rail.scrollBy({
+      left: direction * step,
+      behavior: "smooth",
+    });
+  };
+
+  const controls = (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        className="weather-button inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-0 py-0 text-sm font-semibold disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+        aria-label="Previous surface"
+        disabled={!canScrollPrev}
+        onClick={() => scrollRail(-1)}
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        className="weather-button inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-0 py-0 text-sm font-semibold disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+        aria-label="Next surface"
+        disabled={!canScrollNext}
+        onClick={() => scrollRail(1)}
+      >
+        →
+      </button>
+    </div>
+  );
 
   if (variant === "compact") {
     return (
-      <nav aria-label="Primary routes">
-        <ul className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {navigationLinks.map((link) => (
-            <CompactNavigationLink key={link.href} link={link} onIntent={handleIntentPrefetch} />
-          ))}
-        </ul>
-      </nav>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Primary surfaces
+            </p>
+            <p className="truncate text-xs text-slate-300">
+              {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
+            </p>
+          </div>
+          {controls}
+        </div>
+        <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">
+          Swipe or tap arrows to see every primary surface.
+        </p>
+        <nav aria-label="Primary routes">
+          <ul
+            ref={railRef}
+            className="flex gap-2 overflow-x-auto scroll-smooth pb-1 pr-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {navigationLinks.map((link) => (
+              <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />
+            ))}
+          </ul>
+        </nav>
+      </div>
     );
   }
 
@@ -136,7 +260,7 @@ export function GlobalHeaderNavClient({
           {isMenuOpen ? "Hide sections" : "Browse sections"}
         </button>
       </div>
-      <div className="mb-2 flex items-center justify-between gap-3 sm:hidden">
+      <div className="mb-2 flex items-start justify-between gap-3 sm:hidden">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
             Primary surfaces
@@ -144,17 +268,21 @@ export function GlobalHeaderNavClient({
           <p className="truncate text-xs text-slate-300">
             {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
           </p>
+          <p className="pt-1 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">
+            {isMenuOpen
+              ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or tap arrows to see the other ${Math.max(primaryNavigationSurfaceCount - 1, 0)} primary surfaces.`
+              : "Open sections, then swipe or tap arrows to move across the primary surfaces."}
+          </p>
         </div>
-        <span className="rounded-full border border-slate-700/80 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-          Swipe
-        </span>
+        {controls}
       </div>
       <ul
         id="global-header-nav-list"
-        className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
+        ref={railRef}
+        className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto scroll-smooth pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
       >
         {navigationLinks.map((link) => (
-          <NavigationLinkCard key={link.href} link={link} onIntent={handleIntentPrefetch} />
+          <NavigationLinkCard key={link.href} link={link} onIntent={onIntent} />
         ))}
       </ul>
       <div
@@ -169,11 +297,30 @@ export function GlobalHeaderNavClient({
           isMenuOpen ? "block" : "hidden"
         }`}
       />
-      <p className="pt-1 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 sm:hidden">
-        {isMenuOpen
-          ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe to see the other ${Math.max(primaryNavigationSurfaceCount - 1, 0)} primary surfaces.`
-          : "Open sections to navigate across the primary surfaces."}
-      </p>
     </div>
+  );
+}
+
+export function GlobalHeaderNavClient({
+  pathname,
+  variant = "default",
+}: GlobalHeaderNavClientProps) {
+  const currentPathname = usePathname() ?? "/";
+  const router = useRouter();
+  const resolvedPathname = pathname ?? currentPathname;
+  const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
+  const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
+
+  const handleIntentPrefetch = (href: string) => {
+    router.prefetch(href as Route);
+  };
+
+  return (
+    <GlobalHeaderNavRail
+      navigationLinks={navigationLinks}
+      activeRouteLabel={activeRouteLabel}
+      variant={variant}
+      onIntent={handleIntentPrefetch}
+    />
   );
 }

@@ -15,7 +15,7 @@ Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`,
 
 | ID | Priority | Item | Suggested owner | Status |
 | --- | --- | --- | --- | --- |
-| DD-001 | P0 | Mobile global nav scroll affordance | Design + Frontend | Open |
+| DD-001 | P0 | Mobile global nav scroll affordance | Design + Frontend | Shipped (2026-03-31) |
 | DD-002 | P1 | IA taxonomy/nav alignment with canonical hubs | Product + Frontend | Open |
 | DD-003 | P1 | Theme toggle accessibility semantics | Frontend | Open |
 | DD-004 | P1 | Homepage (`/`) progressive disclosure on mobile | Product + Frontend | Open |

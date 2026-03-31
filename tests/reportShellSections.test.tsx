@@ -169,14 +169,20 @@ describe("ReportShell extracted sections", () => {
         trustStatusTone="stable"
         currentPath="/"
         headerVariant="home-brief"
-        exportCta={{ href: "/operations#ops-export-briefs", label: "Open share brief" }}
+        exportCta={{
+          href: "#share-ready-artifact",
+          label: "Copy weekly brief",
+          copyText: "WEEKLY BRIEF\nAction: Hold posture.",
+          copyTarget: "Weekly brief",
+        }}
       >
         <section>Body</section>
       </ReportShell>,
     );
 
-    assert.match(html, /Open share brief/);
-    assert.match(html, /Share the weekly call before opening Planning or deeper evidence\./);
+    assert.match(html, /Copy weekly brief/);
+    assert.match(html, /href="#share-ready-artifact"/);
+    assert.match(html, /Copy the weekly brief before opening Planning or deeper evidence\./);
     assert.doesNotMatch(html, /On this page/);
   });
 });

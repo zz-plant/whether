@@ -8,6 +8,7 @@ import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
+import { buildWeeklyDecisionPresentation } from "./components/weekly-card/presentationAdapter";
 import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
@@ -22,6 +23,44 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<HomePageSearchParams>;
 }): Promise<Metadata> => buildHomeMetadata(searchParams);
+
+const buildHeaderWeeklyBriefCopy = ({
+  reportShell,
+  weeklyDecisionCardModel,
+  searchParams,
+}: {
+  reportShell: Awaited<ReturnType<typeof assembleHomePage>>["reportShell"];
+  weeklyDecisionCardModel: Awaited<ReturnType<typeof assembleHomePage>>["weeklyDecisionCardModel"];
+  searchParams?: HomePageSearchParams;
+}) => {
+  const postureLabel =
+    weeklyDecisionCardModel.status.postureWithStageLabel ?? weeklyDecisionCardModel.status.statusLabel;
+  const confidenceLabel = `${weeklyDecisionCardModel.status.confidenceLabel} (${Math.round(
+    weeklyDecisionCardModel.status.confidencePercent,
+  )}%)`;
+  const { snapshotGuardrail, snapshotWatch, citationMetaLine } = buildWeeklyDecisionPresentation({
+    model: weeklyDecisionCardModel,
+    searchParams,
+  });
+
+  return [
+    "WEEKLY BRIEF",
+    `Posture: ${postureLabel}`,
+    `Confidence: ${confidenceLabel}`,
+    `Decision as-of: ${reportShell.recordDateLabel}`,
+    `Data refreshed: ${reportShell.fetchedAtLabel}`,
+    `Source: ${reportShell.treasurySource}`,
+    "",
+    `Action: ${weeklyDecisionCardModel.decision.immediateDecision}`,
+    `Threshold: ${snapshotGuardrail}`,
+    `Flip condition: ${snapshotWatch}`,
+    "",
+    `Trust: ${citationMetaLine}`,
+    "",
+    "Citation",
+    weeklyDecisionCardModel.artifact.citation,
+  ].join("\n");
+};
 
 export default async function HomePage({
   searchParams,
@@ -47,6 +86,11 @@ export const HomePageReportContent = async ({
   const initialArtifactMode = isArtifactMode(resolvedSearchParams?.artifactMode)
     ? resolvedSearchParams.artifactMode
     : undefined;
+  const headerWeeklyBriefCopy = buildHeaderWeeklyBriefCopy({
+    reportShell: homepage.reportShell,
+    weeklyDecisionCardModel: homepage.weeklyDecisionCardModel,
+    searchParams: resolvedSearchParams,
+  });
 
   return (
     <ReportShell
@@ -90,7 +134,15 @@ export const HomePageReportContent = async ({
         actions: {
           exportCta: {
             href: "#share-ready-artifact",
-            label: "Share weekly brief",
+            label: "Copy weekly brief",
+            copyText: headerWeeklyBriefCopy,
+            copyTarget: "Weekly brief",
+            telemetryEvent: {
+              pagePath: "/",
+              cluster: "tool",
+              intent: "board",
+              ctaId: "homepage_overview_copy_weekly_brief",
+            },
           },
           nextStep: {
             href: "/operations",

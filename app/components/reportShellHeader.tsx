@@ -1,11 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
 import { canonicalPositioningLine } from "../../lib/seo";
-import type { Route } from "../../lib/navigation/routeType";
 import {
   ReportPageNavigation,
   type ReportPageLink,
 } from "./reportShellNavigation";
+import { ReportCta } from "./reportCta";
 import type { ExportCtaProps } from "./report-shell/types";
 
 export type ReportShellHeaderVariant = "standard" | "home-brief" | "evidence" | "trust";
@@ -85,14 +84,20 @@ export function ReportShellHeader({
             </div>
             {exportCta ? (
               <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  href={exportCta.href as Route}
+                <ReportCta
+                  href={exportCta.href}
+                  copyText={exportCta.copyText}
+                  copyTarget={exportCta.copyTarget}
+                  telemetryEvent={exportCta.telemetryEvent}
+                  label={exportCta.label}
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center rounded-full px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
                   {exportCta.label}
-                </Link>
+                </ReportCta>
                 <p className="max-w-2xl text-xs leading-relaxed text-slate-400">
-                  Share the weekly call before opening Planning or deeper evidence.
+                  {exportCta.copyText
+                    ? "Copy the weekly brief before opening Planning or deeper evidence."
+                    : "Share the weekly call before opening Planning or deeper evidence."}
                 </p>
               </div>
             ) : null}

@@ -3,22 +3,39 @@
 import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
 import type { Route } from "../../lib/navigation/routeType";
+import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { useClipboardCopy } from "./useClipboardCopy";
+import type { ReportCtaProps as SharedReportCtaProps } from "./report-shell/types";
 
-type ReportCtaProps = {
-  href: string;
-  label: string;
+type ReportCtaProps = SharedReportCtaProps & {
   className: string;
-  copyText?: string;
-  copyTarget?: string;
   children?: ReactNode;
 };
 
-export function ReportCta({ href, label, className, copyText, copyTarget, children }: ReportCtaProps) {
+export function ReportCta({
+  href,
+  label,
+  className,
+  copyText,
+  copyTarget,
+  telemetryEvent,
+  children,
+}: ReportCtaProps) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;
+  const isCopied = status === "copied";
+  const hasCopyError = status === "error";
   const isRouteHref = href.startsWith("/");
+  const copyLabel = isCopying ? "Copying" : isCopied ? "Copied" : hasCopyError ? "Retry copy" : label;
+
+  const trackActivation = () => {
+    if (!telemetryEvent) {
+      return;
+    }
+
+    trackContentCtaConversion(telemetryEvent);
+  };
 
   const handleCopyClick = async (event: MouseEvent<HTMLAnchorElement>) => {
     if (!copyText) {
@@ -30,6 +47,7 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
     }
 
     event.preventDefault();
+    trackActivation();
     const copied = await copyToClipboard(copyText, resolvedCopyTarget);
     if (!copied) {
       window.location.assign(href);
@@ -38,7 +56,11 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
 
   if (!copyText && isRouteHref) {
     return (
-      <Link href={href as Route} className={className}>
+      <Link
+        href={href as Route}
+        className={className}
+        onClick={telemetryEvent ? trackActivation : undefined}
+      >
         {children ?? label}
       </Link>
     );
@@ -47,11 +69,11 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
   return (
     <a
       href={href}
-      onClick={copyText ? handleCopyClick : undefined}
+      onClick={copyText ? handleCopyClick : telemetryEvent ? trackActivation : undefined}
       aria-busy={copyText ? isCopying : undefined}
       className={className}
     >
-      {isCopying ? "Copying" : (children ?? label)}
+      {children ?? (copyText ? copyLabel : label)}
     </a>
   );
 }

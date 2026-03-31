@@ -105,6 +105,55 @@ describe("materialized ingestion model", () => {
     assert.equal(vix?.isLive, true);
   });
 
+  it("hydrates recent macro history from stored signal snapshots", () => {
+    const snapshots: SignalEntitySnapshot[] = [
+      ...baseSnapshots,
+      {
+        signalKey: "BBB_CREDIT_SPREAD",
+        family: "spreads",
+        value: 2.4,
+        unit: "%",
+        source: { label: "FRED", url: "https://fred.stlouisfed.org/series/BAA10Y", seriesId: "BAA10Y" },
+        observedAt: "2025-11-28T00:00:00.000Z",
+        ingestedAt: "2025-11-28T01:00:00.000Z",
+        quality: "observed",
+        confidence: "high",
+      },
+      {
+        signalKey: "BBB_CREDIT_SPREAD",
+        family: "spreads",
+        value: 2.3,
+        unit: "%",
+        source: { label: "FRED", url: "https://fred.stlouisfed.org/series/BAA10Y", seriesId: "BAA10Y" },
+        observedAt: "2025-12-15T00:00:00.000Z",
+        ingestedAt: "2025-12-15T01:00:00.000Z",
+        quality: "observed",
+        confidence: "high",
+      },
+      {
+        signalKey: "BBB_CREDIT_SPREAD",
+        family: "spreads",
+        value: 2.2,
+        unit: "%",
+        source: { label: "FRED", url: "https://fred.stlouisfed.org/series/BAA10Y", seriesId: "BAA10Y" },
+        observedAt: "2026-01-10T00:00:00.000Z",
+        ingestedAt: "2026-01-10T01:00:00.000Z",
+        quality: "observed",
+        confidence: "high",
+      },
+    ];
+    const model = buildMaterializedReadModel(snapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const macro = buildCanonicalMacroSeriesFromReadModel(model, undefined, snapshots);
+
+    const bbb = macro.find((series) => series.id === "BBB_CREDIT_SPREAD");
+    assert.deepEqual(
+      bbb?.history?.map((point) => point.date),
+      ["2025-11-28", "2025-12-15", "2026-01-10"],
+    );
+    assert.equal(bbb?.value, 2.2);
+    assert.equal(bbb?.record_date, "2026-01-10");
+  });
+
   it("refreshes missing families before the model goes stale", () => {
     const model = buildMaterializedReadModel(baseSnapshots, new Date("2026-01-10T02:00:00.000Z"));
     const dueFamilies = resolveSignalFamiliesToRefresh(model, new Date("2026-01-10T02:30:00.000Z"));

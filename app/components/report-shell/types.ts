@@ -1,14 +1,24 @@
 import type { Route } from "../../../lib/navigation/routeType";
+import type {
+  ContentCluster,
+  ContentIntent,
+} from "../../../lib/contentMeasurement";
 
 export type ReportCtaProps = {
   href: string;
   label: string;
   copyText?: string;
   copyTarget?: string;
+  telemetryEvent?: {
+    pagePath: string;
+    cluster: ContentCluster;
+    intent: ContentIntent;
+    ctaId: string;
+  };
 };
 
 export type SecondaryCtaProps = { href: string; label: string };
-export type ExportCtaProps = { href: string; label: string };
+export type ExportCtaProps = ReportCtaProps;
 
 export type DecisionBanner = {
   label?: string;

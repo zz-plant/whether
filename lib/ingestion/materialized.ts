@@ -1,8 +1,8 @@
 import { SIGNAL_CADENCE } from "./cadence";
 import { SIGNAL_FAMILIES, pullSignalFamily } from "./families";
 import { getDefaultIngestionStore, type IngestionStore } from "./store";
-import type { MacroSeriesReading, TreasuryData } from "../types";
-import { macroSeries as snapshotMacroSeries } from "../macroSnapshot";
+import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
+import { loadMacroSeries, macroSeries as snapshotMacroSeries } from "../macroSnapshot";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot, SignalFamily, SignalKey } from "./types";
 
 const signalKeysByFamily: Record<SignalFamily, SignalKey[]> = {
@@ -13,6 +13,9 @@ const signalKeysByFamily: Record<SignalFamily, SignalKey[]> = {
   credit: ["CHICAGO_FCI"],
   volatility: ["VIX_INDEX"],
 };
+
+const RECENT_HISTORY_WINDOW_DAYS = 92;
+const RECENT_HISTORY_WINDOW_MS = RECENT_HISTORY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
 const chooseLatest = (existing: SignalEntitySnapshot | undefined, candidate: SignalEntitySnapshot) => {
   if (!existing) {
@@ -148,6 +151,62 @@ export const resolveSignalFamiliesToRefresh = (
 
 const getSignalValue = (model: MaterializedSignalReadModel, key: SignalKey) => model.signals[key]?.snapshot.value ?? null;
 
+const buildRecentHistoryBySignalKey = (snapshots: SignalEntitySnapshot[]) => {
+  const byKey = new Map<
+    SignalKey,
+    Map<string, { observedAt: string; ingestedAt: string; value: number }>
+  >();
+
+  snapshots.forEach((snapshot) => {
+    if (typeof snapshot.value !== "number") {
+      return;
+    }
+
+    const date = snapshot.observedAt.slice(0, 10);
+    const entriesByDate = byKey.get(snapshot.signalKey) ?? new Map<string, { observedAt: string; ingestedAt: string; value: number }>();
+    const existing = entriesByDate.get(date);
+    if (
+      !existing
+      || snapshot.observedAt > existing.observedAt
+      || (snapshot.observedAt === existing.observedAt && snapshot.ingestedAt > existing.ingestedAt)
+    ) {
+      entriesByDate.set(date, {
+        observedAt: snapshot.observedAt,
+        ingestedAt: snapshot.ingestedAt,
+        value: snapshot.value,
+      });
+    }
+    byKey.set(snapshot.signalKey, entriesByDate);
+  });
+
+  const historyByKey: Partial<Record<SignalKey, SeriesHistoryPoint[]>> = {};
+
+  for (const [key, entriesByDate] of byKey.entries()) {
+    const points = Array.from(entriesByDate.entries())
+      .map(([date, entry]) => ({ date, observedAt: entry.observedAt, value: entry.value }))
+      .sort((left, right) => left.observedAt.localeCompare(right.observedAt));
+
+    const latest = points.at(-1);
+    if (!latest) {
+      continue;
+    }
+
+    const latestMs = Date.parse(latest.observedAt);
+    const cutoffMs = Number.isFinite(latestMs)
+      ? latestMs - RECENT_HISTORY_WINDOW_MS
+      : Number.NEGATIVE_INFINITY;
+
+    historyByKey[key] = points
+      .filter((point) => {
+        const pointMs = Date.parse(point.observedAt);
+        return Number.isFinite(pointMs) && pointMs >= cutoffMs;
+      })
+      .map(({ date, value }) => ({ date, value }));
+  }
+
+  return historyByKey;
+};
+
 export const buildCanonicalTreasuryFromReadModel = (model: MaterializedSignalReadModel): TreasuryData | null => {
   const oneMonth = getSignalValue(model, "TREASURY_1M");
   const threeMonth = getSignalValue(model, "TREASURY_3M");
@@ -183,16 +242,26 @@ const macroSignalMap: Partial<Record<MacroSeriesReading["id"], SignalKey>> = {
   VIX_INDEX: "VIX_INDEX",
 };
 
-export const buildCanonicalMacroSeriesFromReadModel = (model: MaterializedSignalReadModel): MacroSeriesReading[] =>
-  snapshotMacroSeries.map((series) => {
+export const buildCanonicalMacroSeriesFromReadModel = (
+  model: MaterializedSignalReadModel,
+  baseSeries: MacroSeriesReading[] = snapshotMacroSeries,
+  snapshots: SignalEntitySnapshot[] = [],
+): MacroSeriesReading[] => {
+  const historyBySignalKey = buildRecentHistoryBySignalKey(snapshots);
+
+  return baseSeries.map((series) => {
     const signalKey = macroSignalMap[series.id];
     if (!signalKey) {
       return series;
     }
 
     const canonical = model.signals[signalKey]?.snapshot;
+    const history = historyBySignalKey[signalKey] ?? series.history;
     if (!canonical || typeof canonical.value !== "number") {
-      return series;
+      return {
+        ...series,
+        history,
+      };
     }
 
     return {
@@ -203,8 +272,10 @@ export const buildCanonicalMacroSeriesFromReadModel = (model: MaterializedSignal
       isLive: true,
       sourceLabel: canonical.source.label,
       sourceUrl: canonical.source.url,
+      history,
     };
   });
+};
 
 export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fetch; store?: IngestionStore }) => {
   const store = options?.store ?? getDefaultIngestionStore();
@@ -225,9 +296,12 @@ export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fet
     return null;
   }
 
+  const storedSnapshots = await store.readSnapshots();
+  const hydratedMacroSeries = await loadMacroSeries(options?.fetcher);
+
   return {
     treasury,
-    macroSeries: buildCanonicalMacroSeriesFromReadModel(model),
+    macroSeries: buildCanonicalMacroSeriesFromReadModel(model, hydratedMacroSeries, storedSnapshots),
     materializedSignals: model,
   };
 };

@@ -4,7 +4,7 @@ This document consolidates delivery status across product roadmap audits, known 
 
 ## Snapshot
 
-- Milestones 5–8 are largely complete, with one remaining UX item.
+- Milestones 5–8 are complete.
 - Summary-system follow-ups are complete.
 - Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.38` with a repo-local install repair.
 
@@ -23,7 +23,7 @@ This document consolidates delivery status across product roadmap audits, known 
 - [x] Milestone 8 CXO function surfaces.
 
 ### Remaining
-- [ ] Promote export/share actions directly into the Overview header (currently partial).
+- [x] Promote export/share actions directly into the Overview header.
 
 ## Summary-system follow-ups
 
