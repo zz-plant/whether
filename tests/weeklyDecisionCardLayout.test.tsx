@@ -82,7 +82,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.doesNotMatch(html, /Seed/);
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
-    assert.match(html, /Share &amp; cite/);
+    assert.match(html, /Citation/);
+    assert.match(html, /More share formats/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Weekly call snapshot");

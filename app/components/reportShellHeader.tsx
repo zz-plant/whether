@@ -1,9 +1,12 @@
+import Link from "next/link";
 import Image from "next/image";
 import { canonicalPositioningLine } from "../../lib/seo";
+import type { Route } from "../../lib/navigation/routeType";
 import {
   ReportPageNavigation,
   type ReportPageLink,
 } from "./reportShellNavigation";
+import type { ExportCtaProps } from "./report-shell/types";
 
 export type ReportShellHeaderVariant = "standard" | "home-brief" | "evidence" | "trust";
 
@@ -17,6 +20,7 @@ type ReportShellHeaderProps = {
   pageLinks: ReportPageLink[];
   pageTitle: string;
   pageNavVariant: "full" | "compact";
+  exportCta?: ExportCtaProps | null;
 };
 
 export function ReportShellHeader({
@@ -29,6 +33,7 @@ export function ReportShellHeader({
   pageLinks,
   pageTitle,
   pageNavVariant,
+  exportCta,
 }: ReportShellHeaderProps) {
   const hideCanonicalPositioningLineOnMobile = currentPath === "/signals" ||
     currentPath.startsWith("/signals/") ||
@@ -78,6 +83,19 @@ export function ReportShellHeader({
                 Stay on this screen for the call, the immediate move, the closest threshold, and the flip condition. Open a support path only if a specific question remains.
               </p>
             </div>
+            {exportCta ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={exportCta.href as Route}
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center rounded-full px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  {exportCta.label}
+                </Link>
+                <p className="max-w-2xl text-xs leading-relaxed text-slate-400">
+                  Share the weekly call before opening Planning or deeper evidence.
+                </p>
+              </div>
+            ) : null}
           </div>
           <div className="xl:min-w-[30rem]">
             <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">

@@ -104,6 +104,12 @@ const WeeklyStructuredSchema = z.object({
 });
 
 const MonthlyStructuredSchema = z.object({
+  posture: z.object({
+    label: z.string(),
+    summary: z.array(z.string()),
+  }),
+  boundedNextActions: z.array(z.string()),
+  reversalConditions: z.array(z.string()),
   executionConstraints: z.array(z.string()),
   provenance: z.object({
     source: z.string(),
@@ -133,15 +139,31 @@ const WeeklySummaryArchiveSchema = BaseSummarySchema.extend({
 }));
 
 const MonthlySummaryArchiveSchema = BaseSummarySchema.extend({
-  structured: MonthlyStructuredSchema.optional(),
+  structured: z.union([
+    MonthlyStructuredSchema,
+    z.object({
+      executionConstraints: z.array(z.string()),
+      provenance: z.object({
+        source: z.string(),
+        timestamp: z.string(),
+        dataAge: z.string(),
+      }),
+    }),
+  ]).optional(),
 }).transform((summary): MonthlySummary => ({
   ...summary,
   structured:
-    summary.structured ??
-    buildMonthlyStructured({
-      constraints: summary.constraints,
-      provenance: summary.provenance,
-    }),
+    summary.structured && "posture" in summary.structured
+      ? summary.structured
+      : buildMonthlyStructured({
+          regimeLabel: summary.regimeLabel,
+          guidance: summary.guidance,
+          confidence: summary.confidence,
+          intensity: summary.intensity,
+          transitionWatch: summary.transitionWatch,
+          constraints: summary.constraints,
+          provenance: summary.provenance,
+        }),
 }));
 
 const QuarterlySummaryArchiveSchema = BaseSummarySchema;

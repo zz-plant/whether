@@ -5,7 +5,7 @@ This document consolidates delivery status across product roadmap audits, known 
 ## Snapshot
 
 - Milestones 5–8 are largely complete, with one remaining UX item.
-- Summary-system follow-ups remain open (P1/P2).
+- Summary-system follow-ups are complete.
 - Stack modernization cut over to Vinext on Cloudflare Workers; warning cleanup and long-tail validation remain open.
 
 ## Product roadmap (milestones 5–8)
@@ -30,7 +30,7 @@ This document consolidates delivery status across product roadmap audits, known 
 - [x] (P0) Shared `structured` → copy renderer and contract unification.
 - [x] (P1) Offline archive materialization for historical `structured` fields.
 - [x] (P1) API contract tests for `/api/weekly` and `/api/monthly` payload guarantees.
-- [ ] (P2) Monthly section expansion toward weekly parity where operator value is clear.
+- [x] (P2) Monthly section expansion toward weekly parity where operator value is clear.
 
 ## Stack modernization
 

@@ -1,5 +1,9 @@
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
+import {
+  resolveNavigationRouteCue,
+  resolvePrimaryNavigationSurfaceCue,
+} from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { getCompactSectionLabel } from "../../lib/report/homeSections";
 import { defaultPageLinkIcon, pageLinkIcons } from "./reportShellPageIcons";
@@ -34,7 +38,14 @@ const getPageNavigationState = (
   const anchorLink = pageLinks.find((link) => link.href === "/") ?? pageLinks[0];
   const supportLinks = pageLinks.filter((link) => link.href !== anchorLink.href);
 
-  return { currentLink, anchorLink, supportLinks };
+  return {
+    currentLink,
+    currentIndex,
+    currentPosition: currentIndex >= 0 ? currentIndex + 1 : 1,
+    anchorLink,
+    supportLinks,
+    totalCount: pageLinks.length,
+  };
 };
 
 const basePageLinkClassName =
@@ -66,8 +77,11 @@ const renderPageLink = ({
       </span>
       <span>{link.label}</span>
     </span>
-    <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
-      {link.description}
+    <span className="flex flex-wrap items-center gap-2 text-[11px] font-medium normal-case tracking-normal text-slate-300">
+      <span>{link.description}</span>
+      <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+        Route {resolveNavigationRouteCue(link.href)}
+      </span>
     </span>
   </Link>
 );
@@ -85,7 +99,7 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const { currentLink, anchorLink, supportLinks } = getPageNavigationState(
+  const { currentLink, currentIndex, currentPosition, anchorLink, supportLinks, totalCount } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -114,6 +128,14 @@ export const ReportPageNavigation = ({
             >
               {anchorLink.label}
             </Link>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                {resolvePrimaryNavigationSurfaceCue(anchorLink.href)}
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                {resolveNavigationRouteCue(anchorLink.href)}
+              </span>
+            </div>
             <p className="mt-3 text-xs leading-relaxed text-slate-300">
               {routeSwitcherIntro}
             </p>
@@ -128,6 +150,23 @@ export const ReportPageNavigation = ({
                 ? "Each path below exists to help the Weekly Brief, not replace it."
                 : `Use ${currentLink.label} only while you need this help: ${currentLink.description}`}
             </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                {currentPosition} of {totalCount}
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                {resolveNavigationRouteCue(currentLink.href)}
+              </span>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5" aria-hidden="true">
+              {pageLinks.map((link, index) => (
+                <span
+                  key={link.href}
+                  className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
+                  title={`${index + 1}. ${link.label}`}
+                />
+              ))}
+            </div>
             <div className={supportGridClassName}>
               {supportLinks.map((link) => renderPageLink({
                 link,
@@ -217,7 +256,7 @@ export const ReportMobileNavigation = ({
   sectionLinks?: ReportSectionLink[];
   maxItems?: number;
 }) => {
-  const { currentLink, anchorLink, supportLinks } = getPageNavigationState(
+  const { currentLink, currentIndex, currentPosition, anchorLink, supportLinks, totalCount } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -247,6 +286,23 @@ export const ReportMobileNavigation = ({
           >
             {anchorLink.label}
           </Link>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              {currentPosition} of {totalCount}
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              {resolveNavigationRouteCue(anchorLink.href)}
+            </span>
+          </div>
+          <div className="mt-3 grid grid-cols-5 gap-1.5" aria-hidden="true">
+            {pageLinks.map((link, index) => (
+              <span
+                key={link.href}
+                className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
+                title={`${index + 1}. ${link.label}`}
+              />
+            ))}
+          </div>
           <p className="mt-2 text-xs leading-relaxed text-slate-300">
             {routeSwitcherIntro}
           </p>
@@ -262,10 +318,12 @@ export const ReportMobileNavigation = ({
                 <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
                   {currentLink.label}
                 </p>
-                <p className="mt-1 text-xs text-slate-400">Jump straight to the part of {currentLink.label} you need.</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Jump straight to the part of {currentLink.label} on {resolveNavigationRouteCue(currentLink.href)} you need.
+                </p>
               </div>
               <span className="rounded-full border border-slate-700/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                {currentLink.label}
+                {currentPosition} of {totalCount}
               </span>
             </div>
             <ol className="mt-3 grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
@@ -296,6 +354,9 @@ export const ReportMobileNavigation = ({
                 {currentLink.label}
               </p>
               <p className="mt-1 line-clamp-2 text-xs text-slate-300">{currentLink.description}</p>
+              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                {resolveNavigationRouteCue(currentLink.href)}
+              </p>
             </div>
           </div>
         </div>
@@ -311,6 +372,9 @@ export const ReportMobileNavigation = ({
               >
                 <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
                 <span className="mt-1 text-[11px] text-slate-400">{link.description}</span>
+                <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                  Route {resolveNavigationRouteCue(link.href)}
+                </span>
               </Link>
             ))}
           </div>

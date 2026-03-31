@@ -27,6 +27,12 @@ export type WeeklyStructured = {
 };
 
 export type MonthlyStructured = {
+  posture: {
+    label: string;
+    summary: string[];
+  };
+  boundedNextActions: string[];
+  reversalConditions: string[];
   executionConstraints: string[];
   provenance: {
     source: string;

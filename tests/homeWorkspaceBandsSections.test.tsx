@@ -61,11 +61,9 @@ const workspaceModel: HomePageWorkspaceModel = {
     exportActions: [],
   },
   translate: {
-    rolePath: { href: "/decide/ceo", title: "CEO", detail: "detail" },
-    situationPath: { href: "/decide/situation", title: "Situation", detail: "detail" },
-    decisionUtilities: [],
+    primaryPath: { href: "/decide/ceo", title: "CEO", detail: "detail", kicker: "Recommended path" },
+    fallbackUtility: { href: "/decide/situation", title: "Situation", detail: "detail" },
     toolkitShortcuts: [],
-    browseActions: [],
   },
 };
 

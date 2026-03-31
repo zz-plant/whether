@@ -88,13 +88,22 @@ export function DecisionTransmissionRail({
       </div>
       <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Share &amp; cite
+          Citation
         </p>
         <p className="mt-1 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
         <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">
           {citation}
         </pre>
-        <div className="mt-3 flex flex-wrap gap-2">{actions}</div>
+        {actions ? (
+          <details className="group weather-auto-chevron mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2">
+            <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              More share formats
+            </summary>
+            <div className="weather-disclosure-panel animate-collapsible-in mt-2 flex flex-wrap gap-2">
+              {actions}
+            </div>
+          </details>
+        ) : null}
       </div>
     </article>
   );

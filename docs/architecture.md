@@ -140,8 +140,8 @@ Use `bun run summary-archive:migrate-structured` to materialize `structured` blo
 3. **P1 — Strengthen contract tests at API boundary**
    - Add route-level tests that assert `/api/weekly` and `/api/monthly` include structured/copy/provenance invariants.
    - Goal: catch schema regressions before UI consumers break.
-4. **P2 — Normalize section taxonomy across cadences**
-   - Align monthly section depth with weekly where useful (for example watchouts/priorities).
+4. **P2 — Normalize section taxonomy across cadences** ✅ Implemented
+   - Monthly structured summaries now include posture, bounded next actions, top reversals, execution constraints, and provenance.
    - Goal: make cross-cadence tooling simpler.
 5. **P2 — Persist SummaryCard raw-text toggle preference**
    - Store per-cadence toggle state in local storage.

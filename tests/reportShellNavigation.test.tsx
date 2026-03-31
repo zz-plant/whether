@@ -21,13 +21,15 @@ describe("Report shell page navigation", () => {
     assert.match(html, /Anchor route/);
     assert.match(html, /Support paths/);
     assert.match(html, /Start from Weekly Brief/);
+    assert.match(html, /Surface 1 of 5/);
 
     assert.match(html, /Weekly Brief/);
     assert.match(html, /Evidence/);
-    assert.match(html, /Validate why the weekly call moved: drivers, thresholds, freshness, and replay\./);
+    assert.match(html, /Evidence for this week&#x27;s call: drivers, thresholds, freshness, and replay\./);
+    assert.match(html, /Route \/signals/);
 
     assert.match(html, /Planning/);
-    assert.match(html, /Approve this week&#x27;s hiring, spending, roadmap, finance, and share-ready plan\./);
+    assert.match(html, /Planning for this week&#x27;s hiring, spending, roadmap, finance, and share-ready plan\./);
   });
 
   it("keeps current path highlighting with aria-current page", () => {
@@ -59,11 +61,13 @@ describe("Report shell page navigation", () => {
     );
 
     assert.match(html, /Return to Weekly Brief/);
-    assert.match(html, /Jump straight to the part of Evidence you need\./);
+    assert.match(html, /2 of 5/);
+    assert.match(html, /Jump straight to the part of Evidence on \/signals you need\./);
     assert.match(html, /href="#current-scores"/);
     assert.match(html, /href="#thresholds"/);
     assert.match(html, /\+1 more section below\./);
     assert.match(html, /Support paths/);
+    assert.match(html, /Route \/operations/);
   });
 });
 

@@ -39,7 +39,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "signals",
     href: "/signals",
     label: "Evidence",
-    description: "Validate why the weekly call moved: drivers, thresholds, freshness, and replay.",
+    description: "Evidence for this week's call: drivers, thresholds, freshness, and replay.",
     boundary: "Evidence depth only. Weekly Brief stays canonical for the live operating call.",
     group: "reference",
     tier: "primary",
@@ -48,7 +48,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "operations",
     href: "/operations",
     label: "Planning",
-    description: "Approve this week's hiring, spending, roadmap, finance, and share-ready plan.",
+    description: "Planning for this week's hiring, spending, roadmap, finance, and share-ready plan.",
     boundary: "Execution depth only. Weekly Brief remains the canonical orchestration surface.",
     group: "workflow",
     tier: "primary",
@@ -57,7 +57,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "decide",
     href: "/decide",
     label: "Decision Tools",
-    description: "Resolve the one remaining edge case with a direct answer, translation, or bounded tool.",
+    description: "Decision Tools for the one remaining edge case: direct answer, translation, or bounded tool.",
     boundary: "Routing and translation depth only. Do not duplicate the live brief or weekly plan.",
     group: "workflow",
     tier: "primary",
@@ -66,7 +66,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "method",
     href: "/method",
     label: "Trust",
-    description: "Check freshness, confidence, and source coverage before irreversible moves.",
+    description: "Trust checks for freshness, confidence, source coverage, and reversal conditions.",
     boundary: "Transparency and trust checks only. Return to Weekly Brief once validated.",
     group: "reference",
     tier: "primary",
@@ -84,6 +84,24 @@ export const navigationLayers: NavigationLayer[] = [
 ] as const;
 
 export const primaryNavigationLayers = navigationLayers.filter((layer) => layer.tier === "primary");
+export const primaryNavigationSurfaceCount = primaryNavigationLayers.length;
+
+export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduce<Record<Route, number>>((acc, layer, index) => {
+  acc[layer.href] = index;
+  return acc;
+}, {} as Record<Route, number>);
+
+export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
+  const index = primaryNavigationSurfaceIndexByHref[href];
+
+  if (typeof index !== "number") {
+    return null;
+  }
+
+  return `Surface ${index + 1} of ${primaryNavigationSurfaceCount}`;
+};
+
+export const resolveNavigationRouteCue = (href: Route) => (href === "/" ? "Weekly Brief" : href);
 
 export const supportingNavigationLayers = navigationLayers.filter((layer) => layer.tier === "supporting");
 

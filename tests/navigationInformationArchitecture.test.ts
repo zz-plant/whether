@@ -5,6 +5,9 @@ import {
   navigationLayers,
   navigationLabelByPath,
   primaryNavigationLayers,
+  primaryNavigationSurfaceCount,
+  resolveNavigationRouteCue,
+  resolvePrimaryNavigationSurfaceCue,
   supportingNavigationLayers,
 } from "../lib/navigation/informationArchitecture";
 import { primaryNavigation } from "../lib/navigation/primaryNavigation";
@@ -44,6 +47,17 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/decide"], "Decision Tools");
     assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
     assert.equal(navigationLabelByPath["/method"], "Trust");
+  });
+
+  it("exposes primary surface progress cues and route cues for navigation copy", () => {
+    assert.equal(primaryNavigationSurfaceCount, 5);
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Surface 1 of 5");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Surface 2 of 5");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Surface 3 of 5");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Surface 4 of 5");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Surface 5 of 5");
+    assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
+    assert.equal(resolveNavigationRouteCue("/signals"), "/signals");
   });
 
   it("keeps canonical route transitions for Decide and Method", () => {

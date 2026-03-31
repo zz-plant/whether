@@ -47,6 +47,12 @@ export const summaryCardCadences: CadenceSummaryConfigByKey = {
     cadenceLabel: "monthly",
     apiHref: "/api/monthly",
     sectionBuilder: (summary) => [
+      {
+        title: "Monthly posture",
+        items: [summary.structured.posture.label, ...summary.structured.posture.summary],
+      },
+      { title: "Bounded next actions", items: summary.structured.boundedNextActions },
+      { title: "Top reversals", items: summary.structured.reversalConditions },
       { title: "Execution constraints", items: summary.structured.executionConstraints },
       {
         title: "Provenance",

@@ -63,6 +63,14 @@ describe("summary route contracts", () => {
     const body = (await response.json()) as Record<string, unknown>;
     assertBaseSummaryContract(body);
     assertWeeklyMonthlyExtras(body);
+
+    const structured = (body.summary as { structured?: { posture?: { label?: unknown; summary?: unknown[] }; boundedNextActions?: unknown[]; reversalConditions?: unknown[]; executionConstraints?: unknown[] } }).structured;
+    assert.ok(structured, "monthly summary should include structured data");
+    assert.equal(typeof structured?.posture?.label, "string");
+    assert.ok(Array.isArray(structured?.posture?.summary), "monthly posture summary should be an array");
+    assert.ok(Array.isArray(structured?.boundedNextActions), "monthly boundedNextActions should be an array");
+    assert.ok(Array.isArray(structured?.reversalConditions), "monthly reversalConditions should be an array");
+    assert.ok(Array.isArray(structured?.executionConstraints), "monthly executionConstraints should be an array");
   });
 
   it("keeps /api/quarterly response contract stable", async () => {

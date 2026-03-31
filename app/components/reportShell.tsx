@@ -164,9 +164,9 @@ export const ReportShell = (props: ReportShellProps) => {
     headerVariant: resolvedHeaderVariantInput,
     sidebarVariant: resolvedSidebarVariant = "full",
     hideHeroChrome: resolvedHideHeroChrome = false,
-    primaryCta: resolvedPrimaryCta = { href: "#weekly-action-summary", label: "This week" },
+    primaryCta: inputPrimaryCta,
     secondaryCta: resolvedSecondaryCta,
-    exportCta: resolvedExportCta = { href: "/operations#ops-export-briefs", label: "Generate executive brief" },
+    exportCta: inputExportCta,
     structuredData: resolvedStructuredData,
     historicalBanner: resolvedHistoricalBanner,
     stageRail: resolvedStageRail,
@@ -181,6 +181,9 @@ export const ReportShell = (props: ReportShellProps) => {
     commandBar: resolvedCommandBar,
     ambientMode: resolvedAmbientMode = "standard",
   } = input;
+  const resolvedPrimaryCta =
+    inputPrimaryCta ?? (resolvedCurrentPath === "/" ? undefined : { href: "#weekly-action-summary", label: "This week" });
+  const resolvedExportCta = inputExportCta ?? { href: "/operations#ops-export-briefs", label: "Generate executive brief" };
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
@@ -192,6 +195,8 @@ export const ReportShell = (props: ReportShellProps) => {
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
   const showPostureRibbon = resolvedCurrentPath !== "/";
   const resolvedHeaderVariant: ReportShellHeaderVariant = resolvedHeaderVariantInput ?? (resolvedHideHeroChrome ? "home-brief" : "standard");
+  const headerExportCta = resolvedCurrentPath === "/" ? resolvedExportCta : null;
+  const bodyExportCta = resolvedCurrentPath === "/" ? null : resolvedExportCta;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
   const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
   const showInlineTrustBlock = !hasSidebar;
@@ -253,6 +258,7 @@ export const ReportShell = (props: ReportShellProps) => {
             pageLinks={resolvedPageLinks}
             pageTitle={resolvedPageTitle}
             pageNavVariant={resolvedPageNavVariant}
+            exportCta={headerExportCta}
           />
           {resolvedCommandBar ? (
             <section
@@ -295,7 +301,7 @@ export const ReportShell = (props: ReportShellProps) => {
             ) : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
-              {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={bodyExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 

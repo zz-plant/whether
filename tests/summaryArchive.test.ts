@@ -69,6 +69,9 @@ describe("parseSummaryArchive", () => {
     assert.equal(weekly.summary.structured.recommendedMoves.length > 0, true);
 
     assert.equal(monthly.cadence, "monthly");
+    assert.equal(monthly.summary.structured.posture.label.length > 0, true);
+    assert.equal(monthly.summary.structured.boundedNextActions.length > 0, true);
+    assert.equal(monthly.summary.structured.reversalConditions.length > 0, true);
     assert.deepEqual(monthly.summary.structured.executionConstraints, monthly.summary.constraints);
     assert.equal(monthly.summary.structured.provenance.dataAge, "2h");
   });

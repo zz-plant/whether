@@ -15,8 +15,46 @@ export async function HomeWorkspaceBands({
   return (
     <div className="home-band-stack">
       <OperationsBandSection workspaceModel={workspaceModel} />
-      <AuditBandSection workspaceModel={workspaceModel} />
-      <CadenceBandSection workspaceModel={workspaceModel} />
+      <section className="space-y-4 lg:hidden" aria-label="Follow-on surfaces">
+        <details className="weather-auto-chevron rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
+          <summary className="cursor-pointer text-left">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Exception review
+            </span>
+            <span className="mt-1 block text-sm font-semibold text-slate-100">
+              Open Evidence or Trust only when the weekly plan still needs proof.
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed text-slate-300">
+              Keep this closed unless someone challenges the call, freshness, or thresholds.
+            </span>
+          </summary>
+          <div className="mt-4">
+            <AuditBandSection workspaceModel={workspaceModel} />
+          </div>
+        </details>
+
+        <details className="weather-auto-chevron rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
+          <summary className="cursor-pointer text-left">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              One more question
+            </span>
+            <span className="mt-1 block text-sm font-semibold text-slate-100">
+              Open one follow-on surface only after the plan is already clear.
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed text-slate-300">
+              Use a single downstream tool for the remaining edge case instead of reopening the brief.
+            </span>
+          </summary>
+          <div className="mt-4">
+            <CadenceBandSection workspaceModel={workspaceModel} />
+          </div>
+        </details>
+      </section>
+
+      <div className="hidden lg:contents">
+        <AuditBandSection workspaceModel={workspaceModel} />
+        <CadenceBandSection workspaceModel={workspaceModel} />
+      </div>
     </div>
   );
 }

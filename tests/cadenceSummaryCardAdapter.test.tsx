@@ -59,7 +59,10 @@ describe("CadenceSummaryCardAdapter", () => {
     }
 
     assert.match(html, /href="\/api\/weekly"/);
-    assert.match(html, /href="\/operations\/data#weekly-api"/);
+    assert.match(
+      html,
+      /href="https:\/\/github\.com\/zz-plant\/whether\/blob\/main\/docs\/developer\/api-reference\.md"/,
+    );
     assert.match(html, /Raw summary text/);
   });
 
@@ -76,11 +79,20 @@ describe("CadenceSummaryCardAdapter", () => {
       </Toast.Provider>,
     );
 
-    const executionConstraintsIndex = html.indexOf("Execution constraints");
-    const provenanceIndex = html.indexOf("Provenance");
+    const titles = [
+      "Monthly posture",
+      "Bounded next actions",
+      "Top reversals",
+      "Execution constraints",
+      "Provenance",
+    ];
 
-    assert.ok(executionConstraintsIndex >= 0);
-    assert.ok(provenanceIndex > executionConstraintsIndex);
+    let previousIndex = -1;
+    for (const title of titles) {
+      const index = html.indexOf(title);
+      assert.ok(index > previousIndex, `Expected \"${title}\" to appear in order.`);
+      previousIndex = index;
+    }
     assert.match(html, /href="\/api\/monthly"/);
     assert.match(html, /Raw summary text/);
   });

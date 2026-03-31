@@ -52,6 +52,22 @@ describe("summaryCopyRenderer", () => {
         statusLabel: "Live",
       },
       structured: {
+        posture: {
+          label: "Growth Mode",
+          summary: [
+            "Priority: scale proven bets.",
+            "Confidence: high (standard signal).",
+            "Boundary watch: stable.",
+          ],
+        },
+        boundedNextActions: [
+          "Keep the month anchored to scale proven bets.",
+          "Keep new commitments inside the current constraints.",
+        ],
+        reversalConditions: [
+          "Re-open broader bets if regime posture or confidence weakens.",
+          "Re-check the plan when any execution constraint starts to bind.",
+        ],
         executionConstraints: ["Sequence delivery around revenue durability"],
         provenance: {
           source: "US Treasury (https://example.com/source)",
@@ -61,7 +77,11 @@ describe("summaryCopyRenderer", () => {
       },
     });
 
-    assert.match(copy, /Execution constraints:\n• Sequence delivery around revenue durability/);
+    assert.match(copy, /MONTHLY POSTURE/);
+    assert.match(copy, /BOUNDED NEXT ACTIONS/);
+    assert.match(copy, /TOP REVERSALS/);
+    assert.match(copy, /EXECUTION CONSTRAINTS/);
+    assert.match(copy, /EXECUTION CONSTRAINTS\n\n• Sequence delivery around revenue durability/);
     assert.match(copy, /Provenance:\nSource: US Treasury \(https:\/\/example\.com\/source\)/);
   });
 });

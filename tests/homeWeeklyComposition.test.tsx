@@ -166,11 +166,9 @@ const workspaceModel: HomePageWorkspaceModel = {
     exportActions: [{ href: "/operations#ops-export-briefs", label: "Open share brief" }],
   },
   translate: {
-    rolePath: { href: "/decide/ceo", title: "CEO view", detail: "Translate this week into leadership calls." },
-    situationPath: { href: "/decide/avoid-premature-scaling", title: "Avoid premature scaling", detail: "Fastest route to this week's next action." },
+    primaryPath: { href: "/decide/team-context", title: "Team context profile", detail: "Adjust the weekly call for your company profile without reopening the whole brief.", kicker: "Recommended unresolved path" },
+    fallbackUtility: { href: "/decide/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime." },
     toolkitShortcuts: [],
-    decisionUtilities: [],
-    browseActions: [],
   },
 };
 
@@ -190,15 +188,14 @@ describe("weekly card and interpretation panel composition", () => {
     const html = renderToStaticMarkup(
       <>
         <WeeklyDecisionCard model={buildHomeCardModel()} />
-        <HomeInterpretationPanel layer={layer} searchParams={{ view: "company", month: "3", year: "2026" }} />
         {workspaceBands}
+        <HomeInterpretationPanel layer={layer} searchParams={{ view: "company", month: "3", year: "2026" }} />
       </>,
     );
 
     assert.match(html, /Current outlook/);
     assert.match(html, /Week of Mar 5, 2026/);
-    assert.match(html, /Audit trail/);
-    assert.match(html, /Decision snapshot for leadership this week/);
+    assert.match(html, /Decision delta: tighten roadmap optionality while protecting core delivery\./);
     assert.match(html, /Operating levers this week/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Revisit decisions\?/);
@@ -210,7 +207,7 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
-    assert.match(html, /See what changed, then pressure-test the call with trust and evidence\./);
+    assert.match(html, /Weekly operating board/);
   });
 
   it("renders weekly card before interpretation panel and preserves homepage hierarchy", async () => {
@@ -228,17 +225,17 @@ describe("weekly card and interpretation panel composition", () => {
     const html = renderToStaticMarkup(
       <>
         <WeeklyDecisionCard model={buildHomeCardModel()} />
-        <HomeInterpretationPanel layer={layer} searchParams={{ view: "forecast" }} />
         {workspaceBands}
+        <HomeInterpretationPanel layer={layer} searchParams={{ view: "forecast" }} />
       </>,
     );
 
     const heroIndex = html.indexOf("Current outlook");
-    const diagnosticsIndex = html.indexOf("Audit trail");
-    const rulesIndex = html.indexOf("Decision snapshot for leadership this week");
+    const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
+    const rulesIndex = html.indexOf("Decision strip");
     const actionStripIndex = html.indexOf("Operating levers this week");
     const interpretationIndex = html.indexOf("Interpretation layer");
-    const workspaceIndex = html.indexOf("See what changed, then pressure-test the call with trust and evidence.");
+    const workspaceIndex = html.indexOf("Weekly operating board");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
     const replayIndex = html.indexOf('id="historical-replay-workspace"');
 
@@ -246,10 +243,10 @@ describe("weekly card and interpretation panel composition", () => {
     assert.ok(diagnosticsIndex > heroIndex);
     assert.ok(rulesIndex > diagnosticsIndex);
     assert.ok(actionStripIndex > rulesIndex);
-    assert.ok(interpretationIndex > actionStripIndex);
-    assert.ok(workspaceIndex > interpretationIndex);
-    assert.ok(executionIndex > workspaceIndex);
-    assert.ok(replayIndex > executionIndex);
+    assert.ok(executionIndex > actionStripIndex);
+    assert.ok(workspaceIndex > executionIndex);
+    assert.ok(replayIndex > workspaceIndex);
+    assert.ok(interpretationIndex > replayIndex);
   });
 
   it("renders orientation strip before the weekly decision card without replacing core card content", () => {

@@ -3,6 +3,8 @@ import {
   navigationLayerByKey,
   navigationLayers,
   primaryNavigationLayers,
+  resolveNavigationRouteCue,
+  resolvePrimaryNavigationSurfaceCue,
 } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
@@ -32,9 +34,10 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
       ? recommendedPrimaryHrefByKey[currentLayer.key as keyof typeof recommendedPrimaryHrefByKey]
       : "/";
   const recommendedAction = PRIMARY_ACTIONS.find((action) => action.href === recommendedHref) ?? PRIMARY_ACTIONS[0];
+  const loopOrder = primaryNavigationLayers.map((layer) => layer.label).join(" → ");
   const introCopy = currentLayer?.tier === "supporting" && parentLayer
     ? `${currentLayer.label} is a supporting surface under ${parentLayer.label}. Use the primary workflow for orientation, then come here only when you need this deeper library.`
-    : "Use Weekly Brief as the anchor. Each downstream surface should answer exactly one unresolved question before you return.";
+    : `Use the five-surface loop: ${loopOrder}. Each downstream surface should answer exactly one unresolved question before you return.`;
 
   return (
     <section className="weather-hub-section" aria-label="Next step rail">
@@ -50,6 +53,14 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
               {currentLayer?.tier === "supporting" ? "Supporting surface" : "You are here"}
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{currentAction.label}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                {resolvePrimaryNavigationSurfaceCue(currentAction.href)}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Route {resolveNavigationRouteCue(currentAction.href)}
+              </span>
+            </div>
             {parentLayer ? (
               <p className="mt-1 text-xs text-slate-300">Primary parent: {parentLayer.label}</p>
             ) : null}

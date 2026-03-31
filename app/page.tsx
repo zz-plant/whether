@@ -88,13 +88,9 @@ export const HomePageReportContent = async ({
           showPageNavigation: false,
         },
         actions: {
-          primaryCta: {
-            href: "#approve-this-weeks-plan",
-            label: "Open next-step plan",
-          },
-          secondaryCta: {
-            href: "#audit-this-call",
-            label: "See supporting evidence",
+          exportCta: {
+            href: "#share-ready-artifact",
+            label: "Share weekly brief",
           },
           nextStep: {
             href: "/operations",

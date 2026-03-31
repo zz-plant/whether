@@ -5,9 +5,14 @@ import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
+  resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
+import {
+  primaryNavigationSurfaceCount,
+  resolvePrimaryNavigationSurfaceCue,
+} from "../../lib/navigation/informationArchitecture";
 
 type GlobalHeaderNavClientProps = {
   pathname?: string;
@@ -94,6 +99,9 @@ export function GlobalHeaderNavClient({
   const resolvedPathname = pathname ?? currentPathname;
   const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const activeLink = navigationLinks.find((link) => link.isActive) ?? navigationLinks[0];
+  const activeSurfaceCue = activeLink ? resolvePrimaryNavigationSurfaceCue(activeLink.href) : null;
+  const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
 
   const handleIntentPrefetch = (href: string) => {
     router.prefetch(href as Route);
@@ -128,6 +136,19 @@ export function GlobalHeaderNavClient({
           {isMenuOpen ? "Hide sections" : "Browse sections"}
         </button>
       </div>
+      <div className="mb-2 flex items-center justify-between gap-3 sm:hidden">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+            Primary surfaces
+          </p>
+          <p className="truncate text-xs text-slate-300">
+            {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
+          </p>
+        </div>
+        <span className="rounded-full border border-slate-700/80 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+          Swipe
+        </span>
+      </div>
       <ul
         id="global-header-nav-list"
         className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
@@ -142,8 +163,16 @@ export function GlobalHeaderNavClient({
           isMenuOpen ? "block" : "hidden"
         }`}
       />
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-slate-950 to-transparent sm:hidden ${
+          isMenuOpen ? "block" : "hidden"
+        }`}
+      />
       <p className="pt-1 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 sm:hidden">
-        {isMenuOpen ? "Swipe for more sections →" : "Open sections to navigate →"}
+        {isMenuOpen
+          ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe to see the other ${Math.max(primaryNavigationSurfaceCount - 1, 0)} primary surfaces.`
+          : "Open sections to navigate across the primary surfaces."}
       </p>
     </div>
   );

@@ -151,4 +151,32 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Copy aligned brief/);
     assert.match(html, /Deep evidence appendix\./);
   });
+
+  it("renders the home brief share action in the header and keeps the body CTA rail quiet", () => {
+    const html = renderToStaticMarkup(
+      <ReportShell
+        statusLabel="DEFENSIVE"
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026"
+        treasurySource="https://fred.stlouisfed.org"
+        pageTitle="Weekly Brief"
+        pageSummary="This week's call and the share-ready path."
+        pageLinks={[]}
+        sectionLinks={[]}
+        trustStatusLabel="HIGH"
+        trustStatusDetail="Stable feed"
+        trustStatusAction="Proceed with planning."
+        trustStatusTone="stable"
+        currentPath="/"
+        headerVariant="home-brief"
+        exportCta={{ href: "/operations#ops-export-briefs", label: "Open share brief" }}
+      >
+        <section>Body</section>
+      </ReportShell>,
+    );
+
+    assert.match(html, /Open share brief/);
+    assert.match(html, /Share the weekly call before opening Planning or deeper evidence\./);
+    assert.doesNotMatch(html, /On this page/);
+  });
 });

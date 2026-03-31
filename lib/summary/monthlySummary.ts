@@ -45,15 +45,50 @@ export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   monthlyActionGuidance[regime];
 
 export const buildMonthlyStructured = ({
+  regimeLabel,
+  guidance,
+  confidence,
+  intensity,
+  transitionWatch,
   constraints,
   provenance,
 }: {
+  regimeLabel: string;
+  guidance: string;
+  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  intensity: RegimeAssessment["diagnostics"]["intensity"];
+  transitionWatch: boolean;
   constraints: string[];
   provenance: MonthlySummaryProvenance;
 }): MonthlyStructured => {
+  const postureSummary = [
+    `Priority: ${guidance}.`,
+    `Confidence: ${confidence.toLowerCase()} (${intensity.toLowerCase()} signal).`,
+    transitionWatch
+      ? "Boundary watch: keep reversals easy."
+      : "Boundary watch: stable.",
+  ];
+  const boundedNextActions = [
+    `Keep the month anchored to ${guidance}.`,
+    transitionWatch
+      ? "Keep new commitments reversible until the next read confirms stability."
+      : "Keep new commitments inside the current constraints.",
+  ];
+  const reversalConditions = [
+    transitionWatch
+      ? "Re-open broader scope after the next read confirms the regime is still stable."
+      : "Re-open broader bets if regime posture or confidence weakens.",
+    "Re-check the plan when any execution constraint starts to bind.",
+  ];
   const source = formatSourceLine(provenance);
 
   return {
+    posture: {
+      label: regimeLabel,
+      summary: postureSummary,
+    },
+    boundedNextActions,
+    reversalConditions,
     executionConstraints: constraints,
     provenance: {
       source,
@@ -82,6 +117,11 @@ export const buildMonthlySummary = ({
     ? `Monthly action summary — ${recordDateLabel}`
     : "Monthly action summary";
   const structured = buildMonthlyStructured({
+    regimeLabel,
+    guidance,
+    confidence: assessment.diagnostics.confidence,
+    intensity: assessment.diagnostics.intensity,
+    transitionWatch: assessment.diagnostics.transitionWatch,
     constraints: assessment.constraints,
     provenance,
   });
