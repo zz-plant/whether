@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildSearchIndex, groupSearchResultsByType, searchIndex } from "../lib/search/searchIndex";
+import { buildSearchIndex, groupSearchResultsByJob, searchIndex } from "../lib/search/searchIndex";
 
 describe("search index", () => {
   it("aggregates toolkit, failure-mode, concept, and doc entities", () => {
@@ -19,9 +19,9 @@ describe("search index", () => {
     assert.equal(results[0]?.type, "toolkit");
   });
 
-  it("groups results by entity type", () => {
-    const grouped = groupSearchResultsByType(searchIndex("method"));
+  it("groups results by entity job", () => {
+    const grouped = groupSearchResultsByJob(searchIndex("method"));
 
-    assert.ok(grouped.doc.length > 0);
+    assert.ok(grouped.trust.some((result) => result.type === "doc"));
   });
 });

@@ -141,6 +141,9 @@ const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: 
   return `${metricLabel(distance.metric)} ${distance.pointsToLine.toFixed(1)} pts to ${kind === "caution" ? "caution" : "reopen"}.`;
 };
 
+const sortThresholdDistance = (left: RuleThresholdDistance, right: RuleThresholdDistance) =>
+  left.pointsToLine - right.pointsToLine;
+
 export const resolveDecisionLaneState = ({
   rule,
   scores,
@@ -154,8 +157,8 @@ export const resolveDecisionLaneState = ({
 
   const pauseConditions = parseRuleThresholdConditions(rule.pauseTrigger).map((condition) => toThresholdDistance(condition, scores));
   const resumeConditions = parseRuleThresholdConditions(rule.resumeTrigger).map((condition) => toThresholdDistance(condition, scores));
-  const nearestPause = pauseConditions.toSorted((left, right) => left.pointsToLine - right.pointsToLine)[0];
-  const nearestResume = resumeConditions.toSorted((left, right) => left.pointsToLine - right.pointsToLine)[0];
+  const nearestPause = [...pauseConditions].sort(sortThresholdDistance)[0];
+  const nearestResume = [...resumeConditions].sort(sortThresholdDistance)[0];
   const pauseSatisfied = pauseConditions.some((condition) => condition.satisfied);
   const resumeSatisfiedCount = resumeConditions.filter((condition) => condition.satisfied).length;
 

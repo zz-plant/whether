@@ -9,6 +9,7 @@ import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
   formatDecisionAction,
@@ -95,6 +96,8 @@ export const DecisionShieldPanel = ({
   const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
   const lastAttemptedTargetRef = useRef<"verdict" | "link" | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const clientId = useMemo(() => createClientId(), []);
 

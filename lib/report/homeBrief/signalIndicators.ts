@@ -283,7 +283,7 @@ export const buildInputInfluenceItems = ({
     signalContributions.map((item: NormalizedSignalContribution) => [
       item.key,
       item,
-    ]),
+    ] as const),
   );
   const indicatorByKey = new Map(regimeSignalIndicators.map((item) => [item.key, item]));
 

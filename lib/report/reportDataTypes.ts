@@ -1,3 +1,5 @@
+import type { NormalizedSignalContribution } from "./signalFormatting";
+
 export type LastYearComparison = {
   current: {
     recordDate: string;
@@ -46,14 +48,7 @@ export type ReportDynamics = {
   totalSignalChanges: number;
   regimeChanged: boolean;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
-  signalContributions?: Array<{
-    key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
-    label: string;
-    value: number | null;
-    normalizedPercent: number | null;
-    normalizedPercentLabel: string;
-    unavailable: boolean;
-  }>;
+  signalContributions?: NormalizedSignalContribution[];
 };
 
 export type ReportEvidenceItem = {

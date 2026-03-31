@@ -349,7 +349,7 @@ export const TimeMachinePanel = ({
   );
 
   const jumpToLatestHref = useMemo(
-    () => buildTimeMachineJumpToLatestHref(pathname, searchParams, latestMonthValue),
+    () => buildTimeMachineJumpToLatestHref(pathname, searchParams, latestMonthValue ?? ""),
     [latestMonthValue, pathname, searchParams],
   );
 

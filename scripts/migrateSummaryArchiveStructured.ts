@@ -3,6 +3,7 @@ import { parseArgs } from "node:util";
 import { buildMonthlyStructured } from "../lib/summary/monthlySummary";
 import { buildWeeklyStructured } from "../lib/summary/weeklySummary";
 import { getGovernanceParametersForPosture } from "../lib/policy/governance";
+import type { RegimeAssessment } from "../lib/regimeEngine";
 import { getRegimeOperatorLabel } from "../lib/regimeLabels";
 
 type ArchiveEntry = {
@@ -11,6 +12,10 @@ type ArchiveEntry = {
   month?: number;
   summary?: {
     regime?: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+    guidance?: string;
+    confidence?: RegimeAssessment["diagnostics"]["confidence"];
+    intensity?: RegimeAssessment["diagnostics"]["intensity"];
+    transitionWatch?: boolean;
     constraints?: string[];
     provenance?: {
       sourceLabel: string;
