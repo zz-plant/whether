@@ -263,8 +263,8 @@ export default async function MethodPage() {
           <article className="weather-hub-link-card space-y-2">
             <h2 className="text-lg font-semibold text-slate-100">Optional context only</h2>
             <p className="text-sm text-slate-300">Use failure-mode diagnostics only after the on-page trust check is complete and someone still needs conceptual context.</p>
-            <Link href="/learn/failure-modes" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              Open failure modes
+            <Link href="#revisit-call" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              Open revisit triggers
             </Link>
           </article>
         </div>

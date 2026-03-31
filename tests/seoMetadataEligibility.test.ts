@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
 import { isSeoPageIndexEligible } from "../lib/report/seoIndexEligibility";
+import { indexableAnswerSlugs } from "../lib/seo/indexationPolicy";
 
 describe("SEO index eligibility", () => {
   it("treats fresh complete payloads as index-eligible", () => {
@@ -45,6 +46,31 @@ describe("SEO index eligibility", () => {
         noindexReasons: eligibility.reasons,
         trustSummary: "Fallback",
         citationMeta: "Fallback",
+      },
+    });
+
+    assert.deepEqual(metadata.robots, { index: false, follow: true });
+  });
+
+  it("applies noindex robots metadata to low-priority answer pages even when payload is fresh", () => {
+    const nonPrioritySlug = "startup-market-outlook";
+    assert.ok(!indexableAnswerSlugs.includes(nonPrioritySlug as (typeof indexableAnswerSlugs)[number]));
+
+    const metadata = buildDecisionAnswerMetadata({
+      title: "Startup Market Outlook",
+      slug: nonPrioritySlug,
+      payload: {
+        currentCall: "Stay selective.",
+        immediateAction: "Prioritize reversible moves.",
+        triggerThreshold: "Tighten if conditions deteriorate.",
+        reversalCondition: "Re-open after two improving reads.",
+        evidence: [],
+        freshness: "Fresh",
+        degraded: false,
+        noindex: false,
+        noindexReasons: [],
+        trustSummary: "Live",
+        citationMeta: "Current week",
       },
     });
 

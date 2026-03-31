@@ -3,6 +3,7 @@ import Link from "next/link";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 export const runtime = "edge";
 
@@ -12,6 +13,8 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/decide/ship-checklist",
   imageAlt: "Whether to ship checklist",
 });
+
+metadata.robots = noindexRobots;
 
 const parseInput = (searchParams: Record<string, string | undefined>): ChecklistInput => ({
   evidenceStrength: (searchParams.evidenceStrength as ChecklistInput["evidenceStrength"]) ?? "medium",

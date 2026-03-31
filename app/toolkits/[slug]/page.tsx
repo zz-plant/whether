@@ -5,6 +5,7 @@ import type { Route } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -19,12 +20,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const toolkit = findToolkitDefinition(slug);
   if (!toolkit) return {};
 
-  return buildPageMetadata({
-    title: toolkit.title,
-    description: toolkit.whenToUse,
-    path: `/toolkits/${slug}`,
-    imageAlt: toolkit.title,
-  });
+  return {
+    ...buildPageMetadata({
+      title: toolkit.title,
+      description: toolkit.whenToUse,
+      path: `/toolkits/${slug}`,
+      imageAlt: toolkit.title,
+    }),
+    robots: noindexRobots,
+  };
 }
 
 export default async function ToolkitDetailPage({ params }: { params: Promise<Params> }) {

@@ -128,5 +128,4 @@ export const secondarySurfaceRoots: ReadonlyArray<Route> = [
   "/guides",
   "/resources",
   "/answers",
-  "/concepts",
 ] as const;

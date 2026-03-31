@@ -6,8 +6,8 @@ import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayload
 import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
 import { decideCanonicalClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
 import { findDecisionScenario } from "../../../seoRouteClusters";
-import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
+import { noindexRobots } from "../../../../lib/seo/indexationPolicy";
 
 type Params = { slug: string; cluster: string };
 
@@ -18,29 +18,22 @@ export function generateStaticParams() {
   return decideCanonicalClusterStaticParams;
 }
 
-
-const shouldNoindexForPayload = (payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">) => {
-  if (!payload) return true;
-  if (payload.noindex || payload.degraded) return true;
-  return (payload.noindexReasons ?? []).some((reason) => reason.startsWith("freshness-") || reason.includes("provenance"));
-};
-
 export const buildDecideClusterMetadata = ({
   slug,
   cluster,
   roleTitle,
   roleDescription,
   scenarioTitle,
-  isCanonical,
-  payload,
+  isCanonical: _isCanonical,
+  payload: _payload,
 }: {
   slug: string;
   cluster: string;
   roleTitle: string;
   roleDescription: string;
   scenarioTitle: string;
-  isCanonical: boolean;
-  payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">;
+  isCanonical?: boolean;
+  payload?: unknown;
 }) => {
   const metadata = buildPageMetadata({
     title: `${roleTitle}: ${scenarioTitle} decision scenario`,
@@ -49,9 +42,7 @@ export const buildDecideClusterMetadata = ({
     imageAlt: roleTitle,
   });
 
-  if (!isCanonical || shouldNoindexForPayload(payload)) {
-    metadata.robots = { index: false, follow: true };
-  }
+  metadata.robots = noindexRobots;
 
   return metadata;
 };
@@ -64,8 +55,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!routeDefinition || !roleDefinition || !scenarioDefinition) return {};
 
-  const payloadRecord = await readProgrammaticPayload(`/decide/${slug}/${cluster}`).catch(() => undefined);
-
   return buildDecideClusterMetadata({
     slug,
     cluster,
@@ -73,7 +62,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     roleDescription: roleDefinition.decisions[0] ?? roleDefinition.title,
     scenarioTitle: scenarioDefinition.title,
     isCanonical: routeDefinition.isCanonical,
-    payload: payloadRecord?.payload,
   });
 }
 

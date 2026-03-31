@@ -198,7 +198,7 @@ export function HomeFirstRunOrientation({
               {featuredConcepts.map((concept) => (
                 <Link
                   key={concept.slug}
-                  href={`/concepts/${concept.slug}`}
+                  href="/decide#guided-translation"
                   className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>

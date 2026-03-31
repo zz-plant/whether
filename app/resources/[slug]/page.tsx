@@ -32,6 +32,11 @@ import {
 } from "../../../lib/downloadableResources";
 import { resourceArticles } from "../../../lib/resourceArticles";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
+import {
+  isIndexableResourceArticleSlug,
+  isIndexableResourcePillarSlug,
+  noindexRobots,
+} from "../../../lib/seo/indexationPolicy";
 
 type Params = { slug: string };
 const resourcesContract = secondarySurfaceContractByKey.resources;
@@ -69,18 +74,25 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params;
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {
-    return buildDownloadableResourceMetadata(downloadableResource.metadata);
+    return {
+      ...buildDownloadableResourceMetadata(downloadableResource.metadata),
+      robots: noindexRobots,
+    };
   }
 
   const article = findResourceArticleBySlug(slug);
   if (article) {
-    return buildResourceArticleMetadata(article);
+    const metadata = buildResourceArticleMetadata(article);
+    if (!isIndexableResourceArticleSlug(article.slug)) {
+      metadata.robots = noindexRobots;
+    }
+    return metadata;
   }
 
   const page = findResourcePillarBySlug(slug);
   if (!page) return {};
 
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: page.title,
     description: page.description,
     path: `/resources/${page.slug}`,
@@ -90,6 +102,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       title: page.h1,
     },
   });
+
+  if (!isIndexableResourcePillarSlug(page.slug)) {
+    metadata.robots = noindexRobots;
+  }
+
+  return metadata;
 }
 
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {

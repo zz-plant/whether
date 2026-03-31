@@ -7,6 +7,7 @@ import { toolkitDefinitions } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { NextStepRail } from "../components/nextStepRail";
+import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
@@ -15,6 +16,8 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/toolkits",
   imageAlt: "Whether toolkits",
 });
+
+metadata.robots = noindexRobots;
 
 export default async function ToolkitsPage({
   searchParams,

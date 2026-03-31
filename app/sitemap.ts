@@ -1,23 +1,18 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
-import {
-  failureModes,
-  postureDefinitions,
-  situationUseCases,
-  toolkitDefinitions,
-  useCaseRoles,
-} from "../lib/decisionDomainCatalog";
-import { productConceptArticles } from "../lib/productCanon";
-import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
+import { resourcePillarPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
 import { tierOneDecisionPages } from "./answers/decisionPages";
-import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
-import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
+import {
+  isIndexableAnswerSlug,
+  isIndexableResourceArticleSlug,
+  isIndexableResourcePillarSlug,
+} from "../lib/seo/indexationPolicy";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -44,9 +39,6 @@ const resolveLastModified = (...candidates: string[]): Date => {
 };
 
 const staticContentLastModified = new Date("2026-02-01T00:00:00.000Z");
-
-const buildPublishedMonthDate = (year: number, month: number): Date =>
-  new Date(Date.UTC(year, Math.max(0, month - 1), 1));
 
 const buildEntry = ({
   path,
@@ -91,85 +83,32 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
-    { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.86 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
-    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.64 },
-    { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/operations", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
-    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
-    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
   ];
 
-  const postureEntries: SitemapEntryDescriptor[] = postureDefinitions.map((posture) => ({
-    path: `/posture/${posture.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
-
-  const decideRoleBridgeEntries: SitemapEntryDescriptor[] = useCaseRoles.map((role) => ({
-    path: `/decide/${role.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.58,
-  }));
-
-  const decideSituationBridgeEntries: SitemapEntryDescriptor[] = situationUseCases.map((slug) => ({
-    path: `/decide/${slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.58,
-  }));
-
-  const toolkitEntries: SitemapEntryDescriptor[] = toolkitDefinitions.map((toolkit) => ({
-    path: `/toolkits/${toolkit.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
-
-  const failureModeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
-    path: `/learn/failure-modes/${slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.65,
-  }));
-
-  const canonEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
-    path: `/concepts/${article.slug}`,
-    lastModified: buildPublishedMonthDate(article.publishedYear, article.publishedMonth),
-    changeFrequency: "monthly",
-    priority: 0.5,
-  }));
-
-  const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages.map((page) => ({
+  const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages
+    .filter((page) => isIndexableResourcePillarSlug(page.slug))
+    .map((page) => ({
     path: `/resources/${page.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
 
-  const resourceSupportEntries: SitemapEntryDescriptor[] = [
-    resourceSupportingPages.decisionShieldOverview.path,
-    resourceSupportingPages.capitalPostureTemplate.path,
-  ].map((path) => ({
-    path: path as `/${string}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.54,
-  }));
-
-  const resourceArticleEntries: SitemapEntryDescriptor[] = resourceArticles.map((article) => ({
+  const resourceArticleEntries: SitemapEntryDescriptor[] = resourceArticles
+    .filter((article) => isIndexableResourceArticleSlug(article.slug))
+    .map((article) => ({
     path: `/resources/${article.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
     priority: 0.58,
-  }));
+    }));
 
   const vcAuthorityEntries: SitemapEntryDescriptor[] = [
     {
@@ -180,12 +119,14 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     },
   ];
 
-  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? tierOneDecisionPages : []).map((page) => ({
-    path: `/answers/${page.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "weekly",
-    priority: 0.58,
-  }));
+  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? tierOneDecisionPages : [])
+    .filter((page) => isIndexableAnswerSlug(page.slug))
+    .map((page) => ({
+      path: `/answers/${page.slug}`,
+      lastModified: staticContentLastModified,
+      changeFrequency: "weekly",
+      priority: 0.58,
+    }));
 
   const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioRoutes.map((clusterRoute) => ({
     path: `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}`,
@@ -194,36 +135,13 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.68,
   }));
 
-  const decideClusterEntries: SitemapEntryDescriptor[] = indexableDecideClusterRoutes.map((clusterRoute) => ({
-    path: `/decide/${clusterRoute.slug}/${clusterRoute.cluster}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.62,
-  }));
-
-  const toolkitClusterEntries: SitemapEntryDescriptor[] = indexableToolkitClusters.map((clusterRoute) => ({
-    path: `/toolkits/${clusterRoute.slug}/${clusterRoute.cluster}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.62,
-  }));
-
   return [
     ...coreEntries,
-    ...postureEntries,
-    ...decideRoleBridgeEntries,
-    ...decideSituationBridgeEntries,
-    ...toolkitEntries,
-    ...failureModeEntries,
-    ...canonEntries,
     ...resourcePillarEntries,
-    ...resourceSupportEntries,
     ...resourceArticleEntries,
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
     ...signalsClusterEntries,
-    ...decideClusterEntries,
-    ...toolkitClusterEntries,
   ]
     .filter((entry) => !isRetiredSitemapPath(entry.path))
     .map(buildEntry);

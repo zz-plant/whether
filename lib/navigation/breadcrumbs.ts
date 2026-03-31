@@ -9,7 +9,6 @@ const canonicalBreadcrumbLabels: Record<string, string> = {
   ...navigationLabelByPath,
   "/": "Home",
   "/resources": "Resources",
-  "/concepts": "Concepts",
 };
 
 const toTitleCase = (value: string) =>

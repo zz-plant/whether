@@ -7,6 +7,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageShell, SecondaryPageSection } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { Tag } from "../components/ui/tag";
+import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Posture guides — routed from Weekly Brief",
@@ -15,6 +16,8 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether posture",
   imagePath: "/social/posture.svg",
 });
+
+metadata.robots = noindexRobots;
 
 export default async function PosturePage() {
   const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/posture" });

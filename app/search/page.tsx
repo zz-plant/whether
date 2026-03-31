@@ -10,6 +10,7 @@ import {
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
+import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const runtime = "edge";
 
@@ -20,6 +21,8 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/search",
   imageAlt: "Whether search",
 });
+
+metadata.robots = noindexRobots;
 
 const searchJobOrder: SearchEntityJob[] = ["check", "approve", "resolve", "risk", "trust"];
 

@@ -4,6 +4,7 @@ import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/decisionDomainCatalog";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../../components/secondaryPageShell";
 import { ButtonLink } from "../../components/ui/buttonLink";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 type Params = { slug: string };
 
 export const dynamicParams = false;
@@ -20,12 +21,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {};
   }
 
-  return buildPageMetadata({
-    title: `${posture.title} posture`,
-    description: posture.summary,
-    path: `/posture/${posture.slug}`,
-    imageAlt: `${posture.title} posture`,
-  });
+  return {
+    ...buildPageMetadata({
+      title: `${posture.title} posture`,
+      description: posture.summary,
+      path: `/posture/${posture.slug}`,
+      imageAlt: `${posture.title} posture`,
+    }),
+    robots: noindexRobots,
+  };
 }
 
 export default async function PostureDetailPage({ params }: { params: Promise<Params> }) {

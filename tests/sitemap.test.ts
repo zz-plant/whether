@@ -3,20 +3,17 @@ import { describe, it } from "node:test";
 import sitemap from "../app/sitemap";
 import { snapshotData } from "../lib/snapshot";
 import { siteUrl } from "../lib/siteUrl";
-import {
-  failureModes,
-  postureDefinitions,
-  situationUseCases,
-  toolkitDefinitions,
-  useCaseRoles,
-} from "../lib/decisionDomainCatalog";
-import {
-  productConceptArticles,
-} from "../lib/productCanon";
+import { resourceArticles } from "../lib/resourceArticles";
+import { resourcePillarPages } from "../lib/resourcesContent";
 import { retiredSitemapPaths } from "../app/sitemapExclusions";
+import {
+  indexableAnswerSlugs,
+  indexableResourceArticleSlugs,
+  indexableResourcePillarSlugs,
+} from "../lib/seo/indexationPolicy";
 
 describe("sitemap", () => {
-  it("returns canonical URLs and includes canonical roots plus supporting detail routes", async () => {
+  it("returns canonical URLs and includes only the curated indexable routes", async () => {
     const entries = await sitemap({ programmaticEligible: true });
 
     assert.ok(entries.length > 0);
@@ -26,78 +23,77 @@ describe("sitemap", () => {
 
     assert.equal(urls.size, entries.length);
     assert.ok(urls.has(siteUrl));
-    assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/operations`));
     assert.ok(!urls.has(`${siteUrl}/toolkits`));
     assert.ok(!urls.has(`${siteUrl}/answers`));
+    assert.ok(!urls.has(`${siteUrl}/posture`));
+    assert.ok(!urls.has(`${siteUrl}/resources`));
+    assert.ok(!urls.has(`${siteUrl}/search`));
+    assert.ok(!urls.has(`${siteUrl}/learn/failure-modes`));
+    assert.ok(!urls.has(`${siteUrl}/concepts`));
 
     for (const retiredPath of retiredSitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${retiredPath}`));
     }
 
-    for (const posture of postureDefinitions) {
-      assert.ok(urls.has(`${siteUrl}/posture/${posture.slug}`));
+    for (const slug of indexableAnswerSlugs) {
+      assert.ok(urls.has(`${siteUrl}/answers/${slug}`));
     }
 
-    for (const role of useCaseRoles) {
-      assert.ok(urls.has(`${siteUrl}/decide/${role.slug}`));
+    for (const page of resourcePillarPages) {
+      const shouldIndex = indexableResourcePillarSlugs.includes(
+        page.slug as (typeof indexableResourcePillarSlugs)[number],
+      );
+      assert.equal(urls.has(`${siteUrl}/resources/${page.slug}`), shouldIndex);
     }
 
-    for (const situation of situationUseCases) {
-      assert.ok(urls.has(`${siteUrl}/decide/${situation}`));
-    }
-
-    for (const toolkit of toolkitDefinitions) {
-      assert.ok(urls.has(`${siteUrl}/toolkits/${toolkit.slug}`));
-    }
-
-    for (const mode of failureModes) {
-      assert.ok(urls.has(`${siteUrl}/learn/failure-modes/${mode}`));
+    for (const article of resourceArticles) {
+      const shouldIndex = indexableResourceArticleSlugs.includes(
+        article.slug as (typeof indexableResourceArticleSlugs)[number],
+      );
+      assert.equal(urls.has(`${siteUrl}/resources/${article.slug}`), shouldIndex);
     }
 
     assert.ok(!urls.has(`${siteUrl}/library/failure-modes`));
-
-    for (const article of productConceptArticles) {
-      assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
-    }
 
     assert.ok(!urls.has(`${siteUrl}/guides/stage`));
     assert.ok(!urls.has(`${siteUrl}/concepts/conflicts`));
   });
 
-  it("uses valid last modified dates for root, static pages, and canon article pages", async () => {
+  it("uses valid last modified dates for root and curated static pages", async () => {
     const entries = await sitemap({ programmaticEligible: true });
 
     const root = entries.find((entry) => entry.url === siteUrl);
     assert.ok(root?.lastModified instanceof Date);
     assert.equal(root?.lastModified?.toISOString(), new Date(snapshotData.record_date).toISOString());
 
-    const posture = entries.find((entry) => entry.url === `${siteUrl}/posture`);
-    assert.ok(posture?.lastModified instanceof Date);
-    assert.equal(posture?.lastModified?.toISOString(), new Date("2026-02-01T00:00:00.000Z").toISOString());
+    const method = entries.find((entry) => entry.url === `${siteUrl}/method`);
+    assert.ok(method?.lastModified instanceof Date);
+    assert.equal(method?.lastModified?.toISOString(), new Date("2026-02-01T00:00:00.000Z").toISOString());
 
-    const firstConceptArticle = productConceptArticles[0];
-    const firstConceptEntry = entries.find(
-      (entry) => entry.url === `${siteUrl}/concepts/${firstConceptArticle.slug}`,
+    const firstAuthorityResource = entries.find(
+      (entry) => entry.url === `${siteUrl}/resources/capital-discipline-venture-backed-companies`,
     );
-    assert.ok(firstConceptEntry?.lastModified instanceof Date);
+    assert.ok(firstAuthorityResource?.lastModified instanceof Date);
     assert.equal(
-      firstConceptEntry?.lastModified?.toISOString(),
-      new Date(
-        Date.UTC(firstConceptArticle.publishedYear, firstConceptArticle.publishedMonth - 1, 1),
-      ).toISOString(),
+      firstAuthorityResource?.lastModified?.toISOString(),
+      new Date("2026-02-01T00:00:00.000Z").toISOString(),
     );
   });
 
-  it("keeps supporting and secondary surfaces below their primary parent priorities", async () => {
+  it("keeps curated authority pages below the primary hubs", async () => {
     const entries = await sitemap({ programmaticEligible: true });
     const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
-    const firstToolkit = toolkitDefinitions[0];
 
-    assert.ok((priorityByUrl.get(`${siteUrl}/decide`) ?? 0) > (priorityByUrl.get(`${siteUrl}/toolkits/${firstToolkit.slug}`) ?? 1));
-    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn/failure-modes`) ?? 1));
-    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/concepts`) ?? 1));
+    assert.ok(
+      (priorityByUrl.get(`${siteUrl}/decide`) ?? 0) >
+        (priorityByUrl.get(`${siteUrl}/answers/${indexableAnswerSlugs[0]}`) ?? 1),
+    );
+    assert.ok(
+      (priorityByUrl.get(`${siteUrl}/operations`) ?? 0) >
+        (priorityByUrl.get(`${siteUrl}/resources/capital-discipline-venture-backed-companies`) ?? 1),
+    );
   });
 
   it("omits programmatic answer/regime URLs when eligibility fails", async () => {

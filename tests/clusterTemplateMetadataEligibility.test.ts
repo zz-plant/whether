@@ -76,7 +76,7 @@ describe("cluster template metadata eligibility", () => {
     assert.deepEqual(metadata.robots, { index: false, follow: true });
   });
 
-  it("keeps canonical toolkit pages indexable when payload is eligible", () => {
+  it("keeps canonical toolkit pages noindex even when payload is eligible", () => {
     const metadata = buildToolkitClusterMetadata({
       slug: "focus",
       cluster: "capital-tightness-watch",
@@ -91,6 +91,6 @@ describe("cluster template metadata eligibility", () => {
       },
     });
 
-    assert.equal(metadata.robots, undefined);
+    assert.deepEqual(metadata.robots, { index: false, follow: true });
   });
 });

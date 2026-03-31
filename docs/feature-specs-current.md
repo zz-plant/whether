@@ -19,9 +19,12 @@ Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decision Tools**
 - `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
+- SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
+- Secondary libraries such as `/guides`, `/toolkits`, `/posture`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
+- `/concepts` and `/learn/failure-modes` now permanently redirect into canonical decision/trust workflows rather than acting as independently indexable content hubs.
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
@@ -137,6 +140,7 @@ before the detailed trust workflow so operators can decide whether a deeper audi
 `/methodology` now permanently redirects to `/method#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
 The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
+Failure-mode diagnostics are now handled through the Trust workflow rather than as a standalone indexable library.
 
 ### 1.7 Share-preview assets for canonical hubs
 High-priority hub routes now ship dedicated static SVG social preview assets for:
@@ -153,7 +157,7 @@ Secondary hubs (`/guides`, `/resources`, `/toolkits`) now lead with immediate va
 focused next actions while reinforcing their parent workflow hub. `/answers` now redirects directly
 back into the canonical Decision Tools answer router instead of maintaining a separate hub shell.
 Full helper libraries remain below the featured paths when those surfaces render a library view.
-`/guides` now owns both stakeholder and stage detail states behind query-selected panels, and `/concepts` now owns focus, audience, and conflict-map browsing behind query-selected states, which keeps those secondary surfaces canonical without parallel route implementations.
+`/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 

@@ -4,6 +4,7 @@ import { findDecisionPage, highValueAnswerStaticParams, highValueStaticAnswerSlu
 import { DecisionAnswerPageContent } from "../decisionAnswerPageContent";
 import { buildSeoDecisionPayload } from "../../../lib/report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
+import { isIndexableAnswerSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 type DecisionPageProps = {
   params: Promise<{ slug: string }>;
@@ -33,10 +34,9 @@ export const buildDecisionAnswerMetadata = ({
     imagePath: "/social/answers.svg",
   });
 
-  if (payload.noindex) {
+  if (payload.noindex || !isIndexableAnswerSlug(slug)) {
     metadata.robots = {
-      index: false,
-      follow: true,
+      ...noindexRobots,
     };
   }
 

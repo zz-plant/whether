@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 export type DownloadableResourceMetadataConfig = {
   title: string;
@@ -53,7 +54,10 @@ const defaultPrintModeClassNames: NonNullable<
 
 export const buildDownloadableResourceMetadata = (
   config: DownloadableResourceMetadataConfig,
-): Metadata => buildPageMetadata(config);
+): Metadata => ({
+  ...buildPageMetadata(config),
+  robots: noindexRobots,
+});
 
 export function InternalLinksPanel({ links }: { links: ResourceLink[] }) {
   return (

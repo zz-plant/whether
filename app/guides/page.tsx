@@ -7,6 +7,7 @@ import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartB
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { ActionLink } from "../components/ui/actionLink";
+import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides — translate the call for one team",
@@ -16,6 +17,8 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether guides overview",
   imagePath: "/social/guides.svg",
 });
+
+metadata.robots = noindexRobots;
 
 const featuredStakeholderSlugs = [
   "founders-ceos",

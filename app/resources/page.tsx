@@ -12,6 +12,7 @@ import { SecondarySurfaceStartBlock } from "../components/secondarySurfaceStartB
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { Tag } from "../components/ui/tag";
+import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — deeper governance artifacts",
@@ -21,6 +22,8 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether resources hub",
   imagePath: "/social/resources.svg",
 });
+
+metadata.robots = noindexRobots;
 
 const authorityPages: Array<{
   path: Route;

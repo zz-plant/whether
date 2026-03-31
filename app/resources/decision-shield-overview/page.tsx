@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Shield Overview",
@@ -8,6 +9,8 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/resources/decision-shield-overview",
   imageAlt: "Decision Shield overview",
 });
+
+metadata.robots = noindexRobots;
 
 export default function DecisionShieldOverviewPage() {
   return (

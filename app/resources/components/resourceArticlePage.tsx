@@ -10,6 +10,7 @@ import {
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
+import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
@@ -97,15 +98,18 @@ const resolveImportedEmbed = (embed: ResourceArticleEmbed): { src: string; title
 };
 
 export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata =>
-  buildPageMetadata({
-    title: article.title,
-    description: article.description,
-    path: `/resources/${article.slug}`,
-    imageAlt: article.title,
-    imageParams: {
-      template: "guides",
+  ({
+    ...buildPageMetadata({
       title: article.title,
-    },
+      description: article.description,
+      path: `/resources/${article.slug}`,
+      imageAlt: article.title,
+      imageParams: {
+        template: "guides",
+        title: article.title,
+      },
+    }),
+    ...(isIndexableResourceArticleSlug(article.slug) ? {} : { robots: noindexRobots }),
   });
 
 export const composeArticleSections = (article: ResourceArticle) =>

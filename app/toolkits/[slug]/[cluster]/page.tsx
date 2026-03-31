@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { findToolkitDefinition } from "../../../../lib/decisionDomainCatalog";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
-import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitCanonicalClusterStaticParams } from "../../clusterRoutes";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
+import { noindexRobots } from "../../../../lib/seo/indexationPolicy";
 
 type Params = { slug: string; cluster: string };
 
@@ -18,29 +18,22 @@ export function generateStaticParams() {
   return toolkitCanonicalClusterStaticParams;
 }
 
-
-const shouldNoindexForPayload = (payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">) => {
-  if (!payload) return true;
-  if (payload.noindex || payload.degraded) return true;
-  return (payload.noindexReasons ?? []).some((reason) => reason.startsWith("freshness-") || reason.includes("provenance"));
-};
-
 export const buildToolkitClusterMetadata = ({
   slug,
   cluster,
   toolkitTitle,
   decisionThisSession,
   contextTitle,
-  isCanonical,
-  payload,
+  isCanonical: _isCanonical,
+  payload: _payload,
 }: {
   slug: string;
   cluster: string;
   toolkitTitle: string;
   decisionThisSession: string;
   contextTitle: string;
-  isCanonical: boolean;
-  payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">;
+  isCanonical?: boolean;
+  payload?: unknown;
 }) => {
   const metadata = buildPageMetadata({
     title: `${toolkitTitle} in ${contextTitle}`,
@@ -49,9 +42,7 @@ export const buildToolkitClusterMetadata = ({
     imageAlt: toolkitTitle,
   });
 
-  if (!isCanonical || shouldNoindexForPayload(payload)) {
-    metadata.robots = { index: false, follow: true };
-  }
+  metadata.robots = noindexRobots;
 
   return metadata;
 };
@@ -64,8 +55,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!clusterDefinition || !toolkit || !context) return {};
 
-  const payloadRecord = await readProgrammaticPayload(`/toolkits/${slug}/${cluster}`).catch(() => undefined);
-
   return buildToolkitClusterMetadata({
     slug,
     cluster,
@@ -73,7 +62,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     decisionThisSession: toolkit.decisionThisSession,
     contextTitle: context.title,
     isCanonical: clusterDefinition.isCanonical,
-    payload: payloadRecord?.payload,
   });
 }
 

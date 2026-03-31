@@ -13,6 +13,7 @@ import {
   TEAM_SIZE_OPTIONS,
 } from "../../../lib/personalizedMandates";
 import { SECTOR_TAXONOMY } from "../../../lib/report/sectorSensitivity";
+import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 
 export const runtime = "edge";
 
@@ -22,6 +23,8 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/decide/team-context",
   imageAlt: "Team context profile",
 });
+
+metadata.robots = noindexRobots;
 
 const parseProfile = (searchParams: Record<string, string | undefined>) => ({
   stage: searchParams.stage,
