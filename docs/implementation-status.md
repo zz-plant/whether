@@ -6,7 +6,7 @@ This document consolidates delivery status across product roadmap audits, known 
 
 - Milestones 5–8 are largely complete, with one remaining UX item.
 - Summary-system follow-ups are complete.
-- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, with framework-core upgrades and broader typecheck drift still open.
+- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.38` with a repo-local install repair.
 
 ## Product roadmap (milestones 5–8)
 
@@ -79,9 +79,19 @@ This document consolidates delivery status across product roadmap audits, known 
 | --- | --- | --- |
 | `bun run lint` | Pass | Tailwind v4 CSS-first migration and runtime telemetry swap lint cleanly. |
 | `bun test tests/reportShellSections.test.tsx tests/weeklyDecisionCardLayout.test.tsx tests/homeWeeklyComposition.test.tsx tests/navigationInformationArchitecture.test.ts tests/reportShellNavigation.test.tsx tests/navigationOrientationBadge.test.tsx tests/staticHubNav.test.tsx tests/nextStepRail.test.tsx tests/monthlySummary.test.ts tests/summaryCopyRenderer.test.ts tests/cadenceSummaryCardAdapter.test.tsx tests/apiSummaryContracts.test.ts tests/summaryArchive.test.ts tests/summaryArchiveMigration.test.ts` | Pass | 40/40 targeted regression tests passed after the dependency upgrade set. |
-| `bun run build` | Pass with known upstream warnings | Vinext production build succeeds on Tailwind v4. Rolldown warning classes remain expected noise. |
-| `bun run check:vinext` | Pass (98% compatible) | `next/web-vitals` issue removed by switching to `web-vitals`; only `next/font/google` remains partial. |
-| `bun run typecheck` | Fail | Pre-existing route-type/test drift remains unresolved and is not introduced by the Tailwind/support-dependency upgrade slice. |
+| `bun run build` | Pass with known upstream warnings | Vinext production build succeeds on Tailwind v4 and the repaired `0.0.38` install lane. Rolldown warning classes remain expected noise. |
+| `bun run check:vinext` | Pass (100% compatible) | `next/web-vitals` issue was removed by switching to `web-vitals`, and `next/font/google` was removed from the root layout in favor of CSS font loading. |
+| `bun run typecheck` | Pass | Cleanup of route/test contract drift and summary typing now leaves the active Vinext lane typecheck-clean. |
+
+### Vinext install repair + 0.0.38 validation (2026-03-31)
+
+| Command | Outcome | Notes |
+| --- | --- | --- |
+| `bun install` | Pass | Root `postinstall` repair restores missing Vinext `dist/` runtime files from the published `0.0.38` tarball when Bun leaves them out of `node_modules`. |
+| `bun run check:vinext` | Pass (100% compatible) | No remaining repo-local compatibility gaps after the root-layout font migration. |
+| `bun run typecheck` | Pass | Active `0.0.38` lane is typecheck-clean. |
+| `bun run lint` | Pass | No lint regressions after the font and install-repair changes. |
+| `bun run build` | Pass with known upstream warnings | Active `0.0.38` lane builds successfully once the repaired install tree is in place. |
 
 ## Proposed next milestone (not started)
 

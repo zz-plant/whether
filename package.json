@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/repair-vinext-install.mjs",
     "dev": "next dev --turbo",
     "dev:vinext": "node scripts/vinext-run.mjs dev",
     "dev:turbo": "next dev --turbo",
@@ -78,7 +79,7 @@
     "react-server-dom-webpack": "^19.2.4",
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.3",
-    "vinext": "0.0.30",
+    "vinext": "0.0.38",
     "vite": "^8.0.3",
     "wrangler": "^4.79.0"
   },

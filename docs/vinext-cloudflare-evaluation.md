@@ -25,11 +25,12 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 
 ## What upstream says now
 - Vinext is still explicitly experimental.
-- Current npm release: `vinext@0.0.30`.
+- Current npm release: `vinext@0.0.38`.
 - npm metadata requires Node `>=22`.
 - Repo metadata now reflects that Node `>=22` is the supported engine for the active build/deploy lane.
 - Upstream claims broad Next.js 16 coverage for App Router, route handlers, metadata, middleware, cache APIs, redirects, sitemap, and robots.
 - Upstream also states its default behavior is request-time rendering rather than Next’s build-time prerender bias, and image optimization remains partial.
+- This repo now clears `bun run check:vinext` at 100% on `0.0.38` after replacing `next/font/google` with CSS font loading and repairing Bun's incomplete Vinext install via the repo-local `postinstall` script.
 
 ## Immediate repo implications
 - Production is now on Vinext.

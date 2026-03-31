@@ -221,15 +221,16 @@ These actions operationalize migration outcomes after the near-term spike and ga
 - Removed the now-unused `tailwind.config.ts` after moving the semantic color extensions into CSS theme tokens.
 - Rewrote the only custom-class `@apply` chain (`.weather-control` -> `.weather-input`) that blocked the official upgrader path.
 - Upgraded the safe support-dependency slice in `package.json` / `bun.lock`: `@cloudflare/vite-plugin`, `@modelcontextprotocol/sdk`, `@tailwindcss/postcss`, `postcss`, `simple-icons`, `vite`, and `wrangler`.
-- Kept `vinext` pinned to `0.0.30` after validating that `0.0.38` introduced a production-build parser regression in `app/layout.tsx`.
+- Replaced `next/font/google` in `app/layout.tsx` with CSS font loading from `app/globals.css`, which removed the last repo-local Vinext compatibility gap on the stable pin.
+- Added `scripts/repair-vinext-install.mjs` and root `postinstall` wiring so the active `vinext@0.0.38` pin repairs Bun's incomplete install tree from the published tarball before build/deploy commands run.
 - Swapped `next/web-vitals` for the official `web-vitals` package in `app/components/webVitalsTracker.tsx` so the pinned Vinext lane no longer reports that compatibility gap.
 
 ### Verification
 - `bun run lint` -> pass
 - `bun test tests/reportShellSections.test.tsx tests/weeklyDecisionCardLayout.test.tsx tests/homeWeeklyComposition.test.tsx tests/navigationInformationArchitecture.test.ts tests/reportShellNavigation.test.tsx tests/navigationOrientationBadge.test.tsx tests/staticHubNav.test.tsx tests/nextStepRail.test.tsx tests/monthlySummary.test.ts tests/summaryCopyRenderer.test.ts tests/cadenceSummaryCardAdapter.test.tsx tests/apiSummaryContracts.test.ts tests/summaryArchive.test.ts tests/summaryArchiveMigration.test.ts` -> pass (40/40)
-- `bun run build` -> pass with the known Rolldown/Vinext warning classes
-- `bun run check:vinext` -> pass at 98% compatibility; only `next/font/google` remains partial
-- `bun run typecheck` -> still fails from broader pre-existing route-type/test drift outside this migration slice
+- `bun run build` -> pass with the known Rolldown/Vinext warning classes on repaired `vinext@0.0.38`
+- `bun run check:vinext` -> pass at 100% compatibility on repaired `vinext@0.0.38`
+- `bun run typecheck` -> pass
 
 ## Rollback strategy (required before production migration)
 

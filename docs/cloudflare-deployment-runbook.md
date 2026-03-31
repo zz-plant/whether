@@ -41,8 +41,9 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 ### Current toolchain notes
 
 - Tailwind now runs on v4 via [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) and [`postcss.config.js`](/Users/kanav/Documents/GitHub/whether-app/postcss.config.js) using `@tailwindcss/postcss`; the legacy `tailwind.config.ts` file was removed during the CSS-first migration.
-- Keep `vinext` pinned to `0.0.30` for now. A local validation run on `0.0.38` improved compatibility reporting but regressed the production build parser path, so do not bump that pin without re-running `bun run build` and `bun run check:vinext`.
+- Keep `vinext` pinned to `0.0.38`. This repo now repairs Bun's incomplete Vinext install during [`postinstall`](https://docs.npmjs.com/cli/v10/using-npm/scripts#life-cycle-scripts) via [`scripts/repair-vinext-install.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/repair-vinext-install.mjs), which restores missing `dist/` runtime files from the published tarball before build/deploy commands run.
 - Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
+- Root layout fonts now load from CSS in [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) instead of `next/font/google` in [`app/layout.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/layout.tsx), which removes the last repo-local compatibility gap on the active Vinext lane.
 
 ## Preview lane
 
