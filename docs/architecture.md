@@ -4,6 +4,37 @@ Whether (Regime Station) is a Next.js App Router product that turns Treasury mac
 operational guidance. The system is organized around a small number of deterministic pipelines:
 fetch/normalize data, score the regime, generate guidance, and render reports.
 
+## One-screen architecture diagram
+```mermaid
+flowchart LR
+  subgraph Ingestion["Ingestion + normalization"]
+    A1["Treasury API + macro sources"] --> A2["treasuryClient.ts\n(snapshot-aware fetch)"]
+    A2 --> A3["treasuryNormalizer.ts"]
+    A3 --> A4["sensors.ts\n(timestamped readings)"]
+  end
+
+  subgraph Decisioning["Regime + decisioning"]
+    A4 --> B1["regimeEngine.ts\nscoring + climate classification"]
+    B1 --> B2["playbook.ts\nrecommended operating posture"]
+    B2 --> B3["decisionShield.ts\nbounded action validation"]
+  end
+
+  subgraph Artifact["Brief + artifact assembly"]
+    B1 --> C1["report/reportData.ts\nhome brief model inputs"]
+    B2 --> C1
+    B3 --> C1
+    C1 --> C2["summary/* builders\nweekly/monthly/quarterly/yearly"]
+    C2 --> C3["API routes under app/api/*\n(copy + structured + provenance)"]
+    C2 --> C4["App Router UI under app/*\nweekly brief + operations surfaces"]
+  end
+
+  subgraph Resilience["Trust + continuity"]
+    D1["snapshot_fallback.json"] --> A2
+    D2["time_machine_cache.json"] --> C2
+    D3["summary_archive.json"] --> C2
+  end
+```
+
 ## Runtime data flow
 1. **Treasury fetch** via `lib/treasury/treasuryClient.ts`, with snapshot fallback and
    source metadata attached.
