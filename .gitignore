@@ -7,6 +7,7 @@ out
 .vercel
 .env.local
 .DS_Store
+artifacts/ui
 
 *.tsbuildinfo
 # Environment files

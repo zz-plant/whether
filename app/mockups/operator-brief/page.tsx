@@ -1,4 +1,9 @@
 import type { Metadata } from "next";
+import {
+  MockupShell,
+  parseDensityMode,
+  parseViewportMode,
+} from "../components/mockupShell";
 
 export const metadata: Metadata = {
   title: "Mockup — Operator-First Weekly Brief",
@@ -105,12 +110,22 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function OperatorBriefMockupPage() {
+export default async function OperatorBriefMockupPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ viewport?: string; density?: string }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const viewport = parseViewportMode(resolvedSearchParams?.viewport);
+  const density = parseDensityMode(resolvedSearchParams?.density);
+
   return (
-    <main
-      id="main-content"
-      tabIndex={-1}
-      className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14"
+    <MockupShell
+      pathname="/mockups/operator-brief"
+      title="Operator-First Weekly Brief"
+      description="A concept route for testing an operator-first Whether experience across viewport sizes before touching the main product."
+      viewport={viewport}
+      density={density}
     >
       <section className="relative overflow-hidden rounded-[2.25rem] border border-cyan-300/20 bg-slate-950/80 px-5 py-8 sm:px-8 sm:py-10">
         <div
@@ -402,6 +417,6 @@ export default function OperatorBriefMockupPage() {
           </aside>
         </div>
       </MockupFrame>
-    </main>
+    </MockupShell>
   );
 }

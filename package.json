@@ -35,6 +35,9 @@
     "review:comment-trends": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
     "review:comment-trends:update": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
     "review:hotspot-preflight": "bun scripts/review-hotspot-preflight.mjs",
+    "ui:mockups": "printf '\\nMockups:\\n- http://localhost:3000/mockups\\n- http://localhost:3000/mockups/operator-brief?viewport=mobile&density=compact\\n- http://localhost:3000/mockups/operator-brief?viewport=desktop&density=comfortable\\n\\nRun `bun run dev` first.\\n'",
+    "ui:shots": "node scripts/ui-capture.mjs",
+    "ui:shots:list": "node scripts/ui-capture.mjs --list",
     "summary-archive:migrate-structured": "bun scripts/migrateSummaryArchiveStructured.ts --write",
     "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
     "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
@@ -67,6 +70,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.30.3",
     "@modelcontextprotocol/sdk": "1.29.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "24.4.0",
     "@types/react": "19.2.14",

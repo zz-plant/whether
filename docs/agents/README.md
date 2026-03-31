@@ -71,6 +71,13 @@ Read:
 - `documentation.md`
 - `quality-and-pr.md`
 
+### Visual iteration or mockup work
+
+Read:
+- `../../AGENTS.md`
+- `ui-ux-standards.md`
+- `../ui-iteration-workflow.md`
+
 ### Skill or MCP workflow changes
 
 Read:
