@@ -122,8 +122,8 @@ export default async function MethodPage() {
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
   const sectionLinks = [
-    { href: "#trust-snapshot", label: "60-second proof check" },
-    { href: "#trust-hub-links", label: "Proof checks" },
+    { href: "#trust-snapshot", label: "60-second trust check" },
+    { href: "#trust-hub-links", label: "Trust checks" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
@@ -141,24 +141,24 @@ export default async function MethodPage() {
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
       trustStatusAction="If checks pass, return to the weekly brief."
       trustStatusTone={trustStatusTone}
-      pageTitle="Proof"
+      pageTitle="Trust"
       currentPath="/method"
       pageSummary="Check whether this week's call is ready to use."
-      pageSummaryLink={{ href: "#trust-snapshot", label: "Start proof check ↓" }}
+      pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
       headerVariant="trust"
       showPageNavigation={true}
-      primaryCta={{ href: "#trust-snapshot", label: "Run proof check" }}
+      primaryCta={{ href: "#trust-snapshot", label: "Run trust check" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/",
         description: "Return to Weekly Brief next",
       }}
       decisionBanner={{
-        label: "Proof check",
+        label: "Trust check",
         decision: "Check freshness, confidence, and change-the-call triggers.",
         horizon: "This week",
         confidence: trustSummary,
@@ -167,13 +167,13 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Proof to verify the current call.",
+        call: "Use Trust to verify the current call.",
         doNow: [
           reportData.actionNowShort,
           "Return to the weekly brief once checks are complete.",
         ],
         trustChecklist: {
-          label: "Proof check",
+          label: "Trust check",
           items: [
             `Confirm freshness: ${reportData.fetchedAtLabel}.`,
             `Confirm confidence: ${confidenceLabel}.`,
@@ -187,10 +187,10 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Proof" }]} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust" }]} />
       <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Trust quick start">
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-          Proof hub
+          Trust hub
         </p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           Check whether this week&apos;s call is ready to use.
@@ -200,7 +200,7 @@ export default async function MethodPage() {
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link href="#trust-snapshot" className="weather-button inline-flex min-h-[44px] items-center justify-center">
-            Run 60-second proof check
+            Run 60-second trust check
           </Link>
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
             Weekly Brief
@@ -294,7 +294,7 @@ export default async function MethodPage() {
             <p className="text-sm text-slate-200">{citationLine}</p>
             <p className="text-xs text-slate-400">Use this as proof only. The decision still lives in Weekly Brief and Planning.</p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Back to proof check</Link>
+              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Back to trust check</Link>
               <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula notes</Link>
             </div>
           </article>

@@ -39,7 +39,7 @@ export function DecisionTransmissionRail({
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Artifact preview
+            Share preview
           </p>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">
             Ready to share
@@ -50,39 +50,45 @@ export function DecisionTransmissionRail({
             Whether weekly call
           </p>
           <div className="mt-2 space-y-2 text-sm">
-            <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-emerald-200">
-                Action
-              </span>
-              {actionNow}
-            </p>
+            <dl className="space-y-2">
+              <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
+                <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">
+                  Action
+                </dt>
+                <dd className="mt-1 text-sm text-slate-100">{actionNow}</dd>
+              </div>
             {showMicroRows ? (
               <div className="space-y-2 rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
                 <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                    Trigger
-                  </p>
-                  <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
+                    Threshold
+                  </dt>
+                  <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
                 </div>
                 <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                    Reversal
-                  </p>
-                  <p className="mt-1 text-sm text-slate-100">{flipWhen}</p>
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
+                    Flip condition
+                  </dt>
+                  <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
                 </div>
               </div>
             ) : (
-              <p className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
-                <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
-                  Trigger
-                </span>
-                {guardrail}
-                <span className="ml-2 mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
-                  Reversal
-                </span>
-                {flipWhen}
-              </p>
+              <div className="space-y-2">
+                <div className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
+                    Threshold
+                  </dt>
+                  <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
+                </div>
+                <div className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
+                    Flip condition
+                  </dt>
+                  <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
+                </div>
+              </div>
             )}
+            </dl>
           </div>
         </div>
       </div>

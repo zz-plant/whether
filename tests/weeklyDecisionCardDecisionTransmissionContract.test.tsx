@@ -101,7 +101,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("This week&#x27;s call"));
+    const snapshotRegion = html.slice(html.indexOf("Current outlook"), html.indexOf('id="weekly-call-core"'));
     assert.doesNotMatch(snapshotRegion, /Current conditions/);
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.match(html, /Current outlook/);
@@ -195,9 +195,9 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     );
 
     const regimeIndex = html.indexOf("Current outlook");
-    const callIndex = html.indexOf("Weekly call snapshot");
-    const doNowIndex = html.indexOf("Action now");
-    const flipIndex = html.indexOf("Reversal / change course if");
+    const callIndex = html.indexOf(">This week<");
+    const doNowIndex = html.indexOf(">Action<");
+    const flipIndex = html.indexOf(">Flip condition<");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -282,8 +282,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, />Diagnostics</);
-    assert.match(html, />More context and continuity</);
-    assert.match(html, />Supporting rationale</);
+    assert.match(html, />Deep evidence</);
+    assert.match(html, />Why this call</);
+    assert.match(html, />Role translation</);
   });
 });

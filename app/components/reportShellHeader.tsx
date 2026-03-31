@@ -108,9 +108,9 @@ export function ReportShellHeader({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-          <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="min-w-0 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               <Image
                 src="/whether-logo.svg"
                 alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)"
@@ -128,18 +128,20 @@ export function ReportShellHeader({
                 {statusLabel}
               </span>
             </div>
-            <p className="max-w-2xl text-xs leading-relaxed text-slate-300">
+            <p className="max-w-2xl text-[11px] leading-relaxed text-slate-300">
               {contextBadge?.copy ?? "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."}
             </p>
-            <p className={`max-w-2xl text-[11px] leading-relaxed text-slate-400 ${hideCanonicalPositioningLineOnMobile ? "hidden sm:block" : ""}`}>
+            <p className={`max-w-2xl text-[11px] leading-relaxed text-slate-500 ${hideCanonicalPositioningLineOnMobile ? "hidden sm:block" : ""}`}>
               {canonicalPositioningLine}
             </p>
           </div>
           <div className="xl:min-w-[23rem]">
-            <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-              <span>Decision as-of {recordDateLabel}</span>
-              <span className="text-slate-500">•</span>
-              <span>Data refreshed {fetchedAtLabel}</span>
+            <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold tracking-[0.06em] text-slate-200">
+              <span className="text-slate-500">As-of</span>
+              <span>{recordDateLabel}</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-500">Refreshed</span>
+              <span>{fetchedAtLabel}</span>
             </div>
           </div>
         </div>

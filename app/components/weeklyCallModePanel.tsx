@@ -49,6 +49,11 @@ type WeeklyCallModePanelProps = {
   glossaryHref?: string;
 };
 
+const compactChangedThisWeekDetail = (detail: string) => {
+  const lead = detail.split(/\b(?:Do now|Action|Flip):/i)[0]?.trim();
+  return lead && lead.length > 0 ? lead : detail;
+};
+
 export function WeeklyCallModePanel({
   startupVariantPolicy,
   postureLabel,
@@ -97,7 +102,9 @@ export function WeeklyCallModePanel({
   const compactDecisionBullets = decisionBullets
     .filter((item) => item.detail.trim().length > 0)
     .slice(0, 3);
-  const changedThisWeekDetail = decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.";
+  const changedThisWeekDetail = compactChangedThisWeekDetail(
+    decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.",
+  );
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
   const revisitLabel = revisitDecisions ? "YES — Regime shift detected." : "NO — Hold posture.";
   const revisitDetail = revisitDecisions
@@ -167,38 +174,26 @@ export function WeeklyCallModePanel({
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
-              <span className="sr-only">What changed</span>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
             </article>
             <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Recheck if</p>
-              <span className="sr-only">What to revisit</span>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit last week&apos;s decisions?</p>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
           </div>
-          <span className="sr-only">Decision strip</span>
+          <p className="sr-only">Weekly decision strip: action, threshold, and flip condition.</p>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do now</p>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Do not do</p>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Threshold</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Recheck if</p>
-                <span className="sr-only">Flip condition / change course if</span>
-                <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
-              </div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Flip condition</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>

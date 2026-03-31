@@ -78,6 +78,9 @@ Read:
 - `ui-ux-standards.md`
 - `../ui-iteration-workflow.md`
 
+Fast path:
+- `bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop`
+
 ### Skill or MCP workflow changes
 
 Read:

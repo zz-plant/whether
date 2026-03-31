@@ -16,26 +16,38 @@ Use `/mockups` as the default place for fast visual experiments before changing 
 
 ## Screenshot workflow
 
-Use the repo-local capture runner for repeatable screenshots:
+Use the repo-local visual iteration lane as the default fast path:
 
 ```bash
-bun run ui:shots:list
-bun run ui:shots
+bun run ui:iterate:list
+bun run ui:iterate
 ```
 
 Defaults:
 
-- base URL: `http://localhost:3000`
+- base URL: `http://127.0.0.1:3000`
 - output directory: `artifacts/ui`
+- review gallery: `artifacts/ui/index.html`
+- manifest: `artifacts/ui/manifest.json`
 
 Useful options:
 
 ```bash
-bun run ui:shots -- --only operator-brief-mobile,operator-brief-desktop
-bun run ui:shots -- --base-url http://127.0.0.1:3001
+bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
+bun run ui:iterate -- --base-url http://127.0.0.1:3001
+bun run ui:iterate -- --dev-script dev:turbo
+bun run ui:iterate -- --no-dev
 ```
 
-The capture runner assumes the app is already running.
+What `ui:iterate` does:
+
+- reuses an already-running app when reachable
+- otherwise starts `bun run dev` against the target host and port
+- waits for `/api/health` to come up
+- captures the requested mockup targets
+- writes a browsable screenshot gallery for quick review
+
+`ui:shots` remains available when you already own the dev server and only want raw capture + gallery output.
 
 ## URL controls
 
@@ -54,7 +66,8 @@ Examples:
 1. Start new UI concepts in `/mockups` instead of reshaping production routes immediately.
 2. Keep each mockup focused on one strong product idea.
 3. Use the built-in viewport and density controls to compare scan behavior.
-4. Only pull the winning idea into `/`, `/signals`, `/operations`, `/decide`, or `/method` after the concept is visually coherent.
+4. Use `artifacts/ui/index.html` as the default comparison surface before moving on.
+5. Only pull the winning idea into `/`, `/signals`, `/operations`, `/decide`, or `/method` after the concept is visually coherent.
 
 ## Scope rules
 

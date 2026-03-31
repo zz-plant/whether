@@ -110,7 +110,7 @@ export default async function DecidePage({
       pageNavVariant="compact"
       showPageNavigation={true}
       primaryCta={{ href: "#unresolved-question-router", label: "Find the right help" }}
-      secondaryCta={{ href: "/operations", label: "Weekly Brief" }}
+      secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
         description: "Return to Planning next",

@@ -69,7 +69,7 @@ const renderPageLink = ({
     key={link.href}
     href={link.href}
     aria-current={isActive ? "page" : undefined}
-    className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName(isActive)}`}
+    className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1.5 text-left sm:w-full sm:text-left ${getPageLinkStateClassName(isActive)}`}
   >
     <span className="inline-flex items-center gap-2">
       <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
@@ -77,11 +77,8 @@ const renderPageLink = ({
       </span>
       <span>{link.label}</span>
     </span>
-    <span className="flex flex-wrap items-center gap-2 text-[11px] font-medium normal-case tracking-normal text-slate-300">
-      <span>{link.description}</span>
-      <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-        Route {resolveNavigationRouteCue(link.href)}
-      </span>
+    <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
+      {link.description}
     </span>
   </Link>
 );
@@ -127,24 +124,20 @@ export const ReportPageNavigation = ({
     currentPath,
   );
   const isAnchorRoute = currentLink.href === anchorLink.href;
-  const supportGridClassName = variant === "compact"
-    ? "grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4"
-    : "grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4";
-
   if (variant === "compact") {
     return (
       <nav aria-label="Report paths" className={className}>
         <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3 sm:p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0 space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                {isAnchorRoute ? "Primary surface" : `Current support path · ${currentLink.label}`}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                {isAnchorRoute ? "Primary surface" : "Support path"}
               </p>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                 <Link
                   href={anchorLink.href}
                   aria-current={isAnchorRoute ? "page" : undefined}
-                  className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] ${
+                  className={`weather-pill inline-flex min-h-[40px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] ${
                     isAnchorRoute
                       ? "border-amber-300/65 bg-amber-400/10 text-amber-50"
                       : "text-slate-100 hover:border-amber-300/55 hover:text-amber-50"
@@ -152,31 +145,24 @@ export const ReportPageNavigation = ({
                 >
                   {anchorLink.label}
                 </Link>
-                <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  {currentPosition} of {totalCount}
+                <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+                  {currentPosition}/{totalCount}
                 </span>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  {resolveNavigationRouteCue(currentLink.href)}
-                </span>
+                {!isAnchorRoute ? (
+                  <span className="text-slate-400">
+                    {currentLink.label}
+                  </span>
+                ) : null}
               </div>
-              <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
-                {isAnchorRoute
-                  ? routeSwitcherIntro
-                  : `Stay here only while you need ${currentLink.label.toLowerCase()}: ${currentLink.description}`}
-              </p>
             </div>
-            <div className="grid grid-cols-5 gap-1.5 lg:w-44" aria-hidden="true">
-              {pageLinks.map((link, index) => (
-                <span
-                  key={link.href}
-                  className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
-                  title={`${index + 1}. ${link.label}`}
-                />
-              ))}
-            </div>
+            <p className="max-w-md text-right text-[11px] leading-relaxed text-slate-400">
+              {isAnchorRoute
+                ? routeSwitcherIntro
+                : `Use ${currentLink.label} only while you need ${currentLink.description.toLowerCase()}`}
+            </p>
           </div>
 
-          <div className={supportGridClassName}>
+          <div className="flex flex-wrap gap-2">
             {supportLinks.map((link) => renderCompactPageLink({
               link,
               isActive: currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle,
@@ -190,68 +176,47 @@ export const ReportPageNavigation = ({
   return (
     <nav aria-label="Report paths" className={className}>
       <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,2.05fr)]">
-          <div className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              {isAnchorRoute ? "Anchor route" : "Return to anchor"}
-            </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={anchorLink.href}
               aria-current={isAnchorRoute ? "page" : undefined}
-              className={`mt-2 inline-flex min-h-[44px] items-center rounded-xl border px-3 py-2 text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+              className={`weather-pill inline-flex min-h-[40px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] ${
                 isAnchorRoute
                   ? "border-amber-300/65 bg-amber-400/10 text-amber-50"
-                  : "border-slate-700/80 bg-slate-950/70 text-slate-100 hover:border-amber-300/55 hover:text-amber-50"
+                  : "text-slate-100 hover:border-amber-300/55 hover:text-amber-50"
               }`}
             >
               {anchorLink.label}
             </Link>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                {resolvePrimaryNavigationSurfaceCue(anchorLink.href)}
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                {resolveNavigationRouteCue(anchorLink.href)}
-              </span>
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-slate-300">
-              {routeSwitcherIntro}
-            </p>
+            <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+              {currentPosition}/{totalCount}
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+              {resolvePrimaryNavigationSurfaceCue(anchorLink.href)} · {resolveNavigationRouteCue(currentLink.href)}
+            </span>
           </div>
+          <p className="max-w-lg text-right text-[11px] leading-relaxed text-slate-400">
+            {isAnchorRoute
+              ? routeSwitcherIntro
+              : `Use ${currentLink.label} only while you need ${currentLink.description.toLowerCase()}`}
+          </p>
+        </div>
 
-          <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              {isAnchorRoute ? "Support paths" : `Current support path · ${currentLink.label}`}
-            </p>
-            <p className="text-xs leading-relaxed text-slate-300">
-              {isAnchorRoute
-                ? "Each path below exists to help the Weekly Brief, not replace it."
-                : `Use ${currentLink.label} only while you need this help: ${currentLink.description}`}
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                {currentPosition} of {totalCount}
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                {resolveNavigationRouteCue(currentLink.href)}
-              </span>
-            </div>
-            <div className="grid grid-cols-5 gap-1.5" aria-hidden="true">
-              {pageLinks.map((link, index) => (
-                <span
-                  key={link.href}
-                  className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
-                  title={`${index + 1}. ${link.label}`}
-                />
-              ))}
-            </div>
-            <div className={supportGridClassName}>
-              {supportLinks.map((link) => renderPageLink({
-                link,
-                isActive: currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle,
-              }))}
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          {supportLinks.map((link) => renderPageLink({
+            link,
+            isActive: currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle,
+          }))}
+        </div>
+        <div className="grid grid-cols-5 gap-1.5 px-1" aria-hidden="true">
+          {pageLinks.map((link, index) => (
+            <span
+              key={link.href}
+              className={`h-1.5 rounded-full ${index === currentIndex ? "bg-sky-300" : "bg-slate-800/80"}`}
+              title={`${index + 1}. ${link.label}`}
+            />
+          ))}
         </div>
       </div>
     </nav>

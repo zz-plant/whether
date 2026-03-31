@@ -5,7 +5,7 @@
   "generatedAtIso": "2026-03-27T00:00:00.000Z",
   "snapshot": {
     "recordDate": "2026-03-27",
-    "fetchedAtIso": "2026-03-30T21:49:12.015Z",
+    "fetchedAtIso": "2026-03-31T19:59:45.187Z",
     "previousRecordDate": "2025-02-28"
   },
   "delta": {
@@ -15,7 +15,7 @@
       {
         "key": "riskAppetite",
         "label": "Risk appetite",
-        "delta": -25
+        "delta": -24
       },
       {
         "key": "curveSlope",
@@ -51,11 +51,11 @@
         "confidenceLabel": "Low (near threshold, stage decisions)"
       }
     ],
-    "freshness": "Mar 30, 2026 at 9:49 PM UTC",
+    "freshness": "Mar 31, 2026 at 7:59 PM UTC",
     "degraded": false,
     "noindex": false,
     "noindexReasons": [],
-    "trustSummary": "Signal reliability LOW (Mar 30, 2026 at 9:49 PM UTC): keep approvals staged until reliability returns to HIGH.",
-    "citationMeta": "Posture VOLATILE · Signal reliability LOW · Decision as-of Mar 27, 2026 · Data refreshed Mar 30, 2026 at 9:49 PM UTC"
+    "trustSummary": "Signal reliability LOW (Mar 31, 2026 at 7:59 PM UTC): keep approvals staged until reliability returns to HIGH.",
+    "citationMeta": "Posture VOLATILE · Signal reliability LOW · Decision as-of Mar 27, 2026 · Data refreshed Mar 31, 2026 at 7:59 PM UTC"
   }
 }
