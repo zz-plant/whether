@@ -221,8 +221,8 @@ export function GlobalHeaderNavRail({
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <div className="min-w-0 space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
               Primary surfaces
             </p>
             <p className="truncate text-[13px] font-medium text-slate-200">
@@ -231,11 +231,6 @@ export function GlobalHeaderNavRail({
           </div>
           {hasScrollableOverflow ? controls : null}
         </div>
-        <p className="text-[11px] leading-relaxed text-slate-400">
-          {hasScrollableOverflow
-            ? "Swipe or use the arrows to move across the primary surfaces."
-            : "All primary surfaces are visible here."}
-        </p>
         <nav aria-label="Primary routes">
           <ul
             ref={railRef}

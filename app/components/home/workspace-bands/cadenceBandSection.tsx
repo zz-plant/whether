@@ -9,9 +9,8 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
     <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
       <HomeBandHeader
         step="03"
-        kicker="Only if a question remains"
-        title="Choose one follow-on surface only after the plan is already clear."
-        description="Use one downstream surface for the remaining question instead of reopening the brief or turning helper surfaces into a second workflow."
+        kicker="One follow-on path"
+        title="Open one more surface only if needed."
         icon={<HistoryIcon className="h-5 w-5 text-violet-100" />}
         toneClass="border-violet-400/40 text-violet-200"
       />
@@ -20,7 +19,6 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
           <CardEyebrow icon={<LayoutGridIcon className="h-3.5 w-3.5" />} label={workspaceModel.translate.primaryPath.kicker} accentClass="text-amber-200" />
           <p className="mt-2 text-sm font-semibold">{workspaceModel.translate.primaryPath.title}</p>
           <p className="mt-1 text-xs text-slate-300">{workspaceModel.translate.primaryPath.detail}</p>
-          <p className="mt-3 text-xs text-slate-200">Use this when the weekly plan is clear but one concrete owner decision still needs translation.</p>
         </Link>
 
         <Link href={workspaceModel.replay.openFullHref as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
@@ -39,8 +37,7 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
 
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Supporting surfaces" accentClass="text-slate-300" />
-          <p className="mt-2 text-sm font-semibold text-slate-100">Open one recommended follow-up only.</p>
-          <p className="mt-1 text-xs text-slate-300">Use a single utility to unblock one owner decision. Keep trust and extra tools collapsed unless challenged.</p>
+          <p className="mt-2 text-sm font-semibold text-slate-100">Recommended follow-up</p>
           <article className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recommended utility</p>
             <p className="text-xs font-semibold text-slate-100">{workspaceModel.translate.fallbackUtility.title}</p>

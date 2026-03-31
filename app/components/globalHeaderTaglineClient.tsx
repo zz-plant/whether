@@ -12,13 +12,13 @@ export function GlobalHeaderTaglineClient({ pathname }: GlobalHeaderTaglineClien
   const tagline = resolveGlobalHeaderTagline(pathname ?? currentPathname);
 
   if (!tagline.description) {
-    return <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">{tagline.title}</p>;
+    return <p className="mt-1 text-sm font-medium text-slate-300">{tagline.title}</p>;
   }
 
   return (
     <div className="mt-1 space-y-1">
-      <p className="text-base font-semibold tracking-tight text-slate-100 sm:text-lg">{tagline.title}</p>
-      <p className="max-w-2xl text-sm text-slate-300">{tagline.description}</p>
+      <p className="text-sm font-semibold tracking-tight text-slate-100 sm:text-base">{tagline.title}</p>
+      <p className="max-w-2xl text-sm leading-relaxed text-slate-300">{tagline.description}</p>
     </div>
   );
 }

@@ -54,35 +54,35 @@
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --weather-focus-ring: rgba(125, 211, 252, 0.88);
   --weather-focus-halo: rgba(14, 165, 233, 0.32);
-  --weather-primary-gradient: linear-gradient(135deg, rgba(103, 232, 249, 0.95), rgba(59, 130, 246, 0.92) 46%, rgba(45, 212, 191, 0.82));
+  --weather-primary-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.94), rgba(37, 99, 235, 0.92) 58%, rgba(14, 165, 233, 0.86));
   --weather-primary-shadow:
-    0 22px 40px -24px rgba(14, 165, 233, 0.62),
-    0 10px 24px -18px rgba(125, 211, 252, 0.34),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+    0 18px 28px -24px rgba(14, 165, 233, 0.38),
+    0 8px 18px -16px rgba(59, 130, 246, 0.24),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
   --weather-primary-shadow-hover:
-    0 24px 44px -24px rgba(14, 165, 233, 0.68),
-    0 12px 26px -18px rgba(125, 211, 252, 0.38),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+    0 20px 32px -24px rgba(14, 165, 233, 0.42),
+    0 10px 20px -16px rgba(59, 130, 246, 0.28),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
   --weather-secondary-shadow:
-    inset 0 0 0 1px rgba(125, 211, 252, 0.08),
-    0 16px 28px -22px rgba(2, 6, 23, 0.84);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 12px 22px -20px rgba(2, 6, 23, 0.62);
   --weather-secondary-shadow-hover:
-    inset 0 0 0 1px rgba(125, 211, 252, 0.12),
-    0 22px 36px -24px rgba(2, 6, 23, 0.9),
-    0 12px 24px -18px rgba(14, 165, 233, 0.16);
-  --shell-glow: rgba(125, 211, 252, 0.26);
-  --shell-glow-secondary: rgba(45, 212, 191, 0.18);
-  --shell-glow-tertiary: rgba(251, 191, 36, 0.14);
-  --surface-edge: rgba(226, 247, 255, 0.18);
-  --surface-sheen: rgba(255, 255, 255, 0.16);
-  --surface-elevated: rgba(76, 200, 255, 0.12);
-  --panel-bg: rgba(12, 24, 45, 0.74);
-  --panel-border: rgba(165, 188, 216, 0.18);
-  --panel-highlight: rgba(110, 231, 183, 0.14);
-  --surface-bg: rgba(9, 18, 34, 0.68);
-  --surface-border: rgba(163, 184, 208, 0.14);
-  --surface-nested-bg: rgba(5, 13, 27, 0.54);
-  --surface-nested-border: rgba(148, 163, 184, 0.14);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.08),
+    0 16px 28px -22px rgba(2, 6, 23, 0.68),
+    0 8px 16px -14px rgba(14, 165, 233, 0.08);
+  --shell-glow: rgba(56, 189, 248, 0.18);
+  --shell-glow-secondary: rgba(14, 165, 233, 0.12);
+  --shell-glow-tertiary: rgba(251, 191, 36, 0.08);
+  --surface-edge: rgba(226, 247, 255, 0.12);
+  --surface-sheen: rgba(255, 255, 255, 0.08);
+  --surface-elevated: rgba(76, 200, 255, 0.08);
+  --panel-bg: rgba(8, 16, 30, 0.78);
+  --panel-border: rgba(148, 163, 184, 0.14);
+  --panel-highlight: rgba(56, 189, 248, 0.08);
+  --surface-bg: rgba(9, 16, 29, 0.62);
+  --surface-border: rgba(148, 163, 184, 0.12);
+  --surface-nested-bg: rgba(5, 12, 24, 0.48);
+  --surface-nested-border: rgba(148, 163, 184, 0.1);
 }
 
 html {
@@ -103,10 +103,9 @@ body {
   min-height: 100dvh;
   overflow-x: clip;
   background-image:
-    radial-gradient(70rem 32rem at 50% -12%, rgba(56, 189, 248, 0.22), transparent 58%),
-    radial-gradient(34rem 22rem at 12% 14%, rgba(251, 191, 36, 0.14), transparent 72%),
-    radial-gradient(38rem 24rem at 88% 8%, rgba(45, 212, 191, 0.14), transparent 74%),
-    linear-gradient(180deg, rgba(5, 11, 22, 0.98) 0%, rgba(7, 17, 32, 0.98) 36%, rgba(5, 12, 24, 1) 100%);
+    radial-gradient(64rem 26rem at 50% -12%, rgba(56, 189, 248, 0.14), transparent 58%),
+    radial-gradient(28rem 18rem at 12% 10%, rgba(251, 191, 36, 0.08), transparent 70%),
+    linear-gradient(180deg, rgba(4, 10, 20, 0.98) 0%, rgba(6, 14, 27, 0.99) 34%, rgba(4, 10, 20, 1) 100%);
 }
 
 body::before,
@@ -120,19 +119,18 @@ body::after {
 body::before {
   z-index: -2;
   background:
-    radial-gradient(28rem 20rem at 12% 18%, rgba(251, 191, 36, 0.08), transparent 72%),
-    radial-gradient(42rem 26rem at 86% 12%, rgba(34, 211, 238, 0.08), transparent 74%),
-    radial-gradient(40rem 26rem at 50% 100%, rgba(59, 130, 246, 0.08), transparent 82%);
-  filter: blur(24px);
+    radial-gradient(28rem 18rem at 84% 10%, rgba(34, 211, 238, 0.06), transparent 74%),
+    radial-gradient(36rem 22rem at 50% 100%, rgba(59, 130, 246, 0.06), transparent 82%);
+  filter: blur(28px);
 }
 
 body::after {
   z-index: -1;
-  opacity: 0.2;
+  opacity: 0.12;
   background-image:
-    linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
-  background-size: 72px 72px, 72px 72px;
+    linear-gradient(rgba(148, 163, 184, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.025) 1px, transparent 1px);
+  background-size: 88px 88px, 88px 88px;
   mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
   -webkit-mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
 }
@@ -143,12 +141,10 @@ body::after {
 }
 
 .weather-shell {
-  background-color: #081121;
+  background-color: #07111f;
   background-image:
-    radial-gradient(56rem 22rem at 50% -4%, rgba(56, 189, 248, 0.18), transparent 62%),
-    radial-gradient(28rem 16rem at 10% 14%, rgba(251, 191, 36, 0.12), transparent 72%),
-    radial-gradient(32rem 18rem at 92% 16%, rgba(45, 212, 191, 0.12), transparent 74%),
-    linear-gradient(180deg, rgba(9, 21, 40, 0.96) 0%, rgba(7, 17, 33, 0.98) 48%, rgba(5, 12, 24, 1) 100%);
+    radial-gradient(54rem 20rem at 50% -4%, rgba(56, 189, 248, 0.12), transparent 62%),
+    linear-gradient(180deg, rgba(8, 18, 34, 0.96) 0%, rgba(6, 14, 27, 0.98) 44%, rgba(4, 10, 20, 1) 100%);
 }
 
 .weather-grid {
@@ -180,41 +176,38 @@ body::after {
   border-color: var(--panel-border);
   background-color: var(--panel-bg);
   background-image:
-    radial-gradient(140% 100% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 42%),
-    radial-gradient(120% 120% at 100% 0%, rgba(34, 211, 238, 0.08), transparent 46%),
-    linear-gradient(180deg, rgba(18, 35, 61, 0.86) 0%, rgba(10, 20, 40, 0.86) 55%, rgba(6, 12, 25, 0.92) 100%);
+    radial-gradient(120% 100% at 0% 0%, rgba(56, 189, 248, 0.05), transparent 38%),
+    linear-gradient(180deg, rgba(14, 25, 43, 0.84) 0%, rgba(8, 16, 30, 0.88) 62%, rgba(5, 11, 22, 0.92) 100%);
   box-shadow:
-    0 28px 48px -34px rgba(2, 6, 23, 0.92),
-    0 10px 24px -18px rgba(14, 165, 233, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.05);
+    0 24px 40px -34px rgba(2, 6, 23, 0.74),
+    0 8px 18px -18px rgba(14, 165, 233, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.03);
 }
 
 .weather-appbar {
   @apply rounded-2xl border backdrop-blur-lg;
-  border-color: rgba(165, 188, 216, 0.18);
-  background-color: rgba(12, 28, 51, 0.64);
+  border-color: rgba(148, 163, 184, 0.15);
+  background-color: rgba(8, 18, 33, 0.72);
   background-image:
-    radial-gradient(120% 140% at 18% 0%, rgba(251, 191, 36, 0.08), transparent 34%),
-    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.1), transparent 42%),
-    linear-gradient(180deg, rgba(20, 40, 70, 0.82) 0%, rgba(12, 25, 46, 0.82) 56%, rgba(8, 17, 34, 0.9) 100%);
+    radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.045), transparent 36%),
+    linear-gradient(180deg, rgba(14, 26, 46, 0.84) 0%, rgba(8, 18, 33, 0.88) 62%, rgba(6, 13, 24, 0.92) 100%);
   box-shadow:
-    0 18px 34px -28px rgba(2, 6, 23, 0.88),
-    0 8px 18px -18px rgba(14, 165, 233, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.05);
+    0 18px 30px -28px rgba(2, 6, 23, 0.62),
+    0 6px 14px -16px rgba(14, 165, 233, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.03);
 }
 
 .weather-panel-static {
   @apply rounded-[22px] border border-slate-700/60 bg-slate-950/65;
   background-image:
-    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.06), transparent 40%),
-    linear-gradient(156deg, rgba(18, 25, 41, 0.86), rgba(8, 13, 25, 0.88) 72%);
+    linear-gradient(160deg, rgba(14, 22, 37, 0.84), rgba(7, 12, 23, 0.88) 72%);
   box-shadow:
-    0 14px 28px -24px rgba(2, 6, 23, 0.76),
-    0 0 0 1px rgba(251, 191, 36, 0.05),
+    0 14px 24px -24px rgba(2, 6, 23, 0.68),
+    0 0 0 1px rgba(125, 211, 252, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+    inset 0 0 0 1px rgba(148, 163, 184, 0.06);
 }
 
 .weather-page-shell {
@@ -797,12 +790,11 @@ body::after {
   border-color: var(--surface-border);
   background-color: var(--surface-bg);
   background-image:
-    radial-gradient(120% 120% at 0% 0%, rgba(251, 191, 36, 0.04), transparent 42%),
-    radial-gradient(120% 120% at 100% 0%, rgba(56, 189, 248, 0.06), transparent 44%),
-    linear-gradient(180deg, rgba(15, 29, 51, 0.72), rgba(8, 16, 31, 0.84) 58%, rgba(5, 11, 23, 0.9) 100%);
+    radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.04), transparent 40%),
+    linear-gradient(180deg, rgba(12, 22, 39, 0.72), rgba(7, 14, 27, 0.84) 62%, rgba(4, 10, 20, 0.9) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.03);
 }
 
 
@@ -860,19 +852,19 @@ body::after {
 
 :where(.weather-panel > .weather-surface),
 :where(.weather-surface > .weather-surface) {
-  border-color: rgba(71, 85, 105, 0.16);
-  background-color: rgba(6, 11, 22, 0.58);
-  background-image: linear-gradient(180deg, rgba(8, 15, 29, 0.62), rgba(5, 10, 22, 0.72));
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.16);
+  border-color: rgba(71, 85, 105, 0.14);
+  background-color: rgba(6, 11, 22, 0.52);
+  background-image: linear-gradient(180deg, rgba(8, 15, 29, 0.54), rgba(5, 10, 22, 0.66));
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
 }
 
 :where(.weather-panel > .weather-panel),
 :where(.weather-surface > .weather-panel) {
-  border-color: rgba(71, 85, 105, 0.18);
-  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.035), rgba(45, 212, 191, 0.03) 44%, rgba(2, 6, 23, 0.14) 78%);
+  border-color: rgba(71, 85, 105, 0.15);
+  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.028), rgba(14, 165, 233, 0.02) 44%, rgba(2, 6, 23, 0.14) 78%);
   box-shadow:
     inset 0 1px 0 rgba(148, 163, 184, 0.04),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.18);
+    inset 0 0 0 1px rgba(15, 23, 42, 0.14);
 }
 
 .weather-quick-glance {
@@ -1204,11 +1196,11 @@ body::after {
   @apply rounded-full border border-slate-700/70 bg-slate-950/75 backdrop-blur-sm;
   min-height: 44px;
   padding-inline: 0.9rem;
-  border-color: rgba(148, 163, 184, 0.18);
-  background-image: linear-gradient(180deg, rgba(20, 34, 56, 0.9), rgba(8, 15, 30, 0.94));
+  border-color: rgba(148, 163, 184, 0.16);
+  background-image: linear-gradient(180deg, rgba(16, 29, 49, 0.86), rgba(8, 14, 27, 0.92));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.03);
 }
 
 .weather-pill-muted {
@@ -1273,12 +1265,12 @@ body::after {
 .weather-button {
   @apply rounded-2xl border border-slate-700/75 text-slate-200;
   font-weight: 500;
-  border-color: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.18);
   background:
-    linear-gradient(180deg, rgba(19, 40, 69, 0.9), rgba(8, 16, 32, 0.94));
+    linear-gradient(180deg, rgba(16, 31, 52, 0.9), rgba(8, 16, 30, 0.94));
   box-shadow:
-    inset 0 0 0 1px rgba(125, 211, 252, 0.06),
-    0 14px 26px -20px rgba(2, 6, 23, 0.86);
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 12px 20px -18px rgba(2, 6, 23, 0.68);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -1377,20 +1369,20 @@ body::after {
   .weather-tab:hover,
   .weather-pill:hover {
     transform: translateY(-1px);
-    border-color: rgba(251, 191, 36, 0.48);
+    border-color: rgba(125, 211, 252, 0.34);
     box-shadow:
-      inset 0 0 0 1px rgba(251, 191, 36, 0.08),
-      0 20px 36px -24px rgba(2, 6, 23, 0.74),
-      0 10px 20px -14px rgba(251, 191, 36, 0.18);
+      inset 0 0 0 1px rgba(125, 211, 252, 0.06),
+      0 16px 28px -22px rgba(2, 6, 23, 0.66),
+      0 8px 16px -14px rgba(14, 165, 233, 0.12);
   }
 
   .weather-button:hover {
     transform: translateY(-1px);
     border-color: rgba(103, 232, 249, 0.36);
     box-shadow:
-      inset 0 0 0 1px rgba(125, 211, 252, 0.08),
-      0 20px 32px -22px rgba(2, 6, 23, 0.9),
-      0 8px 18px -14px rgba(14, 165, 233, 0.18);
+      inset 0 0 0 1px rgba(125, 211, 252, 0.07),
+      0 16px 26px -22px rgba(2, 6, 23, 0.74),
+      0 8px 16px -14px rgba(14, 165, 233, 0.12);
   }
 
   .weather-button-primary:hover {
@@ -1467,21 +1459,21 @@ body::after {
   min-height: 44px;
   align-items: center;
   border-radius: 9999px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 0.72rem 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 0.68rem 1rem;
   font-family: var(--weather-font-display);
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgb(248 250 252);
   background:
-    radial-gradient(140% 140% at 0% 0%, rgba(251, 191, 36, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(19, 35, 58, 0.94), rgba(8, 16, 31, 0.96));
+    radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.06), transparent 42%),
+    linear-gradient(180deg, rgba(15, 28, 48, 0.92), rgba(8, 16, 31, 0.96));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
-    0 18px 32px -26px rgba(2, 6, 23, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04),
+    0 14px 24px -24px rgba(2, 6, 23, 0.68);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -1491,11 +1483,11 @@ body::after {
 
 .weather-brand-mark:hover {
   transform: translateY(-1px);
-  border-color: rgba(251, 191, 36, 0.36);
+  border-color: rgba(125, 211, 252, 0.34);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(251, 191, 36, 0.08),
-    0 22px 36px -28px rgba(2, 6, 23, 0.92);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.06),
+    0 18px 30px -26px rgba(2, 6, 23, 0.72);
 }
 
 .weather-topbar {
@@ -1509,9 +1501,8 @@ body::after {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.04)),
-    radial-gradient(48rem 18rem at 0% 0%, rgba(251, 191, 36, 0.12), transparent 60%),
-    radial-gradient(42rem 18rem at 100% 0%, rgba(56, 189, 248, 0.12), transparent 62%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 20%, transparent 80%, rgba(255, 255, 255, 0.025)),
+    radial-gradient(42rem 16rem at 100% 0%, rgba(56, 189, 248, 0.08), transparent 62%);
 }
 
 .weather-topbar-search {
@@ -1798,28 +1789,29 @@ html {
 
 .weather-delta-card:hover,
 .weather-delta-card:focus-within {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: rgba(125, 211, 252, 0.32);
-  box-shadow: 0 16px 30px -24px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 14px 24px -22px rgba(14, 165, 233, 0.22);
 }
 
 .weather-delta-card[data-emphasis="true"] {
-  border-color: rgba(125, 211, 252, 0.3);
-  background-color: rgba(2, 6, 23, 0.62);
-  box-shadow: 0 14px 28px -24px rgba(14, 165, 233, 0.3);
+  border-color: rgba(125, 211, 252, 0.24);
+  background-color: rgba(2, 6, 23, 0.56);
+  box-shadow: 0 12px 20px -20px rgba(14, 165, 233, 0.2);
 }
 
 .home-band {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  --home-band-border: rgba(148, 163, 184, 0.2);
-  --home-band-glow: rgba(56, 189, 248, 0.16);
-  --home-band-panel-bg: rgba(5, 10, 22, 0.42);
-  --home-band-panel-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(15, 23, 42, 0.08) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(15, 23, 42, 0.2);
-  --home-band-list-bg: rgba(2, 6, 23, 0.34);
-  --home-band-list-border: rgba(71, 85, 105, 0.44);
+  --home-band-border: rgba(148, 163, 184, 0.16);
+  --home-band-accent: rgb(148 163 184);
+  --home-band-accent-soft: rgba(148, 163, 184, 0.16);
+  --home-band-panel-bg: rgba(7, 13, 24, 0.48);
+  --home-band-panel-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(15, 23, 42, 0.06) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 0 0 1px rgba(15, 23, 42, 0.16);
+  --home-band-list-bg: rgba(2, 6, 23, 0.28);
+  --home-band-list-border: rgba(71, 85, 105, 0.32);
   --home-band-kicker: rgb(148 163 184);
 }
 
@@ -1834,10 +1826,9 @@ html {
   inset: 0;
   border-radius: inherit;
   background:
-    radial-gradient(60% 90% at 100% 0%, var(--home-band-glow), transparent 72%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 26%);
+    linear-gradient(180deg, color-mix(in srgb, var(--home-band-accent-soft) 42%, transparent), transparent 24%);
   pointer-events: none;
-  opacity: 0.9;
+  opacity: 0.7;
 }
 
 .home-band > * {
@@ -1901,7 +1892,7 @@ html {
   inset: 0 auto 0 0;
   width: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), var(--home-band-glow));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), var(--home-band-accent-soft));
 }
 
 .home-band-link-card {
@@ -1915,11 +1906,11 @@ html {
 }
 
 .home-band-link-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: rgba(125, 211, 252, 0.35);
   box-shadow:
-    0 16px 28px -22px rgba(15, 23, 42, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 14px 22px -20px rgba(15, 23, 42, 0.68),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .home-band-link-card:focus-visible {
@@ -1934,55 +1925,60 @@ html {
 }
 
 .home-band--flow {
-  --home-band-border: rgba(103, 232, 249, 0.24);
-  --home-band-glow: rgba(56, 189, 248, 0.18);
-  --home-band-panel-bg: rgba(4, 30, 52, 0.42);
-  --home-band-panel-image: linear-gradient(180deg, rgba(186, 230, 253, 0.08), rgba(8, 47, 73, 0.08) 58%, rgba(2, 6, 23, 0.12) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.08), inset 0 0 0 1px rgba(14, 116, 144, 0.16);
+  --home-band-border: rgba(103, 232, 249, 0.2);
+  --home-band-accent: rgb(125 211 252);
+  --home-band-accent-soft: rgba(56, 189, 248, 0.16);
+  --home-band-panel-bg: rgba(4, 20, 36, 0.48);
+  --home-band-panel-image: linear-gradient(180deg, rgba(186, 230, 253, 0.05), rgba(8, 47, 73, 0.05) 58%, rgba(2, 6, 23, 0.08) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.05), inset 0 0 0 1px rgba(14, 116, 144, 0.1);
   --home-band-kicker: rgb(125 211 252);
 }
 
 .home-band--audit {
-  --home-band-border: rgba(96, 165, 250, 0.22);
-  --home-band-glow: rgba(59, 130, 246, 0.18);
-  --home-band-panel-bg: rgba(5, 16, 34, 0.42);
-  --home-band-panel-image: linear-gradient(165deg, rgba(191, 219, 254, 0.08), rgba(15, 23, 42, 0.08) 52%, rgba(30, 41, 59, 0.12) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(219, 234, 254, 0.08), inset 0 0 0 1px rgba(59, 130, 246, 0.12);
-  --home-band-list-bg: rgba(15, 23, 42, 0.42);
-  --home-band-list-border: rgba(96, 165, 250, 0.18);
+  --home-band-border: rgba(96, 165, 250, 0.18);
+  --home-band-accent: rgb(147 197 253);
+  --home-band-accent-soft: rgba(59, 130, 246, 0.14);
+  --home-band-panel-bg: rgba(5, 16, 34, 0.46);
+  --home-band-panel-image: linear-gradient(165deg, rgba(191, 219, 254, 0.05), rgba(15, 23, 42, 0.06) 52%, rgba(30, 41, 59, 0.08) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(219, 234, 254, 0.05), inset 0 0 0 1px rgba(59, 130, 246, 0.1);
+  --home-band-list-bg: rgba(15, 23, 42, 0.34);
+  --home-band-list-border: rgba(96, 165, 250, 0.16);
   --home-band-kicker: rgb(147 197 253);
 }
 
 .home-band--operations {
-  --home-band-border: rgba(245, 158, 11, 0.24);
-  --home-band-glow: rgba(251, 191, 36, 0.16);
-  --home-band-panel-bg: rgba(28, 16, 6, 0.44);
-  --home-band-panel-image: linear-gradient(165deg, rgba(251, 191, 36, 0.09), rgba(69, 26, 3, 0.1) 46%, rgba(15, 23, 42, 0.12) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(254, 243, 199, 0.08), inset 0 0 0 1px rgba(217, 119, 6, 0.15);
-  --home-band-list-bg: rgba(24, 24, 27, 0.5);
-  --home-band-list-border: rgba(245, 158, 11, 0.18);
+  --home-band-border: rgba(245, 158, 11, 0.18);
+  --home-band-accent: rgb(252 211 77);
+  --home-band-accent-soft: rgba(245, 158, 11, 0.14);
+  --home-band-panel-bg: rgba(26, 16, 8, 0.46);
+  --home-band-panel-image: linear-gradient(165deg, rgba(251, 191, 36, 0.05), rgba(69, 26, 3, 0.06) 46%, rgba(15, 23, 42, 0.08) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(254, 243, 199, 0.05), inset 0 0 0 1px rgba(217, 119, 6, 0.1);
+  --home-band-list-bg: rgba(24, 24, 27, 0.36);
+  --home-band-list-border: rgba(245, 158, 11, 0.16);
   --home-band-kicker: rgb(252 211 77);
 }
 
 .home-band--history {
-  --home-band-border: rgba(165, 180, 252, 0.24);
-  --home-band-glow: rgba(129, 140, 248, 0.16);
-  --home-band-panel-bg: rgba(20, 18, 44, 0.42);
-  --home-band-panel-image: linear-gradient(165deg, rgba(199, 210, 254, 0.08), rgba(30, 27, 75, 0.1) 52%, rgba(15, 23, 42, 0.12) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(224, 231, 255, 0.08), inset 0 0 0 1px rgba(99, 102, 241, 0.14);
-  --home-band-list-bg: rgba(30, 27, 75, 0.26);
-  --home-band-list-border: rgba(129, 140, 248, 0.2);
+  --home-band-border: rgba(165, 180, 252, 0.18);
+  --home-band-accent: rgb(196 181 253);
+  --home-band-accent-soft: rgba(129, 140, 248, 0.14);
+  --home-band-panel-bg: rgba(20, 18, 44, 0.44);
+  --home-band-panel-image: linear-gradient(165deg, rgba(199, 210, 254, 0.05), rgba(30, 27, 75, 0.06) 52%, rgba(15, 23, 42, 0.08) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(224, 231, 255, 0.05), inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+  --home-band-list-bg: rgba(30, 27, 75, 0.22);
+  --home-band-list-border: rgba(129, 140, 248, 0.16);
   --home-band-kicker: rgb(196 181 253);
 }
 
 .home-band--translate {
-  --home-band-border: rgba(45, 212, 191, 0.24);
-  --home-band-glow: rgba(20, 184, 166, 0.16);
-  --home-band-panel-bg: rgba(7, 25, 23, 0.42);
-  --home-band-panel-image: linear-gradient(165deg, rgba(153, 246, 228, 0.08), rgba(17, 94, 89, 0.1) 50%, rgba(15, 23, 42, 0.12) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(204, 251, 241, 0.08), inset 0 0 0 1px rgba(13, 148, 136, 0.14);
-  --home-band-list-bg: rgba(6, 18, 17, 0.5);
-  --home-band-list-border: rgba(45, 212, 191, 0.18);
+  --home-band-border: rgba(45, 212, 191, 0.18);
+  --home-band-accent: rgb(94 234 212);
+  --home-band-accent-soft: rgba(20, 184, 166, 0.14);
+  --home-band-panel-bg: rgba(7, 25, 23, 0.44);
+  --home-band-panel-image: linear-gradient(165deg, rgba(153, 246, 228, 0.05), rgba(17, 94, 89, 0.06) 50%, rgba(15, 23, 42, 0.08) 100%);
+  --home-band-panel-shadow: inset 0 1px 0 rgba(204, 251, 241, 0.05), inset 0 0 0 1px rgba(13, 148, 136, 0.1);
+  --home-band-list-bg: rgba(6, 18, 17, 0.36);
+  --home-band-list-border: rgba(45, 212, 191, 0.16);
   --home-band-kicker: rgb(94 234 212);
 }
 
@@ -2011,8 +2007,8 @@ html {
     top: 0.9rem;
     margin-bottom: 0.25rem;
     padding-block: 0.35rem 0.5rem;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0.92), rgba(2, 6, 23, 0.72) 82%, transparent);
-    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.56) 82%, transparent);
+    backdrop-filter: blur(14px);
   }
 
   .home-band-shell__header::after {

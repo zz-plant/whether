@@ -58,7 +58,7 @@ export default async function SignalsPage({
       showOfflineBadge={model.isFallback && !model.historicalSelection}
       pageTitle="Evidence"
       currentPath="/signals"
-      pageSummary="See what changed underneath the weekly call: drivers, thresholds, freshness, and replay."
+      pageSummary="Drivers, thresholds, freshness, and replay behind the weekly call."
       pageSummaryLink={{
         href:
           model.activeSignalsView === "detail"
@@ -79,7 +79,7 @@ export default async function SignalsPage({
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       nextStep={{
         href: "/operations",
-        description: "Open Planning once the evidence check is complete",
+        description: "Open Planning next",
       }}
       decisionBanner={{
         label: "Decision",
@@ -147,7 +147,7 @@ export default async function SignalsPage({
             assistMode="evidence"
             buttonLabel="Translate the signals"
             title="How to read the three main evidence terms"
-            summary="Use this when you want the diagnostic layer translated into plain operating language before you open the full appendix."
+            summary="Translate the main evidence terms."
           >
             <p>
               <span className="font-semibold text-slate-50">Tightness</span> = how hard conditions
@@ -166,7 +166,7 @@ export default async function SignalsPage({
             assistMode="trust"
             buttonLabel="Translate reliability"
             title="How to read freshness and confidence"
-            summary="Use this when the evidence is not the problem, but you need to know whether it is safe to rely on right now."
+            summary="Show whether the read is safe to use."
           >
             <p>
               <span className="font-semibold text-slate-50">Confidence</span> = how far the current

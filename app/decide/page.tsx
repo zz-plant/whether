@@ -29,7 +29,7 @@ const featuredStakeholderSlugs = [
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Tools — resolve one remaining edge case",
-  description: "Primary routing surface for one unresolved question after Weekly Brief and Planning. Open direct answers, translations, or toolkits only after the question type is clear.",
+  description: "Route one remaining question into the right answer, translation, or toolkit.",
   path: "/decide",
   imageAlt: "Whether decision tools",
   imagePath: "/social/decide.svg",
@@ -97,12 +97,12 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       treasurySource={reportData.treasury.source}
       trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="Route one unresolved question into the smallest downstream help."
-      trustStatusAction="Return to Weekly Brief or Planning once the question is resolved."
+      trustStatusDetail="Resolve one remaining question."
+      trustStatusAction="Return to Planning once it is resolved."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Decision Tools"
       currentPath="/decide"
-      pageSummary="Route one remaining question into the smallest downstream help: direct answer, translation, or toolkit."
+      pageSummary="Route one remaining question into the right answer, translation, or toolkit."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Route the question ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -113,7 +113,7 @@ export default async function DecidePage({
       secondaryCta={{ href: "/operations", label: "Return to Planning" }}
       nextStep={{
         href: "/operations",
-        description: "Return to Planning once this edge case is resolved",
+        description: "Return to Planning next",
       }}
       decisionBanner={{
         label: "Start here",
@@ -130,7 +130,7 @@ export default async function DecidePage({
           liveCall.action,
           shouldStartWithChecker
             ? "Run one go / wait / kill check before opening broader libraries."
-            : "Open one direct answer, translation, or toolkit path only after the question type is clear.",
+            : "Open the path that matches the question.",
         ],
         flipConditions: [liveCall.guardrail, liveCall.flip],
         updatedAt: reportData.fetchedAtLabel,
@@ -142,7 +142,7 @@ export default async function DecidePage({
       <HubHero
         eyebrow="Resolve the one question still blocking action"
         title="Route the last open question before you open another library."
-        description="Start here when Weekly Brief and Planning still leave one edge case open. This page should route you to the smallest help needed. Open Answers, Guides, or Toolkits only after the question type is already clear."
+        description="Use this page only for the last open question after Weekly Brief and Planning."
         actions={(
           <>
             <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Route my question</Link>
@@ -164,7 +164,7 @@ export default async function DecidePage({
 
       <LiteracyAssistRouter
         title="What do you need translated before you commit?"
-        description="Decision Tools can answer four different kinds of gaps. Pick the one that matches your missing literacy instead of browsing the whole library first."
+        description="Pick the gap that still needs translation."
         targets={{
           decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
           evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
@@ -176,7 +176,7 @@ export default async function DecidePage({
       <HubSection
         id="unresolved-question-router"
         title="What remains unresolved?"
-        description="Take the recommended next path first. Open a downstream library only when you already know you need a direct answer, a translation, or a runnable instrument."
+        description="Take the recommended next path first."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
@@ -199,7 +199,7 @@ export default async function DecidePage({
 
           <article id="direct-answers" className="weather-hub-card scroll-mt-28 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Alternative: direct answer</p>
-            <p className="text-sm text-slate-200">Use this when the question is already crisp and you want one yes / no answer you can share immediately.</p>
+            <p className="text-sm text-slate-200">For a crisp yes / no question.</p>
             <div className="space-y-2">
               {recommendedAnswerPages.map((page) => (
                 <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
@@ -215,7 +215,7 @@ export default async function DecidePage({
 
           <article id="guided-translation" className="weather-hub-card scroll-mt-28 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Alternative: team translation</p>
-            <p className="text-sm text-slate-200">Use this when the weekly call is clear but one owner or stage still needs a tailored version.</p>
+            <p className="text-sm text-slate-200">For one owner- or stage-specific version of the call.</p>
             <div className="grid gap-2">
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
@@ -248,12 +248,9 @@ export default async function DecidePage({
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Open downstream libraries only if routing still is not clear
+          More paths
         </summary>
         <div className="mt-4 space-y-6">
-          <p className="text-sm text-slate-300">
-            Keep this section as a reserve path only. If the top router and selected translation do not settle the question, choose one more routed path below instead of browsing broad libraries.
-          </p>
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">

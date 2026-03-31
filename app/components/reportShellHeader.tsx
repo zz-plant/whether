@@ -57,7 +57,7 @@ export function ReportShellHeader({
     <header className="weather-appbar relative z-20 border-slate-800/60 px-4 py-2.5 sm:px-5 sm:py-3 lg:sticky lg:top-4">
       {variant === "home-brief" ? (
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-          <div className="min-w-0 space-y-2.5">
+          <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <Image
                 src="/whether-logo.svg"
@@ -67,23 +67,20 @@ export function ReportShellHeader({
                 className="h-9 w-auto"
                 priority
               />
-              <span className="rounded-full border border-amber-300/35 bg-amber-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-50">
-                Weekly operating brief
-              </span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100">
-                {statusLabel}
-              </span>
             </div>
             <div className="space-y-1.5">
-              <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.05rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[1.4rem]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                Weekly brief
+              </p>
+              <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.05rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[1.32rem]">
                 Decide this week&apos;s pace in one screen.
               </p>
               <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
-                Stay on this screen for the call, the immediate move, the closest threshold, and the flip condition. Open a support path only if a specific question remains.
+                Start with the call, the immediate move, the threshold to watch, and the flip condition. Open a support path only when one question remains unresolved.
               </p>
             </div>
             {exportCta ? (
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <ReportCta
                   href={exportCta.href}
                   copyText={exportCta.copyText}
@@ -94,17 +91,15 @@ export function ReportShellHeader({
                 >
                   {exportCta.label}
                 </ReportCta>
-                <p className="max-w-2xl text-xs leading-relaxed text-slate-400">
-                  {exportCta.copyText
-                    ? "Copy the weekly brief before opening Planning or deeper evidence."
-                    : "Share the weekly call before opening Planning or deeper evidence."}
-                </p>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                  {statusLabel}
+                </span>
               </div>
             ) : null}
           </div>
           <div className="xl:min-w-[30rem]">
             <div className="weather-surface flex min-h-[36px] flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1">Posture {statusLabel}</span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2.5 py-1">Posture {statusLabel}</span>
               <span className="text-slate-500">•</span>
               <span>Decision as-of {recordDateLabel}</span>
               <span className="text-slate-500">•</span>
@@ -114,7 +109,7 @@ export function ReportShellHeader({
         </div>
       ) : (
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-          <div className="min-w-0 space-y-2.5">
+          <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-3">
               <Image
                 src="/whether-logo.svg"

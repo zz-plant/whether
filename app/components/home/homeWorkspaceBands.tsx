@@ -22,10 +22,7 @@ export async function HomeWorkspaceBands({
               Exception review
             </span>
             <span className="mt-1 block text-sm font-semibold text-slate-100">
-              Open Evidence or Trust only when the weekly plan still needs proof.
-            </span>
-            <span className="mt-1 block text-xs leading-relaxed text-slate-300">
-              Keep this closed unless someone challenges the call, freshness, or thresholds.
+              Open Evidence or Trust only for exceptions.
             </span>
           </summary>
           <div className="mt-4">
@@ -39,10 +36,7 @@ export async function HomeWorkspaceBands({
               One more question
             </span>
             <span className="mt-1 block text-sm font-semibold text-slate-100">
-              Open one follow-on surface only after the plan is already clear.
-            </span>
-            <span className="mt-1 block text-xs leading-relaxed text-slate-300">
-              Use a single downstream tool for the remaining edge case instead of reopening the brief.
+              Open one follow-on surface only if needed.
             </span>
           </summary>
           <div className="mt-4">

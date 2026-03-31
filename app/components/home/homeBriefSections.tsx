@@ -85,13 +85,15 @@ export const HomeDecisionSection = ({
 }) => (
   <Suspense fallback={<WeeklyDiagnosticsFallback />}>
     <StreamedSectionReveal delay="short">
-      <details className="group rounded-xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 sm:px-4 sm:py-3">
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-          More support surfaces
+      <details className="group weather-surface rounded-2xl px-3 py-3 sm:px-4 sm:py-4">
+        <summary className="cursor-pointer list-none">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+            Support surfaces
+          </span>
+          <span className="mt-1 block text-sm font-semibold text-slate-100">
+            Open only if something is still unresolved.
+          </span>
         </summary>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
-          Planning, evidence, and cadence stay below the weekly brief unless you need one of them.
-        </p>
         <div className="weather-disclosure-panel animate-collapsible-in mt-4">
           <HomeWorkspaceBands workspaceModelPromise={workspaceModelPromise} />
         </div>

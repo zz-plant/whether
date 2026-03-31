@@ -23,8 +23,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <HomeBandHeader
         step="01"
         kicker="Planning"
-        title="Open Planning next unless this week's call needs an exception review."
-        description="This is the default next move after the weekly brief: lock what to do now, what to avoid, and what would make you reopen the plan."
+        title="Open Planning next."
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Open Planning</span></Link>}
@@ -140,12 +139,6 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
             {financeSnapshot ? financeSnapshot.actionNow : "Planning owns the final execution-ready artifact and operator asks."}
           </p>
         </article>
-      </div>
-      <div className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3 text-sm text-slate-300">
-        <p className="font-semibold text-slate-100">Need more detail?</p>
-        <p className="mt-2">
-          Stay in Planning for approvals and guardrails. Open <Link href="/decide" className="font-semibold text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">Decision Tools</Link> only if one owner-specific question is still unresolved after the plan is clear.
-        </p>
       </div>
     </section>
   );

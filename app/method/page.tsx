@@ -17,7 +17,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Trust — freshness, confidence, and sources",
   description:
-    "Canonical trust entrypoint for Whether: run freshness, confidence, source coverage, and formula checks here before opening deeper appendices.",
+    "Check freshness, confidence, sources, and formulas for this week's call.",
   path: "/method",
   imageAlt: "Whether trust hub",
 });
@@ -82,19 +82,19 @@ export default async function MethodPage() {
   const trustActions = [
     {
       title: "Review source freshness",
-      detail: `Data refreshed: ${reportData.fetchedAtLabel}. Check source status and citation context here before opening external proof.`,
+      detail: `Data refreshed: ${reportData.fetchedAtLabel}. Check source status and citation context here.`,
       href: "#sources-freshness",
       cta: "Open sources appendix",
     },
     {
       title: "Review confidence limits",
-      detail: `Current confidence: ${confidenceLabel}. Check pause, flip, and warning conditions before approving irreversible spend.`,
+      detail: `Current confidence: ${confidenceLabel}. Check pause, flip, and warning conditions here.`,
       href: "#confidence-limits",
       cta: "Open confidence appendix",
     },
     {
       title: "Review formulas and appendices",
-      detail: "Open formula and appendix material only if a reviewer still needs deeper proof after the on-page trust check.",
+      detail: "Formula and appendix reference.",
       href: "#formula-reference",
       cta: "Open formula reference",
     },
@@ -107,18 +107,18 @@ export default async function MethodPage() {
   const trustVerdict = trustStatusTone === "stable"
     ? {
         label: "Safe to use for this week's operating call",
-        detail: "Freshness, confidence, and source coverage are strong enough to defend the current brief without escalating to a deeper trust review.",
+        detail: "Freshness, confidence, and source coverage support the current brief.",
         toneClasses: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
       }
     : trustStatusTone === "historical"
       ? {
           label: "Use only for retrospective comparison",
-          detail: "This is a historical snapshot. Use it to compare prior weeks, not to approve fresh irreversible moves.",
+          detail: "This is a historical snapshot, not a live approval read.",
           toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
         }
       : {
           label: "Use cautiously before approving irreversible moves",
-          detail: "Trust is degraded enough that the current brief needs an explicit freshness and confidence check before you rely on it for this week's decision.",
+          detail: "Trust is degraded enough that the current brief needs an explicit check first.",
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
   const sectionLinks = [
@@ -139,11 +139,11 @@ export default async function MethodPage() {
       treasurySource={reportData.treasury.source}
       trustStatusLabel={trustSummary}
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
-      trustStatusAction="If trust checks pass, return to the weekly brief and execute the operating call."
+      trustStatusAction="If trust checks pass, return to the weekly brief."
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Run the trust check here first, then open appendix pages only if someone still needs deeper proof."
+      pageSummary="Check freshness, confidence, and sources for this week's call."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -155,7 +155,7 @@ export default async function MethodPage() {
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       nextStep={{
         href: "/",
-        description: "Return to Weekly Brief after validating trust and confidence",
+        description: "Return to Weekly Brief next",
       }}
       decisionBanner={{
         label: "Start here",
@@ -167,10 +167,10 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Trust as the single audit entrypoint, then move back to the weekly brief or plan.",
+        call: "Use Trust to verify the current call.",
         doNow: [
           reportData.actionNowShort,
-          "Return to the weekly brief and execute this operating move once trust checks are complete.",
+          "Return to the weekly brief once trust checks are complete.",
         ],
         trustChecklist: {
           label: "Trust check",
@@ -196,7 +196,7 @@ export default async function MethodPage() {
           Check whether this week&apos;s call is fresh, reliable, and safe to use.
         </h1>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Start with the verdict below, then run the short trust check only if someone still needs proof before acting on the brief.
+          Start with the verdict below.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link href="#trust-snapshot" className="weather-button inline-flex min-h-[44px] items-center justify-center">
@@ -215,7 +215,7 @@ export default async function MethodPage() {
         <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
       </section>
 
-      <HubSection id="trust-snapshot" title="60-second trust check" description="Read top-to-bottom before acting on this week's posture." className="scroll-mt-28">
+      <HubSection id="trust-snapshot" title="60-second trust check" description="Check this before acting on this week's posture." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-hub-card rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current call</p>
@@ -249,7 +249,7 @@ export default async function MethodPage() {
         </div>
       </HubSection>
 
-      <HubSection id="trust-hub-links" title="Audit workflow" description="Open an appendix only when that exact question appears in review." className="scroll-mt-28">
+      <HubSection id="trust-hub-links" title="Audit workflow" description="Open the appendix that matches the question." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">
           {trustActions.map((item) => (
             <article key={item.title} className="weather-hub-link-card space-y-2">
@@ -273,7 +273,7 @@ export default async function MethodPage() {
       <HubSection
         id="sources-freshness"
         title="Sources and freshness appendix"
-        description="Use this appendix when a reviewer asks where the current call came from and how current the evidence is."
+        description="Where the current call came from and how current the evidence is."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -304,7 +304,7 @@ export default async function MethodPage() {
       <HubSection
         id="confidence-limits"
         title="Confidence and limits appendix"
-        description="Use this appendix when a reviewer asks how fragile the call is, what pauses it, or what would force a change."
+        description="How fragile the call is, what pauses it, and what forces a change."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

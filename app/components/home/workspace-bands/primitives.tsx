@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const HomeBandGlyph = ({ children, toneClass }: { children: ReactNode; toneClass: string }) => (
-  <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-slate-950/70 ${toneClass}`}>
+  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl border bg-slate-950/55 ${toneClass}`}>
     {children}
   </span>
 );
@@ -14,7 +14,7 @@ const HomeBandSignal = ({ toneClass }: { toneClass: string }) => (
   </span>
 );
 
-export const HomeBandHeader = ({ step, kicker, title, description, icon, toneClass, actions }: { step: string; kicker: string; title: string; description: string; icon: ReactNode; toneClass: string; actions?: ReactNode }) => (
+export const HomeBandHeader = ({ step, kicker, title, description, icon, toneClass, actions }: { step: string; kicker: string; title: string; description?: string; icon: ReactNode; toneClass: string; actions?: ReactNode }) => (
   <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
     <div className="flex items-start gap-3">
       <HomeBandGlyph toneClass={toneClass}>{icon}</HomeBandGlyph>
@@ -24,8 +24,8 @@ export const HomeBandHeader = ({ step, kicker, title, description, icon, toneCla
           <p className="home-band-kicker">{kicker}</p>
           <HomeBandSignal toneClass={toneClass.split(" ")[0] ?? toneClass} />
         </div>
-        <h2 className="text-xl font-semibold text-slate-100">{title}</h2>
-        <p className="max-w-3xl text-sm text-slate-300">{description}</p>
+        <h2 className="text-lg font-semibold leading-tight text-slate-100 sm:text-[1.1rem]">{title}</h2>
+        {description ? <p className="max-w-3xl text-sm leading-relaxed text-slate-300">{description}</p> : null}
       </div>
     </div>
     {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}

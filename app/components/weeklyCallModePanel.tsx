@@ -135,7 +135,7 @@ export function WeeklyCallModePanel({
                 assistMode="decision"
                 buttonLabel="Translate this call"
                 title="How to read the current call"
-                summary="Use this when you understand the business context but need the macro terms converted into operating language."
+                summary="Translate macro terms into operating language."
               >
                 <div className="flex flex-wrap gap-1.5">
                   <span className={assistChipClass}>Tightness = harder long-payback commitments</span>
@@ -143,9 +143,9 @@ export function WeeklyCallModePanel({
                   <span className={assistChipClass}>Action / Pause / Change course = move, stop line, reopen line</span>
                 </div>
                 <p>
-                  Need the fuller glossary?{" "}
+                  Need more?{" "}
                   <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                    Open plain-English help
+                    Open glossary help
                   </Link>
                   .
                 </p>
@@ -154,7 +154,7 @@ export function WeeklyCallModePanel({
                 assistMode="trust"
                 buttonLabel="Translate trust status"
                 title="How to use the trust state"
-                summary="Use this when you want to know whether this week’s call is safe to rely on now or should be treated cautiously."
+                summary="Show whether the current call is ready to use."
               >
                 <div className="flex flex-wrap gap-1.5">
                   <span className={assistChipClass}>Confidence = distance from the nearest flip line</span>
@@ -188,14 +188,14 @@ export function WeeklyCallModePanel({
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Guardrail / pause if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Pause if</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Reversal / change course if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Change course if</p>
                 <span className="sr-only">Flip condition / change course if</span>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>

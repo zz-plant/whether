@@ -33,8 +33,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
       <HomeBandHeader
         step="02"
         kicker="Exception paths"
-        title="Open Evidence or Trust only when the weekly call still needs proof."
-        description="Planning stays the default path. Leave home for Evidence when the drivers need checking, or Trust when a reviewer needs freshness, confidence, or formula defense."
+        title="Open Evidence or Trust only for exceptions."
         icon={<AuditIcon className="h-5 w-5 text-sky-100" />}
         toneClass="border-sky-400/40 text-sky-200"
         actions={(
@@ -105,7 +104,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
           <Link href={"/signals" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Evidence owns</p>
             <p className="mt-2 text-sm font-semibold">Why the call moved</p>
-            <p className="mt-1 text-xs text-slate-300">Use this only when the compact home readout is not enough and you need the driver stack, thresholds, or replay before approving the plan.</p>
+            <p className="mt-1 text-xs text-slate-300">Driver stack, thresholds, and replay.</p>
             {workspaceModel.audit.evidenceMovers.length > 0 ? (
               <ul className="mt-3 space-y-2">
                 {workspaceModel.audit.evidenceMovers.slice(0, 2).map((item) => (

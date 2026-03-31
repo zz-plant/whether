@@ -199,7 +199,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Turn the weekly call into this week's plan, then confirm guardrails, finance decisions, and the final brief."
+      pageSummary="Approve this week's plan, guardrails, finance posture, and final brief."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open planning flow ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
@@ -255,7 +255,7 @@ export default async function OperationsPage({
 
       <LiteracyAssistRouter
         title="What do you need translated in Planning?"
-        description="Open the planning layer that matches your gap instead of reading every section at full density."
+        description="Open the planning layer that matches your gap."
         targets={{
           decision: { href: buildAssistHref("decision", "#ops-monthly-action-summary") },
           evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
@@ -277,14 +277,13 @@ export default async function OperationsPage({
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Planning help</p>
           <h2 className="text-base font-semibold text-slate-100">Translate the plan only where you need support.</h2>
-          <p className="text-sm text-slate-300">These helpers persist by section, so you can keep Planning dense where you are already fluent.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <PersistedAssistPanel
             assistMode="decision"
             buttonLabel="Translate this plan"
             title="How to read the weekly planning flow"
-            summary="Use this when you understand the weekly call but need the execution review translated into concrete approvals."
+            summary="Translate the weekly planning flow."
           >
             <p><span className="font-semibold text-slate-50">Weekly plan</span> = what to approve or hold for team pace and priority changes this week.</p>
             <p><span className="font-semibold text-slate-50">Guardrails</span> = the limits that should pause new work before it becomes hard to reverse.</p>
@@ -294,7 +293,7 @@ export default async function OperationsPage({
             assistMode="trust"
             buttonLabel="Translate approval readiness"
             title="How to read owner and approval state"
-            summary="Use this when the work is clear but you need a faster answer to whether the plan is ready to circulate."
+            summary="Show whether the plan is ready to circulate."
           >
             <p><span className="font-semibold text-slate-50">Owner</span> = the function that should drive the step to completion.</p>
             <p><span className="font-semibold text-slate-50">Approval state</span> = the minimum outcome this step should reach before you move on.</p>
@@ -304,7 +303,7 @@ export default async function OperationsPage({
             assistMode="share"
             buttonLabel="Translate the final brief"
             title="How to choose the share format"
-            summary="Use this when Planning is approved and you only need the right artifact for the room."
+            summary="Choose the right artifact for the room."
           >
             <p><span className="font-semibold text-slate-50">Operator brief</span> = the default terse artifact for leaders who already know the framework.</p>
             <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with one-line term translation for mixed-literacy audiences.</p>
