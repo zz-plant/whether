@@ -16,23 +16,26 @@ flowchart LR
   subgraph Decisioning["2) Regime + bounded decisioning"]
     A4 --> B1["regimeEngine.ts\nregime score + constraints"]
     B1 --> B2["playbook.ts\nposture recommendation"]
-    B2 --> B3["decisionShield.ts\naction + threshold + reversal checks"]
+    U1["Operator decision input\n(lifecycle + category + action)"] --> B3["decisionShield.ts\naction + threshold + reversal checks"]
+    B1 --> B3
   end
 
-  subgraph Artifact["3) Brief + artifact assembly"]
-    B1 --> C1["report/reportData.ts\nweekly decision model"]
+  subgraph Artifact["3) Parallel artifact assembly"]
+    B1 --> C1["report/reportData.ts\nreport dataset + trust framing"]
     B2 --> C1
-    B3 --> C1
-    C1 --> C2["summary/* builders\nstructured sections + copy"]
+    B1 --> C2["summary/* builders\nweekly/monthly/quarterly/yearly structured sections"]
+    B2 --> C2
+    C1 --> C4["app/* routes\nhome brief + signals + operations"]
     C2 --> C3["app/api/*\nweekly/monthly/quarterly/yearly payloads"]
-    C2 --> C4["app/* routes\nhome brief + signals + operations"]
+    C2 --> C4
+    B3 --> C4
     C3 --> C5["Transmission artifacts\nSlack-ready copy + meeting citation paths"]
     C4 --> C5
   end
 
   subgraph Resilience["Trust + continuity overlays"]
     D1["snapshot_fallback.json"] --> A2
-    D2["time_machine_cache.json"] --> C2
+    D2["time_machine_cache.json"] --> C1
     D3["summary_archive.json"] --> C2
     D4["report/trustStatus.ts\nfreshness + fallback state"] --> C4
     D4 --> C3
@@ -43,7 +46,8 @@ flowchart LR
 ```mermaid
 flowchart TD
   W["What changed this week?"] --> P["Recommended posture"]
-  P --> D["Bounded decision\n(action + trigger + reversal)"]
+  P --> A["Choose action\n(team decision input)"]
+  A --> D["Decision shield verdict\nsafe/risky/dangerous + reversal trigger"]
   D --> R["Revisit queue\nwhat to re-open now"]
   R --> S["Shareable artifact\nAPI/brief/export copy"]
 ```
