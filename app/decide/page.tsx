@@ -28,8 +28,8 @@ const featuredStakeholderSlugs = [
 ] as const;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decision Tools — resolve one remaining edge case",
-  description: "Route one remaining question into the right answer, translation, or toolkit.",
+  title: "Decision Tools — translate one open question",
+  description: "Translate one open question into the smallest useful help.",
   path: "/decide",
   imageAlt: "Whether decision tools",
   imagePath: "/social/decide.svg",
@@ -97,27 +97,27 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       treasurySource={reportData.treasury.source}
       trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="Resolve one remaining question."
-      trustStatusAction="Return to Planning once it is resolved."
+      trustStatusDetail="Translate one open question."
+      trustStatusAction="Return to Planning when it is resolved."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
-      pageTitle="Decision Tools"
+      pageTitle="Translation"
       currentPath="/decide"
-      pageSummary="Route one remaining question into the right answer, translation, or toolkit."
-      pageSummaryLink={{ href: "#unresolved-question-router", label: "Route the question ↓" }}
+      pageSummary="Translate one remaining question into the right help."
+      pageSummaryLink={{ href: "#unresolved-question-router", label: "Find the help ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
       showPageNavigation={true}
-      primaryCta={{ href: "#unresolved-question-router", label: "Route my question" }}
-      secondaryCta={{ href: "/operations", label: "Return to Planning" }}
+      primaryCta={{ href: "#unresolved-question-router", label: "Find the right help" }}
+      secondaryCta={{ href: "/operations", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
         description: "Return to Planning next",
       }}
       decisionBanner={{
-        label: "Start here",
-        decision: "Resolve one remaining team-specific or situation-specific question without reopening the weekly brief.",
+        label: "Translation",
+        decision: "Resolve one remaining question without reopening the weekly brief.",
         horizon: "This week",
         confidence: homeBriefModel.confidenceLabel,
         effectiveDate: reportData.recordDateLabel,
@@ -125,12 +125,12 @@ export default async function DecidePage({
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Decision Tools to close the one question the weekly brief and plan do not settle.",
+        call: "Use Translation to close the last open question.",
         doNow: [
           liveCall.action,
           shouldStartWithChecker
-            ? "Run one go / wait / kill check before opening broader libraries."
-            : "Open the path that matches the question.",
+            ? "Run one go / wait / kill check before opening broader help."
+            : "Open the help that matches the question.",
         ],
         flipConditions: [liveCall.guardrail, liveCall.flip],
         updatedAt: reportData.fetchedAtLabel,
@@ -138,14 +138,14 @@ export default async function DecidePage({
       structuredData={breadcrumbStructuredData}
     >
       <OperatorWorkflowRouteTracker />
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decision Tools" }]} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Translation" }]} />
       <HubHero
-        eyebrow="Resolve the one question still blocking action"
-        title="Route the last open question before you open another library."
-        description="Use this page only for the last open question after Weekly Brief and Planning."
+        eyebrow="One open question"
+        title="Get the last question translated."
+        description="Use this page when the Weekly Brief and Planning still leave one thing unresolved."
         actions={(
           <>
-            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Route my question</Link>
+            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Find the help</Link>
             <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Weekly Brief</Link>
           </>
         )}
@@ -163,8 +163,8 @@ export default async function DecidePage({
       />
 
       <LiteracyAssistRouter
-        title="What do you need translated before you commit?"
-        description="Pick the gap that still needs translation."
+        title="What still needs translation?"
+        description="Pick the help that fits."
         targets={{
           decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
           evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
@@ -175,8 +175,8 @@ export default async function DecidePage({
 
       <HubSection
         id="unresolved-question-router"
-        title="What remains unresolved?"
-        description="Take the recommended next path first."
+        title="What still needs help?"
+        description="Take the recommended path first."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_repeat(2,minmax(0,0.9fr))]">
@@ -198,8 +198,8 @@ export default async function DecidePage({
           </article>
 
           <article id="direct-answers" className="weather-hub-card scroll-mt-28 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Alternative: direct answer</p>
-            <p className="text-sm text-slate-200">For a crisp yes / no question.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Direct answer</p>
+            <p className="text-sm text-slate-200">For a yes / no question.</p>
             <div className="space-y-2">
               {recommendedAnswerPages.map((page) => (
                 <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
@@ -214,8 +214,8 @@ export default async function DecidePage({
           </article>
 
           <article id="guided-translation" className="weather-hub-card scroll-mt-28 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Alternative: team translation</p>
-            <p className="text-sm text-slate-200">For one owner- or stage-specific version of the call.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Role translation</p>
+            <p className="text-sm text-slate-200">For one role or stage.</p>
             <div className="grid gap-2">
               {recommendedStakeholderGuides.map((guide) => (
                 <Link
@@ -248,13 +248,13 @@ export default async function DecidePage({
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          More paths
+          More help
         </summary>
         <div className="mt-4 space-y-6">
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More role paths</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More role help</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
                   <Link key={role.slug} href={`/decide/${role.slug}`} className="weather-hub-chip">
@@ -264,7 +264,7 @@ export default async function DecidePage({
               </div>
             </div>
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More situation paths</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More situation help</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
                   <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-hub-chip">

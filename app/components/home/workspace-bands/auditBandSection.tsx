@@ -119,8 +119,8 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
 
           <Link href={"/method" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Trust owns</p>
-            <p className="mt-2 text-sm font-semibold">Whether you can defend the call</p>
-            <p className="mt-1 text-xs text-slate-300">Use this only when someone challenges readiness and you need a fast trust verdict, source coverage check, or formula explanation.</p>
+            <p className="mt-2 text-sm font-semibold">Can you defend the call?</p>
+            <p className="mt-1 text-xs text-slate-300">Use when someone asks for proof.</p>
             <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/45 px-2.5 py-2 text-xs">
               <p className="font-semibold text-slate-100">Operating implication</p>
               <p className="mt-1 text-slate-300">{workspaceModel.audit.decisionImpactWindow}</p>

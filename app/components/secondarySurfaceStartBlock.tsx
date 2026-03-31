@@ -11,13 +11,13 @@ export function SecondarySurfaceStartBlock({ surface }: SecondarySurfaceStartBlo
 
   return (
     <SecondaryPageSection
-      eyebrow={`Secondary surface · ${contract.intentLabel}`}
-      title={contract.startInstruction}
-      description={contract.helperSummary}
+      eyebrow={`Support path · ${contract.intentLabel}`}
+      title={`Open ${contract.parentHubLabel} support when needed.`}
+      description="This helper layer exists for proof or translation, not as a second workflow."
       actions={(
         <>
           <ButtonLink href="/" variant="primary">
-            Start from Weekly Brief
+            Weekly Brief
           </ButtonLink>
           <ButtonLink href={contract.parentHubHref} variant="pill">
             {contract.returnCtaLabel} ({contract.parentHubLabel})

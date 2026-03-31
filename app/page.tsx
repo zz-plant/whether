@@ -104,7 +104,7 @@ export const HomePageReportContent = async ({
         },
         page: {
           pageTitle: "Weekly Brief",
-          pageSummary: "This week's call, what to do now, and a summary you can share right away. Open other pages only if you need supporting evidence, planning details, or data status.",
+          pageSummary: "One weekly call, one operating move, and one shareable brief.",
           pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",
@@ -134,7 +134,7 @@ export const HomePageReportContent = async ({
         actions: {
           exportCta: {
             href: "#share-ready-artifact",
-            label: "Copy weekly brief",
+            label: "Copy operator brief",
             copyText: headerWeeklyBriefCopy,
             copyTarget: "Weekly brief",
             telemetryEvent: {
@@ -146,7 +146,7 @@ export const HomePageReportContent = async ({
           },
           nextStep: {
             href: "/operations",
-            description: "Open Planning next to approve this week's hiring, spending, roadmap, and finance moves",
+            description: "Open Planning next to approve or hold this week's moves",
           },
         },
         payloads: {

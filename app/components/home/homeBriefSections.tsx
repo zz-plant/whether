@@ -91,7 +91,7 @@ export const HomeDecisionSection = ({
             Support surfaces
           </span>
           <span className="mt-1 block text-sm font-semibold text-slate-100">
-            Open only if something is still unresolved.
+            Open only if you still need proof or a follow-up.
           </span>
         </summary>
         <div className="weather-disclosure-panel animate-collapsible-in mt-4">

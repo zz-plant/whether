@@ -31,7 +31,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <article className="rounded-2xl border border-slate-800/80 bg-slate-950/55 p-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Weekly operating board" accentClass="text-emerald-200" />
+            <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Weekly operator brief" accentClass="text-emerald-200" />
             <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.approvalHeadline}</p>
             <p className="mt-1 text-sm text-slate-300">{workspaceModel.operations.approvalDetail}</p>
           </div>
@@ -133,10 +133,10 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<DocumentIcon className="h-3.5 w-3.5" />} label={financeSnapshot ? "Finance posture" : "Final brief"} accentClass="text-slate-200" />
           <p className="mt-2 text-sm font-semibold text-slate-100">
-            {financeSnapshot ? financeSnapshot.label : "Share the aligned brief only after planning is complete."}
+            {financeSnapshot ? financeSnapshot.label : "Share the aligned brief when planning is complete."}
           </p>
           <p className="mt-2 text-sm text-slate-300">
-            {financeSnapshot ? financeSnapshot.actionNow : "Planning owns the final execution-ready artifact and operator asks."}
+            {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is the room-ready output."}
           </p>
         </article>
       </div>

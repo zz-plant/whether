@@ -56,7 +56,7 @@ const getPageLinkStateClassName = (isActive: boolean) =>
     ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
     : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 
-const routeSwitcherIntro = "Weekly Brief is the anchor. Use support paths for evidence, planning, answers, or trust.";
+const routeSwitcherIntro = "Weekly Brief is the anchor. Use support paths only for proof or translation.";
 
 const renderPageLink = ({
   link,

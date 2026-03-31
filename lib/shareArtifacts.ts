@@ -22,7 +22,7 @@ export const buildArtifactModeHref = (href: string, mode: ArtifactMode) => {
 };
 
 export const buildArtifactShareTitle = (mode: ArtifactMode) =>
-  `Whether ${artifactModeLabels[mode]}`;
+  artifactModeLabels[mode];
 
 export const buildArtifactShareText = ({
   mode,

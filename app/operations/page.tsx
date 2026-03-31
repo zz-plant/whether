@@ -445,9 +445,9 @@ export default async function OperationsPage({
           {
             id: "ops-export-briefs",
             label: "Share",
-            title: "Share brief",
-            description: "Copy-ready narratives for leadership updates and stakeholder syncs.",
-            summary: "Copy or export the aligned brief after plan and finance review are complete.",
+            title: "Share the brief",
+            description: "Pick the operator brief, explainer brief, or a board-ready artifact.",
+            summary: "Start with the operator brief; use explainer mode only when the room needs translation.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",
@@ -457,8 +457,8 @@ export default async function OperationsPage({
                 <SectionedReportPanel
                   id="ops-export-briefs-panel"
                   label="Share"
-                  title="Aligned brief"
-                  description="Copy-ready narratives for leadership updates and stakeholder syncs."
+                  title="Share-ready brief"
+                  description="Operator brief first. Explainer brief when the room needs translation."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel

@@ -19,7 +19,7 @@ export async function HomeWorkspaceBands({
         <details className="weather-auto-chevron rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
           <summary className="cursor-pointer text-left">
             <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              Exception review
+              Proof
             </span>
             <span className="mt-1 block text-sm font-semibold text-slate-100">
               Open Evidence or Trust only for exceptions.
@@ -33,7 +33,7 @@ export async function HomeWorkspaceBands({
         <details className="weather-auto-chevron rounded-2xl border border-slate-800/80 bg-slate-950/55 px-4 py-3">
           <summary className="cursor-pointer text-left">
             <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-              One more question
+              Follow-up
             </span>
             <span className="mt-1 block text-sm font-semibold text-slate-100">
               Open one follow-on surface only if needed.

@@ -12,8 +12,8 @@ export function StaticHubNav({ currentPath }: { currentPath: string }) {
   return (
     <nav className="weather-hub-section" aria-label="Primary workflow hubs">
       <div className="space-y-2">
-        <p className="weather-hub-section-eyebrow">Workflow surfaces</p>
-        <h2 className="text-xl font-semibold text-white">Evidence, Planning, Decision Tools, and Trust</h2>
+        <p className="weather-hub-section-eyebrow">Support layers</p>
+        <h2 className="text-xl font-semibold text-white">Proof, planning, translation, and trust</h2>
       </div>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {hubLinks.map((link) => {

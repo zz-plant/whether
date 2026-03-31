@@ -17,12 +17,12 @@ import {
 type PrimaryActionType = "copy_weekly_brief";
 
 type CopyTarget =
-  | "Board snippet"
+  | "Board note"
   | "Meeting pack"
   | "Explainer brief"
-  | "Weekly call snapshot"
-  | "Weekly operator brief"
-  | "Board"
+  | "Call snapshot"
+  | "Operator brief"
+  | "Board summary"
   | "Citation";
 
 type CopyState = "idle" | "copying" | "copied" | "error";
@@ -166,30 +166,35 @@ export function CopyLeadershipArtifactsButtons({
     applyOverride(boardSummary),
     "",
     "Plain-English guide",
-    "• Tightness = how hard conditions make new long-payback commitments.",
-    "• Risk appetite = how willing markets are to fund risk and faster expansion.",
-    "• Pause if = the threshold that should stop new commitments.",
-    "• Change course if = the signal that reopens this week’s call.",
+    "• Tightness = how hard it is to make long-payback commitments.",
+    "• Risk appetite = how willing markets are to support faster expansion.",
+    "• Pause if = the stop line.",
+    "• Change course if = the reopen line.",
     "",
-    "Weekly operator brief",
+    "Operator brief",
     applyOverride(weeklyOperatorBrief),
     "",
     "Citation",
     citation,
   ].join("\n");
-  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Weekly operator brief";
+  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Operator brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
     : applyOverride(weeklyOperatorBrief);
+  const activeModeLabel = artifactModeLabels[artifactMode];
+  const activeModeNote =
+    artifactMode === "explainer"
+      ? "Same call, with plain-English translation."
+      : "Default share path for leadership.";
 
   const meetingPackContent = [
-    "BOARD SNIPPET",
+    "BOARD NOTE",
     applyOverride(boardSnippet),
     "",
-    "Weekly call snapshot",
+    "Call snapshot",
     applyOverride(weeklyCallSnapshot),
     "",
-    "WEEKLY OPERATOR BRIEF",
+    "OPERATOR BRIEF",
     applyOverride(weeklyOperatorBrief),
     "",
     "BOARD SUMMARY",
@@ -225,7 +230,7 @@ export function CopyLeadershipArtifactsButtons({
     const currentUrl = buildArtifactModeHref(window.location.href, artifactMode);
     const shareText = buildArtifactShareText({
       mode: artifactMode,
-      summary: "Share-ready weekly brief",
+      summary: activeModeLabel,
       brief: applyOverride(primaryBriefContent),
       url: currentUrl,
     });
@@ -238,7 +243,7 @@ export function CopyLeadershipArtifactsButtons({
     const shareApi = navigator.share;
     if (typeof shareApi !== "function") {
       setShareState("sharing");
-      const copied = await copyToClipboard(shareText, "Share brief");
+      const copied = await copyToClipboard(shareText, activeModeLabel);
       setShareState(copied ? "copied" : "error");
       return;
     }
@@ -257,7 +262,7 @@ export function CopyLeadershipArtifactsButtons({
         return;
       }
 
-      const copied = await copyToClipboard(shareText, "Share brief");
+      const copied = await copyToClipboard(shareText, activeModeLabel);
       setShareState(copied ? "copied" : "error");
     }
   };
@@ -271,7 +276,9 @@ export function CopyLeadershipArtifactsButtons({
         ? "Copied link"
       : shareState === "error"
         ? "Retry share"
-        : "Share brief";
+        : artifactMode === "explainer"
+          ? "Share explainer brief"
+          : "Share operator brief";
 
   return (
     <div className="space-y-2">
@@ -295,36 +302,36 @@ export function CopyLeadershipArtifactsButtons({
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel(primaryBriefTarget, `Copy ${artifactModeLabels[artifactMode].toLowerCase()}`)}
+          {copyLabel(primaryBriefTarget, `Copy ${activeModeLabel.toLowerCase()}`)}
         </ActionButton>
         <ActionButton
           variant="secondary"
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(applyOverride(weeklyCallSnapshot), "Weekly call snapshot");
+            copyToClipboard(applyOverride(weeklyCallSnapshot), "Call snapshot");
           }}
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
+          {copyLabel("Call snapshot", "Copy call snapshot")}
         </ActionButton>
       </div>
       <p className="px-1 text-[11px] leading-5 text-slate-400" role="status" aria-live="polite">
         {shareState === "shared"
-          ? "Shared with the current artifact mode and link."
+          ? `${activeModeLabel} shared with its link.`
           : shareState === "copied"
-            ? "Copied share link for the current artifact mode."
+            ? `Copied ${activeModeLabel.toLowerCase()} link.`
           : shareState === "error"
             ? "Share failed. Copy fallback is available."
-            : "Default share path: use the share button on mobile or the copy buttons on desktop."
+            : `Use the share button for ${activeModeLabel.toLowerCase()} or copy a brief below.`
         }
       </p>
 
       <p className="px-1 text-[11px] leading-5 text-slate-400">
-        Default share path: use the {artifactModeLabels[artifactMode].toLowerCase()}. The URL keeps the selected artifact mode so shared links reopen the same brief.
+        {activeModeLabel}: {activeModeNote} The URL keeps the selected artifact mode so shared links reopen the same brief.
       </p>
-      <div className="flex flex-wrap gap-2" aria-label="Artifact mode">
+      <div className="grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
         {(["operator", "explainer"] as const).map((mode) => {
           const active = mode === artifactMode;
           return (
@@ -350,11 +357,16 @@ export function CopyLeadershipArtifactsButtons({
                 }
               }}
               aria-pressed={active}
-              className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+              className={`weather-pill inline-flex min-h-[44px] flex-col items-start px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] ${
                 active ? "border-sky-300/80 text-slate-100" : "text-slate-300"
               }`}
             >
-              {artifactModeLabels[mode]}
+              <span>{artifactModeLabels[mode]}</span>
+              <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
+                {mode === "explainer"
+                  ? "Plain-English terms for mixed-literacy rooms."
+                  : "Default brief for leadership and operators."}
+              </span>
             </button>
           );
         })}
@@ -362,7 +374,7 @@ export function CopyLeadershipArtifactsButtons({
 
       <details className="weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
         <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-          Board, print, and company exceptions
+          More formats
         </summary>
         <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
           <div>
@@ -370,11 +382,11 @@ export function CopyLeadershipArtifactsButtons({
               <ActionButton
                 variant="secondary"
                 type="button"
-                onClick={() => copyToClipboard(applyOverride(boardSnippet), "Board snippet")}
+                onClick={() => copyToClipboard(applyOverride(boardSnippet), "Board note")}
                 disabled={isCopying}
                 aria-busy={isCopying}
               >
-                {copyLabel("Board snippet", "Copy board snippet")}
+                {copyLabel("Board note", "Copy board note")}
               </ActionButton>
               <ActionButton
                 variant="secondary"
@@ -388,11 +400,11 @@ export function CopyLeadershipArtifactsButtons({
               <ActionButton
                 variant="secondary"
                 type="button"
-                onClick={() => copyToClipboard(applyOverride(boardSummary), "Board")}
+                onClick={() => copyToClipboard(applyOverride(boardSummary), "Board summary")}
                 disabled={isCopying}
                 aria-busy={isCopying}
               >
-                {copyLabel("Board", "Copy board summary")}
+                {copyLabel("Board summary", "Copy board summary")}
               </ActionButton>
               <ActionButton
                 variant="secondary"
@@ -404,11 +416,11 @@ export function CopyLeadershipArtifactsButtons({
                 {copyLabel("Citation", "Copy citation")}
               </ActionButton>
               <ActionButton variant="secondary" type="button" onClick={handleExportPdf}>
-                Export / print PDF
+                Print / PDF
               </ActionButton>
             </div>
             <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400">
-              Use these after the default weekly brief is aligned and ready to be repackaged.
+              Use these after the operator brief is aligned and ready to be repackaged.
             </p>
           </div>
 

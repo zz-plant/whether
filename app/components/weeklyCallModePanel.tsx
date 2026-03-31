@@ -113,11 +113,11 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly call snapshot">
+      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly operator brief">
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <h2 className={tierOneHeadingClassName}>This week in one screen</h2>
+              <h2 className={tierOneHeadingClassName}>This week</h2>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{postureLabel}</span>
@@ -134,8 +134,8 @@ export function WeeklyCallModePanel({
               <PersistedAssistPanel
                 assistMode="decision"
                 buttonLabel="Translate this call"
-                title="How to read the current call"
-                summary="Translate macro terms into operating language."
+                title="Call translation"
+                summary="Translate the terms."
               >
                 <div className="flex flex-wrap gap-1.5">
                   <span className={assistChipClass}>Tightness = harder long-payback commitments</span>
@@ -153,8 +153,8 @@ export function WeeklyCallModePanel({
               <PersistedAssistPanel
                 assistMode="trust"
                 buttonLabel="Translate trust status"
-                title="How to use the trust state"
-                summary="Show whether the current call is ready to use."
+                title="Trust verdict"
+                summary="Show whether the read is ready to use."
               >
                 <div className="flex flex-wrap gap-1.5">
                   <span className={assistChipClass}>Confidence = distance from the nearest flip line</span>
@@ -166,12 +166,12 @@ export function WeeklyCallModePanel({
           ) : null}
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Changed vs last week</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
               <span className="sr-only">What changed</span>
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
             </article>
             <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit decisions?</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Recheck if</p>
               <span className="sr-only">What to revisit</span>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
@@ -181,21 +181,21 @@ export function WeeklyCallModePanel({
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do now</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Pause if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Do not do</p>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Change course if</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Recheck if</p>
                 <span className="sr-only">Flip condition / change course if</span>
                 <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
               </div>
@@ -203,31 +203,26 @@ export function WeeklyCallModePanel({
             </article>
           </div>
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Decision use</p>
-                <p className={`mt-1 text-xs font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>
-                  {needsTrustWarning ? "Use caution" : "Ready to use"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trust state</p>
-                <p className="mt-1 text-xs font-semibold text-slate-100">{trustStateLabel}</p>
-              </div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Safe to use?</p>
+              <p className={`text-xs font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>
+                {needsTrustWarning ? "Use caution" : "Ready to use"}
+              </p>
             </div>
+            <p className="mt-2 text-xs font-semibold text-slate-100">{trustStateLabel}</p>
             <p className="mt-2 text-[11px] leading-5 text-slate-200">{trustStateDetail}</p>
           </div>
         </article>
 
         <CompactDisclosure
           queryKey="moreContext"
-          summary="More context"
+          summary="Why this call"
           className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
           summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
         >
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this is the hold line</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why we believe this</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {guardrailPolicyDetails.chips.map((chip) => (
@@ -237,13 +232,13 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Variant</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Role and stability</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
               <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What would change the call</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Recheck if</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -263,10 +258,10 @@ export function WeeklyCallModePanel({
           </div>
         </CompactDisclosure>
 
-        {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
+      {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
           <CompactDisclosure
             queryKey="supportingRationale"
-            summary="Supporting rationale"
+            summary="Role translation"
             className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3"
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >

@@ -29,11 +29,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Evidence",
+  title: "Whether Report — Proof",
   description:
-    "Evidence appendix for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
+    "Proof behind the weekly brief: what moved, why it matters, and when to revisit.",
   path: "/signals",
-  imageAlt: "Whether Report evidence overview",
+  imageAlt: "Whether Report proof overview",
   imagePath: "/social/signals.svg",
 });
 
@@ -56,9 +56,9 @@ export default async function SignalsPage({
       trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Evidence"
+      pageTitle="Proof"
       currentPath="/signals"
-      pageSummary="Drivers, thresholds, freshness, and replay behind the weekly call."
+      pageSummary="Proof behind the weekly call."
       pageSummaryLink={{
         href:
           model.activeSignalsView === "detail"
@@ -66,8 +66,8 @@ export default async function SignalsPage({
             : "#decision-summary",
         label:
           model.activeSignalsView === "detail"
-            ? "Open evidence path ↓"
-            : "Open implication summary ↓",
+            ? "Open proof details ↓"
+            : "Open plain-English read ↓",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={model.sectionLinks}
@@ -75,15 +75,15 @@ export default async function SignalsPage({
       pageNavVariant="compact"
       headerVariant="evidence"
       showPageNavigation={true}
-      primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
-      secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
+      primaryCta={{ href: "#current-scores", label: "View proof" }}
+      secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
-        description: "Open Planning next",
+        description: "Use Planning next",
       }}
       decisionBanner={{
-        label: "Decision",
-        decision: `${model.regimeLabel} regime matches the current macro diagnostics.`,
+        label: "Proof",
+        decision: `${model.regimeLabel} call is still supported by the current evidence.`,
         horizon: "Current cycle",
         confidence: model.trust.trustStatusLabel,
         effectiveDate: model.recordDateLabel,
@@ -92,11 +92,10 @@ export default async function SignalsPage({
       decisionDiffs={[{ label: `Regime: ${model.regimeLabel}`, tone: "neutral" }]}
       commandBar={{
         regime: model.assessment.regime,
-        call: `${model.regimeLabel} posture remains active while signal thresholds hold.`,
+        call: "Use Proof to check what moved.",
         doNow: [
           model.actionNowShort,
-          model.startItems[0]
-            ?? "Prioritize the highest-confidence start rule before changing posture.",
+          model.startItems[0] ?? "Use the strongest proof item before changing the plan.",
         ],
         flipConditions: [
           model.reportData.flipThreshold,
@@ -119,8 +118,8 @@ export default async function SignalsPage({
       <OperatorWorkflowRouteTracker />
       <PageFlowNav
         eyebrow={signalsScrollPlan.eyebrow}
-        title={signalsScrollPlan.title}
-        description={signalsScrollPlan.description}
+        title="Proof in one step"
+        description="Use this page to check the call, the proof, and when to revisit."
         items={signalsScrollPlan.items}
         maxItems={3}
       />
@@ -134,9 +133,9 @@ export default async function SignalsPage({
         assessment={model.assessment}
         recordDate={model.treasury.record_date}
         impactLinks={[
-          { label: "Tightness", href: model.regimeTimelineHref, metric: "tightness" },
-          { label: "Risk appetite", href: "#current-scores", metric: "riskAppetite" },
-          { label: "Base rate", href: "#current-scores", metric: "baseRate" },
+          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
+          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
+          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
         ]}
         openPanelHref={model.timeMachineHref}
       />
@@ -146,8 +145,8 @@ export default async function SignalsPage({
           <PersistedAssistPanel
             assistMode="evidence"
             buttonLabel="Translate the signals"
-            title="How to read the three main evidence terms"
-            summary="Translate the main evidence terms."
+            title="How to read the main proof terms"
+            summary="Turn the signals into operating language."
           >
             <p>
               <span className="font-semibold text-slate-50">Tightness</span> = how hard conditions
@@ -204,14 +203,13 @@ export default async function SignalsPage({
         <section id="historical-replay" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
           <header className="space-y-2">
             <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
-              Historical regime replay
+              Historical replay
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Pick any date to replay the mandate card context.
+              Pick any date to replay the call context.
             </h2>
             <p className="text-sm text-slate-300">
-              We snap your selection to the closest available monthly snapshot and label the replay
-              timestamp.
+              We snap your selection to the closest available monthly snapshot and label the replay timestamp.
             </p>
           </header>
           <HistoricalReplayDatePicker

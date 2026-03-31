@@ -250,12 +250,12 @@ export const ExportBriefPanel = ({
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Export briefs"
-          title="Send to team"
+          label="Share first"
+          title="Pick the brief"
           titleId="export-briefs-title"
           description={
             <>
-              Copy ready-made summaries for Slack, email, or slide decks, or print to PDF.
+              Start with the operator brief. Use the explainer brief only when the room needs translation.
             </>
           }
           aside={
@@ -265,7 +265,7 @@ export const ExportBriefPanel = ({
                 onClick={handlePrint}
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
               >
-                <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export PDF</span>
+                <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Print / PDF</span>
               </Button>
               {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
             </>
@@ -273,13 +273,13 @@ export const ExportBriefPanel = ({
         />
 
         <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Send to team</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Share choices</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Weekly Operator Brief</span>}
-              state={clipboardState("Weekly operator brief") }
-              disabled={isCopyDisabled("Weekly operator brief")}
-              onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly operator brief")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy operator brief</span>}
+              state={clipboardState("Operator brief")}
+              disabled={isCopyDisabled("Operator brief")}
+              onClick={() => void handleCopy(weeklyOperatorPlainText, "Operator brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -287,10 +287,10 @@ export const ExportBriefPanel = ({
               }}
             />
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Slack Brief</span>}
-              state={clipboardState("Slack")}
-              disabled={isCopyDisabled("Slack")}
-              onClick={() => void handleCopy(briefing, "Slack")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Slack brief</span>}
+              state={clipboardState("Slack brief")}
+              disabled={isCopyDisabled("Slack brief")}
+              onClick={() => void handleCopy(briefing, "Slack brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -298,10 +298,10 @@ export const ExportBriefPanel = ({
               }}
             />
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><DocumentIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Board Summary</span>}
-              state={clipboardState("Board")}
-              disabled={isCopyDisabled("Board")}
-              onClick={() => void handleCopy(boardBrief, "Board")}
+              label={<span className="inline-flex items-center gap-1.5"><DocumentIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy board summary</span>}
+              state={clipboardState("Board summary")}
+              disabled={isCopyDisabled("Board summary")}
+              onClick={() => void handleCopy(boardBrief, "Board summary")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -315,47 +315,47 @@ export const ExportBriefPanel = ({
               data-premium-cta="export_pdf"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
             >
-              <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export PDF</span>
+              <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Print / PDF</span>
             </Button>
           </div>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="type-kicker"><WorkAppLabel app="slack" label="Slack-ready brief" /></p>
+            <p className="type-kicker"><WorkAppLabel app="slack" label="Slack brief" /></p>
             <p className="mt-3 text-sm text-slate-300">
-              One pasteable block tuned for status updates.
+              One pasteable block for status updates.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <ClipboardActionRow
-                label="Copy weekly operator brief"
-                state={clipboardState("Weekly operator brief") }
-                disabled={isCopyDisabled("Weekly operator brief")}
-                onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly operator brief")}
+                label="Copy operator brief"
+                state={clipboardState("Operator brief")}
+                disabled={isCopyDisabled("Operator brief")}
+                onClick={() => void handleCopy(weeklyOperatorPlainText, "Operator brief")}
               />
               <ClipboardActionRow
-                label="Copy Slack block payload"
-                state={clipboardState("Slack blocks")}
-                disabled={isCopyDisabled("Slack blocks")}
-                onClick={() => void handleCopy(weeklyOperatorSlackBlocks, "Slack blocks")}
+                label="Copy Slack format"
+                state={clipboardState("Slack format")}
+                disabled={isCopyDisabled("Slack format")}
+                onClick={() => void handleCopy(weeklyOperatorSlackBlocks, "Slack format")}
               />
               <ClipboardActionRow
-                label="Copy image/PDF card text"
+                label="Copy card text"
                 state={clipboardState("Card text")}
                 disabled={isCopyDisabled("Card text")}
                 onClick={() => void handleCopy(weeklyOperatorCardText, "Card text")}
               />
               <ClipboardActionRow
                 label={<><span>Copy</span> <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" /></>}
-                state={clipboardState("Slack")}
-                disabled={isCopyDisabled("Slack")}
-                onClick={() => void handleCopy(briefing, "Slack")}
+                state={clipboardState("Slack brief")}
+                disabled={isCopyDisabled("Slack brief")}
+                onClick={() => void handleCopy(briefing, "Slack brief")}
               />
               <ClipboardActionRow
                 label="Copy board summary"
-                state={clipboardState("Board")}
-                disabled={isCopyDisabled("Board")}
-                onClick={() => void handleCopy(boardBrief, "Board")}
+                state={clipboardState("Board summary")}
+                disabled={isCopyDisabled("Board summary")}
+                onClick={() => void handleCopy(boardBrief, "Board summary")}
               />
               <Button
                 type="button"
@@ -366,8 +366,8 @@ export const ExportBriefPanel = ({
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Download brief
+                >
+                Download operator brief
               </Button>
               <Button
                 type="button"
@@ -378,8 +378,8 @@ export const ExportBriefPanel = ({
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Download Slack blocks
+                >
+                Download Slack format
               </Button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
@@ -424,10 +424,10 @@ export const ExportBriefPanel = ({
               Plain-English summary lines that can drop into status updates or exec briefings.
             </p>
             <ClipboardActionRow
-              label="Copy constraint headlines"
-              state={clipboardState("Headlines")}
-              disabled={isCopyDisabled("Headlines")}
-              onClick={() => void handleCopy(constraintHeadlines, "Headlines")}
+              label="Copy key lines"
+              state={clipboardState("Key lines")}
+              disabled={isCopyDisabled("Key lines")}
+              onClick={() => void handleCopy(constraintHeadlines, "Key lines")}
               className="mt-4"
             />
             <Button
@@ -440,12 +440,12 @@ export const ExportBriefPanel = ({
               }
               className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
-              Download headlines
+              Download key lines
             </Button>
           </div>
           <div className="weather-surface p-4">
             <p className="type-kicker">
-              Headline preview
+              Key lines preview
             </p>
             <p className="mt-3 text-sm text-slate-300">
               Keep the text intact when sharing to preserve sourcing.
@@ -461,14 +461,14 @@ export const ExportBriefPanel = ({
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
             <p className="type-kicker">
-              Autonomous agent handoff
+              Agent handoff
             </p>
             <p className="mt-3 text-sm text-slate-300">
               Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <ClipboardActionRow
-                label="Copy JSON payload"
+                label="Copy JSON"
                 state={clipboardState("Agent JSON payload")}
                 disabled={isCopyDisabled("Agent JSON payload")}
                 onClick={() => void handleCopy(agentPayload, "Agent JSON payload")}
@@ -486,7 +486,7 @@ export const ExportBriefPanel = ({
                 Download JSON
               </Button>
               <ClipboardActionRow
-                label="Copy agent prompt"
+                label="Copy prompt"
                 state={clipboardState("Agent prompt")}
                 disabled={isCopyDisabled("Agent prompt")}
                 onClick={() => void handleCopy(agentPrompt, "Agent prompt")}
@@ -530,85 +530,85 @@ export const ExportBriefPanel = ({
           <div className="mt-4 grid gap-4">
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="jira" label="Jira description" />
+                <WorkAppLabel app="jira" label="Jira note" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Jira issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
                 <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Jira description")}
-                  disabled={isCopyDisabled("Jira description")}
-                  onClick={() => void handleCopy(jiraMarkdownBrief, "Jira description")}
+                  label={<><span>Copy</span> <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Jira note")}
+                  disabled={isCopyDisabled("Jira note")}
+                  onClick={() => void handleCopy(jiraMarkdownBrief, "Jira note")}
                 />
                 <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
                       jiraMarkdownBrief,
-                      `whether-jira-description-${treasury.record_date}.md`
+                      `whether-jira-note-${treasury.record_date}.md`
                     )
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" />
+                  Download <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="confluence" label="Confluence page snippet" />
+                <WorkAppLabel app="confluence" label="Confluence note" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Confluence page body.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
                 <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Confluence page snippet")}
-                  disabled={isCopyDisabled("Confluence page snippet")}
-                  onClick={() => void handleCopy(confluenceWikiBrief, "Confluence page snippet")}
+                  label={<><span>Copy</span> <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Confluence note")}
+                  disabled={isCopyDisabled("Confluence note")}
+                  onClick={() => void handleCopy(confluenceWikiBrief, "Confluence note")}
                 />
                 <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
                       confluenceWikiBrief,
-                      `whether-confluence-snippet-${treasury.record_date}.txt`
+                      `whether-confluence-note-${treasury.record_date}.txt`
                     )
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" />
+                  Download <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="linear" label="Linear issue description" />
+                <WorkAppLabel app="linear" label="Linear note" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Linear issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
                 <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Linear issue description")}
-                  disabled={isCopyDisabled("Linear issue description")}
-                  onClick={() => void handleCopy(linearMarkdownBrief, "Linear issue description")}
+                  label={<><span>Copy</span> <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Linear note")}
+                  disabled={isCopyDisabled("Linear note")}
+                  onClick={() => void handleCopy(linearMarkdownBrief, "Linear note")}
                 />
                 <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
                       linearMarkdownBrief,
-                      `whether-linear-description-${treasury.record_date}.md`
+                      `whether-linear-note-${treasury.record_date}.md`
                     )
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" />
+                  Download <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
