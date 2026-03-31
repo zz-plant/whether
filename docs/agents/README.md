@@ -111,3 +111,11 @@ Usually also inspect:
 ## Scope note
 
 These files are contributor-operational guidance. Product and strategy docs are indexed in [docs/README.md](../README.md).
+
+## Keep agent entrypoints in sync
+
+If you add, remove, or rename an agent guide here:
+
+1. Update this README index.
+2. Update `../README.md` if canonical routing changes.
+3. Update `../../README.md` when contributor onboarding paths change.

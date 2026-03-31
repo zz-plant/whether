@@ -110,3 +110,12 @@ If you promote a finding from one of these documents into product or workflow be
 - Collapse or delete stale proposal docs once their decisions are absorbed elsewhere.
 - Keep evidence logs clearly separate from behavioral guidance.
 - When in doubt, optimize for shorter paths to the right document, not more documentation volume.
+
+## README alignment checklist
+
+When docs structure changes, update all README entrypoints in the same change:
+
+- `../README.md` for repo-level orientation
+- `README.md` (this file) for canonical source mapping
+- `agents/README.md` for agent routing paths
+- `developer/README.md` for external integration paths
