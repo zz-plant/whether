@@ -2,12 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatPublishedLabel } from "../../../lib/formatters";
-import type { ProductConceptArticle } from "../../../lib/productCanon";
-import { getMacroContextForArticle, regimeToneByKey } from "../../../lib/productCanon";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 export type ConceptTaxonomyKind = "audience" | "focus";
+
+type ProductConceptArticle = {
+  slug: string;
+  title: string;
+  summary: string;
+  publishedYear: number;
+  publishedMonth: number;
+};
 
 export type ConceptTaxonomyCopy<TTaxonomy extends string> = {
   metadataNotFoundTitle: string;
@@ -118,8 +124,6 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
         <h2 className="text-lg font-semibold text-slate-100">Articles</h2>
         <ol className="space-y-3">
           {articles.map((article) => {
-            const macroContext = getMacroContextForArticle(article);
-
             return (
               <li key={article.slug} className="weather-surface space-y-3 px-4 py-4">
                 <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
@@ -127,15 +131,6 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
                 </p>
                 <h3 className="text-base font-semibold text-slate-100">{article.title}</h3>
                 <p className="text-sm text-slate-300">{article.summary}</p>
-                {macroContext ? (
-                  <p>
-                    <span
-                      className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${regimeToneByKey[macroContext.primary.summary.regime]}`}
-                    >
-                      {macroContext.primary.summary.regimeLabel}
-                    </span>
-                  </p>
-                ) : null}
                 <Link
                   href={`/concepts/${article.slug}`}
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100"
