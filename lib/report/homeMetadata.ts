@@ -4,11 +4,13 @@ import {
 } from "../seo";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
+import { decisionTransmissionSearchDescription } from "./decisionTransmissionCopy";
 
 export type { HomePageSearchParams };
 
-const HOME_TITLE = "Startup market weather, weekly posture, and founder decisions — Whether";
-const HOME_DESCRIPTION = `${canonicalPositioningLine} Weekly answer: what to change now across hiring, fundraising, and runway.`;
+const HOME_TITLE = "Weekly market call for leadership teams: act now, confidence, and flip triggers — Whether";
+const HOME_DESCRIPTION =
+  `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 
 const buildImageParams = (searchParams: HomePageSearchParams | undefined) => {
   const params: Record<string, string> = { template: "report" };

@@ -1,6 +1,7 @@
 # Whether
 
 Whether turns public macro signals into a weekly operating posture for startup and product leaders.
+Each week it answers, fast: what should change right now, how sure we are, and what would flip the call.
 
 The core product loop is:
 
@@ -46,7 +47,7 @@ See [docs/developer/quickstart.md](docs/developer/quickstart.md) for the full in
 ### What Whether does
 
 - Converts macro market signals into a current operating posture.
-- Compresses posture into bounded decisions for startup and product leaders.
+- Compresses posture into bounded decisions (action, threshold, reversal condition) for startup and product leaders.
 - Produces artifacts that can be pasted into Slack, meetings, and planning reviews.
 - Preserves trust with provenance, freshness markers, and degraded-state behavior.
 

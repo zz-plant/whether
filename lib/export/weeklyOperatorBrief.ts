@@ -11,6 +11,7 @@ export type WeeklyOperatorBriefPayload = {
   regimeStage: string;
   confidence: string;
   doNowBullets: string[];
+  whyCouldBeWrong: string;
   flipTrigger: string;
   flipConditionLabels: string[];
 };
@@ -72,6 +73,10 @@ export const buildWeeklyOperatorBriefPayload = ({
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     doNowBullets: canonicalDecisionCopy?.doNowLines.length ? canonicalDecisionCopy.doNowLines : doNowBullets,
+    whyCouldBeWrong:
+      postureState?.currentState.confidenceLabel === "HIGH"
+        ? "Cross-signal confirmation could still fade; keep irreversible approvals gated until next weekly checkpoint."
+        : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.",
     flipTrigger:
       canonicalDecisionCopy?.flipTrigger
       ?? postureState?.whatFlipsNext.flipTrigger
@@ -101,6 +106,9 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   "",
   "Do now:",
   ...payload.doNowBullets.map((bullet) => `• ${bullet}`),
+  "",
+  `Why this could be wrong: ${payload.whyCouldBeWrong}`,
+  `What would change our mind: ${payload.flipTrigger}`,
   "",
   `Change course if: ${payload.flipTrigger}`,
   ...(payload.flipConditionLabels.length > 0
@@ -132,6 +140,15 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             type: "mrkdwn",
             text: `*Do now*\n${payload.doNowBullets.map((bullet) => `• ${bullet}`).join("\n")}`,
           },
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*What would change our mind:* ${payload.flipTrigger}`,
+            },
+          ],
         },
         {
           type: "context",

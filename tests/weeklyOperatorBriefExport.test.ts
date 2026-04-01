@@ -49,6 +49,7 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(payload.regimeStage, "Defensive · Late Cycle");
     assert.equal(payload.confidence, "HIGH confidence");
     assert.ok(payload.doNowBullets.length > 0);
+    assert.ok(payload.whyCouldBeWrong.length > 0);
     assert.ok(payload.flipTrigger.length > 0);
   });
 
@@ -60,6 +61,8 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Regime \+ stage:/);
     assert.match(text, /Do now:/);
+    assert.match(text, /Why this could be wrong:/);
+    assert.match(text, /What would change our mind:/);
     assert.match(text, /Change course if:/);
     assert.equal(cardText, text);
   });
