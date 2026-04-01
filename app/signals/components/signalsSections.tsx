@@ -44,11 +44,12 @@ export const SignalsModeSwitcherSection = ({
           How much detail
         </p>
         <h2 className="text-base font-semibold text-slate-100">
-          Short read and deeper evidence are available in parallel.
+          Start with the short read, then open deeper evidence only if needed.
         </h2>
         <p className="text-sm text-slate-300">
           The short read tells you what changed, what it means this week, and what would make the
-          read wrong. The deeper view adds the full history, diagnostics, and supporting checks.
+          read wrong. The deeper view adds diagnostics and supporting checks only when the room
+          asks you to defend the read.
         </p>
       </div>
       <RadioGroup
@@ -71,7 +72,7 @@ export const SignalsModeSwitcherSection = ({
             id: "detail",
             label: "Deeper evidence",
             detail:
-              "Diagnostics, historical replay, and the checks that would overturn the read.",
+              "Diagnostics, replay, and the checks that would overturn the read.",
           },
         ] as const).map((item) => (
           <Radio.Root
@@ -386,14 +387,15 @@ export const SignalsNeedMoreProofSection = ({
       </h2>
       <p className="text-sm text-slate-300">
         The deeper view adds diagnostics, historical replay, threshold tuning, and advanced filters.
-        Use it when the room asks why this moved or what would make it wrong.
+        Use it when the room asks why this moved, whether a past regime looked similar, or what
+        would make the read wrong.
       </p>
     </div>
-    <a
-      href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
-      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
-    >
-      Open deeper evidence
+      <a
+        href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
+        className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+      >
+        Open deeper evidence
     </a>
   </section>
 );
@@ -554,13 +556,13 @@ export const SignalsAdvancedControlsSection = ({
     <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="space-y-3">
         <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
-          <span>Historical tools and filters</span>
+          <span>Replay and threshold tools</span>
           <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
             {showAdvanced ? "Open" : "Closed"}
           </span>
         </div>
         <p className="text-sm leading-relaxed text-slate-300">
-          Use these only when you need threshold tuning or a deeper timeline read.
+          Use these only when the evidence still needs a replay, historical comparison, or threshold check.
         </p>
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2">

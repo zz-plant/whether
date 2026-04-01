@@ -34,10 +34,9 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
       ? recommendedPrimaryHrefByKey[currentLayer.key as keyof typeof recommendedPrimaryHrefByKey]
       : "/";
   const recommendedAction = PRIMARY_ACTIONS.find((action) => action.href === recommendedHref) ?? PRIMARY_ACTIONS[0];
-  const loopOrder = primaryNavigationLayers.map((layer) => layer.label).join(" → ");
   const introCopy = currentLayer?.tier === "supporting" && parentLayer
-    ? `${currentLayer.label} is a supporting surface under ${parentLayer.label}. Use the primary workflow for orientation, then come here only when you need this deeper library.`
-    : `Use the five-surface loop: ${loopOrder}. Each downstream surface should answer exactly one unresolved question before you return.`;
+    ? `${currentLayer.label} supports ${parentLayer.label}. Use the main path for orientation, then come here only when you need this deeper library.`
+    : "Use one deeper page to answer one unresolved question, then return to the weekly brief or plan.";
 
   return (
     <section className="weather-hub-section" aria-label="Next step rail">
@@ -50,7 +49,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
         {currentAction ? (
           <div className="weather-hub-card min-w-[14rem] px-4 py-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-              {currentLayer?.tier === "supporting" ? "Supporting surface" : "You are here"}
+              {currentLayer?.tier === "supporting" ? "Supporting page" : "You are here"}
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{currentAction.label}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -58,7 +57,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
                 {resolvePrimaryNavigationSurfaceCue(currentAction.href)}
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Route {resolveNavigationRouteCue(currentAction.href)}
+                {resolveNavigationRouteCue(currentAction.href)}
               </span>
             </div>
             {parentLayer ? (

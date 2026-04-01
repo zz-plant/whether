@@ -106,8 +106,7 @@ export default async function DecidePage({
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
-      pageNavVariant="compact"
-      showPageNavigation={true}
+      showPageNavigation={false}
       primaryCta={{ href: "#unresolved-question-router", label: "Find the right help" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
@@ -214,7 +213,7 @@ export default async function DecidePage({
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Current weekly call</p>
           <h2 id="translation-support-title" className="text-lg font-semibold text-slate-100">Keep the translation anchored to the live brief</h2>
-          <p className="text-sm text-slate-300">The recommended path above already carries the live action, guardrail, and flip line. Use the router below only if you need a different support path.</p>
+          <p className="text-sm text-slate-300">The recommended path above already carries the live action, guardrail, and flip line. Use the router below only if you need a different kind of help.</p>
         </div>
         <div className="grid gap-3">
           <LiteracyAssistRouter

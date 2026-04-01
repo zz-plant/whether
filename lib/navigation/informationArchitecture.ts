@@ -20,9 +20,9 @@ export type NavigationLayer = {
 };
 
 export const navigationGroupLabels = {
-  core: "Anchor",
-  workflow: "Action",
-  reference: "Verify",
+  core: "This week",
+  workflow: "Decide",
+  reference: "Check",
 } as const;
 
 export const navigationLayers: NavigationLayer[] = [
@@ -30,7 +30,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "weekly-brief",
     href: "/",
     label: "Weekly Brief",
-    description: "Start here for this week's call, bounded action, and the share-ready artifact.",
+    description: "Read this week's call, bounded action, and the share-ready artifact.",
     boundary: "Canonical weekly workspace. Leave home only if proof, planning, edge cases, or trust still need work.",
     group: "core",
     tier: "primary",
@@ -39,7 +39,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "signals",
     href: "/signals",
     label: "Evidence",
-    description: "Evidence for this week's call: drivers, thresholds, freshness, and replay.",
+    description: "Check what changed, what drove it, and which watch lines matter now.",
     boundary: "Evidence depth only. Weekly Brief stays canonical for the live operating call.",
     group: "reference",
     tier: "primary",
@@ -48,7 +48,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "operations",
     href: "/operations",
     label: "Planning",
-    description: "Planning for this week's hiring, spending, roadmap, finance, and share-ready plan.",
+    description: "Set this week's guardrails for hiring, spend, roadmap, and the final brief.",
     boundary: "Execution depth only. Weekly Brief remains the canonical orchestration surface.",
     group: "workflow",
     tier: "primary",
@@ -57,7 +57,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "decide",
     href: "/decide",
     label: "Decision Tools",
-    description: "Decision Tools for the one remaining edge case: direct answer, translation, or bounded tool.",
+    description: "Resolve one remaining question with the smallest useful answer or tool.",
     boundary: "Routing and translation depth only. Do not duplicate the live brief or weekly plan.",
     group: "workflow",
     tier: "primary",
@@ -66,7 +66,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "method",
     href: "/method",
     label: "Trust",
-    description: "Trust checks for freshness, confidence, source coverage, and reversal conditions.",
+    description: "Check freshness, confidence, source coverage, and reversal conditions.",
     boundary: "Transparency and trust checks only. Return to Weekly Brief once validated.",
     group: "reference",
     tier: "primary",
@@ -92,13 +92,12 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 }, {} as Record<Route, number>);
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
-  const index = primaryNavigationSurfaceIndexByHref[href];
-
-  if (typeof index !== "number") {
-    return null;
-  }
-
-  return `Surface ${index + 1} of ${primaryNavigationSurfaceCount}`;
+  if (href === "/") return "Start here";
+  if (href === "/signals") return "Check proof";
+  if (href === "/operations") return "Set guardrails";
+  if (href === "/decide") return "Resolve one question";
+  if (href === "/method") return "Check trust";
+  return null;
 };
 
 export const resolveNavigationRouteCue = (href: Route) => (href === "/" ? "Weekly Brief" : href);
@@ -122,10 +121,4 @@ export const trustHubAliases: ReadonlyArray<{ href: Route; canonicalHref: Route;
     status: "legacy-alias",
     note: "Methodology permanently redirects to the Trust formula reference anchor.",
   },
-] as const;
-
-export const secondarySurfaceRoots: ReadonlyArray<Route> = [
-  "/guides",
-  "/resources",
-  "/answers",
 ] as const;

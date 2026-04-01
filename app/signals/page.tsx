@@ -6,11 +6,7 @@ import { HistoricalBanner } from "../components/historicalBanner";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
-import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
-import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
-import { PageFlowNav } from "../components/pageFlowNav";
-import { PersistedAssistPanel } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./signalsPageModel";
 import {
@@ -72,9 +68,8 @@ export default async function SignalsPage({
       pageLinks={reportPageLinks}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
-      pageNavVariant="compact"
       headerVariant="evidence"
-      showPageNavigation={true}
+      showPageNavigation={false}
       primaryCta={{ href: "#current-scores", label: "See what changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
@@ -136,25 +131,6 @@ export default async function SignalsPage({
         stopItems={model.stopItems}
         topDiagnosticCallouts={model.topDiagnosticCallouts}
       />
-
-      {model.activeSignalsView === "detail" ? (
-        <section id="historical-replay" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
-          <header className="space-y-2">
-            <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
-              Historical replay
-            </p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Pick any date to replay the read.
-            </h2>
-            <p className="text-sm text-slate-300">
-              We snap your selection to the closest available monthly snapshot and label the replay timestamp.
-            </p>
-          </header>
-          <HistoricalReplayDatePicker
-            initialDate={`${model.selectedYear}-${String(model.selectedMonth).padStart(2, "0")}-01`}
-          />
-        </section>
-      ) : null}
 
       <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
 
@@ -242,60 +218,6 @@ export default async function SignalsPage({
         ]}
         openPanelHref={model.timeMachineHref}
       />
-
-      <PageFlowNav
-        eyebrow={signalsScrollPlan.eyebrow}
-        title="Three things to check"
-        description="What changed, what it means this week, and what would make the read wrong."
-        items={signalsScrollPlan.items}
-        maxItems={3}
-      />
-
-      <section className="weather-panel space-y-6 px-6 py-5" aria-label="Evidence term assistance">
-        <div className="flex flex-wrap gap-2">
-          <PersistedAssistPanel
-            assistMode="evidence"
-            buttonLabel="What these terms mean"
-            title="Plain-English guide to the three main signals"
-            summary="Translate the signals into business language."
-          >
-            <p>
-              <span className="font-semibold text-slate-50">Funding pressure</span> (called{" "}
-              <span className="font-semibold text-slate-50">Tightness</span> here) = how hard it
-              is to fund new long-payback bets right now.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Investor appetite</span> (called{" "}
-              <span className="font-semibold text-slate-50">Risk appetite</span> here) = how
-              willing markets are to reward faster expansion and risk.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Rate trend</span> (called{" "}
-              <span className="font-semibold text-slate-50">Curve slope</span> here) = a quick
-              read on whether conditions are getting better or worse.
-            </p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="trust"
-            buttonLabel="How reliable is this?"
-            title="What confidence and freshness mean"
-            summary="Whether this week's read is safe to use."
-          >
-            <p>
-              <span className="font-semibold text-slate-50">Confidence</span> = how much room the
-              current read has before one of its watch lines breaks.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Freshness</span> = how recently the
-              underlying data updated.
-            </p>
-            <p>
-              If either weakens, keep big decisions reversible even if the read still looks broadly
-              right.
-            </p>
-          </PersistedAssistPanel>
-        </div>
-      </section>
 
       <RelatedReportLinks
         title="Need more context?"

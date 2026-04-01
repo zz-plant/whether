@@ -147,9 +147,8 @@ export default async function MethodPage() {
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
-      pageNavVariant="compact"
       headerVariant="trust"
-      showPageNavigation={true}
+      showPageNavigation={false}
       primaryCta={{ href: "#trust-snapshot", label: "Snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{

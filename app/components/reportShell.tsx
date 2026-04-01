@@ -185,7 +185,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
-  const hasSidebar = resolvedSidebarVariant === "full";
+  const hasSidebar = resolvedSidebarVariant === "full" && resolvedSectionLinks.length > 0;
   const missionSequenceLabels = ["Now", "Next", "Later"];
   const missionSequenceTitle = resolvedActionSequence?.title ?? "Plan";
   const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
@@ -196,10 +196,11 @@ export const ReportShell = (props: ReportShellProps) => {
   const bodyExportCta = resolvedCurrentPath === "/" ? null : resolvedExportCta;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
   const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
-  const showInlineTrustBlock = !hasSidebar;
-  const renderTrustBeforeContent = showInlineTrustBlock && resolvedInlineTrustPlacement === "before-content";
-  const renderTrustAfterFirstSection = showInlineTrustBlock && resolvedInlineTrustPlacement === "after-first-section";
-  const renderMobileTrustAfterFirstSection = hasSidebar && resolvedInlineTrustPlacement !== "hidden";
+  const renderTrustBeforeContent =
+    !hasSidebar && resolvedInlineTrustPlacement === "before-content";
+  const renderTrustAfterFirstSection =
+    resolvedInlineTrustPlacement !== "hidden"
+    && (hasSidebar || resolvedInlineTrustPlacement === "after-first-section");
   const enableTvAmbientMode = resolvedAmbientMode === "tv";
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone: resolvedTrustStatusTone,
@@ -269,7 +270,6 @@ export const ReportShell = (props: ReportShellProps) => {
                     maxItems={maxSectionNavItemsDesktop}
                   />
                 ) : null}
-                <HeroTrustProvenanceBlock {...trustBlockProps} />
               </aside>
             ) : null}
 
@@ -294,11 +294,6 @@ export const ReportShell = (props: ReportShellProps) => {
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
                         <div className="mt-4">
-                          <InlineTrustBlock {...trustBlockProps} />
-                        </div>
-                      ) : null}
-                      {renderMobileTrustAfterFirstSection && index === 0 ? (
-                        <div className="mt-4 xl:hidden">
                           <InlineTrustBlock {...trustBlockProps} />
                         </div>
                       ) : null}

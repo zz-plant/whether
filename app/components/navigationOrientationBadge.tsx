@@ -69,14 +69,14 @@ export function NavigationOrientationBadge({
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            Navigation zones
+            Where To Go
           </p>
           <p className="text-[11px] leading-5 text-slate-300">
-            Swipe sideways to compare the weekly, action, and reference zones.
+            Start with the weekly brief, then open one deeper page only when needed.
           </p>
         </div>
         <span className="rounded-full border border-slate-700/80 bg-slate-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          3 zones
+          Main routes
         </span>
       </div>
       <div className="relative">

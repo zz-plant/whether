@@ -1,5 +1,4 @@
 import {
-  navigationGroupLabels,
   navigationLayers,
   navigationLayerByKey,
   primaryNavigationLayers,
@@ -29,7 +28,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
   if (pathMatchesLink("/", normalizedPathname)) {
     return {
       title: "Weekly operating brief for hiring, spend, and pace.",
-      description: "Start here, share from here, and open a support path only if a specific question remains.",
+      description: "Start here, share from here, and open one deeper page only if a specific question remains.",
     } as const;
   }
 
@@ -71,5 +70,3 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
     isActive: pathMatchesLink(link.href, normalizedPathname),
   }));
 };
-
-export const globalHeaderGroupLabels = navigationGroupLabels;

@@ -10,7 +10,6 @@ import {
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 import {
-  primaryNavigationSurfaceCount,
   resolvePrimaryNavigationSurfaceCue,
 } from "../../lib/navigation/informationArchitecture";
 
@@ -34,7 +33,7 @@ function NavigationLinkCard({
   link: GlobalHeaderNavigationLink;
   onIntent: (href: string) => void;
 }) {
-  const eyebrow = link.href === "/" ? "Start here" : "Support path";
+  const eyebrow = link.href === "/" ? "Weekly brief" : "Open when needed";
 
   return (
     <li className="flex-shrink-0 sm:min-w-0">
@@ -224,10 +223,10 @@ export function GlobalHeaderNavRail({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 space-y-0.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Primary surfaces
+              Navigation
             </p>
             <p className="truncate text-[13px] font-medium text-slate-200">
-              {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
+              {activeRouteLabel}
             </p>
           </div>
           {hasScrollableOverflow ? controls : null}
@@ -248,7 +247,7 @@ export function GlobalHeaderNavRail({
 
   return (
     <div className="relative">
-      <div className="mb-2 sm:hidden">
+          <div className="mb-2 sm:hidden">
         <button
           type="button"
           className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 text-xs font-semibold tracking-[0.14em]"
@@ -256,23 +255,23 @@ export function GlobalHeaderNavRail({
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((current) => !current)}
         >
-          {isMenuOpen ? "Hide sections" : "Browse sections"}
+          {isMenuOpen ? "Close navigation" : "Open navigation"}
         </button>
       </div>
       <div className="mb-2 flex items-start justify-between gap-3 sm:hidden">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            Primary surfaces
+            Navigation
           </p>
           <p className="truncate text-[13px] font-medium text-slate-200">
-            {activeSurfaceCue ?? `Surface 1 of ${primaryNavigationSurfaceCount}`} · {activeRouteLabel}
+            {activeRouteLabel}
           </p>
           <p className="pt-1 text-[11px] leading-relaxed text-slate-400">
             {hasScrollableOverflow
               ? isMenuOpen
-                ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or use the arrows to move across the remaining primary surfaces.`
-                : "Open sections, then swipe or use the arrows to move across the primary surfaces."
-              : "All primary surfaces are visible once you open sections."}
+                ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or use the arrows to move between the main pages.`
+                : "Open navigation, then swipe or use the arrows to move between the main pages."
+              : "All main pages are visible once navigation is open."}
           </p>
         </div>
         {hasScrollableOverflow ? controls : null}

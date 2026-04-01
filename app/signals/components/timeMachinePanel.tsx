@@ -447,8 +447,7 @@ export const TimeMachinePanel = ({
         <div className="mt-4 weather-surface weather-delta-card p-4" aria-label="Time navigation controls">
           <p className="type-label text-slate-400">Time navigation</p>
           <p className="mt-2 text-sm text-slate-300">
-            Move backward and forward month-by-month, jump to live data, or open the forward-looking
-            forecast view.
+            Move backward and forward month-by-month, then jump back to live data when you are done.
           </p>
           <div className="weather-list-stagger mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {previousSnapshotHref ? (
@@ -480,12 +479,6 @@ export const TimeMachinePanel = ({
               className={fullWidthPillLinkClass}
             >
               Jump to now
-            </ActionLink>
-            <ActionLink
-              href="/#posture-forecast"
-              className={fullWidthPillLinkClass}
-            >
-              Open forecast view
             </ActionLink>
           </div>
         </div>
@@ -648,132 +641,137 @@ export const TimeMachinePanel = ({
           ) : null}
         </div>
 
-        <div className="mt-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="type-label text-slate-400">Summary timeline</p>
-              <p className="mt-2 text-sm text-slate-300">
-                Browse archived action summaries and export a filtered slice for offline review.
-              </p>
+        <details className="mt-6 weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/55 px-4 py-3">
+          <summary className="min-h-[44px] cursor-pointer list-none text-sm font-semibold text-slate-100">
+            Open archived summary export
+          </summary>
+          <div className="mt-4 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="type-label text-slate-400">Summary timeline</p>
+                <p className="mt-2 text-sm text-slate-300">
+                  Browse archived action summaries and export a filtered slice for offline review.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleExportTimeline}
+                disabled={filteredEntries.length === 0}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                Export timeline (JSON)
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleExportTimeline}
-              disabled={filteredEntries.length === 0}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              Export timeline (JSON)
-            </button>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Filters</p>
-              <Fieldset.Root className="mt-3 space-y-4 border-0 p-0">
-                <Fieldset.Legend className="sr-only">Filter the summary timeline</Fieldset.Legend>
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                    Cadence
-                  </p>
-                  <Tabs.Root
-                    value={timelineCadence}
-                    onValueChange={(value) => {
-                      if (value) {
-                        setTimelineCadence(value as (typeof cadenceOptions)[number]);
-                      }
-                    }}
-                    className="mt-2"
-                  >
-                    <Tabs.List className="flex flex-wrap gap-2">
+            <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">Filters</p>
+                <Fieldset.Root className="mt-3 space-y-4 border-0 p-0">
+                  <Fieldset.Legend className="sr-only">Filter the summary timeline</Fieldset.Legend>
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                      Cadence
+                    </p>
+                    <Tabs.Root
+                      value={timelineCadence}
+                      onValueChange={(value) => {
+                        if (value) {
+                          setTimelineCadence(value as (typeof cadenceOptions)[number]);
+                        }
+                      }}
+                      className="mt-2"
+                    >
+                      <Tabs.List className="flex flex-wrap gap-2">
+                        {cadenceOptions.map((cadence) => (
+                          <Tabs.Tab
+                            key={cadence}
+                            value={cadence}
+                            className={({ active }) =>
+                              `weather-tab inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                                active
+                                  ? "border-sky-400/70 text-slate-100"
+                                  : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
+                              }`
+                            }
+                          >
+                            {cadence}
+                          </Tabs.Tab>
+                        ))}
+                      </Tabs.List>
                       {cadenceOptions.map((cadence) => (
-                        <Tabs.Tab
-                          key={cadence}
-                          value={cadence}
-                          className={({ active }) =>
-                            `weather-tab inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
-                              active
-                                ? "border-sky-400/70 text-slate-100"
-                                : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
-                            }`
-                          }
-                        >
-                          {cadence}
-                        </Tabs.Tab>
+                        <Tabs.Panel key={cadence} value={cadence} className="mt-4 space-y-3">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                              <Field.Label>Start date</Field.Label>
+                              <Input
+                                type="date"
+                                value={rangeStart}
+                                min={cadenceRange.min ?? undefined}
+                                max={cadenceRange.max ?? undefined}
+                                onChange={(event) => setRangeStart(event.target.value)}
+                                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                              />
+                            </Field.Root>
+                            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                              <Field.Label>End date</Field.Label>
+                              <Input
+                                type="date"
+                                value={rangeEnd}
+                                min={cadenceRange.min ?? undefined}
+                                max={cadenceRange.max ?? undefined}
+                                onChange={(event) => setRangeEnd(event.target.value)}
+                                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                              />
+                            </Field.Root>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            {rangeStart && rangeEnd
+                              ? `${filteredEntries.length} entries match the range.`
+                              : "Select a date range to load the timeline."}
+                          </p>
+                        </Tabs.Panel>
                       ))}
-                    </Tabs.List>
-                    {cadenceOptions.map((cadence) => (
-                      <Tabs.Panel key={cadence} value={cadence} className="mt-4 space-y-3">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                            <Field.Label>Start date</Field.Label>
-                            <Input
-                              type="date"
-                              value={rangeStart}
-                              min={cadenceRange.min ?? undefined}
-                              max={cadenceRange.max ?? undefined}
-                              onChange={(event) => setRangeStart(event.target.value)}
-                              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                            />
-                          </Field.Root>
-                          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                            <Field.Label>End date</Field.Label>
-                            <Input
-                              type="date"
-                              value={rangeEnd}
-                              min={cadenceRange.min ?? undefined}
-                              max={cadenceRange.max ?? undefined}
-                              onChange={(event) => setRangeEnd(event.target.value)}
-                              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                            />
-                          </Field.Root>
-                        </div>
-                        <p className="text-xs text-slate-500">
-                          {rangeStart && rangeEnd
-                            ? `${filteredEntries.length} entries match the range.`
-                            : "Select a date range to load the timeline."}
-                        </p>
-                      </Tabs.Panel>
-                    ))}
-                  </Tabs.Root>
-                </div>
-              </Fieldset.Root>
-            </div>
-            <div className="space-y-4">
-              {filteredEntries.length === 0 ? (
-                <div className="weather-surface p-4">
-                  <p className="type-label text-slate-400">No entries</p>
-                  <p className="mt-2 text-sm text-slate-300">
-                    Adjust the range or cadence to load historical summaries.
-                  </p>
-                </div>
-              ) : null}
-              {filteredEntries.map((entry) => {
-                const label = buildTimelineEntryLabel(entry);
-                const tooltip = buildProvenanceTooltip(entry.summary.provenance);
-                return (
-                  <div key={`${entry.cadence}-${entry.asOf}`} className="weather-surface p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="type-label text-slate-400">{label}</p>
-                        <p className="mt-2 text-sm text-slate-200">
-                          As of{" "}
-                          <time dateTime={entry.asOf}>{formatDateLabel(entry.asOf)}</time>
-                        </p>
-                      </div>
-                      <span
-                        title={tooltip}
-                        aria-label="Summary provenance"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/80 text-xs font-semibold text-slate-300"
-                      >
-                        ⓘ
-                      </span>
-                    </div>
-                    {renderTimelineSummaryCard(entry)}
+                    </Tabs.Root>
                   </div>
-                );
-              })}
+                </Fieldset.Root>
+              </div>
+              <div className="space-y-4">
+                {filteredEntries.length === 0 ? (
+                  <div className="weather-surface p-4">
+                    <p className="type-label text-slate-400">No entries</p>
+                    <p className="mt-2 text-sm text-slate-300">
+                      Adjust the range or cadence to load historical summaries.
+                    </p>
+                  </div>
+                ) : null}
+                {filteredEntries.map((entry) => {
+                  const label = buildTimelineEntryLabel(entry);
+                  const tooltip = buildProvenanceTooltip(entry.summary.provenance);
+                  return (
+                    <div key={`${entry.cadence}-${entry.asOf}`} className="weather-surface p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="type-label text-slate-400">{label}</p>
+                          <p className="mt-2 text-sm text-slate-200">
+                            As of{" "}
+                            <time dateTime={entry.asOf}>{formatDateLabel(entry.asOf)}</time>
+                          </p>
+                        </div>
+                        <span
+                          title={tooltip}
+                          aria-label="Summary provenance"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/80 text-xs font-semibold text-slate-300"
+                        >
+                          ⓘ
+                        </span>
+                      </div>
+                      {renderTimelineSummaryCard(entry)}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        </details>
       </div>
     </section>
   );

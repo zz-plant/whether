@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { canonicalPositioningLine } from "../../lib/seo";
 import {
   ReportPageNavigation,
   type ReportPageLink,
@@ -34,11 +33,6 @@ export function ReportShellHeader({
   pageNavVariant,
   exportCta,
 }: ReportShellHeaderProps) {
-  const hideCanonicalPositioningLineOnMobile = currentPath === "/signals" ||
-    currentPath.startsWith("/signals/") ||
-    currentPath === "/method" ||
-    currentPath.startsWith("/method/");
-
   const contextBadge = variant === "evidence"
     ? {
         label: "Screen: Evidence",
@@ -76,7 +70,7 @@ export function ReportShellHeader({
                 Decide this week&apos;s pace in one screen.
               </p>
               <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
-                The call, immediate move, threshold, and flip condition are captured in one view, with support paths available as needed.
+                The call, immediate move, threshold, and flip condition are captured in one view, with deeper pages available only when needed.
               </p>
             </div>
             {exportCta ? (
@@ -109,7 +103,7 @@ export function ReportShellHeader({
         </div>
       ) : (
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="min-w-0 space-y-1.5">
+          <div className="min-w-0 space-y-1">
             <div className="flex flex-wrap items-center gap-2.5">
               <Image
                 src="/whether-logo.svg"
@@ -128,11 +122,8 @@ export function ReportShellHeader({
                 {statusLabel}
               </span>
             </div>
-            <p className="max-w-2xl text-[11px] leading-relaxed text-slate-300">
-              {contextBadge?.copy ?? "Weekly posture artifact for operators with guardrails and linked evidence."}
-            </p>
-            <p className={`max-w-2xl text-[11px] leading-relaxed text-slate-500 ${hideCanonicalPositioningLineOnMobile ? "hidden sm:block" : ""}`}>
-              {canonicalPositioningLine}
+            <p className="text-[11px] font-medium tracking-[0.06em] text-slate-400">
+              {pageTitle}
             </p>
           </div>
           <div className="xl:min-w-[23rem]">

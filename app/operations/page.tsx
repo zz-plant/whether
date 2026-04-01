@@ -207,8 +207,7 @@ export default async function OperationsPage({
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       exportCta={{ href: "#ops-export-briefs", label: "Open final brief" }}
-      pageNavVariant="compact"
-      showPageNavigation={true}
+      showPageNavigation={false}
       decisionBanner={{
         label: "Start here",
         decision: "Approve or hold the week's hiring, spend, and roadmap moves.",

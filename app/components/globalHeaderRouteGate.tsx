@@ -30,7 +30,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
     ? resolveGlobalHeaderTagline(pathname)
     : {
         title: "Operating posture navigation",
-        description: "Move into a support path only after the weekly brief leaves one specific question unresolved.",
+        description: "Open one deeper page only after the weekly brief leaves one specific question unresolved.",
       };
 
   if (!isReportShellRoute(pathname)) {

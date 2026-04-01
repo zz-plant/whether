@@ -56,7 +56,7 @@ const getPageLinkStateClassName = (isActive: boolean) =>
     ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
     : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 
-const routeSwitcherIntro = "Weekly Brief is the anchor. Use support paths only for proof or translation.";
+const routeSwitcherIntro = "Weekly Brief stays primary. Open one deeper page only when you need evidence, planning, tools, or trust.";
 
 const renderPageLink = ({
   link,
@@ -131,7 +131,7 @@ export const ReportPageNavigation = ({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0 space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                {isAnchorRoute ? "Primary surface" : "Support path"}
+                {isAnchorRoute ? "Weekly brief" : "Current page"}
               </p>
               <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                 <Link
@@ -146,7 +146,7 @@ export const ReportPageNavigation = ({
                   {anchorLink.label}
                 </Link>
                 <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
-                  {currentPosition}/{totalCount}
+                    {currentPosition}/{totalCount}
                 </span>
                 {!isAnchorRoute ? (
                   <span className="text-slate-400">
@@ -405,7 +405,7 @@ export const ReportMobileNavigation = ({
         </div>
 
         {visibleSupportLinks.length > 0 ? (
-          <div aria-label="Support paths" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+          <div aria-label="Additional pages" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
             {visibleSupportLinks.map((link) => (
               <Link
                 key={link.href}
@@ -416,7 +416,7 @@ export const ReportMobileNavigation = ({
                 <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
                 <span className="mt-1 text-[11px] text-slate-400">{link.description}</span>
                 <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                  Route {resolveNavigationRouteCue(link.href)}
+                  {resolveNavigationRouteCue(link.href)}
                 </span>
               </Link>
             ))}
@@ -424,7 +424,7 @@ export const ReportMobileNavigation = ({
         ) : null}
         {hiddenSupportCount > 0 ? (
           <p className="mt-2 text-[11px] text-slate-400">
-            +{hiddenSupportCount} more support path{hiddenSupportCount === 1 ? "" : "s"} available.
+            +{hiddenSupportCount} more page{hiddenSupportCount === 1 ? "" : "s"} available.
           </p>
         ) : null}
       </div>
