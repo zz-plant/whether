@@ -53,10 +53,22 @@ const runCliWithRetries = async (
 };
 
 const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
-  const env: NodeJS.ProcessEnv = { ...process.env, ...overrides };
+  const env = {
+    PATH: process.env.PATH,
+    HOME: process.env.HOME,
+    TMPDIR: process.env.TMPDIR,
+    TEMP: process.env.TEMP,
+    TMP: process.env.TMP,
+    SystemRoot: process.env.SystemRoot,
+    ...overrides,
+  } as NodeJS.ProcessEnv;
   delete env.WHETHER_API_URL;
   delete env.WHETHER_API_KEY;
   delete env.WHETHER_TOKEN;
+  delete env.HTTP_PROXY;
+  delete env.HTTPS_PROXY;
+  delete env.ALL_PROXY;
+  delete env.NO_PROXY;
   return env;
 };
 
