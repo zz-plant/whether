@@ -823,7 +823,7 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
+    const select = await runCli(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
     const status = await runCli(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -865,7 +865,7 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
+    const select = await runCli(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
     const status = await runCli(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -1068,14 +1068,18 @@ describe("whether cli", () => {
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 0);
-    const parsed = JSON.parse(result.stdout);
-    assert.equal(parsed[0]?.name, "api/health");
-    assert.equal(parsed[0]?.autodiscovered, false);
-    assert.equal(parsed[0]?.apiBaseUrl, `http://127.0.0.1:${port}`);
-    assert.equal(parsed[1]?.name, "apiBaseUrl");
-    assert.equal(parsed[1]?.source, "flag");
-    assert.equal(parsed[2]?.name, "auth");
-    assert.equal(parsed[2]?.authenticated, false);
+    const parsed = JSON.parse(result.stdout) as Array<Record<string, unknown>>;
+    const healthCheck = parsed.find((check) => check.name === "api/health");
+    const apiBaseUrlCheck = parsed.find((check) => check.name === "apiBaseUrl");
+    const authCheck = parsed.find((check) => check.name === "auth");
+
+    assert.ok(healthCheck);
+    assert.equal(healthCheck?.autodiscovered, false);
+    assert.equal(healthCheck?.apiBaseUrl, `http://127.0.0.1:${port}`);
+    assert.ok(apiBaseUrlCheck);
+    assert.equal(apiBaseUrlCheck?.source, "flag");
+    assert.ok(authCheck);
+    assert.equal(authCheck?.authenticated, false);
   });
 
   it("status does not pass unsupported flags to the status endpoint", async () => {
