@@ -18,20 +18,20 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
     let stdout = "";
     let stderr = "";
 
-    child.stdout.on("data", (chunk) => {
+    child.stdout.on("data", (chunk: Buffer) => {
       stdout += String(chunk);
     });
-    child.stderr.on("data", (chunk) => {
+    child.stderr.on("data", (chunk: Buffer) => {
       stderr += String(chunk);
     });
     child.on("error", reject);
-    child.on("close", (status) => {
+    child.on("close", (status: number | null) => {
       resolve({ status, stdout, stderr });
     });
   });
 
-const buildIsolatedEnv = (overrides: NodeJS.ProcessEnv = {}) => {
-  const env = { ...process.env, ...overrides };
+const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
+  const env: NodeJS.ProcessEnv = { ...process.env, ...overrides };
   delete env.WHETHER_API_URL;
   delete env.WHETHER_API_KEY;
   delete env.WHETHER_TOKEN;
