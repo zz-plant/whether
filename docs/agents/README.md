@@ -90,6 +90,7 @@ Read:
 
 Usually also inspect:
 - `../../.codex/skills/README.md`
+- `../../.roomodes` if you are using Roo workspace modes
 
 ## Common blockers
 
@@ -109,6 +110,8 @@ Usually also inspect:
 - `ui-ux-standards.md` — accessibility, visual consistency, and interaction standards
 - `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows
 - `agent-interface.md` — HTTP and MCP entrypoints for agentic integrations
+
+If you are using Roo, repo-scoped workspace modes live in `../../.roomodes` and route common Whether jobs to the matching repo-local skills.
 
 ## Decision checklist for every task
 

@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "oven.bun-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-playwright.playwright",
+    "eamodio.gitlens"
+  ]
+}

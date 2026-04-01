@@ -19,6 +19,18 @@
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 - Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
 
+## IDE workspace defaults
+- Repo-local VS Code compatible workspace settings live under `.vscode/`.
+- `settings.json` pins the editor to the workspace TypeScript version, enables Bun-aware ESLint defaults, and excludes generated artifacts (`.next`, `output`, deploy/build folders) from the default explorer/search/watch loops.
+- `tasks.json` exposes the common repo commands (`dev`, `lint`, `typecheck`, `test`, `check`, `check:vinext`, `build:cloudflare`, `ui:shots`, `mcp:whether`) in the task runner.
+- `extensions.json` recommends the baseline extension set for this repo: ESLint, Bun, Tailwind CSS, Playwright, and GitLens.
+- `whether-skills.code-snippets` adds repo-local snippets for drafting first-party skills and trigger-test blocks directly in the editor.
+- `.roomodes` adds repo-scoped Roo modes that route common Whether work to the right repo-local skills:
+  - `whether-briefing`
+  - `whether-audit`
+  - `whether-research`
+  - `whether-skills`
+
 ## Default execution profile for agents
 
 Use a minimal tool set first and expand only when a repeated workflow requires it.
