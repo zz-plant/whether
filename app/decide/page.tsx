@@ -8,8 +8,7 @@ import {
   situationUseCaseDefinitions,
   useCaseRoles,
 } from "../../lib/decisionDomainCatalog";
-import { BreadcrumbTrail } from "../components/breadcrumbTrail";
-import { HubHero, HubSection } from "../components/hubPageShell";
+import { HubSection } from "../components/hubPageShell";
 import { LiteracyAssistRouter } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { featuredAnswerPages } from "../answers/selectors";
@@ -138,41 +137,6 @@ export default async function DecidePage({
       structuredData={breadcrumbStructuredData}
     >
       <OperatorWorkflowRouteTracker />
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Translation" }]} />
-      <HubHero
-        eyebrow="One open question"
-        title="Get the last question translated."
-        description="Use this page when the Weekly Brief and Planning still leave one thing unresolved."
-        actions={(
-          <>
-            <Link href="#unresolved-question-router" className="weather-button inline-flex items-center justify-center">Find the help</Link>
-            <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Weekly Brief</Link>
-          </>
-        )}
-        aside={(
-          <div className="weather-hub-card space-y-3 px-5 py-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Current weekly call</p>
-            <p className="text-sm font-semibold text-slate-100">{liveCall.posture}</p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="font-semibold text-slate-100">Action now:</span> {liveCall.action}</li>
-              <li><span className="font-semibold text-slate-100">Pause if:</span> {liveCall.guardrail}</li>
-              <li><span className="font-semibold text-slate-100">Change course if:</span> {liveCall.flip}</li>
-            </ul>
-          </div>
-        )}
-      />
-
-      <LiteracyAssistRouter
-        title="What still needs translation?"
-        description="Pick the help that fits."
-        targets={{
-          decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
-          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
-          trust: { href: "/method?assist=trust" },
-          share: { href: "/operations?assist=share#ops-export-briefs" },
-        }}
-      />
-
       <HubSection
         id="unresolved-question-router"
         title="What still needs help?"
@@ -245,6 +209,26 @@ export default async function DecidePage({
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </HubSection>
+
+      <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="translation-support-title">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Current weekly call</p>
+          <h2 id="translation-support-title" className="text-lg font-semibold text-slate-100">Keep the translation anchored to the live brief</h2>
+          <p className="text-sm text-slate-300">The recommended path above already carries the live action, guardrail, and flip line. Use the router below only if you need a different support path.</p>
+        </div>
+        <div className="grid gap-3">
+          <LiteracyAssistRouter
+            title="What still needs translation?"
+            description="Pick the help that fits."
+            targets={{
+              decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
+              evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
+              trust: { href: "/method?assist=trust" },
+              share: { href: "/operations?assist=share#ops-export-briefs" },
+            }}
+          />
+        </div>
+      </section>
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">

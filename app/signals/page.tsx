@@ -116,75 +116,10 @@ export default async function SignalsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
-      <PageFlowNav
-        eyebrow={signalsScrollPlan.eyebrow}
-        title="Three things to check"
-        description="What changed, what it means this week, and what would make the read wrong."
-        items={signalsScrollPlan.items}
-        maxItems={3}
-      />
-
       <SignalsModeSwitcherSection
         activeSignalsView={model.activeSignalsView}
         searchParams={resolvedSearchParams}
       />
-
-      <ReturningVisitorDeltaStrip
-        assessment={model.assessment}
-        recordDate={model.treasury.record_date}
-        impactLinks={[
-          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
-          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
-          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
-        ]}
-        openPanelHref={model.timeMachineHref}
-      />
-
-      <section className="weather-panel space-y-6 px-6 py-5" aria-label="Evidence term assistance">
-        <div className="flex flex-wrap gap-2">
-          <PersistedAssistPanel
-            assistMode="evidence"
-            buttonLabel="What these terms mean"
-            title="Plain-English guide to the three main signals"
-            summary="Translate the signals into business language."
-          >
-            <p>
-              <span className="font-semibold text-slate-50">Funding pressure</span> (called{" "}
-              <span className="font-semibold text-slate-50">Tightness</span> here) = how hard it
-              is to fund new long-payback bets right now.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Investor appetite</span> (called{" "}
-              <span className="font-semibold text-slate-50">Risk appetite</span> here) = how
-              willing markets are to reward faster expansion and risk.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Rate trend</span> (called{" "}
-              <span className="font-semibold text-slate-50">Curve slope</span> here) = a quick
-              read on whether conditions are getting better or worse.
-            </p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="trust"
-            buttonLabel="How reliable is this?"
-            title="What confidence and freshness mean"
-            summary="Whether this week's read is safe to use."
-          >
-            <p>
-              <span className="font-semibold text-slate-50">Confidence</span> = how much room the
-              current read has before one of its watch lines breaks.
-            </p>
-            <p>
-              <span className="font-semibold text-slate-50">Freshness</span> = how recently the
-              underlying data updated.
-            </p>
-            <p>
-              If either weakens, keep big decisions reversible even if the read still looks broadly
-              right.
-            </p>
-          </PersistedAssistPanel>
-        </div>
-      </section>
 
       <SignalsDecisionSummarySection
         decisionDeltaLabel={model.decisionDeltaLabel}
@@ -296,6 +231,71 @@ export default async function SignalsPage({
           />
         </>
       ) : null}
+
+      <ReturningVisitorDeltaStrip
+        assessment={model.assessment}
+        recordDate={model.treasury.record_date}
+        impactLinks={[
+          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
+          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
+          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
+        ]}
+        openPanelHref={model.timeMachineHref}
+      />
+
+      <PageFlowNav
+        eyebrow={signalsScrollPlan.eyebrow}
+        title="Three things to check"
+        description="What changed, what it means this week, and what would make the read wrong."
+        items={signalsScrollPlan.items}
+        maxItems={3}
+      />
+
+      <section className="weather-panel space-y-6 px-6 py-5" aria-label="Evidence term assistance">
+        <div className="flex flex-wrap gap-2">
+          <PersistedAssistPanel
+            assistMode="evidence"
+            buttonLabel="What these terms mean"
+            title="Plain-English guide to the three main signals"
+            summary="Translate the signals into business language."
+          >
+            <p>
+              <span className="font-semibold text-slate-50">Funding pressure</span> (called{" "}
+              <span className="font-semibold text-slate-50">Tightness</span> here) = how hard it
+              is to fund new long-payback bets right now.
+            </p>
+            <p>
+              <span className="font-semibold text-slate-50">Investor appetite</span> (called{" "}
+              <span className="font-semibold text-slate-50">Risk appetite</span> here) = how
+              willing markets are to reward faster expansion and risk.
+            </p>
+            <p>
+              <span className="font-semibold text-slate-50">Rate trend</span> (called{" "}
+              <span className="font-semibold text-slate-50">Curve slope</span> here) = a quick
+              read on whether conditions are getting better or worse.
+            </p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="trust"
+            buttonLabel="How reliable is this?"
+            title="What confidence and freshness mean"
+            summary="Whether this week's read is safe to use."
+          >
+            <p>
+              <span className="font-semibold text-slate-50">Confidence</span> = how much room the
+              current read has before one of its watch lines breaks.
+            </p>
+            <p>
+              <span className="font-semibold text-slate-50">Freshness</span> = how recently the
+              underlying data updated.
+            </p>
+            <p>
+              If either weakens, keep big decisions reversible even if the read still looks broadly
+              right.
+            </p>
+          </PersistedAssistPanel>
+        </div>
+      </section>
 
       <RelatedReportLinks
         title="Need more context?"

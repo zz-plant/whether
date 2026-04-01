@@ -17,6 +17,7 @@ import {
 type GlobalHeaderNavClientProps = {
   pathname?: string;
   variant?: "default" | "compact";
+  deferPathResolution?: boolean;
 };
 
 type GlobalHeaderNavRailProps = {
@@ -304,12 +305,29 @@ export function GlobalHeaderNavRail({
 export function GlobalHeaderNavClient({
   pathname,
   variant = "default",
+  deferPathResolution = false,
 }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
   const router = useRouter();
-  const resolvedPathname = pathname ?? currentPathname;
-  const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
-  const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const livePathname = pathname ?? currentPathname;
+  const resolvedPathname = deferPathResolution && !isHydrated ? null : livePathname;
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const navigationLinks = useMemo(
+    () =>
+      resolvedPathname
+        ? resolveGlobalHeaderNavigationLinks(resolvedPathname)
+        : resolveGlobalHeaderNavigationLinks("/").map((link) => ({
+            ...link,
+            isActive: false,
+          })),
+    [resolvedPathname],
+  );
+  const activeRouteLabel = resolvedPathname ? resolveGlobalHeaderRouteLabel(resolvedPathname) : "Report";
 
   const handleIntentPrefetch = (href: string) => {
     router.prefetch(href as Route);

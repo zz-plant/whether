@@ -69,12 +69,6 @@ export function CommandCenterNavBlock({
     decisionBanner?.decision ??
     (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   const actionLinks = [
-    secondaryCta
-      ? {
-          href: secondaryCta.href,
-          label: secondaryCta.label,
-        }
-      : null,
     nextStep
       ? {
           href: nextStep.href,
@@ -87,7 +81,9 @@ export function CommandCenterNavBlock({
           label: exportCta.label,
         }
       : null,
-  ].filter((item): item is { href: string; label: string } => Boolean(item));
+  ]
+    .filter((item): item is { href: string; label: string } => Boolean(item))
+    .filter((item, index, items) => items.findIndex((candidate) => candidate.href === item.href && candidate.label === item.label) === index);
 
   if (heroVariant === "compact") {
     return (

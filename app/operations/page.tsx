@@ -245,25 +245,6 @@ export default async function OperationsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
-      <PageFlowNav
-        eyebrow={operationsScrollPlan.eyebrow}
-        title={operationsScrollPlan.title}
-        description={operationsScrollPlan.description}
-        items={operationsScrollPlan.items}
-        maxItems={3}
-      />
-
-      <LiteracyAssistRouter
-        title="What do you need translated in Planning?"
-        description="Open the planning layer that matches your gap."
-        targets={{
-          decision: { href: buildAssistHref("decision", "#ops-monthly-action-summary") },
-          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
-          trust: { href: buildAssistHref("trust", "#ops-finance-strategy") },
-          share: { href: buildAssistHref("share", "#ops-export-briefs") },
-        }}
-      />
-
       {!historicalSelection && isFallback ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}
@@ -272,75 +253,6 @@ export default async function OperationsPage({
           fallbackReason={treasury.fallback_reason}
         />
       ) : null}
-
-      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Planning translation help">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Quick definitions</p>
-          <h2 className="text-base font-semibold text-slate-100">Plain-language help for this page.</h2>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <PersistedAssistPanel
-            assistMode="decision"
-            buttonLabel="Translate this plan"
-            title="What the main planning terms mean"
-            summary="Plain-language definitions for the planning page."
-          >
-            <p><span className="font-semibold text-slate-50">Weekly plan</span> = what to approve or hold for team pace and priority changes this week.</p>
-            <p><span className="font-semibold text-slate-50">Guardrails</span> = the limits that should pause new work before it becomes hard to reverse.</p>
-            <p><span className="font-semibold text-slate-50">Finance strategy</span> = the cash and budget stance that should stay aligned with the current call.</p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="trust"
-            buttonLabel="Translate approval readiness"
-            title="What owner and approval state mean"
-            summary="Whether the plan is ready to circulate."
-          >
-            <p><span className="font-semibold text-slate-50">Owner</span> = the function that should drive the step to completion.</p>
-            <p><span className="font-semibold text-slate-50">Approval state</span> = the minimum outcome this step should reach before you move on.</p>
-            <p><span className="font-semibold text-slate-50">Reopen when</span> = the signal that sends you back into this step even after approval.</p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="share"
-            buttonLabel="Translate the final brief"
-            title="How to choose the share format"
-            summary="Choose the right version for the room."
-          >
-            <p><span className="font-semibold text-slate-50">Operator brief</span> = the shortest version for leaders who already know the context.</p>
-            <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with quick term translation for mixed-background audiences.</p>
-            <p><span className="font-semibold text-slate-50">Board and governance artifacts</span> = longer versions for rooms that need more context or documentation.</p>
-          </PersistedAssistPanel>
-        </div>
-      </section>
-
-      <section id="ops-failure-patterns" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-failure-patterns-title">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Risk checks</p>
-          <h2 id="ops-failure-patterns-title" className="text-lg font-semibold text-slate-100">Watch the false-signal patterns before you approve the plan</h2>
-          <p className="text-sm text-slate-300">These warnings sit inside Planning so the team can test the weekly plan before going deeper.</p>
-        </div>
-        {failureModes.length === 0 ? (
-          <div className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-200">
-            No active warning right now. Keep the normal guardrails in force and go deeper only if the data gets stale or the signal gets weaker.
-          </div>
-        ) : (
-          <div className="grid gap-3 lg:grid-cols-2">
-            {failureModes.map((warning) => (
-              <article key={warning.id} className="weather-surface rounded-xl border px-4 py-4">
-                <p className="text-sm font-semibold text-slate-100">{warning.warning}</p>
-                <p className="mt-2 text-sm text-slate-300">{warning.mitigationCheck}</p>
-              </article>
-            ))}
-          </div>
-        )}
-        <div className="flex flex-wrap gap-2">
-          <Link href="#ops-playbook" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-            Recheck guardrails
-          </Link>
-          <Link href="/method#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Trust risk checks
-          </Link>
-        </div>
-      </section>
 
       <OperationsExecutionStepper
         steps={[
@@ -494,6 +406,94 @@ export default async function OperationsPage({
           },
         ]}
       />
+
+      <PageFlowNav
+        eyebrow={operationsScrollPlan.eyebrow}
+        title={operationsScrollPlan.title}
+        description={operationsScrollPlan.description}
+        items={operationsScrollPlan.items}
+        maxItems={3}
+      />
+
+      <LiteracyAssistRouter
+        title="What do you need translated in Planning?"
+        description="Open the planning layer that matches your gap."
+        targets={{
+          decision: { href: buildAssistHref("decision", "#ops-monthly-action-summary") },
+          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
+          trust: { href: buildAssistHref("trust", "#ops-finance-strategy") },
+          share: { href: buildAssistHref("share", "#ops-export-briefs") },
+        }}
+      />
+
+      <section id="ops-failure-patterns" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-failure-patterns-title">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Risk checks</p>
+          <h2 id="ops-failure-patterns-title" className="text-lg font-semibold text-slate-100">Watch the false-signal patterns before you approve the plan</h2>
+          <p className="text-sm text-slate-300">These warnings sit inside Planning so the team can test the weekly plan before going deeper.</p>
+        </div>
+        {failureModes.length === 0 ? (
+          <div className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-200">
+            No active warning right now. Keep the normal guardrails in force and go deeper only if the data gets stale or the signal gets weaker.
+          </div>
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {failureModes.map((warning) => (
+              <article key={warning.id} className="weather-surface rounded-xl border px-4 py-4">
+                <p className="text-sm font-semibold text-slate-100">{warning.warning}</p>
+                <p className="mt-2 text-sm text-slate-300">{warning.mitigationCheck}</p>
+              </article>
+            ))}
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Link href="#ops-playbook" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            Recheck guardrails
+          </Link>
+          <Link href="/method#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Trust risk checks
+          </Link>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Planning translation help">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Quick definitions</p>
+          <h2 className="text-base font-semibold text-slate-100">Plain-language help for this page.</h2>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <PersistedAssistPanel
+            assistMode="decision"
+            buttonLabel="Translate this plan"
+            title="What the main planning terms mean"
+            summary="Plain-language definitions for the planning page."
+          >
+            <p><span className="font-semibold text-slate-50">Weekly plan</span> = what to approve or hold for team pace and priority changes this week.</p>
+            <p><span className="font-semibold text-slate-50">Guardrails</span> = the limits that should pause new work before it becomes hard to reverse.</p>
+            <p><span className="font-semibold text-slate-50">Finance strategy</span> = the cash and budget stance that should stay aligned with the current call.</p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="trust"
+            buttonLabel="Translate approval readiness"
+            title="What owner and approval state mean"
+            summary="Whether the plan is ready to circulate."
+          >
+            <p><span className="font-semibold text-slate-50">Owner</span> = the function that should drive the step to completion.</p>
+            <p><span className="font-semibold text-slate-50">Approval state</span> = the minimum outcome this step should reach before you move on.</p>
+            <p><span className="font-semibold text-slate-50">Reopen when</span> = the signal that sends you back into this step even after approval.</p>
+          </PersistedAssistPanel>
+          <PersistedAssistPanel
+            assistMode="share"
+            buttonLabel="Translate the final brief"
+            title="How to choose the share format"
+            summary="Choose the right version for the room."
+          >
+            <p><span className="font-semibold text-slate-50">Operator brief</span> = the shortest version for leaders who already know the context.</p>
+            <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with quick term translation for mixed-background audiences.</p>
+            <p><span className="font-semibold text-slate-50">Board and governance artifacts</span> = longer versions for rooms that need more context or documentation.</p>
+          </PersistedAssistPanel>
+        </div>
+      </section>
 
       <section id="ops-edge-case-gate" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-edge-case-gate-title">
         <div className="space-y-2">

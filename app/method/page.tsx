@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
-import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubSection } from "../components/hubPageShell";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
@@ -154,8 +153,8 @@ export default async function MethodPage() {
       primaryCta={{ href: "#trust-snapshot", label: "Snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
-        href: "/",
-        description: "Weekly Brief",
+        href: "/signals",
+        description: "Check evidence next",
       }}
       decisionBanner={{
         label: "Trust",
@@ -187,34 +186,6 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust" }]} />
-      <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Trust quick start">
-        <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-          Trust
-        </p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Is this week&rsquo;s call ready to use?
-        </h1>
-        <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Is the data current, how strong is the signal, and what would make it wrong?
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Link href="#trust-snapshot" className="weather-button inline-flex min-h-[44px] items-center justify-center">
-            Snapshot
-          </Link>
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
-            Weekly Brief
-          </Link>
-        </div>
-      </section>
-
-      <section className="weather-panel scroll-mt-28 space-y-3 px-6 py-5" aria-label="Trust verdict">
-        <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
-          {trustVerdict.label}
-        </p>
-        <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
-      </section>
-
       <HubSection id="trust-snapshot" title="Can You Rely On It?" description="Freshness, signal strength, and what would make this call wrong." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-hub-card rounded-2xl px-4 py-4">
@@ -248,6 +219,13 @@ export default async function MethodPage() {
           </article>
         </div>
       </HubSection>
+
+      <section className="weather-panel scroll-mt-28 space-y-3 px-6 py-5" aria-label="Trust verdict">
+        <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
+          {trustVerdict.label}
+        </p>
+        <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
+      </section>
 
       <HubSection id="trust-hub-links" title="Key Questions" description="Pick the question that matters." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">

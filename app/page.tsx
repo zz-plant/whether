@@ -173,8 +173,6 @@ export const HomePageReportContent = async ({
         initialArtifactMode={initialArtifactMode}
       />
 
-      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
-
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}
         interpretationSearchParams={homepage.interpretationSearchParams}
@@ -195,6 +193,8 @@ export const HomePageReportContent = async ({
           ))}
         </dl>
       </section>
+
+      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
     </ReportShell>
   );
 };

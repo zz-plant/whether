@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   isReportShellRoute,
   normalizePathname,
@@ -19,7 +20,18 @@ type GlobalHeaderRouteGateProps = {
 
 export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGateProps) {
   const pathname = normalizePathname(usePathname() ?? "/");
-  const tagline = resolveGlobalHeaderTagline(pathname);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const tagline = isHydrated
+    ? resolveGlobalHeaderTagline(pathname)
+    : {
+        title: "Operating posture navigation",
+        description: "Move into a support path only after the weekly brief leaves one specific question unresolved.",
+      };
 
   if (!isReportShellRoute(pathname)) {
     return <>{defaultHeader}</>;
@@ -39,7 +51,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
               </Link>
               <div className="min-w-0 space-y-0.5">
                 <p className="truncate text-xs font-semibold tracking-[0.08em] text-slate-100 sm:text-[13px]">
-                  {resolveGlobalHeaderRouteLabel(pathname)}
+                  {isHydrated ? resolveGlobalHeaderRouteLabel(pathname) : "Report"}
                 </p>
                 {tagline.description ? (
                   <p className="hidden max-w-[42rem] text-[12px] leading-relaxed text-slate-400 md:block">
@@ -57,7 +69,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
           </div>
         </div>
         <div className="mt-2">
-          <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+          <GlobalHeaderNavClient pathname={pathname} variant="compact" deferPathResolution={true} />
         </div>
       </div>
     </header>

@@ -547,7 +547,24 @@ export const buildHomeBriefModelInternal = (
       boldnessScore: weeklyLeadershipSummary.boldnessScore,
       boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
       notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
-      shorthandLine: `We're ${weeklyLeadershipSummary.notchShiftLabel} bold this week.`,
+      shorthandLine:
+        weeklyLeadershipSummary.boldnessDelta === 0
+          ? "We're holding the same boldness this week."
+          : (() => {
+              const shiftValue = Number.parseInt(weeklyLeadershipSummary.notchShiftLabel, 10);
+              const absoluteShift = Number.isFinite(shiftValue) ? Math.abs(shiftValue) : 0;
+              const notchLabel = absoluteShift === 1 ? "notch" : "notches";
+
+              if (shiftValue > 0) {
+                return `We're +${absoluteShift} ${notchLabel} bolder this week.`;
+              }
+
+              if (shiftValue < 0) {
+                return `We're ${absoluteShift} ${notchLabel} more defensive this week.`;
+              }
+
+              return "We're holding the same boldness this week.";
+            })(),
       hiringWindow: weeklyLeadershipSummary.hiringWindow,
       expansionWindow: weeklyLeadershipSummary.expansionWindow,
       raiseWindow: weeklyLeadershipSummary.raiseWindow,
