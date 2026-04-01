@@ -7,33 +7,33 @@ const executionSteps = [
   {
     href: "#ops-monthly-action-summary",
     label: "Step 1",
-    title: "Read this week's plan",
-    description: "Start here. Confirm what you should approve, hold, or revisit before changing team pace.",
+    title: "Approval call",
+    description: "What leadership should approve, hold, or revisit this week.",
   },
   {
     href: "#ops-playbook",
     label: "Step 2",
-    title: "Apply the guardrails",
-    description: "Use start, stop, and fence rules to keep changes reversible and bounded.",
+    title: "Guardrails",
+    description: "The start, stop, and fence lines that keep changes reversible and bounded.",
   },
   {
     href: "#ops-export-briefs",
     label: "Step 3",
-    title: "Share the aligned brief",
-    description: "Copy the artifact once finance guidance and operator asks are aligned.",
+    title: "Shareable brief",
+    description: "The version to circulate once finance guidance and operator asks align.",
   },
 ] as const;
 
 const implementationHandoffLinks = [
   {
     href: "https://github.com/zz-plant/whether/blob/main/docs/developer/integrations.md",
-    label: "Send to tools",
-    description: "Optional: route the approved brief into Slack, Notion, and Linear.",
+    label: "Integration notes",
+    description: "Slack, Notion, and Linear handoff once the brief is approved.",
   },
   {
     href: "https://github.com/zz-plant/whether/blob/main/docs/developer/api-reference.md",
-    label: "Open data/API handoff",
-    description: "Optional: share payload and endpoint guidance with data and automation owners.",
+    label: "API handoff",
+    description: "Payload and endpoint guidance for data and automation owners.",
   },
 ] as const;
 
@@ -41,8 +41,8 @@ export const OperationsWorkflowProgress = () => {
   return (
     <section className="weather-panel space-y-3 px-4 py-4" aria-label="Planning workflow progress">
       <div>
-        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Start here</p>
-        <h2 className="text-sm font-semibold text-slate-100">Use this page in 3 steps</h2>
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
+        <h2 className="text-sm font-semibold text-slate-100">This week&apos;s planning call</h2>
       </div>
       <ol className="grid gap-3 md:grid-cols-3">
         {executionSteps.map((step, index) => {
@@ -83,9 +83,9 @@ export const OperationsWorkflowProgress = () => {
       </ol>
 
       <div className="weather-surface space-y-2 rounded-xl border border-slate-800/80 px-3 py-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Optional handoff</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Implementation handoff</p>
         <p className="text-xs text-slate-300">
-          Open these only after the weekly plan is approved.
+          For tools and automation owners once the weekly plan is approved.
         </p>
         <ul className="grid gap-2 md:grid-cols-2">
           {implementationHandoffLinks.map((link) => {

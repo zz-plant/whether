@@ -146,7 +146,7 @@ export const HomePageReportContent = async ({
           },
           nextStep: {
             href: "/operations",
-            description: "Open Planning next to approve or hold this week's moves",
+            description: "Planning for approval and hold lines",
           },
         },
         payloads: {

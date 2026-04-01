@@ -121,11 +121,6 @@ export const renderWeeklySummaryCopy = ({
     `Data age: ${provenance.ageLabel}`,
     "",
     ...complianceStamp,
-    "",
-    "---",
-    "",
-    "Actions:",
-    "Copy for roadmap review Check a decision Why this verdict",
   ].join("\n");
 };
 

@@ -17,18 +17,18 @@ export const SignalsModeSwitcherSection = ({
   activeSignalsView: SignalsView;
   searchParams?: Record<string, string | undefined>;
 }) => (
-  <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence tab submode">
+  <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
     <div className="space-y-1">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        Evidence tab submode
+        Evidence view
       </p>
       <h2 className="text-base font-semibold text-slate-100">
-        Stay in Evidence, then choose implication or full detail depth.
+        Start with the short version, then go deeper only if needed.
       </h2>
       <p className="text-sm text-slate-300">
-        This toggle changes how much evidence detail you see inside the Evidence tab. Start with
-        the operating implication. Open detail mode only when you need the full diagnostic
-        appendix, replay, or threshold audit.
+        This changes how much detail you see. Start with what the evidence means right now. Use the
+        deeper view only when you need the full history, supporting diagnostics, or the lines that
+        would change the call.
       </p>
     </div>
     <div className="grid gap-2 sm:grid-cols-2">
@@ -37,13 +37,13 @@ export const SignalsModeSwitcherSection = ({
           id: "implication",
           label: "What this means now",
           detail:
-            "Default action-first read with just enough scorecard context to confirm the weekly call.",
+            "The short version, with just enough context to support the weekly call.",
         },
         {
           id: "detail",
           label: "Evidence detail",
           detail:
-            "Full diagnostics, historical replay, and advanced controls for deeper validation.",
+            "Full diagnostics, historical replay, and advanced controls.",
         },
       ] as const).map((item) => {
         const active = item.id === activeSignalsView;
@@ -128,19 +128,19 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Reopen the call when
+            This call changes when
           </p>
           {showMicroDecisionRows ? (
             <div className="mt-2 space-y-2 text-sm text-slate-200">
               <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                  Trigger
+                  Warning sign
                 </p>
                 <p className="mt-1">{triggerCondition}</p>
               </div>
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                  Reversal
+                  Back to normal when
                 </p>
                 <p className="mt-1">{reversalCondition}</p>
               </div>
@@ -148,7 +148,7 @@ export const SignalsDecisionSummarySection = ({
           ) : (
             <p className="mt-2 text-sm text-slate-200">
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
-                Trigger:
+                Warning sign:
               </span>
               {" "}
               <span>{triggerCondition}</span>
@@ -156,7 +156,7 @@ export const SignalsDecisionSummarySection = ({
               <span aria-hidden="true" className="text-slate-500">·</span>
               {" "}
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
-                Reversal:
+                Back to normal when:
               </span>
               {" "}
               <span>{reversalCondition}</span>
@@ -168,13 +168,13 @@ export const SignalsDecisionSummarySection = ({
     <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Posture
+          Market setup
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
       </div>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Confidence
+          Signal strength
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
       </div>
@@ -200,19 +200,19 @@ export const SignalsDecisionSummarySection = ({
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
       <article className="weather-surface space-y-3 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          Current posture
+          Current setup
         </p>
         <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          {regimeLabel} regime is the active operating posture.
+          {regimeLabel} is the current market setup.
         </h2>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Start with the decision delta below, then use diagnostics and thresholds to validate the
-          call before changing operating posture.
+          Start with what changed, then use the evidence below to decide whether the weekly call
+          should stay in place or change.
         </p>
         <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
             <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Recommended action
+              What to do
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
               Keep posture aligned with the highest-priority start and stop rules listed in the
@@ -221,7 +221,7 @@ export const SignalsDecisionSummarySection = ({
           </div>
           <div>
             <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Impact if wrong
+              If this is wrong
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
               Execution pacing can drift if liquidity conditions shift before the next review.
@@ -229,15 +229,15 @@ export const SignalsDecisionSummarySection = ({
           </div>
           <div>
             <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Next checkpoint
+              Check again
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              Re-check after the next data refresh and threshold confirmation.
+              Re-check after the next data refresh.
             </dd>
           </div>
         </dl>
         <p className="text-xs text-slate-300">
-          The evidence scorecard and threshold logic appear below in the standard review order.
+          The scorecard and the lines to watch appear below.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
@@ -268,7 +268,7 @@ export const SignalsDecisionSummarySection = ({
           </ul>
         </div>
         <p className="text-xs text-slate-300">
-          Model shorthand: Posture = f(risk appetite, funding tightness, yield-curve slope).
+          In plain English: this call combines investor risk appetite, funding tightness, and the shape of interest rates.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5">
@@ -287,7 +287,7 @@ export const SignalsDecisionSummarySection = ({
               <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
               <p className="mt-2 text-xs text-slate-300">
-                Review in the current scores section below.
+                More detail appears in the scorecards below.
               </p>
             </li>
           ))}
@@ -309,7 +309,7 @@ export const SignalsCurrentScoresSection = ({
     <header className="space-y-2">
       <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        Real-time scorecard for the three regime drivers.
+        Live scorecard for the three biggest drivers.
       </h2>
     </header>
     <div className="space-y-4">
@@ -327,11 +327,8 @@ export const SignalsCurrentScoresSection = ({
                   </dt>
                   <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
                 </dl>
-                <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
+                <p className="text-sm font-semibold text-slate-200">Line to watch: {card.threshold}</p>
                 <p className="text-sm text-slate-300">{card.description}</p>
-                <p className="text-xs text-slate-300">
-                  Source signal details are listed in this scorecard.
-                </p>
               </article>
             ))}
           </div>
@@ -349,21 +346,21 @@ export const SignalsNeedMoreProofSection = ({
   <section className="weather-panel space-y-3 px-6 py-5">
     <div className="space-y-2">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        Need more proof?
+        Still need proof?
       </p>
       <h2 className="text-lg font-semibold text-slate-100">
-        Open the full evidence appendix only when this call still needs defending.
+        Go deeper only if this call still needs defending.
       </h2>
       <p className="text-sm text-slate-300">
-        Detail mode adds prioritized diagnostics, historical replay, threshold tuning, and advanced
-        filters. Use it when the room asks “why?” or “what would change this?”
+        The deeper view adds prioritized diagnostics, historical replay, threshold tuning, and advanced
+        filters. Use it when the room asks “why?” or “what would make this wrong?”
       </p>
     </div>
     <a
       href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
       className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
     >
-      Open evidence detail
+      More evidence
     </a>
   </section>
 );

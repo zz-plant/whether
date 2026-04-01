@@ -12,34 +12,34 @@ export type ScrollPlan = {
 };
 
 export const homeScrollPlan: ScrollPlan = {
-  eyebrow: "Scroll path",
+  eyebrow: "What follows",
   title: "Keep the brief as the only source of truth",
   description:
-    "Share from home, then open exactly one downstream surface only if evidence, planning, or translation still needs work.",
+    "Go deeper only if the brief still leaves a real question.",
   items: [
     {
       href: "#audit-this-call",
       label: "Evidence",
-      summary: "Open Evidence or Trust only when the brief needs proof or a trust audit.",
+      summary: "Proof and trust checks when the brief gets challenged.",
     },
     {
       href: "#approve-this-weeks-plan",
       label: "Planning",
-      summary: "Commit the weekly plan before you widen into company-specific translation.",
+      summary: "Approve or hold this week's moves.",
     },
     {
       href: "#historical-replay-workspace",
       label: "Depth",
-      summary: "Use Decision Tools, replay, or toolkits only for the one unresolved question that remains.",
+      summary: "Only for the last unresolved question.",
     },
   ],
 };
 
 export const signalsScrollPlan: ScrollPlan = {
-  eyebrow: "Evidence path",
-  title: "Read Evidence from decision to proof",
+  eyebrow: "Evidence",
+  title: "Decision delta, then proof",
   description:
-    "Start with the decision delta, then move through replay, live scores, priority drivers, and threshold logic in that order.",
+    "Decision delta first, then replay, live scores, priority drivers, and threshold logic.",
   items: [
     {
       href: "#decision-summary",
@@ -70,10 +70,10 @@ export const signalsScrollPlan: ScrollPlan = {
 };
 
 export const operationsScrollPlan: ScrollPlan = {
-  eyebrow: "Execution path",
-  title: "Use Planning as a controlled review sequence",
+  eyebrow: "Planning",
+  title: "Approve the weekly plan before widening out",
   description:
-    "Approve the weekly plan first, pressure-test false-signal risks, then validate guardrails, finance posture, sharing output, and only then open deeper escalation paths if needed.",
+    "Weekly plan first, then false-signal risk, guardrails, finance posture, and shareable output.",
   items: [
     {
       href: "#ops-monthly-action-summary",
@@ -109,48 +109,48 @@ export const operationsScrollPlan: ScrollPlan = {
 };
 
 export const decideScrollPlan: ScrollPlan = {
-  eyebrow: "Decision path",
-  title: "Use Decision Tools only for unresolved edge cases",
+  eyebrow: "Decision tools",
+  title: "Resolve the last open decision",
   description:
-    "Start with the fastest bounded tool or exact answer, then widen into translation paths only if the weekly plan still leaves one unresolved question.",
+    "Start with the clearest tool. Go deeper only if one decision still stays open.",
   items: [
     {
       href: "#run-this-now",
-      label: "Run",
-      summary: "Open the fastest weekly toolkit shortcut first.",
+      label: "Start",
+      summary: "The fastest toolkit path.",
     },
     {
       href: "#direct-answers",
       label: "Answer",
-      summary: "Use a one-question answer when the unresolved issue is already crisp.",
+      summary: "A direct answer when the question is already clear.",
     },
     {
       href: "#decision-utilities",
       label: "Validate",
-      summary: "Use utilities only when the weekly call needs one more bounded check.",
+      summary: "Use utilities only when one more check is necessary.",
     },
     {
       href: "#guided-translation",
       label: "Translate",
-      summary: "Widen into owner or company-stage paths only after the fast paths are exhausted.",
+      summary: "Role or stage translation after the fast paths are exhausted.",
     },
   ],
 };
 
 export const methodScrollPlan: ScrollPlan = {
-  eyebrow: "Trust path",
-  title: "Audit Trust from freshness to reversal conditions",
+  eyebrow: "Trust",
+  title: "Freshness, confidence, and reversal conditions",
   description:
-    "Open the primary trust surfaces first, confirm the current status, then review flip conditions and optional glossary support.",
+    "Current status first, then reversal conditions and glossary support if needed.",
   items: [
     {
       href: "#trust-hub-links",
-      label: "Surfaces",
-      summary: "Open sources, confidence, formulas, or learn support from one place.",
+      label: "Key questions",
+      summary: "Sources, confidence, formulas, and revisit triggers.",
     },
     {
       href: "#trust-snapshot",
-      label: "Snapshot",
+      label: "Status",
       summary: "Confirm freshness, confidence, and source coverage.",
     },
     {

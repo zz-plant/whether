@@ -54,7 +54,7 @@ export function PageFlowNav({
           <div className="flex flex-wrap items-center gap-2">
             <p className="weather-hub-section-eyebrow">{eyebrow}</p>
             <span className="weather-hub-chip !min-h-[1.85rem] px-2 py-0.5 text-[10px]">
-              {items.length} checkpoints
+              {items.length} sections
             </span>
           </div>
           <h2 className={`${compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"} font-semibold text-slate-100`}>{title}</h2>
@@ -90,16 +90,6 @@ export function PageFlowNav({
                       </span>
                     </div>
                     <p className="mt-2 text-sm font-semibold text-slate-100">{item.summary}</p>
-                    <p className="mt-2 text-xs text-slate-300">
-                      {status === "active"
-                        ? "Start here before widening the workflow."
-                        : status === "next"
-                          ? "Open this only if the current checkpoint is no longer enough."
-                          : "Keep this in reserve for the final unresolved question."}
-                    </p>
-                    <span className="mt-3 inline-flex text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-200">
-                      Jump to section
-                    </span>
                   </div>
                 </div>
               </Link>
@@ -109,7 +99,7 @@ export function PageFlowNav({
       </ol>
       {hiddenItemCount > 0 ? (
         <p className="px-1 text-xs text-slate-400">
-          +{hiddenItemCount} more checkpoint{hiddenItemCount === 1 ? "" : "s"} below.
+          +{hiddenItemCount} more section{hiddenItemCount === 1 ? "" : "s"} below.
         </p>
       ) : null}
     </section>

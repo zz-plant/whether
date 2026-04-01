@@ -17,7 +17,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Trust — freshness, confidence, and sources",
   description:
-    "Proof that this week's call is fresh, usable, and backed by sources.",
+    "Whether this week's call is current, dependable, and backed by sources.",
   path: "/method",
   imageAlt: "Whether trust hub",
 });
@@ -81,22 +81,22 @@ export default async function MethodPage() {
   ];
   const trustActions = [
     {
-      title: "Check freshness",
-      detail: `Data refreshed: ${reportData.fetchedAtLabel}. Check the source status here.`,
+      title: "Is the data current?",
+      detail: `Updated ${reportData.fetchedAtLabel}. Source status and timestamps.`,
       href: "#sources-freshness",
-      cta: "Open sources",
+      cta: "Sources",
     },
     {
-      title: "Check confidence",
-      detail: `Current confidence: ${confidenceLabel}. Check the pause and flip lines here.`,
+      title: "How strong is the signal?",
+      detail: `Confidence is ${confidenceLabel}. This section shows what would make the call too weak to rely on.`,
       href: "#confidence-limits",
-      cta: "Open confidence",
+      cta: "Confidence",
     },
     {
-      title: "See formulas",
-      detail: "How the score is built.",
+      title: "How is the score built?",
+      detail: "The formulas behind the call.",
       href: "#formula-reference",
-      cta: "Open formulas",
+      cta: "Formula reference",
     },
   ];
   const trustStatusTone = reportData.historicalSelection
@@ -106,24 +106,24 @@ export default async function MethodPage() {
       : "stable";
   const trustVerdict = trustStatusTone === "stable"
     ? {
-        label: "Safe to use for this week's operating call",
-        detail: "Freshness, confidence, and source coverage support the current brief.",
+        label: "Ready to rely on this week",
+        detail: "The data is current enough and the signal is strong enough to support the brief.",
         toneClasses: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
       }
     : trustStatusTone === "historical"
       ? {
-          label: "Use only for retrospective comparison",
-          detail: "This is a historical snapshot, not a live approval read.",
+          label: "Only useful for looking back",
+          detail: "This is a historical snapshot, not the live weekly call.",
           toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
         }
       : {
-          label: "Use cautiously before approving irreversible moves",
-          detail: "Trust is degraded enough that the current brief needs an explicit check first.",
+          label: "Double-check before making hard-to-reverse moves",
+          detail: "The data or signal is weak enough that the brief needs extra verification first.",
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
   const sectionLinks = [
-    { href: "#trust-snapshot", label: "60-second trust check" },
-    { href: "#trust-hub-links", label: "Trust checks" },
+    { href: "#trust-snapshot", label: "Snapshot" },
+    { href: "#trust-hub-links", label: "Key questions" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
@@ -139,27 +139,27 @@ export default async function MethodPage() {
       treasurySource={reportData.treasury.source}
       trustStatusLabel={trustSummary}
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
-      trustStatusAction="If checks pass, return to the weekly brief."
+      trustStatusAction="Usable for this week's brief if freshness and confidence hold."
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Check whether this week's call is ready to use."
-      pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
+      pageSummary="Can you rely on this week's call?"
+      pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
       headerVariant="trust"
       showPageNavigation={true}
-      primaryCta={{ href: "#trust-snapshot", label: "Run trust check" }}
+      primaryCta={{ href: "#trust-snapshot", label: "Snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/",
-        description: "Return to Weekly Brief next",
+        description: "Weekly Brief",
       }}
       decisionBanner={{
-        label: "Trust check",
-        decision: "Check freshness, confidence, and change-the-call triggers.",
+        label: "Trust",
+        decision: "Is the data current, how strong is the signal, and what would make the call wrong?",
         horizon: "This week",
         confidence: trustSummary,
         effectiveDate: reportData.recordDateLabel,
@@ -167,13 +167,13 @@ export default async function MethodPage() {
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use Trust to verify the current call.",
+        call: "Whether this week's call is current, dependable, and safe to act on.",
         doNow: [
           reportData.actionNowShort,
-          "Return to the weekly brief once checks are complete.",
+          "Hold irreversible approvals if trust degrades.",
         ],
         trustChecklist: {
-          label: "Trust check",
+          label: "What matters",
           items: [
             `Confirm freshness: ${reportData.fetchedAtLabel}.`,
             `Confirm confidence: ${confidenceLabel}.`,
@@ -190,17 +190,17 @@ export default async function MethodPage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Trust" }]} />
       <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Trust quick start">
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-          Trust hub
+          Trust
         </p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Check whether this week&apos;s call is ready to use.
+          Is this week&rsquo;s call ready to use?
         </h1>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Start with the verdict below.
+          Is the data current, how strong is the signal, and what would make it wrong?
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link href="#trust-snapshot" className="weather-button inline-flex min-h-[44px] items-center justify-center">
-            Run 60-second trust check
+            Snapshot
           </Link>
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
             Weekly Brief
@@ -215,7 +215,7 @@ export default async function MethodPage() {
         <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
       </section>
 
-      <HubSection id="trust-snapshot" title="60-second trust check" description="Check this before acting on this week's posture." className="scroll-mt-28">
+      <HubSection id="trust-snapshot" title="Can You Rely On It?" description="Freshness, signal strength, and what would make this call wrong." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-hub-card rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current call</p>
@@ -223,12 +223,12 @@ export default async function MethodPage() {
             <p className="mt-2 text-sm text-slate-200">Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></p>
           </article>
           <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Trust status</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Can you rely on it?</p>
             <p className="mt-2 text-sm text-slate-200">{trustSummary}</p>
             <p className="mt-2 text-sm text-slate-300">Coverage: {sourceCoverage}</p>
             <p className="mt-2 text-xs text-slate-400">Data refreshed: {reportData.fetchedAtLabel}</p>
             <div className="mt-3 border-t border-slate-700/70 pt-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Trust check</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Snapshot</p>
               <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
                 <li className="flex items-start gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
@@ -242,14 +242,14 @@ export default async function MethodPage() {
             </div>
           </article>
           <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What would change the call</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What would make it wrong</p>
             <p className="mt-2 text-sm text-slate-200">{reportData.flipThreshold}</p>
             <p className="mt-2 text-sm text-slate-300">{reportData.actionNowShort}</p>
           </article>
         </div>
       </HubSection>
 
-      <HubSection id="trust-hub-links" title="Audit workflow" description="Open the appendix that matches the question." className="scroll-mt-28">
+      <HubSection id="trust-hub-links" title="Key Questions" description="Pick the question that matters." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">
           {trustActions.map((item) => (
             <article key={item.title} className="weather-hub-link-card space-y-2">
@@ -261,10 +261,10 @@ export default async function MethodPage() {
             </article>
           ))}
           <article className="weather-hub-link-card space-y-2">
-            <h2 className="text-lg font-semibold text-slate-100">Revisit checks</h2>
-            <p className="text-sm text-slate-300">See what would invalidate this week&apos;s call.</p>
+            <h2 className="text-lg font-semibold text-slate-100">Revisit triggers</h2>
+            <p className="text-sm text-slate-300">What would invalidate this week&rsquo;s call.</p>
             <Link href="#revisit-call" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              Open checks
+              Revisit triggers
             </Link>
           </article>
         </div>
@@ -292,9 +292,9 @@ export default async function MethodPage() {
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Citation-ready summary</p>
             <p className="text-sm text-slate-200">{citationLine}</p>
-            <p className="text-xs text-slate-400">Use this as proof only. The decision still lives in Weekly Brief and Planning.</p>
+            <p className="text-xs text-slate-400">For citation and recap. The weekly call still lives in the brief.</p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Back to trust check</Link>
+              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Snapshot</Link>
               <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula notes</Link>
             </div>
           </article>
@@ -303,16 +303,16 @@ export default async function MethodPage() {
 
       <HubSection
         id="confidence-limits"
-        title="Confidence and limits"
-        description="How fragile the call is, what pauses it, and what forces a change."
+        title="How Strong Is The Signal?"
+        description="How fragile the call is, what should pause it, and what would force a change."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Bounded decision checks</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
-              <li><span className="text-slate-400">Change course if:</span> {reportData.flipThreshold}</li>
+              <li><span className="text-slate-400">This call breaks if:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">Pause if:</span> {reportData.guardrailThreshold}</li>
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and transition watch turns OFF before expanding fixed-cost approvals.</li>
             </ul>
@@ -324,7 +324,7 @@ export default async function MethodPage() {
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Recheck freshness</Link>
-              <Link href="#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Open checks</Link>
+              <Link href="#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Revisit triggers</Link>
             </div>
           </article>
         </div>
@@ -338,7 +338,7 @@ export default async function MethodPage() {
       >
         <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className="text-sm text-slate-200">
-            Use this section when reviewers ask how the scoring works, what would make you pause, and what would change the call.
+            The scoring logic, pause lines, and flip conditions behind this week&rsquo;s call.
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
             <li>• Tie formula review to the current confidence and freshness labels before making irreversible decisions.</li>
@@ -346,17 +346,13 @@ export default async function MethodPage() {
             <li>• Document reversal conditions before reopening fixed-cost approvals.</li>
           </ul>
           <div className="flex flex-wrap gap-2 text-xs">
-            <Link href="#confidence-limits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View confidence limits</Link>
-            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">View source provenance</Link>
+            <Link href="#confidence-limits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Confidence limits</Link>
+            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source provenance</Link>
           </div>
         </div>
       </HubSection>
 
-      <HubSection
-        id="revisit-call"
-        title="Revisit triggers and false-signal risks"
-        className="scroll-mt-28"
-      >
+      <HubSection id="revisit-call" title="What Would Make This Wrong?" className="scroll-mt-28">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 rounded-xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>
@@ -380,7 +376,7 @@ export default async function MethodPage() {
                 <li key={item.label} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
                   <p className="mt-1">{item.detail}</p>
-                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Review evidence</Link>
+                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Related check</Link>
                 </li>
               ))}
             </ul>
@@ -388,7 +384,7 @@ export default async function MethodPage() {
         </div>
       </HubSection>
 
-      <HubSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Copy this into Slack, notes, or the meeting agenda." className="scroll-mt-28">
+      <HubSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Slack, notes, or agenda-ready." className="scroll-mt-28">
         <pre className="weather-hub-card overflow-x-auto rounded-2xl px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>

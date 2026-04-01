@@ -115,7 +115,7 @@ export function ToolkitLibraryPanels({
             <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2 text-sm text-slate-100">
               <span className="weather-hub-chip w-fit">Toolkit</span>
               <p className="font-semibold">{toolkit.title}</p>
-              <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
+              <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
             </Link>
           ))}
         </div>

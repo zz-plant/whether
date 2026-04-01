@@ -106,7 +106,7 @@ export function WeeklyCallModePanel({
     decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.",
   );
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
-  const revisitLabel = revisitDecisions ? "YES — Regime shift detected." : "NO — Hold posture.";
+  const revisitLabel = revisitDecisions ? "Yes. Last week's decisions need another look." : "No. Last week's decisions still hold.";
   const revisitDetail = revisitDecisions
     ? "Recheck last week's approvals before adding fixed cost."
     : "";
@@ -117,7 +117,7 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
   const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
-  const trustVerdict = needsTrustWarning ? "Use caution." : "Ready to use.";
+  const trustVerdict = needsTrustWarning ? "Double-check before acting." : "Clear enough to act.";
 
   return (
     <>
@@ -175,7 +175,7 @@ export function WeeklyCallModePanel({
               <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
             </article>
             <article className={`rounded-xl border px-3 py-3 ${revisitToneClass}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit last week&apos;s decisions?</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Do last week&apos;s decisions still hold?</p>
               <p className="mt-1 text-sm font-semibold leading-6">{revisitLabel}</p>
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
@@ -224,13 +224,13 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Role and stability</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Who this matters most for</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
               <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Recheck if</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">This changes if</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">

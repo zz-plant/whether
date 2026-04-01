@@ -77,9 +77,9 @@ export function OperationsExecutionStepper({
     <section className="space-y-4" aria-label="Planning execution stepper">
       <div className="weather-panel space-y-3 px-4 py-4">
         <div>
-          <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Execution flow</p>
-          <h2 className="text-sm font-semibold text-slate-100">Use Planning in one linear pass</h2>
-          <p className="mt-1 text-xs text-slate-300">Each step shows who owns it, what approval state it should reach, and what would reopen it.</p>
+          <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
+          <h2 className="text-sm font-semibold text-slate-100">This week&apos;s sequence</h2>
+          <p className="mt-1 text-xs text-slate-300">Each stage names the owner, the approval state, and the condition that reopens it.</p>
         </div>
         <ol className="grid gap-3 md:grid-cols-4">
           {steps.map((step, index) => {
@@ -144,7 +144,7 @@ export function OperationsExecutionStepper({
                     </div>
                   </div>
                   <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100">
-                    Current step
+                    Current
                   </span>
                 </div>
                 {step.children}
@@ -175,7 +175,7 @@ export function OperationsExecutionStepper({
                 onClick={() => setActiveStep(step.id)}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
               >
-                Open step
+                Details
               </button>
             </section>
           );

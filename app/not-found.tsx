@@ -6,13 +6,13 @@ export default function NotFound() {
     <SecondaryPageShell width="compact">
       <SecondaryPageHeader
         eyebrow="Route unavailable"
-        title="That link moved, but your next step is still available."
-        description="Some older routes were replaced during the IA update. Continue with the current command surface, review Evidence first, or open Planning without losing intent."
+        title="That link moved. This week's brief is still here."
+        description="Some older routes were retired during the IA update. The current brief, evidence, and planning page are still available."
         actions={(
           <>
-            <ButtonLink href="/" variant="primary">Open Weekly Brief</ButtonLink>
-            <ButtonLink href="/signals" variant="ghost">Review evidence</ButtonLink>
-            <ButtonLink href="/operations" variant="ghost">Open Planning</ButtonLink>
+            <ButtonLink href="/" variant="primary">Weekly Brief</ButtonLink>
+            <ButtonLink href="/signals" variant="ghost">Evidence</ButtonLink>
+            <ButtonLink href="/operations" variant="ghost">Planning</ButtonLink>
           </>
         )}
       />

@@ -19,18 +19,18 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
       <HomeBandHeader
         step="02"
         kicker="Exceptions only"
-        title="Open Evidence or Trust only if the call gets challenged."
+        title="Evidence and trust for challenged calls."
         icon={<AuditIcon className="h-5 w-5 text-sky-100" />}
         toneClass="border-sky-400/40 text-sky-200"
         actions={(
           <>
             <Link href={"/signals" as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
               <TrendUpIcon className="h-3.5 w-3.5" />
-              <span>Open Evidence</span>
+              <span>Evidence</span>
             </Link>
             <Link href={"/method" as Route} className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]">
               <ShieldIcon className="h-3.5 w-3.5" />
-              <span>Open Trust</span>
+              <span>Trust</span>
             </Link>
           </>
         )}
@@ -63,8 +63,8 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
       <div className="grid gap-3 lg:grid-cols-2">
         <Link href={"/signals" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Need proof?</p>
-          <p className="mt-2 text-sm font-semibold">Open Evidence for why the call moved</p>
-          <p className="mt-1 text-xs text-slate-300">Driver stack, thresholds, and replay live there.</p>
+          <p className="mt-2 text-sm font-semibold">Why the call moved</p>
+          <p className="mt-1 text-xs text-slate-300">Driver stack, thresholds, and replay.</p>
           {workspaceModel.audit.evidenceMovers.length > 0 ? (
             <ul className="mt-3 space-y-2">
               {workspaceModel.audit.evidenceMovers.slice(0, 2).map((item) => (
@@ -79,8 +79,8 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
 
         <Link href={"/method" as Route} className="home-band-link-card rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Need source defense?</p>
-          <p className="mt-2 text-sm font-semibold">Open Trust for freshness, coverage, and method</p>
-          <p className="mt-1 text-xs text-slate-300">Use this when someone asks whether the weekly read is reliable enough to act on.</p>
+          <p className="mt-2 text-sm font-semibold">Is the read reliable enough to use?</p>
+          <p className="mt-1 text-xs text-slate-300">Freshness, coverage, and method.</p>
           <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/45 px-2.5 py-2 text-xs">
             <p className="font-semibold text-slate-100">Operating implication</p>
             <p className="mt-1 text-slate-300">{workspaceModel.audit.decisionImpactWindow}</p>

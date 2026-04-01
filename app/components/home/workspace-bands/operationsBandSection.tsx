@@ -23,10 +23,10 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <HomeBandHeader
         step="01"
         kicker="Planning"
-        title="Open Planning next."
+        title="Planning call."
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
-        actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Open Planning</span></Link>}
+        actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Planning</span></Link>}
       />
       <article className="rounded-2xl border border-slate-800/80 bg-slate-950/55 p-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -133,7 +133,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<DocumentIcon className="h-3.5 w-3.5" />} label={financeSnapshot ? "Finance posture" : "Final brief"} accentClass="text-slate-200" />
           <p className="mt-2 text-sm font-semibold text-slate-100">
-            {financeSnapshot ? financeSnapshot.label : "Share the aligned brief when planning is complete."}
+            {financeSnapshot ? financeSnapshot.label : "Aligned brief ready once planning is complete."}
           </p>
           <p className="mt-2 text-sm text-slate-300">
             {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is the room-ready output."}
