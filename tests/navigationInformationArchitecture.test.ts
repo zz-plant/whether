@@ -25,9 +25,9 @@ describe("navigation information architecture", () => {
   });
 
   it("defines passive group labels from IA as single source of truth", () => {
-    assert.equal(navigationGroupLabels.core, "Anchor");
-    assert.equal(navigationGroupLabels.workflow, "Action");
-    assert.equal(navigationGroupLabels.reference, "Verify");
+    assert.equal(navigationGroupLabels.core, "This week");
+    assert.equal(navigationGroupLabels.workflow, "Decide");
+    assert.equal(navigationGroupLabels.reference, "Check");
 
     for (const layer of navigationLayers) {
       assert.ok(navigationGroupLabels[layer.group]);
@@ -51,11 +51,11 @@ describe("navigation information architecture", () => {
 
   it("exposes primary surface progress cues and route cues for navigation copy", () => {
     assert.equal(primaryNavigationSurfaceCount, 5);
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Surface 1 of 5");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Surface 2 of 5");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Surface 3 of 5");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Surface 4 of 5");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Surface 5 of 5");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Check proof");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Set guardrails");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Resolve one question");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Check trust");
     assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
     assert.equal(resolveNavigationRouteCue("/signals"), "/signals");
   });

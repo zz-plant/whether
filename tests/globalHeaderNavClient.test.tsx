@@ -15,8 +15,8 @@ describe("GlobalHeaderNavRail", () => {
       />,
     );
 
-    assert.match(html, /Surface 2 of 5/);
-    assert.match(html, /Primary surfaces/);
+    assert.match(html, /Navigation/);
+    assert.match(html, /Evidence/);
     assert.match(html, /aria-label="Previous surface"/);
     assert.match(html, /aria-label="Next surface"/);
   });
@@ -30,8 +30,8 @@ describe("GlobalHeaderNavRail", () => {
       />,
     );
 
-    assert.match(html, /Browse sections/);
-    assert.match(html, /Open sections, then swipe or use the arrows to move across the primary surfaces\./);
+    assert.match(html, /Open navigation/);
+    assert.match(html, /Open navigation, then swipe or use the arrows to move between the main pages\./);
     assert.match(html, /aria-label="Previous surface"/);
     assert.match(html, /aria-label="Next surface"/);
   });
