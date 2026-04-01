@@ -85,6 +85,6 @@ describe("PageFlowNav", () => {
 
     assert.match(html, /href="#audit-this-call"/);
     assert.match(html, /href="#decision-utilities"/);
-    assert.match(html, /Jump to section/);
+    assert.match(html, /2 sections/);
   });
 });
