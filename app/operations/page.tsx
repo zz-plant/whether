@@ -447,7 +447,7 @@ export default async function OperationsPage({
             label: "Share",
             title: "Share the brief",
             description: "Pick the operator brief, explainer brief, or a board-ready artifact.",
-            summary: "Start with the operator brief; use explainer mode only when the room needs translation.",
+            summary: "Operator brief first, with explainer mode for audiences that need translation.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",

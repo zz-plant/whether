@@ -76,7 +76,7 @@ export function ReportShellHeader({
                 Decide this week&apos;s pace in one screen.
               </p>
               <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
-                Start with the call, the immediate move, the threshold to watch, and the flip condition. Open a support path only when one question remains unresolved.
+                The call, immediate move, threshold, and flip condition are captured in one view, with support paths available as needed.
               </p>
             </div>
             {exportCta ? (
@@ -129,7 +129,7 @@ export function ReportShellHeader({
               </span>
             </div>
             <p className="max-w-2xl text-[11px] leading-relaxed text-slate-300">
-              {contextBadge?.copy ?? "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."}
+              {contextBadge?.copy ?? "Weekly posture artifact for operators with guardrails and linked evidence."}
             </p>
             <p className={`max-w-2xl text-[11px] leading-relaxed text-slate-500 ${hideCanonicalPositioningLineOnMobile ? "hidden sm:block" : ""}`}>
               {canonicalPositioningLine}

@@ -36,7 +36,7 @@ export const SignalsModeSwitcherSection = ({
         How much detail
       </p>
       <h2 className="text-base font-semibold text-slate-100">
-        Start with the short read. Go deeper only if the read still needs defending.
+        Short read and deeper evidence are available in parallel.
       </h2>
       <p className="text-sm text-slate-300">
         The short read tells you what changed, what it means this week, and what would make the

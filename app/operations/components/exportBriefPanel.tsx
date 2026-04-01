@@ -255,7 +255,7 @@ export const ExportBriefPanel = ({
           titleId="export-briefs-title"
           description={
             <>
-              Start with the operator brief. Use the explainer brief only when the room needs translation.
+              Operator brief and explainer brief options for different audiences.
             </>
           }
           aside={

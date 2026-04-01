@@ -29,7 +29,7 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Start with Action now, Pause if, and Change course if, then use posture and regime-score context to pressure-test the call.",
+    detail: "Action now, Pause if, and Change course if define the decision, with posture and regime score as context.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
@@ -97,9 +97,9 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "How to use this glossary",
     bullets: [
-      { emphasis: "Start with current environment", detail: "to anchor this week's posture." },
-      { emphasis: "Translate terms into constraints", detail: "before discussing bets." },
-      { emphasis: "Use linked sections", detail: "to pull supporting evidence fast." },
+      { emphasis: "Current environment", detail: "anchors this week's posture." },
+      { emphasis: "Terms become constraints", detail: "for discussing bets." },
+      { emphasis: "Linked sections", detail: "provide supporting evidence quickly." },
     ],
   },
   {
