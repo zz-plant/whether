@@ -23,7 +23,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <HomeBandHeader
         step="01"
         kicker="Planning"
-        title="Planning call."
+        title="What to approve this week"
         icon={<CheckIcon className="h-5 w-5 text-emerald-100" />}
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Planning</span></Link>}
@@ -31,7 +31,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
       <article className="rounded-2xl border border-slate-800/80 bg-slate-950/55 p-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Weekly operator brief" accentClass="text-emerald-200" />
+            <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Weekly decision" accentClass="text-emerald-200" />
             <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.approvalHeadline}</p>
             <p className="mt-1 text-sm text-slate-300">{workspaceModel.operations.approvalDetail}</p>
           </div>
@@ -46,7 +46,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <section className="rounded-xl border border-emerald-400/20 bg-emerald-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Commit now</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Approve now</p>
               <span className="rounded-full border border-emerald-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
                 Approve now
               </span>
@@ -54,8 +54,8 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
             <div className="mt-3 space-y-2">
               <article className="rounded-lg border border-emerald-400/20 bg-slate-950/45 px-2.5 py-2">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-semibold text-slate-100">Weekly call</p>
-                  <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">Owner Leadership</span>
+                  <p className="text-xs font-semibold text-slate-100">Weekly direction</p>
+                  <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400">Owner leadership</span>
                 </div>
                 <p className="mt-1 text-xs leading-5 text-slate-300">{workspaceModel.operations.approvalHeadline}</p>
               </article>
@@ -75,9 +75,9 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
 
           <section className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Hold the line if</p>
               <span className="rounded-full border border-amber-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-100">
-                Keep active
+                Do not loosen
               </span>
             </div>
             <div className="mt-3 space-y-2">
@@ -97,9 +97,9 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
 
           <section className="rounded-xl border border-sky-400/20 bg-sky-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Change course if</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Reopen if</p>
               <span className="rounded-full border border-sky-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
-                Watch
+                Recheck
               </span>
             </div>
             <div className="mt-3 space-y-2">
@@ -115,8 +115,8 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
                 </article>
               )) : (
                 <article className="rounded-lg border border-sky-400/20 bg-slate-950/45 px-2.5 py-2">
-                  <p className="text-xs font-semibold text-slate-100">Final brief</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-300">Reopen full-speed planning only after the current hold lines clear and the next weekly read confirms.</p>
+                  <p className="text-xs font-semibold text-slate-100">Planning reset</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-300">Open back up only after the current hold lines clear and the next weekly read confirms.</p>
                 </article>
               )}
             </div>
@@ -126,17 +126,17 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
 
       <div className="weather-list-stagger grid gap-4 lg:grid-cols-2">
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-          <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Guardrail owner" accentClass="text-amber-200" />
-          <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.topGuardrails[0]?.label ?? "Guardrails"}</p>
-          <p className="mt-2 text-sm text-slate-300">{workspaceModel.operations.topGuardrails[0]?.detail ?? "Keep this week's guardrails in force until a flip condition clears."}</p>
+          <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Main hold line" accentClass="text-amber-200" />
+          <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.topGuardrails[0]?.label ?? "Current limit"}</p>
+          <p className="mt-2 text-sm text-slate-300">{workspaceModel.operations.topGuardrails[0]?.detail ?? "Keep this limit in place until the signal blocking it clears."}</p>
         </article>
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-          <CardEyebrow icon={<DocumentIcon className="h-3.5 w-3.5" />} label={financeSnapshot ? "Finance posture" : "Final brief"} accentClass="text-slate-200" />
+          <CardEyebrow icon={<DocumentIcon className="h-3.5 w-3.5" />} label={financeSnapshot ? "Finance implication" : "Meeting-ready brief"} accentClass="text-slate-200" />
           <p className="mt-2 text-sm font-semibold text-slate-100">
-            {financeSnapshot ? financeSnapshot.label : "Aligned brief ready once planning is complete."}
+            {financeSnapshot ? financeSnapshot.label : "Meeting-ready brief once planning is complete."}
           </p>
           <p className="mt-2 text-sm text-slate-300">
-            {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is the room-ready output."}
+            {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is what you carry into the room."}
           </p>
         </article>
       </div>

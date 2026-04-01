@@ -10,6 +10,19 @@ import {
   type SignalsView,
 } from "../signalsQueryState";
 
+const SIGNAL_LABEL_COPY: Record<string, string> = {
+  Tightness: "Funding pressure",
+  "Risk appetite": "Investor appetite",
+  "Curve slope": "Rate trend",
+  "Base rate": "Base rate",
+  "Regime timeline": "Past changes",
+  "Macro source series": "Raw source data",
+  "Threshold logic": "Watch lines",
+  "Time machine": "Past snapshots",
+};
+
+const displaySignalLabel = (label: string) => SIGNAL_LABEL_COPY[label] ?? label;
+
 export const SignalsModeSwitcherSection = ({
   activeSignalsView,
   searchParams,
@@ -20,30 +33,29 @@ export const SignalsModeSwitcherSection = ({
   <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
     <div className="space-y-1">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        Evidence view
+        How much detail
       </p>
       <h2 className="text-base font-semibold text-slate-100">
-        Start with the short version, then go deeper only if needed.
+        Start with the short read. Go deeper only if the read still needs defending.
       </h2>
       <p className="text-sm text-slate-300">
-        This changes how much detail you see. Start with what the evidence means right now. Use the
-        deeper view only when you need the full history, supporting diagnostics, or the lines that
-        would change the call.
+        The short read tells you what changed, what it means this week, and what would make the
+        read wrong. The deeper view adds the full history, diagnostics, and supporting checks.
       </p>
     </div>
     <div className="grid gap-2 sm:grid-cols-2">
       {([
         {
           id: "implication",
-          label: "What this means now",
+          label: "Short read",
           detail:
-            "The short version, with just enough context to support the weekly call.",
+            "What changed, what it means this week, and the main lines to watch.",
         },
         {
           id: "detail",
-          label: "Evidence detail",
+          label: "Deeper evidence",
           detail:
-            "Full diagnostics, historical replay, and advanced controls.",
+            "Diagnostics, historical replay, and the checks that would overturn the read.",
         },
       ] as const).map((item) => {
         const active = item.id === activeSignalsView;
@@ -111,7 +123,7 @@ export const SignalsDecisionSummarySection = ({
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Current call
+            Best read right now
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
             {actionNowShort ?? "Hold the current operating posture while thresholds hold."}
@@ -128,19 +140,19 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            This call changes when
+            What would make this wrong
           </p>
           {showMicroDecisionRows ? (
             <div className="mt-2 space-y-2 text-sm text-slate-200">
               <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                  Warning sign
+                  Wrong if
                 </p>
                 <p className="mt-1">{triggerCondition}</p>
               </div>
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                  Back to normal when
+                  Safe again when
                 </p>
                 <p className="mt-1">{reversalCondition}</p>
               </div>
@@ -148,7 +160,7 @@ export const SignalsDecisionSummarySection = ({
           ) : (
             <p className="mt-2 text-sm text-slate-200">
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
-                Warning sign:
+                Wrong if:
               </span>
               {" "}
               <span>{triggerCondition}</span>
@@ -156,7 +168,7 @@ export const SignalsDecisionSummarySection = ({
               <span aria-hidden="true" className="text-slate-500">·</span>
               {" "}
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
-                Back to normal when:
+                Safe again when:
               </span>
               {" "}
               <span>{reversalCondition}</span>
@@ -168,13 +180,13 @@ export const SignalsDecisionSummarySection = ({
     <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Market setup
+          Current environment
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
       </div>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Signal strength
+          How likely it is to hold
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
       </div>
@@ -200,14 +212,14 @@ export const SignalsDecisionSummarySection = ({
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
       <article className="weather-surface space-y-3 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          Current setup
+          Big picture
         </p>
         <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          {regimeLabel} is the current market setup.
+          {regimeLabel} is the current funding environment.
         </h2>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Start with what changed, then use the evidence below to decide whether the weekly call
-          should stay in place or change.
+          The question is whether this still supports the weekly read. The sections below show what
+          changed, why it matters, and what would overturn it.
         </p>
         <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
@@ -215,8 +227,7 @@ export const SignalsDecisionSummarySection = ({
               What to do
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              Keep posture aligned with the highest-priority start and stop rules listed in the
-              founder playbook.
+              Run this week&apos;s plan with the do more and avoid rules shown here.
             </dd>
           </div>
           <div>
@@ -224,7 +235,7 @@ export const SignalsDecisionSummarySection = ({
               If this is wrong
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              Execution pacing can drift if liquidity conditions shift before the next review.
+              You can overhire or overcommit if funding conditions weaken faster than expected.
             </dd>
           </div>
           <div>
@@ -232,24 +243,24 @@ export const SignalsDecisionSummarySection = ({
               Check again
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              Re-check after the next data refresh.
+              After the next refresh, or sooner if one of the watch lines breaks.
             </dd>
           </div>
         </dl>
         <p className="text-xs text-slate-300">
-          The scorecard and the lines to watch appear below.
+          The main drivers and watch lines are below.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          Founder operating moves
+          This week
         </p>
         <h3 className="text-lg font-semibold text-slate-100">
-          Convert {regimeLabel} into execution rules this week
+          What this means for founder decisions
         </h3>
         <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
-            Start now
+            Do more of this
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
             {startItems.slice(0, 3).map((item) => (
@@ -259,7 +270,7 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <div className="rounded-xl border border-rose-800/60 bg-rose-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-200">
-            Avoid now
+            Be careful with
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
             {stopItems.slice(0, 3).map((item) => (
@@ -268,12 +279,13 @@ export const SignalsDecisionSummarySection = ({
           </ul>
         </div>
         <p className="text-xs text-slate-300">
-          In plain English: this call combines investor risk appetite, funding tightness, and the shape of interest rates.
+          This read mostly comes down to three things: how hard it is to fund new bets, how open
+          markets are to risk, and whether rate conditions are improving or getting worse.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          Top 3 movers
+          What moved most
         </p>
         <ul className="space-y-3" aria-label="Top mover callouts">
           {topDiagnosticCallouts.map((item, index) => (
@@ -282,12 +294,12 @@ export const SignalsDecisionSummarySection = ({
               className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3"
             >
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                Mover {index + 1}
+                Reason {index + 1}
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
               <p className="mt-2 text-xs text-slate-300">
-                More detail appears in the scorecards below.
+                The scorecards below show the watch line behind it.
               </p>
             </li>
           ))}
@@ -307,9 +319,9 @@ export const SignalsCurrentScoresSection = ({
 }) => (
   <section id="current-scores" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
     <header className="space-y-2">
-      <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
+      <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Key numbers</p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        Live scorecard for the three biggest drivers.
+        The three numbers most responsible for this week&apos;s read.
       </h2>
     </header>
     <div className="space-y-4">
@@ -323,11 +335,11 @@ export const SignalsCurrentScoresSection = ({
               <article key={card.label} className="weather-surface space-y-3 p-4">
                 <dl>
                   <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-                    {card.label}
+                    {displaySignalLabel(card.label)}
                   </dt>
                   <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
                 </dl>
-                <p className="text-sm font-semibold text-slate-200">Line to watch: {card.threshold}</p>
+                <p className="text-sm font-semibold text-slate-200">Watch line: {card.threshold}</p>
                 <p className="text-sm text-slate-300">{card.description}</p>
               </article>
             ))}
@@ -346,21 +358,21 @@ export const SignalsNeedMoreProofSection = ({
   <section className="weather-panel space-y-3 px-6 py-5">
     <div className="space-y-2">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        Still need proof?
+        Need more detail?
       </p>
       <h2 className="text-lg font-semibold text-slate-100">
-        Go deeper only if this call still needs defending.
+        Open the deeper evidence only if the read still needs defending.
       </h2>
       <p className="text-sm text-slate-300">
-        The deeper view adds prioritized diagnostics, historical replay, threshold tuning, and advanced
-        filters. Use it when the room asks “why?” or “what would make this wrong?”
+        The deeper view adds diagnostics, historical replay, threshold tuning, and advanced filters.
+        Use it when the room asks why this moved or what would make it wrong.
       </p>
     </div>
     <a
       href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
       className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
     >
-      More evidence
+      Open deeper evidence
     </a>
   </section>
 );
@@ -385,10 +397,10 @@ export const SignalsEvidencePrioritiesSection = ({
   >
     <header className="space-y-2">
       <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
-        Evidence priorities
+        Start with these checks
       </p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        Prioritized diagnostics by focus area.
+        The most useful places to pressure-test the read.
       </h2>
     </header>
     <div className="grid gap-2 sm:grid-cols-5">
@@ -416,10 +428,10 @@ export const SignalsEvidencePrioritiesSection = ({
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
             Priority {index + 1}
           </p>
-          <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+          <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
           <p className="text-sm text-slate-200">{item.why}</p>
           <p className="text-xs text-slate-300">
-            Use the sections below to validate this driver in sequence.
+            Use the sections below to check this next.
           </p>
         </li>
       ))}
@@ -427,7 +439,7 @@ export const SignalsEvidencePrioritiesSection = ({
     {additionalPriorityQueue.length ? (
       <details className="weather-surface group p-4">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
-          <span>Show full priority queue</span>
+          <span>Show the rest</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
             ⌄
           </span>
@@ -438,10 +450,10 @@ export const SignalsEvidencePrioritiesSection = ({
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
                 Priority {index + essentialPriorityQueue.length + 1}
               </p>
-              <p className="mt-2 text-sm font-semibold text-slate-100">{item.label}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
               <p className="mt-2 text-xs text-slate-300">
-                Validate this item in the matching section below.
+                Check this in the matching section below.
               </p>
             </li>
           ))}
@@ -477,15 +489,15 @@ export const SignalsDiagnosticsSection = ({
         </h2>
         <p className="text-sm text-slate-300">
           {showFullDiagnostics
-            ? "Showing the full diagnostic set for deep validation and audits."
-            : "Start with the top 3 drivers. Expand only when you need full diagnostic depth."}
+            ? "Showing the full evidence set for a deeper validation pass."
+            : "Start with the top 3 reasons. Expand only when you need the full evidence set."}
         </p>
       </div>
       <a
         href={buildDiagnosticsExpansionHref(searchParams, !showFullDiagnostics)}
         className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
       >
-        {showFullDiagnostics ? "Show top 3 only" : "Show full diagnostics"}
+        {showFullDiagnostics ? "Show top 3 only" : "Show full evidence"}
       </a>
     </div>
 
@@ -496,10 +508,10 @@ export const SignalsDiagnosticsSection = ({
             <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
               Driver {index + 1}
             </p>
-            <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+            <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
             <p className="text-sm text-slate-200">{item.why}</p>
             <p className="text-xs text-slate-300">
-              Review this driver in the evidence stack below.
+              More detail is below.
             </p>
           </li>
         ))}
@@ -521,14 +533,13 @@ export const SignalsAdvancedControlsSection = ({
     <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="space-y-3">
         <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
-          <span>Advanced filters and historical tools</span>
+          <span>Historical tools and filters</span>
           <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
             {showAdvanced ? "Open" : "Closed"}
           </span>
         </div>
         <p className="text-sm leading-relaxed text-slate-300">
-          Keep historical replay visible for the default audit loop. Use advanced controls only for
-          threshold tuning and deeper timeline diagnostics.
+          Use these only when you need threshold tuning or a deeper timeline read.
         </p>
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2">

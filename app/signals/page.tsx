@@ -29,11 +29,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Proof",
+  title: "Whether Report — Why the weekly read changed",
   description:
-    "Proof behind the weekly brief: what moved, why it matters, and when to revisit.",
+    "Why the weekly read changed: what moved, why it matters, and what would make it wrong.",
   path: "/signals",
-  imageAlt: "Whether Report proof overview",
+  imageAlt: "Whether Report evidence overview",
   imagePath: "/social/signals.svg",
 });
 
@@ -56,9 +56,9 @@ export default async function SignalsPage({
       trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Proof"
+      pageTitle="Why the weekly read changed"
       currentPath="/signals"
-      pageSummary="Proof behind the weekly call."
+      pageSummary="What changed, why it matters, and what would make this wrong."
       pageSummaryLink={{
         href:
           model.activeSignalsView === "detail"
@@ -66,8 +66,8 @@ export default async function SignalsPage({
             : "#decision-summary",
         label:
           model.activeSignalsView === "detail"
-            ? "Open proof details ↓"
-            : "Open plain-English read ↓",
+            ? "Open the detailed evidence ↓"
+            : "Open the short read ↓",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={model.sectionLinks}
@@ -75,15 +75,15 @@ export default async function SignalsPage({
       pageNavVariant="compact"
       headerVariant="evidence"
       showPageNavigation={true}
-      primaryCta={{ href: "#current-scores", label: "View proof" }}
+      primaryCta={{ href: "#current-scores", label: "See what changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
-        description: "Use Planning next",
+        description: "Set this week's operating rules",
       }}
       decisionBanner={{
-        label: "Proof",
-        decision: `${model.regimeLabel} call is still supported by the current evidence.`,
+        label: "Evidence",
+        decision: "The current evidence still supports this week's read.",
         horizon: "Current cycle",
         confidence: model.trust.trustStatusLabel,
         effectiveDate: model.recordDateLabel,
@@ -92,7 +92,7 @@ export default async function SignalsPage({
       decisionDiffs={[{ label: `Regime: ${model.regimeLabel}`, tone: "neutral" }]}
       commandBar={{
         regime: model.assessment.regime,
-        call: "Use Proof to check what moved.",
+        call: "Check what changed before you change the plan.",
         doNow: [
           model.actionNowShort,
           model.startItems[0] ?? "Use the strongest proof item before changing the plan.",
@@ -118,8 +118,8 @@ export default async function SignalsPage({
       <OperatorWorkflowRouteTracker />
       <PageFlowNav
         eyebrow={signalsScrollPlan.eyebrow}
-        title="Proof in one step"
-        description="Use this page to check the call, the proof, and when to revisit."
+        title="Three things to check"
+        description="What changed, what it means this week, and what would make the read wrong."
         items={signalsScrollPlan.items}
         maxItems={3}
       />
@@ -144,40 +144,43 @@ export default async function SignalsPage({
         <div className="flex flex-wrap gap-2">
           <PersistedAssistPanel
             assistMode="evidence"
-            buttonLabel="Translate the signals"
-            title="How to read the main proof terms"
-            summary="Turn the signals into operating language."
+            buttonLabel="What these terms mean"
+            title="Plain-English guide to the three main signals"
+            summary="Translate the signals into business language."
           >
             <p>
-              <span className="font-semibold text-slate-50">Tightness</span> = how hard conditions
-              make new long-payback commitments.
+              <span className="font-semibold text-slate-50">Funding pressure</span> (called{" "}
+              <span className="font-semibold text-slate-50">Tightness</span> here) = how hard it
+              is to fund new long-payback bets right now.
             </p>
             <p>
-              <span className="font-semibold text-slate-50">Risk appetite</span> = how willing
-              markets are to fund faster expansion and risk.
+              <span className="font-semibold text-slate-50">Investor appetite</span> (called{" "}
+              <span className="font-semibold text-slate-50">Risk appetite</span> here) = how
+              willing markets are to reward faster expansion and risk.
             </p>
             <p>
-              <span className="font-semibold text-slate-50">Curve slope</span> = an early read on
-              whether the current posture is likely to persist or deteriorate.
+              <span className="font-semibold text-slate-50">Rate trend</span> (called{" "}
+              <span className="font-semibold text-slate-50">Curve slope</span> here) = a quick
+              read on whether conditions are getting better or worse.
             </p>
           </PersistedAssistPanel>
           <PersistedAssistPanel
             assistMode="trust"
-            buttonLabel="Translate reliability"
-            title="How to read freshness and confidence"
-            summary="Show whether the read is safe to use."
+            buttonLabel="How reliable is this?"
+            title="What confidence and freshness mean"
+            summary="Whether this week's read is safe to use."
           >
             <p>
-              <span className="font-semibold text-slate-50">Confidence</span> = how far the current
-              read sits from the nearest flip threshold.
+              <span className="font-semibold text-slate-50">Confidence</span> = how much room the
+              current read has before one of its watch lines breaks.
             </p>
             <p>
-              <span className="font-semibold text-slate-50">Freshness</span> = when the underlying
-              inputs last refreshed.
+              <span className="font-semibold text-slate-50">Freshness</span> = how recently the
+              underlying data updated.
             </p>
             <p>
-              If either degrades, keep decisions reversible even if the current call still looks
-              directionally right.
+              If either weakens, keep big decisions reversible even if the read still looks broadly
+              right.
             </p>
           </PersistedAssistPanel>
         </div>
@@ -206,7 +209,7 @@ export default async function SignalsPage({
               Historical replay
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Pick any date to replay the call context.
+              Pick any date to replay the read.
             </h2>
             <p className="text-sm text-slate-300">
               We snap your selection to the closest available monthly snapshot and label the replay timestamp.

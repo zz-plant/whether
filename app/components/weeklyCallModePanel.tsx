@@ -117,11 +117,13 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
   const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
-  const trustVerdict = needsTrustWarning ? "Double-check before acting." : "Clear enough to act.";
+  const trustVerdict = needsTrustWarning
+    ? "Keep big commitments reversible."
+    : "Safe enough to use for this week.";
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly operator brief">
+      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly brief">
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
@@ -139,7 +141,7 @@ export function WeeklyCallModePanel({
           </div>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
             <article className="rounded-xl border border-violet-400/25 bg-violet-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200">Boldness budget</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200">How aggressive to be</p>
               <div className="mt-2 flex items-end gap-2">
                 <p className="text-2xl font-semibold leading-none text-violet-50">
                   {weeklyLeadershipSummary.boldnessScore}
@@ -151,7 +153,7 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Windows this week</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Where you have room</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-3">
                 <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Hiring</p>
@@ -180,18 +182,18 @@ export function WeeklyCallModePanel({
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
           </div>
-          <p className="sr-only">Weekly decision strip: action now, pause if, and change course if.</p>
+          <p className="sr-only">Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision.</p>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do this now</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Pause if</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Slow down if</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Change course if</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Lean back in if</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
@@ -201,20 +203,20 @@ export function WeeklyCallModePanel({
               {trustStateDetail}
             </p>
             {trustReason ? (
-              <p className="mt-1 text-[11px] leading-5 text-slate-300">Cached snapshot active. Reason: {trustReason}</p>
+              <p className="mt-1 text-[11px] leading-5 text-slate-300">Using the last clean snapshot because {trustReason}</p>
             ) : null}
           </div>
         </article>
 
         <CompactDisclosure
           queryKey="moreContext"
-          summary="Why this call"
+          summary="Why this week points here"
           className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
           summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
         >
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why we believe this</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why the read points here</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {guardrailPolicyDetails.chips.map((chip) => (
@@ -230,7 +232,7 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">This changes if</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">This likely changes if</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -253,15 +255,15 @@ export function WeeklyCallModePanel({
       {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
           <CompactDisclosure
             queryKey="supportingRationale"
-            summary="Role translation"
+            summary="How this lands across the company"
             className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3"
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >
             {glossaryHref ? (
               <p className="mt-2 text-[11px] leading-5 text-slate-300">
-                Need term help?{" "}
+                Need plain-language definitions?{" "}
                 <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                  Open glossary help
+                  Open the glossary
                 </Link>
                 .
               </p>
@@ -269,7 +271,7 @@ export function WeeklyCallModePanel({
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? (
               <p className="mt-2 text-[11px] leading-5 text-slate-400">
-                Cached weekly read. Reason: {trustReason}
+                Using the last clean weekly read because {trustReason}
               </p>
             ) : null}
             {compactDecisionBullets.length > 0 ? (
