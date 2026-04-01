@@ -8,6 +8,14 @@ import os from "node:os";
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
 
+const resolveServerPort = (server: http.Server) => {
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("Expected test server to bind to a numeric local port");
+  }
+  return address.port;
+};
+
 const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
   new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
     const child = spawn("node", [CLI_PATH, ...args], {
@@ -206,7 +214,7 @@ describe("whether cli", () => {
     });
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
-    const { port } = server.address() as { port: number };
+    const port = resolveServerPort(server);
     const result = await runCli(["brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
 
@@ -1075,7 +1083,7 @@ describe("whether cli", () => {
     });
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
-    const { port } = server.address() as { port: number };
+    const port = resolveServerPort(server);
     const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
@@ -1083,10 +1091,11 @@ describe("whether cli", () => {
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 0, result.stderr);
-    const parsed = JSON.parse(result.stdout) as Array<Record<string, unknown>>;
-    const healthCheck = parsed.find((check) => check.name === "api/health");
-    const apiBaseUrlCheck = parsed.find((check) => check.name === "apiBaseUrl");
-    const authCheck = parsed.find((check) => check.name === "auth");
+    const parsed = JSON.parse(result.stdout);
+    assert.ok(Array.isArray(parsed), "doctor --json should return a checks array");
+    const healthCheck = parsed.find((check) => Boolean(check) && typeof check === "object" && "name" in check && check.name === "api/health");
+    const apiBaseUrlCheck = parsed.find((check) => Boolean(check) && typeof check === "object" && "name" in check && check.name === "apiBaseUrl");
+    const authCheck = parsed.find((check) => Boolean(check) && typeof check === "object" && "name" in check && check.name === "auth");
 
     assert.ok(healthCheck);
     assert.equal(healthCheck?.autodiscovered, false);
