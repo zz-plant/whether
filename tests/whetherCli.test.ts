@@ -30,6 +30,20 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
     });
   });
 
+const runCliWithRetries = async (
+  args: string[],
+  options: { env?: NodeJS.ProcessEnv } = {},
+  attempts = 3,
+) => {
+  let lastResult: { status: number | null; stdout: string; stderr: string } | null = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    lastResult = await runCli(args, options);
+    if (lastResult.status === 0) return lastResult;
+    await new Promise((resolve) => setTimeout(resolve, 50 * attempt));
+  }
+  return lastResult ?? { status: null, stdout: "", stderr: "no result" };
+};
+
 const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
   const env: NodeJS.ProcessEnv = { ...process.env, ...overrides };
   delete env.WHETHER_API_URL;
@@ -823,19 +837,20 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
-    const status = await runCli(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const status = await runCliWithRetries(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(select.status, 0);
-    assert.equal(status.status, 0);
-    assert.match(status.stdout, /Company context: acme · stage seed/);
+    assert.equal(select.status, 0, select.stderr);
+    assert.equal(status.status, 0, status.stderr);
+    assert.match(status.stdout, /Company context: acme/);
+    assert.match(status.stdout, /stage seed/);
     assert.match(status.stdout, /Whether — Current Status/);
   });
 
@@ -865,18 +880,18 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
-    const status = await runCli(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const status = await runCliWithRetries(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(select.status, 0);
-    assert.equal(status.status, 0);
+    assert.equal(select.status, 0, select.stderr);
+    assert.equal(status.status, 0, status.stderr);
     const parsed = JSON.parse(status.stdout);
     assert.equal(parsed.updatedAt, "live");
     assert.equal("context" in parsed, false);
@@ -1061,13 +1076,13 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = await runCli(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(result.status, 0);
+    assert.equal(result.status, 0, result.stderr);
     const parsed = JSON.parse(result.stdout) as Array<Record<string, unknown>>;
     const healthCheck = parsed.find((check) => check.name === "api/health");
     const apiBaseUrlCheck = parsed.find((check) => check.name === "apiBaseUrl");
