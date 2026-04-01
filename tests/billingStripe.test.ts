@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it, mock } from "node:test";
+import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
   createStripeCheckoutSession,
   isStripeBillingReady,
@@ -10,7 +10,7 @@ const ORIGINAL_ENV = { ...process.env };
 
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
-  mock.restoreAll();
+  mock.restore();
 });
 
 describe("stripe billing helpers", () => {
@@ -32,7 +32,7 @@ describe("stripe billing helpers", () => {
     process.env.STRIPE_PRICE_PRO_MONTHLY = "price_pro";
     process.env.STRIPE_PRICE_TEAM_MONTHLY = "price_team";
 
-    const fetchMock = mock.method(globalThis, "fetch", async () =>
+    const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async () =>
       new Response(
         JSON.stringify({ id: "cs_test_123", url: "https://checkout.stripe.com/c/pay/cs_test_123" }),
         { status: 200, headers: { "content-type": "application/json" } },
@@ -51,7 +51,7 @@ describe("stripe billing helpers", () => {
     assert.equal(checkout.id, "cs_test_123");
     assert.match(checkout.url, /checkout\.stripe\.com/);
 
-    const [, init] = fetchMock.mock.calls[0].arguments as [string, RequestInit];
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     assert.equal((init.headers as Record<string, string>)["Idempotency-Key"], "idem-456");
     const params = new URLSearchParams(String(init.body));
     assert.equal(params.get("metadata[source]"), "export_brief");
@@ -78,7 +78,7 @@ describe("stripe billing helpers", () => {
     process.env.STRIPE_PRICE_PRO_MONTHLY = "price_pro";
     process.env.STRIPE_PRICE_TEAM_MONTHLY = "price_team";
 
-    mock.method(globalThis, "fetch", async () => {
+    spyOn(globalThis, "fetch").mockImplementation(async () => {
       throw new Error("network down");
     });
 

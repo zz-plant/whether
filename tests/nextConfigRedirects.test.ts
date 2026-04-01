@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 
 type RedirectEntry = { source: string; destination: string; permanent: boolean };
 type RedirectPair = [source: string, destination: string];

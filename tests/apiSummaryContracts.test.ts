@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { GET as getWeeklyRoute } from "../app/api/weekly/route";
 import { GET as getMonthlyRoute } from "../app/api/monthly/route";
 import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";

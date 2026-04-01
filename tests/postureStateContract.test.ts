@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { buildPostureStateContract } from "../lib/report/postureStateContract";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";

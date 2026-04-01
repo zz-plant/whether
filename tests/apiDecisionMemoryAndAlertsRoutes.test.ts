@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { beforeEach, describe, it } from "bun:test";
 import { GET as getDecisionMemoryRoute, POST as postDecisionMemoryRoute } from "../app/api/decision-memory/route";
 import { GET as getAlertPreferencesRoute, POST as postAlertPreferencesRoute } from "../app/api/alert-preferences/route";
 import { GET as getAlertDeliveriesRoute, POST as postAlertDeliveriesRoute } from "../app/api/alert-deliveries/route";

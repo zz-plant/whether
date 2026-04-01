@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it, mock } from "node:test";
+import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import { POST as postCheckoutRoute } from "../app/api/billing/checkout/route";
 
 const ORIGINAL_ENV = { ...process.env };
 
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
-  mock.restoreAll();
+  mock.restore();
 });
 
 describe("/api/billing/checkout", () => {
@@ -44,7 +44,7 @@ describe("/api/billing/checkout", () => {
     process.env.STRIPE_PRICE_PRO_MONTHLY = "price_pro";
     process.env.STRIPE_PRICE_TEAM_MONTHLY = "price_team";
 
-    const fetchMock = mock.method(globalThis, "fetch", async (input: string | URL) => {
+    const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async (input: string | URL | Request) => {
       const url = String(input);
       if (url.includes("api.stripe.com")) {
         return new Response(
@@ -81,9 +81,11 @@ describe("/api/billing/checkout", () => {
     assert.equal(body.ok, true);
     assert.match(body.checkoutUrl ?? "", /checkout\.stripe\.com/);
 
-    const stripeCalls = fetchMock.mock.calls.filter((call) => String(call.arguments[0]).includes("api.stripe.com"));
+    const stripeCalls = fetchMock.mock.calls.filter((call) =>
+      String(call[0]).includes("api.stripe.com"),
+    );
     assert.equal(stripeCalls.length, 1);
-    const [, stripeInit] = stripeCalls[0].arguments as [string, RequestInit];
+    const [, stripeInit] = stripeCalls[0] as [string, RequestInit];
     assert.equal((stripeInit.headers as Record<string, string>)["Idempotency-Key"], "idem-123");
     const stripeParams = new URLSearchParams(String(stripeInit.body));
     assert.equal(stripeParams.get("metadata[planCandidate]"), "team");

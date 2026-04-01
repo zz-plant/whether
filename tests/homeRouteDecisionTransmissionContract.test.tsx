@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
@@ -69,9 +69,9 @@ describe("home route render contract", () => {
       </>,
     );
 
-    const summaryHeadings = html.match(/aria-label="Weekly call snapshot"/g) ?? [];
     const canonicalOrders = html.match(/Weekly decision transmission order/g) ?? [];
-    assert.equal(summaryHeadings.length, 1);
+    const transmissionRails = html.match(/Transmit this call/g) ?? [];
     assert.equal(canonicalOrders.length, 1);
+    assert.equal(transmissionRails.length, 1);
   });
 });

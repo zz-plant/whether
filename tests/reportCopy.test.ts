@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import {
   BEGINNER_GLOSSARY_ENTRIES,
   FIRST_TIME_GUIDE_HIGHLIGHTS,

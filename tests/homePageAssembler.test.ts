@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";

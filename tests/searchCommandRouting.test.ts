@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { resolveSearchCommandHref } from "../app/search/page";
 import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/decide/components/toolkitLibraryPanels";
 import { searchIndex } from "../lib/search/searchIndex";

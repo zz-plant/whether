@@ -148,11 +148,12 @@ export const SignalsDecisionSummarySection = ({
           ) : (
             <p className="mt-2 text-sm text-slate-200">
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
-                Trigger
+                Trigger:
               </span>
               {triggerCondition}
-              <span className="ml-2 mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
-                Reversal
+              <span aria-hidden="true" className="mx-2 text-slate-500">·</span>
+              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
+                Reversal:
               </span>
               {reversalCondition}
             </p>

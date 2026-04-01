@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { featuredAnswerPages } from "../app/answers/selectors";
 import { answerPages } from "../app/answers/decisionPages";
 import { getResourceArticleDecisionAreas } from "../lib/resourceArticles";

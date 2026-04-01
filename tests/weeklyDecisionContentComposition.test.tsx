@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WeeklyDecisionContent } from "../app/components/weekly-card/decision-content/WeeklyDecisionContent";
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it, mock } from "node:test";
+import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
   dispatchPremiumFunnelEvent,
   isPremiumIntentSource,
@@ -10,7 +10,7 @@ const ORIGINAL_ENV = { ...process.env };
 
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
-  mock.restoreAll();
+  mock.restore();
 });
 
 describe("premium funnel helpers", () => {
@@ -61,7 +61,7 @@ describe("premium funnel helpers", () => {
   });
 
   it("forwards events when webhook is configured", async () => {
-    const fetchMock = mock.method(globalThis, "fetch", async () =>
+    const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async () =>
       new Response(JSON.stringify({ ok: true }), { status: 200 }),
     );
 

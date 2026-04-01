@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { afterEach, describe, it, mock } from "node:test";
+import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import { POST as postBillingWebhookRoute } from "../app/api/billing/webhook/route";
 
 const ORIGINAL_ENV = { ...process.env };
@@ -15,7 +15,7 @@ const buildStripeSignature = (payload: string, secret: string, timestamp = "1700
 
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
-  mock.restoreAll();
+  mock.restore();
 });
 
 describe("/api/billing/webhook", () => {
@@ -101,7 +101,7 @@ describe("/api/billing/webhook", () => {
       },
     });
 
-    const fetchMock = mock.method(globalThis, "fetch", async () =>
+    const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async () =>
       new Response(JSON.stringify({ ok: true }), { status: 200 }),
     );
 
@@ -118,7 +118,7 @@ describe("/api/billing/webhook", () => {
 
     assert.equal(response.status, 200);
     assert.equal(fetchMock.mock.calls.length, 1);
-    const [, init] = fetchMock.mock.calls[0].arguments as [string, RequestInit];
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     const body = JSON.parse(String(init.body)) as { type?: string; source?: string; planCandidate?: string };
     assert.equal(body.type, "premium_checkout_complete");
     assert.equal(body.source, "export_brief");

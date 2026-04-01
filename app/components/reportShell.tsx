@@ -213,7 +213,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustStatusActionForDisplay = trustReadiness.tone === "warning"
     ? "Pause irreversible approvals until one verified live refresh lands."
     : resolvedTrustStatusAction;
-  const showExtendedCommandBar = Boolean(resolvedCommandBar) && resolvedCurrentPath === "/";
+  const extendedCommandBar = resolvedCurrentPath === "/" ? resolvedCommandBar : undefined;
   const trustBlockProps = {
     trustStatusTone: trustReadiness.tone,
     trustStatusLabel: controlHeadline,
@@ -257,7 +257,7 @@ export const ReportShell = (props: ReportShellProps) => {
             exportCta={headerExportCta}
           />
           {resolvedHistoricalBanner}
-          {showExtendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
+          {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
           <div className={`mt-4 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
             {hasSidebar ? (

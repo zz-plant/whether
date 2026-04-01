@@ -2,7 +2,7 @@
  * Validation fallback tests to prevent import-time exceptions when cached data drifts.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { parseSnapshotData } from "../lib/snapshot";
 import { parseTimeMachineCache } from "../lib/timeMachine/timeMachineCache";
 import { parseSummaryArchive } from "../lib/summary/summaryArchive";

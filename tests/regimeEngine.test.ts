@@ -2,7 +2,7 @@
  * Regime Engine unit tests for scoring and classification boundaries.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import {
   classifyRegime,
   computeRiskAppetiteScore,

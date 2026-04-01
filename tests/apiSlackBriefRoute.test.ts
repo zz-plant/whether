@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { GET as getSlackBriefRoute } from "../app/api/brief/slack/route";
 
 describe("/api/brief/slack", () => {

@@ -1,23 +1,21 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-import {
-  buildCaptureGalleryHtml,
-  resolveCaptureTargets,
-} from "../scripts/ui-capture.lib.mjs";
+import { describe, it } from "bun:test";
+// @ts-ignore Runtime-only .mjs helper is validated by these tests.
+import { buildCaptureGalleryHtml, resolveCaptureTargets } from "../scripts/ui-capture.lib.mjs";
 
 describe("ui capture helpers", () => {
   it("keeps the full configured capture set when no filters are provided", () => {
     const targets = resolveCaptureTargets();
 
     assert.ok(targets.length >= 4);
-    assert.ok(targets.some((target) => target.id === "operator-brief-mobile"));
-    assert.ok(targets.some((target) => target.id === "operator-brief-desktop"));
+    assert.ok(targets.some((target: { id: string }) => target.id === "operator-brief-mobile"));
+    assert.ok(targets.some((target: { id: string }) => target.id === "operator-brief-desktop"));
   });
 
   it("filters capture targets by requested id", () => {
     const targets = resolveCaptureTargets(["operator-brief-mobile"]);
 
-    assert.deepEqual(targets.map((target) => target.id), ["operator-brief-mobile"]);
+    assert.deepEqual(targets.map((target: { id: string }) => target.id), ["operator-brief-mobile"]);
   });
 
   it("renders a gallery page with route and image references for each capture", () => {

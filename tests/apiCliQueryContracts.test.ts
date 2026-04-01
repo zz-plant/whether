@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { NextRequest, NextResponse } from "next/server";
 import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
 import { INVALID_AS_OF_ERROR, parseCliRouteRequest } from "../lib/api/cliRoute";

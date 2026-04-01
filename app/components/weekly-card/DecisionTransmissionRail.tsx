@@ -53,7 +53,7 @@ export function DecisionTransmissionRail({
             <dl className="space-y-2">
               <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
                 <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">
-                  Action
+                  Action now
                 </dt>
                 <dd className="mt-1 text-sm text-slate-100">{actionNow}</dd>
               </div>
@@ -61,13 +61,13 @@ export function DecisionTransmissionRail({
               <div className="space-y-2 rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
                 <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
                   <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                    Threshold
+                    Pause if
                   </dt>
                   <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
                 </div>
                 <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
                   <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                    Flip condition
+                    Change course if
                   </dt>
                   <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
                 </div>
@@ -76,13 +76,13 @@ export function DecisionTransmissionRail({
               <div className="space-y-2">
                 <div className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
                   <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                    Threshold
+                    Pause if
                   </dt>
                   <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
                 </div>
                 <div className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
                   <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                    Flip condition
+                    Change course if
                   </dt>
                   <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
                 </div>

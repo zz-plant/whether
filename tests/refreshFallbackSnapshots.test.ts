@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import currentMacroSnapshot from "../data/macro_snapshot.json";
 import type { loadMacroSeries } from "../lib/macroSnapshot";
 import type { MacroSeriesId, MacroSeriesReading } from "../lib/types";

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import type { ReactNode } from "react";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
 import type { ReportDynamics } from "../lib/report/reportData";

@@ -2,7 +2,7 @@
  * Treasury normalization unit tests for API payload mapping.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { normalizeTreasuryResponse } from "../lib/treasury/treasuryNormalizer";
 
 describe("treasury normalizer", () => {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { scoreAnswerLaunchReadiness, summarizeAnswerLaunchReadiness } from "../lib/seo/answerLaunchReadiness";
 
 describe("answer launch readiness", () => {

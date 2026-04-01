@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import sitemap from "../app/sitemap";
 import { snapshotData } from "../lib/snapshot";
 import { siteUrl } from "../lib/siteUrl";

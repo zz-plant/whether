@@ -2,7 +2,7 @@
  * Decision Shield unit tests for verdicts and guardrails.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { evaluateDecision } from "../lib/decisionShield";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { buildHomeMetadata } from "../lib/report/homeMetadata";
 import { buildHomeSharePath } from "../lib/report/homeSharePreview";
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { GET as getLlmsRoute } from "../app/llms.txt/route";
 import { GET as getDiscoveryRoute } from "../app/.well-known/whether-agent.json/route";
 import { agentApiCorsHeaders } from "../lib/agentApiCors";

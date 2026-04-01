@@ -2,7 +2,7 @@
  * Playbook selector unit tests for regime mapping.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { getPlaybookForRegime, getPlaybookGuidance } from "../lib/playbook";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";

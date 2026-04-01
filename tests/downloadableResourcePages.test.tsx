@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import ResourceRoutePage, { generateMetadata, generateStaticParams } from "../app/resources/[slug]/page";
 import { downloadableResourceSlugs, downloadableResources } from "../lib/downloadableResources";

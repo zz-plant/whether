@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { buildForecastModel } from "../lib/report/forecastModel";

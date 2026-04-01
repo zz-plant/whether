@@ -2,7 +2,7 @@
  * Sensor builder unit tests for base rate and curve slope readings.
  */
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { buildSensorReadings } from "../lib/sensors";
 import type { TreasuryData } from "../lib/types";
 

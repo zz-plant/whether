@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import http from "node:http";

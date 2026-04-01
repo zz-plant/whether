@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 
 describe("seo quality gates", () => {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { beforeEach, describe, it } from "bun:test";
 import { GET } from "../app/api/decision-events/route";
 import { buildRegimeDecisionEvent, getDecisionEventStore, resetDecisionEventStore } from "../lib/events/decisionEventStore";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
