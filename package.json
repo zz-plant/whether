@@ -41,7 +41,8 @@
     "seo:answers:launch-readiness": "bun scripts/seo-answer-launch-readiness.ts",
     "seo:weekly-runbook": "bun scripts/seo-weekly-runbook.ts",
     "cli:whether": "node scripts/whether-cli.mjs",
-    "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts"
+    "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
+    "check:vinext": "bun run check"
   },
   "engines": {
     "bun": "1.3.x",
