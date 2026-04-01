@@ -28,6 +28,10 @@ const AUTH_FAILURE = {
 };
 
 const AUTH_CHECK_ENDPOINT = "/api/auth/status";
+const DEFAULT_API_BASE_URL = "http://localhost:3000";
+const LOCAL_API_PORT_CANDIDATES = [3000, 3001, 3002, 3003, 3004, 3005, 8787];
+const LOCAL_API_HOST_CANDIDATES = ["localhost", "127.0.0.1"];
+const LOCAL_API_DISCOVERY_TIMEOUT_MS = 150;
 
 const HELP = `Whether CLI — decision terminal for operators
 
@@ -63,9 +67,11 @@ Setup:
 
 const SUB_HELP = {
   ping: "Usage: whether ping [--json]",
-  agent: "Usage: whether agent [weekly|monthly|quarterly|yearly] [--json]",
+  agent:
+    "Usage: whether agent [weekly|monthly|quarterly|yearly] [--json] [--compact|--payload-only|--prompt-only|--skills-only]",
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
-  status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
+  status:
+    "Usage: whether status [--verbose|--view expanded|--compact] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy] [--json]",
@@ -181,12 +187,36 @@ const writeOutput = (payload, settings) => {
 const normalizeFlags = async (flags) => {
   const config = await loadConfig();
   const envToken = process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? null;
+  const envApiBaseUrl = process.env.WHETHER_API_URL ?? null;
+  const configApiBaseUrl = config.api_base_url ?? null;
+  const apiBaseUrl =
+    typeof flags["api-base-url"] === "string"
+      ? flags["api-base-url"]
+      : envApiBaseUrl
+        ? envApiBaseUrl
+        : configApiBaseUrl
+          ? configApiBaseUrl
+          : DEFAULT_API_BASE_URL;
+  const apiBaseUrlSource =
+    typeof flags["api-base-url"] === "string"
+      ? "flag"
+      : envApiBaseUrl
+        ? "env"
+        : configApiBaseUrl
+          ? "config"
+          : "default";
   return {
     config,
     output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.format ?? config.output ?? "text",
     quiet: Boolean(flags.quiet),
     noColor: Boolean(flags["no-color"]),
-    apiBaseUrl: flags["api-base-url"] ?? process.env.WHETHER_API_URL ?? config.api_base_url ?? "http://localhost:3000",
+    apiBaseUrl,
+    apiBaseUrlSource,
+    allowLocalApiDiscovery:
+      !flags["no-local-discovery"] &&
+      (apiBaseUrlSource === "default" || (apiBaseUrlSource === "config" && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(apiBaseUrl))),
+    resolvedApiBaseUrl: null,
+    autodiscoveredApiBaseUrl: false,
     token: flags.token ?? envToken ?? config.token ?? null,
     tokenSource: typeof flags.token === "string" ? "flag" : envToken ? "env" : config.token ? "config" : "none",
     profile: process.env.WHETHER_PROFILE ?? config.profile ?? "default",
@@ -511,7 +541,7 @@ const renderBashCompletion = () => `# whether bash completion
 _whether_completion() {
   local cur="\${COMP_WORDS[COMP_CWORD]}"
   local commands="ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version"
-  local global_flags="--help --version --json --yaml --markdown --quiet --no-color --api-base-url --token --output --company --stage"
+  local global_flags="--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only"
   local subcommands=""
 
   if [[ \${COMP_CWORD} -eq 1 ]]; then
@@ -542,7 +572,7 @@ const renderZshCompletion = () => `#compdef whether
 _whether_completion() {
   local -a commands global_flags subcommands
   commands=(ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version)
-  global_flags=(--help --version --json --yaml --markdown --quiet --no-color --api-base-url --token --output --company --stage)
+  global_flags=(--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only)
 
   if (( CURRENT == 2 )); then
     compadd -- $commands $global_flags
@@ -675,18 +705,124 @@ const buildHttpStatusError = ({ status, ok, endpoint, settings, body = null }) =
   return null;
 };
 
+const buildRequestHeaders = (settings) => ({
+  accept: "application/json",
+  ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
+});
 
-const getJson = async (settings, endpoint) => {
-  let response;
+const parseJsonBody = async (response) => {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    return null;
+  }
   try {
-    response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
+    return await response.clone().json();
+  } catch {
+    return null;
+  }
+};
+
+const isLocalApiUrl = (value) => {
+  try {
+    const parsed = new URL(String(value));
+    return LOCAL_API_HOST_CANDIDATES.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+};
+
+const buildLocalApiCandidateUrls = (currentApiBaseUrl) => {
+  const candidates = [];
+  const seen = new Set();
+  const pushCandidate = (candidate) => {
+    if (seen.has(candidate)) return;
+    seen.add(candidate);
+    candidates.push(candidate);
+  };
+
+  if (isLocalApiUrl(currentApiBaseUrl)) {
+    try {
+      const parsed = new URL(currentApiBaseUrl);
+      pushCandidate(parsed.origin);
+      for (const host of LOCAL_API_HOST_CANDIDATES) {
+        pushCandidate(`${parsed.protocol}//${host}${parsed.port ? `:${parsed.port}` : ""}`);
+      }
+    } catch {
+      // Ignore invalid configured URL and fall back to defaults below.
+    }
+  }
+
+  for (const port of LOCAL_API_PORT_CANDIDATES) {
+    for (const host of LOCAL_API_HOST_CANDIDATES) {
+      pushCandidate(`http://${host}:${port}`);
+    }
+  }
+
+  return candidates;
+};
+
+const discoverHealthyLocalApiBaseUrl = async (settings, endpoint = "/api/health") => {
+  if (!settings.allowLocalApiDiscovery) return null;
+  if (settings.autodiscoveredApiBaseUrl && settings.resolvedApiBaseUrl) {
+    return settings.resolvedApiBaseUrl;
+  }
+
+  const candidates = buildLocalApiCandidateUrls(settings.apiBaseUrl);
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(`${candidate}${endpoint}`, {
+        cache: "no-store",
+        headers: buildRequestHeaders(settings),
+        signal: AbortSignal.timeout(LOCAL_API_DISCOVERY_TIMEOUT_MS),
+      });
+      const parsedBody = await parseJsonBody(response);
+      if (response.ok || (response.status === 503 && parsedBody?.status === "degraded")) {
+        settings.resolvedApiBaseUrl = candidate;
+        settings.autodiscoveredApiBaseUrl = candidate !== settings.apiBaseUrl;
+        return candidate;
+      }
+    } catch {
+      // Keep scanning known local dev ports.
+    }
+  }
+
+  return null;
+};
+
+const fetchApiResponse = async (settings, endpoint, options = {}) => {
+  const allowAutoDiscovery = options.allowAutoDiscovery ?? true;
+  if (allowAutoDiscovery && settings.allowLocalApiDiscovery && !settings.resolvedApiBaseUrl) {
+    await discoverHealthyLocalApiBaseUrl(settings);
+  }
+
+  const primaryBaseUrl = settings.resolvedApiBaseUrl ?? settings.apiBaseUrl;
+
+  try {
+    const response = await fetch(`${primaryBaseUrl}${endpoint}`, {
       cache: "no-store",
-      headers: {
-        accept: "application/json",
-        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
-      },
+      headers: buildRequestHeaders(settings),
     });
+    settings.resolvedApiBaseUrl = primaryBaseUrl;
+    settings.autodiscoveredApiBaseUrl = primaryBaseUrl !== settings.apiBaseUrl;
+    return { response, baseUrl: primaryBaseUrl };
   } catch (cause) {
+    if (allowAutoDiscovery) {
+      const discoveredBaseUrl = await discoverHealthyLocalApiBaseUrl(settings);
+      if (discoveredBaseUrl && discoveredBaseUrl !== primaryBaseUrl) {
+        try {
+          const response = await fetch(`${discoveredBaseUrl}${endpoint}`, {
+            cache: "no-store",
+            headers: buildRequestHeaders(settings),
+          });
+          settings.resolvedApiBaseUrl = discoveredBaseUrl;
+          settings.autodiscoveredApiBaseUrl = true;
+          return { response, baseUrl: discoveredBaseUrl };
+        } catch {
+          // Fall through to the original network error below.
+        }
+      }
+    }
+
     throw buildCliError({
       category: ERROR_CATEGORY.NETWORK,
       summary: "Unable to reach Whether API.",
@@ -695,24 +831,16 @@ const getJson = async (settings, endpoint) => {
       exitCode: EXIT.NETWORK,
     });
   }
+};
 
-  let parsedBody = null;
-  const contentType = response.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    try {
-      // By cloning the response, we can safely inspect the body for error
-      // classification without consuming the stream for the final return.
-      parsedBody = await response.clone().json();
-    } catch {
-      // Ignore if body is not valid JSON. The final `response.json()` will handle it.
-      parsedBody = null;
-    }
-  }
+
+const getJson = async (settings, endpoint) => {
+  const { response } = await fetchApiResponse(settings, endpoint);
+  const parsedBody = await parseJsonBody(response);
 
   const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
   if (statusError) throw statusError;
 
-  // The original response body is still available due to clone(), so this is safe.
   return response.json();
 };
 
@@ -725,41 +853,16 @@ const cmdVersion = async (settings) => {
 const cmdPing = async (settings, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.ping, settings);
   const endpoint = "/api/health";
-  let response;
-  try {
-    response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
-      cache: "no-store",
-      headers: {
-        accept: "application/json",
-        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
-      },
-    });
-  } catch (cause) {
-    throw buildCliError({
-      category: ERROR_CATEGORY.NETWORK,
-      summary: "Unable to reach Whether API.",
-      settings,
-      cause,
-      exitCode: EXIT.NETWORK,
-    });
-  }
-
-  let parsedBody = null;
-  const contentType = response.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    try {
-      parsedBody = await response.json();
-    } catch {
-      parsedBody = null;
-    }
-  }
+  const { response, baseUrl } = await fetchApiResponse(settings, endpoint);
+  const parsedBody = await parseJsonBody(response);
 
   if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
     const payload = {
       ok: true,
-      apiBaseUrl: settings.apiBaseUrl,
+      apiBaseUrl: baseUrl,
       status: "degraded",
       degraded: true,
+      autodiscovered: settings.autodiscoveredApiBaseUrl,
     };
     writeOutput(settings.output === "text" ? "degraded" : payload, settings);
     return;
@@ -770,9 +873,10 @@ const cmdPing = async (settings, flags) => {
   const health = parsedBody ?? (await response.json());
   const payload = {
     ok: true,
-    apiBaseUrl: settings.apiBaseUrl,
+    apiBaseUrl: baseUrl,
     status: health.status ?? "ok",
     degraded: health.status === "degraded",
+    autodiscovered: settings.autodiscoveredApiBaseUrl,
   };
   writeOutput(settings.output === "text" ? "ok" : payload, settings);
 };
@@ -785,6 +889,26 @@ const freshnessText = (body) => {
   const degraded = body.degraded ? "degraded" : "live";
   return `Updated ${updated} · ${degraded} · ${confidence}-reliability`;
 };
+
+const compactStatusPayload = (body) => ({
+  regime: body.regime,
+  cyclePhase: body.cyclePhase,
+  confidence: body.confidence,
+  trend: body.trend,
+  decision: body.call?.summary ?? null,
+  topDoNow: body.call?.do?.slice(0, 3) ?? [],
+  flipTrigger: body.call?.flipConditions?.[0] ?? null,
+  freshness: freshnessText(body),
+  updatedAt: body.updatedAt ?? null,
+  degraded: Boolean(body.degraded),
+});
+
+const compactStatusText = (body) => `Status snapshot
+${body.regime} · ${body.trend} · ${body.confidence.label} (${body.confidence.score})
+Call: ${body.call.summary}
+Top do now: ${(body.call.do ?? []).slice(0, 2).join(" | ") || "n/a"}
+Flip: ${body.call.flipConditions?.[0] ?? "n/a"}
+Freshness: ${freshnessText(body)}`;
 
 const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nFreshness:          ${freshnessText(body)}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
 
@@ -834,6 +958,72 @@ Agent prompt:
 ${body.agentHandoff?.prompt ?? ""}
 `;
 
+const compactAgentPayload = (body) => {
+  const skills = body.agentHandoff?.payload?.skills ?? body.skills ?? [];
+  return {
+    cadence: body.cadence,
+    recordDateLabel: body.recordDateLabel ?? body.summary?.recordDateLabel ?? null,
+    generatedAt: body.generatedAt ?? null,
+    summaryHash: body.summaryHash ?? null,
+    summary: body.summary?.summary ?? body.copy ?? null,
+    decisionDelta: body.agentHandoff?.payload?.decision_delta?.summary ?? body.decision_delta?.summary ?? null,
+    flipWatch: body.agentHandoff?.payload?.flip_watch?.flip_trigger ?? body.flip_watch?.flip_trigger ?? null,
+    skills: skills.map((skill) => ({
+      id: skill.id,
+      label: skill.label,
+      purpose: skill.purpose,
+      outputs: skill.outputs ?? [],
+    })),
+    links: body.links ?? {},
+  };
+};
+
+const compactAgentText = (body) => {
+  const compact = compactAgentPayload(body);
+  return `Agent brief (compact)
+
+Cadence: ${compact.cadence}
+Record date: ${compact.recordDateLabel ?? "Unavailable"}
+Summary hash: ${compact.summaryHash ?? "n/a"}
+Decision delta: ${compact.decisionDelta ?? "n/a"}
+Flip watch: ${compact.flipWatch ?? "n/a"}
+Skills:
+${compact.skills.map((skill) => `- ${skill.id}: ${skill.purpose}`).join("\n") || "- none"}`;
+};
+
+const selectAgentOutput = (body, flags, settings) => {
+  if (flags["prompt-only"]) {
+    return settings.output === "text"
+      ? body.agentHandoff?.prompt ?? ""
+      : {
+          cadence: body.cadence,
+          recordDateLabel: body.recordDateLabel ?? null,
+          generatedAt: body.generatedAt ?? null,
+          summaryHash: body.summaryHash ?? null,
+          prompt: body.agentHandoff?.prompt ?? null,
+        };
+  }
+
+  if (flags["payload-only"]) {
+    return settings.output === "text"
+      ? JSON.stringify(body.agentHandoff?.payload ?? {}, null, 2)
+      : (body.agentHandoff?.payload ?? {});
+  }
+
+  if (flags["skills-only"]) {
+    const skills = body.agentHandoff?.payload?.skills ?? body.skills ?? [];
+    return settings.output === "text"
+      ? skills.map((skill) => `${skill.id}: ${skill.purpose}`).join("\n")
+      : skills;
+  }
+
+  if (flags.compact) {
+    return settings.output === "text" ? compactAgentText(body) : compactAgentPayload(body);
+  }
+
+  return settings.output === "text" ? agentText(body) : body;
+};
+
 const resolveAgentCadence = (subcommand, flags) => {
   const candidate = typeof flags.cadence === "string" ? flags.cadence : subcommand ?? "weekly";
   if (!SUPPORTED_AGENT_CADENCES.includes(candidate)) {
@@ -881,6 +1071,7 @@ const cmdStatus = async (settings, flags) => {
     view: flags.verbose || flags.view === "expanded" ? "expanded" : undefined,
   });
   const body = await getJson(settings, route);
+  const compact = flags.compact ? (isTextOutput(settings) ? compactStatusText(body) : compactStatusPayload(body)) : null;
   const expandedTail = body.view === "expanded"
     ? `
 
@@ -893,9 +1084,11 @@ Top deltas:
 ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.direction} (${item.delta})`).join("\n")}`
     : "";
   const context = resolveCompanyContext(settings, flags);
-  const rendered = attachCompanyContextText(flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`, context);
-  await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : body, settings);
-  writeOutput(isTextOutput(settings) ? rendered : body, settings);
+  const baseRendered = compact ?? (flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`);
+  const rendered = attachCompanyContextText(baseRendered, context);
+  const payload = compact ?? body;
+  await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : payload, settings);
+  writeOutput(isTextOutput(settings) ? rendered : payload, settings);
 };
 
 const cmdCall = async (settings, subcommand, flags) => {
@@ -1117,9 +1310,9 @@ const cmdAgent = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.agent, settings);
   const cadence = resolveAgentCadence(subcommand, flags);
   const body = await getJson(settings, `/api/agent?cadence=${cadence}`);
-  const text = agentText(body);
-  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
-  writeOutput(isTextOutput(settings) ? text : body, settings);
+  const output = selectAgentOutput(body, flags, settings);
+  await writeFileIfRequested(flags, output, settings);
+  writeOutput(output, settings);
 };
 
 const cmdCompany = async (settings, subcommand, args, flags) => {
@@ -1170,36 +1363,50 @@ const cmdDoctor = async (settings) => {
   const endpoint = "/api/health";
 
   try {
-    const response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
-      cache: "no-store",
-      headers: {
-        accept: "application/json",
-        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
-      },
-    });
-
-    let parsedBody = null;
-    const contentType = response.headers.get("content-type") ?? "";
-    if (contentType.includes("application/json")) {
-      try {
-        parsedBody = await response.json();
-      } catch {
-        parsedBody = null;
-      }
-    }
-
+    const { response, baseUrl } = await fetchApiResponse(settings, endpoint);
+    const parsedBody = await parseJsonBody(response);
     if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
-      checks.push({ name: "api/health", status: "warning", message: "API is reachable but degraded.", health: parsedBody.status });
+      checks.push({
+        name: "api/health",
+        status: "warning",
+        message: "API is reachable but degraded.",
+        health: parsedBody.status,
+        apiBaseUrl: baseUrl,
+        autodiscovered: settings.autodiscoveredApiBaseUrl,
+      });
     } else {
       const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
       if (statusError) throw statusError;
-      checks.push({ name: "api/health", status: "ok", health: parsedBody?.status ?? "ok" });
+      checks.push({
+        name: "api/health",
+        status: settings.autodiscoveredApiBaseUrl ? "warning" : "ok",
+        health: parsedBody?.status ?? "ok",
+        apiBaseUrl: baseUrl,
+        message: settings.autodiscoveredApiBaseUrl
+          ? `Configured ${settings.apiBaseUrl} was unavailable; using detected local API at ${baseUrl}.`
+          : undefined,
+        autodiscovered: settings.autodiscoveredApiBaseUrl,
+      });
     }
   } catch (error) {
     checks.push({ name: "api/health", status: "error", message: error.message });
   }
 
   const config = await loadConfig();
+  checks.push({
+    name: "apiBaseUrl",
+    status: "ok",
+    configured: settings.apiBaseUrl,
+    resolved: settings.resolvedApiBaseUrl ?? settings.apiBaseUrl,
+    source: settings.apiBaseUrlSource,
+    autodiscovered: settings.autodiscoveredApiBaseUrl,
+  });
+  checks.push({
+    name: "auth",
+    status: settings.token ? "ok" : "warning",
+    authenticated: Boolean(settings.token),
+    source: settings.tokenSource,
+  });
   checks.push({ name: "configPath", status: "ok", path: CONFIG_PATH, profile: config.profile ?? "default" });
   writeOutput(checks, settings);
 };

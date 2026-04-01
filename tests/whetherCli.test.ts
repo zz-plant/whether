@@ -30,6 +30,41 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
     });
   });
 
+const buildIsolatedEnv = (overrides: NodeJS.ProcessEnv = {}) => {
+  const env = { ...process.env, ...overrides };
+  delete env.WHETHER_API_URL;
+  delete env.WHETHER_API_KEY;
+  delete env.WHETHER_TOKEN;
+  return env;
+};
+
+const listenOnPreferredLocalPort = async (server: http.Server, preferredPorts = [3002, 3003, 3004, 3005]) => {
+  for (const port of preferredPorts) {
+    const opened = await new Promise<boolean>((resolve, reject) => {
+      const onError = (error: NodeJS.ErrnoException) => {
+        server.off("listening", onListening);
+        if (error.code === "EADDRINUSE" || error.code === "EACCES") {
+          resolve(false);
+          return;
+        }
+        reject(error);
+      };
+      const onListening = () => {
+        server.off("error", onError);
+        resolve(true);
+      };
+
+      server.once("error", onError);
+      server.once("listening", onListening);
+      server.listen(port, "127.0.0.1");
+    });
+
+    if (opened) return port;
+  }
+
+  throw new Error(`Unable to bind test server to local discovery ports: ${preferredPorts.join(", ")}`);
+};
+
 describe("whether cli", () => {
   it("prints expanded help", () => {
     const result = spawnSync("node", [CLI_PATH, "--help"], { encoding: "utf8" });
@@ -393,6 +428,53 @@ describe("whether cli", () => {
 
     assert.equal(stdout.updatedAt, "live");
     assert.equal(written.updatedAt, "live");
+  });
+
+  it("auto-discovers a healthy local API when the default localhost port is unavailable", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "ok" }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Current",
+          cyclePhase: "Now",
+          confidence: { label: "HIGH", score: 93 },
+          trend: "stable",
+          decisionStability: "stable",
+          updatedAt: "live",
+          freshness: { line: "Updated live" },
+          call: {
+            summary: "live summary",
+            do: ["go now", "protect margin"],
+            avoid: ["wait"],
+            flipConditions: ["risk appetite > 55"],
+          },
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    const port = await listenOnPreferredLocalPort(server);
+    const result = await runCli(["status", "--compact", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(port >= 3002, true);
+    assert.equal(parsed.regime, "Current");
+    assert.equal(parsed.decision, "live summary");
+    assert.equal(parsed.flipTrigger, "risk appetite > 55");
+    assert.equal(parsed.freshness, "Updated live");
   });
 
 
@@ -800,6 +882,62 @@ describe("whether cli", () => {
     assert.equal("context" in parsed, false);
   });
 
+  it("agent extraction flags return compact, payload, skills, and prompt views", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/agent")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          cadence: "weekly",
+          recordDateLabel: "Week of 2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+          summaryHash: "weekly-hash",
+          summary: { summary: "Compact weekly summary." },
+          links: { self: "/api/agent?cadence=weekly" },
+          skills: [{ id: "top-level-skill", label: "Top level", purpose: "Fallback skill", outputs: ["note"] }],
+          agentHandoff: {
+            payload: {
+              decision_delta: { summary: "Tighten approvals now." },
+              flip_watch: { flip_trigger: "Risk appetite > 55" },
+              skills: [{ id: "decision-delta", label: "Decision delta", purpose: "Summarize the change", outputs: ["delta_brief"] }],
+            },
+            prompt: "Draft the weekly operator handoff.",
+          },
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const compact = await runCli(["agent", "--compact", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    const payload = await runCli(["agent", "--payload-only", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    const skills = await runCli(["agent", "--skills-only", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    const prompt = await runCli(["agent", "--prompt-only", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(compact.status, 0);
+    assert.equal(payload.status, 0);
+    assert.equal(skills.status, 0);
+    assert.equal(prompt.status, 0);
+
+    const compactParsed = JSON.parse(compact.stdout);
+    const payloadParsed = JSON.parse(payload.stdout);
+    const skillsParsed = JSON.parse(skills.stdout);
+
+    assert.equal(compactParsed.summaryHash, "weekly-hash");
+    assert.equal(compactParsed.decisionDelta, "Tighten approvals now.");
+    assert.equal(compactParsed.flipWatch, "Risk appetite > 55");
+    assert.equal(compactParsed.skills[0]?.id, "decision-delta");
+
+    assert.equal(payloadParsed.decision_delta.summary, "Tighten approvals now.");
+    assert.equal(payloadParsed.flip_watch.flip_trigger, "Risk appetite > 55");
+
+    assert.equal(skillsParsed[0]?.id, "decision-delta");
+    assert.match(prompt.stdout, /Draft the weekly operator handoff\./);
+  });
+
   it("export pdf writes a real pdf artifact to the requested path", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
     const outputPath = path.join(homeDir, "briefing.pdf");
@@ -907,6 +1045,34 @@ describe("whether cli", () => {
 
     assert.equal(result.status, 6);
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
+  });
+
+  it("doctor reports resolved API base URL and token source", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "ok" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    const port = await listenOnPreferredLocalPort(server);
+    const result = await runCli(["doctor", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed[0]?.name, "api/health");
+    assert.equal(parsed[0]?.autodiscovered, true);
+    assert.match(parsed[0]?.apiBaseUrl, new RegExp(`127\\.0\\.0\\.1:${port}|localhost:${port}`));
+    assert.equal(parsed[1]?.name, "apiBaseUrl");
+    assert.equal(parsed[1]?.source, "default");
+    assert.equal(parsed[2]?.name, "auth");
+    assert.equal(parsed[2]?.authenticated, false);
   });
 
   it("status does not pass unsupported flags to the status endpoint", async () => {

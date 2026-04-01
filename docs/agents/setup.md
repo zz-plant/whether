@@ -58,7 +58,13 @@ export WHETHER_API_KEY="<whether-api-key>"
 
 # Preflight (machine-readable)
 bun run cli:whether -- auth status --json
+bun run cli:whether -- doctor --json
 ```
+
+CLI ergonomics notes:
+- `whether status --compact` is the fastest shell read for the current operating call.
+- `whether agent --compact --json` gives agents a smaller structured handoff than the full `/api/agent` payload.
+- Local CLI runs auto-discover a healthy Whether API on common localhost dev ports when the default `http://localhost:3000` is unavailable.
 
 ## Baseline verification after setup
 - `bun run lint`

@@ -35,7 +35,12 @@ export WHETHER_TOKEN="${WHETHER_TOKEN:-}"
 bun run cli:whether -- --version
 bun run cli:whether -- ping --json
 bun run cli:whether -- brief --json
+bun run cli:whether -- agent --compact --json
 ```
+
+Notes:
+- If `bun run dev` shifts off `http://localhost:3000`, the CLI will auto-discover a healthy local Whether API on nearby localhost ports by default.
+- Use `bun run cli:whether -- doctor --json` to confirm the configured vs resolved API base URL and auth source.
 
 ## Read only what matches the task
 

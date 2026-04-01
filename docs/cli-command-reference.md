@@ -11,8 +11,8 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 - `whether --version`
 - `whether ping`
-- `whether agent [weekly|monthly|quarterly|yearly] [--json]`
-- `whether status`
+- `whether agent [weekly|monthly|quarterly|yearly] [--json] [--compact|--payload-only|--prompt-only|--skills-only]`
+- `whether status [--compact]`
 - `whether call [show|copy|diff]`
 - `whether regime`
 - `whether changes`
@@ -39,14 +39,15 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `--markdown`
 - `--quiet`
 - `--no-color`
+- `--no-local-discovery` (disable local `localhost`/`127.0.0.1` port probing when the configured dev URL is unreachable)
 - `--output <file>` (write command output to a file; it is a path, not a format selector)
 - `--yes` (install: non-interactive acceptance of defaults)
 - `--ci` (install: alias of `--yes` for CI scripts)
 
 ## Command-specific query flags
 
-- `agent`: positional cadence (`weekly`, `monthly`, `quarterly`, `yearly`) or `--cadence <value>`
-- `status`: `--as-of <YYYY-MM>`, `--view expanded`, `--verbose`
+- `agent`: positional cadence (`weekly`, `monthly`, `quarterly`, `yearly`) or `--cadence <value>`, plus `--compact`, `--payload-only`, `--prompt-only`, `--skills-only`
+- `status`: `--as-of <YYYY-MM>`, `--view expanded`, `--verbose`, `--compact`
 - `call`: `--as-of <YYYY-MM>`
 - `changes`: `--as-of <YYYY-MM>`
 - `diagnostics`: `--as-of <YYYY-MM>`
@@ -64,6 +65,16 @@ Notes:
 - `--json` on parity commands is optimized for agents, CI, and scripts. It returns the backend payload without local CLI wrappers.
 - Current parity commands are `agent`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, and `scenario`.
 - Derived commands such as `export`, `share`, and filtered `diagnostics evidence|provenance` intentionally compose or transform backend data.
+
+Agent shortcuts:
+- `whether agent --compact --json` returns a smaller agent brief with the summary hash, decision delta, flip watch, and skill list.
+- `whether agent --payload-only --json` returns `agentHandoff.payload` directly.
+- `whether agent --skills-only --json` returns the declared skill contract only.
+- `whether agent --prompt-only` prints the backend prompt without extra framing.
+
+Shell shortcuts:
+- `whether status --compact` prints a one-screen status snapshot that is easier to scan in a terminal or pipe into shell tools.
+- If the configured local URL is unreachable and you are using the default local setup, the CLI probes common local dev ports and reuses the first healthy Whether API it finds. Use `--no-local-discovery` to force strict URL behavior.
 
 ## Install contract (automation-safe)
 
@@ -86,6 +97,9 @@ Behavior:
 
 Linux/macOS note:
 - Commands above are POSIX shell-safe and work in standard Linux and macOS terminals.
+
+Local dev note:
+- `bun run dev` may move from `http://localhost:3000` to `3001`, `3002`, or another nearby port if earlier ports are occupied. The CLI now auto-discovers a healthy local Whether API on common local dev ports when you have not pinned a remote API URL.
 
 ## Exit codes
 
@@ -190,11 +204,14 @@ Use these four commands as the minimal smoke surface for operators and agents:
   - Stdout (text): semantic version only (example `0.1.0`)
 - `whether ping --json`
   - Exit: `0` on healthy API
-  - Stdout (json): `{ "ok": true, "apiBaseUrl": "...", "status": "ok" }`
+  - Stdout (json): `{ "ok": true, "apiBaseUrl": "...", "status": "ok", "autodiscovered": false }`
   - Exit: `2` for auth/forbidden, `6` for network, `7` for 429/5xx server failures
 - `whether agent weekly --json`
   - Exit: `0`
   - Stdout (json): canonical `/api/agent` payload including `cadence`, `copy`, `agentHandoff`, `links`, `generatedAt`, and `version`
+- `whether agent --compact --json`
+  - Exit: `0`
+  - Stdout (json): compact agent handoff with `summaryHash`, `decisionDelta`, `flipWatch`, and `skills`
 - `whether brief --json`
   - Exit: `0`
   - Stdout (json): raw `/api/brief/slack` payload that includes `brief` text
@@ -228,3 +245,4 @@ Exit-code contract:
 
 Optional API validation:
 - `whether auth status --check` performs an authenticated `/api/auth/status` check and preserves existing auth/network/server exit codes.
+- `whether doctor --json` now also reports the configured vs resolved API base URL, whether local autodiscovery kicked in, and the current token source.
