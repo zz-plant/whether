@@ -85,19 +85,7 @@ export const HomeDecisionSection = ({
 }) => (
   <Suspense fallback={<WeeklyDiagnosticsFallback />}>
     <StreamedSectionReveal delay="short">
-      <details className="group weather-surface rounded-2xl px-3 py-3 sm:px-4 sm:py-4">
-        <summary className="cursor-pointer list-none">
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-            Support surfaces
-          </span>
-          <span className="mt-1 block text-sm font-semibold text-slate-100">
-            Open only if you still need proof or a follow-up.
-          </span>
-        </summary>
-        <div className="weather-disclosure-panel animate-collapsible-in mt-4">
-          <HomeWorkspaceBands workspaceModelPromise={workspaceModelPromise} />
-        </div>
-      </details>
+      <HomeWorkspaceBands workspaceModelPromise={workspaceModelPromise} />
     </StreamedSectionReveal>
   </Suspense>
 );

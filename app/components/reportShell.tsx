@@ -86,7 +86,7 @@ type ReportShellInput = {
   decisionDiffs?: DecisionDiff[];
   nextStep?: { description: string; href: string };
   nextRefreshLabel?: string;
-  inlineTrustPlacement?: "before-content" | "after-first-section";
+  inlineTrustPlacement?: "before-content" | "after-first-section" | "hidden";
   provenance?: DataProvenance;
   commandBar?: RegimeCommandBarProps;
   ambientMode?: "standard" | "tv";
@@ -199,7 +199,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const showInlineTrustBlock = !hasSidebar;
   const renderTrustBeforeContent = showInlineTrustBlock && resolvedInlineTrustPlacement === "before-content";
   const renderTrustAfterFirstSection = showInlineTrustBlock && resolvedInlineTrustPlacement === "after-first-section";
-  const renderMobileTrustAfterFirstSection = hasSidebar;
+  const renderMobileTrustAfterFirstSection = hasSidebar && resolvedInlineTrustPlacement !== "hidden";
   const enableTvAmbientMode = resolvedAmbientMode === "tv";
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone: resolvedTrustStatusTone,

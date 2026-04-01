@@ -122,7 +122,7 @@ export const HomePageReportContent = async ({
           outageExitGate: homepage.reportShell.outageExitGate,
           degradedSourceRows: homepage.reportShell.degradedSourceRows,
           showOfflineBadge: homepage.reportShell.showOfflineBadge,
-          inlineTrustPlacement: "after-first-section",
+          inlineTrustPlacement: "hidden",
           provenance: homepage.reportShell.provenance,
         },
         chrome: {

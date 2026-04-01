@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { shouldSplitDecisionConditionRows } from "../../../lib/report/reportFormatting";
 import { sectionSpacing, tierOneHeading, tierOnePanel } from "./shared";
 
 type DecisionTransmissionRailProps = {
@@ -19,11 +18,6 @@ export function DecisionTransmissionRail({
   citation,
   actions,
 }: DecisionTransmissionRailProps) {
-  const showMicroRows = shouldSplitDecisionConditionRows({
-    trigger: guardrail,
-    reversal: flipWhen,
-  });
-
   return (
     <article
       id="share-ready-artifact"
@@ -37,79 +31,42 @@ export function DecisionTransmissionRail({
         </span>
       </div>
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Share preview
-          </p>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">
-            Ready to share
-          </span>
-        </div>
-        <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/75 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Whether weekly call
-          </p>
-          <div className="mt-2 space-y-2 text-sm">
-            <dl className="space-y-2">
-              <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-2.5 py-2 text-slate-100">
-                <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">
-                  Action now
-                </dt>
-                <dd className="mt-1 text-sm text-slate-100">{actionNow}</dd>
-              </div>
-            {showMicroRows ? (
-              <div className="space-y-2 rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-slate-100">
-                <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                    Pause if
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
-                </div>
-                <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                    Change course if
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="rounded-lg border border-amber-400/20 bg-amber-500/8 px-2.5 py-2 text-slate-100">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
-                    Pause if
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-100">{guardrail}</dd>
-                </div>
-                <div className="rounded-lg border border-sky-400/20 bg-sky-500/8 px-2.5 py-2 text-slate-100">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
-                    Change course if
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-100">{flipWhen}</dd>
-                </div>
-              </div>
-            )}
-            </dl>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          Default share path
+        </p>
+        <p className="mt-2 text-sm font-semibold text-slate-100">
+          Share the operator brief first. Keep Planning as the approval surface and use citation only when someone asks for proof.
+        </p>
+        <p className="mt-2 text-xs leading-5 text-slate-300">
+          Current call: {actionNow}
+        </p>
+        <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+          <div className="grid gap-2 text-xs text-slate-200">
+            <p><span className="font-semibold text-amber-100">Pause if:</span> {guardrail}</p>
+            <p><span className="font-semibold text-sky-100">Change course if:</span> {flipWhen}</p>
           </div>
         </div>
-      </div>
-      <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Citation
-        </p>
-        <p className="mt-1 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
-        <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">
-          {citation}
-        </pre>
         {actions ? (
           <details className="group weather-auto-chevron mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2">
             <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              More share formats
+              Share actions
             </summary>
             <div className="weather-disclosure-panel animate-collapsible-in mt-2 flex flex-wrap gap-2">
               {actions}
             </div>
           </details>
         ) : null}
+        <details className="group weather-auto-chevron mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2">
+          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            Cite this call
+          </summary>
+          <div className="weather-disclosure-panel animate-collapsible-in mt-2">
+            <p className="text-xs leading-5 text-slate-300">{citationMetaLine}</p>
+            <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">
+              {citation}
+            </pre>
+          </div>
+        </details>
       </div>
     </article>
   );

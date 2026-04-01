@@ -163,11 +163,12 @@ The homepage supports optional interpretation layers without changing the canoni
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
 1. **Current outlook strip** (compact posture, trend, confidence, and flip-window context only; no second operating call)
-2. **This week in 15 seconds** (single canonical decision block with `Action`, `Guardrail`, `Flip condition`)
+2. **This week in 15 seconds** (single canonical decision block with boldness budget, window states, `Action`, `Guardrail`, `Flip condition`)
 3. **Decision support details** (delta + evidence helpers that reference the canonical decision)
 4. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
-5. **Share rail + citation** (share actions stay compact; supporting citation remains lower-fold)
+5. **Share actions + citation disclosure** (default share actions stay compact; citation remains lower emphasis)
 6. **Why this call** disclosure (supporting evidence hidden behind details/summary)
+7. **Planning next / exception paths** (Planning visible as the default next step; Evidence and Trust framed as exception routes)
 
 Implementation guardrails:
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
@@ -179,7 +180,9 @@ Implementation guardrails:
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - The current-outlook strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
+- The canonical weekly-call block should expose a compact scalar anchor (`Boldness budget`) plus window state labels before the bounded decision triplet.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move longer explanation into disclosure content below the primary scan path.
+- Trust on `/` should remain a single compact sentence inside the canonical weekly-call block; do not inject a second standalone trust panel immediately under the hero.
 - Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Share actions should remain routine-first. Company-specific override controls must stay separate from default share actions.
 - Citation + provenance belong near the lower fold: `Cite this call` stays separate from the share-action rail, and compact provenance remains immediately after the weekly card on `/`.

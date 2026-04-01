@@ -143,9 +143,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             startupVariantPolicy={startupVariantPolicy}
             postureLabel={postureWithStageLabel ?? statusLabel}
             operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
-            trendLabel={trendLabel}
-            confidencePercent={confidencePercent}
-            confidenceLabel={confidenceLabel}
             snapshotGuardrail={snapshotGuardrail}
             snapshotWatch={snapshotWatch}
             revisitDecisions={revisitDecisions}
@@ -162,6 +159,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
             stabilityRule={stabilityRule}
+            weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
             decisionBullets={decisionBullets}
             guardrailPolicyDetails={guardrailPolicyDetails}
             flipPolicyDetails={flipPolicyDetails}

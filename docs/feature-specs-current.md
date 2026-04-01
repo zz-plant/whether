@@ -53,9 +53,13 @@ now keeps the weekly operator brief and short snapshot as the only default-scan 
 packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
 Operator-workflow telemetry still logs artifact-mode selection and route transitions across the core
 weekly loop.
-The weekly-call module also now uses earlier task-first and plain-English assistive copy so mixed-literacy users can map core terms such as `tightness`, `risk appetite`, and `flip condition` to an operating decision without leaving the first scan path.
+The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
+- boldness budget score and weekly delta,
+- hiring, expansion, and raise windows,
+- one-line net delta shorthand.
+Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
-The weekly brief sequence now favors `current call -> operating levers -> share-ready artifact -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
+The weekly brief sequence now favors `current call -> operating levers -> share actions -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
@@ -65,6 +69,7 @@ an inline home interaction. Role, situation, and toolkit paths are handled as ex
 surfaces after planning rather than as a parallel home workflow.
 The default post-brief path is now Planning; Evidence and Trust are framed as exception checks when
 the weekly call still needs proof.
+Planning is now rendered as the visible next step on home, while Evidence and Trust are reduced to compact exception cards rather than a second homepage narrative.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
 labels, embedded threshold context, and restrained accent usage for outlier conditions.

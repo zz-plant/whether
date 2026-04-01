@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { CompactDisclosure } from "./compactDisclosure";
-import { PersistedAssistPanel } from "./literacyAssistControls";
 
 type PolicyDetails = {
   summary: string;
@@ -21,9 +20,6 @@ type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
   postureLabel: string;
   operatingCall: string;
-  trendLabel: string;
-  confidencePercent: number;
-  confidenceLabel: "HIGH" | "MED" | "LOW";
   snapshotGuardrail: string;
   snapshotWatch: string;
   revisitDecisions: boolean;
@@ -40,6 +36,16 @@ type WeeklyCallModePanelProps = {
   inlineTrustLabel: string;
   inlineTrustTone: "stable" | "warning" | "historical";
   stabilityRule: string;
+  weeklyLeadershipSummary: {
+    boldnessScore: number;
+    boldnessDelta: number;
+    notchShiftLabel: string;
+    shorthandLine: string;
+    hiringWindow: string;
+    expansionWindow: string;
+    raiseWindow: string;
+    netDeltaLabel: string;
+  };
   decisionBullets: Array<{ label: string; detail: string }>;
   guardrailPolicyDetails: PolicyDetails;
   flipPolicyDetails: PolicyDetails;
@@ -58,9 +64,6 @@ export function WeeklyCallModePanel({
   startupVariantPolicy,
   postureLabel,
   operatingCall,
-  trendLabel,
-  confidencePercent,
-  confidenceLabel,
   snapshotGuardrail,
   snapshotWatch,
   revisitDecisions,
@@ -71,12 +74,12 @@ export function WeeklyCallModePanel({
   tierOneHeadingClassName,
   whyItMattersLine,
   needsTrustWarning = false,
-  trustStateLabel,
   trustStateDetail,
   trustReason,
   inlineTrustLabel,
   inlineTrustTone,
   stabilityRule,
+  weeklyLeadershipSummary,
   decisionBullets,
   guardrailPolicyDetails,
   flipPolicyDetails,
@@ -87,9 +90,6 @@ export function WeeklyCallModePanel({
 }: WeeklyCallModePanelProps) {
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
-  const trustToneClass = needsTrustWarning
-    ? "border-amber-400/35 bg-amber-500/10 text-amber-50"
-    : "border-emerald-400/30 bg-emerald-500/10 text-emerald-50";
   const detailDisclosureBase = "mt-2 rounded-lg border border-slate-700/60 bg-slate-950/65 px-3 py-2";
   const inlineTrustToneClass = inlineTrustTone === "stable"
     ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
@@ -116,7 +116,8 @@ export function WeeklyCallModePanel({
   const compactTrustToneClass = needsTrustWarning
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
-  const assistChipClass = "rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold tracking-[0.02em] text-slate-100";
+  const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
+  const trustVerdict = needsTrustWarning ? "Use caution." : "Ready to use.";
 
   return (
     <>
@@ -136,41 +137,38 @@ export function WeeklyCallModePanel({
               <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
             </div>
           </div>
-          {glossaryHref ? (
-            <div className="mt-2 space-y-2">
-              <PersistedAssistPanel
-                assistMode="decision"
-                buttonLabel="Translate this call"
-                title="Call translation"
-                summary="Translate the terms."
-              >
-                <div className="flex flex-wrap gap-1.5">
-                  <span className={assistChipClass}>Tightness = harder long-payback commitments</span>
-                  <span className={assistChipClass}>Risk appetite = markets fund faster expansion</span>
-                  <span className={assistChipClass}>Action / Pause / Change course = move, stop line, reopen line</span>
-                </div>
-                <p>
-                  Need more?{" "}
-                  <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                    Open glossary help
-                  </Link>
-                  .
+          <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
+            <article className="rounded-xl border border-violet-400/25 bg-violet-500/8 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200">Boldness budget</p>
+              <div className="mt-2 flex items-end gap-2">
+                <p className="text-2xl font-semibold leading-none text-violet-50">
+                  {weeklyLeadershipSummary.boldnessScore}
+                  <span className="ml-1 text-sm font-medium text-violet-200/90">/100</span>
                 </p>
-              </PersistedAssistPanel>
-              <PersistedAssistPanel
-                assistMode="trust"
-                buttonLabel="Translate trust status"
-                title="Trust verdict"
-                summary="Show whether the read is ready to use."
-              >
-                <div className="flex flex-wrap gap-1.5">
-                  <span className={assistChipClass}>Confidence = distance from the nearest flip line</span>
-                  <span className={assistChipClass}>Freshness = recency of core inputs</span>
-                  <span className={assistChipClass}>Ready to use = standard approvals okay; Use caution = keep commitments reversible</span>
+                <p className="text-sm font-semibold text-violet-100">{signedBoldnessDelta}</p>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-violet-100">{weeklyLeadershipSummary.shorthandLine}</p>
+            </article>
+
+            <article className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Windows this week</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Hiring</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.hiringWindow}</p>
                 </div>
-              </PersistedAssistPanel>
-            </div>
-          ) : null}
+                <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Expansion</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.expansionWindow}</p>
+                </div>
+                <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Raise</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.raiseWindow}</p>
+                </div>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.netDeltaLabel}</p>
+            </article>
+          </div>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)]">
             <article className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
@@ -198,14 +196,13 @@ export function WeeklyCallModePanel({
             </article>
           </div>
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Safe to use?</p>
-              <p className={`text-xs font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>
-                {needsTrustWarning ? "Use caution" : "Ready to use"}
-              </p>
-            </div>
-            <p className="mt-2 text-xs font-semibold text-slate-100">{trustStateLabel}</p>
-            <p className="mt-2 text-[11px] leading-5 text-slate-200">{trustStateDetail}</p>
+            <p className="text-[11px] leading-5 text-slate-100">
+              <span className={`font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>{trustVerdict}</span>{" "}
+              {trustStateDetail}
+            </p>
+            {trustReason ? (
+              <p className="mt-1 text-[11px] leading-5 text-slate-300">Cached snapshot active. Reason: {trustReason}</p>
+            ) : null}
           </div>
         </article>
 
@@ -260,6 +257,15 @@ export function WeeklyCallModePanel({
             className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3"
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >
+            {glossaryHref ? (
+              <p className="mt-2 text-[11px] leading-5 text-slate-300">
+                Need term help?{" "}
+                <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                  Open glossary help
+                </Link>
+                .
+              </p>
+            ) : null}
             {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             {trustReason ? (
               <p className="mt-2 text-[11px] leading-5 text-slate-400">

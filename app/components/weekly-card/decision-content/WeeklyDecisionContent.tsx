@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { CompactDisclosure } from "../../compactDisclosure";
 import { disclosureSummaryClass } from "../shared";
@@ -41,6 +42,13 @@ export function WeeklyDecisionContent({
           summaryClassName={disclosureSummaryClass}
         >
           <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-4">
+            <div className="rounded-lg border border-slate-800/70 bg-slate-950/60 px-3 py-3 text-xs leading-5 text-slate-300">
+              Evidence owns the full proof path. Use this section for compact support only, or open{" "}
+              <Link href="/signals" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                Evidence
+              </Link>{" "}
+              for drivers, thresholds, and replay.
+            </div>
             {influenceSection}
             {diagnosticsSection}
             {matrixSection}

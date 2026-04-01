@@ -235,6 +235,17 @@ export type StartRouteDeltaBlock = {
   items: StartRouteDeltaItem[];
 };
 
+export type WeeklyLeadershipSummary = {
+  boldnessScore: number;
+  boldnessDelta: number;
+  notchShiftLabel: string;
+  shorthandLine: string;
+  hiringWindow: string;
+  expansionWindow: string;
+  raiseWindow: string;
+  netDeltaLabel: string;
+};
+
 export type WeeklyDecisionCardViewModel = {
   status: {
     statusLabel: string;
@@ -280,6 +291,7 @@ export type WeeklyDecisionCardViewModel = {
     roleAwareTemplates: RoleAwareOperatingTemplate[];
     executiveOperationalStance: { expand: string[]; avoid: string[] };
     revisitDecisions: boolean;
+    weeklyLeadershipSummary: WeeklyLeadershipSummary;
     weeklyMovement: {
       score: number;
       direction: "defensive" | "expansionary" | "neutral";

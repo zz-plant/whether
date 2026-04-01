@@ -51,6 +51,7 @@ import {
   buildInputInfluenceItems,
   buildRegimeSignalIndicators,
 } from "./signalIndicators";
+import { buildWeeklyLeadershipBriefModel } from "../weeklyLeadershipBrief";
 import type {
   BoundaryDimension,
   BoundaryDirection,
@@ -167,6 +168,23 @@ export const buildHomeBriefModelInternal = (
   const weeklyDeltaBySignal = new Map(
     (reportDynamics?.changedSignals ?? []).map((item) => [item.key, item.delta]),
   );
+  const previousAssessment = previousRegime
+    ? {
+        ...assessment,
+        regime: previousRegime,
+        scores: {
+          ...assessment.scores,
+          tightness: assessment.scores.tightness - (weeklyDeltaBySignal.get("tightness") ?? 0),
+          riskAppetite: assessment.scores.riskAppetite - (weeklyDeltaBySignal.get("riskAppetite") ?? 0),
+          baseRate: assessment.scores.baseRate !== undefined
+            ? assessment.scores.baseRate - (weeklyDeltaBySignal.get("baseRate") ?? 0)
+            : assessment.scores.baseRate,
+          curveSlope: assessment.scores.curveSlope === null
+            ? null
+            : (assessment.scores.curveSlope ?? 0) - (weeklyDeltaBySignal.get("curveSlope") ?? 0),
+        },
+      }
+    : null;
   const postureTrajectory: PostureTrajectoryState = {
     current: {
       tightness: assessment.scores.tightness,
@@ -186,6 +204,17 @@ export const buildHomeBriefModelInternal = (
     },
   };
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
+  const weeklyLeadershipSummary = buildWeeklyLeadershipBriefModel({
+    assessment,
+    previousAssessment,
+    treasury: {
+      ...treasury,
+      isLive: !Boolean(treasury?.fallback_at || treasury?.fallback_reason),
+    },
+    last4Boldness: [],
+    hiringTrendDelta: (weeklyDeltaBySignal.get("riskAppetite") ?? 0) - (weeklyDeltaBySignal.get("tightness") ?? 0),
+    stabilityWeeks: transitionWatch === "ON" ? 1 : 2,
+  });
   const operatingStanceLine = buildOperatingStanceLine({
     severityDelta,
     directionLabel: reportDynamics?.directionLabel,
@@ -392,6 +421,16 @@ export const buildHomeBriefModelInternal = (
     roleAwareTemplates,
     executiveOperationalStance,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
+    weeklyLeadershipSummary: {
+      boldnessScore: weeklyLeadershipSummary.boldnessScore,
+      boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
+      notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
+      shorthandLine: `We're ${weeklyLeadershipSummary.notchShiftLabel} bold this week.`,
+      hiringWindow: weeklyLeadershipSummary.hiringWindow,
+      expansionWindow: weeklyLeadershipSummary.expansionWindow,
+      raiseWindow: weeklyLeadershipSummary.raiseWindow,
+      netDeltaLabel: weeklyLeadershipSummary.netDeltaLabel,
+    },
     guardrail,
     actionNowShort: conciseActionNow,
     guardrailThreshold: guardrail,
@@ -512,6 +551,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       roleAwareTemplates: homeBriefModel.roleAwareTemplates,
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,
       revisitDecisions: homeBriefModel.revisitDecisions,
+      weeklyLeadershipSummary: homeBriefModel.weeklyLeadershipSummary,
       weeklyMovement: homeBriefModel.weeklyMovement,
     },
     presentation: {
