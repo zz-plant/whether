@@ -9,6 +9,7 @@ Use this file to find the current source of truth without reading the whole `doc
 - `one-screen-weekly-brief-spec.md` for the primary brief contract
 - `feature-specs-current.md` for shipped product intent
 - `architecture.md` for system boundaries and extension points
+- `architecture-improved.md` for comprehensive diagrams, data flows, and module breakdowns (recommended for onboarding)
 
 ### If you are changing contributor workflow
 
@@ -52,7 +53,8 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 ### Engineering workflow
 
 - `development-playbook.md` — day-to-day engineering workflow and validation depth
-- `architecture.md` — modules, data flow, and extension points
+- `architecture.md` — modules, data flow, and extension points (canonical)
+- `architecture-improved.md` — comprehensive diagrams, data flows, and module breakdowns (recommended for onboarding)
 - `stack-compatibility-matrix.md` — runtime and platform constraints
 - `domain-and-deployment.md` — deployment topology and domain model
 - `cloudflare-deployment-runbook.md` — deploy expectations and evidence capture

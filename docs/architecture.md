@@ -1,5 +1,7 @@
 # Architecture overview
 
+> **Note**: For comprehensive diagrams, detailed module breakdowns, and visual data flows, see [`architecture-improved.md`](./architecture-improved.md). This file serves as a concise reference with essential system boundaries.
+
 Whether (Regime Station) is a Next.js App Router product that turns Treasury macro data into
 operational guidance. The system is organized around a small number of deterministic pipelines:
 fetch/normalize data, score the regime, generate guidance, and render reports.
@@ -152,6 +154,56 @@ Use `bun run summary-archive:migrate-structured` to materialize `structured` blo
   wire it into `lib/sensors.ts`.
 - **New guidance**: update `data/recommendations.ts` and extend `lib/playbook.ts` mappings.
 - **New report lanes**: add a route under `app/` plus corresponding builders in `lib/report/*`.
+
+## Component hierarchy
+
+```
+app/
+├── layout.tsx                    # Global shell (metadata, skip link, header)
+├── page.tsx                      # Homepage (weekly brief)
+│   ├── ReportShell               # Page shell wrapper
+│   │   ├── reportShellHeader     # Header with regime badge + date
+│   │   └── homeBriefSections     # Main brief content
+│   │       ├── HomeWhatChangedSection
+│   │       ├── HomeDecisionSection
+│   │       └── HomeRevisitFlipSection
+│   └── weeklyDecisionCard        # Decision card component
+│       ├── HistorySection
+│       ├── InputInfluenceSection
+│       └── YearAgoComparator
+├── [legacySlug]/                 # Legacy route handling
+├── about/                        # About pages
+├── answers/[slug]/               # Short-form answer pages
+├── decide/[slug]/                # Decision answer pages
+│   ├── clusterRoutes.ts          # Cluster-based routing
+│   └── decisionAnswerPageContent.tsx
+├── concepts/[slug]/              # Concept explainer pages
+├── learn/failure-modes/[slug]    # Failure mode learning
+├── guides/                       # Stage/stakeholder guides
+├── operations/                   # Operations workflow
+│   ├── components/
+│   │   ├── decisionShieldPanel.tsx
+│   │   ├── exportBriefPanel.tsx
+│   │   └── operationsWorkflowProgress.tsx
+├── signals/                      # Signal monitoring
+├── sources/                      # Data source info
+└── mockups/                      # UI testing pages
+
+lib/
+├── report/                       # Report generation
+│   ├── homeBriefModel.ts         # Home page data model
+│   ├── homePageAssembler.ts      # Page composition
+│   ├── decisionKnobs.ts          # Operating levers
+│   ├── boundedDecisionRules.ts   # Threshold-based rules
+│   └── operatingCalls.ts         # Actionable guidance
+├── regimeEngine.ts               # Regime classification
+├── playbook.ts                   # Regime → operations mapping
+└── summary/                      # Summary builders
+    ├── weeklySummary.ts
+    ├── monthlySummary.ts
+    ├── quarterlySummary.ts
+    └── yearlySummary.ts
+```
 
 ## Client provider placement (global vs scoped)
 - Keep `app/layout.tsx` server-first and limit it to true shell concerns (document metadata, skip link, and shared header).
