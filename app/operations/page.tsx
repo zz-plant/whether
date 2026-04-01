@@ -31,7 +31,7 @@ import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
 import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { PageFlowNav } from "../components/pageFlowNav";
-import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
+import { canonicalCapitalDisciplinePath, resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 import { LiteracyAssistRouter, PersistedAssistPanel } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
@@ -544,8 +544,8 @@ export default async function OperationsPage({
                 {resource.title}
               </Link>
             ))}
-            <Link href="/resources" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-              Open resources library
+            <Link href={canonicalCapitalDisciplinePath as Route} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              Open governance pillar
             </Link>
           </div>
         </div>

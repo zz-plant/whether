@@ -10,7 +10,7 @@ Use this command sequence in CI to keep Cloudflare Workers deploys deterministic
 
 ```bash
 bun install --frozen-lockfile
-bun run check:vinext
+bun run check
 bun run build:cloudflare
 bun run deploy:cloudflare
 ```
@@ -26,8 +26,6 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 - **Preview build-only validation:** `bun run build:cloudflare:preview`
 - **Preview deploy:** `bun run deploy:cloudflare:preview`
 - **Preview deploy dry run:** `bun run deploy:cloudflare:preview:dry-run`
-- **Legacy alias:** `bun run deploy:vinext`
-- **Legacy alias dry run:** `bun run deploy:vinext:dry-run`
 
 ## Production lane
 
@@ -57,9 +55,9 @@ The preview lane now lives in [`wrangler.toml`](/Users/kanav/Documents/GitHub/wh
 Validation commands for the preview lane:
 
 ```bash
-bun run check:vinext
+bun run check
 bun run build:cloudflare:preview
-bun run start:vinext
+bun run start
 bun run deploy:cloudflare:preview:dry-run
 ```
 

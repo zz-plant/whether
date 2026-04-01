@@ -27,8 +27,8 @@ export const solutionRedirectPairs = [
 
 export const canonicalSurfaceRedirectPairs = [
   ["/startup-macro-posture/index", "/method#formula-reference"],
-  ["/startup-macro-posture/:regime", "/posture/:regime"],
-  ["/startup-macro-posture", "/posture"],
+  ["/startup-macro-posture/:regime", "/"],
+  ["/startup-macro-posture", "/"],
   ["/methodology", "/method#formula-reference"],
   ["/sources", "/method#sources-freshness"],
   ["/confidence", "/method#confidence-limits"],
@@ -53,11 +53,6 @@ export const redirectEntries = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Build pipelines run typecheck separately (`bun run check`),
-  // so we skip duplicated TypeScript validation during `next build` to reduce deploy time.
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   async redirects() {
     return redirectEntries;
   },

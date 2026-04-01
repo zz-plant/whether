@@ -8,6 +8,8 @@ out
 .env.local
 .DS_Store
 artifacts/ui
+artifacts/seo-payloads
+artifacts/seo-refresh
 
 *.tsbuildinfo
 # Environment files

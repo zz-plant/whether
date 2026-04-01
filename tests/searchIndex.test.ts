@@ -23,4 +23,10 @@ describe("search index", () => {
 
     assert.ok(grouped.trust.some((result) => result.type === "doc"));
   });
+
+  it("routes governance-artifact queries back into Planning rather than the retired resources hub shell", () => {
+    const resourceDoc = buildSearchIndex().find((entity) => entity.id === "doc-resources");
+
+    assert.equal(resourceDoc?.href, "/operations#ops-export-briefs");
+  });
 });

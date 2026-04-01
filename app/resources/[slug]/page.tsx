@@ -125,7 +125,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   if (isRetiredResourceArticleSlug(slug)) {
-    permanentRedirect("/resources");
+    permanentRedirect("/operations#ops-export-briefs");
   }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {

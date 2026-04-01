@@ -11,7 +11,7 @@ import type { ReportData } from "../report/reportData";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { findSignalsCluster } from "../../app/signals/clusterRoutes";
 
-const ARTIFACT_ROOT = join(process.cwd(), "data", "seo-payloads");
+const ARTIFACT_ROOT = join(process.cwd(), "artifacts", "seo-payloads");
 const MANIFEST_PATH = join(ARTIFACT_ROOT, "manifest.json");
 
 const deltaSignalSchema = z.object({

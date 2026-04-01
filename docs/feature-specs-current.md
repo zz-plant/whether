@@ -18,13 +18,15 @@ Primary IA is now the five-surface operator loop:
 Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decision Tools**
 - `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
-- `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
+- `/guides`, `/resources/*`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
-- Secondary libraries such as `/guides`, `/toolkits`, `/posture`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
+- Secondary libraries such as `/guides`, `/toolkits`, `/posture`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
 - `/guides` now acts as a compatibility redirect into query-selected translation states on `/decide`, so role and stage translation live inside the canonical Decision Tools workflow rather than on a parallel library page.
 - `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/decide`, so toolkit search and browse state live inside the canonical Decision Tools workflow rather than as a standalone library route.
 - `/posture` now acts as a compatibility redirect back to the Weekly Brief. Live posture reference no longer ships as a standalone workflow.
+- `/search` now acts as a command-only redirect into the next canonical workflow state instead of rendering its own browse surface.
+- `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
 - `/concepts` and `/learn/failure-modes` now permanently redirect into canonical decision/trust workflows rather than acting as independently indexable content hubs.
@@ -166,9 +168,9 @@ focused next actions while reinforcing their parent workflow hub. `/answers` now
 back into the canonical Decision Tools answer router instead of maintaining a separate hub shell.
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
-`/search` remains product-accessible but now behaves as a command router: it recommends the next primary workflow surface first, then exposes only a short supporting match list instead of acting like a broad browse-first library.
+`/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
 `/decide/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow.
-The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Decision Tools answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into the canonical Resources hub.
+The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Decision Tools answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 

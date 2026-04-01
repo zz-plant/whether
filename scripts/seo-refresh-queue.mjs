@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const DEFAULT_MANIFEST_PATH = join(process.cwd(), "data", "seo-payloads", "manifest.json");
-const DEFAULT_OUTPUT_DIR = join(process.cwd(), "data", "seo-refresh");
+const DEFAULT_MANIFEST_PATH = join(process.cwd(), "artifacts", "seo-payloads", "manifest.json");
+const DEFAULT_OUTPUT_DIR = join(process.cwd(), "artifacts", "seo-refresh");
 const DEFAULT_METRICS_PATH = join(DEFAULT_OUTPUT_DIR, "page-metrics.json");
 const DEFAULT_STATUS_PATH = join(DEFAULT_OUTPUT_DIR, "status.json");
 const DEFAULT_QUEUE_PATH = join(DEFAULT_OUTPUT_DIR, "queue.json");

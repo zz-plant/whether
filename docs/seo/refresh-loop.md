@@ -24,6 +24,6 @@ This improves trust and recency for boards/operators reviewing the same page rep
 ## Automated queue artifact
 Run `bun run seo:refresh-queue` to produce machine-readable outputs for editorial/ops:
 
-- `data/seo-refresh/queue.json` — pages currently queued for refresh, including `noindexNow` for stale pages.
-- `data/seo-refresh/status.json` — per-page status ledger with `lastEvaluatedAtIso`, refresh request/refreshed timestamps, `slaDueAtIso`, and `slaState`.
-- Optional input: `data/seo-refresh/page-metrics.json` with `byUrl` metrics (`trafficTier` or `organicEntrances30d`, plus `ctaConversionRate`).
+- `artifacts/seo-refresh/queue.json` — pages currently queued for refresh, including `noindexNow` for stale pages.
+- `artifacts/seo-refresh/status.json` — per-page status ledger with `lastEvaluatedAtIso`, refresh request/refreshed timestamps, `slaDueAtIso`, and `slaState`.
+- Optional input: `artifacts/seo-refresh/page-metrics.json` with `byUrl` metrics (`trafficTier` or `organicEntrances30d`, plus `ctaConversionRate`).

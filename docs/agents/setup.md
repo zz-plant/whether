@@ -8,7 +8,6 @@
 ## Core repo commands
 - Install dependencies: `bun install`
 - Start dev server: `bun run dev`
-- Start dev server (Turbopack): `bun run dev:turbo`
 - Build for production: `bun run build`
 - Run full quality checks: `bun run check`
 - Run lint checks: `bun run lint`
@@ -22,7 +21,7 @@
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
 - `settings.json` pins the editor to the workspace TypeScript version, enables Bun-aware ESLint defaults, and excludes generated artifacts (`.next`, `output`, deploy/build folders) from the default explorer/search/watch loops.
-- `tasks.json` exposes the common repo commands (`dev`, `lint`, `typecheck`, `test`, `check`, `check:vinext`, `build:cloudflare`, `ui:shots`, `mcp:whether`) in the task runner.
+- `tasks.json` exposes the common repo commands (`dev`, `lint`, `typecheck`, `test`, `check`, `build:cloudflare`, `ui:shots`, `mcp:whether`) in the task runner.
 - `extensions.json` recommends the baseline extension set for this repo: ESLint, Bun, Tailwind CSS, Playwright, and GitLens.
 - `whether-skills.code-snippets` adds repo-local snippets for drafting first-party skills and trigger-test blocks directly in the editor.
 - `.roomodes` adds repo-scoped Roo modes that route common Whether work to the right repo-local skills:

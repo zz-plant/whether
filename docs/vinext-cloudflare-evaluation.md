@@ -9,14 +9,11 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 - Dynamic segments: 19
 - Architecture: heavy Next 16 App Router usage with metadata, route handlers, redirects, search-param navigation, sitemap/robots, and Cloudflare deployment coupling.
 
-## Current lanes
+## Active lane
 ### `current-vinext` (production baseline)
 - Dev/start/build/deploy: `bun run dev`, `bun run start`, `bun run build`, `bun run deploy:cloudflare`
 - Cloudflare path: Vinext + [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
-
-### `vinext-spike` (parallel evaluation)
-- Dev/start/build/check: `bun run dev:vinext`, `bun run start:vinext`, `bun run build:vinext`, `bun run check:vinext`
-- Cloudflare preview deploy wrapper: `bun run deploy:cloudflare:preview`
+- Preview deploy wrapper: `bun run deploy:cloudflare:preview`
 - Vite/Vinext config: [`vite.config.ts`](/Users/kanav/Documents/GitHub/whether-app/vite.config.ts)
 - Cloudflare preview environment: `env.preview` in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
 - Worker entry: [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts)
@@ -30,18 +27,18 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 - Repo metadata now reflects that Node `>=22` is the supported engine for the active build/deploy lane.
 - Upstream claims broad Next.js 16 coverage for App Router, route handlers, metadata, middleware, cache APIs, redirects, sitemap, and robots.
 - Upstream also states its default behavior is request-time rendering rather than Next’s build-time prerender bias, and image optimization remains partial.
-- This repo now clears `bun run check:vinext` at 100% on `0.0.38` after replacing `next/font/google` with CSS font loading and repairing Bun's incomplete Vinext install via the repo-local `postinstall` script.
+- This repo now clears the canonical `bun run check` lane on `0.0.38` after replacing `next/font/google` with CSS font loading and repairing Bun's incomplete Vinext install via the repo-local `postinstall` script.
 
 ## Immediate repo implications
 - Production is now on Vinext.
-- Keep the preview spike isolated through `env.preview` for rollback rehearsal and config experimentation.
+- Keep preview isolated through `env.preview` for rollback rehearsal and config experimentation.
 - Do not assume `runtime = "edge"` semantics are authoritative under Vinext; validate actual runtime behavior in deployed preview/production environments.
 - Do not depend on Next-generated typed-route output in shared navigation/content modules. This repo now uses a local route-type compatibility layer for those modules.
 
 ## Must-pass operating gates
 ### Gate A — Runtime and tooling readiness
 - Node 22+ is the default for build and deploy.
-- `bun run check:vinext` passes.
+- `bun run check` passes.
 - `bun run lint`, `bun run typecheck`, and `bun run test` still pass in the baseline lane.
 
 ### Gate B — Build and boot parity
@@ -50,7 +47,7 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
   - `bun run build:cloudflare`
 - Preview lane passes:
   - `bun run build:cloudflare:preview`
-  - `bun run start:vinext`
+  - `bun run start`
   - `bun run deploy:cloudflare:preview:dry-run`
 
 ### Gate C — Route/runtime parity

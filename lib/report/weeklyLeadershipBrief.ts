@@ -8,10 +8,21 @@ type WindowThresholds = {
   strong: number;
 };
 
+type WeeklyLeadershipAssessment = Pick<RegimeAssessment, "regime"> & {
+  scores: {
+    tightness: RegimeAssessment["scores"]["tightness"];
+    riskAppetite: RegimeAssessment["scores"]["riskAppetite"];
+    curveSlope?: RegimeAssessment["scores"]["curveSlope"];
+  };
+  inputs?: RegimeAssessment["inputs"];
+};
+
+type WeeklyLeadershipTreasury = Pick<TreasuryData, "isLive">;
+
 export type WeeklyLeadershipBriefInputs = {
-  assessment: RegimeAssessment;
-  previousAssessment: RegimeAssessment | null;
-  treasury: TreasuryData;
+  assessment: WeeklyLeadershipAssessment;
+  previousAssessment: WeeklyLeadershipAssessment | null;
+  treasury: WeeklyLeadershipTreasury;
   last4Boldness: number[];
   hiringTrendDelta: number;
   stabilityWeeks: number;
@@ -118,7 +129,7 @@ export const buildWeeklyLeadershipBriefModel = ({
     curveDelta,
     hiringTrend,
     confidenceLabel: treasury.isLive ? "High" : "Medium",
-    inputsComplete: assessment.inputs.every((input) => input.value !== null),
+    inputsComplete: assessment.inputs?.every((input) => input.value !== null) ?? true,
     notchShiftLabel:
       boldnessDelta > 1
         ? `+${Math.max(1, Math.round(boldnessDelta / 3))} notch`

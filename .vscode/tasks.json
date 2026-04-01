@@ -5,7 +5,7 @@
       "label": "dev",
       "type": "shell",
       "command": "bun run dev",
-      "detail": "Start the local Next/Turbopack dev server.",
+      "detail": "Start the local Vinext dev server.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -56,18 +56,6 @@
       "type": "shell",
       "command": "bun run check",
       "detail": "Run hotspot preflight, lint, typecheck, and tests.",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": true
-      }
-    },
-    {
-      "label": "check:vinext",
-      "type": "shell",
-      "command": "bun run check:vinext",
-      "detail": "Run the Vinext compatibility check lane.",
       "group": "build",
       "presentation": {
         "reveal": "always",

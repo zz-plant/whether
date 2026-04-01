@@ -26,42 +26,6 @@ export const searchJobLabels: Record<SearchEntityJob, string> = {
   trust: "Defend the call",
 };
 
-export const searchJobDescriptions: Record<SearchEntityJob, string> = {
-  check: "Evidence, replay, and provenance surfaces for understanding why the weekly call moved.",
-  approve: "Planning and leadership-artifact surfaces for approving, holding, and sharing the weekly plan.",
-  resolve: "Decision aids, toolkits, and one-question pages for the one unresolved call that remains.",
-  risk: "Failure modes and framework context for pressure-testing the current posture.",
-  trust: "Freshness, confidence, source, and formula checks for defending the call.",
-};
-
-export const searchPrimaryHubByJob: Record<SearchEntityJob, { href: SearchPrimaryHub; label: string; summary: string }> = {
-  check: {
-    href: "/signals",
-    label: "Open Evidence",
-    summary: "Start with the canonical proof surface when you need to see what changed and why.",
-  },
-  approve: {
-    href: "/operations",
-    label: "Open Planning",
-    summary: "Start with the approval workspace when you need to approve, hold, or share the weekly plan.",
-  },
-  resolve: {
-    href: "/decide",
-    label: "Open Decision Tools",
-    summary: "Start here when one team-specific question still needs an answer.",
-  },
-  risk: {
-    href: "/method",
-    label: "Open Trust",
-    summary: "Start with the audit gate when you need to pressure-test the call or its assumptions.",
-  },
-  trust: {
-    href: "/method",
-    label: "Open Trust",
-    summary: "Start with the audit gate when you need freshness, confidence, sources, or formulas.",
-  },
-};
-
 const keyDocs: SearchEntity[] = [
   {
     id: "doc-signals",
@@ -136,8 +100,8 @@ const keyDocs: SearchEntity[] = [
     recommendedHubHref: "/operations",
     recommendedHubLabel: "Open Planning",
     title: "Prepare a board-ready artifact",
-    href: "/resources",
-    summary: "Board-ready long-form helper artifacts for leadership reviews after weekly posture is set.",
+    href: "/operations#ops-export-briefs",
+    summary: "Open Planning's artifact checkpoint when leadership needs a board-ready export after the weekly plan is set.",
     intentLabel: "Prepare governance artifact",
     keywords: ["resources", "board", "artifact", "template", "operations"],
   },
@@ -220,12 +184,6 @@ export const buildSearchIndex = (): SearchEntity[] => {
   }));
 
   return [...toolkitEntities, ...failureModeEntities, ...keyDocs];
-};
-
-export const searchEntityTypeLabels: Record<SearchEntityType, string> = {
-  toolkit: "Toolkits to run",
-  "failure-mode": "Risk patterns to diagnose",
-  doc: "Workflow surfaces",
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();

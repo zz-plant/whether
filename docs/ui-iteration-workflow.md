@@ -35,7 +35,7 @@ Useful options:
 ```bash
 bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
 bun run ui:iterate -- --base-url http://127.0.0.1:3001
-bun run ui:iterate -- --dev-script dev:turbo
+bun run ui:iterate -- --dev-script dev
 bun run ui:iterate -- --no-dev
 ```
 
