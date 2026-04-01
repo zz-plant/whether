@@ -70,7 +70,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /What changed/);
     assert.match(html, /Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision\./);
     assert.match(html, /Do this now/);
-    assert.match(html, /Do last week&#x27;s decisions still hold\?/);
+    assert.match(html, /Revisit now/);
     assert.match(html, /Slow down if/);
     assert.match(html, /Lean back in if/);
     assert.match(html, /Current outlook/);
@@ -93,8 +93,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const actionStripIndex = html.indexOf("Operating levers this week");
     const shareRailIndex = html.indexOf("Transmit this call");
 
-    assert.ok(deltaIndex > heroIndex);
-    assert.ok(guidanceIndex > deltaIndex);
+    assert.ok(guidanceIndex > heroIndex);
+    assert.ok(deltaIndex > guidanceIndex);
     assert.ok(actionStripIndex > guidanceIndex);
     assert.ok(shareRailIndex > actionStripIndex);
     assert.ok(postureIndex >= heroIndex);
@@ -238,7 +238,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Do this now/);
     assert.match(callCore, /Slow down if/);
     assert.match(callCore, /Lean back in if/);
-    assert.match(callCore, /Do last week&#x27;s decisions still hold\?/);
+    assert.match(callCore, /Revisit now/);
     assert.match(callCore, /What changed/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. Last week&#x27;s decisions still hold\./);
     assert.match(callCore, /Revisit queue/);

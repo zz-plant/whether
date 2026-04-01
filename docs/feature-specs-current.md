@@ -63,6 +63,12 @@ The canonical weekly-call block now also includes:
 - a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
 - a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened,
 - a delta-only brief in the share rail for repeat readers who only need the weekly change, reopen items, and current hold / reopen lines.
+The current homepage hierarchy now makes the action lane dominant: `Do this now` leads the top fold, `What changed` supports it, and `Revisit now` plus readiness/trust sit in a smaller secondary lane rather than competing as equal-width cards.
+The artifact rail now follows a routine-first hierarchy:
+- one recommended artifact mode,
+- one primary share/copy path,
+- quick variants for repeat readers (`delta brief`, `call snapshot`),
+- separate disclosures for board/governance repackaging and company-specific exceptions.
 Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share actions -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
