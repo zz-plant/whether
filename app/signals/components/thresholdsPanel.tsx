@@ -16,6 +16,7 @@ import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ThresholdNumberField } from "./ThresholdNumberField";
 
 type ThresholdDraft = {
@@ -252,23 +253,18 @@ export const ThresholdsPanel = ({
   return (
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10 scroll-mt-28">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Capital posture thresholds</p>
-            <h3 id="thresholds-title" className="type-section text-slate-100">
-              Tune classification guardrails
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
-              Thresholds are URL-driven for deterministic back/forward behavior and auditability.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-            <span>
+        <SectionPanelHeader
+          label="Capital posture thresholds"
+          title="Tune classification guardrails"
+          titleId="thresholds-title"
+          description="Thresholds are URL-driven for deterministic back/forward behavior and auditability."
+          aside={
+            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold tracking-[0.1em] text-slate-200">
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
               {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
             </span>
-          </div>
-        </div>
+          }
+        />
 
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">

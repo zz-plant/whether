@@ -9,13 +9,12 @@ import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { Input } from "@base-ui/react/input";
-import { Popover } from "@base-ui/react/popover";
 import { Tabs } from "@base-ui/react/tabs";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { ActionLink } from "../../components/ui/actionLink";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import type { SummaryArchiveEntry } from "../../../lib/summary/summaryArchive";
 import { MonthlySummaryCard } from "../../components/monthlySummaryCard";
@@ -371,6 +370,10 @@ export const TimeMachinePanel = ({
   );
   const nowDecisionHref = `${nowHref}#decision-summary`;
   const replayPreviousHref = !isHistorical ? previousSnapshotHref : null;
+  const centeredPillLinkClass = "justify-center";
+  const fullWidthPillLinkClass = "w-full justify-center";
+  const disabledPillClass =
+    "weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-500/90 opacity-70";
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
@@ -388,12 +391,12 @@ export const TimeMachinePanel = ({
           aside={
             <>
               {isHistorical ? (
-                <Link
+                <ActionLink
                   href={nowDecisionHref as Route}
-                  className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className={centeredPillLinkClass}
                 >
                   Exit historical view
-                </Link>
+                </ActionLink>
               ) : null}
               <DataProvenanceStrip provenance={provenance} />
             </>
@@ -431,12 +434,12 @@ export const TimeMachinePanel = ({
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
             <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
             {!isHistorical && replayPreviousHref ? (
-              <Link
+              <ActionLink
                 href={replayPreviousHref as Route}
-                className="mt-3 weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className={`mt-3 ${centeredPillLinkClass}`}
               >
                 Replay previous month
-              </Link>
+              </ActionLink>
             ) : null}
           </div>
         </div>
@@ -449,41 +452,41 @@ export const TimeMachinePanel = ({
           </p>
           <div className="weather-list-stagger mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {previousSnapshotHref ? (
-              <Link
+              <ActionLink
                 href={previousSnapshotHref as Route}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className={fullWidthPillLinkClass}
               >
                 ← Previous month
-              </Link>
+              </ActionLink>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+              <span aria-disabled="true" className={disabledPillClass}>
                 ← Previous month
               </span>
             )}
             {nextSnapshotHref ? (
-              <Link
+              <ActionLink
                 href={nextSnapshotHref as Route}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className={fullWidthPillLinkClass}
               >
                 Next month →
-              </Link>
+              </ActionLink>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+              <span aria-disabled="true" className={disabledPillClass}>
                 Next month →
               </span>
             )}
-            <Link
+            <ActionLink
               href={nowHref as Route}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className={fullWidthPillLinkClass}
             >
               Jump to now
-            </Link>
-            <Link
+            </ActionLink>
+            <ActionLink
               href="/#posture-forecast"
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className={fullWidthPillLinkClass}
             >
               Open forecast view
-            </Link>
+            </ActionLink>
           </div>
         </div>
 
@@ -574,7 +577,7 @@ export const TimeMachinePanel = ({
               type="submit"
               disabled={isPending}
               aria-busy={isPending}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400 touch-manipulation"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -584,24 +587,57 @@ export const TimeMachinePanel = ({
           </Fieldset.Root>
         </Form>
         <div className="mt-3 flex flex-wrap gap-3 text-xs">
-          <a
+          <ActionLink
             href={clearDraftHref}
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
+            className="justify-center text-slate-300 hover:border-slate-500/70"
           >
             Clear draft
-          </a>
-          <a
+          </ActionLink>
+          <ActionLink
             href={jumpToLatestHref}
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            className={centeredPillLinkClass}
           >
             Jump to latest
-          </a>
+          </ActionLink>
         </div>
-        <div className="mt-4 min-h-[20px]">
+        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)]">
+          <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2">
+            <div>
+              <p className="type-label text-slate-400">Latest available record</p>
+              <p className="mt-2 text-sm text-slate-200">
+                <span className="mono text-slate-100">
+                  <time dateTime={latestRecordDate}>{latestRecordLabel}</time>
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="type-label text-slate-400">Cache coverage</p>
+              <p className="mt-2 text-sm text-slate-200">
+                <span className="mono text-slate-100">
+                  {coverageLabel && cacheCoverage.earliest && cacheCoverage.latest ? (
+                    <>
+                      <time dateTime={cacheCoverage.earliest}>{coverageLabel.earliest}</time> →{" "}
+                      <time dateTime={cacheCoverage.latest}>{coverageLabel.latest}</time>
+                    </>
+                  ) : (
+                    "No cache loaded"
+                  )}
+                </span>
+              </p>
+            </div>
+            {isDraft ? (
+              <div className="rounded-xl border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
+                <p className="type-label text-sky-200">Draft staged</p>
+                <p className="mt-2 text-sm text-slate-200">
+                  The URL now points to {selectedLabel}. Load snapshot to apply the replay.
+                </p>
+              </div>
+            ) : null}
+          </div>
           {statusMessages.length > 0 ? (
             <div
               id={statusMessages.some((message) => message.includeId) ? errorId : undefined}
-              className="space-y-2 text-xs text-amber-200"
+              className="weather-surface space-y-2 border border-amber-400/20 bg-amber-500/8 p-4 text-sm text-amber-100"
               role="status"
               aria-live="polite"
             >
@@ -611,30 +647,6 @@ export const TimeMachinePanel = ({
             </div>
           ) : null}
         </div>
-        {isDraft ? (
-          <p className="mt-2 text-xs text-slate-500">
-            Draft selection is staged in the URL. Load snapshot to apply.
-          </p>
-        ) : null}
-        <p className="mt-4 text-xs text-slate-500">
-          Latest available record:{" "}
-          <span className="mono text-slate-300">
-            <time dateTime={latestRecordDate}>{latestRecordLabel}</time>
-          </span>
-        </p>
-        <p className="mt-2 text-xs text-slate-500">
-          Cache coverage:{" "}
-          <span className="mono text-slate-300">
-            {coverageLabel && cacheCoverage.earliest && cacheCoverage.latest ? (
-              <>
-                <time dateTime={cacheCoverage.earliest}>{coverageLabel.earliest}</time> →{" "}
-                <time dateTime={cacheCoverage.latest}>{coverageLabel.latest}</time>
-              </>
-            ) : (
-              "No cache loaded"
-            )}
-          </span>
-        </p>
 
         <div className="mt-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -677,7 +689,7 @@ export const TimeMachinePanel = ({
                           key={cadence}
                           value={cadence}
                           className={({ active }) =>
-                            `weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                            `weather-tab inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
                               active
                                 ? "border-sky-400/70 text-slate-100"
                                 : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"

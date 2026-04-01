@@ -26,6 +26,12 @@ type TimeMachineMonthPickerProps = {
   year: number;
 };
 
+const yearStepperButtonClass =
+  "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600";
+
+const monthOptionBaseClass =
+  "inline-flex min-h-[44px] items-center justify-center rounded-xl border px-2 py-2 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation";
+
 export const TimeMachineMonthPicker = ({
   calendarMonths,
   calendarYear,
@@ -60,22 +66,25 @@ export const TimeMachineMonthPicker = ({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="start" sideOffset={10}>
-          <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
+          <Popover.Popup className="weather-panel-static w-72 rounded-[1.6rem] border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-2xl">
             <div className="flex items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={() => onCalendarYearChange(Math.max(minYear, calendarYear - 1))}
                 disabled={calendarYear <= minYear}
-                className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
+                className={yearStepperButtonClass}
               >
                 ‹
               </button>
-              <span className="text-sm font-semibold text-slate-100">{calendarYear}</span>
+              <div className="text-center">
+                <p className="type-label text-slate-500">Calendar year</p>
+                <span className="mt-1 block text-sm font-semibold text-slate-100">{calendarYear}</span>
+              </div>
               <button
                 type="button"
                 onClick={() => onCalendarYearChange(Math.min(maxYear, calendarYear + 1))}
                 disabled={calendarYear >= maxYear}
-                className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
+                className={yearStepperButtonClass}
               >
                 ›
               </button>
@@ -97,14 +106,14 @@ export const TimeMachineMonthPicker = ({
                       }
                     }}
                     disabled={!isAvailable}
-                    className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                    className={`${monthOptionBaseClass} ${
                       isActive
-                        ? "border-sky-400/70 text-slate-100"
-                        : "border-slate-800/70 text-slate-300"
+                        ? "border-sky-400/70 bg-sky-500/12 text-slate-100 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.08)]"
+                        : "border-slate-800/70 bg-slate-950/55 text-slate-300"
                     } ${
                       isAvailable
                         ? "hover:border-sky-400/70 hover:text-slate-100"
-                        : "cursor-not-allowed text-slate-600"
+                        : "cursor-not-allowed bg-slate-950/20 text-slate-600"
                     }`}
                   >
                     {option.label.slice(0, 3)}
@@ -112,10 +121,11 @@ export const TimeMachineMonthPicker = ({
                 );
               })}
             </div>
-            <div className="mt-3 text-[11px] text-slate-500">
-              {coverageMin && coverageMax
-                ? `Coverage: ${coverageMin} → ${coverageMax}`
-                : "No cache loaded yet."}
+            <div className="weather-surface mt-3 rounded-xl px-3 py-2">
+              <p className="type-label text-slate-500">Available range</p>
+              <p className="mt-1 text-[11px] text-slate-300">
+                {coverageMin && coverageMax ? `${coverageMin} → ${coverageMax}` : "No cache loaded yet."}
+              </p>
             </div>
             <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
           </Popover.Popup>

@@ -17,7 +17,7 @@ export function ActionStrip({ doItems, dontItems, fenceItems = [] }: ActionStrip
     return (
       <ul className="mt-3 space-y-2 text-sm text-slate-100">
         {items.map((item) => (
-          <li key={item} className="flex min-h-[44px] items-start gap-2 rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-2.5">
+          <li key={item} className="weather-surface flex min-h-[44px] items-start gap-2 rounded-xl px-3 py-2.5">
             <span aria-hidden="true" className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
             <span aria-hidden="true" className="mt-0.5 shrink-0 text-xs text-slate-300">{icon}</span>
             <span className="leading-relaxed">{item}</span>
@@ -35,25 +35,25 @@ export function ActionStrip({ doItems, dontItems, fenceItems = [] }: ActionStrip
         <p className="mt-2 max-w-2xl text-sm text-slate-300">Make this week’s trade-offs explicit so teams move with fewer second guesses.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr,1fr,0.8fr]">
-        <article className="rounded-xl border border-emerald-500/40 bg-slate-900/50 p-4">
+        <article className="weather-surface border-emerald-500/40 bg-emerald-500/[0.07] p-4">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-200">Do</h3>
-            <span className={`rounded-full px-2 py-1 text-xs font-medium ${toneSummary.do.labelTone}`}>{toneSummary.do.label} · {doItems.length}</span>
+            <span className={`weather-pill px-2.5 py-1 text-xs font-medium ${toneSummary.do.labelTone}`}>{toneSummary.do.label} · {doItems.length}</span>
           </div>
           {renderActionItems(doItems, "do")}
         </article>
-        <article className="rounded-xl border border-rose-500/40 bg-slate-900/50 p-4">
+        <article className="weather-surface border-rose-500/40 bg-rose-500/[0.06] p-4">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-rose-200">Don’t</h3>
-            <span className={`rounded-full px-2 py-1 text-xs font-medium ${toneSummary.dont.labelTone}`}>{toneSummary.dont.label} · {dontItems.length}</span>
+            <span className={`weather-pill px-2.5 py-1 text-xs font-medium ${toneSummary.dont.labelTone}`}>{toneSummary.dont.label} · {dontItems.length}</span>
           </div>
           {renderActionItems(dontItems, "dont")}
         </article>
         {fenceItems.length > 0 ? (
-          <article className="rounded-xl border border-amber-500/40 bg-slate-900/50 p-4">
+          <article className="weather-surface border-amber-500/40 bg-amber-500/[0.06] p-4">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Fence</h3>
-              <span className={`rounded-full px-2 py-1 text-xs font-medium ${toneSummary.fence.labelTone}`}>{toneSummary.fence.label} · {fenceItems.length}</span>
+              <span className={`weather-pill px-2.5 py-1 text-xs font-medium ${toneSummary.fence.labelTone}`}>{toneSummary.fence.label} · {fenceItems.length}</span>
             </div>
             {renderActionItems(fenceItems, "fence")}
           </article>

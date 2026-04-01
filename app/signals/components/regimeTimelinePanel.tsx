@@ -2,6 +2,7 @@ import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachin
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 
 
 type RegimeRun = {
@@ -121,20 +122,20 @@ export const RegimeTimelinePanel = ({
   return (
     <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Regime timeline</p>
-            <h3 id="regime-timeline-title" className="type-section text-slate-100">
-              24-month regime sequence
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
-              Timeline emphasizes continuity while keeping month-level navigation.
-            </p>
-          </div>
-        </div>
+        <SectionPanelHeader
+          label="Regime timeline"
+          title="24-month regime sequence"
+          titleId="regime-timeline-title"
+          description="Timeline emphasizes continuity while keeping month-level navigation."
+          aside={
+            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold tracking-[0.1em] text-slate-100">
+              Current: {currentLabel}
+            </span>
+          }
+        />
 
         <div className="mt-6">
-          <div className="relative overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-950/50 p-3 sm:p-4">
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-800/70 bg-slate-950/50 p-3 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.04)] sm:p-4">
             <div className="flex min-h-20 items-stretch">
               {runs.map((run) => {
                 const spanLabel = formatRunSpan(run);
@@ -162,16 +163,11 @@ export const RegimeTimelinePanel = ({
             </div>
 
             {selectedIndex >= 0 ? (
-              <>
-                <div
-                  className="pointer-events-none absolute bottom-2 top-2 z-20 w-px bg-sky-300/95"
-                  style={{ left: getSelectedMarkerOffset(selectedIndex, series.length) }}
-                  aria-hidden="true"
-                />
-                <p className="pointer-events-none absolute right-2 top-2 z-20 rounded-md bg-slate-950/85 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-200 sm:text-[11px]">
-                  Current: {currentLabel}
-                </p>
-              </>
+              <div
+                className="pointer-events-none absolute bottom-2 top-2 z-20 w-px bg-sky-300/95"
+                style={{ left: getSelectedMarkerOffset(selectedIndex, series.length) }}
+                aria-hidden="true"
+              />
             ) : null}
 
             <div className="absolute inset-0 z-30 flex">
@@ -197,11 +193,20 @@ export const RegimeTimelinePanel = ({
               })}
             </div>
           </div>
-
-          <p className="mt-3 text-xs text-slate-400" aria-live="polite">
-            Last {series.length} months: {changeCount} regime changes, longest run:{" "}
-            {longestRun ? `${REGIME_LABELS[longestRun.regime]} (${longestRun.count} months)` : "n/a"}.
-          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">Regime changes</p>
+              <p className="mt-2 text-sm text-slate-200">
+                {changeCount} changes across the last {series.length} months.
+              </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">Longest continuous run</p>
+              <p className="mt-2 text-sm text-slate-200">
+                {longestRun ? `${REGIME_LABELS[longestRun.regime]} (${longestRun.count} months)` : "n/a"}.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

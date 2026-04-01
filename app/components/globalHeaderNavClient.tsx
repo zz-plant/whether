@@ -44,10 +44,10 @@ function NavigationLinkCard({
         title={link.boundary}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`weather-pill group inline-flex min-h-[78px] min-w-[148px] flex-col items-start justify-start rounded-[1.2rem] px-3.5 py-3.5 text-left transition-colors touch-manipulation sm:h-full sm:min-w-0 ${
+        className={`weather-route-card group inline-flex min-h-[78px] min-w-[148px] flex-col items-start justify-start gap-1.5 px-3.5 py-3.5 text-left sm:h-full sm:min-w-0 ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/18 text-sky-50 shadow-[0_18px_34px_-26px_rgba(56,189,248,0.46)]"
-            : "text-slate-100 hover:border-amber-300/45"
+            : "text-slate-100"
         }`}
       >
         <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
@@ -84,7 +84,7 @@ function CompactNavigationLink({
         aria-current={link.isActive ? "page" : undefined}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`inline-flex min-h-[42px] items-center justify-center rounded-full border px-3.5 py-2 text-xs font-semibold tracking-[0.08em] transition-colors touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+        className={`weather-pill inline-flex min-h-[42px] items-center justify-center px-3.5 py-2 text-xs font-semibold tracking-[0.08em] touch-manipulation ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/20 text-sky-50"
             : isAnchor

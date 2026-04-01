@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ActionLink } from "./ui/actionLink";
 import { ArrowRightIcon } from "./uiIcons";
 
 export type ReportStageItem = {
@@ -31,7 +32,7 @@ export const StageRail = ({
             <a
               href={item.href}
               aria-current={item.status === "current" ? "step" : undefined}
-              className={`inline-flex min-h-[44px] w-full items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${tone}`}
+              className={`weather-route-card inline-flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] ${tone}`}
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">
                 {index + 1}
@@ -83,13 +84,14 @@ export const DecisionBanner = ({
       </div>
     </dl>
     {evidenceHref ? (
-      <a
+      <ActionLink
         href={evidenceHref}
-        className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        variant="inline"
+        className="gap-1"
       >
         Review evidence trail
-      <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
-      </a>
+        <ArrowRightIcon className="h-3.5 w-3.5" />
+      </ActionLink>
     ) : null}
   </section>
 );
@@ -110,13 +112,14 @@ export const ActionSequence = ({
         <li key={item.title} className="weather-surface flex flex-col gap-3 p-4">
           <p className="text-sm font-semibold text-slate-100">{index + 1}. {item.title}</p>
           <p className="text-sm text-slate-300">{item.detail}</p>
-          <a
+          <ActionLink
             href={item.href}
-            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            variant="inline"
+            className="mt-auto gap-1"
           >
             {item.cta}
-          <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
-          </a>
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </ActionLink>
         </li>
       ))}
     </ol>
