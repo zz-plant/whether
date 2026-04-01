@@ -8,7 +8,6 @@ import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitation
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { ReportShell } from "../components/reportShell";
-import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -144,11 +143,9 @@ export default async function MethodPage() {
       currentPath="/method"
       pageSummary="Can you rely on this week's call?"
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
-      pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       headerVariant="trust"
-      showPageNavigation={false}
       primaryCta={{ href: "#trust-snapshot", label: "Snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{

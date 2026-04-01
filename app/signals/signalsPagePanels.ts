@@ -5,10 +5,7 @@ export const loadSignalsPagePanels = async ({
   showAdvanced: boolean;
   showFullDiagnostics: boolean;
 }) => {
-  const [summaryArchive, signalDiagnostics, advancedPanels] = await Promise.all([
-    showAdvanced
-      ? import("../../lib/summary/summaryArchive").then((module) => module.getSummaryArchive())
-      : Promise.resolve(null),
+  const [signalDiagnostics, advancedPanels] = await Promise.all([
     showFullDiagnostics
       ? import("./components/signalVisualizationSuite").then(
           (module) => module.SignalVisualizationSuite,
@@ -28,7 +25,6 @@ export const loadSignalsPagePanels = async ({
   ]);
 
   return {
-    summaryArchive,
     SignalVisualizationSuite: signalDiagnostics,
     AdvancedThresholdsSection: advancedPanels?.[0] ?? null,
     TimeMachinePanel: advancedPanels?.[1] ?? null,

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DecisionContractBlock } from "../../components/decisionContractBlock";
-import { NextStepRail } from "../../components/nextStepRail";
 import { buildPageMetadata } from "../../../lib/seo";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } from "../clusterRoutes";
@@ -55,7 +54,6 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
         reversal={reportData.flipThreshold}
         evidence={clusterDefinition.evidence}
       />
-      <NextStepRail currentPath={`/signals/${cluster}`} />
     </main>
   );
 }

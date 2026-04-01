@@ -9,7 +9,6 @@ import { DisplayModeToggle } from "./displayModeToggle";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import {
   ReportSectionNavigation,
-  type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
@@ -49,7 +48,6 @@ type ReportShellInput = {
   pageTitle: string;
   pageSummary: string;
   pageSummaryLink?: { href: string; label: string };
-  pageLinks: ReportPageLink[];
   sectionLinks: ReportSectionLink[];
   trustStatusLabel: string;
   trustStatusDetail: string;
@@ -65,8 +63,6 @@ type ReportShellInput = {
   showOfflineBadge?: boolean;
   offlineBadgeLabel?: string;
   heroVariant?: "full" | "compact";
-  pageNavVariant?: "full" | "compact";
-  showPageNavigation?: boolean;
   headerVariant?: ReportShellHeaderVariant;
   sidebarVariant?: "full" | "hidden";
   hideHeroChrome?: boolean;
@@ -94,9 +90,9 @@ type ReportShellInput = {
 
 type ReportShellModel = {
   status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
-  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "pageLinks" | "sectionLinks" | "currentPath">;
+  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
-  chrome?: Pick<ReportShellInput, "heroVariant" | "pageNavVariant" | "showPageNavigation" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
+  chrome?: Pick<ReportShellInput, "heroVariant" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
   actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
@@ -141,7 +137,6 @@ export const ReportShell = (props: ReportShellProps) => {
     pageTitle: resolvedPageTitle,
     pageSummary: resolvedPageSummary,
     pageSummaryLink: resolvedPageSummaryLink,
-    pageLinks: resolvedPageLinks,
     sectionLinks: resolvedSectionLinks,
     currentPath: resolvedCurrentPath,
     trustStatusDetail: resolvedTrustStatusDetail,
@@ -157,8 +152,6 @@ export const ReportShell = (props: ReportShellProps) => {
     showOfflineBadge: resolvedShowOfflineBadge = false,
     offlineBadgeLabel: resolvedOfflineBadgeLabel = "Cached snapshot",
     heroVariant: resolvedHeroVariant = "full",
-    pageNavVariant: resolvedPageNavVariant = "full",
-    showPageNavigation: resolvedShowPageNavigation = false,
     headerVariant: resolvedHeaderVariantInput,
     sidebarVariant: resolvedSidebarVariant = "full",
     hideHeroChrome: resolvedHideHeroChrome = false,
@@ -250,11 +243,7 @@ export const ReportShell = (props: ReportShellProps) => {
             statusLabel={resolvedStatusLabel}
             fetchedAtLabel={resolvedFetchedAtLabel}
             recordDateLabel={resolvedRecordDateLabel}
-            currentPath={resolvedCurrentPath}
-            showPageNavigation={resolvedShowPageNavigation}
-            pageLinks={resolvedPageLinks}
             pageTitle={resolvedPageTitle}
-            pageNavVariant={resolvedPageNavVariant}
             exportCta={headerExportCta}
           />
           {resolvedHistoricalBanner}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
-import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { isArtifactMode } from "../lib/shareArtifacts";
@@ -106,7 +105,6 @@ export const HomePageReportContent = async ({
         page: {
           pageTitle: "Weekly Brief",
           pageSummary: decisionTransmissionSummaryLine,
-          pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",
         },
@@ -129,8 +127,6 @@ export const HomePageReportContent = async ({
         chrome: {
           sidebarVariant: "hidden",
           hideHeroChrome: true,
-          pageNavVariant: "compact",
-          showPageNavigation: false,
         },
         actions: {
           exportCta: {

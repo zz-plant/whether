@@ -1,6 +1,5 @@
 import { Skeleton } from "./skeleton";
 import { ReportShell } from "./reportShell";
-import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export function RouteLoadingShell({
   label = "Loading page",
@@ -22,7 +21,6 @@ export function RouteLoadingShell({
       treasurySource="fiscaldata.treasury.gov"
       pageTitle={pageTitle}
       pageSummary={description}
-      pageLinks={reportPageLinks}
       sectionLinks={[]}
       trustStatusLabel="Loading"
       trustStatusDetail="Evidence is still loading."

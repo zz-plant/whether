@@ -3,7 +3,6 @@ import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
 import { HistoricalBanner } from "../components/historicalBanner";
-import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
@@ -65,11 +64,9 @@ export default async function SignalsPage({
             ? "Open the detailed evidence ↓"
             : "Open the short read ↓",
       }}
-      pageLinks={reportPageLinks}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
       headerVariant="evidence"
-      showPageNavigation={false}
       primaryCta={{ href: "#current-scores", label: "See what changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
@@ -174,8 +171,7 @@ export default async function SignalsPage({
       && model.showAdvanced
       && model.AdvancedThresholdsSection
       && model.TimeMachinePanel
-      && model.RegimeTimelinePanel
-      && model.summaryArchive ? (
+      && model.RegimeTimelinePanel ? (
         <>
           <model.AdvancedThresholdsSection
             currentThresholds={model.assessment.thresholds}
@@ -191,12 +187,10 @@ export default async function SignalsPage({
             monthsByYear={model.cacheMonthsByYear}
             invalidSelection={model.invalidHistoricalSelection}
             provenance={model.treasuryProvenance}
-            summaryArchive={model.summaryArchive}
             historicalRegime={model.historicalSelection ? model.assessment.regime : null}
             historicalSummary={
               model.historicalSelection ? model.assessment.description : null
             }
-            comparison={model.historicalComparison}
           />
 
           <model.RegimeTimelinePanel

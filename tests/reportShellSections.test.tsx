@@ -125,7 +125,6 @@ describe("ReportShell extracted sections", () => {
         pageTitle="Signals"
         pageSummary="Deep evidence appendix."
         pageSummaryLink={{ href: "#thresholds", label: "See thresholds" }}
-        pageLinks={[]}
         sectionLinks={[
           { href: "#current-scores", label: "Current scores" },
           { href: "#thresholds", label: "Thresholds" },
@@ -161,7 +160,6 @@ describe("ReportShell extracted sections", () => {
         treasurySource="https://fred.stlouisfed.org"
         pageTitle="Weekly Brief"
         pageSummary="This week's call and the share-ready path."
-        pageLinks={[]}
         sectionLinks={[]}
         trustStatusLabel="HIGH"
         trustStatusDetail="Stable feed"

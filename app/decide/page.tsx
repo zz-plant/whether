@@ -15,7 +15,6 @@ import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
 import { ReportShell } from "../components/reportShell";
-import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { buildGuidedTranslationHref, GuidedTranslationPanels, type GuidedTranslationSearchParams } from "./components/guidedTranslationPanels";
 import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 
@@ -103,10 +102,8 @@ export default async function DecidePage({
       currentPath="/decide"
       pageSummary="Translate one remaining question into the right help."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Find the help ↓" }}
-      pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
-      showPageNavigation={false}
       primaryCta={{ href: "#unresolved-question-router", label: "Find the right help" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{

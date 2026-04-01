@@ -80,7 +80,6 @@ export const buildSignalsPageModel = async (
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,
-    historicalComparison,
     historicalSelection,
     invalidHistoricalSelection,
     macroProvenance,
@@ -110,7 +109,6 @@ export const buildSignalsPageModel = async (
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const {
-    summaryArchive,
     SignalVisualizationSuite,
     AdvancedThresholdsSection,
     TimeMachinePanel,
@@ -305,7 +303,6 @@ export const buildSignalsPageModel = async (
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,
-    historicalComparison,
     historicalSelection,
     invalidHistoricalSelection,
     macroProvenance,
@@ -326,7 +323,6 @@ export const buildSignalsPageModel = async (
     historicalTimeMachineHref,
     showAdvanced,
     showFullDiagnostics,
-    summaryArchive,
     SignalVisualizationSuite,
     AdvancedThresholdsSection,
     TimeMachinePanel,

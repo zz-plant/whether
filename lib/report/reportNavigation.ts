@@ -1,6 +1,5 @@
-import type { ReportPageLink } from "../../app/components/reportShellNavigation";
 import { primaryNavigation } from "../navigation/primaryNavigation";
 
-export const reportPageLinks: ReportPageLink[] = primaryNavigation;
+export const reportPageLinks = primaryNavigation;
 
 export const reportShellCorePaths = ["/", "/signals", "/operations", "/decide", "/method"] as const;

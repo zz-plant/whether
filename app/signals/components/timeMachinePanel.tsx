@@ -5,29 +5,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
-import { Input } from "@base-ui/react/input";
-import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ActionLink } from "../../components/ui/actionLink";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import type { SummaryArchiveEntry } from "../../../lib/summary/summaryArchive";
-import { MonthlySummaryCard } from "../../components/monthlySummaryCard";
-import { QuarterlySummaryCard } from "../../components/quarterlySummaryCard";
-import { WeeklySummaryCard } from "../../components/weeklySummaryCard";
-import { YearlySummaryCard } from "../../components/yearlySummaryCard";
 import {
-  formatCurve,
   formatDateLabel,
-  formatDelta,
   formatMonthInput,
-  formatPercent,
-  formatScore,
   monthOptions,
 } from "./timeMachineUtils";
 import {
@@ -49,27 +37,8 @@ type TimeMachinePanelProps = {
   monthsByYear: Record<number, number[]>;
   invalidSelection: boolean;
   provenance: DataProvenance;
-  summaryArchive: SummaryArchiveEntry[];
   historicalRegime?: RegimeKey | null;
   historicalSummary?: string | null;
-  comparison?: {
-    then: {
-      regime: RegimeKey;
-      recordDate: string;
-      baseRate: number;
-      curveSlope: number | null;
-      tightness: number;
-      riskAppetite: number;
-    };
-    now: {
-      regime: RegimeKey;
-      recordDate: string;
-      baseRate: number;
-      curveSlope: number | null;
-      tightness: number;
-      riskAppetite: number;
-    };
-  } | null;
 };
 
 export const TimeMachinePanel = ({
@@ -81,10 +50,8 @@ export const TimeMachinePanel = ({
   monthsByYear,
   invalidSelection,
   provenance,
-  summaryArchive,
   historicalRegime,
   historicalSummary,
-  comparison,
 }: TimeMachinePanelProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -126,7 +93,6 @@ export const TimeMachinePanel = ({
   const latestRecordLabel = formatDateLabel(latestRecordDate);
   const selectedLabel = `${requestedMonthLabel} ${year}`;
   const showHistoricalCallout = isHistorical && historicalSummary;
-  const showComparison = Boolean(isHistorical && comparison);
   const statusMessages = [
     errorMessage
       ? { key: "error", message: errorMessage, includeId: true }
@@ -173,149 +139,9 @@ export const TimeMachinePanel = ({
   const [calendarYear, setCalendarYear] = useState(year);
   const calendarMonths = monthsByYear[calendarYear] ?? [];
 
-  const cadenceOptions = ["weekly", "monthly", "quarterly", "yearly"] as const;
-
-  const buildTimelineEntryLabel = (entry: SummaryArchiveEntry) => {
-    switch (entry.cadence) {
-      case "weekly":
-        return `Week ${entry.week}, ${entry.year}`;
-      case "monthly":
-        return `${monthOptions.find((option) => option.value === entry.month)?.label ?? "Month"} ${entry.year}`;
-      case "quarterly":
-        return `Q${entry.quarter} ${entry.year}`;
-      case "yearly":
-        return `${entry.year}`;
-      default:
-        return "Unknown";
-    }
-  };
-
-  const renderTimelineSummaryCard = (entry: SummaryArchiveEntry) => {
-    switch (entry.cadence) {
-      case "weekly":
-        return <WeeklySummaryCard summary={entry.summary} />;
-      case "monthly":
-        return <MonthlySummaryCard summary={entry.summary} />;
-      case "quarterly":
-        return <QuarterlySummaryCard summary={entry.summary} />;
-      case "yearly":
-        return <YearlySummaryCard summary={entry.summary} />;
-      default:
-        return null;
-    }
-  };
-
-  const buildProvenanceTooltip = (
-    provenanceData: SummaryArchiveEntry["summary"]["provenance"]
-  ) => {
-    return [
-      `Source: ${provenanceData.sourceLabel}`,
-      provenanceData.sourceUrl ? `URL: ${provenanceData.sourceUrl}` : null,
-      `Timestamp: ${provenanceData.timestampLabel}`,
-      `Data age: ${provenanceData.ageLabel}`,
-      `Confidence: ${provenanceData.statusLabel}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
-  };
-
-  const toTimestamp = (value: string) => {
-    const parsed = new Date(value).getTime();
-    return Number.isNaN(parsed) ? null : parsed;
-  };
-
-  const [timelineCadence, setTimelineCadence] = useState<
-    "weekly" | "monthly" | "quarterly" | "yearly"
-  >("monthly");
-  const cadenceEntries = useMemo(
-    () => summaryArchive.filter((entry) => entry.cadence === timelineCadence),
-    [summaryArchive, timelineCadence]
-  );
-  const cadenceRange = useMemo(() => {
-    if (cadenceEntries.length === 0) {
-      return { min: null, max: null };
-    }
-    const sorted = [...cadenceEntries].sort(
-      (a, b) => new Date(a.asOf).getTime() - new Date(b.asOf).getTime()
-    );
-    return { min: sorted[0].asOf, max: sorted.at(-1)?.asOf ?? null };
-  }, [cadenceEntries]);
-  const { min: cadenceMin, max: cadenceMax } = cadenceRange;
-  const [rangeStart, setRangeStart] = useState(() => cadenceRange.min ?? "");
-  const [rangeEnd, setRangeEnd] = useState(() => cadenceRange.max ?? "");
-
   useEffect(() => {
     setCalendarYear(year);
   }, [year]);
-
-  useEffect(() => {
-    if (!cadenceMin || !cadenceMax) {
-      setRangeStart("");
-      setRangeEnd("");
-      return;
-    }
-    setRangeStart((previous) => {
-      const previousTimestamp = toTimestamp(previous);
-      const minTimestamp = toTimestamp(cadenceMin);
-      const maxTimestamp = toTimestamp(cadenceMax);
-      if (!previousTimestamp || !minTimestamp || !maxTimestamp) {
-        return cadenceMin;
-      }
-      if (previousTimestamp < minTimestamp || previousTimestamp > maxTimestamp) {
-        return cadenceMin;
-      }
-      return previous;
-    });
-    setRangeEnd((previous) => {
-      const previousTimestamp = toTimestamp(previous);
-      const minTimestamp = toTimestamp(cadenceMin);
-      const maxTimestamp = toTimestamp(cadenceMax);
-      if (!previousTimestamp || !minTimestamp || !maxTimestamp) {
-        return cadenceMax;
-      }
-      if (previousTimestamp < minTimestamp || previousTimestamp > maxTimestamp) {
-        return cadenceMax;
-      }
-      return previous;
-    });
-  }, [cadenceMax, cadenceMin]);
-
-  const filteredEntries = useMemo(() => {
-    if (!rangeStart || !rangeEnd) {
-      return [];
-    }
-    const rangeStartTimestamp = toTimestamp(rangeStart);
-    const rangeEndTimestamp = toTimestamp(rangeEnd);
-    if (!rangeStartTimestamp || !rangeEndTimestamp || rangeEndTimestamp < rangeStartTimestamp) {
-      return [];
-    }
-    return cadenceEntries
-      .filter((entry) => {
-        const entryTimestamp = toTimestamp(entry.asOf);
-        return Boolean(
-          entryTimestamp &&
-            entryTimestamp >= rangeStartTimestamp &&
-            entryTimestamp <= rangeEndTimestamp
-        );
-      })
-      .sort((a, b) => new Date(b.asOf).getTime() - new Date(a.asOf).getTime());
-  }, [cadenceEntries, rangeEnd, rangeStart]);
-
-  const handleExportTimeline = () => {
-    if (filteredEntries.length === 0) {
-      return;
-    }
-    const filename = `time-machine-${timelineCadence}-${rangeStart}-to-${rangeEnd}.json`;
-    const blob = new Blob([JSON.stringify(filteredEntries, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   const handleSubmit = () => {
     if (isUnavailableSelection) {
@@ -483,66 +309,6 @@ export const TimeMachinePanel = ({
           </div>
         </div>
 
-        {showComparison && comparison ? (
-          <div className="weather-surface weather-delta-card mt-4 p-4" data-emphasis="true">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="type-label text-slate-400">Then vs now</p>
-              <p className="text-xs text-slate-500">
-                Then: {formatDateLabel(comparison.then.recordDate)} · Now:{" "}
-                {formatDateLabel(comparison.now.recordDate)}
-              </p>
-            </div>
-            <div className="weather-list-stagger mt-3 grid gap-3 md:grid-cols-2">
-              <div className="weather-surface weather-delta-card rounded-lg p-3">
-                <p className="type-kicker">Capital posture</p>
-                <p className="mt-2 text-sm text-slate-100">
-                  {comparison.then.regime.toLowerCase()} →{" "}
-                  {comparison.now.regime.toLowerCase()}
-                </p>
-              </div>
-              <div className="weather-surface weather-delta-card rounded-lg p-3">
-                <p className="type-kicker">Base rate</p>
-                <p className="mt-2 text-sm text-slate-100">
-                  {formatPercent(comparison.then.baseRate)} →{" "}
-                  {formatPercent(comparison.now.baseRate)} (
-                  {formatDelta(
-                    comparison.then.baseRate,
-                    comparison.now.baseRate,
-                    "%"
-                  )}
-                  )
-                </p>
-              </div>
-              <div className="weather-surface weather-delta-card rounded-lg p-3">
-                <p className="type-kicker">Curve slope</p>
-                <p className="mt-2 text-sm text-slate-100">
-                  {formatCurve(comparison.then.curveSlope)} →{" "}
-                  {formatCurve(comparison.now.curveSlope)}
-                  {comparison.then.curveSlope !== null && comparison.now.curveSlope !== null
-                    ? ` (${formatDelta(comparison.then.curveSlope, comparison.now.curveSlope, "%")})`
-                    : ""}
-                </p>
-              </div>
-              <div className="weather-surface weather-delta-card rounded-lg p-3">
-                <p className="type-kicker">
-                  Tightness vs risk
-                </p>
-                <p className="mt-2 text-sm text-slate-100">
-                  {formatScore(comparison.then.tightness)}/
-                  {formatScore(comparison.then.riskAppetite)} →{" "}
-                  {formatScore(comparison.now.tightness)}/
-                  {formatScore(comparison.now.riskAppetite)} (
-                  {formatDelta(
-                    comparison.then.tightness,
-                    comparison.now.tightness
-                  )}
-                  /{formatDelta(comparison.then.riskAppetite, comparison.now.riskAppetite)})
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
         <Form onFormSubmit={handleSubmit} className="mt-6">
           <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 md:grid-cols-[1fr,auto]">
             <Fieldset.Legend className="sr-only">Choose a historical month and load the snapshot</Fieldset.Legend>
@@ -640,138 +406,6 @@ export const TimeMachinePanel = ({
             </div>
           ) : null}
         </div>
-
-        <details className="mt-6 weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/55 px-4 py-3">
-          <summary className="min-h-[44px] cursor-pointer list-none text-sm font-semibold text-slate-100">
-            Open archived summary export
-          </summary>
-          <div className="mt-4 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="type-label text-slate-400">Summary timeline</p>
-                <p className="mt-2 text-sm text-slate-300">
-                  Browse archived action summaries and export a filtered slice for offline review.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleExportTimeline}
-                disabled={filteredEntries.length === 0}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                Export timeline (JSON)
-              </button>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
-              <div className="weather-surface p-4">
-                <p className="type-label text-slate-400">Filters</p>
-                <Fieldset.Root className="mt-3 space-y-4 border-0 p-0">
-                  <Fieldset.Legend className="sr-only">Filter the summary timeline</Fieldset.Legend>
-                  <div>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                      Cadence
-                    </p>
-                    <Tabs.Root
-                      value={timelineCadence}
-                      onValueChange={(value) => {
-                        if (value) {
-                          setTimelineCadence(value as (typeof cadenceOptions)[number]);
-                        }
-                      }}
-                      className="mt-2"
-                    >
-                      <Tabs.List className="flex flex-wrap gap-2">
-                        {cadenceOptions.map((cadence) => (
-                          <Tabs.Tab
-                            key={cadence}
-                            value={cadence}
-                            className={({ active }) =>
-                              `weather-tab inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
-                                active
-                                  ? "border-sky-400/70 text-slate-100"
-                                  : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
-                              }`
-                            }
-                          >
-                            {cadence}
-                          </Tabs.Tab>
-                        ))}
-                      </Tabs.List>
-                      {cadenceOptions.map((cadence) => (
-                        <Tabs.Panel key={cadence} value={cadence} className="mt-4 space-y-3">
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                              <Field.Label>Start date</Field.Label>
-                              <Input
-                                type="date"
-                                value={rangeStart}
-                                min={cadenceRange.min ?? undefined}
-                                max={cadenceRange.max ?? undefined}
-                                onChange={(event) => setRangeStart(event.target.value)}
-                                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                              />
-                            </Field.Root>
-                            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                              <Field.Label>End date</Field.Label>
-                              <Input
-                                type="date"
-                                value={rangeEnd}
-                                min={cadenceRange.min ?? undefined}
-                                max={cadenceRange.max ?? undefined}
-                                onChange={(event) => setRangeEnd(event.target.value)}
-                                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                              />
-                            </Field.Root>
-                          </div>
-                          <p className="text-xs text-slate-500">
-                            {rangeStart && rangeEnd
-                              ? `${filteredEntries.length} entries match the range.`
-                              : "Select a date range to load the timeline."}
-                          </p>
-                        </Tabs.Panel>
-                      ))}
-                    </Tabs.Root>
-                  </div>
-                </Fieldset.Root>
-              </div>
-              <div className="space-y-4">
-                {filteredEntries.length === 0 ? (
-                  <div className="weather-surface p-4">
-                    <p className="type-label text-slate-400">No entries</p>
-                    <p className="mt-2 text-sm text-slate-300">
-                      Adjust the range or cadence to load historical summaries.
-                    </p>
-                  </div>
-                ) : null}
-                {filteredEntries.map((entry) => {
-                  const label = buildTimelineEntryLabel(entry);
-                  const tooltip = buildProvenanceTooltip(entry.summary.provenance);
-                  return (
-                    <div key={`${entry.cadence}-${entry.asOf}`} className="weather-surface p-4">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="type-label text-slate-400">{label}</p>
-                          <p className="mt-2 text-sm text-slate-200">
-                            As of{" "}
-                            <time dateTime={entry.asOf}>{formatDateLabel(entry.asOf)}</time>
-                          </p>
-                        </div>
-                        <span
-                          title={tooltip}
-                          aria-label="Summary provenance"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/80 text-xs font-semibold text-slate-300"
-                        >
-                          ⓘ
-                        </span>
-                      </div>
-                      {renderTimelineSummaryCard(entry)}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </details>
       </div>
     </section>
   );

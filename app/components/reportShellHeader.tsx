@@ -1,8 +1,4 @@
 import Image from "next/image";
-import {
-  ReportPageNavigation,
-  type ReportPageLink,
-} from "./reportShellNavigation";
 import { ReportCta } from "./reportCta";
 import type { ExportCtaProps } from "./report-shell/types";
 
@@ -13,11 +9,7 @@ type ReportShellHeaderProps = {
   statusLabel: string;
   fetchedAtLabel: string;
   recordDateLabel: string;
-  currentPath: string;
-  showPageNavigation: boolean;
-  pageLinks: ReportPageLink[];
   pageTitle: string;
-  pageNavVariant: "full" | "compact";
   exportCta?: ExportCtaProps | null;
 };
 
@@ -26,11 +18,7 @@ export function ReportShellHeader({
   statusLabel,
   fetchedAtLabel,
   recordDateLabel,
-  currentPath,
-  showPageNavigation,
-  pageLinks,
   pageTitle,
-  pageNavVariant,
   exportCta,
 }: ReportShellHeaderProps) {
   const contextBadge = variant === "evidence"
@@ -137,15 +125,6 @@ export function ReportShellHeader({
           </div>
         </div>
       )}
-      {showPageNavigation ? (
-        <ReportPageNavigation
-          pageLinks={pageLinks}
-          pageTitle={pageTitle}
-          currentPath={currentPath}
-          variant={pageNavVariant}
-          className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
-        />
-      ) : null}
     </header>
   );
 }

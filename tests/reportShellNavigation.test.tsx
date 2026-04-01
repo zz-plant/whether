@@ -2,70 +2,23 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PageFlowNav } from "../app/components/pageFlowNav";
-import {
-  ReportMobileNavigation,
-  ReportPageNavigation,
-} from "../app/components/reportShellNavigation";
-import { reportPageLinks } from "../lib/report/reportNavigation";
+import { ReportSectionNavigation } from "../app/components/reportShellNavigation";
 
-describe("Report shell page navigation", () => {
-  it("renders Weekly Brief as the anchor and the remaining routes as support paths", () => {
+describe("Report section navigation", () => {
+  it("renders in-page section links as the lightweight index", () => {
     const html = renderToStaticMarkup(
-      <ReportPageNavigation
-        pageLinks={reportPageLinks}
-        pageTitle="Weekly Brief"
-        currentPath="/"
-      />,
-    );
-
-    assert.match(html, /Weekly Brief is the anchor\. Use support paths only for proof or translation\./);
-    assert.match(html, /Surface 1 of 5/);
-
-    assert.match(html, /Weekly Brief/);
-    assert.match(html, /Evidence/);
-    assert.match(html, /Evidence for this week&#x27;s call: drivers, thresholds, freshness, and replay\./);
-    assert.match(html, /href="\/signals"/);
-
-    assert.match(html, /Planning/);
-    assert.match(html, /Planning for this week&#x27;s hiring, spending, roadmap, finance, and share-ready plan\./);
-  });
-
-  it("keeps current path highlighting with aria-current page", () => {
-    const html = renderToStaticMarkup(
-      <ReportPageNavigation
-        pageLinks={reportPageLinks}
-        pageTitle="Evidence"
-        currentPath="/signals"
-      />,
-    );
-
-    assert.match(html, /aria-current="page"[^>]*href="\/signals"/);
-  });
-
-  it("renders mobile section links instead of a section count only", () => {
-    const html = renderToStaticMarkup(
-      <ReportMobileNavigation
-        pageLinks={reportPageLinks}
-        pageTitle="Evidence"
-        currentPath="/signals"
+      <ReportSectionNavigation
         sectionLinks={[
+          { href: "#decision-summary", label: "Decision summary" },
           { href: "#current-scores", label: "Current scores" },
-          { href: "#thresholds", label: "Thresholds" },
-          { href: "#evidence-priorities", label: "Top drivers" },
-          { href: "#historical-replay", label: "Replay" },
-          { href: "#decision-summary", label: "Decision" },
+          { href: "#advanced-controls", label: "Advanced controls" },
         ]}
-      />, 
+      />,
     );
 
-    assert.match(html, /Return to Weekly Brief/);
-    assert.match(html, /2 of 5/);
-    assert.match(html, /Jump straight to the part of Evidence on \/signals you need\./);
     assert.match(html, /href="#current-scores"/);
-    assert.match(html, /href="#thresholds"/);
-    assert.match(html, /\+1 more section below\./);
-    assert.match(html, /Support paths/);
-    assert.match(html, /Route \/operations/);
+    assert.match(html, /Current scores/);
+    assert.match(html, /Advanced controls/);
   });
 });
 

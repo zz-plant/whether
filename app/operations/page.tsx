@@ -21,7 +21,6 @@ import {
 import { MonthlyActionSummaryPanel } from "../components/appendix/monthlyActionSummaryPanel";
 import { PlaybookPanel } from "../components/appendix/playbookPanel";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
-import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -207,7 +206,6 @@ export default async function OperationsPage({
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       exportCta={{ href: "#ops-export-briefs", label: "Open final brief" }}
-      showPageNavigation={false}
       decisionBanner={{
         label: "Start here",
         decision: "Approve or hold the week's hiring, spend, and roadmap moves.",
@@ -229,7 +227,6 @@ export default async function OperationsPage({
         ],
         updatedAt: fetchedAtLabel,
       }}
-      pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
       structuredData={structuredData}
       historicalBanner={
