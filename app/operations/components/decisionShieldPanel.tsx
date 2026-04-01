@@ -9,8 +9,8 @@ import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { Input } from "@base-ui/react/input";
-import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
+import { LabeledSelectField, type LabeledSelectOption } from "../../components/labeledSelectField";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
@@ -57,6 +57,21 @@ const decisionShieldFieldConfigs = {
     serialize: (value: DecisionAction) => value,
   },
 } as const;
+
+const lifecycleSelectOptions: LabeledSelectOption<LifecycleStage>[] = lifecycleOptions.map((option) => ({
+  value: option.value,
+  label: option.label,
+}));
+
+const categorySelectOptions: LabeledSelectOption<DecisionCategory>[] = categoryOptions.map((option) => ({
+  value: option.value,
+  label: option.label,
+}));
+
+const actionSelectOptions: LabeledSelectOption<DecisionAction>[] = actionOptions.map((option) => ({
+  value: option.value,
+  label: option.label,
+}));
 
 export const DecisionShieldPanel = ({
   assessment,
@@ -381,132 +396,30 @@ export const DecisionShieldPanel = ({
           </div>
           <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
             <Fieldset.Legend className="sr-only">Choose the lifecycle, category, and action for this decision</Fieldset.Legend>
-            <Field.Root className="space-y-2">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Lifecycle
-              </Field.Label>
-              <Select.Root
-                value={lifecycle}
-                onValueChange={(value) => setField("lifecycle", value as LifecycleStage)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
-                  <Select.Value placeholder="Select lifecycle" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {lifecycleOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-            </Field.Root>
-            <Field.Root className="space-y-2">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Category
-              </Field.Label>
-              <Select.Root
-                value={category}
-                onValueChange={(value) => setField("category", value as DecisionCategory)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
-                  <Select.Value placeholder="Select category" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {categoryOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-            </Field.Root>
-            <Field.Root className="space-y-2">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Action
-              </Field.Label>
-              <Select.Root
-                value={action}
-                onValueChange={(value) => setField("action", value as DecisionAction)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
-                  <Select.Value placeholder="Select action" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {actionOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-            </Field.Root>
+            <LabeledSelectField
+              label="Lifecycle"
+              value={lifecycle}
+              onValueChange={(value) => setField("lifecycle", value)}
+              options={lifecycleSelectOptions}
+              placeholder="Select lifecycle"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+            />
+            <LabeledSelectField
+              label="Category"
+              value={category}
+              onValueChange={(value) => setField("category", value)}
+              options={categorySelectOptions}
+              placeholder="Select category"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+            />
+            <LabeledSelectField
+              label="Action"
+              value={action}
+              onValueChange={(value) => setField("action", value)}
+              options={actionSelectOptions}
+              placeholder="Select action"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+            />
           </Fieldset.Root>
 
           <div className="weather-surface p-4">

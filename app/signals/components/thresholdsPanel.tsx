@@ -8,7 +8,6 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
-import { NumberField } from "@base-ui/react/number-field";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +16,7 @@ import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { ThresholdNumberField } from "./ThresholdNumberField";
 
 type ThresholdDraft = {
   baseRateTightness: string;
@@ -307,126 +307,51 @@ export const ThresholdsPanel = ({
               <Form onFormSubmit={handleSubmit} className="grid gap-4">
                 <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-[1fr,1fr,1fr,auto]">
                   <Fieldset.Legend className="sr-only">Set threshold guardrails</Fieldset.Legend>
-                  <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    <Field.Label>Base rate threshold (%)</Field.Label>
-                    <NumberField.Root
-                      id="threshold-base-rate"
-                      name={THRESHOLD_PARAM_KEYS.baseRate}
-                      min={0}
-                      max={10}
-                      step={0.01}
-                      value={
-                        draft.baseRateTightness === ""
-                          ? null
-                          : Number.isNaN(Number(draft.baseRateTightness))
-                            ? null
-                            : Number(draft.baseRateTightness)
-                      }
-                      onValueChange={(value) =>
-                        updateDraft("baseRateTightness", value === null ? "" : value.toString())
-                      }
-                    >
-                      <NumberField.Group>
-                        <NumberField.Input
-                          ref={baseRateRef}
-                          inputMode="decimal"
-                          onBlur={() => handleBlur("baseRateTightness")}
-                          aria-invalid={Boolean(errors.baseRateTightness)}
-                          aria-describedby={
-                            errors.baseRateTightness ? errorIds.baseRateTightness : undefined
-                          }
-                          className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-                        />
-                      </NumberField.Group>
-                    </NumberField.Root>
-                    <Field.Error
-                      id={errorIds.baseRateTightness}
-                      match={Boolean(errors.baseRateTightness)}
-                      className="min-h-[18px] text-xs text-amber-200"
-                    >
-                      {errors.baseRateTightness ?? ""}
-                    </Field.Error>
-                  </Field.Root>
-                  <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    <Field.Label>Tightness score threshold</Field.Label>
-                    <NumberField.Root
-                      id="threshold-tightness"
-                      name={THRESHOLD_PARAM_KEYS.tightness}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      value={
-                        draft.tightnessRegime === ""
-                          ? null
-                          : Number.isNaN(Number(draft.tightnessRegime))
-                            ? null
-                            : Number(draft.tightnessRegime)
-                      }
-                      onValueChange={(value) =>
-                        updateDraft("tightnessRegime", value === null ? "" : value.toString())
-                      }
-                    >
-                      <NumberField.Group>
-                        <NumberField.Input
-                          ref={tightnessRef}
-                          inputMode="numeric"
-                          onBlur={() => handleBlur("tightnessRegime")}
-                          aria-invalid={Boolean(errors.tightnessRegime)}
-                          aria-describedby={
-                            errors.tightnessRegime ? errorIds.tightnessRegime : undefined
-                          }
-                          className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-                        />
-                      </NumberField.Group>
-                    </NumberField.Root>
-                    <Field.Error
-                      id={errorIds.tightnessRegime}
-                      match={Boolean(errors.tightnessRegime)}
-                      className="min-h-[18px] text-xs text-amber-200"
-                    >
-                      {errors.tightnessRegime ?? ""}
-                    </Field.Error>
-                  </Field.Root>
-                  <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    <Field.Label>Risk appetite score</Field.Label>
-                    <NumberField.Root
-                      id="threshold-risk"
-                      name={THRESHOLD_PARAM_KEYS.risk}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      value={
-                        draft.riskAppetiteRegime === ""
-                          ? null
-                          : Number.isNaN(Number(draft.riskAppetiteRegime))
-                            ? null
-                            : Number(draft.riskAppetiteRegime)
-                      }
-                      onValueChange={(value) =>
-                        updateDraft("riskAppetiteRegime", value === null ? "" : value.toString())
-                      }
-                    >
-                      <NumberField.Group>
-                        <NumberField.Input
-                          ref={riskRef}
-                          inputMode="numeric"
-                          onBlur={() => handleBlur("riskAppetiteRegime")}
-                          aria-invalid={Boolean(errors.riskAppetiteRegime)}
-                          aria-describedby={
-                            errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined
-                          }
-                          className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-                        />
-                      </NumberField.Group>
-                    </NumberField.Root>
-                    <Field.Error
-                      id={errorIds.riskAppetiteRegime}
-                      match={Boolean(errors.riskAppetiteRegime)}
-                      className="min-h-[18px] text-xs text-amber-200"
-                    >
-                      {errors.riskAppetiteRegime ?? ""}
-                    </Field.Error>
-                  </Field.Root>
+                  <ThresholdNumberField
+                    id="threshold-base-rate"
+                    name={THRESHOLD_PARAM_KEYS.baseRate}
+                    label="Base rate threshold (%)"
+                    min={0}
+                    max={10}
+                    step={0.01}
+                    value={draft.baseRateTightness}
+                    onValueChange={(value) => updateDraft("baseRateTightness", value)}
+                    onBlur={() => handleBlur("baseRateTightness")}
+                    inputMode="decimal"
+                    inputRef={baseRateRef}
+                    error={errors.baseRateTightness}
+                    errorId={errorIds.baseRateTightness}
+                  />
+                  <ThresholdNumberField
+                    id="threshold-tightness"
+                    name={THRESHOLD_PARAM_KEYS.tightness}
+                    label="Tightness score threshold"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    value={draft.tightnessRegime}
+                    onValueChange={(value) => updateDraft("tightnessRegime", value)}
+                    onBlur={() => handleBlur("tightnessRegime")}
+                    inputMode="numeric"
+                    inputRef={tightnessRef}
+                    error={errors.tightnessRegime}
+                    errorId={errorIds.tightnessRegime}
+                  />
+                  <ThresholdNumberField
+                    id="threshold-risk"
+                    name={THRESHOLD_PARAM_KEYS.risk}
+                    label="Risk appetite score"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    value={draft.riskAppetiteRegime}
+                    onValueChange={(value) => updateDraft("riskAppetiteRegime", value)}
+                    onBlur={() => handleBlur("riskAppetiteRegime")}
+                    inputMode="numeric"
+                    inputRef={riskRef}
+                    error={errors.riskAppetiteRegime}
+                    errorId={errorIds.riskAppetiteRegime}
+                  />
                   <div className="flex items-end gap-3">
                     <button
                       type="submit"

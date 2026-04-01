@@ -39,6 +39,7 @@ import {
   buildTimeMachineSnapshotHref,
   buildTimeMachineSubmitHref,
 } from "../signalsQueryState";
+import { TimeMachineMonthPicker } from "./TimeMachineMonthPicker";
 
 type TimeMachinePanelProps = {
   selectedYear: number;
@@ -549,89 +550,26 @@ export const TimeMachinePanel = ({
         <Form onFormSubmit={handleSubmit} className="mt-6">
           <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 md:grid-cols-[1fr,auto]">
             <Fieldset.Legend className="sr-only">Choose a historical month and load the snapshot</Fieldset.Legend>
-            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-              <Field.Label>Month</Field.Label>
-              <Popover.Root>
-                <Popover.Trigger
-                  ref={monthRef}
-                  id="time-machine-month"
-                  type="button"
-                  aria-invalid={isInvalid}
-                  aria-describedby={isInvalid ? errorId : undefined}
-                  className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                >
-                  <span>{selectedLabel}</span>
-                  <span className="text-xs text-slate-400">Pick month</span>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Positioner side="bottom" align="start" sideOffset={10}>
-                    <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
-                      <div className="flex items-center justify-between gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setCalendarYear((prev) => Math.max(minYear, prev - 1))}
-                          disabled={calendarYear <= minYear}
-                          className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
-                        >
-                          ‹
-                        </button>
-                        <span className="text-sm font-semibold text-slate-100">{calendarYear}</span>
-                        <button
-                          type="button"
-                          onClick={() => setCalendarYear((prev) => Math.min(maxYear, prev + 1))}
-                          disabled={calendarYear >= maxYear}
-                          className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
-                        >
-                          ›
-                        </button>
-                      </div>
-                      <div className="mt-3 grid grid-cols-3 gap-2">
-                        {monthOptions.map((option) => {
-                          const isAvailable =
-                            calendarMonths.length === 0
-                              ? false
-                              : calendarMonths.includes(option.value);
-                          const isActive = calendarYear === year && option.value === month;
-                          return (
-                            <Popover.Close
-                              key={`${calendarYear}-${option.value}`}
-                              type="button"
-                              onClick={() => {
-                                if (isAvailable) {
-                                  handleMonthChange(calendarYear, option.value);
-                                } else {
-                                  setErrorMessage(
-                                    "That month is not available for the selected year."
-                                  );
-                                }
-                              }}
-                              disabled={!isAvailable}
-                              className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                                isActive
-                                  ? "border-sky-400/70 text-slate-100"
-                                  : "border-slate-800/70 text-slate-300"
-                              } ${
-                                isAvailable
-                                  ? "hover:border-sky-400/70 hover:text-slate-100"
-                                  : "cursor-not-allowed text-slate-600"
-                              }`}
-                            >
-                              {option.label.slice(0, 3)}
-                            </Popover.Close>
-                          );
-                        })}
-                      </div>
-                      <div className="mt-3 text-[11px] text-slate-500">
-                        {coverageMin && coverageMax
-                          ? `Coverage: ${coverageMin} → ${coverageMax}`
-                          : "No cache loaded yet."}
-                      </div>
-                      <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-            </Field.Root>
+            <TimeMachineMonthPicker
+              monthRef={monthRef}
+              selectedLabel={selectedLabel}
+              isInvalid={isInvalid}
+              errorId={errorId}
+              calendarYear={calendarYear}
+              minYear={minYear}
+              maxYear={maxYear}
+              month={month}
+              year={year}
+              calendarMonths={calendarMonths}
+              monthOptions={monthOptions}
+              coverageMin={coverageMin}
+              coverageMax={coverageMax}
+              onCalendarYearChange={setCalendarYear}
+              onSelectMonth={handleMonthChange}
+              onUnavailableSelection={() => {
+                setErrorMessage("That month is not available for the selected year.");
+              }}
+            />
             <button
               type="submit"
               disabled={isPending}
