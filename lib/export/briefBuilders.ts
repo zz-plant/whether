@@ -145,6 +145,23 @@ const buildFailureModeBlock = (options?: ExportLayerOptions) => {
   ];
 };
 
+const buildDecisionTransmissionRiskBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+  const topWarning = options?.failureModes?.[0]?.warning;
+  const confidenceLine = options?.confidenceLabel
+    ? `${options.confidenceLabel} confidence`
+    : `${assessment.diagnostics.confidence} confidence`;
+  const whyCouldBeWrong = topWarning
+    ?? "Signal mix can whipsaw near regime boundaries; keep irreversible approvals gated until confirmation reads hold.";
+
+  return [
+    "",
+    "Decision transmission check:",
+    `• Confidence: ${confidenceLine}`,
+    `• Why this could be wrong: ${whyCouldBeWrong}`,
+    "• What would change our mind: change course trigger and supporting flip conditions above.",
+  ];
+};
+
 const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
   const analogs = options?.historicalAnalogs ?? [];
   if (analogs.length === 0) return [];
@@ -222,6 +239,7 @@ export const buildSlackBrief = (
     "",
     "Bounded decision (action now / pause if / change course if):",
     ...decisionHighlights,
+    ...buildDecisionTransmissionRiskBlock(assessment, options),
     "",
     "Constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),

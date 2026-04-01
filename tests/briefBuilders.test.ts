@@ -159,6 +159,10 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Change course if: Resume when tightness < 64\./);
     assert.ok(brief.indexOf("• Action now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Change course if: Resume when tightness < 64."));
+    assert.match(brief, /Decision transmission check:/);
+    assert.match(brief, /• Confidence: MEDIUM confidence/);
+    assert.match(brief, /• Why this could be wrong:/);
+    assert.match(brief, /• What would change our mind:/);
   });
 
   it("optionally appends interpretation layer content for handoff", () => {

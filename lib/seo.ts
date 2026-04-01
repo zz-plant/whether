@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { siteUrl } from "./siteUrl";
+import { decisionTransmissionSearchDescription } from "./report/decisionTransmissionCopy";
 
 export const organizationName = "Whether";
 export const websiteName = "Whether — Weekly Startup Market Weather & Operating Posture";
 export const canonicalPositioningLine =
-  "Whether translates macro conditions into weekly operating posture for founders.";
+  "Whether translates macro conditions into a weekly operating call for leadership teams.";
 export const defaultSiteDescription =
-  `${canonicalPositioningLine} Weekly answer: what to change now across hiring, fundraising, and runway.`;
+  `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 export const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();

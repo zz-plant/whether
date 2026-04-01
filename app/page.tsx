@@ -9,6 +9,7 @@ import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import { buildWeeklyDecisionPresentation } from "./components/weekly-card/presentationAdapter";
+import { decisionTransmissionSummaryLine, homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
 import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
@@ -104,7 +105,7 @@ export const HomePageReportContent = async ({
         },
         page: {
           pageTitle: "Weekly Brief",
-          pageSummary: "One weekly call, one operating move, and one shareable brief.",
+          pageSummary: decisionTransmissionSummaryLine,
           pageLinks: reportPageLinks,
           sectionLinks: homepage.reportShell.sectionLinks,
           currentPath: "/",
@@ -179,6 +180,21 @@ export const HomePageReportContent = async ({
         interpretationSearchParams={homepage.interpretationSearchParams}
         fallbackAlert={homepage.fallbackAlert}
       />
+
+      <section className="weather-panel space-y-3 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-faq-title">
+        <p className="weather-hub-section-eyebrow">Weekly decision FAQ</p>
+        <h2 id="weekly-decision-faq-title" className="text-lg font-semibold text-slate-100">
+          Leadership shorthand for this week
+        </h2>
+        <dl className="space-y-3 text-sm text-slate-200">
+          {homeDecisionFaqItems.map((item) => (
+            <div key={item.question} className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+              <dt className="font-semibold text-slate-100">{item.question}</dt>
+              <dd className="mt-1 text-slate-300">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </ReportShell>
   );
 };

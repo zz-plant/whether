@@ -1,6 +1,7 @@
 import { buildBreadcrumbList, defaultSiteDescription, organizationName, websiteName } from "../../seo";
 import { siteUrl } from "../../siteUrl";
 import { createBreadcrumbTrail } from "../../navigation/breadcrumbs";
+import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
 
 export const buildHomeStructuredData = () => ({
   "@context": "https://schema.org",
@@ -40,13 +41,13 @@ export const buildHomeStructuredData = () => ({
       },
       about: {
         "@type": "Thing",
-        name: "Treasury yield curve strategy planning",
+        name: "Weekly operating posture and decision triggers for leadership teams",
       },
       mainEntity: {
         "@type": "Dataset",
         name: "US Treasury yield curve snapshot",
         description:
-          "Weekly US Treasury yield-curve regime snapshot used by Whether to guide product and engineering operating posture.",
+          "Weekly US Treasury yield-curve regime snapshot used by Whether to guide what leaders should change now, with confidence and flip conditions.",
         creator: {
           "@id": `${siteUrl}#organization`,
         },
@@ -56,6 +57,21 @@ export const buildHomeStructuredData = () => ({
           name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
           url: "https://fred.stlouisfed.org/",
         },
+      },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${siteUrl}/#weekly-decision-faq`,
+      mainEntity: homeDecisionFaqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+      isPartOf: {
+        "@id": `${siteUrl}#website`,
       },
     },
     buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }])),
