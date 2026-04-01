@@ -68,15 +68,17 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Current outlook/);
     assert.match(html, />This week</);
     assert.match(html, /What changed/);
-    assert.match(html, /Weekly decision strip: action now, pause if, and change course if\./);
-    assert.match(html, /Action now/);
-    assert.match(html, /Revisit last week&#x27;s decisions\?/);
-    assert.match(html, /Pause if/);
-    assert.match(html, /Change course if/);
+    assert.match(html, /Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision\./);
+    assert.match(html, /Do this now/);
+    assert.match(html, /Do last week&#x27;s decisions still hold\?/);
+    assert.match(html, /Slow down if/);
+    assert.match(html, /Lean back in if/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Flip window/);
     assert.match(html, /Cloudy\./);
-    assert.match(html, /Why this call/);
+    assert.match(html, /Why this week points here/);
+    assert.match(html, /Readiness: Act with caution/);
+    assert.match(html, /Revisit queue/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
     assert.doesNotMatch(html, /Series B/);
@@ -87,7 +89,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("What changed");
     const postureIndex = html.indexOf("Current outlook");
-    const guidanceIndex = html.indexOf("Weekly decision strip: action now, pause if, and change course if.");
+    const guidanceIndex = html.indexOf("Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision.");
     const actionStripIndex = html.indexOf("Operating levers this week");
     const shareRailIndex = html.indexOf("Transmit this call");
 
@@ -140,10 +142,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    assert.match(html, /Cached weekly read\./);
     assert.match(html, />This week</);
-    assert.match(html, /LIVE|FALLBACK SNAPSHOT/);
-    assert.match(html, /Cached weekly read\./);
+    assert.match(html, /FALLBACK SNAPSHOT/);
+    assert.match(html, /Readiness: Act with caution/);
   });
 
   it("keeps a single canonical weekly call region and compact shell spacing", () => {
@@ -180,7 +181,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     });
 
     assert.match(html, /id="weekly-call-core"/);
-    assert.equal((html.match(/Weekly decision strip: action now, pause if, and change course if\./g) ?? []).length, 1);
+    assert.equal((html.match(/Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision\./g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.doesNotMatch(html, /Open Signals/);
     assert.match(html, /weather-panel space-y-4 px-4 py-4/);
@@ -234,12 +235,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       html.indexOf("Why this call"),
     );
 
-    assert.match(callCore, /Action now/);
-    assert.match(callCore, /Pause if/);
-    assert.match(callCore, /Change course if/);
-    assert.match(callCore, /Revisit last week&#x27;s decisions\?/);
-    assert.ok((callCore.match(/<li/g) ?? []).length <= 4);
+    assert.match(callCore, /Do this now/);
+    assert.match(callCore, /Slow down if/);
+    assert.match(callCore, /Lean back in if/);
+    assert.match(callCore, /Do last week&#x27;s decisions still hold\?/);
     assert.match(callCore, /What changed/);
-    assert.match(callCore, /YES — Regime shift detected\.|NO — Hold posture\./);
+    assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. Last week&#x27;s decisions still hold\./);
+    assert.match(callCore, /Revisit queue/);
   });
 });

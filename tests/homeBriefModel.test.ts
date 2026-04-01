@@ -59,6 +59,10 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.executiveOperationalStance.avoid.length <= 4);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
     assert.equal(typeof model.revisitDecisions, "boolean");
+    assert.ok(Array.isArray(model.revisitQueue));
+    assert.ok(model.revisitQueue.length > 0);
+    assert.match(model.revisitQueue[0]?.reason ?? "", /this week/i);
+    assert.match(model.decisionReadiness.label, /Act|Act with caution|Hold/);
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
@@ -128,6 +132,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.confidencePercent, "number");
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.equal(typeof model.revisitDecisions, "boolean");
+    assert.equal(model.revisitQueue.length, 0);
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);

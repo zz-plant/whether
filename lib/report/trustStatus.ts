@@ -37,6 +37,12 @@ export type FailureModeWarning = {
   mitigationCheck: string;
 };
 
+export type DecisionReadinessState = {
+  label: "Act" | "Act with caution" | "Hold";
+  tone: TrustStatusTone;
+  detail: string;
+};
+
 const FALLBACK_FRESHNESS_LABEL = "Unavailable";
 
 const normalizeFreshnessLabel = (freshnessLabel: string) => {
@@ -325,6 +331,51 @@ export const resolveTrustReadinessCopy = ({
       : tone === "warning"
         ? "Readiness watch"
         : "Readiness clear",
+  };
+};
+
+export const buildDecisionReadinessState = ({
+  confidenceLabel,
+  freshnessLabel,
+  isFallbackSnapshot,
+  isHistoricalSelection = false,
+}: {
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  freshnessLabel: string;
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection?: boolean;
+}): DecisionReadinessState => {
+  const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel);
+  const freshnessUnavailable = isUnavailableFreshness(normalizedFreshness);
+
+  if (isHistoricalSelection) {
+    return {
+      label: "Hold",
+      tone: "historical",
+      detail: "Historical snapshot only. Do not use this read for live approvals.",
+    };
+  }
+
+  if (confidenceLabel === "LOW" || freshnessUnavailable) {
+    return {
+      label: "Hold",
+      tone: "warning",
+      detail: "Confidence or freshness is too weak for new irreversible approvals. Wait for a verified live refresh.",
+    };
+  }
+
+  if (isFallbackSnapshot || confidenceLabel === "MED") {
+    return {
+      label: "Act with caution",
+      tone: "warning",
+      detail: `Use the weekly call for staged moves, but keep irreversible commitments gated until reliability improves from ${confidenceLabel} (${normalizedFreshness}).`,
+    };
+  }
+
+  return {
+    label: "Act",
+    tone: "stable",
+    detail: `Fresh live data (${normalizedFreshness}) and HIGH confidence support this week's bounded approvals.`,
   };
 };
 

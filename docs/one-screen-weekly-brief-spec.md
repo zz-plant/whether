@@ -181,10 +181,13 @@ Implementation guardrails:
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - The current-outlook strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
 - The canonical weekly-call block should expose a compact scalar anchor (`Boldness budget`) plus window state labels before the bounded decision triplet.
+- The canonical weekly-call block should also expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row so stable weeks do not require opening Trust to know whether the call is usable.
+- When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move longer explanation into disclosure content below the primary scan path.
 - Trust on `/` should remain a single compact sentence inside the canonical weekly-call block; do not inject a second standalone trust panel immediately under the hero.
 - Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Share actions should remain routine-first. Company-specific override controls must stay separate from default share actions.
+- Share actions should keep the operator brief primary, while also exposing a `delta-only brief` for repeat readers who only need this week’s change, reopen queue, and current guardrails.
 - Citation + provenance belong near the lower fold: `Cite this call` stays separate from the share-action rail, and compact provenance remains immediately after the weekly card on `/`.
 - Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
 - Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.

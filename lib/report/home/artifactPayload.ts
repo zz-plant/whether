@@ -25,6 +25,39 @@ type BuildArtifactPayloadArgs = {
   freshnessLabel: string;
 };
 
+const buildDeltaOnlyBriefText = ({
+  freshnessLabel,
+  homeBriefModel,
+  canonicalDecisionCopy,
+  citation,
+}: {
+  freshnessLabel: string;
+  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  canonicalDecisionCopy: ReturnType<typeof buildCanonicalDecisionCopy>;
+  citation: string;
+}) => {
+  const revisitLines = homeBriefModel.revisitQueue.length > 0
+    ? homeBriefModel.revisitQueue.map((item) => `- ${item.label}: ${item.action}. Flip back in if ${item.flipCondition}.`)
+    : [`- Hold the current bounded rules until the next material weekly delta prints.`];
+
+  return [
+    "DELTA-ONLY BRIEF",
+    `Readiness: ${homeBriefModel.decisionReadiness.label}`,
+    `Changed: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
+    "",
+    "Revisit now",
+    ...revisitLines,
+    "",
+    `Pause if: ${homeBriefModel.guardrail}`,
+    `Lean back in if: ${canonicalDecisionCopy.flipTrigger}`,
+    `Trust: ${homeBriefModel.decisionReadiness.detail}`,
+    `Data refreshed: ${freshnessLabel}`,
+    "",
+    "Citation",
+    citation,
+  ].join("\n");
+};
+
 export const buildLeadershipArtifactPayload = async ({
   assessment,
   treasury,
@@ -77,6 +110,10 @@ export const buildLeadershipArtifactPayload = async ({
       postureState,
       canonicalDecisionCopy,
     });
+    const callCitation = buildCallCitation(assessment, treasury, {
+      interpretationLayer,
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    });
 
     return {
       boardSummary,
@@ -101,10 +138,13 @@ export const buildLeadershipArtifactPayload = async ({
         watch: canonicalDecisionCopy.flipTrigger,
         flipConditions: canonicalDecisionCopy.flipConditions,
       }),
-      callCitation: buildCallCitation(assessment, treasury, {
-        interpretationLayer,
-        postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+      deltaOnlyBriefText: buildDeltaOnlyBriefText({
+        freshnessLabel,
+        homeBriefModel,
+        canonicalDecisionCopy,
+        citation: callCitation,
       }),
+      callCitation,
     };
   } catch (error) {
     console.error("[home] leadership artifact export unavailable", error);

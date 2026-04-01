@@ -59,6 +59,10 @@ The weekly-call module now also surfaces a compact weekly scalar block before th
 - boldness budget score and weekly delta,
 - hiring, expansion, and raise windows,
 - one-line net delta shorthand.
+The canonical weekly-call block now also includes:
+- a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
+- a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened,
+- a delta-only brief in the share rail for repeat readers who only need the weekly change, reopen items, and current hold / reopen lines.
 Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share actions -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.

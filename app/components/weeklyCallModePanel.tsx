@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
-import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import type { DecisionReadinessState } from "../../lib/report/trustStatus";
+import type { RevisitQueueItem, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { CompactDisclosure } from "./compactDisclosure";
 
 type PolicyDetails = {
@@ -23,6 +24,8 @@ type WeeklyCallModePanelProps = {
   snapshotGuardrail: string;
   snapshotWatch: string;
   revisitDecisions: boolean;
+  revisitQueue: RevisitQueueItem[];
+  decisionReadiness: DecisionReadinessState;
   effectiveFlipLabels: string[];
   compactInsetClassName: string;
   tierOnePanelClassName: string;
@@ -67,6 +70,8 @@ export function WeeklyCallModePanel({
   snapshotGuardrail,
   snapshotWatch,
   revisitDecisions,
+  revisitQueue,
+  decisionReadiness,
   effectiveFlipLabels,
   compactInsetClassName,
   tierOnePanelClassName,
@@ -117,9 +122,11 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
   const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
-  const trustVerdict = needsTrustWarning
-    ? "Keep big commitments reversible."
-    : "Safe enough to use for this week.";
+  const readinessToneClass = decisionReadiness.tone === "stable"
+    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
+    : decisionReadiness.tone === "historical"
+      ? "border-violet-400/30 bg-violet-500/10 text-violet-100"
+      : "border-amber-400/30 bg-amber-500/10 text-amber-100";
 
   return (
     <>
@@ -197,11 +204,34 @@ export function WeeklyCallModePanel({
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>
+          {revisitQueue.length > 0 ? (
+            <article className="mt-3 rounded-xl border border-amber-400/20 bg-amber-500/6 px-3 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit queue</p>
+                <span className="rounded-full border border-amber-400/25 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
+                  {revisitQueue.length} decisions
+                </span>
+              </div>
+              <div className="mt-2 grid gap-2 xl:grid-cols-3">
+                {revisitQueue.map((item) => (
+                  <article key={item.id} className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{item.label}</p>
+                    <p className="mt-1 text-sm font-semibold leading-5 text-slate-100">{item.action}</p>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{item.reason}</p>
+                    <p className="mt-1 text-[11px] leading-5 text-sky-100">Flip back in if {item.flipCondition}.</p>
+                  </article>
+                ))}
+              </div>
+            </article>
+          ) : null}
           <div className={`mt-3 rounded-xl border px-3 py-2.5 ${compactTrustToneClass}`}>
-            <p className="text-[11px] leading-5 text-slate-100">
-              <span className={`font-semibold ${needsTrustWarning ? "text-amber-100" : "text-emerald-100"}`}>{trustVerdict}</span>{" "}
-              {trustStateDetail}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${readinessToneClass}`}>
+                Readiness: {decisionReadiness.label}
+              </span>
+              <p className="text-[11px] leading-5 text-slate-100">{decisionReadiness.detail}</p>
+            </div>
+            <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStateDetail}</p>
             {trustReason ? (
               <p className="mt-1 text-[11px] leading-5 text-slate-300">Using the last clean snapshot because {trustReason}</p>
             ) : null}

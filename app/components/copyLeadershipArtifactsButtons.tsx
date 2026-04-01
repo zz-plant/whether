@@ -21,6 +21,7 @@ type CopyTarget =
   | "Meeting pack"
   | "Explainer brief"
   | "Call snapshot"
+  | "Delta brief"
   | "Operator brief"
   | "Board summary"
   | "Citation";
@@ -68,6 +69,7 @@ export function CopyLeadershipArtifactsButtons({
   boardSnippet,
   weeklyCallSnapshot,
   weeklyOperatorBrief,
+  deltaOnlyBrief,
   boardSummary,
   citation,
   fallbackActive = false,
@@ -76,6 +78,7 @@ export function CopyLeadershipArtifactsButtons({
   boardSnippet: string;
   weeklyCallSnapshot: string;
   weeklyOperatorBrief: string;
+  deltaOnlyBrief: string;
   boardSummary: string;
   citation: string;
   fallbackActive?: boolean;
@@ -282,7 +285,7 @@ export function CopyLeadershipArtifactsButtons({
 
   return (
     <div className="space-y-2">
-      <div className="grid gap-2 sm:grid-cols-3" aria-label="Primary weekly brief actions">
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" aria-label="Primary weekly brief actions">
         <ActionButton
           variant="primary"
           type="button"
@@ -309,6 +312,18 @@ export function CopyLeadershipArtifactsButtons({
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
+            copyToClipboard(applyOverride(deltaOnlyBrief), "Delta brief");
+          }}
+          disabled={isCopying}
+          aria-busy={isCopying}
+        >
+          {copyLabel("Delta brief", "Copy delta brief")}
+        </ActionButton>
+        <ActionButton
+          variant="secondary"
+          type="button"
+          onClick={() => {
+            trackFirstActionConversion("copy_weekly_brief");
             copyToClipboard(applyOverride(weeklyCallSnapshot), "Call snapshot");
           }}
           disabled={isCopying}
@@ -322,9 +337,9 @@ export function CopyLeadershipArtifactsButtons({
           ? `${activeModeLabel} shared with its link.`
           : shareState === "copied"
             ? `Copied ${activeModeLabel.toLowerCase()} link.`
-          : shareState === "error"
-            ? "Share failed. Copy fallback is available."
-            : `Use the share button for ${activeModeLabel.toLowerCase()} or copy a brief below.`
+            : shareState === "error"
+              ? "Share failed. Copy fallback is available."
+              : `Use the share button for ${activeModeLabel.toLowerCase()}, or copy the delta brief when repeat readers only need this week's change.`
         }
       </p>
 

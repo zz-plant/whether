@@ -9,6 +9,7 @@ export type ArtifactPayload = {
   boardSnippetText: string;
   weeklyOperatorBriefText: string;
   weeklyCallSnapshotText: string;
+  deltaOnlyBriefText: string;
   callCitation: string;
 };
 

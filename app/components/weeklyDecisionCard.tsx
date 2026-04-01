@@ -76,6 +76,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     startupVariantPolicy,
     roleAwareTemplates,
     revisitDecisions,
+    revisitQueue,
+    decisionReadiness,
     weeklyMovement,
   } = decision;
   const {
@@ -146,6 +148,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             snapshotGuardrail={snapshotGuardrail}
             snapshotWatch={snapshotWatch}
             revisitDecisions={revisitDecisions}
+            revisitQueue={revisitQueue}
+            decisionReadiness={decisionReadiness}
             effectiveFlipLabels={effectiveFlipLabels}
             compactInsetClassName={compactInset}
             tierOnePanelClassName={tierOnePanel}

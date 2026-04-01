@@ -38,6 +38,7 @@ const LeadershipArtifactActions = async ({
         boardSnippet={artifactPayload.boardSnippetText}
         weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
         weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
+        deltaOnlyBrief={artifactPayload.deltaOnlyBriefText}
         boardSummary={artifactPayload.boardSummary}
         citation={artifactPayload.callCitation}
         fallbackActive={fallbackActive}

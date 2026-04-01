@@ -1,4 +1,9 @@
-import { buildCanonicalBoundedDecisionRules } from "../boundedDecisionRules";
+import {
+  buildCanonicalBoundedDecisionRules,
+  decisionAreaLabel,
+  formatBoundedDecisionAction,
+  formatBoundedDecisionReverse,
+} from "../boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../operatingCalls";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
 import { type ReportDynamics } from "../reportData";
@@ -18,6 +23,7 @@ import {
   formatConfidencePlainLabel,
 } from "../reportFormatting";
 import {
+  buildDecisionReadinessState,
   buildFailureModeWarnings,
 } from "../trustStatus";
 import {
@@ -95,6 +101,108 @@ const buildBoundaryTriggerText = ({
   const dimensionLabel = dimension === "tightness" ? "tightness" : "risk appetite";
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
   return `Flip to ${targetRegimeLabel} if ${dimensionLabel} ${condition} ${threshold.toFixed(1)} (now ${current.toFixed(1)}).`;
+};
+
+type RevisitDriverSignal = {
+  key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+  delta: number;
+};
+
+const revisitReasonByArea: Record<WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"], string> = {
+  hiring: "Recheck fixed-cost approvals before opening net-new headcount.",
+  "product-tempo": "Restage roadmap scope before treating last week's tempo as locked.",
+  "capital-raising": "Refresh raise timing assumptions before leadership treats the window as unchanged.",
+  "burn-discipline": "Re-approve discretionary spend before locking new burn commitments.",
+  "expansion-bets": "Restage expansion bets before treating them as committed.",
+};
+
+const signalAreaPriority: Record<RevisitDriverSignal["key"], WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"][]> = {
+  tightness: ["hiring", "burn-discipline", "capital-raising"],
+  riskAppetite: ["product-tempo", "expansion-bets", "capital-raising"],
+  baseRate: ["capital-raising", "burn-discipline", "hiring"],
+  curveSlope: ["product-tempo", "expansion-bets", "capital-raising"],
+};
+
+const formatDriverDelta = (delta: number) => Number.isInteger(delta) ? delta.toFixed(0) : delta.toFixed(1);
+
+const summarizeSignalDriver = (
+  signal: RevisitDriverSignal,
+) => {
+  const absDelta = formatDriverDelta(Math.abs(signal.delta));
+
+  switch (signal.key) {
+    case "tightness":
+      return signal.delta >= 0
+        ? `Capital tightness rose ${absDelta} points this week.`
+        : `Capital tightness eased ${absDelta} points this week.`;
+    case "riskAppetite":
+      return signal.delta >= 0
+        ? `Risk appetite improved ${absDelta} points this week.`
+        : `Risk appetite weakened ${absDelta} points this week.`;
+    case "baseRate":
+      return signal.delta >= 0
+        ? `Base-rate pressure rose ${absDelta} points this week.`
+        : `Base-rate pressure eased ${absDelta} points this week.`;
+    case "curveSlope":
+      return signal.delta >= 0
+        ? `Curve slope steepened ${absDelta} points this week.`
+        : `Curve slope flattened ${absDelta} points this week.`;
+    default:
+      return "Core inputs moved this week.";
+  }
+};
+
+const buildRevisitQueue = ({
+  revisitDecisions,
+  decisionRules,
+  reportDynamics,
+}: {
+  revisitDecisions: boolean;
+  decisionRules: WeeklyDecisionCardViewModel["decision"]["decisionRules"];
+  reportDynamics?: {
+    changedSignals: RevisitDriverSignal[];
+  };
+}): WeeklyDecisionCardViewModel["decision"]["revisitQueue"] => {
+  if (!revisitDecisions) {
+    return [];
+  }
+
+  const changedSignals = [...(reportDynamics?.changedSignals ?? [])]
+    .sort((left, right) => Math.abs(right.delta) - Math.abs(left.delta));
+  const driverByArea = new Map<
+    WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"],
+    RevisitDriverSignal
+  >();
+
+  for (const signal of changedSignals) {
+    for (const area of signalAreaPriority[signal.key]) {
+      if (!driverByArea.has(area)) {
+        driverByArea.set(area, signal);
+      }
+    }
+  }
+
+  const orderedAreas = [
+    ...driverByArea.keys(),
+    ...decisionRules.map((rule) => rule.area),
+  ].filter((area, index, areas) => areas.indexOf(area) === index);
+
+  return orderedAreas.slice(0, 3).flatMap((area) => {
+    const rule = decisionRules.find((candidate) => candidate.area === area);
+    if (!rule) {
+      return [];
+    }
+
+    const driver = driverByArea.get(area);
+
+    return [{
+      id: area,
+      label: decisionAreaLabel(area),
+      action: formatBoundedDecisionAction(rule),
+      reason: `${driver ? `${summarizeSignalDriver(driver)} ` : ""}${revisitReasonByArea[area]}`,
+      flipCondition: formatBoundedDecisionReverse(rule),
+    }];
+  });
 };
 
 export const buildFlipRiskMeterState = (
@@ -230,6 +338,13 @@ export const buildHomeBriefModelInternal = (
     changedSignals: reportDynamics?.changedSignals ?? [],
     anomalySignals: reportDynamics?.anomalySignals ?? [],
   });
+  const revisitDecisions = (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable";
+  const decisionReadiness = buildDecisionReadinessState({
+    confidenceLabel,
+    freshnessLabel: fetchedAtLabel ?? "Unavailable",
+    isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
+    isHistoricalSelection: Boolean(historicalSelection),
+  });
 
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
@@ -352,6 +467,11 @@ export const buildHomeBriefModelInternal = (
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
   });
+  const revisitQueue = buildRevisitQueue({
+    revisitDecisions,
+    decisionRules,
+    reportDynamics,
+  });
 
   const regimeSignalIndicators = buildRegimeSignalIndicators({
     assessment,
@@ -420,7 +540,9 @@ export const buildHomeBriefModelInternal = (
     actionStripItems,
     roleAwareTemplates,
     executiveOperationalStance,
-    revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
+    revisitDecisions,
+    revisitQueue,
+    decisionReadiness,
     weeklyLeadershipSummary: {
       boldnessScore: weeklyLeadershipSummary.boldnessScore,
       boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
@@ -551,6 +673,8 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       roleAwareTemplates: homeBriefModel.roleAwareTemplates,
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,
       revisitDecisions: homeBriefModel.revisitDecisions,
+      revisitQueue: homeBriefModel.revisitQueue,
+      decisionReadiness: homeBriefModel.decisionReadiness,
       weeklyLeadershipSummary: homeBriefModel.weeklyLeadershipSummary,
       weeklyMovement: homeBriefModel.weeklyMovement,
     },

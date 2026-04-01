@@ -196,8 +196,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const regimeIndex = html.indexOf("Current outlook");
     const callIndex = html.indexOf(">This week<");
-    const doNowIndex = html.indexOf(">Action now<");
-    const flipIndex = html.indexOf(">Change course if<");
+    const doNowIndex = html.indexOf(">Do this now<");
+    const flipIndex = html.indexOf(">Lean back in if<");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -282,8 +282,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, />Deep evidence</);
-    assert.match(html, />Why this call</);
-    assert.match(html, />Role translation</);
+    assert.match(html, />Diagnostics</);
+    assert.match(html, />Why this week points here</);
+    assert.match(html, />How this lands across the company</);
   });
 });

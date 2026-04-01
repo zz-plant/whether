@@ -69,6 +69,8 @@ describe("assembleHomePage streaming contract", () => {
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
     assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
+    assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /DELTA-ONLY BRIEF/);
+    assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /Revisit now/);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/decide\//);

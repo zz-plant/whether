@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildCompactTrustSummary, buildTrustStatus } from "../lib/report/trustStatus";
+import {
+  buildCompactTrustSummary,
+  buildDecisionReadinessState,
+  buildTrustStatus,
+} from "../lib/report/trustStatus";
 import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 
 describe("buildTrustStatus trust tones", () => {
@@ -77,6 +81,35 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(freshness.line, /degraded/);
     assert.match(trust, /Cached snapshot/);
     assert.match(trust, /Unavailable/);
+  });
+
+  it("maps readiness to act, caution, and hold based on trust conditions", () => {
+    assert.equal(
+      buildDecisionReadinessState({
+        confidenceLabel: "HIGH",
+        freshnessLabel: "Updated 1h ago",
+        isFallbackSnapshot: false,
+      }).label,
+      "Act",
+    );
+
+    assert.equal(
+      buildDecisionReadinessState({
+        confidenceLabel: "MED",
+        freshnessLabel: "Updated 3h ago",
+        isFallbackSnapshot: false,
+      }).label,
+      "Act with caution",
+    );
+
+    const hold = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Unavailable",
+      isFallbackSnapshot: true,
+    });
+
+    assert.equal(hold.label, "Hold");
+    assert.match(hold.detail, /verified live refresh/i);
   });
 
 });

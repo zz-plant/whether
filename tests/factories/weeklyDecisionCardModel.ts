@@ -213,6 +213,34 @@ export const buildWeeklyDecisionCardModel = (
       avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
     },
     revisitDecisions: true,
+    revisitQueue: [
+      {
+        id: "hiring",
+        label: "Hiring",
+        action: "Limit hiring to backfills and mission-critical roles tied to delivery risk",
+        reason: "Capital tightness rose 1 point this week. Recheck fixed-cost approvals before opening net-new headcount.",
+        flipCondition: "staged approvals when tightness < 66 and risk appetite > 54",
+      },
+      {
+        id: "product-tempo",
+        label: "Product tempo",
+        action: "Protect core roadmap tempo and prioritize near-term customer value slices",
+        reason: "Risk appetite weakened 1 point this week. Restage roadmap scope before treating last week's tempo as locked.",
+        flipCondition: "tempo on deferred bets when risk appetite > 54 and weekly direction stabilizes/improves",
+      },
+      {
+        id: "capital-raising",
+        label: "Capital raising",
+        action: "Prepare raise materials and launch planning early to preserve process control",
+        reason: "Capital tightness rose 1 point this week. Refresh raise timing assumptions before leadership treats the window as unchanged.",
+        flipCondition: "full process when risk appetite > 54 and tightness < 66",
+      },
+    ],
+    decisionReadiness: {
+      label: "Act with caution",
+      tone: "warning",
+      detail: "Use the weekly call for staged moves, but keep irreversible commitments gated until reliability improves from MED (Updated 2h ago).",
+    },
     weeklyLeadershipSummary: {
       boldnessScore: 58,
       boldnessDelta: -2,

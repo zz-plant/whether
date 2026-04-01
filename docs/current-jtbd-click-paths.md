@@ -30,6 +30,7 @@ Validation note: click labels in this document were verified from the current ro
 2. Use one of:
    - `Copy board snippet`
    - `Copy weekly call snapshot`
+   - `Copy delta brief`
    - `Copy Weekly Operator Brief`
 3. If needed, open `More share actions`.
 4. Choose one of:
@@ -41,6 +42,7 @@ Validation note: click labels in this document were verified from the current ro
 
 **Current output**
 - Slack-ready weekly call snapshot
+- Delta-only weekly brief for repeat readers
 - Meeting pack
 - Weekly operator brief
 - Board summary

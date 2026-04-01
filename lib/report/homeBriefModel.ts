@@ -14,7 +14,7 @@ import type {
   TransitionVelocityEstimate,
 } from "./forecastModel";
 import type { RegimeSignalKey } from "./reportFormatting";
-import type { FailureModeWarning } from "./trustStatus";
+import type { DecisionReadinessState, FailureModeWarning } from "./trustStatus";
 import type {
   BoundedDecisionRule,
   ScopedVariantDecisionAdjustment,
@@ -246,6 +246,14 @@ export type WeeklyLeadershipSummary = {
   netDeltaLabel: string;
 };
 
+export type RevisitQueueItem = {
+  id: BoundedDecisionRule["area"];
+  label: string;
+  action: string;
+  reason: string;
+  flipCondition: string;
+};
+
 export type WeeklyDecisionCardViewModel = {
   status: {
     statusLabel: string;
@@ -291,6 +299,8 @@ export type WeeklyDecisionCardViewModel = {
     roleAwareTemplates: RoleAwareOperatingTemplate[];
     executiveOperationalStance: { expand: string[]; avoid: string[] };
     revisitDecisions: boolean;
+    revisitQueue: RevisitQueueItem[];
+    decisionReadiness: DecisionReadinessState;
     weeklyLeadershipSummary: WeeklyLeadershipSummary;
     weeklyMovement: {
       score: number;
