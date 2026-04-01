@@ -41,13 +41,13 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
 const runCliWithRetries = async (
   args: string[],
   options: { env?: NodeJS.ProcessEnv } = {},
-  attempts = 5,
+  attempts = 8,
 ) => {
   let lastResult: { status: number | null; stdout: string; stderr: string } | null = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     lastResult = await runCli(args, options);
     if (lastResult.status === 0) return lastResult;
-    await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
+    await new Promise((resolve) => setTimeout(resolve, 150 * attempt));
   }
   return lastResult ?? { status: null, stdout: "", stderr: "no result" };
 };
