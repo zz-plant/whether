@@ -1,7 +1,8 @@
 "use client";
 
+import { Combobox } from "@base-ui/react/combobox";
 import Link from "next/link";
-import { useMemo, useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
 import { useHapticFeedback } from "./useHapticFeedback";
 import { useClipboardCopy } from "./useClipboardCopy";
@@ -94,6 +95,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     handleReset,
   } = useCommandCenterPreferences();
   const commandCenterRef = useRef<HTMLElement | null>(null);
+  const [comboboxOpen, setComboboxOpen] = useState(false);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
 
@@ -120,29 +122,71 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     setQuery,
   });
 
-  const groupedActions = useMemo(() => {
+  const filteredActions = useMemo(() => {
     const normalizedQuery = normalize(query);
-    const filtered = actions.filter((action) => {
-      const actionTags = action.tags ?? [action.group];
-      const target = buildSearchTarget(action);
-      const queryMatches = normalizedQuery.length === 0 || target.includes(normalizedQuery);
-      const filterMatches = filter === "All" || actionTags.includes(filter);
+    return actions
+      .filter((action) => {
+        const actionTags = action.tags ?? [action.group];
+        const target = buildSearchTarget(action);
+        const queryMatches = normalizedQuery.length === 0 || target.includes(normalizedQuery);
+        const filterMatches = filter === "All" || actionTags.includes(filter);
 
-      return queryMatches && filterMatches;
-    });
-
-    return filtered.slice(0, MAX_RESULTS).reduce<Record<OperatorCommandAction["group"], OperatorCommandAction[]>>(
-      (accumulator, action) => {
-        accumulator[action.group].push(action);
-        return accumulator;
-      },
-      {
-        Playbook: [],
-        Pages: [],
-        Sections: [],
-      },
-    );
+        return queryMatches && filterMatches;
+      })
+      .slice(0, MAX_RESULTS);
   }, [actions, filter, query]);
+
+  const groupedActions = useMemo(
+    () =>
+      filteredActions.reduce<Record<OperatorCommandAction["group"], OperatorCommandAction[]>>(
+        (accumulator, action) => {
+          accumulator[action.group].push(action);
+          return accumulator;
+        },
+        {
+          Playbook: [],
+          Pages: [],
+          Sections: [],
+        },
+      ),
+    [filteredActions],
+  );
+
+  const flattenedActions = useMemo(
+    () => groupOrder.flatMap((group) => groupedActions[group]),
+    [groupedActions],
+  );
+
+  const executeCommandAction = async (action: OperatorCommandAction) => {
+    if (action.group === "Playbook") {
+      triggerDecisionCommitHaptic();
+    } else {
+      triggerNavigationHaptic();
+    }
+
+    if (action.copyText) {
+      const copied = await copyToClipboard(action.copyText, action.copyTarget ?? action.label);
+
+      if (!copied) {
+        window.location.assign(action.href);
+      }
+
+      return;
+    }
+
+    window.location.assign(action.href);
+  };
+
+  const groupedActionSections = groupOrder.map((group) => ({
+    group,
+    actions: groupedActions[group],
+  })).filter((entry) => entry.actions.length > 0);
+
+  const comboboxShouldOpen =
+    isExpanded &&
+    comboboxOpen &&
+    flattenedActions.length > 0 &&
+    (query.trim().length > 0 || filter !== "All");
 
   const totalResults =
     groupedActions.Playbook.length + groupedActions.Pages.length + groupedActions.Sections.length;
@@ -209,19 +253,87 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       {isExpanded ? (
         <>
           <div className="grid gap-3 lg:grid-cols-[1fr,auto] lg:items-start">
-            <label htmlFor="operator-command-search" className="sr-only">
-              Search
-            </label>
-            <input
-              ref={searchInputRef}
-              id="operator-command-search"
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onBlur={() => persistQuery(query)}
-              placeholder="Search"
-              className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            />
+            <Combobox.Root<OperatorCommandAction>
+              value={null}
+              open={comboboxShouldOpen}
+              modal={false}
+              autoHighlight={true}
+              autoComplete="none"
+              filter={null}
+              inputValue={query}
+              onOpenChange={setComboboxOpen}
+              onInputValueChange={(value) => {
+                setQuery(value);
+                setComboboxOpen(true);
+              }}
+              onValueChange={(action) => {
+                if (!action) {
+                  return;
+                }
+
+                setComboboxOpen(false);
+                void executeCommandAction(action);
+              }}
+              itemToStringLabel={(action) => action.label}
+            >
+              <div className="relative">
+                <label htmlFor="operator-command-search" className="sr-only">
+                  Search
+                </label>
+                <Combobox.Input
+                  ref={searchInputRef}
+                  id="operator-command-search"
+                  placeholder="Search"
+                  onFocus={() => setComboboxOpen(true)}
+                  onBlur={() => {
+                    persistQuery(query);
+                    window.setTimeout(() => setComboboxOpen(false), 0);
+                  }}
+                  className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                />
+                <Combobox.Portal>
+                  <Combobox.Positioner side="bottom" align="start" sideOffset={10}>
+                    <Combobox.Popup className="z-30 mt-1 w-[min(40rem,calc(100vw-2rem))] rounded-2xl border border-slate-800/80 bg-slate-950/95 p-3 shadow-2xl">
+                      <Combobox.List className="space-y-3">
+                        {groupedActionSections.map(({ group, actions: groupActions }) => {
+                          const GroupIcon = groupGlyph[group];
+
+                          return (
+                            <div key={`combobox-${group}`} className="space-y-2">
+                              <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-500">
+                                {group}
+                              </p>
+                              <div className="space-y-2">
+                                {groupActions.map((action) => (
+                                  <Combobox.Item
+                                    key={`combobox-${group}-${action.href}-${action.label}`}
+                                    value={action}
+                                    className="flex min-h-[44px] cursor-pointer items-center justify-between gap-3 rounded-xl border border-slate-800/70 px-3 py-2 text-left text-slate-200 outline-none transition-colors data-[highlighted]:border-sky-400/70 data-[highlighted]:text-slate-100"
+                                  >
+                                    <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                      <span aria-hidden="true" className="text-slate-400">
+                                        <GroupIcon className="h-3.5 w-3.5" />
+                                      </span>
+                                      {action.label}
+                                    </span>
+                                    <span className="inline-flex items-center gap-2">
+                                      <span className="hidden text-[11px] text-slate-400 sm:inline">
+                                        {action.description}
+                                      </span>
+                                      <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                                    </span>
+                                  </Combobox.Item>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </Combobox.List>
+                    </Combobox.Popup>
+                  </Combobox.Positioner>
+                </Combobox.Portal>
+              </div>
+            </Combobox.Root>
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
                 {filterOrder.map((item) => {
@@ -304,97 +416,82 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             </p>
           ) : (
             <div className="grid gap-3 lg:grid-cols-3">
-              {groupOrder.map((group) => {
-                if (groupedActions[group].length === 0) {
-                  return null;
-                }
+              {groupedActionSections.map(({ group, actions: groupActions }) => {
+                const GroupIcon = groupGlyph[group];
 
                 return (
                   <section key={group} className="weather-surface relative z-10 space-y-2 p-3">
                     <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">{group}</p>
                     <ul className="space-y-2">
-                      {groupedActions[group].map((action) => {
-                        const GroupIcon = groupGlyph[action.group];
-                        return (
-                          <li key={`${group}-${action.href}-${action.label}`}>
-                            {action.copyText ? (
-                              <button
-                                type="button"
-                                className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                                title={action.description}
-                                aria-label={`${action.label} (copy action)`}
-                                onClick={() => {
-                                  void (async () => {
-                                    const copied = await copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
-                                    if (!copied) {
-                                      if (action.group === "Playbook") {
-                                        triggerDecisionCommitHaptic();
-                                      } else {
-                                        triggerNavigationHaptic();
-                                      }
-                                      window.location.assign(action.href);
-                                    }
-                                  })();
-                                }}
-                              >
-                                <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
-                                  <span aria-hidden="true" className="text-slate-400">
-                                    <GroupIcon className="h-3.5 w-3.5" />
-                                  </span>
-                                  {action.label}
+                      {groupActions.map((action) => (
+                        <li key={`${group}-${action.href}-${action.label}`}>
+                          {action.copyText ? (
+                            <button
+                              type="button"
+                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                              title={action.description}
+                              aria-label={`${action.label} (copy action)`}
+                              onClick={() => {
+                                void executeCommandAction(action);
+                              }}
+                            >
+                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                <span aria-hidden="true" className="text-slate-400">
+                                  <GroupIcon className="h-3.5 w-3.5" />
                                 </span>
-                                <span className="inline-flex items-center gap-2">
-                                  <span className="flex flex-wrap justify-end gap-1">
-                                    {(action.tags ?? [action.group]).map((tag) => (
-                                      <span
-                                        key={`${action.href}-${tag}`}
-                                        className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
-                                      >
-                                        {getTagLabel(tag)}
-                                      </span>
-                                    ))}
-                                  </span>
-                                  <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                                {action.label}
+                              </span>
+                              <span className="inline-flex items-center gap-2">
+                                <span className="flex flex-wrap justify-end gap-1">
+                                  {(action.tags ?? [action.group]).map((tag) => (
+                                    <span
+                                      key={`${action.href}-${tag}`}
+                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                    >
+                                      {getTagLabel(tag)}
+                                    </span>
+                                  ))}
                                 </span>
-                              </button>
-                            ) : (
-                              <Link
-                                href={action.href}
-                                className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                                title={action.description}
-                                aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
-                                onClick={() => {
-                                  if (action.group === "Playbook") {
-                                    triggerDecisionCommitHaptic();
-                                    return;
-                                  }
-                                  triggerNavigationHaptic();
-                                }}
-                              >
-                                <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
-                                  <span aria-hidden="true" className="text-slate-400">
-                                    <GroupIcon className="h-3.5 w-3.5" />
-                                  </span>
-                                  {action.label}
+                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                              </span>
+                            </button>
+                          ) : (
+                            <Link
+                              href={action.href}
+                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                              title={action.description}
+                              aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
+                              onClick={() => {
+                                if (action.group === "Playbook") {
+                                  triggerDecisionCommitHaptic();
+                                  return;
+                                }
+                                triggerNavigationHaptic();
+                              }}
+                            >
+                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                <span aria-hidden="true" className="text-slate-400">
+                                  <GroupIcon className="h-3.5 w-3.5" />
                                 </span>
-                                <span className="inline-flex items-center gap-2">
-                                  <span className="flex flex-wrap justify-end gap-1">
-                                    {(action.tags ?? [action.group]).map((tag) => (
-                                      <span
-                                        key={`${action.href}-${tag}`}
-                                        className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
-                                      >
-                                        {getTagLabel(tag)}
-                                      </span>
-                                    ))}
-                                  </span>
-                                  <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                                {action.label}
+                              </span>
+                              <span className="inline-flex items-center gap-2">
+                                <span className="flex flex-wrap justify-end gap-1">
+                                  {(action.tags ?? [action.group]).map((tag) => (
+                                    <span
+                                      key={`${action.href}-${tag}`}
+                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                    >
+                                      {getTagLabel(tag)}
+                                    </span>
+                                  ))}
                                 </span>
-                              </Link>
-                            )}
-                          </li>
-                        );
-                      })}
+                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                              </span>
+                            </Link>
+                          )}
+                        </li>
+                      ))}
                     </ul>
                   </section>
                 );

@@ -5,6 +5,8 @@
 
 import { useEffect, useState } from "react";
 import { Field } from "@base-ui/react/field";
+import { Fieldset } from "@base-ui/react/fieldset";
+import { Form } from "@base-ui/react/form";
 import { Select } from "@base-ui/react/select";
 import { formatDateUTC } from "../../../lib/formatters";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
@@ -175,175 +177,184 @@ export const AssumptionLockPanel = () => {
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="weather-surface p-4">
-            <Field.Root className="space-y-3">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Risk posture
-              </Field.Label>
-              <Select.Root
-                id="assumption-risk"
-                value={riskPosture}
-                onValueChange={(value) => setField("riskPosture", value as RiskPosture)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
-                  <Select.Value placeholder="Select risk posture" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {riskPostureOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-              <p className="text-sm text-slate-300">
-                {riskPostureOptions.find((option) => option.value === riskPosture)?.description}
-              </p>
-            </Field.Root>
-          </div>
-          <div className="weather-surface p-4">
-            <Field.Root className="space-y-3">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Threshold tolerance
-              </Field.Label>
-              <Select.Root
-                id="assumption-threshold"
-                value={thresholdTolerance}
-                onValueChange={(value) => setField("thresholdTolerance", value as ThresholdTolerance)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
-                  <Select.Value placeholder="Select tolerance" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {thresholdOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-              <p className="text-sm text-slate-300">
-                {thresholdOptions.find((option) => option.value === thresholdTolerance)?.description}
-              </p>
-            </Field.Root>
-          </div>
-          <div className="weather-surface p-4">
-            <Field.Root className="space-y-3">
-              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
-                Interpretation stance
-              </Field.Label>
-              <Select.Root
-                id="assumption-stance"
-                value={interpretationStance}
-                onValueChange={(value) => setField("interpretationStance", value as InterpretationStance)}
-              >
-                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
-                  <Select.Value placeholder="Select stance" />
-                  <Select.Icon className="text-slate-400">
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
-                      <Select.List className="max-h-64 overflow-y-auto">
-                        {stanceOptions.map((option) => (
-                          <Select.Item
-                            key={option.value}
-                            value={option.value}
-                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
-                          >
-                            <Select.ItemText>{option.label}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-              <p className="text-sm text-slate-300">
-                {stanceOptions.find((option) => option.value === interpretationStance)?.description}
-              </p>
-            </Field.Root>
-          </div>
-        </div>
+        <Form
+          onFormSubmit={() => {
+            if (!lockedAt) {
+              handleLock();
+            }
+          }}
+          className="mt-6 space-y-6"
+        >
+          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
+            <Fieldset.Legend className="sr-only">Choose the assumptions the team will operate under</Fieldset.Legend>
+            <div className="weather-surface p-4">
+              <Field.Root className="space-y-3">
+                <Field.Label className="type-label text-slate-400" nativeLabel={false}>
+                  Risk posture
+                </Field.Label>
+                <Select.Root
+                  id="assumption-risk"
+                  value={riskPosture}
+                  onValueChange={(value) => setField("riskPosture", value as RiskPosture)}
+                >
+                  <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
+                    <Select.Value placeholder="Select risk posture" />
+                    <Select.Icon className="text-slate-400">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                        <path
+                          d="M7 10l5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                      <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                        <Select.List className="max-h-64 overflow-y-auto">
+                          {riskPostureOptions.map((option) => (
+                            <Select.Item
+                              key={option.value}
+                              value={option.value}
+                              className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
+                            >
+                              <Select.ItemText>{option.label}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.List>
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <p className="text-sm text-slate-300">
+                  {riskPostureOptions.find((option) => option.value === riskPosture)?.description}
+                </p>
+              </Field.Root>
+            </div>
+            <div className="weather-surface p-4">
+              <Field.Root className="space-y-3">
+                <Field.Label className="type-label text-slate-400" nativeLabel={false}>
+                  Threshold tolerance
+                </Field.Label>
+                <Select.Root
+                  id="assumption-threshold"
+                  value={thresholdTolerance}
+                  onValueChange={(value) => setField("thresholdTolerance", value as ThresholdTolerance)}
+                >
+                  <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
+                    <Select.Value placeholder="Select tolerance" />
+                    <Select.Icon className="text-slate-400">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                        <path
+                          d="M7 10l5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                      <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                        <Select.List className="max-h-64 overflow-y-auto">
+                          {thresholdOptions.map((option) => (
+                            <Select.Item
+                              key={option.value}
+                              value={option.value}
+                              className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
+                            >
+                              <Select.ItemText>{option.label}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.List>
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <p className="text-sm text-slate-300">
+                  {thresholdOptions.find((option) => option.value === thresholdTolerance)?.description}
+                </p>
+              </Field.Root>
+            </div>
+            <div className="weather-surface p-4">
+              <Field.Root className="space-y-3">
+                <Field.Label className="type-label text-slate-400" nativeLabel={false}>
+                  Interpretation stance
+                </Field.Label>
+                <Select.Root
+                  id="assumption-stance"
+                  value={interpretationStance}
+                  onValueChange={(value) => setField("interpretationStance", value as InterpretationStance)}
+                >
+                  <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200">
+                    <Select.Value placeholder="Select stance" />
+                    <Select.Icon className="text-slate-400">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                        <path
+                          d="M7 10l5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                      <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                        <Select.List className="max-h-64 overflow-y-auto">
+                          {stanceOptions.map((option) => (
+                            <Select.Item
+                              key={option.value}
+                              value={option.value}
+                              className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-emerald-200"
+                            >
+                              <Select.ItemText>{option.label}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.List>
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+                <p className="text-sm text-slate-300">
+                  {stanceOptions.find((option) => option.value === interpretationStance)?.description}
+                </p>
+              </Field.Root>
+            </div>
+          </Fieldset.Root>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          {lockedAt ? (
-            <button
-              type="button"
-              onClick={handleUnlock}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-rose-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-200 touch-manipulation"
-            >
-              Unlock assumptions
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleLock}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-emerald-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200 touch-manipulation"
-            >
-              Lock assumptions
-            </button>
-          )}
-          <p className="text-sm text-slate-400">
-            {lockedAt ? "Locked." : "Not locked yet."}
-          </p>
-        </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {lockedAt ? (
+              <button
+                type="button"
+                onClick={handleUnlock}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-rose-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-200 touch-manipulation"
+              >
+                Unlock assumptions
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-emerald-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200 touch-manipulation"
+              >
+                Lock assumptions
+              </button>
+            )}
+            <p className="text-sm text-slate-400">
+              {lockedAt ? "Locked." : "Not locked yet."}
+            </p>
+          </div>
+        </Form>
         <p className="sr-only" role="status" aria-live="polite">
           {statusMessage ?? ""}
         </p>

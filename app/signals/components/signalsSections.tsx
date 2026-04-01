@@ -1,4 +1,9 @@
+"use client";
+
+import { Radio } from "@base-ui/react/radio";
+import { RadioGroup } from "@base-ui/react/radio-group";
 import type { ComponentType } from "react";
+import { useRouter } from "next/navigation";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import {
   buildDiagnosticsExpansionHref,
@@ -29,55 +34,71 @@ export const SignalsModeSwitcherSection = ({
 }: {
   activeSignalsView: SignalsView;
   searchParams?: Record<string, string | undefined>;
-}) => (
-  <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
-    <div className="space-y-1">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        How much detail
-      </p>
-      <h2 className="text-base font-semibold text-slate-100">
-        Short read and deeper evidence are available in parallel.
-      </h2>
-      <p className="text-sm text-slate-300">
-        The short read tells you what changed, what it means this week, and what would make the
-        read wrong. The deeper view adds the full history, diagnostics, and supporting checks.
-      </p>
-    </div>
-    <div className="grid gap-2 sm:grid-cols-2">
-      {([
-        {
-          id: "implication",
-          label: "Short read",
-          detail:
-            "What changed, what it means this week, and the main lines to watch.",
-        },
-        {
-          id: "detail",
-          label: "Deeper evidence",
-          detail:
-            "Diagnostics, historical replay, and the checks that would overturn the read.",
-        },
-      ] as const).map((item) => {
-        const active = item.id === activeSignalsView;
-        return (
-          <a
+}) => {
+  const router = useRouter();
+
+  return (
+    <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+          How much detail
+        </p>
+        <h2 className="text-base font-semibold text-slate-100">
+          Short read and deeper evidence are available in parallel.
+        </h2>
+        <p className="text-sm text-slate-300">
+          The short read tells you what changed, what it means this week, and what would make the
+          read wrong. The deeper view adds the full history, diagnostics, and supporting checks.
+        </p>
+      </div>
+      <RadioGroup
+        value={activeSignalsView}
+        name="signals-view"
+        aria-label="Evidence view mode"
+        onValueChange={(value) => {
+          router.push(buildSignalsViewHref(searchParams, value as SignalsView));
+        }}
+        className="grid gap-2 sm:grid-cols-2"
+      >
+        {([
+          {
+            id: "implication",
+            label: "Short read",
+            detail:
+              "What changed, what it means this week, and the main lines to watch.",
+          },
+          {
+            id: "detail",
+            label: "Deeper evidence",
+            detail:
+              "Diagnostics, historical replay, and the checks that would overturn the read.",
+          },
+        ] as const).map((item) => (
+          <Radio.Root
             key={item.id}
-            href={buildSignalsViewHref(searchParams, item.id)}
-            aria-current={active ? "page" : undefined}
-            className={`rounded-xl border px-3 py-3 text-left transition-colors ${
-              active
-                ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
-                : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-            }`}
+            value={item.id}
+            aria-label={item.label}
+            className={({ checked }) =>
+              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 text-left outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+                checked
+                  ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
+                  : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+              }`
+            }
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">{item.label}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-300">{item.detail}</p>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-);
+            <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80">
+              <Radio.Indicator className="h-2 w-2 rounded-full bg-sky-200" />
+            </span>
+            <span className="min-w-0">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">{item.label}</span>
+              <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
+            </span>
+          </Radio.Root>
+        ))}
+      </RadioGroup>
+    </section>
+  );
+};
 
 export const SignalsDecisionSummarySection = ({
   decisionDeltaLabel,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@base-ui/react/dialog";
+import { DrawerPreview as Drawer } from "@base-ui/react/drawer";
 import { useRef, useState } from "react";
 import { useHapticFeedback } from "./useHapticFeedback";
 
@@ -23,9 +23,10 @@ export const MobileActionSheet = ({
   const haptic = useHapticFeedback();
 
   return (
-    <Dialog.Root
+    <Drawer.Root
       open={open}
-      onOpenChange={(nextOpen) => {
+      swipeDirection="down"
+      onOpenChange={(nextOpen: boolean) => {
         if (nextOpen) {
           suppressCloseAutoFocusRef.current = false;
         }
@@ -38,7 +39,7 @@ export const MobileActionSheet = ({
         }
       }}
     >
-      <Dialog.Trigger
+      <Drawer.Trigger
         className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         aria-label={`${triggerLabel}. ${open ? "Expanded" : "Collapsed"}.`}
       >
@@ -61,11 +62,11 @@ export const MobileActionSheet = ({
         <span className="sr-only">
           {srHint}. {open ? "Expanded" : "Collapsed"}.
         </span>
-      </Dialog.Trigger>
+      </Drawer.Trigger>
 
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-[1px]" />
-        <Dialog.Popup
+      <Drawer.Portal>
+        <Drawer.Backdrop className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-[1px]" />
+        <Drawer.Popup
           className="fixed inset-x-2 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-50 max-h-[85vh] overflow-auto pt-2"
           finalFocus={() => {
             if (!suppressCloseAutoFocusRef.current) {
@@ -79,11 +80,11 @@ export const MobileActionSheet = ({
           <div className="weather-mobile-panel weather-mobile-sheet w-full rounded-3xl border border-slate-700/80 p-4 shadow-2xl">
             <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-600/90" aria-hidden="true" />
             <div className="mb-3 flex items-center justify-between gap-3">
-              <Dialog.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Dialog.Title>
-              <Dialog.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
+              <Drawer.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Drawer.Title>
+              <Drawer.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
                 <span aria-hidden="true">✕</span>
                 <span className="sr-only">Close actions menu</span>
-              </Dialog.Close>
+              </Drawer.Close>
             </div>
             <ul className="grid gap-2">
               {actions.map((action) => (
@@ -103,8 +104,8 @@ export const MobileActionSheet = ({
               ))}
             </ul>
           </div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </Drawer.Popup>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 };

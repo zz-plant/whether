@@ -4,9 +4,10 @@
  */
 "use client";
 
-import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Field } from "@base-ui/react/field";
+import { Fieldset } from "@base-ui/react/fieldset";
+import { Form } from "@base-ui/react/form";
 import { Input } from "@base-ui/react/input";
 import { Popover } from "@base-ui/react/popover";
 import { Tabs } from "@base-ui/react/tabs";
@@ -316,8 +317,7 @@ export const TimeMachinePanel = ({
     URL.revokeObjectURL(url);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     if (isUnavailableSelection) {
       setErrorMessage("That month is not available for the selected year.");
       monthRef.current?.focus();
@@ -546,102 +546,105 @@ export const TimeMachinePanel = ({
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
-          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-            <Field.Label>Month</Field.Label>
-            <Popover.Root>
-              <Popover.Trigger
-                ref={monthRef}
-                id="time-machine-month"
-                type="button"
-                aria-invalid={isInvalid}
-                aria-describedby={isInvalid ? errorId : undefined}
-                className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-              >
-                <span>{selectedLabel}</span>
-                <span className="text-xs text-slate-400">Pick month</span>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner side="bottom" align="start" sideOffset={10}>
-                  <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
-                    <div className="flex items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setCalendarYear((prev) => Math.max(minYear, prev - 1))}
-                        disabled={calendarYear <= minYear}
-                        className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
-                      >
-                        ‹
-                      </button>
-                      <span className="text-sm font-semibold text-slate-100">{calendarYear}</span>
-                      <button
-                        type="button"
-                        onClick={() => setCalendarYear((prev) => Math.min(maxYear, prev + 1))}
-                        disabled={calendarYear >= maxYear}
-                        className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
-                      >
-                        ›
-                      </button>
-                    </div>
-                    <div className="mt-3 grid grid-cols-3 gap-2">
-                      {monthOptions.map((option) => {
-                        const isAvailable =
-                          calendarMonths.length === 0
-                            ? false
-                            : calendarMonths.includes(option.value);
-                        const isActive = calendarYear === year && option.value === month;
-                        return (
-                          <Popover.Close
-                            key={`${calendarYear}-${option.value}`}
-                            type="button"
-                            onClick={() => {
-                              if (isAvailable) {
-                                handleMonthChange(calendarYear, option.value);
-                              } else {
-                                setErrorMessage(
-                                  "That month is not available for the selected year."
-                                );
-                              }
-                            }}
-                            disabled={!isAvailable}
-                            className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                              isActive
-                                ? "border-sky-400/70 text-slate-100"
-                                : "border-slate-800/70 text-slate-300"
-                            } ${
-                              isAvailable
-                                ? "hover:border-sky-400/70 hover:text-slate-100"
-                                : "cursor-not-allowed text-slate-600"
-                            }`}
-                          >
-                            {option.label.slice(0, 3)}
-                          </Popover.Close>
-                        );
-                      })}
-                    </div>
-                    <div className="mt-3 text-[11px] text-slate-500">
-                      {coverageMin && coverageMax
-                        ? `Coverage: ${coverageMin} → ${coverageMax}`
-                        : "No cache loaded yet."}
-                    </div>
-                    <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-          </Field.Root>
-          <button
-            type="submit"
-            disabled={isPending}
-            aria-busy={isPending}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-          >
-            {isPending ? (
-              <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-            ) : null}
-            {isPending ? "Loading" : "Load snapshot"}
-          </button>
-        </form>
+        <Form onFormSubmit={handleSubmit} className="mt-6">
+          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 md:grid-cols-[1fr,auto]">
+            <Fieldset.Legend className="sr-only">Choose a historical month and load the snapshot</Fieldset.Legend>
+            <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+              <Field.Label>Month</Field.Label>
+              <Popover.Root>
+                <Popover.Trigger
+                  ref={monthRef}
+                  id="time-machine-month"
+                  type="button"
+                  aria-invalid={isInvalid}
+                  aria-describedby={isInvalid ? errorId : undefined}
+                  className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                >
+                  <span>{selectedLabel}</span>
+                  <span className="text-xs text-slate-400">Pick month</span>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Positioner side="bottom" align="start" sideOffset={10}>
+                    <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
+                      <div className="flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCalendarYear((prev) => Math.max(minYear, prev - 1))}
+                          disabled={calendarYear <= minYear}
+                          className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
+                        >
+                          ‹
+                        </button>
+                        <span className="text-sm font-semibold text-slate-100">{calendarYear}</span>
+                        <button
+                          type="button"
+                          onClick={() => setCalendarYear((prev) => Math.min(maxYear, prev + 1))}
+                          disabled={calendarYear >= maxYear}
+                          className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
+                        >
+                          ›
+                        </button>
+                      </div>
+                      <div className="mt-3 grid grid-cols-3 gap-2">
+                        {monthOptions.map((option) => {
+                          const isAvailable =
+                            calendarMonths.length === 0
+                              ? false
+                              : calendarMonths.includes(option.value);
+                          const isActive = calendarYear === year && option.value === month;
+                          return (
+                            <Popover.Close
+                              key={`${calendarYear}-${option.value}`}
+                              type="button"
+                              onClick={() => {
+                                if (isAvailable) {
+                                  handleMonthChange(calendarYear, option.value);
+                                } else {
+                                  setErrorMessage(
+                                    "That month is not available for the selected year."
+                                  );
+                                }
+                              }}
+                              disabled={!isAvailable}
+                              className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                                isActive
+                                  ? "border-sky-400/70 text-slate-100"
+                                  : "border-slate-800/70 text-slate-300"
+                              } ${
+                                isAvailable
+                                  ? "hover:border-sky-400/70 hover:text-slate-100"
+                                  : "cursor-not-allowed text-slate-600"
+                              }`}
+                            >
+                              {option.label.slice(0, 3)}
+                            </Popover.Close>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-3 text-[11px] text-slate-500">
+                        {coverageMin && coverageMax
+                          ? `Coverage: ${coverageMin} → ${coverageMax}`
+                          : "No cache loaded yet."}
+                      </div>
+                      <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            </Field.Root>
+            <button
+              type="submit"
+              disabled={isPending}
+              aria-busy={isPending}
+              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            >
+              {isPending ? (
+                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+              ) : null}
+              {isPending ? "Loading" : "Load snapshot"}
+            </button>
+          </Fieldset.Root>
+        </Form>
         <div className="mt-3 flex flex-wrap gap-3 text-xs">
           <a
             href={clearDraftHref}
@@ -715,7 +718,8 @@ export const TimeMachinePanel = ({
           <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Filters</p>
-              <div className="mt-3 space-y-4">
+              <Fieldset.Root className="mt-3 space-y-4 border-0 p-0">
+                <Fieldset.Legend className="sr-only">Filter the summary timeline</Fieldset.Legend>
                 <div>
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
                     Cadence
@@ -781,7 +785,7 @@ export const TimeMachinePanel = ({
                     ))}
                   </Tabs.Root>
                 </div>
-              </div>
+              </Fieldset.Root>
             </div>
             <div className="space-y-4">
               {filteredEntries.length === 0 ? (

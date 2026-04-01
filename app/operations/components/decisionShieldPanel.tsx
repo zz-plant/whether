@@ -6,6 +6,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Field } from "@base-ui/react/field";
+import { Fieldset } from "@base-ui/react/fieldset";
+import { Form } from "@base-ui/react/form";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
@@ -377,7 +379,8 @@ export const DecisionShieldPanel = ({
               Inputs → Execution call → Why now → Execution boundary → Pivot signal
             </p>
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
+          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
+            <Fieldset.Legend className="sr-only">Choose the lifecycle, category, and action for this decision</Fieldset.Legend>
             <Field.Root className="space-y-2">
               <Field.Label className="type-label text-slate-400" nativeLabel={false}>
                 Lifecycle
@@ -504,7 +507,7 @@ export const DecisionShieldPanel = ({
                 </Select.Portal>
               </Select.Root>
             </Field.Root>
-          </div>
+          </Fieldset.Root>
 
           <div className="weather-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -518,30 +521,32 @@ export const DecisionShieldPanel = ({
                 Max 8 presets
               </p>
             </div>
-            <div className="mt-4 flex flex-wrap items-start gap-3">
-              <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
-                <Field.Label nativeLabel={false}>Preset name</Field.Label>
-                <Input
-                  ref={presetInputRef}
-                  type="text"
-                  value={presetName}
-                  onChange={(event) => setPresetName(event.target.value)}
-                  onBlur={handlePresetBlur}
-                  aria-invalid={Boolean(presetError)}
-                  aria-describedby={[presetError ? "preset-error" : null, presetHintId]
-                    .filter(Boolean)
-                    .join(" ")}
-                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                />
-              </Field.Root>
-              <button
-                type="button"
-                onClick={handlePresetSave}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Save preset
-              </button>
-            </div>
+            <Form onFormSubmit={handlePresetSave} className="mt-4">
+              <Fieldset.Root className="flex min-w-0 flex-wrap items-start gap-3 border-0 p-0">
+                <Fieldset.Legend className="sr-only">Save a reusable Decision Shield preset</Fieldset.Legend>
+                <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
+                  <Field.Label nativeLabel={false}>Preset name</Field.Label>
+                  <Input
+                    ref={presetInputRef}
+                    type="text"
+                    value={presetName}
+                    onChange={(event) => setPresetName(event.target.value)}
+                    onBlur={handlePresetBlur}
+                    aria-invalid={Boolean(presetError)}
+                    aria-describedby={[presetError ? "preset-error" : null, presetHintId]
+                      .filter(Boolean)
+                      .join(" ")}
+                    className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                  />
+                </Field.Root>
+                <button
+                  type="submit"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Save preset
+                </button>
+              </Fieldset.Root>
+            </Form>
             <div className="mt-2 min-h-[20px]">
               {presetError ? (
                 <p id="preset-error" className="text-xs text-amber-200">
