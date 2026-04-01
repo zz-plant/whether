@@ -39,8 +39,8 @@ export const AdvancedThresholdsSection = ({
               Threshold and audit controls are hidden by default.
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              Start with focus presets and ranked signals. Open this panel only when you need to tune
-              thresholds or inspect audit history.
+              Focus presets and ranked signals stay in the main flow, while this panel covers
+              threshold tuning and audit history.
             </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
