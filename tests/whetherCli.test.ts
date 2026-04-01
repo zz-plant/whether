@@ -824,10 +824,10 @@ describe("whether cli", () => {
     const { port } = server.address() as { port: number };
 
     const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
     const status = await runCli(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -866,10 +866,10 @@ describe("whether cli", () => {
     const { port } = server.address() as { port: number };
 
     const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
     const status = await runCli(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -1047,7 +1047,7 @@ describe("whether cli", () => {
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
   });
 
-  it("doctor reports resolved API base URL and token source", async () => {
+  it("doctor reports resolved API base URL and token source when URL is explicitly provided", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/health")) {
@@ -1059,18 +1059,21 @@ describe("whether cli", () => {
       res.end();
     });
 
-    const port = await listenOnPreferredLocalPort(server);
-    const result = await runCli(["doctor", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
+    });
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
     assert.equal(parsed[0]?.name, "api/health");
-    assert.equal(parsed[0]?.autodiscovered, true);
-    assert.match(parsed[0]?.apiBaseUrl, new RegExp(`127\\.0\\.0\\.1:${port}|localhost:${port}`));
+    assert.equal(parsed[0]?.autodiscovered, false);
+    assert.equal(parsed[0]?.apiBaseUrl, `http://127.0.0.1:${port}`);
     assert.equal(parsed[1]?.name, "apiBaseUrl");
-    assert.equal(parsed[1]?.source, "default");
+    assert.equal(parsed[1]?.source, "flag");
     assert.equal(parsed[2]?.name, "auth");
     assert.equal(parsed[2]?.authenticated, false);
   });
