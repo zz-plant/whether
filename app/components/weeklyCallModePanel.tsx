@@ -182,18 +182,18 @@ export function WeeklyCallModePanel({
               {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
             </article>
           </div>
-          <p className="sr-only">Weekly decision strip: action, threshold, and flip condition.</p>
+          <p className="sr-only">Weekly decision strip: action now, pause if, and change course if.</p>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Threshold</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Pause if</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Flip condition</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Change course if</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             </article>
           </div>

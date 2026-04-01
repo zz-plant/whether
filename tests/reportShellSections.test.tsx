@@ -45,8 +45,8 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Data trust/);
-    assert.match(html, /Approval status/);
-    assert.match(html, /Recovery progress/);
+    assert.match(html, /Approval lane/);
+    assert.match(html, /Reliability snapshot/);
     assert.match(html, /Data source details/);
     assert.match(html, /\/method/);
   });
@@ -95,8 +95,8 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Whether report/);
-    assert.match(html, /On this page/);
-    assert.match(html, /Elsewhere/);
+    assert.match(html, /Decide now/);
+    assert.match(html, /Review order/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
   });
@@ -182,7 +182,7 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Copy weekly brief/);
     assert.match(html, /href="#share-ready-artifact"/);
-    assert.match(html, /Copy the weekly brief before opening Planning or deeper evidence\./);
-    assert.doesNotMatch(html, /On this page/);
+    assert.match(html, /Decide this week&#x27;s pace in one screen\./);
+    assert.doesNotMatch(html, /Review order/);
   });
 });

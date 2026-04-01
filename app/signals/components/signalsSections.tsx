@@ -150,12 +150,16 @@ export const SignalsDecisionSummarySection = ({
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
                 Trigger:
               </span>
-              {triggerCondition}
-              <span aria-hidden="true" className="mx-2 text-slate-500">·</span>
+              {" "}
+              <span>{triggerCondition}</span>
+              {" "}
+              <span aria-hidden="true" className="text-slate-500">·</span>
+              {" "}
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
                 Reversal:
               </span>
-              {reversalCondition}
+              {" "}
+              <span>{reversalCondition}</span>
             </p>
           )}
         </div>

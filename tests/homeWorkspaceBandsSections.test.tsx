@@ -77,12 +77,12 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Freshness: As of Mar 25, 2026/);
     assert.match(html, /Source coverage: Treasury live; labor snapshot/);
-    assert.match(html, /Outage approvals/);
-    assert.match(html, /Recovery runbook/);
+    assert.match(html, /Readiness board/);
+    assert.match(html, /Planning/);
     assert.match(html, /Labor/);
     assert.match(html, /Treasury/);
     assert.match(html, /Live · Fresh · Daily cadence/);
-    assert.ok(html.indexOf("audit-this-call") < html.indexOf("approve-this-weeks-plan"));
-    assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("historical-replay-workspace"));
+    assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
+    assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));
   });
 });

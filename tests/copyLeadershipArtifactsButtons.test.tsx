@@ -19,9 +19,9 @@ describe("CopyLeadershipArtifactsButtons", () => {
       />,
     );
 
-    const shareIndex = html.indexOf("Share brief");
-    const snapshotIndex = html.indexOf("Copy weekly call snapshot");
-    const boardSnippetIndex = html.indexOf("Copy board snippet");
+    const shareIndex = html.indexOf("Share operator brief");
+    const snapshotIndex = html.indexOf("Copy call snapshot");
+    const boardSnippetIndex = html.indexOf("Copy board note");
 
     assert.ok(shareIndex >= 0);
     assert.ok(snapshotIndex >= 0);

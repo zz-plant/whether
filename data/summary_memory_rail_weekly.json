@@ -1,18 +1,18 @@
 [
   {
-    "record_date": "2026-02-20",
-    "regime": "EXPANSION"
-  },
-  {
-    "record_date": "2026-02-27",
-    "regime": "EXPANSION"
-  },
-  {
     "record_date": "2026-03-06",
     "regime": "EXPANSION"
   },
   {
-    "record_date": "2026-03-12",
+    "record_date": "2026-03-13",
+    "regime": "EXPANSION"
+  },
+  {
+    "record_date": "2026-03-20",
+    "regime": "EXPANSION"
+  },
+  {
+    "record_date": "2026-03-25",
     "regime": "EXPANSION"
   }
 ]

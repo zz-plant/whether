@@ -68,11 +68,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Current outlook/);
     assert.match(html, />This week</);
     assert.match(html, /What changed/);
-    assert.match(html, /Weekly decision strip: action, threshold, and flip condition\./);
-    assert.match(html, /Action/);
+    assert.match(html, /Weekly decision strip: action now, pause if, and change course if\./);
+    assert.match(html, /Action now/);
     assert.match(html, /Revisit last week&#x27;s decisions\?/);
-    assert.match(html, /Threshold/);
-    assert.match(html, /Flip condition/);
+    assert.match(html, /Pause if/);
+    assert.match(html, /Change course if/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Flip window/);
     assert.match(html, /Cloudy\./);
@@ -87,7 +87,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("What changed");
     const postureIndex = html.indexOf("Current outlook");
-    const guidanceIndex = html.indexOf("Weekly decision strip: action, threshold, and flip condition.");
+    const guidanceIndex = html.indexOf("Weekly decision strip: action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Operating levers this week");
     const shareRailIndex = html.indexOf("Transmit this call");
 
@@ -180,7 +180,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     });
 
     assert.match(html, /id="weekly-call-core"/);
-    assert.equal((html.match(/Weekly decision strip: action, threshold, and flip condition\./g) ?? []).length, 1);
+    assert.equal((html.match(/Weekly decision strip: action now, pause if, and change course if\./g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.doesNotMatch(html, /Open Signals/);
     assert.match(html, /weather-panel space-y-4 px-4 py-4/);
@@ -234,9 +234,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       html.indexOf("Why this call"),
     );
 
-    assert.match(callCore, /Action/);
-    assert.match(callCore, /Threshold/);
-    assert.match(callCore, /Flip condition/);
+    assert.match(callCore, /Action now/);
+    assert.match(callCore, /Pause if/);
+    assert.match(callCore, /Change course if/);
     assert.match(callCore, /Revisit last week&#x27;s decisions\?/);
     assert.ok((callCore.match(/<li/g) ?? []).length <= 4);
     assert.match(callCore, /What changed/);

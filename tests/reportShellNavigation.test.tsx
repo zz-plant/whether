@@ -18,15 +18,13 @@ describe("Report shell page navigation", () => {
       />,
     );
 
-    assert.match(html, /Anchor route/);
-    assert.match(html, /Support paths/);
-    assert.match(html, /Start from Weekly Brief/);
+    assert.match(html, /Weekly Brief is the anchor\. Use support paths only for proof or translation\./);
     assert.match(html, /Surface 1 of 5/);
 
     assert.match(html, /Weekly Brief/);
     assert.match(html, /Evidence/);
     assert.match(html, /Evidence for this week&#x27;s call: drivers, thresholds, freshness, and replay\./);
-    assert.match(html, /Route \/signals/);
+    assert.match(html, /href="\/signals"/);
 
     assert.match(html, /Planning/);
     assert.match(html, /Planning for this week&#x27;s hiring, spending, roadmap, finance, and share-ready plan\./);

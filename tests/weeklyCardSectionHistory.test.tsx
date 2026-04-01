@@ -14,8 +14,8 @@ describe("HistorySection", () => {
       />,
     );
 
-    assert.match(html, /Regime history/);
-    assert.match(html, /Changed/);
+    assert.match(html, /Regime history \(recent\)/);
+    assert.match(html, /1 shift in window/);
     assert.match(html, /Current/);
     assert.match(html, /\/?month=2&amp;year=2026/);
   });

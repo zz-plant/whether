@@ -153,12 +153,12 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(action \/ trigger \/ reversal\):/);
-    assert.match(brief, /• Action: Limit net new hiring\./);
-    assert.match(brief, /• Trigger threshold: Pause approvals when tightness > 70\./);
-    assert.match(brief, /• Reversal condition: Resume when tightness < 64\./);
-    assert.ok(brief.indexOf("• Action: Limit net new hiring.") < brief.indexOf("• Trigger threshold: Pause approvals when tightness > 70."));
-    assert.ok(brief.indexOf("• Trigger threshold: Pause approvals when tightness > 70.") < brief.indexOf("• Reversal condition: Resume when tightness < 64."));
+    assert.match(brief, /Bounded decision \(action now \/ pause if \/ change course if\):/);
+    assert.match(brief, /• Action now: Limit net new hiring\./);
+    assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
+    assert.match(brief, /• Change course if: Resume when tightness < 64\./);
+    assert.ok(brief.indexOf("• Action now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
+    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Change course if: Resume when tightness < 64."));
   });
 
   it("optionally appends interpretation layer content for handoff", () => {
@@ -243,8 +243,8 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
     assert.match(brief, /• Hiring stance/);
     assert.match(brief, /Action now: Backfills only/);
-    assert.match(brief, /Trigger\/threshold to tighten or loosen: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Reversal condition: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
+    assert.match(brief, /Change course if: Resume staged approvals when tightness < 66/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {

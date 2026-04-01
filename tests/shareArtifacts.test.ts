@@ -32,7 +32,7 @@ describe("shareArtifacts helpers", () => {
       url: "https://whether.work/?artifactMode=explainer",
     });
 
-    assert.equal(title, "Whether Explainer brief");
+    assert.equal(title, "Explainer brief");
     assert.match(text, /Share-ready weekly brief/);
     assert.match(text, /Weekly operator brief content/);
     assert.match(text, /https:\/\/whether\.work\/\?artifactMode=explainer/);

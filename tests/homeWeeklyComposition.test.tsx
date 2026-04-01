@@ -199,9 +199,9 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Operating levers this week/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Revisit last week&#x27;s decisions\?/);
-    assert.match(html, /Threshold/);
+    assert.match(html, /Pause if/);
     assert.doesNotMatch(html, /Open Signals/);
-    assert.match(html, /Action/);
+    assert.match(html, /Action now/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /Action:/);
@@ -232,11 +232,11 @@ describe("weekly card and interpretation panel composition", () => {
 
     const heroIndex = html.indexOf("Current outlook");
     const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
-    const rulesIndex = html.indexOf("Weekly decision strip: action, threshold, and flip condition.");
+    const rulesIndex = html.indexOf("Weekly decision strip: action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Operating levers this week");
     const interpretationIndex = html.indexOf("Interpretation layer");
-    const workspaceIndex = html.indexOf("Revisit hiring and roadmap calls now.");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
+    const auditIndex = html.indexOf('id="audit-this-call"');
     const replayIndex = html.indexOf('id="historical-replay-workspace"');
 
     assert.ok(heroIndex > -1);
@@ -244,8 +244,8 @@ describe("weekly card and interpretation panel composition", () => {
     assert.ok(rulesIndex > diagnosticsIndex);
     assert.ok(actionStripIndex > rulesIndex);
     assert.ok(executionIndex > actionStripIndex);
-    assert.ok(workspaceIndex > executionIndex);
-    assert.ok(replayIndex > workspaceIndex);
+    assert.ok(auditIndex > executionIndex);
+    assert.ok(replayIndex > auditIndex);
     assert.ok(interpretationIndex > replayIndex);
   });
 

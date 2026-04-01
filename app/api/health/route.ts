@@ -23,6 +23,90 @@ const getCommitSha = () =>
   process.env.GITHUB_SHA ??
   null;
 
+type MonitorSourceHealthRow = {
+  sourceName: string;
+  cadenceLabel: string;
+  freshnessStatus: "fresh" | "stale" | "unknown";
+  freshnessSlaHours: number;
+  lastSuccessfulFetchAt: string | null;
+  activeFallbackReason: string | null;
+  mode: "live" | "fallback";
+  status: "ok" | "degraded" | "unknown";
+};
+
+const toMonitorMode = (mode: SourceHealthRow["mode"]): MonitorSourceHealthRow["mode"] =>
+  mode === "live" ? "live" : "fallback";
+
+const toMonitorStatus = (
+  freshnessStatus: SourceHealthRow["freshnessStatus"],
+  mode: MonitorSourceHealthRow["mode"],
+): MonitorSourceHealthRow["status"] => {
+  if (freshnessStatus === "unknown") {
+    return "unknown";
+  }
+
+  return freshnessStatus === "fresh" && mode === "live" ? "ok" : "degraded";
+};
+
+const getNormalizedFreshnessStatus = (
+  rows: SourceHealthRow[],
+): MonitorSourceHealthRow["freshnessStatus"] => {
+  if (rows.some((row) => row.freshnessStatus === "stale")) {
+    return "stale";
+  }
+
+  if (rows.every((row) => row.freshnessStatus === "unknown")) {
+    return "unknown";
+  }
+
+  if (rows.some((row) => row.freshnessStatus === "unknown")) {
+    return "unknown";
+  }
+
+  return "fresh";
+};
+
+const normalizeMonitorSourceHealth = (sourceHealth: SourceHealthRow[]): MonitorSourceHealthRow[] => {
+  const treasuryRow = sourceHealth.find((row) => row.sourceName === "Treasury");
+  const macroRows = sourceHealth.filter((row) => row.sourceName !== "Treasury");
+
+  const normalizedRows: MonitorSourceHealthRow[] = [];
+
+  if (treasuryRow) {
+    const mode = toMonitorMode(treasuryRow.mode);
+    normalizedRows.push({
+      ...treasuryRow,
+      mode,
+      status: toMonitorStatus(treasuryRow.freshnessStatus, mode),
+    });
+  }
+
+  if (macroRows.length > 0) {
+    const mode = macroRows.every((row) => row.mode === "live") ? "live" : "fallback";
+    const fallbackReasons = macroRows
+      .map((row) => row.activeFallbackReason)
+      .filter((reason): reason is string => typeof reason === "string" && reason.trim().length > 0);
+    const freshnessStatus = getNormalizedFreshnessStatus(macroRows);
+
+    normalizedRows.push({
+      sourceName: "Macro",
+      cadenceLabel: "Mixed cadence",
+      freshnessStatus,
+      freshnessSlaHours: Math.max(...macroRows.map((row) => row.freshnessSlaHours)),
+      lastSuccessfulFetchAt: macroRows
+        .map((row) => row.lastSuccessfulFetchAt)
+        .filter((timestamp): timestamp is string => typeof timestamp === "string")
+        .sort((left, right) => Date.parse(right) - Date.parse(left))[0] ?? null,
+      activeFallbackReason:
+        fallbackReasons.length > 0 ? Array.from(new Set(fallbackReasons)).join(" ") : null,
+      mode,
+      status: toMonitorStatus(freshnessStatus, mode),
+    });
+  }
+
+  return normalizedRows;
+};
+
 export async function GET() {
   const now = new Date();
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/health" });
@@ -36,15 +120,7 @@ export async function GET() {
 
   const status = reportResult.ok && treasuryStatus === "ok" ? "ok" : reportResult.ok ? "degraded" : "down";
   const statusCode = status === "ok" ? 200 : 503;
-  const sources = sourceHealth.map((source): SourceHealthRow & { status: "ok" | "degraded" | "unknown" } => ({
-    ...source,
-    status:
-      source.freshnessStatus === "unknown"
-        ? "unknown"
-        : source.freshnessStatus === "fresh" && source.mode !== "fallback"
-          ? "ok"
-          : "degraded",
-  }));
+  const sources = normalizeMonitorSourceHealth(sourceHealth);
 
   return NextResponse.json(
     {

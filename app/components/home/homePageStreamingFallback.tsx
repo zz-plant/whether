@@ -55,13 +55,13 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
               <p className="max-w-2xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
-                This week&apos;s posture, action, and flip condition are loading.
+                This week&apos;s posture and bounded decision are loading.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="max-w-2xl text-sm text-slate-100">
-                {historicalContext ? "Selected historical week is loading." : "Current week is loading."}
+                {historicalContext ? "Selected historical weekly brief is loading." : "Current weekly brief is loading."}
               </p>
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
                 <span className="weather-loading-beacon" />
@@ -76,7 +76,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-3 h-6 w-28 rounded-full bg-slate-500/40" />
                 </article>
                 <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Action</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Action now</p>
                   <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/40" />
                   <Skeleton className="mt-2 h-5 w-8/12 rounded-full bg-slate-500/32" />
                 </article>
@@ -85,7 +85,11 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-3 h-5 w-24 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Flip condition</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pause if</p>
+                  <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
+                </article>
+                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Change course if</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
               </section>

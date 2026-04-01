@@ -16,7 +16,7 @@ describe("GlobalHeaderNavRail", () => {
     );
 
     assert.match(html, /Surface 2 of 5/);
-    assert.match(html, /Swipe or tap arrows to see every primary surface\./);
+    assert.match(html, /Primary surfaces/);
     assert.match(html, /aria-label="Previous surface"/);
     assert.match(html, /aria-label="Next surface"/);
   });
@@ -31,7 +31,7 @@ describe("GlobalHeaderNavRail", () => {
     );
 
     assert.match(html, /Browse sections/);
-    assert.match(html, /Open sections, then swipe or tap arrows to move across the primary surfaces\./);
+    assert.match(html, /Open sections, then swipe or use the arrows to move across the primary surfaces\./);
     assert.match(html, /aria-label="Previous surface"/);
     assert.match(html, /aria-label="Next surface"/);
   });

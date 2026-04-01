@@ -12,11 +12,11 @@ describe("homepage loading fallbacks", () => {
     const html = renderToStaticMarkup(<HomePageStreamingFallback />);
 
     assert.match(html, /Weekly brief/);
-    assert.match(html, /Loading weekly brief/);
-    assert.match(html, /What changed/);
-    assert.match(html, /Do now/);
-    assert.match(html, /Flip when/);
-    assert.match(html, /Loading additional sections/);
+    assert.match(html, /Weekly brief loading/);
+    assert.match(html, /Action now/);
+    assert.match(html, /Pause if/);
+    assert.match(html, /Change course if/);
+    assert.match(html, /Loading the compact evidence and trust handoff\./);
     assert.doesNotMatch(html, /Shared-card continuity/);
   });
 
@@ -24,15 +24,15 @@ describe("homepage loading fallbacks", () => {
     const html = renderToStaticMarkup(<HomePageStreamingFallback searchParams={{ month: "3", year: "2026" }} />);
 
     assert.match(html, /Historical replay requested · 2026-03/);
-    assert.match(html, /Loading selected weekly brief/);
+    assert.match(html, /Selected historical weekly brief is loading\./);
   });
 
   it("keeps diagnostics fallback neutral", () => {
     const html = renderToStaticMarkup(<WeeklyDiagnosticsFallback />);
 
-    assert.match(html, /Loading additional detail/);
+    assert.match(html, /Loading the compact evidence and trust handoff\./);
     assert.match(html, /Loading/);
-    assert.match(html, /More detail/);
+    assert.match(html, /Planning/);
     assert.doesNotMatch(html, /role-specific guidance/);
   });
 
@@ -59,6 +59,6 @@ describe("homepage loading fallbacks", () => {
     const html = renderToStaticMarkup(<Loading />);
 
     assert.match(html, /Loading page/);
-    assert.doesNotMatch(html, /Loading weekly brief/);
+    assert.doesNotMatch(html, /Weekly brief loading/);
   });
 });

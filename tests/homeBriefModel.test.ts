@@ -7,9 +7,9 @@ describe("buildHomeBriefModel", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
 
     assert.deepEqual(memoryRail, [
-      { label: "2026-02-27", posture: "Expansion" },
-      { label: "2026-03-06", posture: "Expansion" },
-      { label: "2026-03-12", posture: "Expansion" },
+      { label: "2026-03-13", posture: "Expansion" },
+      { label: "2026-03-20", posture: "Expansion" },
+      { label: "2026-03-25", posture: "Expansion" },
       { label: "Mar 19, 2026", posture: "Defensive" },
     ]);
   });

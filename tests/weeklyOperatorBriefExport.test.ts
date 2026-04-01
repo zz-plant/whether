@@ -60,7 +60,7 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Regime \+ stage:/);
     assert.match(text, /Do now:/);
-    assert.match(text, /Flip trigger:/);
+    assert.match(text, /Change course if:/);
     assert.equal(cardText, text);
   });
 

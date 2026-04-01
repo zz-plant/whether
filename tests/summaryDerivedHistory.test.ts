@@ -12,7 +12,7 @@ const byRecordDateAscending = (left: { record_date: string }, right: { record_da
   new Date(left.record_date).getTime() - new Date(right.record_date).getTime();
 
 describe("derived summary history artifacts", () => {
-  it("keeps the homepage weekly posture history trimmed to the latest four weekly records", () => {
+  it("keeps the homepage weekly posture history artifact aligned to the latest four weekly archive records", () => {
     const expected = rawArchive
       .filter((entry) => entry.cadence === "weekly")
       .sort(byAsOfAscending)
