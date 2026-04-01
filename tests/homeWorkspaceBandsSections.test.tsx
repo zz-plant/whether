@@ -77,9 +77,9 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Freshness: As of Mar 25, 2026/);
     assert.match(html, /Source coverage: Treasury live; labor snapshot/);
-    assert.match(html, /Trust summary/);
-    assert.match(html, /Need proof\?/);
-    assert.match(html, /Need source defense\?/);
+    assert.match(html, /Can you rely on it\?/);
+    assert.match(html, /Why the weekly read moved/);
+    assert.match(html, /Is the read reliable enough to use\?/);
     assert.match(html, /Planning/);
     assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));

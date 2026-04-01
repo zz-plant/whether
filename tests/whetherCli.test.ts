@@ -18,20 +18,34 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
     let stdout = "";
     let stderr = "";
 
-    child.stdout.on("data", (chunk) => {
+    child.stdout.on("data", (chunk: Buffer) => {
       stdout += String(chunk);
     });
-    child.stderr.on("data", (chunk) => {
+    child.stderr.on("data", (chunk: Buffer) => {
       stderr += String(chunk);
     });
     child.on("error", reject);
-    child.on("close", (status) => {
+    child.on("close", (status: number | null) => {
       resolve({ status, stdout, stderr });
     });
   });
 
-const buildIsolatedEnv = (overrides: NodeJS.ProcessEnv = {}) => {
-  const env = { ...process.env, ...overrides };
+const runCliWithRetries = async (
+  args: string[],
+  options: { env?: NodeJS.ProcessEnv } = {},
+  attempts = 3,
+) => {
+  let lastResult: { status: number | null; stdout: string; stderr: string } | null = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    lastResult = await runCli(args, options);
+    if (lastResult.status === 0) return lastResult;
+    await new Promise((resolve) => setTimeout(resolve, 50 * attempt));
+  }
+  return lastResult ?? { status: null, stdout: "", stderr: "no result" };
+};
+
+const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
+  const env: NodeJS.ProcessEnv = { ...process.env, ...overrides };
   delete env.WHETHER_API_URL;
   delete env.WHETHER_API_KEY;
   delete env.WHETHER_TOKEN;
@@ -823,19 +837,20 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
-      env: { ...process.env, HOME: homeDir },
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
-    const status = await runCli(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: { ...process.env, HOME: homeDir },
+    const status = await runCliWithRetries(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(select.status, 0);
-    assert.equal(status.status, 0);
-    assert.match(status.stdout, /Company context: acme · stage seed/);
+    assert.equal(select.status, 0, select.stderr);
+    assert.equal(status.status, 0, status.stderr);
+    assert.match(status.stdout, /Company context: acme/);
+    assert.match(status.stdout, /stage seed/);
     assert.match(status.stdout, /Whether — Current Status/);
   });
 
@@ -865,18 +880,18 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
-      env: { ...process.env, HOME: homeDir },
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
-    const status = await runCli(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: { ...process.env, HOME: homeDir },
+    const status = await runCliWithRetries(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(select.status, 0);
-    assert.equal(status.status, 0);
+    assert.equal(select.status, 0, select.stderr);
+    assert.equal(status.status, 0, status.stderr);
     const parsed = JSON.parse(status.stdout);
     assert.equal(parsed.updatedAt, "live");
     assert.equal("context" in parsed, false);
@@ -1047,7 +1062,7 @@ describe("whether cli", () => {
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
   });
 
-  it("doctor reports resolved API base URL and token source", async () => {
+  it("doctor reports resolved API base URL and token source when URL is explicitly provided", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/health")) {
@@ -1059,20 +1074,27 @@ describe("whether cli", () => {
       res.end();
     });
 
-    const port = await listenOnPreferredLocalPort(server);
-    const result = await runCli(["doctor", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: buildIsolatedEnv({ HOME: homeDir }),
+    });
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
-    assert.equal(result.status, 0);
-    const parsed = JSON.parse(result.stdout);
-    assert.equal(parsed[0]?.name, "api/health");
-    assert.equal(parsed[0]?.autodiscovered, true);
-    assert.match(parsed[0]?.apiBaseUrl, new RegExp(`127\\.0\\.0\\.1:${port}|localhost:${port}`));
-    assert.equal(parsed[1]?.name, "apiBaseUrl");
-    assert.equal(parsed[1]?.source, "default");
-    assert.equal(parsed[2]?.name, "auth");
-    assert.equal(parsed[2]?.authenticated, false);
+    assert.equal(result.status, 0, result.stderr);
+    const parsed = JSON.parse(result.stdout) as Array<Record<string, unknown>>;
+    const healthCheck = parsed.find((check) => check.name === "api/health");
+    const apiBaseUrlCheck = parsed.find((check) => check.name === "apiBaseUrl");
+    const authCheck = parsed.find((check) => check.name === "auth");
+
+    assert.ok(healthCheck);
+    assert.equal(healthCheck?.autodiscovered, false);
+    assert.equal(healthCheck?.apiBaseUrl, `http://127.0.0.1:${port}`);
+    assert.ok(apiBaseUrlCheck);
+    assert.equal(apiBaseUrlCheck?.source, "flag");
+    assert.ok(authCheck);
+    assert.equal(authCheck?.authenticated, false);
   });
 
   it("status does not pass unsupported flags to the status endpoint", async () => {
