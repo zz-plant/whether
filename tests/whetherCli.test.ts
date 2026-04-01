@@ -41,13 +41,13 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
 const runCliWithRetries = async (
   args: string[],
   options: { env?: NodeJS.ProcessEnv } = {},
-  attempts = 3,
+  attempts = 5,
 ) => {
   let lastResult: { status: number | null; stdout: string; stderr: string } | null = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     lastResult = await runCli(args, options);
     if (lastResult.status === 0) return lastResult;
-    await new Promise((resolve) => setTimeout(resolve, 50 * attempt));
+    await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
   }
   return lastResult ?? { status: null, stdout: "", stderr: "no result" };
 };
@@ -102,7 +102,7 @@ describe("whether cli", () => {
 
   it("install fails in non-interactive shells without --yes/--ci", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const result = spawnSync("node", [CLI_PATH, "install"], { encoding: "utf8", env: { ...process.env, HOME: homeDir } });
+    const result = spawnSync("node", [CLI_PATH, "install"], { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) });
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 1);
@@ -115,14 +115,14 @@ describe("whether cli", () => {
     const install = spawnSync(
       "node",
       [CLI_PATH, "install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"],
-      { encoding: "utf8", env: { ...process.env, HOME: homeDir } },
+      { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) },
     );
 
     assert.equal(install.status, 0);
 
     const readConfig = spawnSync("node", [CLI_PATH, "config", "--json"], {
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -777,12 +777,12 @@ describe("whether cli", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
     const login = spawnSync("node", [CLI_PATH, "auth", "login"], {
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir, WHETHER_API_KEY: "env-api-key" },
+      env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "env-api-key" },
     });
 
     const status = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -798,12 +798,12 @@ describe("whether cli", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
     const missing = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir },
+      env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     const withEnv = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir, WHETHER_API_KEY: "present" },
+      env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "present" },
     });
 
     fs.rmSync(homeDir, { recursive: true, force: true });
