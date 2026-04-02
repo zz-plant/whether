@@ -45,6 +45,12 @@ const CorridorScale = () => (
   </div>
 );
 
+const corridorSegmentOrder = [
+  { key: "now", label: "Allowed", className: "bg-emerald-400/18 text-emerald-100" },
+  { key: "caution", label: "Caution", className: "bg-amber-400/18 text-amber-100" },
+  { key: "blocked", label: "Blocked", className: "bg-rose-400/18 text-rose-100" },
+] as const;
+
 export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], currentScores }: BoundedRulesMatrixProps) {
   const matrixAreaByKey: Record<"hiring" | "product" | "capital" | "burn", BoundedDecisionRule["area"]> = {
     hiring: "hiring",
@@ -139,15 +145,23 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
                   <span>Current status {corridor.laneState.currentStateLabel}</span>
                   <span>{corridor.laneState.tightenDistanceLabel}</span>
                 </div>
-                <div className="relative mt-2 h-2 rounded-full bg-slate-800/90" aria-hidden="true">
-                  <span className="absolute inset-y-0 left-1/3 w-px bg-slate-700" />
-                  <span className="absolute inset-y-0 left-2/3 w-px bg-slate-700" />
+                <div className="relative mt-2 overflow-hidden rounded-full border border-slate-800/70 bg-slate-900/90" aria-hidden="true">
+                  <div className="grid h-7 grid-cols-3">
+                    {corridorSegmentOrder.map((segment) => (
+                      <span key={segment.key} className={`flex items-center justify-center border-r border-slate-900/70 text-[9px] font-semibold uppercase tracking-[0.08em] ${segment.className}`}>
+                        {segment.label}
+                      </span>
+                    ))}
+                  </div>
                   <span
-                    className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 bg-sky-300"
+                    className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 bg-sky-300 shadow-[0_0_0_2px_rgba(15,23,42,0.7)]"
                     style={{ left: `${corridor.laneState.corridorProgressPercent}%` }}
                   />
                 </div>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.laneState.reopenDistanceLabel}</p>
+                <div className="mt-2 flex items-center justify-between gap-3 text-[11px] leading-5 text-slate-300">
+                  <p>{corridor.laneState.reopenDistanceLabel}</p>
+                  <p className="text-slate-400">Marker shows where this area sits now.</p>
+                </div>
               </div>
             ) : null}
             <div className="mt-3 grid gap-2 lg:grid-cols-3">

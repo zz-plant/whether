@@ -109,14 +109,8 @@ export function HeroTrustProvenanceBlock({
     trustReadiness.tone === "stable" && !outageSeverity && !hasDegradedSourceRows;
   const trustToneClass = trustPanelToneClass[trustReadiness.tone];
   const controlHeadline = trustStatusLabel;
-  const trustStatusDetailForDisplay =
-    trustReadiness.tone === "warning"
-      ? "Decision impact: keep the do now / hold / revisit path, but do not treat this as a clear read until freshness and confidence recover."
-      : trustStatusDetail;
-  const trustStatusActionForDisplay =
-    trustReadiness.tone === "warning"
-      ? "Pause irreversible approvals until one verified live refresh lands."
-      : trustStatusAction;
+  const trustStatusDetailForDisplay = trustStatusDetail;
+  const trustStatusActionForDisplay = trustStatusAction;
   const currentApprovalLane = approvalBuckets?.[0];
 
   return (

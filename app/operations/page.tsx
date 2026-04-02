@@ -28,10 +28,7 @@ import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
 import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
-import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
-import { PageFlowNav } from "../components/pageFlowNav";
 import { canonicalCapitalDisciplinePath, resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
-import { LiteracyAssistRouter, PersistedAssistPanel } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
 
@@ -134,25 +131,33 @@ export default async function OperationsPage({
     : undefined;
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const confidenceLow = snapshot.homeBriefModel.confidenceLabel === "LOW";
+  const liveNeedsCaution = !historicalSelection && !isFallback && confidenceLow;
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
       ? "Using last verified snapshot"
-      : "Live • Treasury verified";
+      : liveNeedsCaution
+        ? "Low-confidence live read"
+        : "Live • Treasury verified";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
         "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 15m.";
+      : liveNeedsCaution
+        ? "Live refresh is current, but signal reliability is LOW. Keep approvals staged until confidence improves."
+        : "Live refresh healthy. Next expected update: 15m.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Evidence feed is live; use it to confirm playbook moves and decision shields.";
+      : liveNeedsCaution
+        ? "Stage only reversible decisions until reliability improves or a stronger live refresh lands."
+        : "Evidence feed is live; use it to confirm playbook moves and decision shields.";
   const trustStatusTone = historicalSelection
     ? "historical"
-    : isFallback
+    : isFallback || liveNeedsCaution
       ? "warning"
       : "stable";
 
@@ -171,20 +176,6 @@ export default async function OperationsPage({
     resourceSupportingPages.decisionShieldOverview,
   ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
-  const buildAssistHref = (assist: "decision" | "evidence" | "trust" | "share", hash: string) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "assist") {
-          params.set(key, value);
-        }
-      });
-    }
-    params.set("assist", assist);
-    const query = params.toString();
-    return query ? `/operations?${query}${hash}` : `/operations${hash}`;
-  };
-
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -403,25 +394,6 @@ export default async function OperationsPage({
         ]}
       />
 
-      <PageFlowNav
-        eyebrow={operationsScrollPlan.eyebrow}
-        title={operationsScrollPlan.title}
-        description={operationsScrollPlan.description}
-        items={operationsScrollPlan.items}
-        maxItems={3}
-      />
-
-      <LiteracyAssistRouter
-        title="What do you need translated in Planning?"
-        description="Open the planning layer that matches your gap."
-        targets={{
-          decision: { href: buildAssistHref("decision", "#ops-monthly-action-summary") },
-          evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
-          trust: { href: buildAssistHref("trust", "#ops-finance-strategy") },
-          share: { href: buildAssistHref("share", "#ops-export-briefs") },
-        }}
-      />
-
       <section id="ops-failure-patterns" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-failure-patterns-title">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Risk checks</p>
@@ -449,45 +421,6 @@ export default async function OperationsPage({
           <Link href="/method#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Trust risk checks
           </Link>
-        </div>
-      </section>
-
-      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Planning translation help">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Quick definitions</p>
-          <h2 className="text-base font-semibold text-slate-100">Plain-language help for this page.</h2>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <PersistedAssistPanel
-            assistMode="decision"
-            buttonLabel="Translate this plan"
-            title="What the main planning terms mean"
-            summary="Plain-language definitions for the planning page."
-          >
-            <p><span className="font-semibold text-slate-50">Weekly plan</span> = what to approve or hold for team pace and priority changes this week.</p>
-            <p><span className="font-semibold text-slate-50">Guardrails</span> = the limits that should pause new work before it becomes hard to reverse.</p>
-            <p><span className="font-semibold text-slate-50">Finance strategy</span> = the cash and budget stance that should stay aligned with the current call.</p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="trust"
-            buttonLabel="Translate approval readiness"
-            title="What owner and approval state mean"
-            summary="Whether the plan is ready to circulate."
-          >
-            <p><span className="font-semibold text-slate-50">Owner</span> = the function that should drive the step to completion.</p>
-            <p><span className="font-semibold text-slate-50">Approval state</span> = the minimum outcome this step should reach before you move on.</p>
-            <p><span className="font-semibold text-slate-50">Reopen when</span> = the signal that sends you back into this step even after approval.</p>
-          </PersistedAssistPanel>
-          <PersistedAssistPanel
-            assistMode="share"
-            buttonLabel="Translate the final brief"
-            title="How to choose the share format"
-            summary="Choose the right version for the room."
-          >
-            <p><span className="font-semibold text-slate-50">Operator brief</span> = the shortest version for leaders who already know the context.</p>
-            <p><span className="font-semibold text-slate-50">Explainer brief</span> = the same call with quick term translation for mixed-background audiences.</p>
-            <p><span className="font-semibold text-slate-50">Board and governance artifacts</span> = longer versions for rooms that need more context or documentation.</p>
-          </PersistedAssistPanel>
         </div>
       </section>
 

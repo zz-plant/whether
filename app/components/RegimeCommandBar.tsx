@@ -78,6 +78,13 @@ const buildForecastCone = ({
   return `${currentX},${currentY} ${nextX + px},${nextY + py} ${nextX - px},${nextY - py}`;
 };
 
+const postureMapQuadrants = [
+  { key: "tight-cautious", label: "Protect runway", x: "left-3", y: "bottom-3", tone: "text-rose-100/90" },
+  { key: "tight-bold", label: "Do not force", x: "right-3", y: "bottom-3", tone: "text-amber-100/90" },
+  { key: "loose-cautious", label: "Proof first", x: "left-3", y: "top-3", tone: "text-sky-100/90" },
+  { key: "loose-bold", label: "Re-open bets", x: "right-3", y: "top-3", tone: "text-emerald-100/90" },
+] as const;
+
 const TrajectoryMap = ({
   regime,
   postureTrajectory,
@@ -105,6 +112,10 @@ const TrajectoryMap = ({
     nextY: projectedY,
     coneWidth,
   });
+  const highlightNearestTightness = regimeDistance.dimensionKey === "tightness";
+  const nearestBoundaryLabel = highlightNearestTightness
+    ? `Nearest flip: Tightness ${postureTrajectory.thresholds.tightness.toFixed(1)}`
+    : `Nearest flip: Risk appetite ${postureTrajectory.thresholds.riskAppetite.toFixed(1)}`;
 
   return (
     <figure className="rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
@@ -113,7 +124,7 @@ const TrajectoryMap = ({
           Posture map
         </figcaption>
         <span className="text-[10px] text-slate-400">
-          Tail = last week, cone = near-term drift
+          {regimeDistance.pointsToFlip.toFixed(1)} pts to nearest flip
         </span>
       </div>
       <div className="mt-3 relative h-[13rem] rounded-xl border border-slate-800/80 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.08),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.88),rgba(2,6,23,0.98))]">
@@ -128,12 +139,39 @@ const TrajectoryMap = ({
           <rect x={riskThresholdX} y="0" width={100 - riskThresholdX} height={tightnessThresholdY} fill="rgba(16,185,129,0.08)" />
           <rect x="0" y={tightnessThresholdY} width={riskThresholdX} height={100 - tightnessThresholdY} fill="rgba(244,63,94,0.08)" />
           <rect x={riskThresholdX} y={tightnessThresholdY} width={100 - riskThresholdX} height={100 - tightnessThresholdY} fill="rgba(245,158,11,0.08)" />
-          <line x1={riskThresholdX} y1="0" x2={riskThresholdX} y2="100" stroke="rgba(148,163,184,0.48)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-          <line x1="0" y1={tightnessThresholdY} x2="100" y2={tightnessThresholdY} stroke="rgba(148,163,184,0.48)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <line
+            x1={riskThresholdX}
+            y1="0"
+            x2={riskThresholdX}
+            y2="100"
+            stroke={highlightNearestTightness ? "rgba(148,163,184,0.32)" : "rgba(251,191,36,0.75)"}
+            strokeWidth={highlightNearestTightness ? "1" : "1.8"}
+            strokeDasharray={highlightNearestTightness ? undefined : "5 3"}
+            vectorEffect="non-scaling-stroke"
+          />
+          <line
+            x1="0"
+            y1={tightnessThresholdY}
+            x2="100"
+            y2={tightnessThresholdY}
+            stroke={highlightNearestTightness ? "rgba(251,191,36,0.75)" : "rgba(148,163,184,0.32)"}
+            strokeWidth={highlightNearestTightness ? "1.8" : "1"}
+            strokeDasharray={highlightNearestTightness ? "5 3" : undefined}
+            vectorEffect="non-scaling-stroke"
+          />
           <line x1={previousX} y1={previousY} x2={currentX} y2={currentY} stroke="rgba(226,232,240,0.6)" strokeWidth="1.5" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
           <polygon points={cone} fill="rgba(125,211,252,0.18)" stroke="rgba(125,211,252,0.34)" strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
+          <line x1={currentX} y1={currentY} x2={projectedX} y2={projectedY} stroke="rgba(251,191,36,0.9)" strokeWidth="1.3" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" />
           <circle cx={previousX} cy={previousY} r="2.1" fill="rgba(15,23,42,0.95)" stroke="rgba(226,232,240,0.65)" strokeWidth="1.1" vectorEffect="non-scaling-stroke" />
           <circle cx={currentX} cy={currentY} r="3.1" className={regimeStyle.pointClass} stroke="rgba(15,23,42,0.95)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+          <circle cx={projectedX} cy={projectedY} r="2.2" fill="rgb(251 191 36)" stroke="rgba(15,23,42,0.95)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <text
+            x={highlightNearestTightness ? 3 : Math.min(98, riskThresholdX + 2)}
+            y={highlightNearestTightness ? Math.max(5, tightnessThresholdY - 2) : 7}
+            className="fill-amber-200 text-[7px] uppercase tracking-[0.14em]"
+          >
+            Nearest flip
+          </text>
         </svg>
         <div className="pointer-events-none absolute inset-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
           <span className="absolute bottom-2 left-3">Cautious</span>
@@ -141,10 +179,23 @@ const TrajectoryMap = ({
           <span className="absolute left-2 top-4 -rotate-90 origin-left">Loose</span>
           <span className="absolute right-2 bottom-7 -rotate-90 origin-right">Tight</span>
         </div>
+        <div className="pointer-events-none absolute inset-0 text-[9px] font-semibold uppercase tracking-[0.1em]">
+          {postureMapQuadrants.map((quadrant) => (
+            <span
+              key={quadrant.key}
+              className={`absolute rounded-full border border-white/8 bg-slate-950/55 px-2 py-1 ${quadrant.tone} ${quadrant.x} ${quadrant.y}`}
+            >
+              {quadrant.label}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-300">
         <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Trend {trendLabel}
+        </span>
+        <span className="rounded-full border border-amber-300/30 bg-amber-500/10 px-2.5 py-1 text-amber-100">
+          {nearestBoundaryLabel}
         </span>
         <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Tightness {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness)})

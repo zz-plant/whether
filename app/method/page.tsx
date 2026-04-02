@@ -77,31 +77,17 @@ export default async function MethodPage() {
       href: "#sources-freshness",
     },
   ];
-  const trustActions = [
-    {
-      title: "Is the data current?",
-      detail: `Updated ${reportData.fetchedAtLabel}. Source status and timestamps.`,
-      href: "#sources-freshness",
-      cta: "Sources",
-    },
-    {
-      title: "How strong is the signal?",
-      detail: `Confidence is ${confidenceLabel}. This section shows what would make the call too weak to rely on.`,
-      href: "#confidence-limits",
-      cta: "Confidence",
-    },
-    {
-      title: "How is the score built?",
-      detail: "The formulas behind the call.",
-      href: "#formula-reference",
-      cta: "Formula reference",
-    },
-  ];
+  const confidenceLow = homeBriefModel.confidenceLabel === "LOW";
   const trustStatusTone = reportData.historicalSelection
     ? "historical"
-    : isFallback
+    : isFallback || confidenceLow
       ? "warning"
       : "stable";
+  const trustStatusAction = trustStatusTone === "stable"
+    ? "Usable for this week's brief if freshness and confidence hold."
+    : trustStatusTone === "historical"
+      ? "Use this view for retrospectives only; switch back to the live brief before approving new moves."
+      : "Use the brief for staged decisions only; wait for stronger live evidence before hard-to-reverse commitments.";
   const trustVerdict = trustStatusTone === "stable"
     ? {
         label: "Ready to rely on this week",
@@ -121,7 +107,6 @@ export default async function MethodPage() {
         };
   const sectionLinks = [
     { href: "#trust-snapshot", label: "Snapshot" },
-    { href: "#trust-hub-links", label: "Key questions" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
@@ -137,7 +122,7 @@ export default async function MethodPage() {
       treasurySource={reportData.treasury.source}
       trustStatusLabel={trustSummary}
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
-      trustStatusAction="Usable for this week's brief if freshness and confidence hold."
+      trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
@@ -215,27 +200,6 @@ export default async function MethodPage() {
                 ? "Wait for one verified live refresh before approving hard-to-reverse moves."
                 : "If freshness or confidence slips, move to a cautious approval posture before widening commitments."}
             </p>
-          </article>
-        </div>
-      </HubSection>
-
-      <HubSection id="trust-hub-links" title="Key Questions" description="Pick the question that matters." className="scroll-mt-28">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {trustActions.map((item) => (
-            <article key={item.title} className="weather-hub-link-card space-y-2">
-              <h2 className="text-lg font-semibold text-slate-100">{item.title}</h2>
-              <p className="text-sm text-slate-300">{item.detail}</p>
-              <Link href={item.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                {item.cta}
-              </Link>
-            </article>
-          ))}
-          <article className="weather-hub-link-card space-y-2">
-            <h2 className="text-lg font-semibold text-slate-100">Revisit triggers</h2>
-            <p className="text-sm text-slate-300">What would invalidate this week&rsquo;s call.</p>
-            <Link href="#revisit-call" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              Revisit triggers
-            </Link>
           </article>
         </div>
       </HubSection>

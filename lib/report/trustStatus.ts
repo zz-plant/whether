@@ -411,6 +411,9 @@ export const buildTrustStatus = ({
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
 }) => {
+  const confidenceLow = confidenceLabel === "LOW";
+  const freshnessUnavailable = isUnavailableFreshness(freshnessLabel);
+
   const label = historicalSelection
     ? "Historical snapshot"
     : isFallback
@@ -440,9 +443,6 @@ export const buildTrustStatus = ({
     isFallback,
     fallbackReason,
   });
-
-  const confidenceLow = confidenceLabel === "LOW";
-  const freshnessUnavailable = isUnavailableFreshness(freshnessLabel);
 
   const outageWindow = historicalSelection
     ? "Retrospective only; do not use for live approvals."

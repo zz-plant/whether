@@ -23,13 +23,18 @@ const inputInfluenceToneClasses: Record<
 const clampSparklineValue = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-const buildSparklinePath = (values: number[], width: number, height: number) => {
+const buildSparklinePath = (
+  values: number[],
+  width: number,
+  height: number,
+  sharedDomain?: { min: number; max: number } | null,
+) => {
   if (values.length === 0) {
     return "";
   }
 
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const min = sharedDomain?.min ?? Math.min(...values);
+  const max = sharedDomain?.max ?? Math.max(...values);
   const yDomainPadding =
     max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
   const domainMin = min - yDomainPadding;
@@ -47,14 +52,33 @@ const buildSparklinePath = (values: number[], width: number, height: number) => 
     .join(" ");
 };
 
+const resolveSharedSparkDomain = (items: InputInfluenceItem[]) => {
+  const values = items.flatMap((item) => item.sparkline);
+  if (values.length === 0) {
+    return null;
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const padding =
+    max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.14;
+
+  return {
+    min: min - padding,
+    max: max + padding,
+  };
+};
+
 function InputInfluenceSparkline({
   values,
   tone,
   label,
+  sharedDomain,
 }: {
   values: number[];
   tone: InputInfluenceItem["tone"];
   label: string;
+  sharedDomain?: { min: number; max: number } | null;
 }) {
   if (values.length === 0) {
     return (
@@ -81,8 +105,21 @@ function InputInfluenceSparkline({
         : "fill-slate-300";
   const chartWidth = 84;
   const chartHeight = 22;
-  const path = buildSparklinePath(values, chartWidth, chartHeight);
+  const path = buildSparklinePath(values, chartWidth, chartHeight, sharedDomain);
+  const min = sharedDomain?.min ?? Math.min(...values);
+  const max = sharedDomain?.max ?? Math.max(...values);
+  const yDomainPadding =
+    max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
+  const domainMin = min - yDomainPadding;
+  const domainMax = max + yDomainPadding;
   const currentValue = values[values.length - 1];
+  const currentX = values.length === 1 ? chartWidth / 2 : chartWidth;
+  const currentY = (() => {
+    const normalized =
+      (clampSparklineValue(currentValue, domainMin, domainMax) - domainMin) /
+      (domainMax - domainMin || 1);
+    return chartHeight - normalized * chartHeight;
+  })();
 
   return (
     <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
@@ -90,7 +127,7 @@ function InputInfluenceSparkline({
         <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
           Recent path
         </p>
-        <p className="text-[10px] text-slate-400">{values.length}-read view</p>
+        <p className="text-[10px] text-slate-400">{values.length}-read shared scale</p>
       </div>
       <svg
         viewBox={`0 0 ${chartWidth} ${chartHeight}`}
@@ -98,6 +135,15 @@ function InputInfluenceSparkline({
         role="img"
         aria-label={`${label} recent movement sparkline`}
       >
+        <line
+          x1="0"
+          x2={chartWidth}
+          y1={chartHeight / 2}
+          y2={chartHeight / 2}
+          stroke="rgba(71,85,105,0.35)"
+          strokeWidth="1"
+          strokeDasharray="3 3"
+        />
         <path
           d={path}
           fill="none"
@@ -108,21 +154,8 @@ function InputInfluenceSparkline({
         />
         {path ? (
           <circle
-            cx={values.length === 1 ? chartWidth / 2 : chartWidth}
-            cy={(() => {
-              const min = Math.min(...values);
-              const max = Math.max(...values);
-              const yDomainPadding =
-                max === min
-                  ? Math.max(1, Math.abs(max) * 0.08 || 1)
-                  : (max - min) * 0.12;
-              const domainMin = min - yDomainPadding;
-              const domainMax = max + yDomainPadding;
-              const normalized =
-                (clampSparklineValue(currentValue, domainMin, domainMax) - domainMin) /
-                (domainMax - domainMin || 1);
-              return chartHeight - normalized * chartHeight;
-            })()}
+            cx={currentX}
+            cy={currentY}
             r="2.6"
             className={fillClass}
           />
@@ -136,6 +169,8 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
   if (items.length === 0) {
     return null;
   }
+
+  const sharedSparkDomain = resolveSharedSparkDomain(items);
 
   return (
     <article
@@ -153,6 +188,9 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
         <p className="text-[11px] text-slate-400">
           Higher share = bigger influence on the weekly call.
         </p>
+      </div>
+      <div className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2 text-[11px] text-slate-300">
+        Shared chart scale keeps the driver cards visually comparable, so the top pressure and nearest watch line stand out immediately.
       </div>
       <ul className="mt-3 grid gap-3 lg:grid-cols-2">
         {items.map((item, index) => {
@@ -221,6 +259,7 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
                   values={item.sparkline}
                   tone={item.tone}
                   label={item.label}
+                  sharedDomain={sharedSparkDomain}
                 />
               </div>
               <div className="mt-3">
@@ -229,19 +268,29 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
                   <span>{item.watchLabel}</span>
                 </div>
                 {thresholdMarker ? (
-                  <div
-                    className="relative mt-1.5 h-5 rounded-full border border-slate-800/70 bg-slate-950/60"
-                    aria-hidden="true"
-                  >
-                    <span
-                      className="absolute inset-y-0 w-px bg-slate-500/90"
-                      style={{ left: `${thresholdMarker.thresholdPercent}%` }}
-                    />
-                    <span
-                      className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 ${tone.fill}`}
-                      style={{ left: `${thresholdMarker.currentPercent}%` }}
-                    />
-                  </div>
+                  <>
+                    <div
+                      className="relative mt-1.5 h-6 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60"
+                      aria-hidden="true"
+                    >
+                      <span className="absolute inset-y-0 left-0 w-1/3 bg-emerald-400/10" />
+                      <span className="absolute inset-y-0 left-1/3 w-1/3 bg-amber-400/12" />
+                      <span className="absolute inset-y-0 right-0 w-1/3 bg-rose-400/10" />
+                      <span
+                        className="absolute inset-y-1 w-px bg-slate-300/90"
+                        style={{ left: `${thresholdMarker.thresholdPercent}%` }}
+                      />
+                      <span
+                        className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 shadow-[0_0_0_2px_rgba(15,23,42,0.6)] ${tone.fill}`}
+                        style={{ left: `${thresholdMarker.currentPercent}%` }}
+                      />
+                    </div>
+                    <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+                      <span>Less pressure</span>
+                      <span>Trigger</span>
+                      <span>More pressure</span>
+                    </div>
+                  </>
                 ) : (
                   <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>
                 )}

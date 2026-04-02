@@ -205,12 +205,8 @@ export const ReportShell = (props: ReportShellProps) => {
   });
   const maxSectionNavItemsDesktop = 4;
   const controlHeadline = trustReadiness.headline;
-  const trustStatusDetailForDisplay = trustReadiness.tone === "warning"
-    ? "Decision impact: keep the do now / hold / revisit path, but do not treat this as a clear read until freshness and confidence recover."
-    : resolvedTrustStatusDetail;
-  const trustStatusActionForDisplay = trustReadiness.tone === "warning"
-    ? "Pause irreversible approvals until one verified live refresh lands."
-    : resolvedTrustStatusAction;
+  const trustStatusDetailForDisplay = resolvedTrustStatusDetail;
+  const trustStatusActionForDisplay = resolvedTrustStatusAction;
   const extendedCommandBar =
     showIntroBlock && resolvedCurrentPath === "/" ? resolvedCommandBar : undefined;
   const trustBlockProps = {
