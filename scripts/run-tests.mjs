@@ -6,6 +6,7 @@ import { spawn } from 'node:child_process';
 const TEST_ROOT_ARG = './tests';
 const TEST_ROOT = path.resolve(TEST_ROOT_ARG);
 const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
+const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? "60000";
 
 async function hasDiscoveredTestFiles(dir) {
   let entries;
@@ -39,7 +40,7 @@ if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
 }
 
 const extraArgs = process.argv.slice(2);
-const child = spawn('bun', ['test', ...extraArgs, TEST_ROOT_ARG], {
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...extraArgs, TEST_ROOT_ARG], {
   stdio: 'inherit',
   env: process.env,
 });

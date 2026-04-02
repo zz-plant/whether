@@ -1,6 +1,20 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 import { GET as getSlackBriefRoute } from "../app/api/brief/slack/route";
+
+
+const originalFetch = globalThis.fetch;
+const disabledFetch: typeof fetch = async () => {
+  throw new Error("Test fetch disabled");
+};
+
+beforeEach(() => {
+  globalThis.fetch = disabledFetch;
+});
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+});
 
 describe("/api/brief/slack", () => {
   it("returns slack-ready brief payload", async () => {
