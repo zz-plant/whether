@@ -53,8 +53,14 @@ const runCliWithRetries = async (
 };
 
 const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
+  const resolvedPath =
+    process.env.PATH ??
+    process.env.Path ??
+    (typeof process.execPath === "string" ? path.dirname(process.execPath) : undefined);
+
   const env = {
-    PATH: process.env.PATH,
+    ...(resolvedPath ? { PATH: resolvedPath } : {}),
+    ...(resolvedPath ? { Path: resolvedPath } : {}),
     HOME: process.env.HOME,
     TMPDIR: process.env.TMPDIR,
     TEMP: process.env.TEMP,
@@ -69,6 +75,7 @@ const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
   delete env.HTTPS_PROXY;
   delete env.ALL_PROXY;
   delete env.NO_PROXY;
+  delete env.CI;
   return env;
 };
 
