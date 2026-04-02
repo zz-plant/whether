@@ -182,46 +182,42 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <HubSection id="trust-snapshot" title="Can You Rely On It?" description="Freshness, signal strength, and what would make this call wrong." className="scroll-mt-28">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current call</p>
-            <p className="mt-2 text-sm text-slate-200">Posture: <span className="font-semibold text-slate-100">{reportData.statusLabel}</span> (decision as-of {reportData.recordDateLabel})</p>
-            <p className="mt-2 text-sm text-slate-200">Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></p>
-          </article>
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Can you rely on it?</p>
-            <p className="mt-2 text-sm text-slate-200">{trustSummary}</p>
-            <p className="mt-2 text-sm text-slate-300">Coverage: {sourceCoverage}</p>
-            <p className="mt-2 text-xs text-slate-400">Data refreshed: {reportData.fetchedAtLabel}</p>
-            <div className="mt-3 border-t border-slate-700/70 pt-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Snapshot</p>
-              <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
-                  <span>Data refreshed: {reportData.fetchedAtLabel}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
-                  <span>Trust summary: {trustSummary}</span>
-                </li>
-              </ul>
-            </div>
-          </article>
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What would make it wrong</p>
-            <p className="mt-2 text-sm text-slate-200">{reportData.flipThreshold}</p>
-            <p className="mt-2 text-sm text-slate-300">{reportData.actionNowShort}</p>
-          </article>
-        </div>
-      </HubSection>
-
       <section className="weather-panel scroll-mt-28 space-y-3 px-6 py-5" aria-label="Trust verdict">
         <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
           {trustVerdict.label}
         </p>
         <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
       </section>
+
+      <HubSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and the boundary for using this week’s read." className="scroll-mt-28">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Freshness</p>
+            <p className="mt-2 text-sm text-slate-200">Decision as-of <span className="font-semibold text-slate-100">{reportData.recordDateLabel}</span></p>
+            <p className="mt-2 text-sm text-slate-200">Updated <span className="font-semibold text-slate-100">{reportData.fetchedAtLabel}</span></p>
+            <p className="mt-2 text-xs text-slate-400">{trustSummary}</p>
+          </article>
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Source coverage</p>
+            <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
+              <li>Treasury: <span className="font-semibold text-slate-100">{reportData.treasuryProvenance.statusLabel}</span></li>
+              <li>Macro: <span className="font-semibold text-slate-100">{reportData.macroProvenance.statusLabel}</span></li>
+              <li>Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></li>
+            </ul>
+            <p className="mt-3 text-xs text-slate-400">Coverage summary: {sourceCoverage}</p>
+          </article>
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Use boundary</p>
+            <p className="mt-2 text-sm text-slate-200">{trustVerdict.detail}</p>
+            <p className="mt-2 text-sm text-slate-300">{reportData.flipThreshold}</p>
+            <p className="mt-2 text-xs text-slate-400">
+              {isFallback
+                ? "Wait for one verified live refresh before approving hard-to-reverse moves."
+                : "If freshness or confidence slips, move to a cautious approval posture before widening commitments."}
+            </p>
+          </article>
+        </div>
+      </HubSection>
 
       <HubSection id="trust-hub-links" title="Key Questions" description="Pick the question that matters." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">

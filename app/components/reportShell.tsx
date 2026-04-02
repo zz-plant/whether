@@ -189,10 +189,14 @@ export const ReportShell = (props: ReportShellProps) => {
   const bodyExportCta = resolvedCurrentPath === "/" ? null : resolvedExportCta;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
   const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
+  const showIntroBlock = !resolvedHideHeroChrome;
   const renderTrustBeforeContent =
-    !hasSidebar && resolvedInlineTrustPlacement === "before-content";
+    !showIntroBlock
+    && !hasSidebar
+    && resolvedInlineTrustPlacement === "before-content";
   const renderTrustAfterFirstSection =
-    resolvedInlineTrustPlacement !== "hidden"
+    !showIntroBlock
+    && resolvedInlineTrustPlacement !== "hidden"
     && (hasSidebar || resolvedInlineTrustPlacement === "after-first-section");
   const enableTvAmbientMode = resolvedAmbientMode === "tv";
   const trustReadiness = resolveTrustReadinessCopy({
@@ -207,7 +211,8 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustStatusActionForDisplay = trustReadiness.tone === "warning"
     ? "Pause irreversible approvals until one verified live refresh lands."
     : resolvedTrustStatusAction;
-  const extendedCommandBar = resolvedCurrentPath === "/" ? resolvedCommandBar : undefined;
+  const extendedCommandBar =
+    showIntroBlock && resolvedCurrentPath === "/" ? resolvedCommandBar : undefined;
   const trustBlockProps = {
     trustStatusTone: trustReadiness.tone,
     trustStatusLabel: controlHeadline,
@@ -238,14 +243,16 @@ export const ReportShell = (props: ReportShellProps) => {
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
         <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
-          <ReportShellHeader
-            variant={resolvedHeaderVariant}
-            statusLabel={resolvedStatusLabel}
-            fetchedAtLabel={resolvedFetchedAtLabel}
-            recordDateLabel={resolvedRecordDateLabel}
-            pageTitle={resolvedPageTitle}
-            exportCta={headerExportCta}
-          />
+          {showIntroBlock ? (
+            <ReportShellHeader
+              variant={resolvedHeaderVariant}
+              statusLabel={resolvedStatusLabel}
+              fetchedAtLabel={resolvedFetchedAtLabel}
+              recordDateLabel={resolvedRecordDateLabel}
+              pageTitle={resolvedPageTitle}
+              exportCta={headerExportCta}
+            />
+          ) : null}
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
@@ -263,7 +270,7 @@ export const ReportShell = (props: ReportShellProps) => {
             ) : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
-              {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={bodyExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={bodyExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 

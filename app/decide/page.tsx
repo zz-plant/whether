@@ -146,12 +146,11 @@ export default async function DecidePage({
               <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
             </div>
-            <div className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-4 py-3 text-sm text-slate-200">
-              <p><span className="font-semibold text-slate-100">Current call:</span> {liveCall.posture}</p>
-              <p className="mt-2"><span className="font-semibold text-slate-100">Action now:</span> {liveCall.action}</p>
-              <p className="mt-2"><span className="font-semibold text-slate-100">Pause if:</span> {liveCall.guardrail}</p>
-              <p className="mt-2"><span className="font-semibold text-slate-100">Change course if:</span> {liveCall.flip}</p>
-            </div>
+            <p className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-4 py-3 text-sm text-slate-200">
+              {shouldStartWithChecker
+                ? "Start with the concrete go / wait / kill check instead of reopening the weekly brief."
+                : "Use the recommended path to translate the live call into one role- or situation-specific decision."}
+            </p>
             <Link href={recommendedPath.href} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
               {recommendedPath.cta}
             </Link>
@@ -208,14 +207,14 @@ export default async function DecidePage({
 
       <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="translation-support-title">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Current weekly call</p>
-          <h2 id="translation-support-title" className="text-lg font-semibold text-slate-100">Keep the translation anchored to the live brief</h2>
-          <p className="text-sm text-slate-300">The recommended path above already carries the live action, guardrail, and flip line. Use the router below only if you need a different kind of help.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Fallback router</p>
+          <h2 id="translation-support-title" className="text-lg font-semibold text-slate-100">Need a different kind of help?</h2>
+          <p className="text-sm text-slate-300">Use this only if the recommended path above does not close the question.</p>
         </div>
         <div className="grid gap-3">
           <LiteracyAssistRouter
-            title="What still needs translation?"
-            description="Pick the help that fits."
+            title="Pick the smallest useful fallback"
+            description="Choose the help that matches the unresolved question."
             targets={{
               decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
               evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },

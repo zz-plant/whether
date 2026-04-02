@@ -34,7 +34,7 @@ Supporting surfaces are intentionally subordinate:
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
-Report-shell routes (`/`, `/signals`, `/operations` and nested report paths) also use a reduced global header mode: brand/home anchor, global search entry, and compact route-orientation cues stay available without restoring the full navigation chrome above the brief.
+Report-shell routes (`/signals`, `/operations`, `/decide`, `/method` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface.
 Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
 
 ### 1.1 Weekly briefing (/) 
@@ -75,6 +75,7 @@ The weekly brief sequence now favors `current call -> operating levers -> share 
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
+The shared report shell no longer inserts extra homepage header / command chrome ahead of the weekly card, so the canonical brief remains the first major decision block.
 The planning handoff compresses the weekly action, guardrail, and finance/share summary before
 deeper review in `/operations`. Historical replay now belongs to `/signals` rather than running as
 an inline home interaction. Role, situation, and toolkit paths are handled as explicit downstream
@@ -134,6 +135,7 @@ implementation depth (integrations, API contracts, and CLI fallback) is linked f
 top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
 assist panels explain only the planning layer the user needs. The execution stepper itself now shows
 owner, approval state, and `reopen when` metadata on both the active step and collapsed summaries.
+Shared report-shell routes now avoid stacking a separate trust summary panel ahead of the first task block; trust status stays compressed inside the intro layer unless a route explicitly promotes a deeper trust section.
 
 ### 1.4 Planning workstreams
 - **Weekly plan** (`/operations`): the default execution
@@ -156,6 +158,7 @@ entry URLs now redirect at the routing layer back into the canonical Trust ancho
 as parallel trust pages.
 The page now opens with a binary trust verdict (`safe to use`, `use cautiously`, or historical-only)
 before the detailed trust workflow so operators can decide whether a deeper audit is necessary.
+The opening trust snapshot stays trust-specific: freshness, source coverage, and use boundary are shown first, while the live weekly call remains on `/`.
 
 `/methodology` now permanently redirects to `/method#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
@@ -179,7 +182,7 @@ back into the canonical Decision Tools answer router instead of maintaining a se
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/decide/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow.
+`/decide/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/decide` itself now leads with one recommended path and a smaller fallback router instead of restating the live weekly call in multiple stacked blocks.
 The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Decision Tools answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
