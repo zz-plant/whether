@@ -15,7 +15,10 @@ function hasFlag(name) {
 }
 
 function sh(cmd, cmdArgs) {
-  return execFileSync(cmd, cmdArgs, { encoding: "utf8" }).trim();
+  return execFileSync(cmd, cmdArgs, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
 }
 
 function isAllZeroSha(value) {
