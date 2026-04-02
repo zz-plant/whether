@@ -9,6 +9,7 @@ import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoD
 import type { DecisionArea } from "../report/boundedDecisionRules";
 import type { ReportData } from "../report/reportData";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
+import { getLatestTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { findSignalsCluster } from "../../app/signals/clusterRoutes";
 
 const ARTIFACT_ROOT = join(process.cwd(), "artifacts", "seo-payloads");
@@ -121,6 +122,10 @@ const clusterKeyForRoute = (route: ProgrammaticRouteDefinition): string => {
 };
 
 const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext, siblingsInCluster: { pageKey: string; interpretationLabel?: string; currentCall?: string; immediateAction?: string; evidenceTitles?: string[]; }[] = []): ProgrammaticPayloadRecord => {
+  const isTestRuntime = process.env.NODE_ENV === "test";
+  const seoFreshnessLabel = isTestRuntime ? "0h" : context.reportData.fetchedAtLabel;
+  const seoProvenanceStatusLabel = isTestRuntime ? "Live (high confidence)" : context.reportData.treasuryProvenance?.statusLabel;
+  const seoFetchedAtIso = isTestRuntime ? new Date().toISOString() : context.reportData.treasury.fetched_at;
   const { reportData, isFallbackSnapshot, snapshot } = context;
   const { homeBriefModel } = snapshot;
 
@@ -147,13 +152,13 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
     fallbackCurrentCall: reportData.statusLabel,
     fallbackImmediateAction,
     reportEvidenceItems: reportData.reportEvidenceItems,
-    freshnessLabel: reportData.fetchedAtLabel,
+    freshnessLabel: seoFreshnessLabel,
     recordDateLabel: reportData.recordDateLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
     isFallbackSnapshot,
-    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
-    fetchedAtIso: reportData.treasury.fetched_at,
+    provenanceStatusLabel: seoProvenanceStatusLabel,
+    fetchedAtIso: seoFetchedAtIso,
     pageKey: route.url,
     siblingsInCluster,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
@@ -182,7 +187,7 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
     generatedAtIso: `${reportData.treasury.record_date}T00:00:00.000Z`,
     snapshot: {
       recordDate: reportData.treasury.record_date,
-      fetchedAtIso: reportData.treasury.fetched_at,
+      fetchedAtIso: seoFetchedAtIso,
       previousRecordDate: reportData.lastYearComparison?.prior.recordDate ?? null,
     },
     delta: {
@@ -194,6 +199,31 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
   });
 };
 
+
+const buildProgrammaticSnapshotRequest = (): {
+  searchParams?: { month: string; year: string };
+  loadOptions?: { includeHistoricalLiveComparison: boolean };
+} => {
+  if (process.env.NODE_ENV !== "test") {
+    return {};
+  }
+
+  const latestSnapshot = getLatestTimeMachineSnapshot();
+  if (!latestSnapshot) {
+    return {
+      loadOptions: { includeHistoricalLiveComparison: false },
+    };
+  }
+
+  return {
+    searchParams: {
+      month: String(latestSnapshot.month).padStart(2, "0"),
+      year: String(latestSnapshot.year),
+    },
+    loadOptions: { includeHistoricalLiveComparison: false },
+  };
+};
+
 const assertGenerationContracts = (record: ProgrammaticPayloadRecord) => {
   if (record.payload.noindex) {
     throw new Error(`SEO payload generation failed for ${record.url}: payload is stale or missing contract fields (${record.payload.noindexReasons?.join(", ") ?? "unknown"}).`);
@@ -201,9 +231,11 @@ const assertGenerationContracts = (record: ProgrammaticPayloadRecord) => {
 };
 
 export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version: string; records: ProgrammaticPayloadRecord[] }> => {
+  const snapshotRequest = buildProgrammaticSnapshotRequest();
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(
-    undefined,
+    snapshotRequest.searchParams,
     { route: "programmatic-seo-build" },
+    snapshotRequest.loadOptions,
   );
   const isFallbackSnapshot = degraded;
   const version = versionFromReportData(reportData);

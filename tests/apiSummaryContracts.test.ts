@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 import { GET as getWeeklyRoute } from "../app/api/weekly/route";
 import { GET as getMonthlyRoute } from "../app/api/monthly/route";
 import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";
@@ -45,6 +45,20 @@ const assertWeeklyMonthlyExtras = (body: Record<string, unknown>) => {
   assert.equal(typeof body.summaryHash, "string", "summaryHash should be a string");
   assert.ok((body.summaryHash as string).length > 0, "summaryHash should not be empty");
 };
+
+
+const originalFetch = globalThis.fetch;
+const disabledFetch: typeof fetch = async () => {
+  throw new Error("Test fetch disabled");
+};
+
+beforeEach(() => {
+  globalThis.fetch = disabledFetch;
+});
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+});
 
 describe("summary route contracts", () => {
   it("keeps /api/weekly response contract stable", async () => {
