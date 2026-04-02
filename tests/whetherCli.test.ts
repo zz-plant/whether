@@ -7,6 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
+const DEFAULT_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
 
 const resolveServerPort = (server: http.Server) => {
   const address = server.address();
@@ -53,8 +54,10 @@ const runCliWithRetries = async (
 };
 
 const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
+  const pathValue = process.env.PATH ?? process.env.Path ?? DEFAULT_PATH;
   const env = {
-    PATH: process.env.PATH,
+    PATH: pathValue,
+    Path: pathValue,
     HOME: process.env.HOME,
     TMPDIR: process.env.TMPDIR,
     TEMP: process.env.TEMP,
