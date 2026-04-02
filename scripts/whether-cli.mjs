@@ -1654,7 +1654,11 @@ const main = async () => {
   }
 };
 
-main()
-  .then(() => {
-    process.exit(0);
-  });
+main().catch((error) => {
+  const knownError = error instanceof Error ? error : new Error(String(error));
+  console.error(knownError.message);
+  if (knownError.cause instanceof Error && knownError.cause.message) {
+    console.error(`Cause: ${knownError.cause.message}`);
+  }
+  process.exit(knownError.exitCode ?? EXIT.ERROR);
+});
