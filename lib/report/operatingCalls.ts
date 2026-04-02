@@ -7,6 +7,7 @@ import {
 } from "./boundedDecisionRules";
 import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
 import { operatingLeverToDecisionArea } from "./operatingLeverMap";
+import type { DecisionTransmissionBoundedRule } from "./reportData";
 
 /**
  * Loop stage owner: decision.
@@ -35,13 +36,6 @@ export type RoleAwareOperatingTemplate = {
   doNow: string;
   avoidNow: string;
   flipTrigger: string;
-};
-
-export type DecisionTransmissionBoundedRule = {
-  action: string;
-  triggerThreshold: string;
-  reversalCondition: string;
-  manualReviewRequired: boolean;
 };
 
 const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>

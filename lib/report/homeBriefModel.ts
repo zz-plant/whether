@@ -82,7 +82,6 @@ export type HomeReportData = {
   lastYearComparison?: LastYearComparison | null;
   regimeSeries?: TimeMachineRegimeEntry[];
   macroProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
-  sourceHealth?: Array<{ sourceName: string; sourceUrl?: string | null; mode?: string }>;
   treasuryProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
   treasury?: { fetched_at?: string | null; fallback_at?: string | null; fallback_reason?: string | null };
   actionStripItems?: ActionStripItem[];

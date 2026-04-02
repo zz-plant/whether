@@ -119,15 +119,17 @@ export type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "u
 
 export type DecisionTransmissionStalenessLabel = "fresh" | "stale" | "unknown";
 
+export type DecisionTransmissionBoundedRule = {
+  action: string;
+  triggerThreshold: string;
+  reversalCondition: string;
+  manualReviewRequired: boolean;
+};
+
 export type DecisionTransmission = {
   whatChanged: string;
   postureNow: string;
-  boundedRules: Array<{
-    action: string;
-    triggerThreshold: string;
-    reversalCondition: string;
-    manualReviewRequired: boolean;
-  }>;
+  boundedRules: DecisionTransmissionBoundedRule[];
   flipConditions: string[];
   freshness: {
     timestamp: string;
