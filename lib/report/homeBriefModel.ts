@@ -1,5 +1,6 @@
 import type { MacroSeriesReading } from "../types";
 import type {
+  DecisionTransmission,
   HistoricalAnalog,
   LastYearComparison,
   ReportDynamics,
@@ -20,7 +21,11 @@ import type {
   ScopedVariantDecisionAdjustment,
   StartupVariantMode,
 } from "./boundedDecisionRules";
-import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
+import {
+  buildDecisionTransmissionBoundedRules,
+  type ActionStripItem,
+  type RoleAwareOperatingTemplate,
+} from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
 import type { StartupClimateIndex } from "./homeBrief/scoring";
@@ -76,8 +81,11 @@ export type HomeReportData = {
   historicalAnalogs?: HistoricalAnalog[];
   lastYearComparison?: LastYearComparison | null;
   regimeSeries?: TimeMachineRegimeEntry[];
-  treasuryProvenance?: { statusLabel?: string };
-  treasury?: { fallback_at?: string | null; fallback_reason?: string | null };
+  macroProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
+  sourceHealth?: Array<{ sourceName: string; sourceUrl?: string | null; mode?: string }>;
+  treasuryProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
+  treasury?: { fetched_at?: string | null; fallback_at?: string | null; fallback_reason?: string | null };
+  actionStripItems?: ActionStripItem[];
   actionNowShort?: string;
   guardrailThreshold?: string;
   flipThreshold?: string;
@@ -359,6 +367,90 @@ export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
 ) => buildHomeBriefModelInternal(data, options);
+
+const normalizeDecisionTransmissionConfidence = (label: string | undefined): DecisionTransmission["confidence"] => {
+  if (label === "HIGH") return "high";
+  if (label === "MED") return "medium";
+  if (label === "LOW") return "low";
+  return "unknown";
+};
+
+const resolveStalenessLabel = ({
+  timestamp,
+  now,
+  staleAfterHours,
+}: {
+  timestamp?: string | null;
+  now: Date;
+  staleAfterHours: number;
+}): DecisionTransmission["freshness"]["stalenessLabel"] => {
+  if (!timestamp) return "unknown";
+  const parsed = Date.parse(timestamp);
+  if (Number.isNaN(parsed)) return "unknown";
+  return (now.getTime() - parsed) / 3_600_000 > staleAfterHours ? "stale" : "fresh";
+};
+
+export const buildDecisionTransmission = (
+  data: HomeReportData,
+  options?: {
+    overlaySector?: SectorKey;
+    startupVariantMode?: StartupVariantMode;
+    now?: Date;
+    staleAfterHours?: number;
+  },
+): DecisionTransmission => {
+  const homeBriefModel = buildHomeBriefModelInternal(data, options);
+  const now = options?.now ?? new Date();
+  const staleAfterHours = options?.staleAfterHours ?? 48;
+  const provenanceCandidates = [
+    data.treasuryProvenance?.sourceLabel
+      ? {
+          sourceLabel: data.treasuryProvenance.sourceLabel,
+          reference: data.treasuryProvenance.sourceUrl ?? "treasury:source-url-unavailable",
+          isFallback: false,
+        }
+      : null,
+    data.macroProvenance?.sourceLabel
+      ? {
+          sourceLabel: data.macroProvenance.sourceLabel,
+          reference: data.macroProvenance.sourceUrl ?? "macro:source-url-unavailable",
+          isFallback: false,
+        }
+      : null,
+  ];
+  const provenance = provenanceCandidates.filter((item): item is NonNullable<typeof item> => item !== null);
+
+  const boundedRules = buildDecisionTransmissionBoundedRules({
+    rules: homeBriefModel.decisionRules,
+    actionStripItems: data.actionStripItems,
+  });
+
+  return {
+    whatChanged: homeBriefModel.decisionShiftSummary,
+    postureNow:
+      homeBriefModel.actionNowShort?.trim() ||
+      homeBriefModel.operatingStanceLine ||
+      "Hold current operating posture until fresh signal confirmation.",
+    boundedRules,
+    flipConditions:
+      homeBriefModel.compactFlipConditionLabels && homeBriefModel.compactFlipConditionLabels.length > 0
+        ? homeBriefModel.compactFlipConditionLabels
+        : [homeBriefModel.reversalTrigger],
+    freshness: {
+      timestamp: data.treasury?.fetched_at ?? data.fetchedAtLabel ?? "timestamp-unavailable",
+      stalenessLabel: resolveStalenessLabel({
+        timestamp: data.treasury?.fetched_at,
+        now,
+        staleAfterHours,
+      }),
+    },
+    confidence: normalizeDecisionTransmissionConfidence(homeBriefModel.confidenceLabel),
+    provenance:
+      provenance.length > 0
+        ? provenance
+        : [{ sourceLabel: "Provenance unavailable", reference: "fallback:manual-source-review-required", isFallback: true }],
+  };
+};
 
 export const buildWeeklyDecisionCardViewModel = ({
   homeBriefModel,
