@@ -1,4 +1,4 @@
-import { buildCompactFreshnessMeta } from "../../../lib/report/reportFormatting";
+import { buildCompactFreshnessMeta, formatTrustStripDisplay } from "../../../lib/report/reportFormatting";
 import { buildWeeklyCitationMetaLine, buildTrustMarker } from "../../../lib/report/trustStatus";
 import type { WeeklyDecisionCardViewModel } from "../../../lib/report/homeBriefModel";
 import {
@@ -32,6 +32,12 @@ export const buildWeeklyDecisionPresentation = ({
     confidenceLabel: status.confidenceLabel,
     freshnessMeta,
     isFallbackSnapshot: Boolean(status.isFallbackSnapshot),
+  });
+  const trustStrip = formatTrustStripDisplay({
+    updatedAtLabel: artifact.fetchedAtLabel,
+    confidenceLabel: status.confidenceLabel,
+    isFallbackSnapshot: Boolean(status.isFallbackSnapshot),
+    provenanceCount: model.diagnostics.evidenceItems.length,
   });
   const snapshotGuardrail =
     decision.guardrailThreshold?.trim()
@@ -88,7 +94,7 @@ export const buildWeeklyDecisionPresentation = ({
     roleTranslations: buildRoleTranslationCards({ decisionRules: decision.decisionRules }),
     citationMetaLine,
     inlineTrustMarker,
-    trustStateLabel: inlineTrustMarker.label.toUpperCase(),
+    trustStrip,
     trustStateDetail: inlineTrustMarker.detail,
     hasMaterialTrustDelta: inlineTrustMarker.degraded,
     snapshotGuardrail,

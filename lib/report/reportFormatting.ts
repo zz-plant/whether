@@ -226,6 +226,17 @@ export type CompactFreshnessMeta = {
   line: string;
 };
 
+export type TrustStripDisplay = {
+  freshnessBadge: string;
+  confidenceBadge: string;
+  provenanceBadge: string;
+  provenanceHref: "/method";
+  fallbackBadge: string | null;
+  warningCopy: string | null;
+  commitmentLabel: "Decision ready" | "Review before commitment";
+  degraded: boolean;
+};
+
 export const buildCompactFreshnessMeta = ({
   updatedAtLabel,
   confidenceLabel,
@@ -259,5 +270,49 @@ export const buildCompactFreshnessMeta = ({
     confidenceCue,
     maxAge,
     line: `Updated ${normalizedUpdatedAt}${ageCue} · ${fallbackCue} · ${confidenceCue}`,
+  };
+};
+
+export const formatTrustStripDisplay = ({
+  updatedAtLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+  provenanceCount,
+  now = new Date(),
+  staleAfterHours = 6,
+}: {
+  updatedAtLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+  provenanceCount: number;
+  now?: Date;
+  staleAfterHours?: number;
+}): TrustStripDisplay => {
+  const freshness = buildCompactFreshnessMeta({
+    updatedAtLabel,
+    confidenceLabel,
+    isFallbackSnapshot,
+    now,
+    staleAfterHours,
+  });
+  const freshnessBadge = freshness.updatedAtLabel === "Unavailable"
+    ? "Freshness unavailable"
+    : freshness.maxAge === "stale"
+      ? "Freshness stale"
+      : "Freshness fresh";
+  const confidenceBadge = `Confidence ${confidenceLabel}`;
+  const safeProvenanceCount = Math.max(0, Math.round(provenanceCount));
+  const provenanceBadge = `Provenance ${safeProvenanceCount}`;
+  const degraded = isFallbackSnapshot || freshness.maxAge === "stale";
+
+  return {
+    freshnessBadge,
+    confidenceBadge,
+    provenanceBadge,
+    provenanceHref: "/method",
+    fallbackBadge: degraded ? "Fallback active" : null,
+    warningCopy: degraded ? "Some inputs are degraded—review before commitment." : null,
+    commitmentLabel: degraded ? "Review before commitment" : "Decision ready",
+    degraded,
   };
 };

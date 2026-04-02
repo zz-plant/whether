@@ -66,6 +66,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Current outlook/);
+    assert.match(html, /aria-label="Trust strip"/);
+    assert.match(html, /Freshness stale/);
+    assert.match(html, /Confidence MED/);
+    assert.match(html, /Provenance 1/);
+    assert.match(html, /Fallback active/);
+    assert.match(html, /href="\/method"/);
     assert.match(html, />This week</);
     assert.match(html, /What changed/);
     assert.match(html, /Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision\./);
@@ -144,6 +150,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, />This week</);
     assert.match(html, /FALLBACK SNAPSHOT/);
+    assert.match(html, /Fallback active/);
+    assert.match(html, /Review before commitment/);
+    assert.match(html, /Some inputs are degraded—review before commitment\./);
     assert.match(html, /Readiness: Act with caution/);
   });
 
