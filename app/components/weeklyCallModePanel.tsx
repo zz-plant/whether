@@ -33,11 +33,11 @@ type WeeklyCallModePanelProps = {
   tierOneHeadingClassName: string;
   whyItMattersLine?: string;
   needsTrustWarning?: boolean;
-  trustStateLabel: string;
   trustStateDetail: string;
   trustReason?: string;
   inlineTrustLabel: string;
   inlineTrustTone: "stable" | "warning" | "historical";
+  commitmentReviewLabel: "Decision ready" | "Review before commitment";
   stabilityRule: string;
   weeklyLeadershipSummary: {
     boldnessScore: number;
@@ -83,6 +83,7 @@ export function WeeklyCallModePanel({
   trustReason,
   inlineTrustLabel,
   inlineTrustTone,
+  commitmentReviewLabel,
   stabilityRule,
   weeklyLeadershipSummary,
   decisionBullets,
@@ -165,6 +166,7 @@ export function WeeklyCallModePanel({
           <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.28fr)_minmax(18rem,0.9fr)]">
             <article className="rounded-[1.1rem] border border-emerald-400/25 bg-[linear-gradient(180deg,rgba(16,185,129,0.09),rgba(2,6,23,0.2))] px-4 py-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do this now</p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">{commitmentReviewLabel}</p>
               <p className="mt-2 text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
               <div className="mt-3 rounded-xl border border-amber-400/20 bg-slate-950/55 px-3 py-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>

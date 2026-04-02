@@ -115,6 +115,34 @@ export type ReportDataLoadOptions = {
   includeHistoricalLiveComparison?: boolean;
 };
 
+export type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "unknown";
+
+export type DecisionTransmissionStalenessLabel = "fresh" | "stale" | "unknown";
+
+export type DecisionTransmissionBoundedRule = {
+  action: string;
+  triggerThreshold: string;
+  reversalCondition: string;
+  manualReviewRequired: boolean;
+};
+
+export type DecisionTransmission = {
+  whatChanged: string;
+  postureNow: string;
+  boundedRules: DecisionTransmissionBoundedRule[];
+  flipConditions: string[];
+  freshness: {
+    timestamp: string;
+    stalenessLabel: DecisionTransmissionStalenessLabel;
+  };
+  confidence: DecisionTransmissionConfidenceLabel;
+  provenance: Array<{
+    sourceLabel: string;
+    reference: string;
+    isFallback: boolean;
+  }>;
+};
+
 const isEdgeRuntime = () => typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime === "string";
 
 const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {
