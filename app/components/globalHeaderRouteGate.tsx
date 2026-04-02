@@ -64,7 +64,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
               href="/decide#unresolved-question-router"
               className="weather-pill inline-flex min-h-[42px] flex-shrink-0 items-center rounded-xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
             >
-              Decision Tools
+              Resolve a question
             </Link>
           </div>
         </div>

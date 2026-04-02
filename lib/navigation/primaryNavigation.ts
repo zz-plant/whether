@@ -12,7 +12,7 @@ export type PrimaryNavigationItem = {
 export const primaryNavigation: PrimaryNavigationItem[] = primaryNavigationLayers.map((layer) => ({
   id: layer.key,
   href: layer.href,
-  label: layer.label,
+  label: layer.navLabel ?? layer.label,
   description: layer.description,
   group: layer.group,
 }));

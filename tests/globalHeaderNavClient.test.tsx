@@ -25,7 +25,7 @@ describe("GlobalHeaderNavRail", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavRail
         navigationLinks={resolveGlobalHeaderNavigationLinks("/")}
-        activeRouteLabel="Weekly Brief"
+        activeRouteLabel="Brief"
         onIntent={() => {}}
       />,
     );

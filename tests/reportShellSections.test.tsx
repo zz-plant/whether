@@ -101,6 +101,36 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Planning sequence/);
   });
 
+  it("keeps compact command-center intros to one decision block without a second status rail", () => {
+    const html = renderToStaticMarkup(
+      <CommandCenterNavBlock
+        heroVariant="compact"
+        pageTitle="Resolve one question"
+        pageSummary="Take the smallest useful path for the one question that is still open."
+        summaryLink={null}
+        recordDateLabel="Apr 1"
+        primaryCta={{ href: "#router", label: "Start with the recommended path" }}
+        secondaryCta={{ href: "/", label: "Weekly Brief" }}
+        statusLabel="DEFENSIVE"
+        trustStatusLabel="HIGH"
+        fetchedAtLabel="Apr 2"
+        resolvedNextRefreshLabel="15m cadence"
+        trustStatusAction="Proceed"
+        showOfflineBadge={false}
+        offlineBadgeLabel="Cached"
+        decisionBanner={{ label: "Resolve one question", decision: "Resolve one remaining question without reopening the weekly brief.", horizon: "This week", confidence: "HIGH", effectiveDate: "Apr 1", evidenceHref: "#router" }}
+        missionSupportText="Use the recommended path first."
+        missionSequenceTitle="Planning sequence"
+        missionSequenceItems={[{ title: "Now", detail: "Act", href: "#", cta: "Do", phase: "Now" }]}
+      />,
+    );
+
+    assert.match(html, /Resolve one question/);
+    assert.match(html, /As-of Apr 1/);
+    assert.doesNotMatch(html, /Current report status/);
+    assert.doesNotMatch(html, /Review order/);
+  });
+
   it("renders sidebar sequence rail", () => {
     const html = renderToStaticMarkup(
       <SidebarSequenceBlock

@@ -19,7 +19,8 @@ export const isReportShellRoute = (pathname: string) => {
 
 export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
-  return navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname))?.label ?? fallbackLabel;
+  const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname));
+  return activeLayer ? activeLayer.navLabel ?? activeLayer.label : fallbackLabel;
 };
 
 export const resolveGlobalHeaderTagline = (pathname: string) => {
@@ -52,7 +53,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
   };
 
   return {
-    title: activeLayer.label,
+    title: activeLayer.navLabel ?? activeLayer.label,
     description:
       activeLayer.tier === "supporting" && parentLayer
         ? `${actionDescriptionByKey[activeLayer.key] ?? activeLayer.description} Primary parent: ${parentLayer.label}.`

@@ -19,7 +19,7 @@ describe("navigation information architecture", () => {
     for (const layer of primaryNavigationLayers) {
       const link = primaryNavigation.find((item) => item.href === layer.href);
       assert.ok(link);
-      assert.equal(link?.label, layer.label);
+      assert.equal(link?.label, layer.navLabel ?? layer.label);
       assert.equal(link?.description, layer.description);
     }
   });

@@ -23,7 +23,9 @@ describe("global header navigation helpers", () => {
 
   it("uses canonical IA labels for condensed report route context", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
-    assert.equal(resolveGlobalHeaderRouteLabel("/operations/cli"), "Planning");
+    assert.equal(resolveGlobalHeaderRouteLabel("/operations/cli"), "Plan");
+    assert.equal(resolveGlobalHeaderRouteLabel("/decide/use-cases"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/method"), "Verify");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Report");
   });
 

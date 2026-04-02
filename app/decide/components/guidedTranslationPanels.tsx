@@ -81,9 +81,16 @@ export function GuidedTranslationPanels({
     selectedStakeholder,
     showStageLibrary,
   } = resolveGuidedTranslationState(searchParams);
+  const hasActiveTranslationSelection = Boolean(
+    selectedStakeholder || selectedStage || showStageLibrary,
+  );
+
+  if (!hasActiveTranslationSelection) {
+    return null;
+  }
 
   return (
-    <div className="space-y-4">
+    <section id="guided-translation-results" className="space-y-4" aria-label="Selected translation details">
       {selectedStakeholder ? (
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
@@ -279,6 +286,6 @@ export function GuidedTranslationPanels({
           ) : null}
         </div>
       </details>
-    </div>
+    </section>
   );
 }

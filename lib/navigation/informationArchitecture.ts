@@ -12,6 +12,7 @@ export type NavigationLayer = {
   key: NavigationLayerKey;
   href: Route;
   label: string;
+  navLabel?: string;
   description: string;
   boundary: string;
   group: "core" | "workflow" | "reference";
@@ -30,6 +31,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "weekly-brief",
     href: "/",
     label: "Weekly Brief",
+    navLabel: "Brief",
     description: "Read this week's call, bounded action, and the share-ready artifact.",
     boundary: "Canonical weekly workspace. Leave home only if proof, planning, edge cases, or trust still need work.",
     group: "core",
@@ -48,6 +50,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "operations",
     href: "/operations",
     label: "Planning",
+    navLabel: "Plan",
     description: "Set this week's guardrails for hiring, spend, roadmap, and the final brief.",
     boundary: "Execution depth only. Weekly Brief remains the canonical orchestration surface.",
     group: "workflow",
@@ -57,6 +60,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "decide",
     href: "/decide",
     label: "Decision Tools",
+    navLabel: "Resolve",
     description: "Resolve one remaining question with the smallest useful answer or tool.",
     boundary: "Routing and translation depth only. Do not duplicate the live brief or weekly plan.",
     group: "workflow",
@@ -66,6 +70,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "method",
     href: "/method",
     label: "Trust",
+    navLabel: "Verify",
     description: "Check freshness, confidence, source coverage, and reversal conditions.",
     boundary: "Transparency and trust checks only. Return to Weekly Brief once validated.",
     group: "reference",

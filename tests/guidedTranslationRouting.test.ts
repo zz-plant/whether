@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import {
   buildGuidedTranslationHref,
+  GuidedTranslationPanels,
   resolveGuidedTranslationState,
 } from "../app/decide/components/guidedTranslationPanels";
 import { operationsSectionLinks } from "../lib/navigation/operationsNavigation";
@@ -37,5 +40,17 @@ describe("guided translation routing", () => {
 
   it("keeps planning section links aligned with the new risk-check insertion", () => {
     assert.ok(operationsSectionLinks.plan.some((link) => link.href === "#ops-failure-patterns"));
+  });
+
+  it("keeps translation panels hidden until a role or stage is selected", () => {
+    const defaultHtml = renderToStaticMarkup(createElement(GuidedTranslationPanels));
+    const selectedHtml = renderToStaticMarkup(
+      createElement(GuidedTranslationPanels, {
+        searchParams: { stakeholder: "heads-of-product" },
+      }),
+    );
+
+    assert.equal(defaultHtml, "");
+    assert.match(selectedHtml, /Selected team translation/);
   });
 });

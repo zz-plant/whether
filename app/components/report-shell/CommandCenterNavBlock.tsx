@@ -91,9 +91,15 @@ export function CommandCenterNavBlock({
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] xl:items-start">
           <div className="space-y-4">
             <div className="space-y-2.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Whether report
-              </p>
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                <span>Whether report</span>
+                <span className="text-slate-600">•</span>
+                <span>{statusLabel}</span>
+                <span className="text-slate-600">•</span>
+                <span>{trustStatusLabel}</span>
+                <span className="text-slate-600">•</span>
+                <span>As-of {recordDateLabel}</span>
+              </div>
               <h1 className="text-2xl font-semibold text-slate-100 sm:text-[2rem]">
                 {pageTitle}
               </h1>
@@ -123,21 +129,12 @@ export function CommandCenterNavBlock({
                   {secondaryCta.label}
                 </InternalAwareLink>
               ) : null}
+              {showOfflineBadge ? (
+                <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-amber-100">
+                  {offlineBadgeLabel}
+                </p>
+              ) : null}
             </div>
-
-            {actionLinks.length > 0 ? (
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-medium text-slate-400">
-                {actionLinks.map((link) => (
-                  <InternalAwareLink
-                    key={`${link.href}-${link.label}`}
-                    href={link.href}
-                    className="text-slate-300 underline decoration-slate-600/80 underline-offset-4 hover:text-slate-100"
-                  >
-                    {link.label}
-                  </InternalAwareLink>
-                ))}
-              </div>
-            ) : null}
           </div>
 
           <article className="weather-priority-card space-y-3 p-4 sm:p-5">
@@ -161,7 +158,6 @@ export function CommandCenterNavBlock({
               </ul>
             ) : null}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300">
-              {nextStep ? <p>Next: {nextStep.description}</p> : null}
               {decisionBanner?.evidenceHref ? (
                 <InternalAwareLink
                   href={decisionBanner.evidenceHref}
@@ -171,40 +167,9 @@ export function CommandCenterNavBlock({
                   <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
                 </InternalAwareLink>
               ) : null}
+              {nextStep ? <p>Next: {nextStep.description}</p> : null}
             </div>
           </article>
-        </div>
-
-        <div className="flex flex-col gap-3 border-t border-slate-800/70 pt-4 lg:flex-row lg:items-center lg:justify-between">
-          <dl
-            className="weather-surface weather-meta-list min-h-[40px] flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-slate-100"
-            aria-label="Current report status"
-          >
-            <div className="weather-meta-list__item">
-              <dt className="text-slate-500">Posture</dt>
-              <dd>{statusLabel}</dd>
-            </div>
-            <div className="weather-meta-list__item">
-              <dt className="text-slate-500">Trust</dt>
-              <dd>{trustStatusLabel}</dd>
-            </div>
-            <div className="weather-meta-list__item">
-              <dt className="text-slate-500">As-of</dt>
-              <dd>{recordDateLabel}</dd>
-            </div>
-            <div className="weather-meta-list__item">
-              <dt className="text-slate-500">Refreshed</dt>
-              <dd>{fetchedAtLabel}</dd>
-            </div>
-          </dl>
-          <div className="flex flex-wrap items-center gap-2">
-            <ManualRefreshButton title="Request the latest weekly brief snapshot." />
-            {showOfflineBadge ? (
-              <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-amber-100">
-                {offlineBadgeLabel}
-              </p>
-            ) : null}
-          </div>
         </div>
       </section>
     );
