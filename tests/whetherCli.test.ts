@@ -173,7 +173,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -196,7 +196,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -225,7 +225,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const port = resolveServerPort(server);
     const result = await runCli(["brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -283,7 +283,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const weekly = await runCli(["agent", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
     const monthly = await runCli(["agent", "monthly", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
@@ -343,7 +343,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["agent", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -411,7 +411,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
 
     const live = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
@@ -450,7 +450,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--json", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -523,7 +523,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -546,7 +546,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -569,7 +569,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -591,7 +591,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -630,7 +630,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -650,7 +650,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -673,7 +673,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -700,7 +700,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["share", "email", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -737,7 +737,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["share", "slack", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -766,7 +766,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
 
     const expired = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -854,7 +854,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
 
     const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -897,7 +897,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
 
     const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -944,7 +944,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const compact = await runCli(["agent", "--compact", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
     const payload = await runCli(["agent", "--payload-only", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
@@ -1024,7 +1024,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["export", "pdf", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -1056,7 +1056,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
 
     const valid = await runCli(["auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
@@ -1094,7 +1094,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const port = resolveServerPort(server);
     const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: buildIsolatedEnv({ HOME: homeDir }),
@@ -1143,7 +1143,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -1178,7 +1178,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["history", "--weeks", "99", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -1219,7 +1219,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const result = await runCli(["status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -1280,7 +1280,7 @@ describe("whether cli", () => {
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, resolve));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
     const base = ["--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"];
 
