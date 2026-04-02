@@ -1,5 +1,8 @@
+import Link from "next/link";
+import type { Route } from "next";
 import type { RegimeKey } from "../../../../lib/regimeEngine";
 import type { FlipRiskMeterState, WeeklyDecisionCardViewModel } from "../../../../lib/report/homeBriefModel";
+import type { TrustStripDisplay } from "../../../../lib/report/reportFormatting";
 import { getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, type RegimeWeatherIcon } from "../../../../lib/regimePresentation";
 import { resolvePostureAndStage } from "../../../../lib/report/homeBriefPresentation";
 import { TrendGlyph } from "../shared";
@@ -16,6 +19,7 @@ type RegimeBannerProps = {
   trendLabel?: string;
   regimeDistance?: WeeklyDecisionCardViewModel["diagnostics"]["regimeDistance"];
   flipRiskMeter: FlipRiskMeterState;
+  trustStrip: TrustStripDisplay;
 };
 
 const RegimeWeatherGlyph = ({ icon, title }: { icon: RegimeWeatherIcon; title: string }) => {
@@ -32,7 +36,7 @@ const RegimeWeatherGlyph = ({ icon, title }: { icon: RegimeWeatherIcon; title: s
 };
 
 export function RegimeBanner(props: RegimeBannerProps) {
-  const { statusLabel, regimeKey = "VOLATILE", postureLabel, stageLabel, postureWithStageLabel, recordDateLabel, confidencePercent, confidenceLabel, trendLabel, regimeDistance, flipRiskMeter } = props;
+  const { statusLabel, regimeKey = "VOLATILE", postureLabel, stageLabel, postureWithStageLabel, recordDateLabel, confidencePercent, confidenceLabel, trendLabel, regimeDistance, flipRiskMeter, trustStrip } = props;
   const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({ statusLabel, postureLabel, stageLabel, postureWithStageLabel });
   const trendValue = trendLabel?.trim() || "Unspecified";
   const flipRiskValue = regimeDistance && Number.isFinite(regimeDistance.pointsToFlip) ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts` : "Unknown";
@@ -69,6 +73,19 @@ export function RegimeBanner(props: RegimeBannerProps) {
             {flipRiskMeter.triggerLabel}
           </span>
         </div>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200" aria-label="Trust strip">
+        <span className="rounded-full border border-white/15 bg-slate-950/35 px-2 py-1">{trustStrip.freshnessBadge}</span>
+        <span className="rounded-full border border-white/15 bg-slate-950/35 px-2 py-1">{trustStrip.confidenceBadge}</span>
+        <Link href={trustStrip.provenanceHref as Route} className="rounded-full border border-sky-400/35 bg-sky-500/10 px-2 py-1 text-sky-100 hover:text-slate-50">
+          {trustStrip.provenanceBadge}
+        </Link>
+        {trustStrip.fallbackBadge ? (
+          <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-1 text-amber-100">{trustStrip.fallbackBadge}</span>
+        ) : null}
+        {trustStrip.warningCopy ? (
+          <p className="w-full text-[11px] normal-case tracking-normal text-amber-100">{trustStrip.warningCopy}</p>
+        ) : null}
       </div>
     </header>
   );
