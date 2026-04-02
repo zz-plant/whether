@@ -96,9 +96,10 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Whether report/);
     assert.match(html, /Decide now/);
-    assert.match(html, /Review order/);
+    assert.match(html, /Use in order/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
+    assert.match(html, /href="#"/);
   });
 
   it("keeps compact command-center intros to one decision block without a second status rail", () => {

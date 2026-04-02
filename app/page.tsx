@@ -165,9 +165,8 @@ export const HomePageReportContent = async ({
       {/*
         Homepage UI state contract:
         - tab: brief | revisit | workspace
-        - focus: all | decision | risk
         - detail: compact | full
-        - modal: none | share
+        - panel: none | share
         URL is first-render source-of-truth. Invalid values normalize to defaults via replace().
       */}
       <HomeRouteStateController
@@ -203,6 +202,9 @@ export const HomePageReportContent = async ({
             </dl>
           </section>
         )}
+        hasRevisitSection={
+          homepage.interpretationLayer.view !== "default" || Boolean(homepage.fallbackAlert)
+        }
         workspaceSection={<HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />}
       />
     </ReportShell>

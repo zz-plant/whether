@@ -198,14 +198,14 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Approve this week's plan, guardrails, finance posture, and final brief."
-      pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open planning flow ↓" }}
+      pageSummary="Approve this week's plan, guardrails, finance posture, and share-ready brief."
+      pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
-        label: "Start planning review",
+        label: "Start with weekly plan",
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
-      exportCta={{ href: "#ops-export-briefs", label: "Open final brief" }}
+      exportCta={{ href: "#ops-export-briefs", label: "Go to share-ready brief" }}
       decisionBanner={{
         label: "Start here",
         decision: "Approve or hold the week's hiring, spend, and roadmap moves.",

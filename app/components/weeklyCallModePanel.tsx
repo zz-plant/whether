@@ -131,14 +131,18 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly brief">
-        <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
+      <article className={`rounded-[1.35rem] border border-slate-700/75 bg-[linear-gradient(180deg,rgba(8,15,27,0.92),rgba(3,9,18,0.98))] p-3 shadow-[0_22px_42px_-34px_rgba(2,6,23,0.82)] sm:p-4 ${sectionSpacingClassName}`} aria-label="Weekly brief">
+        <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-3 overflow-hidden bg-[linear-gradient(145deg,rgba(3,7,18,0.96),rgba(15,23,42,0.92)_48%,rgba(3,9,18,0.96))]`}>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/35 to-transparent" />
+          <div className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-sky-400/6 blur-3xl" />
+          <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-amber-300/6 blur-3xl" />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">
-              <h2 className={tierOneHeadingClassName}>This week</h2>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Weekly operating call</p>
+              <h2 className={`${tierOneHeadingClassName} text-base`}>This week</h2>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{postureLabel}</span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">{postureLabel}</span>
               {trustReason ? (
                 <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-violet-100">
                   FALLBACK SNAPSHOT
@@ -147,37 +151,39 @@ export function WeeklyCallModePanel({
               <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className="rounded-full border border-violet-400/25 bg-violet-500/8 px-3 py-1.5 text-[11px] font-semibold text-violet-100">
+          <div className="relative mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <span className="rounded-2xl border border-violet-400/25 bg-[linear-gradient(180deg,rgba(139,92,246,0.16),rgba(15,23,42,0.82))] px-3 py-2 text-[11px] font-semibold text-violet-100 shadow-[0_12px_24px_-22px_rgba(139,92,246,0.45)]">
               Boldness {weeklyLeadershipSummary.boldnessScore}/100 <span className="ml-1 text-violet-200">{signedBoldnessDelta}</span>
             </span>
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Hiring {weeklyLeadershipSummary.hiringWindow}
             </span>
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Expansion {weeklyLeadershipSummary.expansionWindow}
             </span>
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Raise {weeklyLeadershipSummary.raiseWindow}
             </span>
           </div>
-          <p className="mt-2 text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.shorthandLine} {weeklyLeadershipSummary.netDeltaLabel}</p>
+          <p className="relative mt-3 max-w-3xl text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.shorthandLine} {weeklyLeadershipSummary.netDeltaLabel}</p>
           <p className="sr-only">Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision.</p>
-          <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.28fr)_minmax(18rem,0.9fr)]">
-            <article className="rounded-[1.1rem] border border-emerald-400/25 bg-[linear-gradient(180deg,rgba(16,185,129,0.09),rgba(2,6,23,0.2))] px-4 py-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do this now</p>
-              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">{commitmentReviewLabel}</p>
-              <p className="mt-2 text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
-              <div className="mt-3 rounded-xl border border-amber-400/20 bg-slate-950/55 px-3 py-3">
+          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.28fr)_minmax(18rem,0.9fr)]">
+            <article className="rounded-[1.2rem] border border-emerald-400/22 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(2,6,23,0.26))] px-4 py-4 shadow-[0_16px_28px_-26px_rgba(16,185,129,0.38)]">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do this now</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">{commitmentReviewLabel}</p>
+              </div>
+              <p className="mt-3 max-w-2xl text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
+              <div className="mt-4 rounded-xl border border-amber-400/20 bg-[linear-gradient(180deg,rgba(251,191,36,0.08),rgba(2,6,23,0.24))] px-3 py-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
                 <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
               </div>
               <div className="mt-3 grid gap-2 md:grid-cols-2">
-                <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
+                <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(244,63,94,0.35)]">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Slow down if</p>
                   <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
                 </article>
-                <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
+                <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(56,189,248,0.35)]">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Lean back in if</p>
                   <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
                 </article>
@@ -185,13 +191,18 @@ export function WeeklyCallModePanel({
             </article>
 
             <aside className="space-y-3">
-              <article className={`rounded-[1.1rem] border px-3 py-3 ${revisitToneClass}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit now</p>
-                <p className="mt-1 text-base font-semibold leading-6">{revisitLabel}</p>
+              <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${revisitToneClass}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit now</p>
+                  <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+                    Hold with caution
+                  </span>
+                </div>
+                <p className="mt-2 text-base font-semibold leading-6">{revisitLabel}</p>
                 {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
 
                 {revisitQueue.length > 0 ? (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-4 space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit queue</p>
                       <span className="rounded-full border border-amber-400/25 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
@@ -199,7 +210,7 @@ export function WeeklyCallModePanel({
                       </span>
                     </div>
                     {revisitQueue.map((item) => (
-                      <article key={item.id} className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2.5">
+                      <article key={item.id} className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 shadow-[0_12px_20px_-22px_rgba(2,6,23,0.74)]">
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-sm font-semibold text-slate-100">{item.label}</p>
                           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
@@ -215,8 +226,8 @@ export function WeeklyCallModePanel({
                 ) : null}
               </article>
 
-              <article className={`rounded-[1.1rem] border px-3 py-3 ${compactTrustToneClass}`}>
-                <div className="flex flex-wrap items-center gap-2">
+              <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${readinessToneClass}`}>
                     Readiness: {decisionReadiness.label}
                   </span>
@@ -241,7 +252,7 @@ export function WeeklyCallModePanel({
           summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
         >
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
-            <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
+            <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(244,63,94,0.35)]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why the read points here</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -251,13 +262,13 @@ export function WeeklyCallModePanel({
               </div>
             </article>
 
-            <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3">
+            <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(2,6,23,0.62)]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Who this matters most for</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
               <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>
 
-            <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
+            <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(56,189,248,0.35)]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">This likely changes if</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
@@ -282,7 +293,7 @@ export function WeeklyCallModePanel({
           <CompactDisclosure
             queryKey="supportingRationale"
             summary="How this lands across the company"
-            className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3"
+            className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(8,15,27,0.88),rgba(4,10,20,0.94))] px-3 py-3 shadow-[0_18px_32px_-28px_rgba(2,6,23,0.72)]"
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >
             {glossaryHref ? (

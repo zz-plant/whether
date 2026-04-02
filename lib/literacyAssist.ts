@@ -9,23 +9,23 @@ export const literacyAssistOptions: Array<{
 }> = [
   {
     id: "decision",
-    label: "Recommend the move",
-    description: "Translate the current read into what to do now, what to pause, and what would change the call.",
+    label: "What Should We Do Now?",
+    description: "Show the move to make now, what to pause, and what would change the call.",
   },
   {
     id: "evidence",
-    label: "Explain the evidence",
-    description: "Translate the main signals and thresholds into plain operating language before you act.",
+    label: "Why Is The Call Changing?",
+    description: "Explain the main signals and thresholds in plain operating language.",
   },
   {
     id: "trust",
-    label: "Show why this is reliable",
-    description: "Translate freshness, confidence, and fallback state into a clear use-or-caution read.",
+    label: "Can We Rely On This?",
+    description: "Turn freshness, confidence, and fallback state into a clear use-or-caution read.",
   },
   {
     id: "share",
-    label: "Help me share this",
-    description: "Translate the current call into the right brief, snapshot, or leadership artifact.",
+    label: "Which Brief Should I Send?",
+    description: "Point me to the right brief, snapshot, or leadership artifact for this room.",
   },
 ] as const;
 

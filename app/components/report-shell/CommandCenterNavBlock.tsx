@@ -87,7 +87,11 @@ export function CommandCenterNavBlock({
 
   if (heroVariant === "compact") {
     return (
-      <section className="weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:px-5" aria-label="Page introduction">
+      <section
+        className="weather-panel-static relative min-w-0 overflow-hidden space-y-5 px-4 py-4 sm:px-5"
+        aria-label="Page introduction"
+      >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/50 to-transparent" aria-hidden="true" />
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] xl:items-start">
           <div className="space-y-4">
             <div className="space-y-2.5">
@@ -100,7 +104,7 @@ export function CommandCenterNavBlock({
                 <span className="text-slate-600">•</span>
                 <span>As-of {recordDateLabel}</span>
               </div>
-              <h1 className="text-2xl font-semibold text-slate-100 sm:text-[2rem]">
+              <h1 className="max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-slate-100 sm:text-[2rem]">
                 {pageTitle}
               </h1>
               <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-[15px]">
@@ -137,20 +141,21 @@ export function CommandCenterNavBlock({
             </div>
           </div>
 
-          <article className="weather-priority-card space-y-3 p-4 sm:p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100/80">
+          <article className="weather-priority-card relative overflow-hidden space-y-3 p-4 sm:p-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/45 to-transparent" aria-hidden="true" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
               {decisionBanner?.label ?? "Start here"}
             </p>
-            <h2 className="text-xl font-semibold leading-7 text-slate-50 sm:text-[1.55rem]">
+            <h2 className="max-w-xl text-[1.55rem] font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 sm:text-[1.75rem]">
               {primaryDecisionText}
             </h2>
-            <p className="text-sm leading-relaxed text-slate-200">{missionSupportText}</p>
+            <p className="max-w-lg text-sm leading-relaxed text-slate-200">{missionSupportText}</p>
             {decisionDiffs?.length ? (
               <ul className="flex flex-wrap gap-2" aria-label="Decision deltas">
                 {decisionDiffs.map((item) => (
                   <li
                     key={item.label}
-                    className="inline-flex min-h-[28px] items-center rounded-full border border-sky-300/18 bg-slate-950/35 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-slate-100"
+                    className="inline-flex min-h-[28px] items-center rounded-full border border-sky-300/18 bg-slate-950/35 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
                   >
                     {item.label}
                   </li>
@@ -176,11 +181,15 @@ export function CommandCenterNavBlock({
   }
 
   return (
-    <section className="weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:px-5" aria-label="Page introduction">
+    <section
+      className="weather-panel-static relative min-w-0 overflow-hidden space-y-5 px-4 py-4 sm:px-5"
+      aria-label="Page introduction"
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.06fr)_minmax(21rem,0.94fr)] xl:items-start">
         <div className="space-y-4">
           {roleSwitcher ? (
-            <div className="space-y-2">
+            <div className="space-y-2 rounded-[1.1rem] border border-slate-800/55 bg-slate-950/45 p-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                 Role view
               </p>
@@ -206,7 +215,7 @@ export function CommandCenterNavBlock({
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               Whether report
             </p>
-            <h1 className="type-headline text-slate-100">{pageTitle}</h1>
+            <h1 className="type-headline max-w-3xl text-slate-100">{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
               <span>{pageSummary}</span>
               {summaryLink}
@@ -236,7 +245,8 @@ export function CommandCenterNavBlock({
           </div>
 
           {actionLinks.length > 0 ? (
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-medium text-slate-400">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-slate-400">
+              <span>Need later:</span>
               {actionLinks.map((link) => (
                 <InternalAwareLink
                   key={`${link.href}-${link.label}`}
@@ -251,14 +261,15 @@ export function CommandCenterNavBlock({
         </div>
 
         <div className="space-y-3">
-          <article className="weather-priority-card space-y-3 p-4 sm:p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100/80">
+          <article className="weather-priority-card relative overflow-hidden space-y-3 p-4 sm:p-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/45 to-transparent" aria-hidden="true" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
               {decisionBanner?.label ?? "Decide now"}
             </p>
-            <h2 className="text-[1.45rem] font-semibold leading-8 text-slate-50">
+            <h2 className="max-w-xl text-[1.5rem] font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50">
               {primaryDecisionText}
             </h2>
-            <p className="text-sm leading-relaxed text-slate-200">{missionSupportText}</p>
+            <p className="max-w-lg text-sm leading-relaxed text-slate-200">{missionSupportText}</p>
             {decisionDiffs?.length ? (
               <ul className="flex flex-wrap gap-2" aria-label="Decision deltas">
                 {decisionDiffs.map((item) => (
@@ -286,24 +297,36 @@ export function CommandCenterNavBlock({
           </article>
 
           {missionSequenceItems.length ? (
-            <article className="weather-surface space-y-3 p-4">
+            <article className="weather-surface space-y-3 rounded-[1.1rem] border border-slate-800/55 bg-slate-950/42 p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                   {missionSequenceTitle}
                 </p>
-                <span className="text-[11px] text-slate-400">Review order</span>
+                <span className="text-[11px] text-slate-400">Use in order</span>
               </div>
               <ol className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
                 {missionSequenceItems.map((item) => (
                   <li
                     key={item.title}
-                    className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3"
+                    className="rounded-xl border border-slate-800/70 bg-slate-950/60 shadow-[0_12px_24px_-22px_rgba(2,6,23,0.75)]"
                   >
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                      {item.phase}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-300">{item.detail}</p>
+                    <InternalAwareLink
+                      href={item.href}
+                      className="group block rounded-xl px-3 py-3 transition-[transform,background-color,border-color] duration-200 hover:-translate-y-0.5 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                            {item.phase}
+                          </p>
+                          <p className="mt-1 text-sm font-semibold tracking-[-0.01em] text-slate-100">{item.title}</p>
+                        </div>
+                        <span className="rounded-full border border-sky-300/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+                          {item.cta}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-slate-300">{item.detail}</p>
+                    </InternalAwareLink>
                   </li>
                 ))}
               </ol>
@@ -315,7 +338,7 @@ export function CommandCenterNavBlock({
       <div className="flex flex-col gap-3 border-t border-slate-800/70 pt-4 lg:flex-row lg:items-center lg:justify-between">
         <dl
           className="weather-surface weather-meta-list min-h-[40px] flex-1 px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-slate-100"
-          aria-label="Current report status"
+          aria-label="Status at a glance"
         >
           <div className="weather-meta-list__item">
             <dt className="text-slate-500">Posture</dt>

@@ -20,7 +20,7 @@ describe("home route URL-state integration", () => {
     assert.equal(state.tab, "workspace");
     assert.equal(state.focus, "risk");
     assert.equal(state.detail, "full");
-    assert.equal(state.modal, "none");
+    assert.equal(state.panel, "none");
   });
 
   it("persists state across refresh by rebuilding from URL", () => {
@@ -28,7 +28,7 @@ describe("home route URL-state integration", () => {
       tab: "revisit",
       focus: "decision",
       detail: "full",
-      modal: "share",
+      panel: "share",
     });
 
     const firstLoad = parseStateFromHref(persistedHref);
@@ -44,7 +44,7 @@ describe("home route URL-state integration", () => {
     const transitions: HomeRouteUiState[] = [
       { ...defaultHomeRouteUiState, tab: "workspace" },
       { ...defaultHomeRouteUiState, tab: "workspace", focus: "risk" },
-      { ...defaultHomeRouteUiState, tab: "workspace", focus: "risk", modal: "share" },
+      { ...defaultHomeRouteUiState, tab: "workspace", focus: "risk", panel: "share" },
     ];
 
     for (const next of transitions) {
@@ -65,7 +65,7 @@ describe("home route URL-state integration", () => {
     const backTwice = parseStateFromHref(timeline[timeline.length - 3]);
     const forwardOnce = parseStateFromHref(timeline[timeline.length - 2]);
 
-    assert.equal(backOnce.modal, "none");
+    assert.equal(backOnce.panel, "none");
     assert.equal(backOnce.focus, "risk");
     assert.equal(backTwice.focus, "all");
     assert.equal(backTwice.tab, "workspace");
@@ -73,10 +73,19 @@ describe("home route URL-state integration", () => {
   });
 
   it("normalizes invalid params to deterministic defaults", () => {
-    const invalid = resolveHomeRouteUiState(new URLSearchParams("tab=unknown&focus=oops&detail=max&modal=sheet"));
+    const invalid = resolveHomeRouteUiState(new URLSearchParams("tab=unknown&focus=oops&detail=max&panel=sheet"));
 
     assert.equal(invalid.normalized, true);
     assert.deepEqual(invalid.state, defaultHomeRouteUiState);
     assert.equal(buildHomeRouteUiHref("/", invalid.state), "/");
+  });
+
+  it("preserves share help state in the URL when toggled on", () => {
+    const href = buildHomeRouteUiHref("/", {
+      ...defaultHomeRouteUiState,
+      panel: "share",
+    });
+
+    assert.equal(href, "/?panel=share");
   });
 });

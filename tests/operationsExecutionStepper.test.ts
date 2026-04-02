@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { resolveOperationsExecutionStepId } from "../app/operations/components/operationsExecutionStepper";
+import {
+  buildOperationsExecutionStepHref,
+  resolveOperationsExecutionStepActionLabel,
+  resolveOperationsExecutionStepReturnLabel,
+  resolveOperationsExecutionStepId,
+} from "../app/operations/components/operationsExecutionStepper";
 
 describe("resolveOperationsExecutionStepId", () => {
   const steps = [
@@ -29,6 +34,16 @@ describe("resolveOperationsExecutionStepId", () => {
       children: null,
     },
   ];
+
+  it("builds hash links for opening a step", () => {
+    assert.equal(buildOperationsExecutionStepHref("ops-export-briefs"), "#ops-export-briefs");
+  });
+
+  it("uses action labels that make the stepper feel navigable", () => {
+    assert.equal(resolveOperationsExecutionStepActionLabel(true), "Current step");
+    assert.equal(resolveOperationsExecutionStepActionLabel(false), "Open step");
+    assert.equal(resolveOperationsExecutionStepReturnLabel(), "Back to steps");
+  });
 
   it("keeps canonical step ids when the hash already matches a step", () => {
     assert.equal(
