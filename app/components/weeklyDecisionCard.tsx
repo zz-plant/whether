@@ -110,9 +110,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     roleTranslations,
     citationMetaLine,
     inlineTrustMarker,
-    trustStateLabel,
     trustStateDetail,
     hasMaterialTrustDelta,
+    trustStrip,
     snapshotGuardrail,
     snapshotWatch,
     effectiveFlipLabels,
@@ -137,6 +137,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         trendLabel={trendLabel}
         regimeDistance={regimeDistance}
         flipRiskMeter={flipRiskMeter}
+        trustStrip={trustStrip}
       />
 
       <WeeklyDecisionContent
@@ -157,11 +158,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             tierOneHeadingClassName={tierOneHeading}
             whyItMattersLine={whyItMattersLine}
             needsTrustWarning={hasMaterialTrustDelta}
-            trustStateLabel={trustStateLabel}
             trustStateDetail={trustStateDetail}
             trustReason={status.isFallbackSnapshot ? artifact.freshnessLine : undefined}
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
+            commitmentReviewLabel={trustStrip.commitmentLabel}
             stabilityRule={stabilityRule}
             weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
             decisionBullets={decisionBullets}

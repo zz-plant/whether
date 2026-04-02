@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState, type ButtonHTMLAttributes } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
-import { artifactModeLabels, literacyAssistStorageKeys, type ArtifactMode } from "../../lib/literacyAssist";
+import { artifactModeLabels, type ArtifactMode } from "../../lib/literacyAssist";
 import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
 import {
-  buildArtifactModeHref,
+  ARTIFACT_MODE_QUERY_PARAM,
   buildArtifactShareText,
   buildArtifactShareTitle,
   isArtifactMode,
-  parseArtifactModeFromSearch,
 } from "../../lib/shareArtifacts";
 
 type PrimaryActionType = "copy_weekly_brief";
@@ -85,6 +84,8 @@ export function CopyLeadershipArtifactsButtons({
   initialArtifactMode?: ArtifactMode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const [artifactMode, setArtifactMode] = useState<ArtifactMode>(initialArtifactMode);
   const [shareState, setShareState] = useState<ShareState>("idle");
@@ -111,55 +112,21 @@ export function CopyLeadershipArtifactsButtons({
     : "";
 
   useEffect(() => {
-    const syncArtifactModeFromLocation = () => {
-      const urlMode = parseArtifactModeFromSearch(window.location.search);
+    const requestedMode = searchParams.get(ARTIFACT_MODE_QUERY_PARAM);
+    setArtifactMode(isArtifactMode(requestedMode) ? requestedMode : "operator");
+  }, [searchParams]);
 
-      if (urlMode) {
-        setArtifactMode(urlMode);
-        try {
-          window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, urlMode);
-        } catch {
-          // Ignore storage errors.
-        }
-        return;
-      }
-
-      try {
-        const storedMode = window.localStorage.getItem(literacyAssistStorageKeys.artifactMode);
-        if (isArtifactMode(storedMode)) {
-          setArtifactMode(storedMode);
-          const nextUrl = buildArtifactModeHref(window.location.href, storedMode);
-          window.history.replaceState({}, "", nextUrl);
-        }
-      } catch {
-        // Ignore storage errors.
-      }
-    };
-
-    syncArtifactModeFromLocation();
-
-    const onPopState = () => {
-      syncArtifactModeFromLocation();
-    };
-
-    window.addEventListener("popstate", onPopState);
-
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-    };
-  }, [initialArtifactMode]);
-
-  useEffect(() => {
-    try {
-      const nextUrl = buildArtifactModeHref(window.location.href, artifactMode);
-      if (nextUrl !== window.location.href) {
-        window.history.replaceState({}, "", nextUrl);
-      }
-      window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, artifactMode);
-    } catch {
-      // Ignore storage/history errors.
+  const buildArtifactModeRoute = (mode: ArtifactMode) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (mode === "operator") {
+      nextParams.delete(ARTIFACT_MODE_QUERY_PARAM);
+    } else {
+      nextParams.set(ARTIFACT_MODE_QUERY_PARAM, mode);
     }
-  }, [artifactMode]);
+
+    const nextQuery = nextParams.toString();
+    return nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname;
+  };
 
   const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
   const explainerBriefContent = [
@@ -230,7 +197,7 @@ export function CopyLeadershipArtifactsButtons({
       ctaId: "homepage_top_fold_share_weekly_brief",
     });
 
-    const currentUrl = buildArtifactModeHref(window.location.href, artifactMode);
+    const currentUrl = `${window.location.origin}${buildArtifactModeRoute(artifactMode)}`;
     const shareText = buildArtifactShareText({
       mode: artifactMode,
       summary: activeModeLabel,
@@ -309,13 +276,7 @@ export function CopyLeadershipArtifactsButtons({
                 type="button"
                 onClick={() => {
                   setArtifactMode(mode);
-                  try {
-                    window.localStorage.setItem(literacyAssistStorageKeys.artifactMode, mode);
-                    const nextUrl = buildArtifactModeHref(window.location.href, mode);
-                    window.history.replaceState({}, "", nextUrl);
-                  } catch {
-                    // Ignore storage errors.
-                  }
+                  router.push(buildArtifactModeRoute(mode), { scroll: false });
                   setShareState("idle");
                   if (mode !== artifactMode) {
                     trackOperatorWorkflowEvent({

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
   buildCompactFreshnessMeta,
+  formatTrustStripDisplay,
   formatDecisionTriplet,
   formatRegimeSignalValue,
   formatTrendArrow,
@@ -72,6 +73,34 @@ describe("reportFormatting regime signal helpers", () => {
       threshold: "net-new hiring if tightness > 76 or risk appetite < 44",
       reversal: "staged approvals when tightness < 66 and risk appetite > 54",
     });
+  });
+
+  it("maps trust strip badges and degraded warning from one formatter", () => {
+    const live = formatTrustStripDisplay({
+      updatedAtLabel: "2026-03-12T12:00:00.000Z",
+      confidenceLabel: "HIGH",
+      isFallbackSnapshot: false,
+      provenanceCount: 4,
+      now: new Date("2026-03-12T12:20:00.000Z"),
+    });
+    assert.equal(live.freshnessBadge, "Freshness fresh");
+    assert.equal(live.confidenceBadge, "Confidence HIGH");
+    assert.equal(live.provenanceBadge, "Provenance 4");
+    assert.equal(live.provenanceHref, "/method");
+    assert.equal(live.warningCopy, null);
+    assert.equal(live.commitmentLabel, "Decision ready");
+
+    const degraded = formatTrustStripDisplay({
+      updatedAtLabel: "",
+      confidenceLabel: "MED",
+      isFallbackSnapshot: true,
+      provenanceCount: 2,
+      now: new Date("2026-03-12T12:20:00.000Z"),
+    });
+    assert.equal(degraded.freshnessBadge, "Freshness unavailable");
+    assert.equal(degraded.fallbackBadge, "Fallback active");
+    assert.match(degraded.warningCopy ?? "", /review before commitment/i);
+    assert.equal(degraded.commitmentLabel, "Review before commitment");
   });
 
 });

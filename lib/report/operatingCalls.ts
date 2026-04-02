@@ -7,6 +7,7 @@ import {
 } from "./boundedDecisionRules";
 import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
 import { operatingLeverToDecisionArea } from "./operatingLeverMap";
+import type { DecisionTransmissionBoundedRule } from "./reportData";
 
 /**
  * Loop stage owner: decision.
@@ -47,6 +48,67 @@ const OPERATING_LEVER_FALLBACK = {
   triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
   reversalCondition: "Loosen only when threshold conditions recover and hold.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
+
+const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Threshold unavailable — manual review required.";
+const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "Reversal condition unavailable — manual review required.";
+
+const hasText = (value: string | undefined | null) => typeof value === "string" && value.trim().length > 0;
+
+const toDecisionTransmissionRule = ({
+  action,
+  triggerThreshold,
+  reversalCondition,
+}: {
+  action?: string;
+  triggerThreshold?: string;
+  reversalCondition?: string;
+}): DecisionTransmissionBoundedRule => {
+  const missingThreshold = !hasText(triggerThreshold);
+  const missingReversal = !hasText(reversalCondition);
+
+  return {
+    action: hasText(action) ? action.trim() : OPERATING_LEVER_FALLBACK.actionNow,
+    triggerThreshold: missingThreshold ? MANUAL_REVIEW_THRESHOLD_PLACEHOLDER : triggerThreshold.trim(),
+    reversalCondition: missingReversal ? MANUAL_REVIEW_REVERSAL_PLACEHOLDER : reversalCondition.trim(),
+    manualReviewRequired: missingThreshold || missingReversal,
+  };
+};
+
+export const buildDecisionTransmissionBoundedRules = ({
+  rules,
+  actionStripItems,
+}: {
+  rules?: BoundedDecisionRule[];
+  actionStripItems?: ActionStripItem[];
+}): DecisionTransmissionBoundedRule[] => {
+  if (Array.isArray(actionStripItems) && actionStripItems.length > 0) {
+    return actionStripItems.map((item) =>
+      toDecisionTransmissionRule({
+        action: item.actionNow,
+        triggerThreshold: item.triggerThreshold,
+        reversalCondition: item.reversalCondition,
+      }),
+    );
+  }
+
+  if (Array.isArray(rules) && rules.length > 0) {
+    return rules.map((rule) =>
+      toDecisionTransmissionRule({
+        action: formatBoundedDecisionAction(rule),
+        triggerThreshold: formatActionStripThresholdText(rule),
+        reversalCondition: formatActionStripReversalText(rule),
+      }),
+    );
+  }
+
+  return [
+    toDecisionTransmissionRule({
+      action: OPERATING_LEVER_FALLBACK.actionNow,
+      triggerThreshold: undefined,
+      reversalCondition: undefined,
+    }),
+  ];
+};
 
 type CurrentScores = {
   tightness: number;
