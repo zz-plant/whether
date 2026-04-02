@@ -39,7 +39,28 @@ if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
 }
 
 const extraArgs = process.argv.slice(2);
-const child = spawn('bun', ['test', ...extraArgs, TEST_ROOT_ARG], {
+const hasExplicitTimeoutArg = extraArgs.some((arg, index) => {
+  if (arg === '--timeout') {
+    return true;
+  }
+
+  if (arg.startsWith('--timeout=')) {
+    return true;
+  }
+
+  if (arg === '-t') {
+    return true;
+  }
+
+  return extraArgs[index - 1] === '-t';
+});
+
+const ciTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? '15000';
+const testArgs = hasExplicitTimeoutArg || !process.env.CI
+  ? ['test', ...extraArgs, TEST_ROOT_ARG]
+  : ['test', '--timeout', ciTimeoutMs, ...extraArgs, TEST_ROOT_ARG];
+
+const child = spawn('bun', testArgs, {
   stdio: 'inherit',
   env: process.env,
 });

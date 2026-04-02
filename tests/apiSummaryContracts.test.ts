@@ -1,10 +1,21 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterAll, beforeAll, describe, it } from "bun:test";
 import { GET as getWeeklyRoute } from "../app/api/weekly/route";
 import { GET as getMonthlyRoute } from "../app/api/monthly/route";
 import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";
 import { GET as getYearlyRoute } from "../app/api/yearly/route";
 
+const originalFetch = globalThis.fetch;
+
+beforeAll(() => {
+  globalThis.fetch = (async () => {
+    throw new Error("Network disabled for deterministic route contract tests.");
+  }) as typeof fetch;
+});
+
+afterAll(() => {
+  globalThis.fetch = originalFetch;
+});
 
 const CANONICAL_REGIMES = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
