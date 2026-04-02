@@ -8,6 +8,14 @@ import os from "node:os";
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
 const DEFAULT_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+const NODE_BIN = (() => {
+  const probe = spawnSync("node", ["-p", "process.execPath"], { encoding: "utf8" });
+  if (probe.status === 0) {
+    const resolved = probe.stdout.trim();
+    if (resolved) return resolved;
+  }
+  return process.execPath || "node";
+})();
 
 const resolveServerPort = (server: http.Server) => {
   const address = server.address();
@@ -19,7 +27,7 @@ const resolveServerPort = (server: http.Server) => {
 
 const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
   new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
-    const child = spawn("node", [CLI_PATH, ...args], {
+    const child = spawn(NODE_BIN, [CLI_PATH, ...args], {
       env: options.env ?? process.env,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -104,7 +112,7 @@ const listenOnPreferredLocalPort = async (server: http.Server, preferredPorts = 
 
 describe("whether cli", () => {
   it("prints expanded help", () => {
-    const result = spawnSync("node", [CLI_PATH, "--help"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Whether CLI/);
     assert.match(result.stdout, /status/);
@@ -117,7 +125,7 @@ describe("whether cli", () => {
 
   it("install fails in non-interactive shells without --yes/--ci", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const result = spawnSync("node", [CLI_PATH, "install"], { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "install"], { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) });
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 1);
@@ -127,15 +135,14 @@ describe("whether cli", () => {
 
   it("install supports --ci and writes config for automation", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const install = spawnSync(
-      "node",
-      [CLI_PATH, "install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"],
-      { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) },
-    );
+    const install = spawnSync(NODE_BIN, [CLI_PATH, "install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"], {
+      encoding: "utf8",
+      env: buildIsolatedEnv({ HOME: homeDir }),
+    });
 
     assert.equal(install.status, 0);
 
-    const readConfig = spawnSync("node", [CLI_PATH, "config", "--json"], {
+    const readConfig = spawnSync(NODE_BIN, [CLI_PATH, "config", "--json"], {
       encoding: "utf8",
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
@@ -149,15 +156,15 @@ describe("whether cli", () => {
   });
 
   it("prints semantic version with --version", () => {
-    const result = spawnSync("node", [CLI_PATH, "--version"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "--version"], { encoding: "utf8" });
     assert.equal(result.status, 0);
     assert.match(result.stdout.trim(), /^\d+\.\d+\.\d+$/);
     assert.equal(result.stderr, "");
   });
 
   it("prints installable completion scripts for bash and zsh", () => {
-    const bash = spawnSync("node", [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
-    const zsh = spawnSync("node", [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
+    const bash = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
+    const zsh = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
 
     assert.equal(bash.status, 0);
     assert.match(bash.stdout, /complete -F _whether_completion whether/);
@@ -361,19 +368,19 @@ describe("whether cli", () => {
   });
 
   it("agent rejects unsupported cadence values with a clear error", () => {
-    const result = spawnSync("node", [CLI_PATH, "agent", "daily"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "agent", "daily"], { encoding: "utf8" });
     assert.equal(result.status, 1);
     assert.match(result.stderr, /Invalid cadence "daily"/);
     assert.match(result.stderr, /weekly, monthly, quarterly, yearly/);
   });
 
   it("returns exit code 5 for invalid scenario input", () => {
-    const result = spawnSync("node", [CLI_PATH, "scenario", "--tightness", "oops"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "scenario", "--tightness", "oops"], { encoding: "utf8" });
     assert.equal(result.status, 5);
   });
 
   it("prints subcommand help", () => {
-    const result = spawnSync("node", [CLI_PATH, "call", "--help"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "call", "--help"], { encoding: "utf8" });
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Usage: whether call/);
   });
@@ -790,12 +797,12 @@ describe("whether cli", () => {
 
   it("auth login accepts WHETHER_API_KEY in env when --token is omitted", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const login = spawnSync("node", [CLI_PATH, "auth", "login"], {
+    const login = spawnSync(NODE_BIN, [CLI_PATH, "auth", "login"], {
       encoding: "utf8",
       env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "env-api-key" },
     });
 
-    const status = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+    const status = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
@@ -811,12 +818,12 @@ describe("whether cli", () => {
 
   it("auth status returns machine-readable output and clear exit codes", () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const missing = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+    const missing = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
-    const withEnv = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+    const withEnv = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
       encoding: "utf8",
       env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "present" },
     });
@@ -1079,7 +1086,7 @@ describe("whether cli", () => {
   });
 
   it("ping maps network failures to network exit semantics", () => {
-    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", "http://127.0.0.1:1"], { encoding: "utf8" });
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "ping", "--api-base-url", "http://127.0.0.1:1"], { encoding: "utf8" });
 
     assert.equal(result.status, 6);
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
