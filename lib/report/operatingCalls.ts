@@ -145,13 +145,15 @@ const progressByStep = [12, 38, 70, 92] as const;
 const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Tightness");
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
-  const matches = text.matchAll(/(tightness|risk appetite)\s*(>=|<=|>|<|falls below|rises above)\s*(-?\d+(?:\.\d+)?)/gi);
+  const matches = text.matchAll(
+    /(tightness|risk appetite)\s*(>=|<=|>|<|falls below|rises above|crosses below|crosses above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
+  );
 
   return Array.from(matches, (match) => ({
     metric: match[1].toLowerCase() === "risk appetite" ? "riskAppetite" : "tightness",
-    operator: (match[2].toLowerCase() === "falls below"
+    operator: (["falls below", "crosses below", "below"].includes(match[2].toLowerCase())
       ? "<"
-      : match[2].toLowerCase() === "rises above"
+      : ["rises above", "crosses above", "above"].includes(match[2].toLowerCase())
         ? ">"
         : match[2]) as RuleThresholdCondition["operator"],
     value: Number(match[3]),
