@@ -52,7 +52,7 @@ const OPERATING_LEVER_FALLBACK = {
 const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Threshold unavailable — manual review required.";
 const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "Reversal condition unavailable — manual review required.";
 
-const hasText = (value: string | undefined | null) => typeof value === "string" && value.trim().length > 0;
+const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
 
 const toDecisionTransmissionRule = ({
   action,

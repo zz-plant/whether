@@ -57,7 +57,7 @@ describe("buildDecisionTransmission", () => {
       ...buildBaseInput(),
       actionStripItems: [
         {
-          lever: "hiring",
+          lever: "hiring-stance",
           label: "Hiring",
           actionNow: "Hold net-new hiring.",
           triggerThreshold: " ",
