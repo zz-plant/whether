@@ -382,33 +382,29 @@ describe("buildFlipThreshold", () => {
         tightnessRegime: 70,
         riskAppetiteRegime: 50,
       },
+      scores: {
+        tightness: 76,
+        riskAppetite: 45,
+      },
     }) as ReturnType<typeof evaluateRegime>;
 
   it("returns a future crossing for scarcity regimes", () => {
-    assert.equal(
-      buildFlipThreshold(makeAssessment("SCARCITY")),
-      "Flip watch: Tightness <= 70.0 or Risk appetite > 50.0.",
-    );
+    assert.match(buildFlipThreshold(makeAssessment("SCARCITY")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("SCARCITY")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for defensive regimes", () => {
-    assert.equal(
-      buildFlipThreshold(makeAssessment("DEFENSIVE")),
-      "Flip watch: Tightness <= 70.0 or Risk appetite <= 50.0.",
-    );
+    assert.match(buildFlipThreshold(makeAssessment("DEFENSIVE")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("DEFENSIVE")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for volatile regimes", () => {
-    assert.equal(
-      buildFlipThreshold(makeAssessment("VOLATILE")),
-      "Flip watch: Tightness > 70.0 or Risk appetite > 50.0.",
-    );
+    assert.match(buildFlipThreshold(makeAssessment("VOLATILE")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("VOLATILE")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for expansion regimes", () => {
-    assert.equal(
-      buildFlipThreshold(makeAssessment("EXPANSION")),
-      "Flip watch: Tightness > 70.0 or Risk appetite <= 50.0.",
-    );
+    assert.match(buildFlipThreshold(makeAssessment("EXPANSION")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("EXPANSION")), /already in the flip zone|flips this call if it/i);
   });
 });

@@ -120,8 +120,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid broad hiring classes without clear revenue or reliability linkage."]
         : ["Avoid net-new hiring for speculative capacity or long-payback initiatives."],
       scope: `Applies to all net-new headcount; current tightness ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
-      pauseTrigger: `Pause net-new hiring if tightness > ${fmt(tightnessPause)} or risk appetite < ${fmt(riskPause)}.`,
-      resumeTrigger: `Resume staged approvals when tightness < ${fmt(tightnessResume)} and risk appetite > ${fmt(riskResume)}.`,
+      pauseTrigger: `Pause net-new hiring if tightness crosses above ${fmt(tightnessPause)} or risk appetite crosses below ${fmt(riskPause)}.`,
+      resumeTrigger: `Resume staged approvals only after recovery reads show tightness below ${fmt(tightnessResume)} and risk appetite above ${fmt(riskResume)}.`,
       flipConditions: [
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
@@ -140,8 +140,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid irreversible scope expansion before milestone evidence confirms traction."]
         : ["Avoid long-payback roadmap expansions with weak near-term proof."],
       scope: "Roadmap sequencing, release scope, and experimentation cadence.",
-      pauseTrigger: `Pause long-payback bets if risk appetite < ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
-      resumeTrigger: `Resume tempo on deferred bets when risk appetite > ${fmt(riskResume)} and weekly direction stabilizes/improves.`,
+      pauseTrigger: `Pause long-payback bets if risk appetite crosses below ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
+      resumeTrigger: `Resume tempo on deferred bets only after recovery reads show risk appetite above ${fmt(riskResume)} and weekly direction stabilizes/improves.`,
       flipConditions: [
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
       ],
@@ -159,8 +159,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid waiting for urgency before engaging investors while leverage is strong."]
         : ["Avoid speed-first terms that reduce durability under tighter conditions."],
       scope: "Fundraising launch timing, process pacing, and minimum term quality.",
-      pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or tightness rises above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume full process when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
+      pauseTrigger: `Pause acceleration if risk appetite crosses below ${fmt(riskPause)} or tightness crosses above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume full process only after recovery reads show risk appetite above ${fmt(riskResume)} and tightness below ${fmt(tightnessResume)}.`,
       flipConditions: [
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
@@ -173,8 +173,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       doNow: ["Gate discretionary spend by measurable short-cycle payback proof."],
       avoidNow: ["Avoid multi-quarter spend commitments without clear payback evidence."],
       scope: "Hiring, vendor, and GTM program spend with multi-quarter commitments.",
-      pauseTrigger: `Pause discretionary burn expansion if tightness > ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume controlled burn expansion when tightness < ${fmt(tightnessResume)} and budget payback proof is intact.`,
+      pauseTrigger: `Pause discretionary burn expansion if tightness crosses above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume controlled burn expansion only after recovery reads show tightness below ${fmt(tightnessResume)} and budget payback proof is intact.`,
       flipConditions: [
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
       ],
@@ -192,8 +192,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid one-way expansion commitments without stage-gate evidence."]
         : ["Avoid irreversible expansion bets until window strength improves."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
-      pauseTrigger: `Pause expansion bets if risk appetite < ${fmt(riskPause)} or tightness > ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume in tranches when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
+      pauseTrigger: `Pause expansion bets if risk appetite crosses below ${fmt(riskPause)} or tightness crosses above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume in tranches only after recovery reads show risk appetite above ${fmt(riskResume)} and tightness below ${fmt(tightnessResume)}.`,
       flipConditions: [
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },

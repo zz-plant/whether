@@ -185,34 +185,36 @@ const buildInputInfluenceDescription = ({
 
   if (key === "tightness") {
     const gap = rawValue - assessment.thresholds.tightnessRegime;
+    const tightnessLine = assessment.thresholds.tightnessRegime.toFixed(1);
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong defensive pull" : "Defensive pull",
-          effectDetail: `${gap.toFixed(1)} pts above the regime line, so approvals and fixed-cost tolerance stay tighter.`,
-          watchLabel: `Regime line ${assessment.thresholds.tightnessRegime.toFixed(1)}`,
+          effectDetail: `Current tightness is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the caution line at ${tightnessLine}; approvals and fixed-cost tolerance stay tighter.`,
+          watchLabel: `Caution line ${tightnessLine}`,
           tone: "warning",
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Expansion support" : "Room to loosen",
-          effectDetail: `${Math.abs(gap).toFixed(1)} pts below the regime line, so the call has room to loosen if other inputs confirm.`,
-          watchLabel: `Regime line ${assessment.thresholds.tightnessRegime.toFixed(1)}`,
+          effectDetail: `Current tightness is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the caution line at ${tightnessLine}; the call has room to loosen if other inputs confirm.`,
+          watchLabel: `Caution line ${tightnessLine}`,
           tone: "positive",
         };
   }
 
   if (key === "riskAppetite") {
     const gap = rawValue - assessment.thresholds.riskAppetiteRegime;
+    const riskLine = assessment.thresholds.riskAppetiteRegime.toFixed(1);
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong expansion support" : "Expansion support",
-          effectDetail: `${gap.toFixed(1)} pts above the regime line, so the call can carry larger reversible bets.`,
-          watchLabel: `Regime line ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}`,
+          effectDetail: `Current risk appetite is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the caution line at ${riskLine}; the call can carry larger reversible bets.`,
+          watchLabel: `Caution line ${riskLine}`,
           tone: "positive",
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Risk-off pressure" : "Capping risk-taking",
-          effectDetail: `${Math.abs(gap).toFixed(1)} pts below the regime line, so bet size and expansion appetite stay capped.`,
-          watchLabel: `Regime line ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}`,
+          effectDetail: `Current risk appetite is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the caution line at ${riskLine}; bet size and expansion appetite stay capped.`,
+          watchLabel: `Caution line ${riskLine}`,
           tone: "warning",
         };
   }

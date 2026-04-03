@@ -23,7 +23,7 @@ export type OperatingLeverKey = (typeof operatingLeverOrder)[number];
 export const operatingLeverLabel: Record<OperatingLeverKey, string> = {
   "hiring-stance": "Hiring stance",
   "investment-pace": "Investment pace",
-  "sales-posture": "Sales posture",
+  "sales-posture": "Fundraising posture",
   "product-priorities": "Product priorities",
   "risk-tolerance": "Risk tolerance",
 };

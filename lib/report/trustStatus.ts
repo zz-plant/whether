@@ -313,14 +313,19 @@ export const buildCompactTrustSummary = ({
 export const resolveTrustReadinessCopy = ({
   trustStatusTone,
   degradedSourceRows,
+  trustStatusDetail,
 }: {
   trustStatusTone: TrustStatusTone;
   degradedSourceRows?: Array<unknown>;
+  trustStatusDetail?: string;
 }): { tone: TrustStatusTone; headline: string } => {
   const hasDegradedSources = (degradedSourceRows?.length ?? 0) > 0;
+  const hasConstrainedDetail = (trustStatusDetail ?? "").toLowerCase().includes("too weak")
+    || (trustStatusDetail ?? "").toLowerCase().includes("low")
+    || (trustStatusDetail ?? "").toLowerCase().includes("staged");
   const tone = trustStatusTone === "historical"
     ? "historical"
-    : hasDegradedSources || trustStatusTone === "warning"
+    : hasDegradedSources || trustStatusTone === "warning" || hasConstrainedDetail
       ? "warning"
       : "stable";
 
@@ -329,7 +334,7 @@ export const resolveTrustReadinessCopy = ({
     headline: tone === "historical"
       ? "Historical snapshot"
       : tone === "warning"
-        ? "Readiness watch"
+        ? "Readiness constrained"
         : "Readiness clear",
   };
 };

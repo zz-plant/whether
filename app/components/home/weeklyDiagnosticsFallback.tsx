@@ -1,16 +1,16 @@
 import { Skeleton } from "../skeleton";
 
 export const WeeklyDiagnosticsFallback = () => (
-  <section aria-label="Loading diagnostics lane" className="home-band-stack" aria-busy="true">
+  <section aria-label="Workspace updates pending" className="home-band-stack" aria-busy="true">
     <article className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short space-y-4 px-4 py-4 sm:px-5">
       <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="home-band-kicker">Evidence + trust</p>
-          <h2 className="text-xl font-semibold text-slate-100">Loading the compact evidence and trust handoff.</h2>
+          <h2 className="text-xl font-semibold text-slate-100">Preparing compact evidence and trust handoff.</h2>
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
           <span className="weather-loading-beacon" />
-          Loading
+          Updating
         </span>
       </div>
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
@@ -39,9 +39,9 @@ export const WeeklyDiagnosticsFallback = () => (
       <div className="home-band-shell__header flex items-center justify-between gap-2">
         <div className="space-y-1">
           <p className="home-band-kicker">Planning</p>
-          <h2 className="text-xl font-semibold text-slate-100">Loading the planning handoff.</h2>
+          <h2 className="text-xl font-semibold text-slate-100">Preparing the planning handoff.</h2>
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Queued</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pending</span>
       </div>
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <Skeleton className="h-28 w-full rounded-xl bg-slate-500/32" />

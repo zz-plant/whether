@@ -300,7 +300,7 @@ export const formatTrustStripDisplay = ({
     : freshness.maxAge === "stale"
       ? "Freshness stale"
       : "Freshness fresh";
-  const confidenceBadge = `Confidence ${confidenceLabel}`;
+  const confidenceBadge = `Signal reliability ${confidenceLabel}`;
   const safeProvenanceCount = Math.max(0, Math.round(provenanceCount));
   const provenanceBadge = `Provenance ${safeProvenanceCount}`;
   const degraded = isFallbackSnapshot || freshness.maxAge === "stale";
