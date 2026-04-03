@@ -89,6 +89,21 @@ it("ensures every operating lever item includes bounded decision fields", () => 
   }
 });
 
+it("keeps caution and reopen distances available with crossing/above-below threshold wording", () => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: "DEFENSIVE",
+    thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+    scores: { tightness: 72, riskAppetite: 48 },
+  });
+
+  const items = buildActionStripItems(rules, { tightness: 72, riskAppetite: 48 });
+  const hiringItem = items.find((item) => item.lever === "hiring-stance");
+  assert.ok(hiringItem);
+  assert.doesNotMatch(hiringItem.tightenDistanceLabel ?? "", /unavailable/i);
+  assert.doesNotMatch(hiringItem.reopenDistanceLabel ?? "", /unavailable/i);
+  assert.match(hiringItem.reopenDistanceLabel ?? "", /tightness|risk appetite/i);
+});
+
 
 it("builds scoped variant adjustments with reversal discipline", () => {
   const adjustment = buildScopedVariantDecisionAdjustment({
