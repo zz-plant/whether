@@ -103,6 +103,7 @@ export function HeroTrustProvenanceBlock({
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone,
     degradedSourceRows,
+    trustStatusDetail,
   });
   const hasDegradedSourceRows = Boolean(degradedSourceRows && degradedSourceRows.length > 0);
   const isCompactStableState =

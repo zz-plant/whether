@@ -68,7 +68,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Current outlook/);
     assert.match(html, /aria-label="Trust strip"/);
     assert.match(html, /Freshness stale/);
-    assert.match(html, /Confidence MED/);
+    assert.match(html, /Signal reliability MED/);
     assert.match(html, /Provenance 1/);
     assert.match(html, /Fallback active/);
     assert.match(html, /href="\/method"/);

@@ -48,22 +48,53 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
 };
 
 export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
-  const tightnessThreshold = assessment.thresholds.tightnessRegime.toFixed(1);
-  const riskThreshold = assessment.thresholds.riskAppetiteRegime.toFixed(1);
+  const tightnessThreshold = assessment.thresholds.tightnessRegime;
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
+  const tightnessNow = assessment.scores?.tightness;
+  const riskNow = assessment.scores?.riskAppetite;
+
+  const crossingText = ({
+    label,
+    now,
+    threshold,
+    direction,
+  }: {
+    label: "Tightness" | "Risk appetite";
+    now: number;
+    threshold: number;
+    direction: "riseAbove" | "fallToOrBelow";
+  }) => {
+    const hasCurrentValue = typeof now === "number" && Number.isFinite(now);
+    const alreadyTriggered = hasCurrentValue && (direction === "riseAbove" ? now > threshold : now <= threshold);
+    const crossingCopy = direction === "riseAbove"
+      ? `crosses above ${threshold.toFixed(1)}`
+      : `falls to or below ${threshold.toFixed(1)}`;
+    const holdCopy = direction === "riseAbove"
+      ? `stays above ${threshold.toFixed(1)}`
+      : `stays at or below ${threshold.toFixed(1)}`;
+
+    if (!hasCurrentValue) {
+      return `${label} flips this call if it ${crossingCopy}.`;
+    }
+
+    return alreadyTriggered
+      ? `${label} is already in the flip zone (${now.toFixed(1)}; ${holdCopy}).`
+      : `${label} flips this call if it ${crossingCopy} (now ${now.toFixed(1)}).`;
+  };
 
   if (assessment.regime === "SCARCITY") {
-    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "fallToOrBelow" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "riseAbove" })}`;
   }
 
   if (assessment.regime === "DEFENSIVE") {
-    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "fallToOrBelow" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "fallToOrBelow" })}`;
   }
 
   if (assessment.regime === "VOLATILE") {
-    return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "riseAbove" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "riseAbove" })}`;
   }
 
-  return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+  return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "riseAbove" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "fallToOrBelow" })}`;
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {

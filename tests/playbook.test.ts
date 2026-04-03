@@ -41,10 +41,10 @@ it("derives operating levers from canonical bounded rules with assessment contex
 
   const hiringLever = guidance.operatingLevers.find((item) => item.lever === "hiring-stance");
   assert.match(hiringLever?.actionNow ?? "", /Limit hiring to backfills and mission-critical roles tied to delivery risk/i);
-  assert.match(hiringLever?.triggerThreshold ?? "", /tightness > 76/i);
-  assert.match(hiringLever?.triggerThreshold ?? "", /risk appetite < 44/i);
-  assert.match(hiringLever?.reversalCondition ?? "", /tightness < 66/i);
-  assert.match(hiringLever?.reversalCondition ?? "", /risk appetite > 54/i);
+  assert.match(hiringLever?.triggerThreshold ?? "", /tightness crosses above 76/i);
+  assert.match(hiringLever?.triggerThreshold ?? "", /risk appetite crosses below 44/i);
+  assert.match(hiringLever?.reversalCondition ?? "", /tightness below 66/i);
+  assert.match(hiringLever?.reversalCondition ?? "", /risk appetite above 54/i);
 });
 
 

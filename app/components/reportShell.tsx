@@ -202,6 +202,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone: resolvedTrustStatusTone,
     degradedSourceRows: resolvedDegradedSourceRows,
+    trustStatusDetail: resolvedTrustStatusDetail,
   });
   const maxSectionNavItemsDesktop = 4;
   const controlHeadline = trustReadiness.headline;

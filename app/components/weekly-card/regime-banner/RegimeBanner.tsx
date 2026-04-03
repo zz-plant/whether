@@ -64,7 +64,7 @@ export function RegimeBanner(props: RegimeBannerProps) {
             <span>Trend {trendValue}</span>
           </span>
           <span className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
-            Confidence {confidenceLabel} {Math.round(confidencePercent)}%
+            Posture confidence {Math.round(confidencePercent)}% ({confidenceLabel})
           </span>
           <span className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
             Flip window {flipRiskValue}

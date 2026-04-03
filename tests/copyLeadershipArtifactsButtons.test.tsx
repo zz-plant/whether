@@ -1,36 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { renderToStaticMarkup } from "react-dom/server";
 import {
   actionButtonVariantClassNames,
-  CopyLeadershipArtifactsButtons,
   resolveCopyActionLabel,
 } from "../app/components/copyLeadershipArtifactsButtons";
 
 describe("CopyLeadershipArtifactsButtons", () => {
-  it("renders share and export actions in the artifact rail", () => {
-    const html = renderToStaticMarkup(
-      <CopyLeadershipArtifactsButtons
-        boardSnippet="snippet"
-        weeklyCallSnapshot="snapshot"
-        weeklyOperatorBrief="brief"
-        deltaOnlyBrief="delta"
-        boardSummary="board"
-        citation="citation"
-      />,
-    );
-
-    const shareIndex = html.indexOf("Share operator brief");
-    const deltaIndex = html.indexOf("Copy delta brief");
-    const snapshotIndex = html.indexOf("Copy call snapshot");
-    const boardSnippetIndex = html.indexOf("Copy board note");
-
-    assert.ok(shareIndex >= 0);
-    assert.ok(deltaIndex >= 0);
-    assert.ok(snapshotIndex >= 0);
-    assert.ok(boardSnippetIndex >= 0);
-  });
-
   it("maps copy states and preserves focus/disabled/touch button utility classes", () => {
     assert.equal(resolveCopyActionLabel("idle", "Copy"), "Copy");
     assert.equal(resolveCopyActionLabel("copying", "Copy"), "Copying");

@@ -2,8 +2,8 @@ import { Skeleton } from "./skeleton";
 import { ReportShell } from "./reportShell";
 
 export function RouteLoadingShell({
-  label = "Loading page",
-  description = "Content is loading.",
+  label = "Preparing brief",
+  description = "Live brief is being prepared.",
   currentPath = "/",
   pageTitle = "Weekly Brief",
 }: {
@@ -17,18 +17,18 @@ export function RouteLoadingShell({
       statusLabel={label}
       regime="NEUTRAL"
       recordDateLabel="Updating now"
-      fetchedAtLabel="Refreshing"
+      fetchedAtLabel="Updating data"
       treasurySource="fiscaldata.treasury.gov"
       pageTitle={pageTitle}
       pageSummary={description}
       sectionLinks={[]}
-      trustStatusLabel="Loading"
-      trustStatusDetail="Evidence is still loading."
+      trustStatusLabel="Update in progress"
+      trustStatusDetail="Evidence checks are in progress."
       trustStatusAction="Keep this page open while the latest brief is prepared."
       trustStatusTone="stable"
       currentPath={currentPath}
     >
-      <section aria-label="Loading page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-[1.6rem] px-5 py-5 sm:px-6 sm:py-6">
+      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-[1.6rem] px-5 py-5 sm:px-6 sm:py-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
