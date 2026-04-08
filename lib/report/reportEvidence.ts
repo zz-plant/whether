@@ -82,19 +82,21 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
       : `${label} flips this call if it ${crossingCopy} (now ${now.toFixed(1)}).`;
   };
 
-  if (assessment.regime === "SCARCITY") {
-    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "fallToOrBelow" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "riseAbove" })}`;
-  }
+  const tightnessDirection: "riseAbove" | "fallToOrBelow" =
+    assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
+  const riskDirection: "riseAbove" | "fallToOrBelow" =
+    assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
+  const tightnessTriggered = tightnessDirection === "riseAbove"
+    ? tightnessNow > tightnessThreshold
+    : tightnessNow <= tightnessThreshold;
+  const riskTriggered = riskDirection === "riseAbove"
+    ? riskNow > riskThreshold
+    : riskNow <= riskThreshold;
+  const watchPrefix = tightnessTriggered || riskTriggered
+    ? "Flip watch: Already tripped."
+    : "Flip watch:";
 
-  if (assessment.regime === "DEFENSIVE") {
-    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "fallToOrBelow" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "fallToOrBelow" })}`;
-  }
-
-  if (assessment.regime === "VOLATILE") {
-    return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "riseAbove" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "riseAbove" })}`;
-  }
-
-  return `Flip watch: ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: "riseAbove" })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: "fallToOrBelow" })}`;
+  return `${watchPrefix} ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection })}`;
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
