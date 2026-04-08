@@ -129,6 +129,9 @@ export const buildSignalsPageModel = async (
     stableAction: "Evidence is live with current thresholds and timestamps.",
   });
   const nextRefreshLabel = historicalSelection ? "Fixed historical snapshot" : "15m cadence";
+  const freshnessSummaryLabel = historicalSelection
+    ? `Historical snapshot fixed at ${recordDateLabel}.`
+    : `Decision as-of ${recordDateLabel}; live data refreshed ${fetchedAtLabel}. Next refresh ${nextRefreshLabel}.`;
   const decisionDeltaLabel = historicalSelection
     ? "Historical snapshot for review only — switch to live data before approving new bets."
     : isFallback
@@ -331,6 +334,7 @@ export const buildSignalsPageModel = async (
     isFallback,
     trust,
     nextRefreshLabel,
+    freshnessSummaryLabel,
     decisionDeltaLabel,
     triggerCondition,
     reversalCondition,

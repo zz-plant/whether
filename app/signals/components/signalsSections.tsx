@@ -149,6 +149,7 @@ export const SignalsDecisionSummarySection = ({
   recordDateLabel,
   fetchedAtLabel,
   nextRefreshLabel,
+  freshnessSummaryLabel,
   actionNowShort,
   startItems,
   stopItems,
@@ -163,6 +164,7 @@ export const SignalsDecisionSummarySection = ({
   recordDateLabel: string;
   fetchedAtLabel: string;
   nextRefreshLabel: string;
+  freshnessSummaryLabel: string;
   actionNowShort?: string;
   startItems: string[];
   stopItems: string[];
@@ -237,7 +239,7 @@ export const SignalsDecisionSummarySection = ({
         </div>
       </div>
     </article>
-    <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
           Current environment
@@ -258,15 +260,12 @@ export const SignalsDecisionSummarySection = ({
       </div>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Data refreshed
+          Freshness
         </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
-      </div>
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Next refresh
+        <p className="mt-1 text-sm font-semibold text-slate-100">{freshnessSummaryLabel}</p>
+        <p className="mt-1 text-xs text-slate-300">
+          Updated {fetchedAtLabel} · Next {nextRefreshLabel}
         </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{nextRefreshLabel}</p>
       </div>
     </div>
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
@@ -354,7 +353,7 @@ export const SignalsDecisionSummarySection = ({
               className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3"
             >
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                Reason {index + 1}
+                Top mover {index + 1}
               </p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
@@ -538,7 +537,7 @@ export const SignalsEvidencePrioritiesSection = ({
       {essentialPriorityQueue.map((item, index) => (
         <li key={item.label} className="weather-surface space-y-2 p-4">
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-            Priority {index + 1}
+            First check {index + 1}
           </p>
           <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
           <p className="text-sm text-slate-200">{item.why}</p>
@@ -560,7 +559,7 @@ export const SignalsEvidencePrioritiesSection = ({
           {additionalPriorityQueue.map((item, index) => (
             <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                Priority {index + essentialPriorityQueue.length + 1}
+                Next check {index + essentialPriorityQueue.length + 1}
               </p>
               <p className="mt-2 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
@@ -618,7 +617,7 @@ export const SignalsDiagnosticsSection = ({
         {topDiagnosticCallouts.map((item, index) => (
           <li key={item.label} className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-              Driver {index + 1}
+              Top driver {index + 1}
             </p>
             <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
             <p className="text-sm text-slate-200">{item.why}</p>

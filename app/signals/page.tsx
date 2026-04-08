@@ -123,6 +123,7 @@ export default async function SignalsPage({
         recordDateLabel={model.recordDateLabel}
         fetchedAtLabel={model.fetchedAtLabel}
         nextRefreshLabel={model.nextRefreshLabel}
+        freshnessSummaryLabel={model.freshnessSummaryLabel}
         actionNowShort={model.actionNowShort}
         startItems={model.startItems}
         stopItems={model.stopItems}
