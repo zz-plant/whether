@@ -367,6 +367,11 @@ export default async function OperationsPage({
                     macroSeries={macroSeries}
                     decisionModel={{
                       postureWithStageLabel: snapshot.homeBriefModel.postureWithStageLabel,
+                      currentCall: snapshot.canonicalDecisionCopy?.operatingCall ?? snapshot.homeBriefModel.operatingStanceLine,
+                      actionNow:
+                        snapshot.canonicalDecisionCopy?.doNowLines[0]
+                        ?? snapshot.homeBriefModel.actionNowShort
+                        ?? snapshot.homeBriefModel.operatingStanceLine,
                       operatingStanceLine: snapshot.homeBriefModel.operatingStanceLine,
                       guardrailThreshold: snapshot.homeBriefModel.guardrailThreshold,
                       reversalTrigger: snapshot.homeBriefModel.reversalTrigger,

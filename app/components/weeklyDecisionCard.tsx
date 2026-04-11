@@ -103,6 +103,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = history;
   const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel } = artifact;
+  const snapshotCurrentCall = canonicalDecisionCopy?.operatingCall ?? operatingStanceLine;
   const snapshotDoNow = immediateDecision;
   const {
     activeRole,
@@ -162,7 +163,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trustReason={status.isFallbackSnapshot ? artifact.freshnessLine : undefined}
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
-            commitmentReviewLabel={trustStrip.commitmentLabel}
             stabilityRule={stabilityRule}
             weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
             decisionBullets={decisionBullets}
@@ -249,6 +249,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         asideContent={(
           <>
             <DecisionTransmissionRail
+              currentCall={snapshotCurrentCall}
               actionNow={snapshotDoNow}
               guardrail={snapshotGuardrail}
               flipWhen={snapshotWatch}

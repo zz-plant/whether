@@ -2,12 +2,13 @@
 
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import { insightDatabase } from "../../../data/recommendations";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 
-const buildStrategyBrief = (
+export const buildStrategyBrief = (
   assessment: RegimeAssessment,
   recordDateLabel: string
 ) => {
@@ -16,12 +17,12 @@ const buildStrategyBrief = (
   );
 
   if (!template) {
-    return "Strategy Brief unavailable for current capital posture.";
+    return "Strategy Brief unavailable for current regime.";
   }
 
   return [
     `Strategy Brief — ${recordDateLabel}`,
-    `Capital posture: ${assessment.regime}`,
+    `Posture context: ${formatRegimeLabel(assessment.regime)}`,
     "",
     `Headline: ${template.headline}`,
     `Narrative: ${template.narrative}`,
@@ -109,6 +110,9 @@ export const StrategyBriefPanel = ({
             <p className="mt-2 type-data text-slate-300">
               {insightDatabase.strategyBriefing.subtitle}
             </p>
+            <p className="mt-2 text-sm text-slate-300">
+              Apply this week&apos;s call to strategy, sequencing, and watchlist priorities before the next leadership update.
+            </p>
           </div>
           <div className="flex flex-col items-end gap-3">
             <ClipboardActionRow
@@ -169,7 +173,7 @@ export const StrategyBriefPanel = ({
             ) : (
               <div className="weather-surface p-4">
                 <p className="text-sm text-slate-300">
-                  Strategy Brief unavailable for current capital posture.
+                  Strategy Brief unavailable for the current weekly call.
                 </p>
               </div>
             )}

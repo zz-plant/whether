@@ -70,7 +70,7 @@ describe("home route render contract", () => {
     );
 
     const canonicalOrders = html.match(/Weekly decision transmission order/g) ?? [];
-    const transmissionRails = html.match(/Transmit this call/g) ?? [];
+    const transmissionRails = html.match(/Send this brief/g) ?? [];
     assert.equal(canonicalOrders.length, 1);
     assert.equal(transmissionRails.length, 1);
   });

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import { insightDatabase } from "../../../data/recommendations";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -10,19 +11,19 @@ import { getClipboardUiState, useClipboardCopy } from "../../components/useClipb
 type ExecutiveTemplate =
   (typeof insightDatabase.executiveBriefingSuite.regimes)[number];
 
-const buildExecutiveMemo = (
+export const buildExecutiveMemo = (
   assessment: RegimeAssessment,
   recordDateLabel: string,
   template: ExecutiveTemplate | undefined
 ) => {
 
   if (!template) {
-    return "Executive memo unavailable for current capital posture.";
+    return "Executive memo unavailable for current regime.";
   }
 
   return [
     `Executive Brief — ${recordDateLabel}`,
-    `Capital posture: ${assessment.regime}`,
+    `Posture context: ${formatRegimeLabel(assessment.regime)}`,
     "",
     `Summary: ${template.executiveSummary}`,
     "",
@@ -37,7 +38,7 @@ const buildExecutiveMemo = (
   ].join("\n");
 };
 
-const buildGuardrailChecklist = (
+export const buildGuardrailChecklist = (
   assessment: RegimeAssessment,
   template: ExecutiveTemplate | undefined
 ) => {
@@ -47,7 +48,7 @@ const buildGuardrailChecklist = (
   }
 
   return [
-    `Pause-if Checklist — ${assessment.regime}`,
+    `Pause-if Checklist — ${formatRegimeLabel(assessment.regime)}`,
     ...template.decisionGuardrails.map((item) => `• ${item}`),
   ].join("\n");
 };
@@ -126,6 +127,9 @@ export const ExecutiveBriefingPanel = ({
             </h3>
             <p className="mt-2 type-data text-slate-300">
               {insightDatabase.executiveBriefingSuite.subtitle}
+            </p>
+            <p className="mt-2 text-sm text-slate-300">
+              Turn this week&apos;s call into board-ready guardrails, decision templates, and change-course signals.
             </p>
           </div>
           {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
@@ -215,7 +219,7 @@ export const ExecutiveBriefingPanel = ({
           ) : (
             <div className="weather-surface p-4">
               <p className="text-sm text-slate-300">
-                Executive memo unavailable for current capital posture.
+                Executive memo unavailable for the current weekly call.
               </p>
             </div>
           )}

@@ -6,6 +6,7 @@ import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { artifactModeLabels, type ArtifactMode } from "../../lib/literacyAssist";
 import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
   ARTIFACT_MODE_QUERY_PARAM,
   buildArtifactShareText,
@@ -45,6 +46,35 @@ export const resolveCopyActionLabel = (state: CopyState, defaultLabel: string) =
   if (state === "error") return "Retry copy";
   return defaultLabel;
 };
+
+export const buildExplainerBriefContent = ({
+  boardSummary,
+  weeklyOperatorBrief,
+  citation,
+}: {
+  boardSummary: string;
+  weeklyOperatorBrief: string;
+  citation: string;
+}) => [
+  "EXPLAINER BRIEF",
+  "",
+  "What this call is saying",
+  boardSummary,
+  "",
+  "Plain-English guide",
+  "• Tightness = how hard it is to make long-payback commitments.",
+  "• Risk appetite = how willing markets are to support faster expansion.",
+  `• ${publicDecisionLabels.call} = the standing weekly operating summary.`,
+  `• ${publicDecisionLabels.action} = what to do this week.`,
+  `• ${publicDecisionLabels.threshold} = the trip line that pauses or tightens the call.`,
+  `• ${publicDecisionLabels.reversal} = what must improve before loosening again.`,
+  "",
+  "Operator brief",
+  weeklyOperatorBrief,
+  "",
+  "Citation",
+  citation,
+].join("\n");
 
 function ActionButton({
   variant,
@@ -129,24 +159,11 @@ export function CopyLeadershipArtifactsButtons({
   };
 
   const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
-  const explainerBriefContent = [
-    "EXPLAINER BRIEF",
-    "",
-    "What this call is saying",
-    applyOverride(boardSummary),
-    "",
-    "Plain-English guide",
-    "• Tightness = how hard it is to make long-payback commitments.",
-    "• Risk appetite = how willing markets are to support faster expansion.",
-    "• Pause if = the stop line.",
-    "• Change course if = the reopen line.",
-    "",
-    "Operator brief",
-    applyOverride(weeklyOperatorBrief),
-    "",
-    "Citation",
+  const explainerBriefContent = buildExplainerBriefContent({
+    boardSummary: applyOverride(boardSummary),
+    weeklyOperatorBrief: applyOverride(weeklyOperatorBrief),
     citation,
-  ].join("\n");
+  });
   const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Operator brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent

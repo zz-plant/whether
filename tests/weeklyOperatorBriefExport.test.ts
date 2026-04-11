@@ -59,10 +59,11 @@ describe("weekly operator brief export adapters", () => {
     const cardText = buildWeeklyOperatorBriefCardText(payload);
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
-    assert.match(text, /Regime \+ stage:/);
-    assert.match(text, /Do now:/);
+    assert.match(text, /Posture:/);
+    assert.match(text, /Current call:/);
+    assert.match(text, /Action now:/);
+    assert.match(text, /Pause if:/);
     assert.match(text, /Why this could be wrong:/);
-    assert.match(text, /What would change our mind:/);
     assert.match(text, /Change course if:/);
     assert.equal(cardText, text);
   });

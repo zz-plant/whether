@@ -199,9 +199,9 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Operating levers this week/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Revisit now/);
-    assert.match(html, /(Pause if|Slow down if)/);
+    assert.match(html, /(Stop line|Pause if|Slow down if)/);
     assert.doesNotMatch(html, /Open Signals/);
-    assert.match(html, /(Action now|Do this now)/);
+    assert.match(html, /(Act now|Action now|Do this now)/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /Action:/);
@@ -232,7 +232,7 @@ describe("weekly card and interpretation panel composition", () => {
 
     const heroIndex = html.indexOf("Current outlook");
     const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
-    const rulesIndex = html.indexOf("Weekly decision strip: what to do now");
+    const rulesIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Operating levers this week");
     const interpretationIndex = html.indexOf("Interpretation layer");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');

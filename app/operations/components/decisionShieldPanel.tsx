@@ -1,5 +1,5 @@
 /**
- * Decision Shield panel for validating operator actions against the current capital posture.
+ * Decision Shield panel for applying the weekly call to a specific operator decision.
  * Keeps verdict output shareable and grounded in sensor-driven signals.
  */
 "use client";
@@ -21,6 +21,7 @@ import {
   type LifecycleStage,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import {
@@ -315,7 +316,7 @@ export const DecisionShieldPanel = ({
               Commit to the next move
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Take a decisive, evidence-backed call for this capital posture, then circulate the readout as an operator recommendation—not a guarantee.
+              Apply this week&apos;s call to a specific decision, then circulate the readout as an operator recommendation, not a guarantee.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -391,7 +392,7 @@ export const DecisionShieldPanel = ({
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">
-              Inputs → Execution call → Why now → Execution boundary → Pivot signal
+              Weekly call context → Decision verdict → Why now → {publicDecisionLabels.threshold} → {publicDecisionLabels.reversal}
             </p>
           </div>
           <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
@@ -510,7 +511,7 @@ export const DecisionShieldPanel = ({
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Execution call</p>
+              <p className="type-label text-slate-400">Decision verdict</p>
               <div
                 className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
               >
@@ -535,11 +536,11 @@ export const DecisionShieldPanel = ({
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Execution boundary</p>
+              <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Pivot signal</p>
+              <p className="type-label text-slate-400">{publicDecisionLabels.reversal}</p>
               <p className="mt-3 type-data text-slate-300 break-words">
                 {output.reversalTrigger}
               </p>

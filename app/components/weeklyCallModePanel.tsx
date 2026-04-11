@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { DecisionReadinessState } from "../../lib/report/trustStatus";
 import type { RevisitQueueItem, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { CompactDisclosure } from "./compactDisclosure";
 
 type PolicyDetails = {
@@ -37,7 +38,6 @@ type WeeklyCallModePanelProps = {
   trustReason?: string;
   inlineTrustLabel: string;
   inlineTrustTone: "stable" | "warning" | "historical";
-  commitmentReviewLabel: "Decision ready" | "Review before commitment";
   stabilityRule: string;
   weeklyLeadershipSummary: {
     boldnessScore: number;
@@ -83,7 +83,6 @@ export function WeeklyCallModePanel({
   trustReason,
   inlineTrustLabel,
   inlineTrustTone,
-  commitmentReviewLabel,
   stabilityRule,
   weeklyLeadershipSummary,
   decisionBullets,
@@ -96,7 +95,7 @@ export function WeeklyCallModePanel({
 }: WeeklyCallModePanelProps) {
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
-  const detailDisclosureBase = "mt-2 rounded-lg border border-slate-700/60 bg-slate-950/65 px-3 py-2";
+  const detailDisclosureBase = "mt-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2.5";
   const inlineTrustToneClass = inlineTrustTone === "stable"
     ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
     : inlineTrustTone === "historical"
@@ -123,123 +122,118 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
   const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
-  const readinessToneClass = decisionReadiness.tone === "stable"
-    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
+  const readinessSummaryToneClass = decisionReadiness.tone === "stable"
+    ? "text-emerald-100"
     : decisionReadiness.tone === "historical"
-      ? "border-violet-400/30 bg-violet-500/10 text-violet-100"
-      : "border-amber-400/30 bg-amber-500/10 text-amber-100";
+      ? "text-violet-100"
+      : "text-amber-100";
+  const decisionReadinessSummary = `${decisionReadiness.label}. ${decisionReadiness.detail}`.trim();
+  const trustStatusSummary = trustReason
+    ? `Using the last clean snapshot because ${trustReason}`
+    : trustStateDetail;
 
   return (
     <>
-      <article className={`rounded-[1.35rem] border border-slate-700/75 bg-[linear-gradient(180deg,rgba(8,15,27,0.92),rgba(3,9,18,0.98))] p-3 shadow-[0_22px_42px_-34px_rgba(2,6,23,0.82)] sm:p-4 ${sectionSpacingClassName}`} aria-label="Weekly brief">
-        <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-3 overflow-hidden bg-[linear-gradient(145deg,rgba(3,7,18,0.96),rgba(15,23,42,0.92)_48%,rgba(3,9,18,0.96))]`}>
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/35 to-transparent" />
-          <div className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-sky-400/6 blur-3xl" />
-          <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-amber-300/6 blur-3xl" />
+      <article className={`rounded-[1.35rem] border border-slate-800/85 bg-[linear-gradient(180deg,rgba(7,12,22,0.96),rgba(3,8,16,0.99))] p-3 shadow-[0_22px_42px_-34px_rgba(2,6,23,0.82)] sm:p-4 ${sectionSpacingClassName}`} aria-label="Weekly brief">
+        <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-3 overflow-hidden border-slate-800/80 bg-[linear-gradient(180deg,rgba(5,10,19,0.97),rgba(4,8,16,0.99))]`}>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Weekly operating call</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">This week in 15 seconds</p>
               <h2 className={`${tierOneHeadingClassName} text-base`}>This week</h2>
             </div>
             <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">{postureLabel}</span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">Posture: {postureLabel}</span>
               {trustReason ? (
                 <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-violet-100">
                   FALLBACK SNAPSHOT
                 </span>
               ) : null}
-              <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>{inlineTrustLabel}</span>
+              <span className={`rounded-full border px-2.5 py-1 ${inlineTrustToneClass}`}>Trust: {inlineTrustLabel}</span>
             </div>
           </div>
           <div className="relative mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            <span className="rounded-2xl border border-violet-400/25 bg-[linear-gradient(180deg,rgba(139,92,246,0.16),rgba(15,23,42,0.82))] px-3 py-2 text-[11px] font-semibold text-violet-100 shadow-[0_12px_24px_-22px_rgba(139,92,246,0.45)]">
+            <span className="rounded-xl border border-violet-400/25 bg-[linear-gradient(180deg,rgba(139,92,246,0.14),rgba(15,23,42,0.68))] px-3 py-2 text-[11px] font-semibold text-violet-100 shadow-[0_12px_24px_-24px_rgba(139,92,246,0.38)]">
               Boldness {weeklyLeadershipSummary.boldnessScore}/100 <span className="ml-1 text-violet-200">{signedBoldnessDelta}</span>
             </span>
-            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Hiring {weeklyLeadershipSummary.hiringWindow}
             </span>
-            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Expansion {weeklyLeadershipSummary.expansionWindow}
             </span>
-            <span className="rounded-2xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold text-slate-200">
+            <span className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2 text-[11px] font-semibold text-slate-200">
               Raise {weeklyLeadershipSummary.raiseWindow}
             </span>
           </div>
           <p className="relative mt-3 max-w-3xl text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.shorthandLine} {weeklyLeadershipSummary.netDeltaLabel}</p>
-          <p className="sr-only">Weekly decision strip: what to do now, what should make you slow down, and what should make you reopen the decision.</p>
-          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.28fr)_minmax(18rem,0.9fr)]">
-            <article className="rounded-[1.2rem] border border-emerald-400/22 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(2,6,23,0.26))] px-4 py-4 shadow-[0_16px_28px_-26px_rgba(16,185,129,0.38)]">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do this now</p>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">{commitmentReviewLabel}</p>
+          <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.34fr)_minmax(17rem,0.86fr)]">
+            <article className="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/50 px-4 py-4 shadow-[0_18px_30px_-28px_rgba(2,6,23,0.72)]">
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{publicDecisionLabels.call}</p>
+                <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
               </div>
-              <p className="mt-3 max-w-2xl text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
-              <div className="mt-4 rounded-xl border border-amber-400/20 bg-[linear-gradient(180deg,rgba(251,191,36,0.08),rgba(2,6,23,0.24))] px-3 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
-              </div>
-              <div className="mt-3 grid gap-2 md:grid-cols-2">
-                <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(244,63,94,0.35)]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Slow down if</p>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
-                </article>
-                <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(56,189,248,0.35)]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">Lean back in if</p>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
-                </article>
-              </div>
+              <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</p>
+              <p className="mt-2 max-w-2xl text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
+              <dl className="mt-4 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-950/45 lg:grid lg:grid-cols-3 lg:divide-x lg:divide-slate-800/80">
+                <div className="border-b border-slate-800/80 px-3 py-3 lg:border-b-0">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Shift this week</dt>
+                  <dd className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</dd>
+                </div>
+                <div className="border-b border-slate-800/80 px-3 py-3 lg:border-b-0">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">{publicDecisionLabels.threshold}</dt>
+                  <dd className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</dd>
+                </div>
+                <div className="px-3 py-3">
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">{publicDecisionLabels.reversal}</dt>
+                  <dd className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</dd>
+                </div>
+              </dl>
             </article>
 
             <aside className="space-y-3">
               <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${revisitToneClass}`}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit now</p>
-                  <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
-                    Hold with caution
-                  </span>
+                  {revisitQueue.length > 0 ? (
+                    <span className="rounded-full border border-amber-400/25 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
+                      {revisitQueue.length} decisions
+                    </span>
+                  ) : null}
                 </div>
                 <p className="mt-2 text-base font-semibold leading-6">{revisitLabel}</p>
                 {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
 
                 {revisitQueue.length > 0 ? (
-                  <div className="mt-4 space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit queue</p>
-                      <span className="rounded-full border border-amber-400/25 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
-                        {revisitQueue.length} decisions
-                      </span>
-                    </div>
-                    {revisitQueue.map((item) => (
-                      <article key={item.id} className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 shadow-[0_12px_20px_-22px_rgba(2,6,23,0.74)]">
+                  <div className="mt-4 border-t border-slate-800/70 pt-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit queue</p>
+                    <div className="mt-2 divide-y divide-slate-800/70">
+                      {revisitQueue.map((item) => (
+                        <article key={item.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-sm font-semibold text-slate-100">{item.label}</p>
                           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
-                            Re-open
+                            Revisit
                           </span>
                         </div>
+                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Reopen now</p>
                         <p className="mt-1 text-[11px] leading-5 text-slate-200">{item.action}</p>
+                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Why</p>
                         <p className="mt-1 text-[11px] leading-5 text-slate-400">{item.reason}</p>
-                        <p className="mt-1 text-[11px] leading-5 text-sky-100">Flip back in if {item.flipCondition}.</p>
-                      </article>
-                    ))}
+                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">{publicDecisionLabels.reversal}</p>
+                        <p className="mt-1 text-[11px] leading-5 text-sky-100">{item.flipCondition}.</p>
+                        </article>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
               </article>
 
               <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${readinessToneClass}`}>
-                    Readiness: {decisionReadiness.label}
-                  </span>
-                  <span className="rounded-full border border-slate-700/70 bg-slate-950/65 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                    This week&apos;s call
-                  </span>
-                </div>
-                <p className="mt-2 text-[11px] leading-5 text-slate-100">{decisionReadiness.detail}</p>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStateDetail}</p>
-                {trustReason ? (
-                  <p className="mt-1 text-[11px] leading-5 text-slate-300">Using the last clean snapshot because {trustReason}</p>
-                ) : null}
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision readiness</p>
+                <p className={`mt-2 text-sm font-semibold leading-6 ${readinessSummaryToneClass}`}>{decisionReadinessSummary}</p>
+                <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStatusSummary}</p>
               </article>
             </aside>
           </div>

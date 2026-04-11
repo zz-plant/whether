@@ -8,6 +8,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -39,6 +40,12 @@ export async function DecisionAnswerPageContent({
     fetchedAtIso: reportData.treasury.fetched_at,
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
+  });
+  const contextSummary = buildDecisionAnswerContextSummary({
+    displayLabel: displayRegime.label,
+    canonicalRegime: displayRegime.canonicalRegime,
+    momentumLabel: reportDynamics.directionLabel,
+    revisitDecisions: homeBriefModel.revisitDecisions,
   });
   const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
   const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
@@ -87,8 +94,15 @@ export async function DecisionAnswerPageContent({
         )}
       />
 
-      <SecondaryPageSection title="Current posture context">
-        <p className="text-sm text-slate-200">Posture: {displayRegime.label} ({displayRegime.canonicalRegime}) · Weekly momentum: {reportDynamics.directionLabel} · Revisit decisions: {homeBriefModel.revisitDecisions ? "YES" : "NO"}</p>
+      <SecondaryPageSection title={`${publicDecisionLabels.call} context`}>
+        <div className="space-y-2 text-sm text-slate-200">
+          <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</p>
+          <p><span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</p>
+          <p>{contextSummary.summaryLine}</p>
+          {contextSummary.classificationLine ? (
+            <p className="text-xs text-slate-400">{contextSummary.classificationLine}</p>
+          ) : null}
+        </div>
       </SecondaryPageSection>
 
       <SecondaryPageSection title="Bounded recommendations">
@@ -98,6 +112,9 @@ export async function DecisionAnswerPageContent({
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
               <p className="font-semibold text-slate-100">{rule.recommendation}</p>
               <p className="text-xs text-slate-300">Scope: {rule.scope}</p>
+              {rule.doNow[0] ? (
+                <p className="text-xs text-emerald-200">{publicDecisionLabels.action}: {rule.doNow[0]}</p>
+              ) : null}
               <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
               <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
             </article>

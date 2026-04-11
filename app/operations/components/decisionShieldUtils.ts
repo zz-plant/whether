@@ -1,4 +1,6 @@
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { formatRegimeLabel } from "../../../lib/regimeFormat";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import {
   formatDecisionAction,
   type DecisionAction,
@@ -57,19 +59,19 @@ export const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Report",
-    `Capital posture: ${assessment.regime}`,
+    `Posture context: ${formatRegimeLabel(assessment.regime)}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,
-    `Execution call: ${output.verdict}`,
+    `Decision verdict: ${output.verdict}`,
     "",
     `Summary: ${output.summary}`,
     "",
     "Evidence:",
     ...output.bullets.map((bullet) => `- ${bullet}`),
     "",
-    `Execution boundary: ${output.guardrail}`,
-    `Pivot signal: ${output.reversalTrigger}`,
+    `${publicDecisionLabels.threshold}: ${output.guardrail}`,
+    `${publicDecisionLabels.reversal}: ${output.reversalTrigger}`,
   ];
 
   return lines.join("\n");

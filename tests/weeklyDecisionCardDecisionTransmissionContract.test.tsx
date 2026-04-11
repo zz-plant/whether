@@ -196,8 +196,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const regimeIndex = html.indexOf("Current outlook");
     const callIndex = html.indexOf(">This week<");
-    const doNowIndex = html.indexOf(">Do this now<");
-    const flipIndex = html.indexOf(">Lean back in if<");
+    const doNowIndex = html.indexOf(">Action now<");
+    const flipIndex = html.indexOf(">Change course if<");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);

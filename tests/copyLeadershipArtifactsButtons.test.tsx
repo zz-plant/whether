@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
   actionButtonVariantClassNames,
+  buildExplainerBriefContent,
   resolveCopyActionLabel,
 } from "../app/components/copyLeadershipArtifactsButtons";
 
@@ -28,5 +29,19 @@ describe("CopyLeadershipArtifactsButtons", () => {
         assert.match(className, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
       }
     }
+  });
+
+  it("keeps the explainer brief aligned to the public decision contract", () => {
+    const brief = buildExplainerBriefContent({
+      boardSummary: "Board summary",
+      weeklyOperatorBrief: "Operator brief",
+      citation: "Citation",
+    });
+
+    assert.match(brief, /Current call = the standing weekly operating summary\./);
+    assert.match(brief, /Action now = what to do this week\./);
+    assert.match(brief, /Pause if = the trip line that pauses or tightens the call\./);
+    assert.match(brief, /Change course if = what must improve before loosening again\./);
+    assert.doesNotMatch(brief, /stop line|reopen line/i);
   });
 });

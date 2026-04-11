@@ -67,6 +67,7 @@ const buildIssueTrackerMarkdownBrief = (
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const regimeLabel = formatRegimeLabel(assessment.regime);
+  const postureLabel = decisionModel?.postureWithStageLabel ?? regimeLabel;
   const bullet = format === "wiki" ? "*" : "-";
   const heading2 = format === "wiki" ? "h2. " : "## ";
   const heading3 = format === "wiki" ? "h3. " : "### ";
@@ -79,7 +80,10 @@ const buildIssueTrackerMarkdownBrief = (
 
   return [
     `${heading2}Whether Report — ${treasury.record_date}`,
-    `${format === "wiki" ? "*Regime:*" : "**Regime:**"} ${decisionModel?.postureWithStageLabel ?? regimeLabel} (${assessment.regime})`,
+    `${format === "wiki" ? "*Posture:*" : "**Posture:**"} ${postureLabel}`,
+    ...(postureLabel !== assessment.regime
+      ? [`${format === "wiki" ? "*Regime:*" : "**Regime:**"} ${assessment.regime}`]
+      : []),
     `${format === "wiki" ? "*Tightness:*" : "**Tightness:**"} ${assessment.scores.tightness} / ${format === "wiki" ? "*Risk appetite:*" : "**Risk appetite:**"} ${assessment.scores.riskAppetite}`,
     `${format === "wiki" ? "*Base rate:*" : "**Base rate:**"} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `${format === "wiki" ? "*Curve slope:*" : "**Curve slope:**"} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,

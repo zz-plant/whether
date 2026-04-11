@@ -144,14 +144,14 @@ export const HomePageReportContent = async ({
         />
       ) : null}
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
-      <section className="weather-panel space-y-3 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-faq-title">
-        <p className="weather-hub-section-eyebrow">Weekly decision FAQ</p>
+      <section className="space-y-3 border-t border-slate-800/80 pt-6" aria-labelledby="weekly-decision-faq-title">
+        <p className="weather-hub-section-eyebrow">In the room</p>
         <h2 id="weekly-decision-faq-title" className="text-lg font-semibold text-slate-100">
-          Leadership shorthand for this week
+          Answer these three questions fast
         </h2>
-        <dl className="space-y-3 text-sm text-slate-200">
+        <dl className="overflow-hidden rounded-[1.15rem] border border-slate-800/80 bg-slate-950/25 text-sm text-slate-200 lg:grid lg:grid-cols-3 lg:divide-x lg:divide-slate-800/80">
           {homeDecisionFaqItems.map((item) => (
-            <div key={item.question} className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+            <div key={item.question} className="border-b border-slate-800/80 px-4 py-4 last:border-b-0 lg:border-b-0">
               <dt className="font-semibold text-slate-100">{item.question}</dt>
               <dd className="mt-1 text-slate-300">{item.answer}</dd>
             </div>

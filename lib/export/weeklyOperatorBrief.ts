@@ -5,11 +5,16 @@ import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
+import { publicDecisionLabels } from "../report/reportFormatting";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
   regimeStage: string;
   confidence: string;
+  currentCall: string;
+  actionNow: string;
+  pauseIf: string;
+  changeCourseIf: string;
   doNowBullets: string[];
   whyCouldBeWrong: string;
   flipTrigger: string;
@@ -57,7 +62,6 @@ export const buildWeeklyOperatorBriefPayload = ({
   postureState?: PostureStateContract;
   canonicalDecisionCopy?: CanonicalDecisionCopy;
 }): WeeklyOperatorBriefPayload => {
-
   const doNowBullets = actionStripItems.length > 0
     ? actionStripItems.slice(0, 3).map((item) => item.actionNow)
     : assessment.constraints.slice(0, 3);
@@ -90,11 +94,28 @@ export const buildWeeklyOperatorBriefPayload = ({
       flipTrigger: postureFlipTrigger ?? "",
       flipConditions: postureFlipConditions,
     });
+  const currentCall =
+    canonicalDecisionCopy?.operatingCall
+    ?? actionStripItems[0]?.actionNow
+    ?? assessment.constraints[0]
+    ?? "Hold bounded operating discipline.";
+  const actionNow =
+    canonicalDoNowLines[0]
+    ?? doNowBullets[0]
+    ?? currentCall;
+  const pauseIf =
+    actionStripItems[0]?.triggerThreshold
+    ?? assessment.constraints[1]
+    ?? "Do not approve irreversible commitments without trigger confirmation.";
 
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
+    currentCall,
+    actionNow,
+    pauseIf,
+    changeCourseIf: resolvedFlipTrigger,
     doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
       postureConfidenceLabel === "HIGH"
@@ -105,22 +126,30 @@ export const buildWeeklyOperatorBriefPayload = ({
   };
 };
 
-export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPayload) => [
-  `Weekly Operator Brief — ${payload.date}`,
-  `Regime + stage: ${payload.regimeStage}`,
-  `Confidence: ${payload.confidence}`,
-  "",
-  "Do now:",
-  ...payload.doNowBullets.map((bullet) => `• ${bullet}`),
-  "",
-  `Why this could be wrong: ${payload.whyCouldBeWrong}`,
-  `What would change our mind: ${payload.flipTrigger}`,
-  "",
-  `Change course if: ${payload.flipTrigger}`,
-  ...(payload.flipConditionLabels.length > 0
-    ? ["", "Supporting change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
-    : []),
-].join("\n");
+export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPayload) => {
+  const supportingActionLines = payload.doNowBullets
+    .filter((bullet) => bullet.trim().length > 0)
+    .filter((bullet) => bullet !== payload.actionNow);
+
+  return [
+    `Weekly Operator Brief — ${payload.date}`,
+    `Posture: ${payload.regimeStage}`,
+    `Confidence: ${payload.confidence}`,
+    "",
+    `${publicDecisionLabels.call}: ${payload.currentCall}`,
+    `${publicDecisionLabels.action}: ${payload.actionNow}`,
+    `${publicDecisionLabels.threshold}: ${payload.pauseIf}`,
+    `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
+    ...(supportingActionLines.length > 0
+      ? ["", "Supporting action-now lines:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
+      : []),
+    "",
+    `Why this could be wrong: ${payload.whyCouldBeWrong}`,
+    ...(payload.flipConditionLabels.length > 0
+      ? ["", "Supporting change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+      : []),
+  ].join("\n");
+};
 
 export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBriefPayload) =>
   JSON.stringify(
@@ -136,7 +165,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
         {
           type: "section",
           fields: [
-            { type: "mrkdwn", text: `*Regime + stage*\n${payload.regimeStage}` },
+            { type: "mrkdwn", text: `*Posture*\n${payload.regimeStage}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],
         },
@@ -144,7 +173,14 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Do now*\n${payload.doNowBullets.map((bullet) => `• ${bullet}`).join("\n")}`,
+            text: `*${publicDecisionLabels.call}*\n${payload.currentCall}`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${publicDecisionLabels.action}*\n${payload.actionNow}`,
           },
         },
         {
@@ -152,7 +188,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*What would change our mind:* ${payload.flipTrigger}`,
+              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}`,
             },
           ],
         },
@@ -162,8 +198,8 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             {
               type: "mrkdwn",
               text: payload.flipConditionLabels.length > 0
-                ? `*Change course if:* ${payload.flipTrigger}\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
-                : `*Change course if:* ${payload.flipTrigger}`,
+                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Supporting change-course signals:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
+                : `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
             },
           ],
         },

@@ -6,6 +6,7 @@ import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
+import { publicDecisionLabels } from "../report/reportFormatting";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -15,6 +16,8 @@ import {
 
 export type ModeledExportDecisionPayload = {
   postureWithStageLabel?: string;
+  currentCall?: string;
+  actionNow?: string;
   operatingStanceLine?: string;
   guardrailThreshold?: string;
   reversalTrigger?: string;
@@ -44,30 +47,59 @@ type ExportLayerOptions = {
   modeledDecision?: ModeledExportDecisionPayload;
 };
 
-const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => ({
-  postureWithStageLabel: options?.modeledDecision?.postureWithStageLabel ?? options?.postureWithStageLabel,
-  operatingStanceLine: options?.modeledDecision?.operatingStanceLine ?? options?.operatingStanceLine,
-  guardrailThreshold: options?.modeledDecision?.guardrailThreshold,
-  reversalTrigger: options?.modeledDecision?.reversalTrigger,
-  actionStripItems: options?.modeledDecision?.actionStripItems ?? options?.actionStripItems,
-});
+const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => {
+  const actionStripItems = options?.modeledDecision?.actionStripItems ?? options?.actionStripItems;
+  const currentCall =
+    options?.modeledDecision?.currentCall
+    ?? options?.modeledDecision?.operatingStanceLine
+    ?? options?.operatingStanceLine;
+
+  return {
+    postureWithStageLabel: options?.modeledDecision?.postureWithStageLabel ?? options?.postureWithStageLabel,
+    currentCall,
+    actionNow:
+      options?.modeledDecision?.actionNow
+      ?? actionStripItems?.[0]?.actionNow
+      ?? currentCall,
+    operatingStanceLine: currentCall,
+    guardrailThreshold: options?.modeledDecision?.guardrailThreshold,
+    reversalTrigger: options?.modeledDecision?.reversalTrigger,
+    actionStripItems,
+  };
+};
 
 export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   const modeled = resolveModeledDecisionPayload(options);
   const topActionStripItems = (modeled.actionStripItems ?? []).slice(0, 3);
-
-  if (topActionStripItems.length > 0) {
-    return topActionStripItems.flatMap((item) => [
-      `• Action now: ${item.actionNow}`,
-      `• Pause if: ${item.triggerThreshold}`,
-      `• Change course if: ${item.reversalCondition}`,
-    ]);
-  }
+  const currentCall =
+    modeled.currentCall
+    ?? assessment.constraints[0]
+    ?? "Hold bounded operating discipline.";
+  const actionNow =
+    modeled.actionNow
+    ?? topActionStripItems[0]?.actionNow
+    ?? currentCall;
+  const pauseIf =
+    topActionStripItems[0]?.triggerThreshold
+    ?? modeled.guardrailThreshold
+    ?? assessment.constraints[1]
+    ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const changeCourseIf =
+    topActionStripItems[0]?.reversalCondition
+    ?? modeled.reversalTrigger
+    ?? assessment.constraints[2]
+    ?? "Re-open approvals when confidence and trend stabilize.";
 
   return [
-    `• Action now: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
-    `• Pause if: ${modeled.guardrailThreshold ?? assessment.constraints[1] ?? "Do not approve irreversible commitments without trigger confirmation."}`,
-    `• Change course if: ${modeled.reversalTrigger ?? assessment.constraints[2] ?? "Re-open approvals when confidence and trend stabilize."}`,
+    `• ${publicDecisionLabels.call}: ${currentCall}`,
+    `• ${publicDecisionLabels.action}: ${actionNow}`,
+    `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
+    `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
+    ...topActionStripItems.slice(1).flatMap((item) => [
+      `• ${item.label}: ${item.actionNow}`,
+      `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
+      `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
+    ]),
   ];
 };
 
@@ -82,8 +114,17 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     options?.postureState?.currentState.confidenceLabel !== "HIGH" ? "Confidence: Guarded" : "",
     !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
+  const actionStripItems = modeled.actionStripItems ?? [];
+  const currentCall =
+    modeled.currentCall
+    ?? assessment.constraints[0]
+    ?? "Hold bounded operating discipline.";
+  const actionNow =
+    modeled.actionNow
+    ?? actionStripItems[0]?.actionNow
+    ?? currentCall;
 
-  const actionStrip = (modeled.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
+  const actionStrip = actionStripItems.slice(1, 3).flatMap((item) => [
     `• ${item.label}`,
     `  Action now: ${item.actionNow}`,
     `  Pause if: ${item.triggerThreshold}`,
@@ -97,11 +138,11 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• Trend: ${(options?.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options?.transitionWatch ?? "OFF"}`,
-    `• Current call: ${modeled.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
+    `• ${publicDecisionLabels.call}: ${currentCall}`,
+    `• ${publicDecisionLabels.action}: ${actionNow}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Change course if: ${condition}`),
     `• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.`,
     ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
-    `• Operating posture: ${modeled.operatingStanceLine}`,
     ...actionStrip,
   ];
 };
@@ -158,7 +199,7 @@ const buildDecisionTransmissionRiskBlock = (assessment: RegimeAssessment, option
     "Decision transmission check:",
     `• Confidence: ${confidenceLine}`,
     `• Why this could be wrong: ${whyCouldBeWrong}`,
-    "• What would change our mind: change course trigger and supporting flip conditions above.",
+    "• Change-course trigger: see Change course if and supporting signals above.",
   ];
 };
 
@@ -201,7 +242,7 @@ export const buildBoardSlideBullets = (
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Capital posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? assessment.regime}`,
+  `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? assessment.regime}`,
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...buildBoundedDecisionLines(assessment, options),
@@ -229,7 +270,7 @@ export const buildSlackBrief = (
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
-    `Capital posture: ${modeled.postureWithStageLabel ?? assessment.regime}`,
+    `Posture: ${modeled.postureWithStageLabel ?? assessment.regime}`,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
@@ -237,7 +278,7 @@ export const buildSlackBrief = (
     "Macro signals:",
     ...macroLines,
     "",
-    "Bounded decision (action now / pause if / change course if):",
+    "Bounded decision (current call / action now / pause if / change course if):",
     ...decisionHighlights,
     ...buildDecisionTransmissionRiskBlock(assessment, options),
     "",

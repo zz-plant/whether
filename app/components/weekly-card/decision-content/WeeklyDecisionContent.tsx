@@ -23,12 +23,12 @@ export function WeeklyDecisionContent({
   asideContent,
 }: WeeklyDecisionContentProps) {
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(19.5rem,0.78fr)] xl:items-start">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(17.5rem,0.62fr)] xl:items-start">
       <main className="space-y-5 xl:col-start-1" aria-label="Weekly decision transmission order">
         {modePanel}
       </main>
 
-      <aside className="space-y-5 xl:sticky xl:top-28 xl:col-start-2 xl:row-start-1">
+      <aside className="space-y-4 xl:sticky xl:top-28 xl:col-start-2 xl:row-start-1">
         {asideContent}
       </aside>
 

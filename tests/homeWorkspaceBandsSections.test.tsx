@@ -75,13 +75,13 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="audit-this-call"/);
     assert.match(html, /id="approve-this-weeks-plan"/);
     assert.match(html, /id="historical-replay-workspace"/);
-    assert.match(html, /Approve this week&#x27;s plan/);
+    assert.match(html, /Move this into planning/);
     assert.match(html, /Open Planning/);
-    assert.match(html, /Planning is the default follow-on/);
-    assert.match(html, /Open these only if the call gets challenged/);
+    assert.match(html, /Approve or hold fixed-cost decisions there/);
+    assert.match(html, /Open these only if someone pushes back/);
     assert.match(html, /Why the read moved/);
     assert.match(html, /Use this call/);
-    assert.match(html, /One more tool, only if you still need it/);
+    assert.match(html, /One more place to look/);
     assert.match(html, /CEO/);
     assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));

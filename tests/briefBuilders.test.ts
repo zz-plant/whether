@@ -153,16 +153,18 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(action now \/ pause if \/ change course if\):/);
+    assert.match(brief, /Bounded decision \(current call \/ action now \/ pause if \/ change course if\):/);
+    assert.match(brief, /• Current call: Constraint one/);
     assert.match(brief, /• Action now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
     assert.match(brief, /• Change course if: Resume when tightness < 64\./);
+    assert.ok(brief.indexOf("• Current call: Constraint one") < brief.indexOf("• Action now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Action now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Change course if: Resume when tightness < 64."));
     assert.match(brief, /Decision transmission check:/);
     assert.match(brief, /• Confidence: MEDIUM confidence/);
     assert.match(brief, /• Why this could be wrong:/);
-    assert.match(brief, /• What would change our mind:/);
+    assert.match(brief, /• Change-course trigger:/);
   });
 
   it("optionally appends interpretation layer content for handoff", () => {
@@ -212,7 +214,7 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, { postureWithStageLabel: stageLabel });
     const citation = buildCallCitation(assessment, treasury, { postureWithStageLabel: stageLabel });
 
-    assert.match(brief, /Capital posture: Expansion — Late \(Fragile\)/);
+    assert.match(brief, /Posture: Expansion — Late \(Fragile\)/);
     assert.match(citation, /Posture: Expansion — Late \(Fragile\) \(EXPANSION\)/);
   });
 
@@ -244,8 +246,7 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Current call:/);
     assert.match(brief, /• Re-check owner\/cadence: Owner: CEO \+ Finance lead/);
     assert.match(brief, /• Trust markers: Confidence: Guarded · Freshness: Stale/);
-    assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
-    assert.match(brief, /• Hiring stance/);
+    assert.match(brief, /• Action now: Backfills only/);
     assert.match(brief, /Action now: Backfills only/);
     assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
     assert.match(brief, /Change course if: Resume staged approvals when tightness < 66/);
