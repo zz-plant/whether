@@ -33,7 +33,7 @@ function NavigationLinkCard({
   link: GlobalHeaderNavigationLink;
   onIntent: (href: string) => void;
 }) {
-  const eyebrow = link.href === "/" ? "Weekly brief" : "More detail";
+  const eyebrow = link.href === "/" ? "This week" : "Open when needed";
 
   return (
     <li className="flex-shrink-0 sm:min-w-0">
@@ -226,7 +226,7 @@ export function GlobalHeaderNavRail({
               Navigation
             </p>
             <p className="truncate text-[13px] font-medium text-slate-200">
-              {activeRouteLabel}
+              {activeSurfaceCue ?? activeRouteLabel}
             </p>
           </div>
           {hasScrollableOverflow ? controls : null}

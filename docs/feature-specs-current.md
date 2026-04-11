@@ -36,7 +36,7 @@ The homepage keeps interpretation layers optional and query-driven: the default 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/signals`, `/operations`, `/decide`, `/method` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, and compact report-shell intros now use inline status chips plus one decision card instead of a second status rail.
 Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
-Primary navigation now uses shorter workflow labels in header/nav contexts (`Brief`, `Evidence`, `Plan`, `Resolve`, `Verify`) while canonical route names remain unchanged in specs and route-level copy.
+Primary navigation now uses goal-first labels in header/nav contexts (`Start here`, `See what changed`, `Make the plan`, `Resolve one question`, `Check trust`) while canonical route names remain unchanged in specs and route-level copy.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
@@ -58,13 +58,13 @@ Operator-workflow telemetry still logs artifact-mode selection and route transit
 weekly loop.
 The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
 - boldness budget score and weekly delta,
-- hiring, expansion, and raise windows,
+- hiring, expansion, and fundraising windows,
 - one-line net delta shorthand.
 The canonical weekly-call block now also includes:
 - a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
 - a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened,
 - a delta-only brief in the share rail for repeat readers who only need the weekly change, reopen items, and current hold / reopen lines.
-The current homepage hierarchy now makes the action lane dominant: `Do this now` leads the top fold, `What changed` supports it, and `Revisit now` plus readiness/trust sit in a smaller secondary lane rather than competing as equal-width cards.
+The current homepage hierarchy now makes the action lane dominant: `Do this now` leads the top fold, `What changed` supports it, and `Recheck now` plus readiness/trust sit in a smaller secondary lane rather than competing as equal-width cards.
 The artifact rail now follows a routine-first hierarchy:
 - one recommended artifact mode,
 - one primary share/copy path,
@@ -179,11 +179,11 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 
 Secondary hubs (`/guides`, `/resources`, `/toolkits`) now lead with immediate value and
 focused next actions while reinforcing their parent workflow hub. `/answers` now redirects directly
-back into the canonical Decision Tools answer router instead of maintaining a separate hub shell.
+back into the canonical Decision Tools quick-answer path instead of maintaining a separate hub shell.
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/decide/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/decide` itself now leads with one recommended path, one compact alternatives block, and a smaller fallback router; translation and toolkit depth stay hidden until explicitly selected.
+`/decide/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/decide` itself now leads with one best-next-step path, one compact alternatives block, and a smaller fallback chooser; team/stage views and tool depth stay hidden until explicitly selected.
 The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Decision Tools answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.

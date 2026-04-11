@@ -31,9 +31,9 @@ export const navigationLayers: NavigationLayer[] = [
     key: "weekly-brief",
     href: "/",
     label: "Weekly Brief",
-    navLabel: "Brief",
+    navLabel: "Start here",
     description: "See this week's call, what to do now, and a brief you can share.",
-    boundary: "Best place to start each week. Open another page only if you want more detail.",
+    boundary: "Use this first to see the current call and the next move.",
     group: "core",
     tier: "primary",
   },
@@ -41,8 +41,9 @@ export const navigationLayers: NavigationLayer[] = [
     key: "signals",
     href: "/signals",
     label: "Evidence",
+    navLabel: "See what changed",
     description: "See what changed, what drove it, and the thresholds worth watching.",
-    boundary: "Use this page when you want the evidence behind the brief.",
+    boundary: "Use this when you want the proof behind the call.",
     group: "reference",
     tier: "primary",
   },
@@ -50,9 +51,9 @@ export const navigationLayers: NavigationLayer[] = [
     key: "operations",
     href: "/operations",
     label: "Planning",
-    navLabel: "Plan",
+    navLabel: "Make the plan",
     description: "Turn this week's read into decisions on hiring, spend, roadmap, and what to share.",
-    boundary: "Use this page when you're ready to turn the brief into approvals.",
+    boundary: "Use this when you are ready to turn the call into approvals.",
     group: "workflow",
     tier: "primary",
   },
@@ -60,7 +61,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "decide",
     href: "/decide",
     label: "Decision Tools",
-    navLabel: "Resolve",
+    navLabel: "Resolve one question",
     description: "Find the right answer or tool for one remaining question.",
     boundary: "Use this page when the brief is clear but one question still needs an answer.",
     group: "workflow",
@@ -70,9 +71,9 @@ export const navigationLayers: NavigationLayer[] = [
     key: "method",
     href: "/method",
     label: "Trust",
-    navLabel: "Verify",
+    navLabel: "Check trust",
     description: "Check freshness, confidence, source coverage, and what would change the call.",
-    boundary: "Use this page when you want to sanity-check the brief before a big decision.",
+    boundary: "Use this when you want to sanity-check the call before a big decision.",
     group: "reference",
     tier: "primary",
   },
@@ -80,8 +81,9 @@ export const navigationLayers: NavigationLayer[] = [
     key: "toolkits",
     href: "/toolkits",
     label: "Toolkits",
+    navLabel: "Use a tool",
     description: "Templates and tools for working through a specific decision.",
-    boundary: "Use these tools after you've narrowed the question in Decision Tools.",
+    boundary: "Use these after you've narrowed the question in Decision Tools.",
     group: "workflow",
     tier: "supporting",
     parentKey: "decide",
@@ -97,11 +99,12 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 }, {} as Record<Route, number>);
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
-  if (href === "/") return "Best place to start";
-  if (href === "/signals") return "See the evidence";
+  if (href === "/") return "Start here";
+  if (href === "/signals") return "See what changed";
   if (href === "/operations") return "Make the plan";
-  if (href === "/decide") return "Find an answer";
-  if (href === "/method") return "Check reliability";
+  if (href === "/decide") return "Resolve one question";
+  if (href === "/method") return "Check trust";
+  if (href === "/toolkits") return "Use a tool";
   return null;
 };
 

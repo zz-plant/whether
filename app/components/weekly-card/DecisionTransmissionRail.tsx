@@ -30,16 +30,16 @@ export function DecisionTransmissionRail({
       <div className="flex items-center justify-between gap-3 border-b border-slate-800/70 pb-3">
         <div className="space-y-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Share</p>
-          <h2 className={tierOneHeading}>Send this brief</h2>
+          <h2 className={tierOneHeading}>Share this call</h2>
         </div>
         <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Best for most teams
+          Quick handoff
         </span>
       </div>
       <div className="space-y-4 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Best place to start</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Start here</p>
         <p className="mt-2 max-w-[46rem] text-sm font-semibold leading-6 text-slate-100">
-          Start with the weekly brief. Open Planning when you need approvals, and open Citation when you need the source line.
+          Start with the weekly brief. Open planning for approvals. Open the source note for the citation.
         </p>
         <div className="space-y-1 text-xs leading-5 text-slate-300">
           <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {currentCall}</p>
@@ -67,7 +67,7 @@ export function DecisionTransmissionRail({
         ) : null}
         <details className="group weather-auto-chevron mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Citation
+            Source note
           </summary>
           <div className="weather-disclosure-panel animate-collapsible-in mt-3">
             <p className="text-xs leading-5 text-slate-300">{citationMetaLine}</p>

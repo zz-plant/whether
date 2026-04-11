@@ -96,7 +96,7 @@ export function CommandCenterNavBlock({
           <div className="space-y-4">
             <div className="space-y-2.5">
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                <span>Whether report</span>
+                <span>Start here</span>
                 <span className="text-slate-600">•</span>
                 <span>{statusLabel}</span>
                 <span className="text-slate-600">•</span>
@@ -191,7 +191,7 @@ export function CommandCenterNavBlock({
           {roleSwitcher ? (
             <div className="space-y-2 rounded-[1.1rem] border border-slate-800/55 bg-slate-950/45 p-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Role view
+                Choose a lens
               </p>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 {roleSwitcher.options.map((option) => {
@@ -213,7 +213,7 @@ export function CommandCenterNavBlock({
 
           <div className="space-y-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Whether report
+              Start here
             </p>
             <h1 className="type-headline max-w-3xl text-slate-100">{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
@@ -246,7 +246,7 @@ export function CommandCenterNavBlock({
 
           {actionLinks.length > 0 ? (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-slate-400">
-              <span>Also available:</span>
+              <span>Next options:</span>
               {actionLinks.map((link) => (
                 <InternalAwareLink
                   key={`${link.href}-${link.label}`}
