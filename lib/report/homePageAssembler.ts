@@ -45,6 +45,11 @@ type HomePageAssemblerDependencies = {
   buildPostureState: typeof buildPostureState;
 };
 
+type DeferredHomeSupportModels = {
+  diagnosticsLane: HomePageDiagnosticsLane;
+  workspaceModel: HomePageWorkspaceModel;
+};
+
 const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
 
 const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
@@ -100,6 +105,78 @@ const buildCommandBarPayload = ({
   postureTrajectory: weeklyDecisionCardModel.diagnostics.postureTrajectory,
   regimeDistance: weeklyDecisionCardModel.diagnostics.regimeDistance,
 });
+
+const buildDeferredHomeSupportModels = ({
+  reportData,
+  homeBriefModel,
+  weeklyDecisionCardModel,
+  statusLabel,
+  reportDynamics,
+  trustStatusLabel,
+  trustStatusDetail,
+  trustStatusAction,
+  trustStatusTone,
+  outageType,
+  outageSeverity,
+  decisionImpactWindow,
+  approvalBuckets,
+  recoveryPlan,
+  outageExitGate,
+  freshnessLabel,
+  trustMarker,
+  sectionLinks,
+}: {
+  reportData: ReportData | ReportDataFallback;
+  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
+  statusLabel: string;
+  reportDynamics: ReportData["reportDynamics"];
+  trustStatusLabel: string;
+  trustStatusDetail: string;
+  trustStatusAction: string;
+  trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+  outageType: ReturnType<typeof buildTrustStatus>["outageType"];
+  outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
+  decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
+  approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
+  recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
+  outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
+  freshnessLabel: string;
+  trustMarker: ReturnType<typeof buildTrustMarker>;
+  sectionLinks: { href: string; label: string }[];
+}): DeferredHomeSupportModels => {
+  const diagnosticsLane = buildDiagnosticsLanePayload({
+    homeBriefModel,
+    weeklyDecisionCardModel,
+    statusLabel,
+    reportDynamics,
+  });
+
+  return {
+    diagnosticsLane,
+    workspaceModel: buildHomeWorkspaceModel({
+      reportData,
+      diagnosticsLane,
+      weeklyDecisionCardModel,
+      trustStatusLabel,
+      trustStatusDetail,
+      trustStatusAction,
+      trustStatusTone,
+      outageType,
+      outageSeverity,
+      decisionImpactWindow,
+      approvalBuckets,
+      recoveryPlan,
+      outageExitGate,
+      freshnessLabel,
+      trustMarkerLabel: trustMarker.label,
+      trustMarkerTone: trustMarker.tone,
+      trustMarkerDetail: trustMarker.detail,
+      sourceDegraded: trustMarker.degraded,
+      sectionLinks,
+    }),
+  };
+};
 
 export const assembleHomePage = async ({
   searchParams,
@@ -252,25 +329,12 @@ export const assembleHomePage = async ({
     interpretationLayer,
     interpretationSearchParams,
     diagnosticsLanePromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
-      buildDiagnosticsLanePayload({
-        homeBriefModel: enrichedHomeBriefModel,
-        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
-        statusLabel,
-        reportDynamics,
-      })
-    ),
-    workspaceModelPromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
-      const diagnosticsLane = buildDiagnosticsLanePayload({
-        homeBriefModel: enrichedHomeBriefModel,
-        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
-        statusLabel,
-        reportDynamics,
-      });
-
-      return buildHomeWorkspaceModel({
+      buildDeferredHomeSupportModels({
         reportData,
-        diagnosticsLane,
+        homeBriefModel: enrichedHomeBriefModel,
         weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        statusLabel,
+        reportDynamics,
         trustStatusLabel,
         trustStatusDetail,
         trustStatusAction,
@@ -282,13 +346,32 @@ export const assembleHomePage = async ({
         recoveryPlan,
         outageExitGate,
         freshnessLabel: freshnessMeta.line,
-        trustMarkerLabel: trustMarker.label,
-        trustMarkerTone: trustMarker.tone,
-        trustMarkerDetail: trustMarker.detail,
-        sourceDegraded: trustMarker.degraded,
+        trustMarker,
         sectionLinks,
-      });
-    }),
+      }).diagnosticsLane
+    ),
+    workspaceModelPromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
+      buildDeferredHomeSupportModels({
+        reportData,
+        homeBriefModel: enrichedHomeBriefModel,
+        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        statusLabel,
+        reportDynamics,
+        trustStatusLabel,
+        trustStatusDetail,
+        trustStatusAction,
+        trustStatusTone,
+        outageType,
+        outageSeverity,
+        decisionImpactWindow,
+        approvalBuckets,
+        recoveryPlan,
+        outageExitGate,
+        freshnessLabel: freshnessMeta.line,
+        trustMarker,
+        sectionLinks,
+      }).workspaceModel
+    ),
     reportShell: {
       regime: assessment.regime,
       statusLabel,
