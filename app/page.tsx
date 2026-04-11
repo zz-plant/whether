@@ -7,7 +7,6 @@ import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
-import { HomeRouteStateController } from "./components/home/homeRouteStateController";
 import { decisionTransmissionSummaryLine, homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
 import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import {
@@ -136,51 +135,35 @@ export const HomePageReportContent = async ({
       }}
     >
       <HomeRoutePrefetch />
-      {/*
-        Homepage UI state contract:
-        - tab: brief | revisit | workspace
-        - detail: compact | full
-        - panel: none | share
-        URL is first-render source-of-truth. Invalid values normalize to defaults via replace().
-      */}
-      <HomeRouteStateController
-        whatChangedSection={(
-          <HomeWhatChangedSection
-            weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
-            leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
-            fallbackActive={homepage.fallbackActive}
-            searchParams={resolvedSearchParams}
-            initialArtifactMode={initialArtifactMode}
-          />
-        )}
-        revisitFlipSection={(
-          <HomeRevisitFlipSection
-            interpretationLayer={homepage.interpretationLayer}
-            interpretationSearchParams={homepage.interpretationSearchParams}
-            fallbackAlert={homepage.fallbackAlert}
-          />
-        )}
-        faqSection={(
-          <section className="weather-panel space-y-3 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-faq-title">
-            <p className="weather-hub-section-eyebrow">Weekly decision FAQ</p>
-            <h2 id="weekly-decision-faq-title" className="text-lg font-semibold text-slate-100">
-              Leadership shorthand for this week
-            </h2>
-            <dl className="space-y-3 text-sm text-slate-200">
-              {homeDecisionFaqItems.map((item) => (
-                <div key={item.question} className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-                  <dt className="font-semibold text-slate-100">{item.question}</dt>
-                  <dd className="mt-1 text-slate-300">{item.answer}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        )}
-        hasRevisitSection={
-          homepage.interpretationLayer.view !== "default" || Boolean(homepage.fallbackAlert)
-        }
-        workspaceSection={<HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />}
+      <HomeWhatChangedSection
+        weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
+        leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
+        fallbackActive={homepage.fallbackActive}
+        searchParams={resolvedSearchParams}
+        initialArtifactMode={initialArtifactMode}
       />
+      {homepage.interpretationLayer.view !== "default" || Boolean(homepage.fallbackAlert) ? (
+        <HomeRevisitFlipSection
+          interpretationLayer={homepage.interpretationLayer}
+          interpretationSearchParams={homepage.interpretationSearchParams}
+          fallbackAlert={homepage.fallbackAlert}
+        />
+      ) : null}
+      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
+      <section className="weather-panel space-y-3 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-faq-title">
+        <p className="weather-hub-section-eyebrow">Weekly decision FAQ</p>
+        <h2 id="weekly-decision-faq-title" className="text-lg font-semibold text-slate-100">
+          Leadership shorthand for this week
+        </h2>
+        <dl className="space-y-3 text-sm text-slate-200">
+          {homeDecisionFaqItems.map((item) => (
+            <div key={item.question} className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+              <dt className="font-semibold text-slate-100">{item.question}</dt>
+              <dd className="mt-1 text-slate-300">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </ReportShell>
   );
 };

@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
@@ -67,6 +69,11 @@ describe("assembleHomePage streaming contract", () => {
     const artifactPayload = await homepage.leadershipArtifactPayloadPromise;
     const workspaceModel = await homepage.workspaceModelPromise;
     const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
+    const homeBriefModel = buildHomeBriefModel(reportDataForCopy);
+    const canonicalDecisionCopy = buildCanonicalDecisionCopy({
+      homeBriefModel,
+      postureState,
+    });
 
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
@@ -81,12 +88,15 @@ describe("assembleHomePage streaming contract", () => {
       confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
       actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
       flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
+      postureState,
+      canonicalDecisionCopy,
     });
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
     assert.match(headerOperatorBriefCopy, /Do now:/);
     assert.match(headerOperatorBriefCopy, /Change course if:/);
+    assert.equal(artifactPayload?.weeklyOperatorBriefText, headerOperatorBriefCopy);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/decide\//);

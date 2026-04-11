@@ -25,40 +25,13 @@ type BuildArtifactPayloadArgs = {
   freshnessLabel: string;
 };
 
-export const buildWeeklyOperatorBriefCopyText = ({
-  assessment,
-  treasury,
-  date,
-  postureWithStageLabel,
-  confidenceLabel,
-  actionStripItems,
-  flipConditionLabels,
-  postureState,
-  canonicalDecisionCopy,
-}: {
-  assessment: ReportData["assessment"];
-  treasury: ReportData["treasury"];
-  date: ReportData["weeklyRecordDate"];
-  postureWithStageLabel?: string;
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
-  actionStripItems: Parameters<typeof buildWeeklyOperatorBriefPayload>[0]["actionStripItems"];
-  flipConditionLabels: Parameters<typeof buildWeeklyOperatorBriefPayload>[0]["flipConditionLabels"];
-  postureState?: Parameters<typeof buildWeeklyOperatorBriefPayload>[0]["postureState"];
-  canonicalDecisionCopy?: Parameters<typeof buildWeeklyOperatorBriefPayload>[0]["canonicalDecisionCopy"];
-}) =>
-  buildWeeklyOperatorBriefPlainText(
-    buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      date,
-      postureWithStageLabel,
-      confidenceLabel,
-      actionStripItems,
-      flipConditionLabels,
-      postureState,
-      canonicalDecisionCopy,
-    }),
-  );
+type WeeklyOperatorBriefCopyInput = Parameters<typeof buildWeeklyOperatorBriefPayload>[0];
+
+const buildWeeklyOperatorBriefCopyPayload = (input: WeeklyOperatorBriefCopyInput) =>
+  buildWeeklyOperatorBriefPayload(input);
+
+export const buildWeeklyOperatorBriefCopyText = (input: WeeklyOperatorBriefCopyInput) =>
+  buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefCopyPayload(input));
 
 const buildDeltaOnlyBriefText = ({
   freshnessLabel,
@@ -134,7 +107,7 @@ export const buildLeadershipArtifactPayload = async ({
       homeBriefModel,
       postureState,
     });
-    const weeklyOperatorBriefText = buildWeeklyOperatorBriefCopyText({
+    const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefCopyPayload({
       assessment,
       treasury,
       date: weeklyRecordDate,
@@ -162,7 +135,7 @@ export const buildLeadershipArtifactPayload = async ({
         flipLine: `FLIP: ${canonicalDecisionCopy.flipTrigger}`,
         stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
       }),
-      weeklyOperatorBriefText,
+      weeklyOperatorBriefText: buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload),
       weeklyCallSnapshotText: buildWeeklyCallSnapshotPlainText({
         regime: canonicalDecisionCopy.currentRegimeLabel,
         call: canonicalDecisionCopy.operatingCall,

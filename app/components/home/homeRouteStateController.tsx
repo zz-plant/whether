@@ -1,7 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
-
 const tabValues = ["brief", "revisit", "workspace"] as const;
 const focusValues = ["all", "decision", "risk"] as const;
 const detailValues = ["compact", "full"] as const;
@@ -70,28 +68,3 @@ export const buildHomeRouteUiHref = (pathname: string, state: HomeRouteUiState) 
   const query = params.toString();
   return query ? `${pathname}?${query}` : pathname;
 };
-
-type HomeRouteStateControllerProps = {
-  whatChangedSection: ReactNode;
-  revisitFlipSection: ReactNode;
-  workspaceSection: ReactNode;
-  faqSection: ReactNode;
-  hasRevisitSection: boolean;
-};
-
-export function HomeRouteStateController({
-  whatChangedSection,
-  revisitFlipSection,
-  workspaceSection,
-  faqSection,
-  hasRevisitSection,
-}: HomeRouteStateControllerProps) {
-  return (
-    <>
-      {whatChangedSection}
-      {hasRevisitSection ? revisitFlipSection : null}
-      {workspaceSection}
-      {faqSection}
-    </>
-  );
-}
