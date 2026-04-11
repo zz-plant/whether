@@ -8,8 +8,8 @@ import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import { HomeRouteStateController } from "./components/home/homeRouteStateController";
-import { buildWeeklyDecisionPresentation } from "./components/weekly-card/presentationAdapter";
 import { decisionTransmissionSummaryLine, homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
+import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
@@ -24,44 +24,6 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<HomePageSearchParams>;
 }): Promise<Metadata> => buildHomeMetadata(searchParams);
-
-const buildHeaderWeeklyBriefCopy = ({
-  reportShell,
-  weeklyDecisionCardModel,
-  searchParams,
-}: {
-  reportShell: Awaited<ReturnType<typeof assembleHomePage>>["reportShell"];
-  weeklyDecisionCardModel: Awaited<ReturnType<typeof assembleHomePage>>["weeklyDecisionCardModel"];
-  searchParams?: HomePageSearchParams;
-}) => {
-  const postureLabel =
-    weeklyDecisionCardModel.status.postureWithStageLabel ?? weeklyDecisionCardModel.status.statusLabel;
-  const confidenceLabel = `${weeklyDecisionCardModel.status.confidenceLabel} (${Math.round(
-    weeklyDecisionCardModel.status.confidencePercent,
-  )}%)`;
-  const { snapshotGuardrail, snapshotWatch, citationMetaLine } = buildWeeklyDecisionPresentation({
-    model: weeklyDecisionCardModel,
-    searchParams,
-  });
-
-  return [
-    "WEEKLY BRIEF",
-    `Posture: ${postureLabel}`,
-    `Confidence: ${confidenceLabel}`,
-    `Decision as-of: ${reportShell.recordDateLabel}`,
-    `Data refreshed: ${reportShell.fetchedAtLabel}`,
-    `Source: ${reportShell.treasurySource}`,
-    "",
-    `Action: ${weeklyDecisionCardModel.decision.immediateDecision}`,
-    `Threshold: ${snapshotGuardrail}`,
-    `Flip condition: ${snapshotWatch}`,
-    "",
-    `Trust: ${citationMetaLine}`,
-    "",
-    "Citation",
-    weeklyDecisionCardModel.artifact.citation,
-  ].join("\n");
-};
 
 export default async function HomePage({
   searchParams,
@@ -87,10 +49,22 @@ export const HomePageReportContent = async ({
   const initialArtifactMode = isArtifactMode(resolvedSearchParams?.artifactMode)
     ? resolvedSearchParams.artifactMode
     : undefined;
-  const headerWeeklyBriefCopy = buildHeaderWeeklyBriefCopy({
-    reportShell: homepage.reportShell,
-    weeklyDecisionCardModel: homepage.weeklyDecisionCardModel,
-    searchParams: resolvedSearchParams,
+  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
+  const operatorBriefPostureState = {
+    currentState: {
+      confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
+    },
+  } as Parameters<typeof buildWeeklyOperatorBriefCopyText>[0]["postureState"];
+  const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
+    assessment: reportData.assessment,
+    treasury: reportData.treasury,
+    date: reportData.weeklyRecordDate,
+    postureWithStageLabel: homepage.weeklyDecisionCardModel.status.postureWithStageLabel,
+    confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
+    actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
+    flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
+    postureState: operatorBriefPostureState,
+    canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,
   });
 
   return (
@@ -133,8 +107,8 @@ export const HomePageReportContent = async ({
           exportCta: {
             href: "#share-ready-artifact",
             label: "Copy operator brief",
-            copyText: headerWeeklyBriefCopy,
-            copyTarget: "Weekly brief",
+            copyText: headerOperatorBriefCopy,
+            copyTarget: "Operator brief",
             telemetryEvent: {
               pagePath: "/",
               cluster: "tool",

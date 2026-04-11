@@ -71,23 +71,6 @@ export const buildHomeRouteUiHref = (pathname: string, state: HomeRouteUiState) 
   return query ? `${pathname}?${query}` : pathname;
 };
 
-export const determineHistoryIntent = (current: HomeRouteUiState, next: HomeRouteUiState) => {
-  if (
-    current.tab === next.tab
-    && current.focus === next.focus
-    && current.detail === next.detail
-    && current.panel === next.panel
-  ) {
-    return "none" as const;
-  }
-
-  if (current.detail !== next.detail && current.tab === next.tab && current.focus === next.focus && current.panel === next.panel) {
-    return "replace" as const;
-  }
-
-  return "push" as const;
-};
-
 type HomeRouteStateControllerProps = {
   whatChangedSection: ReactNode;
   revisitFlipSection: ReactNode;

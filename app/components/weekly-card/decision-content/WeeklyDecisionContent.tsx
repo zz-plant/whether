@@ -26,12 +26,17 @@ export function WeeklyDecisionContent({
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(19.5rem,0.78fr)] xl:items-start">
       <main className="space-y-5 xl:col-start-1" aria-label="Weekly decision transmission order">
         {modePanel}
-        {actionStripSection}
       </main>
 
       <aside className="space-y-5 xl:sticky xl:top-28 xl:col-start-2 xl:row-start-1">
         {asideContent}
       </aside>
+
+      {actionStripSection ? (
+        <section className="xl:col-span-2">
+          {actionStripSection}
+        </section>
+      ) : null}
 
       <section className="xl:col-span-2">
         <CompactDisclosure

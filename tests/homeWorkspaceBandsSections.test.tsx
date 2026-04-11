@@ -68,19 +68,21 @@ const workspaceModel: HomePageWorkspaceModel = {
 };
 
 describe("HomeWorkspaceBands section composition", () => {
-  it("composes audit, operations, and cadence sections with stable IDs", async () => {
+  it("composes compact planning, challenge, and optional follow-on sections with stable IDs", async () => {
     const component = await HomeWorkspaceBands({ workspaceModelPromise: Promise.resolve(workspaceModel) });
     const html = renderToStaticMarkup(component);
 
     assert.match(html, /id="audit-this-call"/);
     assert.match(html, /id="approve-this-weeks-plan"/);
     assert.match(html, /id="historical-replay-workspace"/);
-    assert.match(html, /Freshness: As of Mar 25, 2026/);
-    assert.match(html, /Source coverage: Treasury live; labor snapshot/);
-    assert.match(html, /Can you rely on it\?/);
-    assert.match(html, /Why the weekly read moved/);
-    assert.match(html, /Is the read reliable enough to use\?/);
-    assert.match(html, /Planning/);
+    assert.match(html, /Approve this week&#x27;s plan/);
+    assert.match(html, /Open Planning/);
+    assert.match(html, /Planning is the default follow-on/);
+    assert.match(html, /Open these only if the call gets challenged/);
+    assert.match(html, /Why the read moved/);
+    assert.match(html, /Use this call/);
+    assert.match(html, /One more tool, only if you still need it/);
+    assert.match(html, /CEO/);
     assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));
   });

@@ -35,7 +35,7 @@ export function DecisionTransmissionRail({
       </div>
       <div className="rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-          Default share path
+          Canonical share path
         </p>
         <p className="mt-2 max-w-[46rem] text-sm font-semibold leading-6 text-slate-100">
           Share the operator brief first. Keep Planning as the approval surface and use citation only when someone asks for proof.

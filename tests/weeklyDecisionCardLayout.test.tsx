@@ -101,8 +101,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.ok(guidanceIndex > heroIndex);
     assert.ok(deltaIndex > guidanceIndex);
-    assert.ok(actionStripIndex > guidanceIndex);
-    assert.ok(shareRailIndex > actionStripIndex);
+    assert.ok(shareRailIndex > guidanceIndex);
+    assert.ok(actionStripIndex > shareRailIndex);
     assert.ok(postureIndex >= heroIndex);
     assert.ok(postureIndex < deltaIndex);
   });

@@ -12,17 +12,17 @@ import type { ArtifactMode } from "../../../lib/literacyAssist";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
 
 type ArtifactActionsProps = {
-  artifactPayloadPromise: Promise<ArtifactPayload | null>;
+  leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
   initialArtifactMode?: ArtifactMode;
 };
 
 const LeadershipArtifactActions = async ({
-  artifactPayloadPromise,
+  leadershipArtifactPayloadPromise,
   fallbackActive,
   initialArtifactMode,
 }: ArtifactActionsProps) => {
-  const artifactPayload = await artifactPayloadPromise;
+  const artifactPayload = await leadershipArtifactPayloadPromise;
 
   if (!artifactPayload) {
     return (
@@ -69,7 +69,7 @@ export const HomeWhatChangedSection = ({
       actions={(
         <Suspense fallback={<ArtifactActionsFallback />}>
           <LeadershipArtifactActions
-            artifactPayloadPromise={leadershipArtifactPayloadPromise}
+            leadershipArtifactPayloadPromise={leadershipArtifactPayloadPromise}
             fallbackActive={fallbackActive}
             initialArtifactMode={initialArtifactMode}
           />

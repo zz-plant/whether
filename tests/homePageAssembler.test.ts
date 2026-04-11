@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
+import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";
 import { buildAssessmentFixture, buildReportDataFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
@@ -65,12 +66,27 @@ describe("assembleHomePage streaming contract", () => {
     const diagnosticsLane = await homepage.diagnosticsLanePromise;
     const artifactPayload = await homepage.leadershipArtifactPayloadPromise;
     const workspaceModel = await homepage.workspaceModelPromise;
+    const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
 
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
     assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
     assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /DELTA-ONLY BRIEF/);
     assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /Revisit now/);
+    const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
+      assessment: reportDataForCopy.assessment,
+      treasury: reportDataForCopy.treasury,
+      date: reportDataForCopy.weeklyRecordDate,
+      postureWithStageLabel: homepage.weeklyDecisionCardModel.status.postureWithStageLabel,
+      confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
+      actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
+      flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
+    });
+
+    assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
+    assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
+    assert.match(headerOperatorBriefCopy, /Do now:/);
+    assert.match(headerOperatorBriefCopy, /Change course if:/);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/decide\//);
