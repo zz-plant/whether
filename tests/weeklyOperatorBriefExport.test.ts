@@ -77,6 +77,19 @@ describe("weekly operator brief export adapters", () => {
     assert.ok(parsed.blocks.some((block) => block.type === "context"));
   });
 
+  it("falls back to non-canonical flip text when canonical copy is unavailable", () => {
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "MED",
+      flipConditionLabels: ["Tightness < 65", "Risk appetite > 50"],
+    });
+
+    assert.equal(payload.flipTrigger, "Tightness < 65");
+    assert.deepEqual(payload.flipConditionLabels, ["Tightness < 65", "Risk appetite > 50"]);
+    assert.equal(payload.doNowBullets.length > 0, true);
+  });
+
   it("removes flip trigger duplication from canonical flip conditions", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,

@@ -49,11 +49,6 @@ export const HomePageReportContent = async ({
     ? resolvedSearchParams.artifactMode
     : undefined;
   const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-  const operatorBriefPostureState = {
-    currentState: {
-      confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
-    },
-  } as Parameters<typeof buildWeeklyOperatorBriefCopyText>[0]["postureState"];
   const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
     assessment: reportData.assessment,
     treasury: reportData.treasury,
@@ -62,7 +57,6 @@ export const HomePageReportContent = async ({
     confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
     actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
     flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
-    postureState: operatorBriefPostureState,
     canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,
   });
 

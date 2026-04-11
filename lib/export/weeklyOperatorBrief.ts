@@ -68,34 +68,40 @@ export const buildWeeklyOperatorBriefPayload = ({
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
 
+  const canonicalDoNowLines = canonicalDecisionCopy?.doNowLines ?? [];
+  const canonicalFlipConditions = canonicalDecisionCopy?.flipConditions ?? [];
+  const postureConfidenceLabel = postureState?.currentState?.confidenceLabel ?? confidenceLabel;
+  const postureFlipTrigger = postureState?.whatFlipsNext?.flipTrigger;
+  const postureFlipConditions = [...(postureState?.whatFlipsNext?.thresholds ?? [])];
+  const resolvedFlipTrigger =
+    canonicalDecisionCopy?.flipTrigger
+    ?? postureFlipTrigger
+    ?? normalizedFlipConditionLabels[0]
+    ?? "Flip when live indicators cross the weekly guardrail threshold.";
+
+  const resolvedFlipConditionLabels = canonicalFlipConditions.length > 0
+    ? buildFlipConditionsWithoutTriggerDuplication({
+      flipTrigger: resolvedFlipTrigger,
+      flipConditions: canonicalFlipConditions,
+    })
+    : normalizedFlipConditionLabels.length > 0
+    ? normalizedFlipConditionLabels
+    : buildFlipConditionsWithoutTriggerDuplication({
+      flipTrigger: postureFlipTrigger ?? "",
+      flipConditions: postureFlipConditions,
+    });
+
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
-    doNowBullets: canonicalDecisionCopy?.doNowLines.length ? canonicalDecisionCopy.doNowLines : doNowBullets,
+    doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
-      postureState?.currentState.confidenceLabel === "HIGH"
+      postureConfidenceLabel === "HIGH"
         ? "Cross-signal confirmation could still fade; keep irreversible approvals gated until next weekly checkpoint."
         : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.",
-    flipTrigger:
-      canonicalDecisionCopy?.flipTrigger
-      ?? postureState?.whatFlipsNext.flipTrigger
-      ?? normalizedFlipConditionLabels[0]
-      ?? "Flip when live indicators cross the weekly guardrail threshold.",
-    flipConditionLabels: canonicalDecisionCopy?.flipConditions.length
-      ? buildFlipConditionsWithoutTriggerDuplication({
-        flipTrigger:
-          canonicalDecisionCopy.flipTrigger
-          ?? postureState?.whatFlipsNext.flipTrigger
-          ?? "",
-        flipConditions: canonicalDecisionCopy.flipConditions,
-      })
-      : normalizedFlipConditionLabels.length > 0
-      ? normalizedFlipConditionLabels
-      : buildFlipConditionsWithoutTriggerDuplication({
-        flipTrigger: postureState?.whatFlipsNext.flipTrigger ?? "",
-        flipConditions: [...(postureState?.whatFlipsNext.thresholds ?? [])],
-      }),
+    flipTrigger: resolvedFlipTrigger,
+    flipConditionLabels: resolvedFlipConditionLabels,
   };
 };
 

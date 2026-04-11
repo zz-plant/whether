@@ -3,21 +3,21 @@ import { spawnSync } from "node:child_process";
 const baseUrl = (process.argv[2] ?? "https://whether.work").replace(/\/$/, "");
 
 const pageChecks = [
-  { path: "/", required: ["weekly-action-summary", "executive-snapshot", "signal-matrix"] },
+  { path: "/", required: ["weekly-posture-brief-title", "share-ready-artifact", "approve-this-weeks-plan"] },
   { path: "/signals", required: ["signal"] },
   { path: "/operations", required: ["operations"] },
   { path: "/toolkits", required: ["toolkits"] },
   { path: "/decide", required: ["decide"] },
-  { path: "/learn", required: ["learn"] },
   { path: "/operations/data", required: ["data"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];
 
 const redirectChecks = [
-  { from: "/operate", to: "/operations" },
-  { from: "/templates", to: "/toolkits" },
+  { from: "/learn", to: "/method" },
 ];
+
+const retiredRouteChecks = ["/operate", "/templates"];
 
 const weeklyRequiredKeys = [
   "summary",
@@ -41,7 +41,7 @@ const fail = (message) => {
 const curl = (url) => {
   const command = spawnSync(
     "curl",
-    ["-sS", "-L", "--max-time", "25", "-w", "\n__STATUS__:%{http_code}", url],
+    ["-sS", "-L", "--max-time", "25", "-w", "\n__STATUS__:%{http_code}\n__EFFECTIVE_URL__:%{url_effective}", url],
     { encoding: "utf8" },
   );
 
@@ -49,16 +49,23 @@ const curl = (url) => {
     fail(`curl failed for ${url}: ${command.stderr.trim() || "unknown error"}`);
   }
 
-  const marker = "\n__STATUS__:";
-  const index = command.stdout.lastIndexOf(marker);
-  if (index < 0) {
+  const statusMarker = "\n__STATUS__:";
+  const statusIndex = command.stdout.lastIndexOf(statusMarker);
+  if (statusIndex < 0) {
     fail(`could not parse response status for ${url}`);
   }
 
-  const body = command.stdout.slice(0, index);
-  const status = Number(command.stdout.slice(index + marker.length).trim());
+  const effectiveUrlMarker = "\n__EFFECTIVE_URL__:";
+  const effectiveUrlIndex = command.stdout.lastIndexOf(effectiveUrlMarker);
+  if (effectiveUrlIndex < 0 || effectiveUrlIndex < statusIndex) {
+    fail(`could not parse effective URL for ${url}`);
+  }
 
-  return { body, status };
+  const body = command.stdout.slice(0, statusIndex);
+  const status = Number(command.stdout.slice(statusIndex + statusMarker.length, effectiveUrlIndex).trim());
+  const effectiveUrl = command.stdout.slice(effectiveUrlIndex + effectiveUrlMarker.length).trim();
+
+  return { body, status, effectiveUrl };
 };
 
 const run = async () => {
@@ -87,16 +94,23 @@ const run = async () => {
       fail(`${redirectCheck.from} should resolve to 200 via redirect chain, got ${response.status}`);
     }
 
-    const canonicalResponse = curl(`${baseUrl}${redirectCheck.to}`);
-    if (canonicalResponse.status !== 200) {
-      fail(`${redirectCheck.to} returned ${canonicalResponse.status} (expected 200)`);
-    }
+    const expectedEffectiveUrl = `${baseUrl}${redirectCheck.to}`;
+    const resolvedEffectiveUrl = response.effectiveUrl.replace(/#.*$/, "");
 
-    if (response.body !== canonicalResponse.body) {
-      fail(`${redirectCheck.from} did not resolve to canonical content at ${redirectCheck.to}`);
+    if (resolvedEffectiveUrl !== expectedEffectiveUrl) {
+      fail(`${redirectCheck.from} resolved to ${response.effectiveUrl} instead of canonical ${expectedEffectiveUrl}`);
     }
 
     console.log(`✅ ${redirectCheck.from} redirect checks passed`);
+  }
+
+  for (const retiredPath of retiredRouteChecks) {
+    const response = curl(`${baseUrl}${retiredPath}`);
+    if (response.status !== 404) {
+      fail(`${retiredPath} should return 404 after route retirement, got ${response.status}`);
+    }
+
+    console.log(`✅ ${retiredPath} retired-route checks passed`);
   }
 
   const weeklyResponse = curl(`${baseUrl}/api/weekly`);
