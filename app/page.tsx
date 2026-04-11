@@ -99,9 +99,9 @@ export const HomePageReportContent = async ({
         actions: {
           exportCta: {
             href: "#share-ready-artifact",
-            label: "Copy operator brief",
+            label: "Copy weekly brief",
             copyText: headerOperatorBriefCopy,
-            copyTarget: "Operator brief",
+            copyTarget: "Weekly brief",
             telemetryEvent: {
               pagePath: "/",
               cluster: "tool",
@@ -111,7 +111,7 @@ export const HomePageReportContent = async ({
           },
           nextStep: {
             href: "/operations",
-            description: "Planning for approval and hold lines",
+            description: "Turn this into a weekly plan",
           },
         },
         payloads: {

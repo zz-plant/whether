@@ -29,7 +29,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
   if (pathMatchesLink("/", normalizedPathname)) {
     return {
       title: "Weekly operating brief for hiring, spend, and pace.",
-      description: "Start here, share from here, and open one deeper page only if a specific question remains.",
+      description: "Start with this week's brief, then open another page if you want more detail.",
     } as const;
   }
 
@@ -44,19 +44,19 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
 
   const parentLayer = activeLayer.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
   const actionDescriptionByKey: Partial<Record<NavigationLayer["key"], string>> = {
-    "weekly-brief": "Read the weekly call, then leave home only if proof, planning, translation, or trust still needs work.",
-    signals: "Validate what changed, why it changed, and which thresholds or replay history would alter this week's decision.",
-    operations: "Approve the weekly plan, guardrails, finance posture, and share-ready artifact in one pass.",
-    decide: "Resolve one remaining edge case after the weekly brief and plan are already directionally clear.",
-    method: "Run a fast trust check on freshness, confidence, source coverage, and reversal conditions before irreversible moves.",
-    toolkits: "Run one bounded instrument only after Decision Tools has already narrowed the decision.",
+    "weekly-brief": "See this week's call, what to do now, and what would change it.",
+    signals: "See what moved, why it moved, and the thresholds worth watching.",
+    operations: "Turn the brief into decisions on hiring, spend, roadmap, and what to share.",
+    decide: "Find the right answer or tool for the one question still on the table.",
+    method: "Check freshness, confidence, source coverage, and what would change the read.",
+    toolkits: "Use a template or tool for a specific decision.",
   };
 
   return {
     title: activeLayer.navLabel ?? activeLayer.label,
     description:
       activeLayer.tier === "supporting" && parentLayer
-        ? `${actionDescriptionByKey[activeLayer.key] ?? activeLayer.description} Primary parent: ${parentLayer.label}.`
+        ? `${actionDescriptionByKey[activeLayer.key] ?? activeLayer.description} See ${parentLayer.label} for the broader set of options.`
         : (actionDescriptionByKey[activeLayer.key] ?? activeLayer.description),
   } as const;
 };

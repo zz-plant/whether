@@ -33,7 +33,7 @@ function NavigationLinkCard({
   link: GlobalHeaderNavigationLink;
   onIntent: (href: string) => void;
 }) {
-  const eyebrow = link.href === "/" ? "Weekly brief" : "Open when needed";
+  const eyebrow = link.href === "/" ? "Weekly brief" : "More detail";
 
   return (
     <li className="flex-shrink-0 sm:min-w-0">

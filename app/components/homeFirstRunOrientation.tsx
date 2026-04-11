@@ -63,7 +63,7 @@ export function HomeFirstRunOrientation({
   };
 
   return (
-    <section className="space-y-4" aria-label="Decision handoff">
+    <section className="space-y-4" aria-label="Weekly overview">
       {!dismissed ? (
         <section
           data-weather-first-run-orientation="true"
@@ -74,9 +74,9 @@ export function HomeFirstRunOrientation({
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Start here</p>
-              <h2 className="text-sm font-semibold text-slate-100 sm:text-base">Fast orientation for this week</h2>
-              <p className="text-xs text-slate-300">Scan delta, lock the call, then jump to execution surfaces.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">This week at a glance</p>
+              <h2 className="text-sm font-semibold text-slate-100 sm:text-base">A quick read for this week</h2>
+              <p className="text-xs text-slate-300">See what changed, confirm the call, then open the page you need.</p>
             </div>
               <button
                 type="button"
@@ -148,13 +148,13 @@ export function HomeFirstRunOrientation({
 
       <details className="weather-panel weather-auto-chevron space-y-4 px-5 py-4" id="why-whether">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-          Optional context and decision playbooks
+          More context
         </summary>
         <div className="space-y-5 pt-4">
           <section className="space-y-4" aria-label="Why Whether versus alternatives">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
-              <h2 className="text-base font-semibold text-slate-100">Secondary context for when the weekly call needs more detail</h2>
+              <h2 className="text-base font-semibold text-slate-100">More detail when you want it</h2>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               <article className="weather-surface space-y-2 px-4 py-3">
@@ -172,10 +172,10 @@ export function HomeFirstRunOrientation({
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-slate-300">
               <Link href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
-                Open full operating playbook
+                See the full plan
               </Link>
               <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
-                Inspect full evidence context
+                See the full evidence view
               </Link>
             </div>
           </section>

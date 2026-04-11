@@ -33,13 +33,13 @@ export function DecisionTransmissionRail({
           <h2 className={tierOneHeading}>Send this brief</h2>
         </div>
         <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Default route
+          Best for most teams
         </span>
       </div>
       <div className="space-y-4 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Start here</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Best place to start</p>
         <p className="mt-2 max-w-[46rem] text-sm font-semibold leading-6 text-slate-100">
-          Start with the operator brief. Planning is where approvals happen; citation is backup, not the lead.
+          Start with the weekly brief. Open Planning when you need approvals, and open Citation when you need the source line.
         </p>
         <div className="space-y-1 text-xs leading-5 text-slate-300">
           <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {currentCall}</p>

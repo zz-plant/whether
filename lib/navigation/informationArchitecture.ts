@@ -32,8 +32,8 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/",
     label: "Weekly Brief",
     navLabel: "Brief",
-    description: "Read this week's call, bounded action, and the share-ready artifact.",
-    boundary: "Canonical weekly workspace. Leave home only if proof, planning, edge cases, or trust still need work.",
+    description: "See this week's call, what to do now, and a brief you can share.",
+    boundary: "Best place to start each week. Open another page only if you want more detail.",
     group: "core",
     tier: "primary",
   },
@@ -41,8 +41,8 @@ export const navigationLayers: NavigationLayer[] = [
     key: "signals",
     href: "/signals",
     label: "Evidence",
-    description: "Check what changed, what drove it, and which watch lines matter now.",
-    boundary: "Evidence depth only. Weekly Brief stays canonical for the live operating call.",
+    description: "See what changed, what drove it, and the thresholds worth watching.",
+    boundary: "Use this page when you want the evidence behind the brief.",
     group: "reference",
     tier: "primary",
   },
@@ -51,8 +51,8 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/operations",
     label: "Planning",
     navLabel: "Plan",
-    description: "Set this week's guardrails for hiring, spend, roadmap, and the final brief.",
-    boundary: "Execution depth only. Weekly Brief remains the canonical orchestration surface.",
+    description: "Turn this week's read into decisions on hiring, spend, roadmap, and what to share.",
+    boundary: "Use this page when you're ready to turn the brief into approvals.",
     group: "workflow",
     tier: "primary",
   },
@@ -61,8 +61,8 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/decide",
     label: "Decision Tools",
     navLabel: "Resolve",
-    description: "Resolve one remaining question with the smallest useful answer or tool.",
-    boundary: "Routing and translation depth only. Do not duplicate the live brief or weekly plan.",
+    description: "Find the right answer or tool for one remaining question.",
+    boundary: "Use this page when the brief is clear but one question still needs an answer.",
     group: "workflow",
     tier: "primary",
   },
@@ -71,8 +71,8 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/method",
     label: "Trust",
     navLabel: "Verify",
-    description: "Check freshness, confidence, source coverage, and reversal conditions.",
-    boundary: "Transparency and trust checks only. Return to Weekly Brief once validated.",
+    description: "Check freshness, confidence, source coverage, and what would change the call.",
+    boundary: "Use this page when you want to sanity-check the brief before a big decision.",
     group: "reference",
     tier: "primary",
   },
@@ -80,8 +80,8 @@ export const navigationLayers: NavigationLayer[] = [
     key: "toolkits",
     href: "/toolkits",
     label: "Toolkits",
-    description: "Supporting instruments under Decision Tools for one already-routed decision exercise.",
-    boundary: "Supporting surface under Decision Tools. No duplicate posture logic or evidence summaries.",
+    description: "Templates and tools for working through a specific decision.",
+    boundary: "Use these tools after you've narrowed the question in Decision Tools.",
     group: "workflow",
     tier: "supporting",
     parentKey: "decide",
@@ -97,11 +97,11 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 }, {} as Record<Route, number>);
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
-  if (href === "/") return "Start here";
-  if (href === "/signals") return "Check proof";
-  if (href === "/operations") return "Set guardrails";
-  if (href === "/decide") return "Resolve one question";
-  if (href === "/method") return "Check trust";
+  if (href === "/") return "Best place to start";
+  if (href === "/signals") return "See the evidence";
+  if (href === "/operations") return "Make the plan";
+  if (href === "/decide") return "Find an answer";
+  if (href === "/method") return "Check reliability";
   return null;
 };
 

@@ -34,10 +34,10 @@ export async function HomeWorkspaceBands({
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Next move</p>
             <h2 id="approve-this-weeks-plan-title" className="text-lg font-semibold text-slate-100">
-              Move this into planning
+              Turn this into a plan
             </h2>
             <p className="max-w-2xl text-sm text-slate-300">
-              Approve or hold fixed-cost decisions there. Evidence and Trust are challenge paths, not parallel homepage workflows.
+              Use Planning to approve or hold fixed-cost decisions. Open Evidence or Trust only if you want more detail.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -95,9 +95,9 @@ export async function HomeWorkspaceBands({
         aria-labelledby="audit-this-call-title"
       >
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Challenge paths</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Need more context?</p>
           <h2 id="audit-this-call-title" className="text-lg font-semibold text-slate-100">
-            Open these only if someone pushes back
+            Open these if you want the evidence behind the call
           </h2>
         </div>
 
@@ -138,9 +138,9 @@ export async function HomeWorkspaceBands({
         aria-labelledby="historical-replay-workspace-title"
       >
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-200">Still unresolved?</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-200">Still have a question?</p>
           <h2 id="historical-replay-workspace-title" className="text-lg font-semibold text-slate-100">
-            One more place to look
+            More places to look
           </h2>
         </div>
 
@@ -179,7 +179,7 @@ export async function HomeWorkspaceBands({
           >
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               <LayoutGridIcon className="h-3.5 w-3.5" />
-              <span>Utility</span>
+              <span>Tool</span>
             </div>
             <p className="mt-3 text-sm font-semibold group-hover:text-slate-50">
               {toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title}

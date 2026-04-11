@@ -22,7 +22,7 @@ type CopyTarget =
   | "Explainer brief"
   | "Call snapshot"
   | "Delta brief"
-  | "Operator brief"
+  | "Weekly brief"
   | "Board summary"
   | "Citation";
 
@@ -69,7 +69,7 @@ export const buildExplainerBriefContent = ({
   `• ${publicDecisionLabels.threshold} = the trip line that pauses or tightens the call.`,
   `• ${publicDecisionLabels.reversal} = what must improve before loosening again.`,
   "",
-  "Operator brief",
+  "Weekly brief",
   weeklyOperatorBrief,
   "",
   "Citation",
@@ -164,15 +164,15 @@ export function CopyLeadershipArtifactsButtons({
     weeklyOperatorBrief: applyOverride(weeklyOperatorBrief),
     citation,
   });
-  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Operator brief";
+  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Weekly brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
     : applyOverride(weeklyOperatorBrief);
   const activeModeLabel = artifactModeLabels[artifactMode];
   const activeModeNote =
     artifactMode === "explainer"
-      ? "Same call, with plain-English translation."
-      : "Default share path for leadership.";
+      ? "The same recommendation, written in plainer language."
+      : "Best for most leadership updates.";
 
   const meetingPackContent = [
     "BOARD NOTE",
@@ -181,7 +181,7 @@ export function CopyLeadershipArtifactsButtons({
     "Call snapshot",
     applyOverride(weeklyCallSnapshot),
     "",
-    "OPERATOR BRIEF",
+    "WEEKLY BRIEF",
     applyOverride(weeklyOperatorBrief),
     "",
     "BOARD SUMMARY",
@@ -265,7 +265,7 @@ export function CopyLeadershipArtifactsButtons({
         ? "Retry share"
         : artifactMode === "explainer"
           ? "Share explainer brief"
-          : "Share operator brief";
+          : "Share weekly brief";
 
   return (
     <div className="space-y-3">
@@ -276,12 +276,12 @@ export function CopyLeadershipArtifactsButtons({
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Routine sharing
+            Most common
           </span>
         </div>
 
         <p className="mt-2 text-[11px] leading-5 text-slate-300">
-          {activeModeNote} Shared links reopen the same artifact mode.
+          {activeModeNote} Shared links keep the same version of the brief open.
         </p>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
@@ -311,8 +311,8 @@ export function CopyLeadershipArtifactsButtons({
                 <span>{artifactModeLabels[mode]}</span>
                 <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
                   {mode === "explainer"
-                    ? "Plain-English terms for mixed-literacy rooms."
-                    : "Default brief for leadership and operators."}
+                    ? "Plain-English version for teams with different levels of macro familiarity."
+                    : "Concise version for leadership updates and weekly planning."}
                 </span>
               </button>
             );
@@ -348,11 +348,11 @@ export function CopyLeadershipArtifactsButtons({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick variants</p>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Repeat readers
+            Shorter versions
           </span>
         </div>
         <p className="mt-2 text-[11px] leading-5 text-slate-400">
-          Use the delta brief when the room only needs what changed. Use the call snapshot when chat needs the shortest possible version.
+          Use the delta brief when people only need what changed. Use the call snapshot when you need the shortest version.
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <ActionButton
@@ -387,7 +387,7 @@ export function CopyLeadershipArtifactsButtons({
               ? `Copied ${activeModeLabel.toLowerCase()} link.`
               : shareState === "error"
                 ? "Share failed. Copy fallback is available."
-                : `Share the ${activeModeLabel.toLowerCase()} by default. Use quick variants only when the room needs a shorter artifact.`
+                : `Share the ${activeModeLabel.toLowerCase()} by default. Use the shorter versions only when people need a faster read.`
           }
         </p>
       </article>
@@ -398,7 +398,7 @@ export function CopyLeadershipArtifactsButtons({
         </summary>
         <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
           <p className="text-[11px] leading-5 text-slate-400">
-            Open these only after the routine weekly brief is aligned. This lane is for repackaging the same call for board, finance, or documentation-heavy rooms.
+            Use these when you need the same call packaged for a board, finance, or documentation-heavy audience.
           </p>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
             <ActionButton
@@ -455,7 +455,7 @@ export function CopyLeadershipArtifactsButtons({
         </summary>
         <div className="mt-3 space-y-3 border-t border-amber-400/15 pt-3">
           <p className="max-w-2xl text-xs leading-5 text-amber-50">
-            Keep this separate from routine sharing. Use it only when leadership needs the copied artifact to carry an explicit local override.
+            Use this only when the shared brief needs a clearly stated company-specific exception.
           </p>
 
           {hasOverride ? (
@@ -466,7 +466,7 @@ export function CopyLeadershipArtifactsButtons({
           ) : null}
 
           <p className="text-xs leading-5 text-amber-100/80">
-            Appropriate when a board- or exec-level call needs an explicit local exception, not for routine sharing or formatting tweaks.
+            Best for board or executive updates that need an explicit local exception, not for routine edits or formatting tweaks.
           </p>
           <div className="grid gap-2 md:grid-cols-2">
             <label className="space-y-1">

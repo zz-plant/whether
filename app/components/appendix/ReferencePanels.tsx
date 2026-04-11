@@ -70,8 +70,8 @@ export const CxoFunctionPanel = ({
       {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
     </div>
     <p className="mt-3 max-w-3xl type-data text-slate-300">
-      Each module below translates capital posture signals into CXO-ready artifacts. Use them to align
-      finance, operations, and product leadership on a shared macro posture.
+      Each module below turns the current posture into practical guidance for finance, operations,
+      and product leaders.
     </p>
     <div className="mt-6 grid gap-4 md:grid-cols-2">
       {cxoFunctionOutputs.map((item) => (

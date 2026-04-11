@@ -30,7 +30,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
     ? resolveGlobalHeaderTagline(pathname)
     : {
         title: "Operating posture navigation",
-        description: "Open one deeper page only after the weekly brief leaves one specific question unresolved.",
+        description: "See the weekly brief first, then open another page if you want more detail.",
       };
 
   if (!isReportShellRoute(pathname)) {
@@ -64,7 +64,7 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
               href="/decide#unresolved-question-router"
               className="weather-pill inline-flex min-h-[42px] flex-shrink-0 items-center rounded-xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
             >
-              Resolve a question
+              Find an answer
             </Link>
           </div>
         </div>

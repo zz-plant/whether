@@ -58,7 +58,7 @@ export function ReportShellHeader({
                 Decide this week&apos;s pace in one screen.
               </p>
               <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
-                The call, immediate move, threshold, and flip condition are captured in one view, with deeper pages available only when needed.
+                This week&apos;s call, next move, threshold, and flip condition are all here. Open another page only if you want more context.
               </p>
             </div>
             {exportCta ? (

@@ -189,14 +189,14 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Approve this week's plan, guardrails, finance posture, and share-ready brief."
+      pageSummary="Approve this week's plan, guardrails, finance posture, and the brief you'll share."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
         label: "Start with weekly plan",
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
-      exportCta={{ href: "#ops-export-briefs", label: "Go to share-ready brief" }}
+      exportCta={{ href: "#ops-export-briefs", label: "Go to sharing options" }}
       decisionBanner={{
         label: "Start here",
         decision: "Approve or hold the week's hiring, spend, and roadmap moves.",
@@ -345,8 +345,8 @@ export default async function OperationsPage({
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Pick the operator brief, explainer brief, or a board-ready artifact.",
-            summary: "Operator brief first, with explainer mode for audiences that need translation.",
+            description: "Choose a weekly brief, an explainer brief, or a board-ready version.",
+            summary: "Start with the weekly brief, then switch to the explainer when people want more context.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",
@@ -357,7 +357,7 @@ export default async function OperationsPage({
                   id="ops-export-briefs-panel"
                   label="Share"
                   title="Share-ready brief"
-                  description="Operator brief first. Explainer brief when the room needs translation."
+                  description="Start with the weekly brief. Use the explainer when people want more context."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel
@@ -440,20 +440,20 @@ export default async function OperationsPage({
             Open Decision Tools
           </Link>
           <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Return to share brief
+            Back to sharing options
           </Link>
         </div>
       </section>
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Need deeper board or governance artifacts?
+          Need more board or governance detail?
         </summary>
         <div className="mt-4 space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Governance library</p>
-            <h2 className="text-lg font-semibold text-slate-100">Board-ready artifacts and deeper planning resources</h2>
-            <p className="text-sm text-slate-300">Stay in Planning for the live weekly approval flow. Open these deeper artifacts only when leadership needs more governance depth than the in-page brief already provides.</p>
+            <h2 className="text-lg font-semibold text-slate-100">Board and governance resources</h2>
+            <p className="text-sm text-slate-300">The planning page should cover the weekly approval flow. Open these resources when you need a fuller board or governance version of the same work.</p>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {resourcePillarPages.map((pillar) => (

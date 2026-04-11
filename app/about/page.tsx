@@ -15,7 +15,7 @@ export default function AboutPage() {
       <HubHero
         eyebrow="Why Whether exists"
         title="A weekly macro brief built for operating decisions, not commentary."
-        description="Whether is a small independent operator tool. It compresses public macro signals into a compact weekly posture so product and engineering leaders can decide what to tighten, what to defer, and what they can safely ship forward."
+        description="Whether is a small independent weekly brief. It turns public macro signals into a compact weekly read so product and engineering leaders can decide what to tighten, what to defer, and what they can safely keep moving."
         stats={[
           { label: "Core loop", value: "Signals → posture → decision → artifact" },
           { label: "Use case", value: "Weekly leadership cadence", detail: "Built to scan, decide, and share in under a minute." },
@@ -48,8 +48,8 @@ export default function AboutPage() {
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
             <p className="weather-hub-section-eyebrow">What it is</p>
-            <p><span className="font-semibold text-slate-100">Independent operator brief:</span> Whether is a lightweight decision product, not a large research institution with a broad public footprint.</p>
-            <p><span className="font-semibold text-slate-100">Best use:</span> weekly pacing, bounded operating defaults, and share-ready meeting artifacts.</p>
+            <p><span className="font-semibold text-slate-100">Independent weekly brief:</span> Whether is a lightweight decision product, not a large research institution with a broad public footprint.</p>
+            <p><span className="font-semibold text-slate-100">Best use:</span> weekly pacing, bounded decisions, and meeting-ready briefs you can share.</p>
             <p><span className="font-semibold text-slate-100">How to judge it:</span> by freshness, provenance, confidence, and whether the brief stays decision-complete when data degrades.</p>
           </div>
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">

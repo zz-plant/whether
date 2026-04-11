@@ -246,7 +246,7 @@ export function CommandCenterNavBlock({
 
           {actionLinks.length > 0 ? (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-slate-400">
-              <span>Need later:</span>
+              <span>Also available:</span>
               {actionLinks.map((link) => (
                 <InternalAwareLink
                   key={`${link.href}-${link.label}`}
@@ -302,7 +302,7 @@ export function CommandCenterNavBlock({
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                   {missionSequenceTitle}
                 </p>
-                <span className="text-[11px] text-slate-400">Use in order</span>
+                <span className="text-[11px] text-slate-400">Best in this order</span>
               </div>
               <ol className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
                 {missionSequenceItems.map((item) => (

@@ -25,7 +25,7 @@ export const literacyAssistOptions: Array<{
   {
     id: "share",
     label: "Which Brief Should I Send?",
-    description: "Point me to the right brief, snapshot, or leadership artifact for this room.",
+    description: "Point me to the right brief, snapshot, or update to share.",
   },
 ] as const;
 
@@ -39,7 +39,7 @@ export const literacyAssistStorageKeys = {
 } as const satisfies Record<"focus" | LiteracyAssistMode | "artifactMode", string>;
 
 export const artifactModeLabels: Record<ArtifactMode, string> = {
-  operator: "Operator brief",
+  operator: "Weekly brief",
   explainer: "Explainer brief",
 };
 

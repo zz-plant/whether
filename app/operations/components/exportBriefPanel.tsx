@@ -259,7 +259,7 @@ export const ExportBriefPanel = ({
           titleId="export-briefs-title"
           description={
             <>
-              Operator brief and explainer brief options for different audiences.
+              Weekly brief and explainer brief options for different audiences.
             </>
           }
           aside={
@@ -280,10 +280,10 @@ export const ExportBriefPanel = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Share choices</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy operator brief</span>}
-              state={clipboardState("Operator brief")}
-              disabled={isCopyDisabled("Operator brief")}
-              onClick={() => void handleCopy(weeklyOperatorPlainText, "Operator brief")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy weekly brief</span>}
+              state={clipboardState("Weekly brief")}
+              disabled={isCopyDisabled("Weekly brief")}
+              onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -332,10 +332,10 @@ export const ExportBriefPanel = ({
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <ClipboardActionRow
-                label="Copy operator brief"
-                state={clipboardState("Operator brief")}
-                disabled={isCopyDisabled("Operator brief")}
-                onClick={() => void handleCopy(weeklyOperatorPlainText, "Operator brief")}
+                label="Copy weekly brief"
+                state={clipboardState("Weekly brief")}
+                disabled={isCopyDisabled("Weekly brief")}
+                onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly brief")}
               />
               <ClipboardActionRow
                 label="Copy Slack format"
@@ -371,7 +371,7 @@ export const ExportBriefPanel = ({
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                Download operator brief
+                Download weekly brief
               </Button>
               <Button
                 type="button"

@@ -5,9 +5,9 @@ export default function NotFound() {
   return (
     <SecondaryPageShell width="compact">
       <SecondaryPageHeader
-        eyebrow="Route unavailable"
-        title="That link moved. This week's brief is still here."
-        description="Some older routes were retired during the IA update. The current brief, evidence, and planning page are still available."
+        eyebrow="Page not found"
+        title="That page moved."
+        description="That older link no longer works, but the weekly brief, evidence, and planning pages are still here."
         actions={(
           <>
             <ButtonLink href="/" variant="primary">Weekly Brief</ButtonLink>
