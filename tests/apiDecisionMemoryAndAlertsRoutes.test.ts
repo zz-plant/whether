@@ -3,11 +3,12 @@ import { beforeEach, describe, it } from "bun:test";
 import { GET as getDecisionMemoryRoute, POST as postDecisionMemoryRoute } from "../app/api/decision-memory/route";
 import { GET as getAlertPreferencesRoute, POST as postAlertPreferencesRoute } from "../app/api/alert-preferences/route";
 import { GET as getAlertDeliveriesRoute, POST as postAlertDeliveriesRoute } from "../app/api/alert-deliveries/route";
+import { GET as getWeeklyDigestRoute } from "../app/api/weekly-digest/route";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { resetDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
 import { resetAlertPreferenceRepository } from "../lib/storage/alertPreferenceRepository";
 import { getRegimeAlertRepository, resetRegimeAlertRepository } from "../lib/storage/regimeAlertRepository";
-import type { RegimeAlertEvent } from "../lib/signalOps";
+import type { AlertDeliveryEvent, RegimeAlertEvent } from "../lib/signalOps";
 
 describe("decision memory and alert routes", () => {
   beforeEach(() => {
@@ -189,5 +190,81 @@ describe("decision memory and alert routes", () => {
     assert.equal(response.status, 400);
     const body = (await response.json()) as { error?: string };
     assert.equal(body.error, "invalid-payload");
+  });
+
+  it("keeps weekly digest counts top-level and marks fallback-backed payloads as degraded", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => {
+      throw new Error("Test fetch disabled");
+    };
+
+    try {
+      const repository = getRegimeAlertRepository();
+      const alert: RegimeAlertEvent = {
+        eventId: "alert-event",
+        sourceVersion: "v1",
+        canonicalTimestampSource: "request-received-at",
+        id: "alert-1",
+        createdAt: "2026-02-16T00:00:00.000Z",
+        payload: {
+          previousRecordDate: "2026-02-09",
+          currentRecordDate: "2026-02-16",
+          previousAssessment: {
+            regime: "DEFENSIVE",
+            scores: { tightness: 68, riskAppetite: 49 },
+          } as RegimeAlertEvent["payload"]["previousAssessment"],
+          currentAssessment: {
+            regime: "SCARCITY",
+            scores: { tightness: 72, riskAppetite: 45 },
+          } as RegimeAlertEvent["payload"]["currentAssessment"],
+          reasons: [{ code: "risk", message: "risk moved" }],
+          decisionDeltas: [],
+          triggerStates: {},
+          sourceUrls: [],
+          timeMachineHref: "/",
+        },
+      };
+      const delivery: AlertDeliveryEvent = {
+        eventId: "delivery-event",
+        sourceVersion: "v1",
+        canonicalTimestampSource: "request-received-at",
+        id: "delivery-1",
+        clientId: "client-a",
+        alertId: "alert-1",
+        channel: "slack",
+        deliveredAt: "2026-02-16T00:05:00.000Z",
+        status: "sent",
+        summary: "SCARCITY (2026-02-16) · signals-updated",
+      };
+
+      await repository.appendAlert(alert);
+      await repository.appendDelivery(delivery);
+
+      const response = await getWeeklyDigestRoute();
+      assert.equal(response.status, 200);
+
+      const body = (await response.json()) as {
+        version?: string;
+        digest?: { summary?: string; bullets?: string[] };
+        alertCount?: number;
+        deliveryCount?: number;
+        degraded?: boolean;
+        backend?: string;
+        deprecated?: { alertCount?: number; deliveryCount?: number; note?: string };
+      };
+
+      assert.equal(body.version, "v1");
+      assert.equal(body.alertCount, 1);
+      assert.equal(body.deliveryCount, 1);
+      assert.equal(body.deprecated?.alertCount, 1);
+      assert.equal(body.deprecated?.deliveryCount, 1);
+      assert.equal(body.degraded, true);
+      assert.equal(body.backend, "local-fallback");
+      assert.match(body.digest?.summary ?? "", /SCARCITY regime as of 2026-02-16/);
+      assert.ok(Array.isArray(body.digest?.bullets));
+      assert.match(body.deprecated?.note ?? "", /Top-level alertCount and deliveryCount remain canonical/i);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });

@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-31T19:25:27.789Z",
+  "fetched_at": "2026-04-12T18:41:17.397Z",
   "isLive": false,
   "series": [
     {
@@ -67,50 +67,14 @@
     {
       "id": "BBB_CREDIT_SPREAD",
       "label": "BBB credit spread (OAS)",
-      "value": 1.78,
+      "value": 1.73,
       "unit": "%",
       "explanation": "Option-adjusted spread for BBB corporates, proxying credit risk appetite.",
       "sourceLabel": "FRED",
       "sourceUrl": "https://fred.stlouisfed.org/series/BAA10Y",
       "formulaUrl": "/formulas#credit-spread",
-      "record_date": "2026-03-27",
+      "record_date": "2026-04-09",
       "history": [
-        {
-          "date": "2025-12-25",
-          "value": 0
-        },
-        {
-          "date": "2025-12-26",
-          "value": 1.75
-        },
-        {
-          "date": "2025-12-29",
-          "value": 1.76
-        },
-        {
-          "date": "2025-12-30",
-          "value": 1.75
-        },
-        {
-          "date": "2025-12-31",
-          "value": 1.72
-        },
-        {
-          "date": "2026-01-01",
-          "value": 0
-        },
-        {
-          "date": "2026-01-02",
-          "value": 1.74
-        },
-        {
-          "date": "2026-01-05",
-          "value": 1.75
-        },
-        {
-          "date": "2026-01-06",
-          "value": 1.74
-        },
         {
           "date": "2026-01-07",
           "value": 1.73
@@ -342,50 +306,58 @@
         {
           "date": "2026-03-27",
           "value": 1.78
+        },
+        {
+          "date": "2026-03-30",
+          "value": 1.79
+        },
+        {
+          "date": "2026-03-31",
+          "value": 1.79
+        },
+        {
+          "date": "2026-04-01",
+          "value": 1.75
+        },
+        {
+          "date": "2026-04-02",
+          "value": 1.74
+        },
+        {
+          "date": "2026-04-03",
+          "value": 0
+        },
+        {
+          "date": "2026-04-06",
+          "value": 1.7
+        },
+        {
+          "date": "2026-04-07",
+          "value": 1.75
+        },
+        {
+          "date": "2026-04-08",
+          "value": 1.73
+        },
+        {
+          "date": "2026-04-09",
+          "value": 1.73
         }
       ],
-      "fetched_at": "2026-03-31T19:25:27.789Z",
+      "fetched_at": "2026-04-12T18:41:17.397Z",
       "isLive": false
     },
     {
       "id": "HY_CREDIT_SPREAD",
       "label": "High yield credit spread (OAS)",
-      "value": 3.46,
+      "value": 2.9,
       "unit": "%",
       "explanation": "ICE BofA US High Yield OAS, used as a faster speculative-risk stress signal.",
       "sourceLabel": "FRED",
       "sourceUrl": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
       "formulaUrl": "/formulas#high-yield-spread",
-      "record_date": "2026-03-30",
+      "record_date": "2026-04-09",
       "history": [
-        {
-          "date": "2025-12-29",
-          "value": 2.87
-        },
-        {
-          "date": "2025-12-30",
-          "value": 2.84
-        },
-        {
-          "date": "2025-12-31",
-          "value": 2.81
-        },
-        {
-          "date": "2026-01-01",
-          "value": 0
-        },
-        {
-          "date": "2026-01-02",
-          "value": 2.83
-        },
-        {
-          "date": "2026-01-05",
-          "value": 2.81
-        },
-        {
-          "date": "2026-01-06",
-          "value": 2.79
-        },
         {
           "date": "2026-01-07",
           "value": 2.79
@@ -629,121 +601,125 @@
         {
           "date": "2026-03-30",
           "value": 3.46
+        },
+        {
+          "date": "2026-03-31",
+          "value": 3.28
+        },
+        {
+          "date": "2026-04-01",
+          "value": 3.16
+        },
+        {
+          "date": "2026-04-02",
+          "value": 3.17
+        },
+        {
+          "date": "2026-04-03",
+          "value": 3.13
+        },
+        {
+          "date": "2026-04-06",
+          "value": 3.05
+        },
+        {
+          "date": "2026-04-07",
+          "value": 3.12
+        },
+        {
+          "date": "2026-04-08",
+          "value": 2.94
+        },
+        {
+          "date": "2026-04-09",
+          "value": 2.9
         }
       ],
-      "fetched_at": "2026-03-31T19:25:27.789Z",
+      "fetched_at": "2026-04-12T18:41:17.397Z",
       "isLive": false
     },
     {
       "id": "CHICAGO_FCI",
       "label": "Chicago Fed National Financial Conditions Index",
-      "value": -0.47504,
+      "value": -0.433,
       "unit": "index",
       "explanation": "Composite financial conditions index covering rates, credit spreads, leverage, and risk appetite.",
       "sourceLabel": "FRED",
       "sourceUrl": "https://fred.stlouisfed.org/series/NFCI",
       "formulaUrl": "/formulas#financial-conditions",
-      "record_date": "2026-03-20",
+      "record_date": "2026-04-03",
       "history": [
         {
-          "date": "2025-12-19",
-          "value": -0.52564
-        },
-        {
-          "date": "2025-12-26",
-          "value": -0.53631
-        },
-        {
           "date": "2026-01-02",
-          "value": -0.54632
+          "value": -0.544
         },
         {
           "date": "2026-01-09",
-          "value": -0.55542
+          "value": -0.554
         },
         {
           "date": "2026-01-16",
-          "value": -0.56035
+          "value": -0.559
         },
         {
           "date": "2026-01-23",
-          "value": -0.56115
+          "value": -0.56
         },
         {
           "date": "2026-01-30",
-          "value": -0.558
+          "value": -0.556
         },
         {
           "date": "2026-02-06",
-          "value": -0.55183
+          "value": -0.549
         },
         {
           "date": "2026-02-13",
-          "value": -0.54248
+          "value": -0.537
         },
         {
           "date": "2026-02-20",
-          "value": -0.53066
+          "value": -0.522
         },
         {
           "date": "2026-02-27",
-          "value": -0.5174
+          "value": -0.505
         },
         {
           "date": "2026-03-06",
-          "value": -0.503
+          "value": -0.487
         },
         {
           "date": "2026-03-13",
-          "value": -0.48796
+          "value": -0.469
         },
         {
           "date": "2026-03-20",
-          "value": -0.47504
+          "value": -0.454
+        },
+        {
+          "date": "2026-03-27",
+          "value": -0.441
+        },
+        {
+          "date": "2026-04-03",
+          "value": -0.433
         }
       ],
-      "fetched_at": "2026-03-31T19:25:27.789Z",
+      "fetched_at": "2026-04-12T18:41:17.397Z",
       "isLive": false
     },
     {
       "id": "VIX_INDEX",
       "label": "CBOE volatility index (VIX)",
-      "value": 30.61,
+      "value": 19.49,
       "unit": "index",
       "explanation": "Implied equity volatility used as a short-cycle shock and regime-boundary warning signal.",
       "sourceLabel": "FRED",
       "sourceUrl": "https://fred.stlouisfed.org/series/VIXCLS",
       "formulaUrl": "/formulas#vix",
-      "record_date": "2026-03-30",
+      "record_date": "2026-04-09",
       "history": [
-        {
-          "date": "2025-12-29",
-          "value": 14.2
-        },
-        {
-          "date": "2025-12-30",
-          "value": 14.33
-        },
-        {
-          "date": "2025-12-31",
-          "value": 14.95
-        },
-        {
-          "date": "2026-01-01",
-          "value": 0
-        },
-        {
-          "date": "2026-01-02",
-          "value": 14.51
-        },
-        {
-          "date": "2026-01-05",
-          "value": 14.9
-        },
-        {
-          "date": "2026-01-06",
-          "value": 14.75
-        },
         {
           "date": "2026-01-07",
           "value": 15.38
@@ -979,9 +955,41 @@
         {
           "date": "2026-03-30",
           "value": 30.61
+        },
+        {
+          "date": "2026-03-31",
+          "value": 25.25
+        },
+        {
+          "date": "2026-04-01",
+          "value": 24.54
+        },
+        {
+          "date": "2026-04-02",
+          "value": 23.87
+        },
+        {
+          "date": "2026-04-03",
+          "value": 0
+        },
+        {
+          "date": "2026-04-06",
+          "value": 24.17
+        },
+        {
+          "date": "2026-04-07",
+          "value": 25.78
+        },
+        {
+          "date": "2026-04-08",
+          "value": 21.04
+        },
+        {
+          "date": "2026-04-09",
+          "value": 19.49
         }
       ],
-      "fetched_at": "2026-03-31T19:25:27.789Z",
+      "fetched_at": "2026-04-12T18:41:17.397Z",
       "isLive": false
     },
     {

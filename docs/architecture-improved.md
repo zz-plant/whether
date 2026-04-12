@@ -551,7 +551,7 @@ else: EXPANSION
 ### Common Issues
 
 1. **Regime not updating**: Check `data/macro_snapshot.json` freshness
-2. **Historical data missing**: Run `bun run summary-archive:migrate-structured`
+2. **Historical data missing or stale**: Run `bun run time-machine:update-summaries --start-year <year> --end-year <year>` to backfill archive/cache history, then `bun run data:refresh-fallbacks` to refresh latest fallback snapshots.
 3. **Build failures**: Ensure vinext is properly installed via `bun install`
 
 ---

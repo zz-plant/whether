@@ -41,7 +41,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
-| `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
+| `/api/weekly-digest` | GET | Build digest summary from stored alert events, including top-level counts plus `degraded`/`backend` markers. |
 | `/api/decision-memory` | GET, POST | List/create Decision Memory entries (`{ entries, count }`), with CSV export via `?format=csv`. |
 | `/api/alert-preferences` | GET, POST | Read/upsert delivery preferences by `clientId` (`{ preferences }`). |
 | `/api/alert-deliveries` | GET, POST | List delivery history and create delivery attempts (`{ deliveries }`). |
@@ -92,6 +92,13 @@ The nested `agentHandoff.payload` now exposes:
 
 ```bash
 curl -s "http://localhost:3000/api/integrations/weekly-mandate?target=slack" | jq '{target, recordDate, payload}'
+```
+
+### Weekly digest payload
+
+```bash
+curl -s "http://localhost:3000/api/weekly-digest" \
+  | jq '{version, generatedAt, alertCount, deliveryCount, degraded, backend, digest}'
 ```
 
 ### CLI fallback core read path (`/api/cli/status`)

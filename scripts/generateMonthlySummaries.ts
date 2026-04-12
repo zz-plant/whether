@@ -7,12 +7,15 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { execFileSync } from "node:child_process";
+import { readFile, writeFile } from "node:fs/promises";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
+import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
 
 const DEFAULT_START_YEAR = 2012;
 const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
+const TIME_MACHINE_CACHE_PATH = "data/time_machine_cache.json";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -215,8 +218,56 @@ type MonthlySummaryArchiveEntry = {
   summary: MonthlySummary;
 };
 
+type TimeMachineCacheEntry = TreasuryData & {
+  year: number;
+  month: number;
+};
+
+const writeJson = async (filePath: string, value: unknown) => {
+  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+};
+
+const readTimeMachineCacheEntries = async (): Promise<TimeMachineCacheEntry[]> => {
+  try {
+    const raw = await readFile(TIME_MACHINE_CACHE_PATH, "utf8");
+    const parsed = JSON.parse(raw) as TimeMachineCacheEntry[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    const resolvedError = error as NodeJS.ErrnoException;
+    if (resolvedError.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+};
+
+const writeTimeMachineCache = async ({
+  entries,
+  mode,
+}: {
+  entries: TimeMachineCacheEntry[];
+  mode: "replace" | "merge";
+}) => {
+  const nextEntries = mode === "merge"
+    ? (() => {
+        const merged = new Map<string, TimeMachineCacheEntry>();
+        return readTimeMachineCacheEntries().then((existing) => {
+          existing.forEach((entry) => merged.set(`${entry.year}-${entry.month}`, entry));
+          entries.forEach((entry) => merged.set(`${entry.year}-${entry.month}`, entry));
+          return Array.from(merged.values());
+        });
+      })()
+    : Promise.resolve(entries);
+
+  const sorted = (await nextEntries).sort(
+    (left, right) => new Date(left.record_date).getTime() - new Date(right.record_date).getTime(),
+  );
+  await writeJson(TIME_MACHINE_CACHE_PATH, sorted);
+};
+
 const generateMonthlySummaries = async () => {
   const output: MonthlySummaryArchiveEntry[] = [];
+  const timeMachineEntries: TimeMachineCacheEntry[] = [];
   const now = new Date();
   const fetchedAt = now.toISOString();
   const datasets = {
@@ -280,6 +331,11 @@ const generateMonthlySummaries = async () => {
       }
 
       const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
+      timeMachineEntries.push({
+        year,
+        month,
+        ...treasury,
+      });
       const assessment = evaluateRegime(treasury);
       const recordDateLabel = formatDateValue(treasury.record_date);
       const baseRateSourceUrl =
@@ -331,6 +387,8 @@ const generateMonthlySummaries = async () => {
     getKey: (entry) => `${entry.year}-${entry.month}`,
   });
   await writeSummaryArchive({ monthlyEntries: output, mode });
+  await writeTimeMachineCache({ entries: timeMachineEntries, mode });
+  await refreshDerivedSummaryHistory();
 };
 
 generateMonthlySummaries().catch((error) => {

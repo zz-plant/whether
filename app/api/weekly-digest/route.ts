@@ -8,6 +8,7 @@ export const runtime = "edge";
 
 export async function GET() {
   const repository = getRegimeAlertRepository();
+  const backend = repository.backendStatus();
   const alertsResult = await repository.listAlerts({ limit: 64 });
   const deliveriesResult = await repository.listDeliveries({ limit: 128 });
 
@@ -19,16 +20,23 @@ export async function GET() {
     assessment: reportData.assessment,
     reportDynamics: reportData.reportDynamics,
   });
+  const degraded = !reportResult.ok || backend === "local-fallback";
+  const alertCount = alertsResult.alerts.length;
+  const deliveryCount = deliveriesResult.deliveries.length;
 
   return NextResponse.json({
+    version: "v1",
     generatedAt: new Date().toISOString(),
     digest,
     postureState,
+    alertCount,
+    deliveryCount,
+    degraded,
+    backend,
     deprecated: {
-      alertCount: alertsResult.alerts.length,
-      deliveryCount: deliveriesResult.deliveries.length,
-      note: "Counts remain for backward compatibility; posture semantics now come from postureState contract.",
+      alertCount,
+      deliveryCount,
+      note: "Top-level alertCount and deliveryCount remain canonical; deprecated nested aliases remain temporarily for compatibility while posture semantics come from postureState contract.",
     },
-    backend: repository.backendStatus(),
   });
 }

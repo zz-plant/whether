@@ -2354,13 +2354,13 @@
   {
     "year": 2026,
     "month": 1,
-    "source": "https://fred.stlouisfed.org/series/DGS10",
+    "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-01-30",
-    "fetched_at": "2026-03-01T23:24:30.177Z",
+    "fetched_at": "2026-04-12T18:41:06.737Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
-      "threeMonth": null,
+      "threeMonth": 3.67,
       "twoYear": 3.52,
       "tenYear": 4.26
     }
@@ -2368,15 +2368,29 @@
   {
     "year": 2026,
     "month": 2,
-    "source": "https://fred.stlouisfed.org/series/DGS10",
+    "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-02-27",
-    "fetched_at": "2026-03-01T23:24:30.177Z",
+    "fetched_at": "2026-04-12T18:41:06.737Z",
     "isLive": false,
     "yields": {
-      "oneMonth": 3.72,
-      "threeMonth": null,
-      "twoYear": 3.52,
-      "tenYear": 4.26
+      "oneMonth": 3.74,
+      "threeMonth": 3.67,
+      "twoYear": 3.38,
+      "tenYear": 3.97
+    }
+  },
+  {
+    "year": 2026,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org/series/DGS1MO",
+    "record_date": "2026-03-31",
+    "fetched_at": "2026-04-12T18:41:06.737Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.74,
+      "threeMonth": 3.7,
+      "twoYear": 3.79,
+      "tenYear": 4.3
     }
   }
 ]

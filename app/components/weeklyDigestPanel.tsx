@@ -6,9 +6,16 @@ import { buildSignsToWatch } from "../../lib/report/reportNarrative";
 import { formatTimestampUTC } from "../../lib/formatters";
 
 type WeeklyDigestPayload = {
+  version?: string;
   generatedAt: string;
-  alertCount: number;
-  deliveryCount: number;
+  alertCount?: number;
+  deliveryCount?: number;
+  degraded?: boolean;
+  deprecated?: {
+    alertCount?: number;
+    deliveryCount?: number;
+    note?: string;
+  };
   digest: {
     summary: string;
     bullets: string[];
@@ -18,6 +25,8 @@ type WeeklyDigestPayload = {
 export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
   const [payload, setPayload] = useState<WeeklyDigestPayload | null>(null);
   const signsToWatch = buildSignsToWatch(assessment);
+  const alertCount = payload?.alertCount ?? payload?.deprecated?.alertCount ?? 0;
+  const deliveryCount = payload?.deliveryCount ?? payload?.deprecated?.deliveryCount ?? 0;
 
   useEffect(() => {
     let active = true;
@@ -63,7 +72,7 @@ export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment
           </ul>
           {payload ? (
             <p className="mt-3 text-xs text-slate-500">
-              {payload.alertCount} alerts tracked · {payload.deliveryCount} deliveries · generated {formatTimestampUTC(payload.generatedAt)}
+              {alertCount} alerts tracked · {deliveryCount} deliveries · generated {formatTimestampUTC(payload.generatedAt)}
             </p>
           ) : null}
         </div>

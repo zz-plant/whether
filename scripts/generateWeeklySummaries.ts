@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
+import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
 
 const START_YEAR = 2018;
 const END_YEAR = new Date().getUTCFullYear();
@@ -415,6 +416,7 @@ const generateWeeklySummaries = async () => {
     getKey: (entry) => `${entry.year}-${entry.week}`,
   });
   await writeSummaryArchive({ weeklyEntries: output, mode });
+  await refreshDerivedSummaryHistory();
 };
 
 generateWeeklySummaries().catch((error) => {

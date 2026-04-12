@@ -672,11 +672,15 @@
     "regime": "EXPANSION"
   },
   {
+    "record_date": "2026-02-27",
+    "regime": "EXPANSION"
+  },
+  {
     "record_date": "2026-02-28",
     "regime": "VOLATILE"
   },
   {
-    "record_date": "2026-02-27",
+    "record_date": "2026-03-31",
     "regime": "EXPANSION"
   }
 ]

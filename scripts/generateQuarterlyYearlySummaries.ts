@@ -12,7 +12,6 @@ import { execFileSync } from "node:child_process";
 import { resolveYearRange } from "./summaryRange";
 
 const START_YEAR = 2010;
-const END_YEAR = 2025;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -256,12 +255,6 @@ const generateQuarterlyAndYearlySummaries = async () => {
   const yearlyOutput: YearlySummaryArchiveEntry[] = [];
   const now = new Date();
   const fetchedAt = now.toISOString();
-  const { startYear, endYear, isPartial } = resolveYearRange({
-    defaultStartYear: START_YEAR,
-    defaultEndYear: END_YEAR,
-    minYear: START_YEAR,
-    maxYear: END_YEAR,
-  });
   const datasets = {
     oneMonth: await fetchSeries(seriesCatalog.oneMonth),
     threeMonth: await fetchSeries(seriesCatalog.threeMonth),
@@ -271,12 +264,37 @@ const generateQuarterlyAndYearlySummaries = async () => {
   const basePoints = datasets.tenYear.points;
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
+  const latestRequired = [
+    getLatestValidDate(datasets.twoYear.points),
+    getLatestValidDate(datasets.tenYear.points),
+  ]
+    .filter((point): point is SeriesPoint => Boolean(point))
+    .map((point) => point.time)
+    .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
+  const latestFallback = [
+    getLatestValidDate(datasets.oneMonth.points),
+    getLatestValidDate(datasets.threeMonth.points),
+  ]
+    .filter((point): point is SeriesPoint => Boolean(point))
+    .map((point) => point.time)
+    .reduce((max, value) => Math.max(max, value), 0);
+  const effectiveEndTime = Math.min(latestRequired, latestFallback);
+  const effectiveEndYear = new Date(effectiveEndTime).getUTCFullYear();
+  const { startYear, endYear, isPartial } = resolveYearRange({
+    defaultStartYear: START_YEAR,
+    defaultEndYear: effectiveEndYear,
+    minYear: START_YEAR,
+    maxYear: effectiveEndYear,
+  });
 
   for (let year = startYear; year <= endYear; year += 1) {
     for (let quarter = 1; quarter <= 4; quarter += 1) {
       const month = quarter * 3;
       const asOf = resolveHistoricalDate(year, month);
       const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
+      if (asOfTime > effectiveEndTime) {
+        break;
+      }
       assertCoverageForAsOf(asOf, asOfTime, datasets);
       const recordDate = findLatestCommonDate(
         asOfTime,
@@ -325,6 +343,9 @@ const generateQuarterlyAndYearlySummaries = async () => {
 
     const yearAsOf = resolveHistoricalDate(year, 12);
     const yearAsOfTime = Date.parse(`${yearAsOf}T00:00:00Z`);
+    if (yearAsOfTime > effectiveEndTime) {
+      continue;
+    }
     assertCoverageForAsOf(yearAsOf, yearAsOfTime, datasets);
     const yearRecordDate = findLatestCommonDate(
       yearAsOfTime,
