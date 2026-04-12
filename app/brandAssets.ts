@@ -1,0 +1,52 @@
+const svgHeaders = {
+  "Content-Type": "image/svg+xml; charset=utf-8",
+  "Cache-Control": "public, max-age=3600",
+} as const;
+
+export const WHETHER_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="312" height="72" viewBox="0 0 312 72" fill="none">
+  <title>Whether Logo</title>
+  <g transform="translate(2 4)">
+    <circle cx="28" cy="28" r="22" stroke="#E2E8F0" stroke-width="4" />
+    <path
+      d="M14 30.5C17.5 20.5 38.5 20.5 42 30.5"
+      stroke="#E2E8F0"
+      stroke-width="4"
+      stroke-linecap="round"
+    />
+    <path
+      d="M18 38.5C21 33 35 33 38 38.5"
+      stroke="#E2E8F0"
+      stroke-width="3.2"
+      stroke-linecap="round"
+      opacity="0.96"
+    />
+    <circle cx="28" cy="24.5" r="2.2" fill="#7DD3FC" />
+  </g>
+  <g fill="#E2E8F0" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" letter-spacing="2.2">
+    <text x="72" y="33" font-size="24" font-weight="700">WHETHER</text>
+    <text x="72" y="54" font-size="12" font-weight="500" opacity="0.78">REGIME STATION</text>
+  </g>
+</svg>`;
+
+export const WHETHER_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Whether Pressure System Mark</title>
+  <circle cx="32" cy="32" r="25" stroke="#0F172A" stroke-width="5" />
+  <path
+    d="M16.5 34.5C20.5 22.5 43.5 22.5 47.5 34.5"
+    stroke="#0F172A"
+    stroke-width="5"
+    stroke-linecap="round"
+  />
+  <path
+    d="M21 43C25 36.5 39 36.5 43 43"
+    stroke="#0F172A"
+    stroke-width="4.2"
+    stroke-linecap="round"
+  />
+  <circle cx="32" cy="28" r="2.6" fill="#0F172A" />
+</svg>`;
+
+export const buildSvgResponse = (svg: string) =>
+  new Response(svg, {
+    headers: svgHeaders,
+  });

@@ -271,7 +271,7 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const orientationIndex = html.indexOf("Fast orientation for this week");
+    const orientationIndex = html.indexOf("A quick read for this week");
     const cardIndex = html.indexOf("Current outlook");
 
     assert.ok(orientationIndex > -1);

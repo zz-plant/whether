@@ -10,7 +10,6 @@ type WeeklyDecisionContentProps = {
   matrixSection: ReactNode;
   contextSection: ReactNode;
   actionStripSection: ReactNode;
-  asideContent: ReactNode;
 };
 
 export function WeeklyDecisionContent({
@@ -20,25 +19,20 @@ export function WeeklyDecisionContent({
   matrixSection,
   contextSection,
   actionStripSection,
-  asideContent,
 }: WeeklyDecisionContentProps) {
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(17.5rem,0.62fr)] xl:items-start">
+    <div className="space-y-4">
       <main className="space-y-5 xl:col-start-1" aria-label="Weekly decision transmission order">
         {modePanel}
       </main>
 
-      <aside className="space-y-4 xl:sticky xl:top-28 xl:col-start-2 xl:row-start-1">
-        {asideContent}
-      </aside>
-
       {actionStripSection ? (
-        <section className="xl:col-span-2">
+        <section>
           {actionStripSection}
         </section>
       ) : null}
 
-      <section className="xl:col-span-2">
+      <section>
         <CompactDisclosure
           id="deep-evidence"
           queryKey="deepEvidence"

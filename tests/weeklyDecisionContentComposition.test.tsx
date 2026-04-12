@@ -13,7 +13,6 @@ describe("WeeklyDecisionContent composition boundaries", () => {
         matrixSection={<div>matrix-section</div>}
         contextSection={<div>context-section</div>}
         actionStripSection={<div>action-strip-section</div>}
-        asideContent={<div>aside-content</div>}
       />,
     );
 
@@ -22,6 +21,6 @@ describe("WeeklyDecisionContent composition boundaries", () => {
     assert.ok(html.indexOf("diagnostics-section") < html.indexOf("matrix-section"));
     assert.ok(html.indexOf("matrix-section") < html.indexOf("context-section"));
     assert.ok(html.indexOf("action-strip-section") < html.indexOf("influence-section"));
-    assert.match(html, /aside-content/);
+    assert.doesNotMatch(html, /aside-content/);
   });
 });

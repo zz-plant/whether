@@ -294,9 +294,9 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Confidence trend \(8w\)/);
-    assert.match(html, /Missing weeks are dashed markers/);
-    assert.match(html, /missing confidence data/);
+    assert.match(html, /Confidence check/);
+    assert.match(html, /Last read -&gt; This week -&gt; Threshold/);
+    assert.match(html, /1 missing week in the 8-week window\./);
   });
 
   it("keeps missing signal detail copy neutral when delta cards are already present", () => {
@@ -411,7 +411,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
     assert.match(detailsHtml, /Why this posture call/);
     assert.match(detailsHtml, /Posture history/);
-    assert.match(cardHtml, /Send this brief/);
+    assert.match(cardHtml, /Share-ready handoff/);
+    assert.match(cardHtml, /Source note/);
     assert.match(cardHtml, /Copy citation/);
     assert.doesNotMatch(cardHtml, /Use this citation in meeting notes, board updates, or operating memos\./);
     assert.doesNotMatch(cardHtml, /Share actions stay in the transmission rail above\./);

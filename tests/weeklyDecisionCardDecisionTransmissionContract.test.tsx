@@ -195,7 +195,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     );
 
     const regimeIndex = html.indexOf("Current outlook");
-    const callIndex = html.indexOf(">This week<");
+    const callIndex = html.indexOf(">Current call<");
     const doNowIndex = html.indexOf(">Action now<");
     const flipIndex = html.indexOf(">Change course if<");
 

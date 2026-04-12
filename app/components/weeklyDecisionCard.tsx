@@ -4,12 +4,10 @@ import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
-import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 import { InputInfluenceSection } from "./weekly-card/InputInfluenceSection";
 import {
   MoreContextDisclosureBody,
 } from "./weekly-card/MoreContextDisclosureBody";
-import { DecisionTransmissionRail } from "./weekly-card/DecisionTransmissionRail";
 import { buildWeeklyDecisionPresentation } from "./weekly-card/presentationAdapter";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import {
@@ -103,8 +101,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = history;
   const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel } = artifact;
-  const snapshotCurrentCall = canonicalDecisionCopy?.operatingCall ?? operatingStanceLine;
-  const snapshotDoNow = immediateDecision;
   const {
     activeRole,
     roleHrefs,
@@ -145,7 +141,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         modePanel={(
           <WeeklyCallModePanel
             startupVariantPolicy={startupVariantPolicy}
-            postureLabel={postureWithStageLabel ?? statusLabel}
             operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
             snapshotGuardrail={snapshotGuardrail}
             snapshotWatch={snapshotWatch}
@@ -172,6 +167,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             activeRole={activeRole}
             roleHrefs={roleHrefs}
             glossaryHref={glossaryHref}
+            citationMetaLine={citationMetaLine}
+            citation={citation}
+            actions={actions}
+            confidenceHistory={confidenceHistory}
+            confidenceTrend={confidenceTrend}
+            confidencePercent={confidencePercent}
           />
         )}
         influenceSection={inputInfluence.length > 0 ? (
@@ -246,25 +247,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           />
         )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
-        asideContent={(
-          <>
-            <DecisionTransmissionRail
-              currentCall={snapshotCurrentCall}
-              actionNow={snapshotDoNow}
-              guardrail={snapshotGuardrail}
-              flipWhen={snapshotWatch}
-              citationMetaLine={citationMetaLine}
-              citation={citation}
-              actions={actions}
-            />
-            {confidenceHistory.length > 0 && confidenceTrend ? (
-              <ConfidenceMiniChart
-                confidenceHistory={confidenceHistory}
-                confidenceTrend={confidenceTrend}
-              />
-            ) : null}
-          </>
-        )}
       />
     </section>
   );

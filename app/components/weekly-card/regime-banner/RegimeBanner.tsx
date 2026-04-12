@@ -46,45 +46,47 @@ export function RegimeBanner(props: RegimeBannerProps) {
 
   return (
     <header className={`z-10 rounded-2xl border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div id="weekly-posture-brief-title" className="flex min-w-0 items-center gap-3">
-          <span className="weather-icon-chip h-9 w-9 flex-shrink-0 text-slate-50"><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /></span>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div id="weekly-posture-brief-title" className="flex min-w-0 items-start gap-3">
+          <span className="weather-icon-chip h-8 w-8 flex-shrink-0 text-slate-50"><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /></span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
-              <span>Orientation</span>
-              <span className="rounded-full border border-white/10 bg-slate-950/35 px-2 py-0.5">Week of {recordDateLabel}</span>
+              <span>Current outlook</span>
+              <span className="text-slate-400">Week of {recordDateLabel}</span>
             </div>
             <p className="mt-1 text-base font-semibold leading-tight text-slate-50 sm:text-lg">{resolvedPostureLabel} · {resolvedStageLabel}</p>
             <p className="mt-1 text-[11px] leading-5 text-slate-300">{activeWeather}. {flipRiskMeter.detailLabel}</p>
           </div>
         </div>
-        <div className={`flex flex-wrap gap-1.5 text-[11px] font-semibold ${bannerTone.metrics}`} aria-label="Current outlook metadata">
-          <span className="inline-flex min-h-8 items-center gap-1 rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
+        <div className="rounded-xl border border-white/10 bg-slate-950/25 px-3 py-2.5 text-[11px] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] lg:min-w-[18rem]" aria-label="Current outlook metadata">
+          <div className={`flex items-center gap-1.5 ${bannerTone.metrics}`}>
             <TrendGlyph trendLabel={trendValue} />
             <span>Trend {trendValue}</span>
-          </span>
-          <span className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
+          </div>
+          <p className="mt-1 text-sm font-semibold text-slate-50">
             Posture confidence {Math.round(confidencePercent)}% ({confidenceLabel})
-          </span>
-          <span className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
-            Flip window {flipRiskValue}
-          </span>
-          <span className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
-            {flipRiskMeter.triggerLabel}
-          </span>
+          </p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-300">
+            Flip window {flipRiskValue} · {flipRiskMeter.triggerLabel}
+          </p>
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200" aria-label="Trust strip">
-        <span className="rounded-full border border-white/15 bg-slate-950/35 px-2 py-1">{trustStrip.freshnessBadge}</span>
-        <span className="rounded-full border border-white/15 bg-slate-950/35 px-2 py-1">{trustStrip.confidenceBadge}</span>
-        <Link href={trustStrip.provenanceHref as Route} className="rounded-full border border-sky-400/35 bg-sky-500/10 px-2 py-1 text-sky-100 hover:text-slate-50">
+      <div className="mt-3 text-[11px] leading-5 text-slate-300" aria-label="Trust strip">
+        <span className="font-semibold text-slate-100">{trustStrip.freshnessBadge}</span>
+        <span className="text-slate-500"> · </span>
+        <span className="font-semibold text-slate-100">{trustStrip.confidenceBadge}</span>
+        <span className="text-slate-500"> · </span>
+        <Link href={trustStrip.provenanceHref as Route} className="font-semibold text-sky-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50">
           {trustStrip.provenanceBadge}
         </Link>
         {trustStrip.fallbackBadge ? (
-          <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-1 text-amber-100">{trustStrip.fallbackBadge}</span>
+          <>
+            <span className="text-slate-500"> · </span>
+            <span className="font-semibold text-amber-100">{trustStrip.fallbackBadge}</span>
+          </>
         ) : null}
         {trustStrip.warningCopy ? (
-          <p className="w-full text-[11px] normal-case tracking-normal text-amber-100">{trustStrip.warningCopy}</p>
+          <p className="mt-1 text-[11px] normal-case tracking-normal text-amber-100">{trustStrip.warningCopy}</p>
         ) : null}
       </div>
     </header>

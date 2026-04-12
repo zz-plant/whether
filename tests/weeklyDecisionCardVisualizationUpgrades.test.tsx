@@ -5,7 +5,7 @@ import { MoreContextDisclosureBody, WeeklyDecisionCard } from "../app/components
 import { buildWeeklyDecisionCardModel } from "./factories/weeklyDecisionCardModel";
 
 describe("WeeklyDecisionCard visualization upgrades", () => {
-  it("renders the confidence trend chart in the weekly brief aside", () => {
+  it("renders the tighter confidence comparison block in the weekly brief", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         model={buildWeeklyDecisionCardModel({
@@ -21,9 +21,9 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
       />,
     );
 
-    assert.match(html, /Confidence trend \(8w\)/);
-    assert.match(html, /Missing weeks are dashed markers\./);
-    assert.match(html, /2026-02-20 missing confidence data/);
+    assert.match(html, /Confidence check/);
+    assert.match(html, /Last read -&gt; This week -&gt; Threshold/);
+    assert.match(html, /1 missing week in the 8-week window\./);
   });
 
   it("renders historical analog cards inside more context and continuity", () => {
