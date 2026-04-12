@@ -165,6 +165,39 @@ export function WeeklyCallModePanel({
   const supportingDrivers = driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitQueue[0] ?? null;
   const deferredRevisitItems = revisitQueue.slice(1);
+  const postureSummaryCards = [
+    {
+      label: "Decision pace",
+      value: `${weeklyLeadershipSummary.boldnessScore}/100`,
+      detail: `${signedBoldnessDelta} · ${weeklyLeadershipSummary.notchShiftLabel}`,
+      className: compactMetricCardBase,
+    },
+    {
+      label: "Hiring",
+      value: weeklyLeadershipSummary.hiringWindow,
+      detail: "Headcount posture",
+      className: compactMetricCardBase,
+    },
+    {
+      label: "Expansion",
+      value: weeklyLeadershipSummary.expansionWindow,
+      detail: "Growth posture",
+      className: compactMetricCardBase,
+    },
+    {
+      label: "Fundraising",
+      value: weeklyLeadershipSummary.raiseWindow,
+      detail: "Raise window",
+      className: compactMetricCardBase,
+    },
+    {
+      label: "Trust",
+      value: inlineTrustLabel,
+      detail: decisionReadiness.label,
+      className: `${compactMetricCardBase} ${inlineTrustToneClass}`,
+    },
+  ] as const;
+  const supportingRationalePreview = activeRoleTranslation?.implication ?? whyItMattersLine ?? trustStatusSummary;
   const driverToneClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
     direction === "tightening"
       ? "border-amber-400/25 bg-amber-500/8 text-amber-100"
@@ -186,13 +219,26 @@ export function WeeklyCallModePanel({
           <div className="relative flex flex-col gap-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="max-w-3xl space-y-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Shift this week</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">What changed this week</p>
                 <h2 className={`${tierOneHeadingClassName} text-base sm:text-lg`}>{weeklyLeadershipSummary.shorthandLine}</h2>
                 <p className="text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.netDeltaLabel}</p>
                 <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Last review -&gt; This week</p>
                   <p className="mt-1 text-xs leading-5 text-slate-200">{comparisonSummary}</p>
                 </div>
+                {!needsTrustWarning ? (
+                  <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
+                        Ready now {decisionReadiness.label}
+                      </span>
+                      <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>
+                        Trust {inlineTrustLabel}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[11px] leading-5 text-slate-400">{decisionReadiness.detail}</p>
+                  </div>
+                ) : null}
                 {postureSteps.length > 1 ? (
                   <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -218,55 +264,38 @@ export function WeeklyCallModePanel({
                   </div>
                 ) : null}
               </div>
-              <article className={`max-w-sm rounded-[1.05rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Can act now</p>
-                <p className={`mt-2 text-sm font-semibold leading-6 ${readinessSummaryToneClass}`}>{decisionReadinessSummary}</p>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStatusSummary}</p>
-              </article>
+              {needsTrustWarning ? (
+                <article className={`max-w-sm rounded-[1.05rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Can act now</p>
+                  <p className={`mt-2 text-sm font-semibold leading-6 ${readinessSummaryToneClass}`}>{decisionReadinessSummary}</p>
+                  <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStatusSummary}</p>
+                </article>
+              ) : null}
             </div>
 
-            <div className="grid gap-2 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)]">
-              <article className={compactMetricCardBase}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Boldness budget</p>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <p className="text-lg font-semibold text-slate-100">{weeklyLeadershipSummary.boldnessScore}/100</p>
-                  <p className="text-xs font-semibold text-slate-300">{signedBoldnessDelta}</p>
+            <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+              {postureSummaryCards.map((card) => (
+                <div key={card.label} className={card.className}>
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{card.label}</dt>
+                  <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
+                  <dd className="mt-1 text-[11px] leading-5 text-slate-400">{card.detail}</dd>
                 </div>
-                <p className="mt-1 text-[11px] leading-5 text-slate-400">{weeklyLeadershipSummary.notchShiftLabel}</p>
-              </article>
-              <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                <div className={compactMetricCardBase}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Hiring</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.hiringWindow}</dd>
-                </div>
-                <div className={compactMetricCardBase}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Expansion</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.expansionWindow}</dd>
-                </div>
-                <div className={compactMetricCardBase}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Raise</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-100">{weeklyLeadershipSummary.raiseWindow}</dd>
-                </div>
-                <div className={`${compactMetricCardBase} ${inlineTrustToneClass}`}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Trust</dt>
-                  <dd className="mt-1 text-sm font-semibold">{inlineTrustLabel}</dd>
-                </div>
-              </dl>
-            </div>
+              ))}
+            </dl>
 
             <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
 
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.34fr)_minmax(17rem,0.86fr)]">
               <article className="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/50 px-4 py-4 shadow-[0_18px_30px_-28px_rgba(2,6,23,0.72)]">
-                <div className="space-y-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</p>
+                <p className="mt-2 max-w-2xl text-xl font-semibold leading-8 text-emerald-50 sm:text-[1.55rem]">{actionNowDetail}</p>
+                <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{publicDecisionLabels.call}</p>
-                  <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
+                  <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
                 </div>
-                <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</p>
-                <p className="mt-2 max-w-2xl text-lg font-semibold leading-7 text-emerald-50 sm:text-xl">{actionNowDetail}</p>
                 {primaryDriver ? (
                   <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Top driver</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Why the call moved</p>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       <p className="text-sm font-semibold text-slate-100">{primaryDriver.label}</p>
                       <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
@@ -282,16 +311,15 @@ export function WeeklyCallModePanel({
                 ) : null}
                 <dl className="mt-4 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-950/45 lg:grid lg:grid-cols-3 lg:divide-x lg:divide-slate-800/80">
                   <div className="border-b border-slate-800/80 px-3 py-3 lg:border-b-0">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">
-                      {supportingDrivers.length > 0 ? "Top drivers" : "What changed"}
-                    </dt>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</dt>
                     <dd className="mt-1">
+                      <p className="text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
                       {supportingDrivers.length > 0 ? (
-                        <ul className="space-y-2">
+                        <ul className="mt-3 space-y-2">
                           {supportingDrivers.map((driver) => (
                             <li key={`${driver.label}-${driver.deltaLabel}`} className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-2">
                               <div className="flex items-start justify-between gap-2">
-                                <p className="text-xs font-semibold text-amber-50">{driver.label}</p>
+                                <p className="text-xs font-semibold text-slate-100">{driver.label}</p>
                                 <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(driver.postureDirection)}`}>
                                   {driver.postureDirectionLabel}
                                 </span>
@@ -315,9 +343,7 @@ export function WeeklyCallModePanel({
                             </li>
                           ))}
                         </ul>
-                      ) : (
-                        <p className="text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
-                      )}
+                      ) : null}
                     </dd>
                   </div>
                   <div className="border-b border-slate-800/80 px-3 py-3 lg:border-b-0">
@@ -403,7 +429,7 @@ export function WeeklyCallModePanel({
                   <div className="space-y-1">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Share this call</p>
                     <h3 className="text-sm font-semibold text-slate-100">Share-ready handoff</h3>
-                    <p className="text-xs leading-5 text-slate-300">Copy this into planning, Slack, or the meeting notes without rewriting the brief.</p>
+                    <p className="text-xs leading-5 text-slate-300">Use the weekly brief above as the canonical wording. Pick the format you need below.</p>
                   </div>
                   <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                     Ready to send
@@ -411,31 +437,17 @@ export function WeeklyCallModePanel({
                 </div>
 
                 <div className="mt-3 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-                  <p className="text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Default share</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">Weekly brief</p>
                   <p className="mt-2 text-xs leading-5 text-slate-300">
-                    <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {actionNowDetail}
+                    Includes the call, action now, pause if, and change course if. Use the shorter variants only when the room already knows the call.
                   </p>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    <div className="rounded-lg border border-rose-400/25 bg-rose-500/8 px-3 py-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">{publicDecisionLabels.threshold}</p>
-                      <p className="mt-1 text-xs leading-5 text-rose-50">{snapshotGuardrail}</p>
-                    </div>
-                    <div className="rounded-lg border border-sky-400/25 bg-sky-500/8 px-3 py-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-200">{publicDecisionLabels.reversal}</p>
-                      <p className="mt-1 text-xs leading-5 text-sky-50">{snapshotWatch}</p>
-                    </div>
-                  </div>
                 </div>
 
                 {actions ? (
-                  <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                    <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                      Copy or share
-                    </summary>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {actions}
-                    </div>
-                  </details>
+                  <div className="mt-3">
+                    {actions}
+                  </div>
                 ) : null}
 
                 <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
@@ -465,6 +477,7 @@ export function WeeklyCallModePanel({
         <CompactDisclosure
           queryKey="moreContext"
           summary="Why this week points here"
+          preview={guardrailPolicyDetails.summary}
           className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
           summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
         >
@@ -510,6 +523,7 @@ export function WeeklyCallModePanel({
           <CompactDisclosure
             queryKey="supportingRationale"
             summary="How this lands across the company"
+            preview={supportingRationalePreview}
             className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(8,15,27,0.88),rgba(4,10,20,0.94))] px-3 py-3 shadow-[0_18px_32px_-28px_rgba(2,6,23,0.72)]"
             summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
           >

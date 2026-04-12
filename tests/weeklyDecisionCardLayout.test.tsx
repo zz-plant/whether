@@ -72,14 +72,15 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Provenance 1/);
     assert.match(html, /Fallback active/);
     assert.match(html, /href="\/method"/);
-    assert.match(html, />Shift this week</);
+    assert.match(html, />What changed this week</);
     assert.match(html, /Can act now/);
     assert.match(html, /68% confidence/);
     assert.match(html, /Last review -&gt; This week/);
     assert.match(html, /Weekly decision strip: current call, action now, pause if, and change course if\./);
     assert.match(html, /Action now/);
-    assert.match(html, /Top driver/);
-    assert.match(html, /Top drivers/);
+    assert.match(html, /Decision pace/);
+    assert.match(html, /Why the call moved/);
+    assert.match(html, />What changed</);
     assert.match(html, /Revisit now/);
     assert.match(html, /Pause if/);
     assert.match(html, /Change course if/);
@@ -97,13 +98,14 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Whether weekly brief citation/);
     assert.match(html, /Confidence check/);
     assert.match(html, /Last week -&gt; This week -&gt; Threshold/);
-    assert.match(html, /Copy or share/);
+    assert.match(html, /Copy weekly brief/);
+    assert.match(html, /Default share/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
     const postureIndex = html.indexOf("Current outlook");
     const guidanceIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
-    const actionStripIndex = html.indexOf("Operating levers this week");
+    const actionStripIndex = html.indexOf("Per-lever guardrails");
     const shareSectionIndex = html.indexOf("Share-ready handoff");
 
     assert.ok(guidanceIndex > heroIndex);
@@ -155,7 +157,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    assert.match(html, />Shift this week</);
+    assert.match(html, />What changed this week</);
     assert.match(html, /Fallback active/);
     assert.match(html, /Some inputs are degraded—review before commitment\./);
     assert.match(html, /Can act now/);
@@ -260,6 +262,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Confidence check/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. Last week&#x27;s decisions still hold\./);
     assert.match(callCore, /Revisit queue/);
+    assert.match(callCore, /Default share/);
     assert.match(callCore, /Source note/);
     assert.match(callCore, /Why/);
   });

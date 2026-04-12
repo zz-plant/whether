@@ -55,10 +55,10 @@ export function ReportShellHeader({
                 Weekly brief
               </p>
               <p className="max-w-3xl font-[family:var(--weather-font-display)] text-[1.05rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[1.32rem]">
-                Decide this week&apos;s pace in one screen.
+                What changed, what to do now, and what flips the call.
               </p>
               <p className="max-w-3xl text-sm leading-relaxed text-slate-300">
-                This week&apos;s call, next move, threshold, and flip condition are all here. Open another page only if you want more context.
+                Use this as the canonical weekly artifact. Open another page only when you need proof, planning, or one deeper answer.
               </p>
             </div>
             {exportCta ? (

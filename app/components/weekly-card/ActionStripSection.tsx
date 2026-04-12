@@ -64,7 +64,10 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
     <section className={`${tierTwoPanel} ${sectionSpacing} border-slate-800/80 bg-[linear-gradient(180deg,rgba(6,11,20,0.92),rgba(3,8,16,0.98))]`} aria-label="Action strip">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h3 className={tierTwoHeading}>Operating levers this week</h3>
+          <h3 className={tierTwoHeading}>Per-lever guardrails</h3>
+          <p className="mt-1 text-xs leading-5 text-slate-400">
+            Open this only when you need the domain-specific thresholds.
+          </p>
         </div>
       </div>
       <ul className="mt-4 overflow-hidden rounded-[1rem] border border-slate-800/75 bg-slate-950/35 divide-y divide-slate-800/75">
@@ -121,7 +124,7 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                 </div>
                 <dl className="grid gap-3 sm:grid-cols-3 text-[11px] leading-5">
                   <div className="border-l-2 border-emerald-400/40 pl-3">
-                    <dt className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Open now</dt>
+                    <dt className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do now</dt>
                     <dd className="mt-1 text-slate-100">{item.actionNow}</dd>
                   </div>
                   <div className="border-l-2 border-amber-400/40 pl-3">

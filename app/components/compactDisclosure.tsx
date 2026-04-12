@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 type CompactDisclosureProps = {
   summary: string;
+  preview?: string;
   className?: string;
   summaryClassName: string;
   children: ReactNode;
@@ -48,6 +49,7 @@ export const buildDisclosureHref = (
 
 export function CompactDisclosure({
   summary,
+  preview,
   className,
   summaryClassName,
   children,
@@ -101,7 +103,14 @@ export function CompactDisclosure({
       className={className}
     >
       <summary className={`${summaryClassName} cursor-pointer list-none`}>
-        <span>{summary}</span>
+        <span className="min-w-0 flex-1">
+          <span className="block">{summary}</span>
+          {preview ? (
+            <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-slate-400">
+              {preview}
+            </span>
+          ) : null}
+        </span>
         <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
       </summary>
       {children}

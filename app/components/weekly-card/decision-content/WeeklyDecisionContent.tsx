@@ -37,6 +37,7 @@ export function WeeklyDecisionContent({
           id="deep-evidence"
           queryKey="deepEvidence"
           summary="Deep evidence"
+          preview="Drivers, thresholds, diagnostics, and continuity."
           className="group overflow-hidden rounded-[1.25rem] border border-slate-800/70 bg-[linear-gradient(180deg,rgba(10,16,28,0.72),rgba(4,10,20,0.9))] px-3 py-2.5 shadow-[0_18px_36px_-28px_rgba(2,6,23,0.8)]"
           summaryClassName={disclosureSummaryClass}
         >

@@ -220,16 +220,16 @@ export function GlobalHeaderNavRail({
   if (variant === "compact") {
     return (
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Navigation
-            </p>
-            <p className="truncate text-[13px] font-medium text-slate-200">
-              {activeSurfaceCue ?? activeRouteLabel}
-            </p>
-          </div>
-          {hasScrollableOverflow ? controls : null}
+        <div className="min-w-0 space-y-0.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Workspaces
+          </p>
+          <p className="truncate text-[13px] font-medium text-slate-200">
+            {activeSurfaceCue ?? activeRouteLabel}
+          </p>
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            Swipe through the main workspaces. The weekly brief stays primary.
+          </p>
         </div>
         <nav aria-label="Primary routes">
           <ul

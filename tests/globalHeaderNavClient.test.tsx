@@ -5,7 +5,7 @@ import { GlobalHeaderNavRail } from "../app/components/globalHeaderNavClient";
 import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
 
 describe("GlobalHeaderNavRail", () => {
-  it("surfaces explicit compact-nav scroll affordances", () => {
+  it("keeps the compact rail focused on workspace switching", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavRail
         navigationLinks={resolveGlobalHeaderNavigationLinks("/signals")}
@@ -15,10 +15,11 @@ describe("GlobalHeaderNavRail", () => {
       />,
     );
 
-    assert.match(html, /Navigation/);
-    assert.match(html, /Evidence/);
-    assert.match(html, /aria-label="Previous surface"/);
-    assert.match(html, /aria-label="Next surface"/);
+    assert.match(html, /Workspaces/);
+    assert.match(html, /See what changed/);
+    assert.match(html, /Swipe through the main workspaces\. The weekly brief stays primary\./);
+    assert.doesNotMatch(html, /aria-label="Previous surface"/);
+    assert.doesNotMatch(html, /aria-label="Next surface"/);
   });
 
   it("explains how to open and traverse the default mobile rail", () => {

@@ -32,9 +32,9 @@ export async function HomeWorkspaceBands({
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Start here</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Step 2</p>
             <h2 id="approve-this-weeks-plan-title" className="text-lg font-semibold text-slate-100">
-              Make the plan
+              Turn the call into this week&apos;s plan
             </h2>
             <p className="max-w-2xl text-sm text-slate-300">
               Approve or hold the week&apos;s hiring, spend, and roadmap moves here.
@@ -95,10 +95,13 @@ export async function HomeWorkspaceBands({
         aria-labelledby="audit-this-call-title"
       >
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Need more context?</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Step 3</p>
           <h2 id="audit-this-call-title" className="text-lg font-semibold text-slate-100">
-            Open these if you want the proof behind the call
+            Check the proof only if needed
           </h2>
+          <p className="max-w-2xl text-sm text-slate-300">
+            Use this when someone needs the drivers, thresholds, or trust check before they approve a move.
+          </p>
         </div>
 
         <div className="grid gap-px overflow-hidden rounded-[1.15rem] border border-slate-800/80 bg-slate-800/80 lg:grid-cols-2">
@@ -138,9 +141,9 @@ export async function HomeWorkspaceBands({
         aria-labelledby="historical-replay-workspace-title"
       >
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-200">Still have a question?</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-200">Step 4</p>
           <h2 id="historical-replay-workspace-title" className="text-lg font-semibold text-slate-100">
-            Open one focused path
+            Open one deeper path
           </h2>
           <p className="max-w-2xl text-sm text-slate-300">
             Use this only when one decision still needs a tighter answer.

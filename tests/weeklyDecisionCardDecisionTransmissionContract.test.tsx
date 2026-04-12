@@ -109,7 +109,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.match(html, /Flip risk is in play/i);
   });
 
-  it("keeps top-fold sequence canonical: posture, call, action now, change course if", () => {
+  it("keeps top-fold sequence canonical: posture, action now, call, change course if", () => {
     // Contract: top-fold sequence must stay stable for one-screen decision transmission.
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
@@ -195,13 +195,13 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     );
 
     const regimeIndex = html.indexOf("Current outlook");
-    const callIndex = html.indexOf(">Current call<");
     const doNowIndex = html.indexOf(">Action now<");
+    const callIndex = html.indexOf(">Current call<");
     const flipIndex = html.indexOf(">Change course if<");
 
     assert.ok(regimeIndex >= 0);
-    assert.ok(callIndex > regimeIndex);
-    assert.ok(doNowIndex > callIndex);
+    assert.ok(doNowIndex > regimeIndex);
+    assert.ok(callIndex > doNowIndex);
     assert.ok(flipIndex > doNowIndex);
   });
 
