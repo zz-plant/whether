@@ -53,6 +53,7 @@ export type AlertDeliveryEvent = {
   sourceVersion: string;
   canonicalTimestampSource: "request-received-at";
   id: string;
+  clientId: string;
   alertId: string;
   channel: AlertChannel;
   deliveredAt: string;

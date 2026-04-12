@@ -49,6 +49,22 @@ Validation note: click labels in this document were verified from the current ro
 - Citation line
 - PDF/print export
 
+## 2.1 Re-deliver the call and keep an operator audit trail
+
+**JTBD:** When I need to resend the weekly call or prove what we approved, let me do it from the same Planning checkpoint instead of stitching together separate tools.
+
+**Clicks**
+1. Click `Planning` in global navigation.
+2. Open `Share the brief`.
+3. In `Regime alert log`, toggle delivery channels or click `Deliver latest alert`.
+4. In `Decision Memory`, copy the latest saved entry or export CSV.
+
+**Current output**
+- Per-profile alert delivery toggles
+- Recent delivery history
+- Latest Decision Memory entries
+- CSV export for saved decision runs
+
 ## 3. Validate why the call moved and whether to trust it
 
 **JTBD:** When someone challenges the weekly call, show me the evidence, freshness, and trust status fast.

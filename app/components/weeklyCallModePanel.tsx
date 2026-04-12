@@ -151,50 +151,72 @@ export function WeeklyCallModePanel({
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
   const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
+  const signedBoldnessPointsLabel = weeklyLeadershipSummary.boldnessDelta === 0
+    ? "No change vs last week"
+    : `${signedBoldnessDelta} pts vs last week`;
+  const shouldShowReadinessCallout = needsTrustWarning || inlineTrustTone !== "stable" || Boolean(trustReason);
   const readinessSummaryToneClass = decisionReadiness.tone === "stable"
     ? "text-emerald-100"
     : decisionReadiness.tone === "historical"
       ? "text-violet-100"
       : "text-amber-100";
-  const decisionReadinessSummary = `${decisionReadiness.label}. ${decisionReadiness.detail}`.trim();
   const trustStatusSummary = trustReason
     ? `Using the last clean snapshot because ${trustReason}`
     : trustStateDetail;
+  const supportingDeltaLine = comparisonSummary.trim().length > 0
+    ? comparisonSummary
+    : weeklyLeadershipSummary.shorthandLine;
   const compactMetricCardBase = "rounded-xl border border-slate-800/70 bg-slate-950/50 px-3 py-2.5";
   const primaryDriver = driverHighlights[0] ?? null;
-  const supportingDrivers = driverHighlights.slice(0, 2);
-  const featuredRevisitItem = revisitQueue[0] ?? null;
-  const deferredRevisitItems = revisitQueue.slice(1);
+  const supportingDrivers = primaryDriver ? driverHighlights.slice(1, 3) : driverHighlights.slice(0, 2);
+  const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
+  const deferredRevisitItems = revisitDecisions ? revisitQueue.slice(1) : [];
+  const formatBackdropValue = (
+    value: string,
+    kind: "hiring" | "expansion" | "raise",
+  ) => {
+    if (kind === "raise") {
+      if (value === "Improving") {
+        return "Opening";
+      }
+      if (value === "Stable") {
+        return "Steady";
+      }
+      return value;
+    }
+
+    if (value === "Strong") {
+      return "Supportive";
+    }
+    if (value === "Constrained") {
+      return "Tight";
+    }
+    return value;
+  };
   const postureSummaryCards = [
     {
-      label: "Decision pace",
+      label: "Boldness budget",
       value: `${weeklyLeadershipSummary.boldnessScore}/100`,
-      detail: `${signedBoldnessDelta} · ${weeklyLeadershipSummary.notchShiftLabel}`,
+      detail: signedBoldnessPointsLabel,
       className: compactMetricCardBase,
     },
     {
-      label: "Hiring",
-      value: weeklyLeadershipSummary.hiringWindow,
-      detail: "Headcount posture",
+      label: "Hiring market",
+      value: formatBackdropValue(weeklyLeadershipSummary.hiringWindow, "hiring"),
+      detail: "External backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Expansion",
-      value: weeklyLeadershipSummary.expansionWindow,
-      detail: "Growth posture",
+      label: "Expansion market",
+      value: formatBackdropValue(weeklyLeadershipSummary.expansionWindow, "expansion"),
+      detail: "External backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Fundraising",
-      value: weeklyLeadershipSummary.raiseWindow,
-      detail: "Raise window",
+      label: "Raise market",
+      value: formatBackdropValue(weeklyLeadershipSummary.raiseWindow, "raise"),
+      detail: "External backdrop",
       className: compactMetricCardBase,
-    },
-    {
-      label: "Trust",
-      value: inlineTrustLabel,
-      detail: decisionReadiness.label,
-      className: `${compactMetricCardBase} ${inlineTrustToneClass}`,
     },
   ] as const;
   const supportingRationalePreview = activeRoleTranslation?.implication ?? whyItMattersLine ?? trustStatusSummary;
@@ -204,12 +226,6 @@ export function WeeklyCallModePanel({
       : direction === "opening"
         ? "border-emerald-400/25 bg-emerald-500/8 text-emerald-100"
         : "border-slate-700/70 bg-slate-950/60 text-slate-300";
-  const driverBarClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
-    direction === "tightening"
-      ? "bg-amber-300"
-      : direction === "opening"
-        ? "bg-emerald-300"
-        : "bg-slate-500";
 
   return (
     <>
@@ -217,132 +233,59 @@ export function WeeklyCallModePanel({
         <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-3 overflow-hidden border-slate-800/80 bg-[linear-gradient(180deg,rgba(5,10,19,0.97),rgba(4,8,16,0.99))]`}>
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative flex flex-col gap-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="max-w-3xl space-y-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">What changed this week</p>
-                <h2 className={`${tierOneHeadingClassName} text-base sm:text-lg`}>{weeklyLeadershipSummary.shorthandLine}</h2>
-                <p className="text-xs leading-5 text-slate-300">{weeklyLeadershipSummary.netDeltaLabel}</p>
-                <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Last review -&gt; This week</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-200">{comparisonSummary}</p>
-                </div>
-                {!needsTrustWarning ? (
-                  <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
-                        Ready now {decisionReadiness.label}
-                      </span>
-                      <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>
-                        Trust {inlineTrustLabel}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-[11px] leading-5 text-slate-400">{decisionReadiness.detail}</p>
-                  </div>
-                ) : null}
-                {postureSteps.length > 1 ? (
-                  <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Posture trajectory</p>
-                      {trajectoryDeltaSummary ? (
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
-                      ) : null}
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      {postureSteps.map((step, index) => (
-                        <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
-                          <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
-                            <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
-                            <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
-                          </article>
-                          {index < postureSteps.length - 1 ? (
-                            <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-              {needsTrustWarning ? (
-                <article className={`max-w-sm rounded-[1.05rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Can act now</p>
-                  <p className={`mt-2 text-sm font-semibold leading-6 ${readinessSummaryToneClass}`}>{decisionReadinessSummary}</p>
-                  <p className="mt-2 text-[11px] leading-5 text-slate-300">{trustStatusSummary}</p>
-                </article>
-              ) : null}
-            </div>
-
-            <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-              {postureSummaryCards.map((card) => (
-                <div key={card.label} className={card.className}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{card.label}</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
-                  <dd className="mt-1 text-[11px] leading-5 text-slate-400">{card.detail}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
-
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.34fr)_minmax(17rem,0.86fr)]">
               <article className="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/50 px-4 py-4 shadow-[0_18px_30px_-28px_rgba(2,6,23,0.72)]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</p>
-                <p className="mt-2 max-w-2xl text-xl font-semibold leading-8 text-emerald-50 sm:text-[1.55rem]">{actionNowDetail}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
+                    {decisionReadiness.label}
+                  </span>
+                  <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>
+                    Trust {inlineTrustLabel}
+                  </span>
+                </div>
+                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</p>
+                <h2 className={`${tierOneHeadingClassName} mt-2 text-lg sm:text-[1.55rem] sm:leading-8`}>{actionNowDetail}</h2>
+                <p className="mt-2 text-xs leading-5 text-slate-300">{supportingDeltaLine}</p>
+                {shouldShowReadinessCallout ? (
+                  <div className={`mt-3 rounded-lg border px-3 py-2.5 ${compactTrustToneClass}`}>
+                    <p className={`text-sm font-semibold leading-6 ${readinessSummaryToneClass}`}>{decisionReadiness.label}</p>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{needsTrustWarning ? trustStatusSummary : decisionReadiness.detail}</p>
+                  </div>
+                ) : null}
                 <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{publicDecisionLabels.call}</p>
                   <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
                 </div>
-                {primaryDriver ? (
-                  <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Why the call moved</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-slate-100">{primaryDriver.label}</p>
-                      <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
-                        {primaryDriver.weightLabel}
-                      </span>
-                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(primaryDriver.postureDirection)}`}>
-                        {primaryDriver.postureDirectionLabel}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-[11px] font-semibold text-slate-200">{primaryDriver.deltaLabel}</p>
-                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{primaryDriver.implication}</p>
-                  </div>
-                ) : null}
+
+                <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
+
                 <dl className="mt-4 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-950/45 lg:grid lg:grid-cols-3 lg:divide-x lg:divide-slate-800/80">
                   <div className="border-b border-slate-800/80 px-3 py-3 lg:border-b-0">
                     <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</dt>
                     <dd className="mt-1">
                       <p className="text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
+                      {primaryDriver ? (
+                        <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-2.5 py-2.5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-xs font-semibold text-slate-100">{primaryDriver.label}</p>
+                            <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
+                              {primaryDriver.weightLabel}
+                            </span>
+                            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(primaryDriver.postureDirection)}`}>
+                              {primaryDriver.deltaLabel}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-[11px] leading-5 text-slate-300">{primaryDriver.implication}</p>
+                        </div>
+                      ) : null}
                       {supportingDrivers.length > 0 ? (
-                        <ul className="mt-3 space-y-2">
+                        <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em]">
                           {supportingDrivers.map((driver) => (
-                            <li key={`${driver.label}-${driver.deltaLabel}`} className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-2">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className="text-xs font-semibold text-slate-100">{driver.label}</p>
-                                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(driver.postureDirection)}`}>
-                                  {driver.postureDirectionLabel}
-                                </span>
-                              </div>
-                              {driver.weightPercent !== null ? (
-                                <div className="mt-2 h-1.5 rounded-full bg-slate-900/90">
-                                  <span
-                                    className={`block h-full rounded-full ${driverBarClass(driver.postureDirection)}`}
-                                    style={{ width: `${Math.max(12, driver.weightPercent)}%` }}
-                                  />
-                                </div>
-                              ) : null}
-                              <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em]">
-                                <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-slate-300">
-                                  {driver.weightLabel}
-                                </span>
-                                <span className={`rounded-full border px-2 py-0.5 ${driverToneClass(driver.postureDirection)}`}>
-                                  {driver.deltaLabel}
-                                </span>
-                              </div>
-                            </li>
+                            <span key={`${driver.label}-${driver.deltaLabel}`} className={`rounded-full border px-2 py-0.5 ${driverToneClass(driver.postureDirection)}`}>
+                              {driver.label} {driver.deltaLabel}
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       ) : null}
                     </dd>
                   </div>
@@ -419,7 +362,47 @@ export function WeeklyCallModePanel({
               </aside>
             </div>
 
-            <div className={`grid gap-3 ${confidenceTrend ? "xl:grid-cols-[minmax(0,1.18fr)_minmax(16rem,0.82fr)]" : ""}`}>
+            <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              {postureSummaryCards.map((card) => (
+                <div key={card.label} className={card.className}>
+                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{card.label}</dt>
+                  <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
+                  <dd className="mt-1 text-[11px] leading-5 text-slate-400">{card.detail}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {postureSteps.length > 1 ? (
+              <details className="rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
+                <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                  Trajectory since last review
+                </summary>
+                <div className="mt-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[11px] leading-5 text-slate-300">{comparisonSummary}</p>
+                    {trajectoryDeltaSummary ? (
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {postureSteps.map((step, index) => (
+                      <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
+                        <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
+                          <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
+                          <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
+                        </article>
+                        {index < postureSteps.length - 1 ? (
+                          <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </details>
+            ) : null}
+
+            <div className="grid gap-3">
               <article
                 id="share-ready-artifact"
                 aria-label="Share-ready artifact"
@@ -464,11 +447,18 @@ export function WeeklyCallModePanel({
               </article>
 
               {confidenceTrend ? (
-                <ConfidenceMiniChart
-                  confidenceHistory={confidenceHistory}
-                  confidenceTrend={confidenceTrend}
-                  currentConfidencePercent={confidencePercent}
-                />
+                <details className="rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
+                  <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                    Confidence and continuity
+                  </summary>
+                  <div className="mt-3">
+                    <ConfidenceMiniChart
+                      confidenceHistory={confidenceHistory}
+                      confidenceTrend={confidenceTrend}
+                      currentConfidencePercent={confidencePercent}
+                    />
+                  </div>
+                </details>
               ) : null}
             </div>
           </div>

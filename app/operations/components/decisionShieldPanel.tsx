@@ -29,7 +29,7 @@ import {
   useClipboardCopy,
   type ClipboardCopyState,
 } from "../../components/useClipboardCopy";
-import { createClientId } from "./clientId";
+import { createOpaqueId, usePersistentClientId } from "../../components/clientIdentity";
 import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
 import {
   actionOptions,
@@ -108,7 +108,7 @@ export const DecisionShieldPanel = ({
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
   const [memoryStatus, setMemoryStatus] = useState<string | null>(null);
   const [isSavingMemory, setIsSavingMemory] = useState(false);
-  const presetStorageKey = "whether.decisionShieldPresets";
+  const legacyPresetStorageKey = "whether.decisionShieldPresets";
   const { add } = Toast.useToastManager();
   const presetInputRef = useRef<HTMLInputElement | null>(null);
   const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
@@ -117,7 +117,8 @@ export const DecisionShieldPanel = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const clientId = useMemo(() => createClientId(), []);
+  const clientId = usePersistentClientId();
+  const presetStorageKey = clientId ? `whether.decisionShieldPresets:${clientId}` : null;
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -129,9 +130,14 @@ export const DecisionShieldPanel = ({
   );
 
   useEffect(() => {
+    if (!presetStorageKey) {
+      return;
+    }
     try {
-      const stored = window.localStorage.getItem(presetStorageKey);
+      const stored = window.localStorage.getItem(presetStorageKey)
+        ?? window.localStorage.getItem(legacyPresetStorageKey);
       if (!stored) {
+        setPresets([]);
         return;
       }
       const parsed = JSON.parse(stored) as typeof presets;
@@ -139,11 +145,15 @@ export const DecisionShieldPanel = ({
         setPresets(parsed);
       }
     } catch {
+      setPresets([]);
       // Intentionally ignore storage restore errors to keep console clean.
     }
-  }, [presetStorageKey]);
+  }, [legacyPresetStorageKey, presetStorageKey]);
 
   useEffect(() => {
+    if (!presetStorageKey) {
+      return;
+    }
     try {
       window.localStorage.setItem(presetStorageKey, JSON.stringify(presets));
     } catch {
@@ -166,7 +176,7 @@ export const DecisionShieldPanel = ({
       return;
     }
     const nextPreset = {
-      id: createClientId(),
+      id: createOpaqueId(),
       name: presetName.trim(),
       lifecycle,
       category,
@@ -224,6 +234,10 @@ export const DecisionShieldPanel = ({
 
   const handleSaveToDecisionMemory = () => {
     if (isSavingMemory) {
+      return;
+    }
+    if (!clientId) {
+      setMemoryStatus("Preparing your operator profile. Try saving again in a second.");
       return;
     }
 
@@ -345,11 +359,11 @@ export const DecisionShieldPanel = ({
             <button
               type="button"
               onClick={handleSaveToDecisionMemory}
-              disabled={isSavingMemory}
+              disabled={isSavingMemory || !clientId}
               aria-busy={isSavingMemory}
               className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
-              {isSavingMemory ? "Saving" : "Save to memory"}
+              {isSavingMemory ? "Saving" : !clientId ? "Preparing memory" : "Save to memory"}
             </button>
             <DataProvenanceStrip provenance={provenance} />
           </div>

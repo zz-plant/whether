@@ -162,13 +162,13 @@ The homepage supports optional interpretation layers without changing the canoni
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
-1. **Current outlook strip** (compact posture, trend, confidence, and flip-window context only; no second operating call)
-2. **This week in 15 seconds** (single canonical decision block with boldness budget, window states, `Action`, `Guardrail`, `Flip condition`)
-3. **Decision support details** (delta + evidence helpers that reference the canonical decision)
-4. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
-5. **Share actions + citation disclosure** (default share actions stay compact; citation remains lower emphasis)
-6. **Why this call** disclosure (supporting evidence hidden behind details/summary)
-7. **Planning next / exception paths** (Planning visible as the default next step; Evidence and Trust framed as exception routes)
+1. **This week strip** (compact posture, trend, confidence, and flip trigger metadata only; no second operating call)
+2. **Action-first weekly call** (single canonical decision block with readiness/trust chips, `Action now`, `Current call`, and the bounded `What changed` / `Pause if` / `Change course if` triplet)
+3. **Compact backdrop row** (`Boldness budget` plus external market backdrops for hiring, expansion, and raise conditions)
+4. **Share actions + lower-emphasis detail** (share rail stays visible; trajectory and confidence continuity stay collapsed by default)
+5. **Why this call** disclosure (supporting evidence hidden behind details/summary)
+6. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
+7. **Planning next / exception paths** (Planning visible as the default next step; proof and deeper paths framed as exception routes)
 
 Implementation guardrails:
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
@@ -180,12 +180,13 @@ Implementation guardrails:
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Top fold should visually prioritize one dominant action lane first, then a smaller secondary lane for `Revisit now` and `Decision readiness`. Avoid giving every summary block equal visual weight.
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
-- The current-outlook strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
-- The canonical weekly-call block should expose a compact scalar anchor (`Boldness budget`) plus window state labels before the bounded decision triplet.
-- The canonical weekly-call block should also expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row so stable weeks do not require opening Trust to know whether the call is usable.
+- The top strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
+- The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
+- The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance.
+- The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.
-- Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move longer explanation into disclosure content below the primary scan path.
-- Trust on `/` should remain a single compact sentence inside the canonical weekly-call block; do not inject a second standalone trust panel immediately under the hero.
+- Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
+- Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
 - Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Share actions should remain routine-first. Company-specific override controls must stay separate from default share actions.
 - Share actions should keep the operator brief primary, while also exposing a `delta-only brief` for repeat readers who only need this week’s change, reopen queue, and current guardrails.

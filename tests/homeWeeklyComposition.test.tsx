@@ -193,7 +193,7 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /Current outlook/);
+    assert.match(html, /This week/);
     assert.match(html, /Week of Mar 5, 2026/);
     assert.match(html, /Decision delta: tighten roadmap optionality while protecting core delivery\./);
     assert.match(html, /Per-lever guardrails/);
@@ -230,7 +230,7 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("Current outlook");
+    const heroIndex = html.indexOf("This week");
     const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
     const rulesIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Per-lever guardrails");
@@ -272,7 +272,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("A quick read for this week");
-    const cardIndex = html.indexOf("Current outlook");
+    const cardIndex = html.indexOf("data-testid=\"weekly-regime-banner\"");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);

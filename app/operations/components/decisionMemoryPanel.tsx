@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePersistentClientId } from "../../components/clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
@@ -29,10 +30,15 @@ export const DecisionMemoryPanel = () => {
   const [entries, setEntries] = useState<DecisionMemoryEntry[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const { copyToClipboard, status, activeTarget, copiedTarget } = useClipboardCopy();
+  const clientId = usePersistentClientId();
 
   useEffect(() => {
+    if (!clientId) {
+      return;
+    }
     let active = true;
-    void fetch("/api/decision-memory")
+    setStatusMessage(null);
+    void fetch(`/api/decision-memory?clientId=${encodeURIComponent(clientId)}`)
       .then(async (response) => {
         if (!response.ok) {
           return;
@@ -45,22 +51,23 @@ export const DecisionMemoryPanel = () => {
       .catch(() => {
         if (active) {
           setStatusMessage("Unable to load Decision Memory right now.");
+          setEntries([]);
         }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [clientId]);
 
   const latestEntry = entries[0] ?? null;
 
   const csvDownloadHref = useMemo(() => {
-    if (entries.length === 0) {
+    if (entries.length === 0 || !clientId) {
       return null;
     }
-    return "/api/decision-memory?format=csv";
-  }, [entries.length]);
+    return `/api/decision-memory?format=csv&clientId=${encodeURIComponent(clientId)}`;
+  }, [clientId, entries.length]);
 
   return (
     <section id="decision-memory" aria-labelledby="decision-memory-title" className="mt-10">
@@ -98,7 +105,13 @@ export const DecisionMemoryPanel = () => {
 
         {statusMessage ? <p className="mt-4 text-sm text-amber-200">{statusMessage}</p> : null}
 
-        {entries.length === 0 ? (
+        {!clientId ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
+            <p className="text-sm text-slate-300">
+              Loading your operator audit trail.
+            </p>
+          </div>
+        ) : entries.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
               No Decision Memory entries yet. Save a Decision Shield verdict to start the audit trail.

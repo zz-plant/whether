@@ -12,10 +12,11 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const limitRaw = url.searchParams.get("limit");
+  const clientId = url.searchParams.get("clientId") ?? undefined;
   const limit = limitRaw ? Math.max(1, Math.min(200, Number.parseInt(limitRaw, 10) || 64)) : 64;
 
   const repository = getRegimeAlertRepository();
-  const listed = await repository.listDeliveries({ cursor, limit });
+  const listed = await repository.listDeliveries({ cursor, limit, clientId });
   const degraded = repository.backendStatus() === "local-fallback";
 
   return NextResponse.json({
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
       limit,
       returned: listed.deliveries.length,
     },
+    clientId: clientId ?? null,
     degraded,
     backend: repository.backendStatus(),
   });
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
       ...lineage,
       canonicalTimestampSource: "request-received-at",
       id: lineage.eventId,
+      clientId: candidate.clientId,
       alertId: candidate.alertId,
       channel,
       deliveredAt: new Date().toISOString(),
@@ -76,12 +79,13 @@ export async function POST(request: Request) {
     created.push(event);
   }
 
-  const listed = await repository.listDeliveries({ limit: 128 });
+  const listed = await repository.listDeliveries({ limit: 128, clientId: candidate.clientId });
 
   return NextResponse.json({
     created: true,
     events: created,
     deliveries: listed.deliveries,
+    clientId: candidate.clientId,
     degraded,
     backend: repository.backendStatus(),
   });

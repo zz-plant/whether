@@ -21,6 +21,7 @@ import {
 import { MonthlyActionSummaryPanel } from "../components/appendix/monthlyActionSummaryPanel";
 import { PlaybookPanel } from "../components/appendix/playbookPanel";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
+import { DecisionMemoryPanel } from "./components/decisionMemoryPanel";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -30,6 +31,7 @@ import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
 import { canonicalCapitalDisciplinePath, resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
+import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
 
 
 export const runtime = "edge";
@@ -350,7 +352,13 @@ export default async function OperationsPage({
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",
-            hashAliases: ["ops-export-briefs-panel", "ops-operator-requests", "ops-operator-requests-panel"],
+            hashAliases: [
+              "ops-export-briefs-panel",
+              "ops-operator-requests",
+              "ops-operator-requests-panel",
+              "regime-alert-log",
+              "decision-memory",
+            ],
             children: (
               <div className="space-y-6">
                 <SectionedReportPanel
@@ -383,6 +391,8 @@ export default async function OperationsPage({
                     provenance={treasuryProvenance}
                     showProvenance={false}
                   />
+                  <RegimeAlertsPanel />
+                  <DecisionMemoryPanel />
                 </SectionedReportPanel>
                 <SectionedReportPanel
                   id="ops-operator-requests-panel"

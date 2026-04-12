@@ -24,9 +24,10 @@ Recommended pull sequence:
 
 ### Delivery simulation + audit flow
 
-- Configure destination toggles per consumer: `POST /api/alert-preferences`.
+- Configure destination toggles per consumer/profile: `POST /api/alert-preferences`.
 - Trigger delivery runs: `POST /api/alert-deliveries`.
-- Inspect run history: `GET /api/alert-deliveries`.
+- Inspect run history: `GET /api/alert-deliveries?clientId=<id>`.
+- Operator audit trail for saved Decision Shield runs: `GET /api/decision-memory?clientId=<id>` or `GET /api/decision-memory?clientId=<id>&format=csv`.
 
 ## 3) Reliability and publish gates
 

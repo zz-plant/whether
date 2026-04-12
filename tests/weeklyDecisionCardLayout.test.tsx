@@ -65,30 +65,31 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /weekly-posture-brief-title/);
-    assert.match(html, /Current outlook/);
+    assert.match(html, /This week/);
     assert.match(html, /aria-label="Trust strip"/);
     assert.match(html, /Freshness stale/);
     assert.match(html, /Signal reliability MED/);
     assert.match(html, /Provenance 1/);
     assert.match(html, /Fallback active/);
     assert.match(html, /href="\/method"/);
-    assert.match(html, />What changed this week</);
-    assert.match(html, /Can act now/);
+    assert.match(html, />Act with caution</);
     assert.match(html, /68% confidence/);
-    assert.match(html, /Last review -&gt; This week/);
     assert.match(html, /Weekly decision strip: current call, action now, pause if, and change course if\./);
     assert.match(html, /Action now/);
-    assert.match(html, /Decision pace/);
-    assert.match(html, /Why the call moved/);
+    assert.match(html, /Boldness budget/);
+    assert.match(html, /Hiring market/);
+    assert.match(html, /Expansion market/);
+    assert.match(html, /Raise market/);
+    assert.match(html, /External backdrop/);
     assert.match(html, />What changed</);
     assert.match(html, /Revisit now/);
     assert.match(html, /Pause if/);
     assert.match(html, /Change course if/);
-    assert.match(html, /Current outlook/);
+    assert.match(html, /This week/);
     assert.match(html, /6 pts to flip/);
     assert.match(html, /Cloudy\./);
     assert.match(html, /Why this week points here/);
-    assert.match(html, /Act with caution\./);
+    assert.match(html, /Act with caution/);
     assert.match(html, /Revisit queue/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
@@ -97,13 +98,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Source note/);
     assert.match(html, /Whether weekly brief citation/);
     assert.match(html, /Confidence check/);
-    assert.match(html, /Last week -&gt; This week -&gt; Threshold/);
+    assert.match(html, /(Last read|Last week) -&gt; This week -&gt; Threshold/);
     assert.match(html, /Copy weekly brief/);
     assert.match(html, /Default share/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
-    const postureIndex = html.indexOf("Current outlook");
+    const postureIndex = html.indexOf("This week");
     const guidanceIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Per-lever guardrails");
     const shareSectionIndex = html.indexOf("Share-ready handoff");
@@ -157,12 +158,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    assert.match(html, />What changed this week</);
+    assert.match(html, /Action now/);
     assert.match(html, /Fallback active/);
     assert.match(html, /Some inputs are degraded—review before commitment\./);
-    assert.match(html, /Can act now/);
+    assert.match(html, />Act with caution</);
     assert.match(html, /Using the last clean snapshot because Freshness: Mar 6, 2026 09:12 UTC/);
-    assert.match(html, /Act with caution\./);
+    assert.match(html, /Act with caution/);
   });
 
   it("keeps a single canonical weekly call region and compact shell spacing", () => {

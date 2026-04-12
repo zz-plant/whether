@@ -15,7 +15,7 @@ export interface RegimeAlertRepository {
   listAlerts(options?: { cursor?: Cursor; limit?: number }): Promise<{ alerts: RegimeAlertEvent[]; nextCursor: Cursor }>;
   latestAlert(): Promise<RegimeAlertEvent | null>;
   appendDelivery(event: AlertDeliveryEvent): Promise<void>;
-  listDeliveries(options?: { cursor?: Cursor; limit?: number }): Promise<{ deliveries: AlertDeliveryEvent[]; nextCursor: Cursor }>;
+  listDeliveries(options?: { cursor?: Cursor; limit?: number; clientId?: string }): Promise<{ deliveries: AlertDeliveryEvent[]; nextCursor: Cursor }>;
   backendStatus(): "durable" | "local-fallback";
 }
 
@@ -73,11 +73,14 @@ class InMemoryRegimeAlertRepository implements RegimeAlertRepository {
     this.deliveries.splice(128);
   }
 
-  async listDeliveries(options?: { cursor?: Cursor; limit?: number }) {
+  async listDeliveries(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {
     const cursor = options?.cursor ?? null;
     const limit = options?.limit ?? 128;
     const threshold = parseCursor(cursor);
-    const ascending = [...this.deliveries].reverse();
+    const filtered = options?.clientId
+      ? this.deliveries.filter((event) => event.clientId === options.clientId)
+      : this.deliveries;
+    const ascending = [...filtered].reverse();
     const from = ascending.slice(Math.max(0, threshold + 1), Math.max(0, threshold + 1) + limit);
     const deliveries = from.reverse().map((event) => clone(event));
     const nextCursor = deliveries.length > 0 ? `${threshold + deliveries.length}` : cursor;
@@ -138,9 +141,11 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
     await this.queue;
   }
 
-  async listDeliveries(options?: { cursor?: Cursor; limit?: number }) {
+  async listDeliveries(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {
     await this.queue;
-    return this.listFromKv<AlertDeliveryEvent>(DELIVERY_PREFIX, options?.cursor ?? null, options?.limit ?? 128).then((result) => ({
+    return this.listFromKv<AlertDeliveryEvent>(DELIVERY_PREFIX, options?.cursor ?? null, options?.limit ?? 128, (item) =>
+      options?.clientId ? item.clientId === options.clientId : true,
+    ).then((result) => ({
       deliveries: result.items,
       nextCursor: result.nextCursor,
     }));
@@ -150,7 +155,7 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
     return "durable" as const;
   }
 
-  private async listFromKv<T>(prefix: string, cursor: Cursor, limit: number) {
+  private async listFromKv<T>(prefix: string, cursor: Cursor, limit: number, predicate?: (item: T) => boolean) {
     const threshold = parseCursor(cursor);
     const collected: Array<{ index: number; item: T }> = [];
     let listCursor: string | undefined;
@@ -166,7 +171,11 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
         if (!raw) {
           continue;
         }
-        collected.push({ index, item: JSON.parse(raw) as T });
+        const item = JSON.parse(raw) as T;
+        if (predicate && !predicate(item)) {
+          continue;
+        }
+        collected.push({ index, item });
       }
       listCursor = page.cursor;
       if (page.list_complete) break;

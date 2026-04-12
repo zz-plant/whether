@@ -55,8 +55,20 @@ export const getWindowState = (value: number, thresholds: WindowThresholds) => {
 };
 
 export const getNetDeltaLabel = (delta: number) => {
+  if (delta >= 12) {
+    return "Materially more aggressive than last week.";
+  }
+  if (delta >= 4) {
+    return "More aggressive than last week.";
+  }
   if (delta > 0) {
     return "Slightly more aggressive than last week.";
+  }
+  if (delta <= -12) {
+    return "Materially more defensive than last week.";
+  }
+  if (delta <= -4) {
+    return "More defensive than last week.";
   }
   if (delta < 0) {
     return "Slightly more defensive than last week.";

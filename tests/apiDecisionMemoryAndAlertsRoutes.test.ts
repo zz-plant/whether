@@ -57,6 +57,14 @@ describe("decision memory and alert routes", () => {
     assert.equal(getBody.count, 1);
     assert.equal(getBody.entries.length, 1);
 
+    const filteredResponse = await getDecisionMemoryRoute(
+      new Request("http://localhost/api/decision-memory?clientId=client-a"),
+    );
+    assert.equal(filteredResponse.status, 200);
+    const filteredBody = (await filteredResponse.json()) as { entries: Array<{ context: { clientId: string } }>; count: number };
+    assert.equal(filteredBody.count, 1);
+    assert.equal(filteredBody.entries[0]?.context.clientId, "client-a");
+
     const csvResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?format=csv"));
     assert.equal(csvResponse.status, 200);
     assert.equal(csvResponse.headers.get("content-type"), "text/csv; charset=utf-8");
@@ -146,14 +154,27 @@ describe("decision memory and alert routes", () => {
     );
 
     assert.equal(post.status, 200);
-    const postBody = (await post.json()) as { deliveries: Array<{ status: string }> };
+    const postBody = (await post.json()) as { deliveries: Array<{ status: string; clientId: string }>; clientId: string };
     assert.equal(postBody.deliveries.length, 3);
+    assert.equal(postBody.clientId, "abc");
+    assert.ok(postBody.deliveries.every((delivery) => delivery.clientId === "abc"));
 
-    const get = await getAlertDeliveriesRoute(new Request("http://localhost/api/alert-deliveries"));
+    const secondPost = await postAlertDeliveriesRoute(
+      new Request("http://localhost/api/alert-deliveries", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ clientId: "other-client", alertId: "alert-1" }),
+      }),
+    );
+    assert.equal(secondPost.status, 200);
+
+    const get = await getAlertDeliveriesRoute(new Request("http://localhost/api/alert-deliveries?clientId=abc"));
     assert.equal(get.status, 200);
-    const getBody = (await get.json()) as { deliveries: unknown[]; count: number };
+    const getBody = (await get.json()) as { deliveries: Array<{ clientId: string }>; count: number; clientId: string | null };
     assert.equal(getBody.deliveries.length, 3);
     assert.equal(getBody.count, 3);
+    assert.equal(getBody.clientId, "abc");
+    assert.ok(getBody.deliveries.every((delivery) => delivery.clientId === "abc"));
   });
 
   it("rejects invalid alert deliveries payload", async () => {

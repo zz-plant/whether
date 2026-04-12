@@ -21,6 +21,7 @@ type GlobalHeaderRouteGateProps = {
 export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGateProps) {
   const pathname = normalizePathname(usePathname() ?? "/");
   const [isHydrated, setIsHydrated] = useState(false);
+  const isHomeBrief = pathname === "/";
 
   useEffect(() => {
     setIsHydrated(true);
@@ -35,6 +36,44 @@ export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGatePr
 
   if (!isReportShellRoute(pathname)) {
     return <>{defaultHeader}</>;
+  }
+
+  if (isHomeBrief) {
+    return (
+      <header className="mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-3 lg:px-8 lg:pt-4">
+        <div className="weather-appbar weather-topbar px-4 py-3 sm:px-5 sm:py-3.5">
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <Link href="/" className={GLOBAL_HEADER_BRAND_LINK_CLASSNAME}>
+                Whether
+              </Link>
+              <div className="min-w-0 space-y-0.5">
+                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-[11px]">
+                  Weekly brief
+                </p>
+                <p className="hidden max-w-[34rem] text-[12px] leading-relaxed text-slate-300 sm:block">
+                  Start with this week&apos;s call. Open proof or another route only if the room still needs it.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/operations#ops-monthly-action-summary"
+                className="weather-button-primary inline-flex min-h-[42px] flex-shrink-0 items-center rounded-xl px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+              >
+                Make the plan
+              </Link>
+              <Link
+                href="/signals"
+                className="hidden min-h-[42px] items-center rounded-xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100 sm:inline-flex"
+              >
+                See proof
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
   }
 
   return (

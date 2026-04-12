@@ -4,6 +4,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePersistentClientId } from "./clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
@@ -68,28 +69,17 @@ const mapServerAlerts = (alerts: ServerAlert[]): RegimeAlertLogEntry[] =>
     reasons: entry.payload.reasons,
   }));
 
-const createClientId = () => {
-  const key = "whether-alert-client-id";
-  const existing = window.localStorage.getItem(key);
-  if (existing) {
-    return existing;
-  }
-  const created = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`;
-  window.localStorage.setItem(key, created);
-  return created;
-};
-
 export const RegimeAlertsPanel = () => {
   const [alerts, setAlerts] = useState<RegimeAlertLogEntry[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryEvent[]>([]);
   const [deliveryStatus, setDeliveryStatus] = useState<string | null>(null);
-  const [clientId, setClientId] = useState<string>("anonymous");
   const [preferences, setPreferences] = useState<DeliveryPreferences>({
     slack: true,
     email: true,
     webhook: false,
   });
   const { activeTarget, copiedTarget, status, error, copyToClipboard } = useClipboardCopy();
+  const clientId = usePersistentClientId();
 
   const latestAlertId = useMemo(() => alerts[0]?.id, [alerts]);
 
@@ -108,7 +98,12 @@ export const RegimeAlertsPanel = () => {
   }, []);
 
   const loadDeliveries = useCallback(() => {
-    void fetch("/api/alert-deliveries")
+    if (!clientId) {
+      setDeliveries([]);
+      return;
+    }
+
+    void fetch(`/api/alert-deliveries?clientId=${encodeURIComponent(clientId)}`)
       .then(async (response) => {
         if (!response.ok) {
           return;
@@ -119,13 +114,14 @@ export const RegimeAlertsPanel = () => {
       .catch(() => {
         setDeliveries([]);
       });
-  }, []);
+  }, [clientId]);
 
   useEffect(() => {
-    const resolvedClientId = createClientId();
-    setClientId(resolvedClientId);
+    if (!clientId) {
+      return;
+    }
 
-    void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(resolvedClientId)}`)
+    void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(clientId)}`)
       .then(async (response) => {
         if (!response.ok) {
           return;
@@ -138,7 +134,7 @@ export const RegimeAlertsPanel = () => {
       .catch(() => {
         // Keep defaults.
       });
-  }, []);
+  }, [clientId]);
 
   useEffect(() => {
     let active = true;
@@ -173,6 +169,9 @@ export const RegimeAlertsPanel = () => {
   }, [loadAlerts, loadDeliveries]);
 
   const togglePreference = (channel: DeliveryChannel) => {
+    if (!clientId) {
+      return;
+    }
     const next = { ...preferences, [channel]: !preferences[channel] };
     setPreferences(next);
     void fetch("/api/alert-preferences", {
@@ -185,6 +184,10 @@ export const RegimeAlertsPanel = () => {
   };
 
   const deliverLatestAlert = () => {
+    if (!clientId) {
+      setDeliveryStatus("Preparing your delivery profile.");
+      return;
+    }
     if (!latestAlertId) {
       setDeliveryStatus("No alert available to deliver.");
       return;
@@ -224,6 +227,9 @@ export const RegimeAlertsPanel = () => {
             <p className="mt-2 type-data text-slate-300">
               Review regime change alerts and deliver them through Slack, email, or webhook.
             </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Delivery preferences and logs are scoped to this device&apos;s operator profile.
+            </p>
           </div>
           <div className="weather-surface space-y-2 p-3">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Delivery channels</p>
@@ -233,6 +239,7 @@ export const RegimeAlertsPanel = () => {
                   key={channel}
                   type="button"
                   onClick={() => togglePreference(channel)}
+                  disabled={!clientId}
                   className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
                     preferences[channel] ? "text-emerald-200" : "text-slate-400"
                   }`}
@@ -245,10 +252,12 @@ export const RegimeAlertsPanel = () => {
             <button
               type="button"
               onClick={deliverLatestAlert}
+              disabled={!clientId}
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em]"
             >
               Deliver latest alert
             </button>
+            {!clientId ? <p className="text-xs text-slate-500">Loading delivery profile…</p> : null}
             {deliveryStatus ? <p className="text-xs text-slate-300">{deliveryStatus}</p> : null}
           </div>
         </div>

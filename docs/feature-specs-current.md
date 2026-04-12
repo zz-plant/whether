@@ -132,6 +132,10 @@ Planning handoff also now uses a more stateful board treatment with explicit own
 and change-course cues instead of sentence-only summaries. Existing
 hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
 implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
+The share step now also houses the operator follow-through surfaces that were previously disconnected from the core loop:
+- per-profile alert delivery controls and recent send history,
+- Decision Memory export and latest-entry recall,
+- share artifacts, delivery controls, and audit history in one checkpoint before the brief leaves the room.
 `/operations` now exposes the same mixed-literacy translation model as the Weekly Brief: a
 top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
 assist panels explain only the planning layer the user needs. The execution stepper itself now shows
@@ -140,7 +144,7 @@ Shared report-shell routes now avoid stacking a separate trust summary panel ahe
 
 ### 1.4 Planning workstreams
 - **Weekly plan** (`/operations`): the default execution
-  path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
+  path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
 - **Developer references** (linked from `/operations`): `docs/developer/api-reference.md`, `docs/developer/cli-fallback.md`, and `docs/developer/integrations.md`.
 
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
@@ -398,13 +402,16 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 - `POST /api/regime-alerts` — create an alert when trigger/cooldown rules pass.
 - `GET /api/weekly-digest` — digest summary generated from logged alerts.
 - `GET /api/alert-preferences` / `POST /api/alert-preferences` — per-client delivery preferences.
-- `GET /api/alert-deliveries` / `POST /api/alert-deliveries` — delivery logs and send attempts.
+- `GET /api/alert-deliveries` / `POST /api/alert-deliveries` — delivery logs and send attempts, filterable by `clientId` for per-profile audit views.
 
-### 6.4 Integration APIs
+### 6.4 Decision audit APIs
+- `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
+
+### 6.5 Integration APIs
 - `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
   mandate export payload.
 
-### 6.5 Open Graph
+### 6.6 Open Graph
 - `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).
 
 ## 7) Non-goals (as enforced in UI copy)
