@@ -65,15 +65,42 @@ export const ConfidenceMiniChart = ({
   const threshold = currentPercent !== null ? resolveThreshold(currentPercent) : null;
   const delta = currentPercent !== null && previousPercent !== null ? currentPercent - previousPercent : null;
   const missingWeeks = confidenceHistory.filter((point) => point.isMissing).length;
+  const thresholdGap = currentPercent !== null && threshold ? currentPercent - threshold.value : null;
+  const thresholdStatus = thresholdGap === null
+    ? null
+    : thresholdGap > 0
+      ? {
+          label: `${thresholdGap} pts above line`,
+          detail: "Safely above the decision threshold.",
+          toneClass: "border-emerald-400/25 bg-emerald-500/8 text-emerald-100",
+        }
+      : thresholdGap < 0
+        ? {
+            label: `${Math.abs(thresholdGap)} pts below line`,
+            detail: "Below the decision threshold.",
+            toneClass: "border-rose-400/25 bg-rose-500/8 text-rose-100",
+          }
+        : {
+            label: "On the line",
+            detail: "Sitting exactly on the decision threshold.",
+            toneClass: "border-amber-400/25 bg-amber-500/8 text-amber-100",
+          };
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
-      <div>
-        <h2 className={tierOneHeading}>Confidence check</h2>
-        <p className="mt-1 text-[11px] leading-5 text-slate-400">{previousLabel} -&gt; This week -&gt; Threshold</p>
-        <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>
-          {confidenceTrend}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className={tierOneHeading}>Confidence check</h2>
+          <p className="mt-1 text-[11px] leading-5 text-slate-400">{previousLabel} -&gt; This week -&gt; Threshold</p>
+          <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>
+            {confidenceTrend}
+          </p>
+        </div>
+        {thresholdStatus ? (
+          <div className={`rounded-full border px-3 py-1.5 text-right text-[10px] font-semibold uppercase tracking-[0.12em] ${thresholdStatus.toneClass}`}>
+            <span className="block">{thresholdStatus.label}</span>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3">
@@ -137,6 +164,7 @@ export const ConfidenceMiniChart = ({
             </span>
           </div>
           <p className="mt-2 text-xs leading-5 text-slate-300">
+            {thresholdStatus ? `${thresholdStatus.detail} ` : ""}
             {delta !== null
               ? `${delta >= 0 ? "+" : ""}${delta} pts vs ${previousLabel.toLowerCase()}. ${threshold.detail}`
               : threshold.detail}

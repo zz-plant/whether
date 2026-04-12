@@ -110,10 +110,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     trustStateDetail,
     hasMaterialTrustDelta,
     trustStrip,
+    comparisonSummary,
     snapshotGuardrail,
     snapshotWatch,
     effectiveFlipLabels,
     decisionBullets,
+    driverHighlights,
     guardrailPolicyDetails,
     flipPolicyDetails,
   } = buildWeeklyDecisionPresentation({ model, searchParams });
@@ -158,9 +160,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trustReason={status.isFallbackSnapshot ? artifact.freshnessLine : undefined}
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
+            comparisonSummary={comparisonSummary}
             stabilityRule={stabilityRule}
             weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
             decisionBullets={decisionBullets}
+            driverHighlights={driverHighlights}
             guardrailPolicyDetails={guardrailPolicyDetails}
             flipPolicyDetails={flipPolicyDetails}
             roleTranslations={roleTranslations}

@@ -1,6 +1,7 @@
 import { buildCompactFreshnessMeta, formatTrustStripDisplay } from "../../../lib/report/reportFormatting";
 import { buildWeeklyCitationMetaLine, buildTrustMarker } from "../../../lib/report/trustStatus";
 import type { WeeklyDecisionCardViewModel } from "../../../lib/report/homeBriefModel";
+import { deltaLabelBySignal } from "../../../lib/report/briefFormatting";
 import {
   buildPolicyDetails,
   buildRoleHref,
@@ -84,6 +85,18 @@ export const buildWeeklyDecisionPresentation = ({
           "Use the primary flip trigger to decide when this week’s posture should be revisited.",
         fallbackOwner: "CEO",
       });
+  const driverHighlights = (decision.reportDynamics.changedSignals ?? [])
+    .slice(0, 3)
+    .map((signal) => {
+      const matchingEvidence = model.diagnostics.evidenceItems.find((item) => item.key === signal.key);
+      const roundedDelta = Math.abs(signal.delta) >= 10 ? signal.delta.toFixed(0) : signal.delta.toFixed(1);
+
+      return {
+        label: signal.label?.trim() || deltaLabelBySignal[signal.key],
+        deltaLabel: `${signal.delta > 0 ? "+" : ""}${roundedDelta} vs last week`,
+        implication: matchingEvidence?.immediateImplication ?? matchingEvidence?.supportingBullets[0] ?? "Moved enough to affect this week's operating posture.",
+      };
+    });
 
   return {
     activeRole: resolveRoleView(searchParams?.role),
@@ -97,6 +110,9 @@ export const buildWeeklyDecisionPresentation = ({
     trustStrip,
     trustStateDetail: inlineTrustMarker.detail,
     hasMaterialTrustDelta: inlineTrustMarker.degraded,
+    comparisonSummary:
+      model.sinceLastReview.items.find((item) => item.id === "posture-shift")?.detail
+      ?? status.postureDelta,
     snapshotGuardrail,
     snapshotWatch,
     effectiveFlipLabels,
@@ -109,6 +125,7 @@ export const buildWeeklyDecisionPresentation = ({
       { label: "What to revisit", detail: decision.guardrail.trim() },
       { label: "What would flip", detail: snapshotWatch.trim() },
     ],
+    driverHighlights,
     guardrailPolicyDetails,
     flipPolicyDetails,
   };

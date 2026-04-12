@@ -46,7 +46,7 @@ export function RegimeBanner(props: RegimeBannerProps) {
 
   return (
     <header className={`z-10 rounded-2xl border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-start lg:justify-between">
         <div id="weekly-posture-brief-title" className="flex min-w-0 items-start gap-3">
           <span className="weather-icon-chip h-8 w-8 flex-shrink-0 text-slate-50"><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /></span>
           <div className="min-w-0">
@@ -58,16 +58,16 @@ export function RegimeBanner(props: RegimeBannerProps) {
             <p className="mt-1 text-[11px] leading-5 text-slate-300">{activeWeather}. {flipRiskMeter.detailLabel}</p>
           </div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-slate-950/25 px-3 py-2.5 text-[11px] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] lg:min-w-[18rem]" aria-label="Current outlook metadata">
-          <div className={`flex items-center gap-1.5 ${bannerTone.metrics}`}>
+        <div className="rounded-xl border border-white/10 bg-slate-950/25 px-3 py-2 text-[11px] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] lg:min-w-[18rem]" aria-label="Current outlook metadata">
+          <p className={`flex items-center gap-1.5 text-sm font-semibold text-slate-50 ${bannerTone.metrics}`}>
             <TrendGlyph trendLabel={trendValue} />
-            <span>Trend {trendValue}</span>
-          </div>
-          <p className="mt-1 text-sm font-semibold text-slate-50">
-            Posture confidence {Math.round(confidencePercent)}% ({confidenceLabel})
+            <span>{trendValue} trend</span>
+            <span className="text-slate-500">·</span>
+            <span>{Math.round(confidencePercent)}% confidence</span>
+            <span className="text-slate-400">({confidenceLabel})</span>
           </p>
           <p className="mt-1 text-[11px] leading-5 text-slate-300">
-            Flip window {flipRiskValue} · {flipRiskMeter.triggerLabel}
+            {flipRiskValue} to flip · {flipRiskMeter.triggerLabel}
           </p>
         </div>
       </div>
