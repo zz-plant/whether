@@ -38,11 +38,7 @@ export const isContentMeasurementEvent = (input: unknown): input is ContentMeasu
   );
 };
 
-export const trackContentCtaConversion = (event: Omit<ContentMeasurementEvent, "type"> & { type?: "cta_conversion" }) => {
-  const payload: ContentMeasurementEvent = {
-    ...event,
-    type: "cta_conversion",
-  };
+export const trackContentMeasurementEvent = (payload: ContentMeasurementEvent) => {
   const body = JSON.stringify(payload);
 
   if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
@@ -60,6 +56,33 @@ export const trackContentCtaConversion = (event: Omit<ContentMeasurementEvent, "
     keepalive: true,
   }).catch(() => {
     // Ignore telemetry network failures to keep the client console clean.
+  });
+};
+
+export const trackContentOrganicEntrance = (
+  event: Omit<ContentMeasurementEvent, "type" | "ctaId" | "internalPath">,
+) => {
+  trackContentMeasurementEvent({
+    ...event,
+    type: "organic_entrance",
+  });
+};
+
+export const trackContentCtaConversion = (
+  event: Omit<ContentMeasurementEvent, "type" | "internalPath"> & { type?: "cta_conversion" },
+) => {
+  trackContentMeasurementEvent({
+    ...event,
+    type: "cta_conversion",
+  });
+};
+
+export const trackContentAssistedConversion = (
+  event: Omit<ContentMeasurementEvent, "type" | "ctaId"> & { type?: "assisted_conversion" },
+) => {
+  trackContentMeasurementEvent({
+    ...event,
+    type: "assisted_conversion",
   });
 };
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
   canonicalPositioningLine,
+  websiteName,
 } from "../seo";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
@@ -45,7 +46,7 @@ export const buildHomeMetadata = async (
       url: buildCanonicalUrl(sharePath),
       title: HOME_TITLE,
       description: HOME_DESCRIPTION,
-      siteName: "Whether — Startup Market Weather & Weekly Operating Posture",
+      siteName: websiteName,
       images: [
         {
           url: imageUrl,

@@ -11,6 +11,7 @@ import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
+import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
@@ -125,6 +126,7 @@ type ResourceDecisionArtifact = {
 
 export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
   const canonicalUrl = buildCanonicalUrl(`/resources/${article.slug}`);
+  const pagePath = `/resources/${article.slug}`;
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -148,7 +150,11 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
   };
 
   return (
-    <main className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+    <main
+      className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_280px]"
+      data-content-measurement-root={pagePath}
+    >
+      <ContentMeasurementTracker pagePath={pagePath} cluster={article.cluster} intent={article.intent} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
 

@@ -37,6 +37,7 @@ import {
   isIndexableResourcePillarSlug,
   noindexRobots,
 } from "../../../lib/seo/indexationPolicy";
+import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 
 type Params = { slug: string };
 const RESOURCES_RETURN_HREF = "/operations" as const;
@@ -201,7 +202,16 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const midpointIndex = Math.floor(page.sections.length / 2);
 
   return (
-    <main id="top" className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <main
+      id="top"
+      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
+      data-content-measurement-root={`/resources/${page.slug}`}
+    >
+      <ContentMeasurementTracker
+        pagePath={`/resources/${page.slug}`}
+        cluster={page.cluster}
+        intent={page.intent}
+      />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationSchema) }} />
 

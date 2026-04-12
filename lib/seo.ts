@@ -3,9 +3,9 @@ import { siteUrl } from "./siteUrl";
 import { decisionTransmissionSearchDescription } from "./report/decisionTransmissionCopy";
 
 export const organizationName = "Whether";
-export const websiteName = "Whether — Weekly Startup Market Weather & Operating Posture";
+export const websiteName = "Whether — Weekly Operating Brief for Leadership Teams";
 export const canonicalPositioningLine =
-  "Whether translates macro conditions into a weekly operating call for leadership teams.";
+  "Whether translates macro conditions into a weekly operating brief for leadership teams.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 export const defaultSocialImagePath = "/api/og?template=report";

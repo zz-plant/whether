@@ -8,6 +8,7 @@ import { signalScenarioRoutes } from "./seoRouteClusters";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
+import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
 import {
   isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
@@ -51,6 +52,23 @@ const buildEntry = ({
   changeFrequency,
   priority,
 });
+
+const isSignalScenarioIndexable = async (path: `/${string}`): Promise<boolean> => {
+  try {
+    const payloadRecord = await readProgrammaticPayload(path);
+    const payload = payloadRecord.payload;
+
+    if (payload.noindex || payload.degraded) {
+      return false;
+    }
+
+    return !(payload.noindexReasons ?? []).some(
+      (reason) => reason.startsWith("freshness-") || reason.includes("provenance"),
+    );
+  } catch {
+    return false;
+  }
+};
 
 export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sitemap" });
@@ -128,12 +146,27 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: 0.58,
     }));
 
-  const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioRoutes.map((clusterRoute) => ({
-    path: `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}`,
-    lastModified: reportLastModified,
-    changeFrequency: "weekly",
-    priority: 0.68,
-  }));
+  const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible
+    ? await Promise.all(
+      signalScenarioRoutes.map(async (clusterRoute) => {
+        const path = `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}` as const;
+        if (!(await isSignalScenarioIndexable(path))) {
+          return null;
+        }
+
+        return {
+          path,
+          lastModified: reportLastModified,
+          changeFrequency: "weekly" as const,
+          priority: 0.68,
+        };
+      }),
+    )
+    : [];
+
+  const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioEntryCandidates.filter(
+    (entry): entry is SitemapEntryDescriptor => entry !== null,
+  );
 
   return [
     ...coreEntries,

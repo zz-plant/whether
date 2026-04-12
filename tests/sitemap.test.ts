@@ -101,6 +101,7 @@ describe("sitemap", () => {
     const urls = new Set(entries.map((entry) => entry.url));
 
     assert.ok(!urls.has(`${siteUrl}/answers/should-we-hire-engineers-right-now`));
+    assert.ok(!urls.has(`${siteUrl}/signals/capital-tightness-watch/hiring`));
     assert.ok(!urls.has(`${siteUrl}/should-we-hire-engineers-right-now`));
     assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
   });

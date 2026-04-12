@@ -1,4 +1,5 @@
 import type { Route } from "./navigation/routeType";
+import type { ContentCluster, ContentIntent } from "./contentMeasurement";
 
 export type GovernanceLexiconTerm = {
   slug: "reversibility" | "escalation-thresholds" | "30-day-confirmation-logic" | "capital-regime";
@@ -62,6 +63,8 @@ export type ResourcePillarPage = {
   h1: string;
   canonicalPath: string;
   parentTopic: boolean;
+  cluster: ContentCluster;
+  intent: ContentIntent;
   boardPackContext: string;
   midpointCtaLabel: string;
   sections: PillarSection[];
@@ -238,6 +241,8 @@ export const resourcePillarPages: ResourcePillarPage[] = [
     h1: "Capital Discipline Venture Backed Companies",
     canonicalPath: canonicalCapitalDisciplinePath,
     parentTopic: true,
+    cluster: "authority",
+    intent: "board",
     boardPackContext:
       "This canonical pillar anchors the parent topic and links every supporting governance artifact to board-level capital allocation decisions.",
     midpointCtaLabel: "Download the Capital Posture Template",
@@ -376,6 +381,8 @@ export const resourcePillarPages: ResourcePillarPage[] = [
     h1: "Board Level Capital Posture Framework",
     canonicalPath: canonicalCapitalDisciplinePath,
     parentTopic: false,
+    cluster: "authority",
+    intent: "board",
     boardPackContext:
       "This supporting pillar extends the parent topic by converting posture concepts into a board-operable framework and artifact cadence.",
     midpointCtaLabel: "Request a Board Pack Walkthrough",
@@ -522,6 +529,8 @@ export const resourcePillarPages: ResourcePillarPage[] = [
     h1: "Reversibility as Governance",
     canonicalPath: canonicalCapitalDisciplinePath,
     parentTopic: false,
+    cluster: "authority",
+    intent: "board",
     boardPackContext:
       "This supporting pillar explains how reversibility standards become board-level control logic linked to capital posture and escalation practices.",
     midpointCtaLabel: "Download Reversibility Governance Template",

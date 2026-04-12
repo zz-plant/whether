@@ -3,11 +3,10 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
-import { buildSocialImageUrl } from "../lib/seo";
+import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
 
-const siteName = "Whether — Capital Posture Governance Standard";
-const siteDescription =
-  "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+const siteName = websiteName;
+const siteDescription = defaultSiteDescription;
 const socialImageUrl = buildSocialImageUrl();
 const themeStorageKey = "whether-theme";
 const displayModeStorageKey = "whether-display-mode";
@@ -61,7 +60,7 @@ export const metadata: Metadata = {
     template: "%s | Whether"
   },
   description: siteDescription,
-  applicationName: "Whether Capital Posture Governance Standard",
+  applicationName: "Whether",
   keywords: [
     "macroeconomic signals",
     "Treasury yield curve",
@@ -88,7 +87,7 @@ export const metadata: Metadata = {
         url: socialImageUrl,
         width: 1200,
         height: 630,
-        alt: "Whether capital posture social preview",
+        alt: "Whether weekly operating brief social preview",
       },
     ],
   },

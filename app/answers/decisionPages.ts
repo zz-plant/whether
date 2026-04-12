@@ -1,4 +1,5 @@
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
+import type { ContentCluster, ContentIntent } from "../../lib/contentMeasurement";
 
 export type AnswerCategory = "climate" | "decision" | "explanation";
 
@@ -14,6 +15,36 @@ export type DecisionPageDefinition = {
   thresholdFocus: "tightness" | "risk" | "both";
   featuredOrder?: number;
 };
+
+const resolveIntentFromAudience = (audience: string): ContentIntent => {
+  const normalizedAudience = audience.toLowerCase();
+
+  if (normalizedAudience.includes("vc")) {
+    return "vc-partner";
+  }
+
+  if (normalizedAudience.includes("board") || normalizedAudience.includes("chief of staff")) {
+    return "board";
+  }
+
+  if (normalizedAudience.includes("cfo") || normalizedAudience.includes("finance")) {
+    return "cfo";
+  }
+
+  return "vp-product";
+};
+
+export const getDecisionPageContentMeasurement = (
+  page: Pick<DecisionPageDefinition, "category" | "audience">,
+): { cluster: ContentCluster; intent: ContentIntent } => ({
+  cluster:
+    page.category === "decision"
+      ? "tool"
+      : page.category === "climate"
+        ? "pain"
+        : "authority",
+  intent: resolveIntentFromAudience(page.audience),
+});
 
 const allAnswerPages: DecisionPageDefinition[] = [
   {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
+import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "How VC firms can enforce capital discipline across portfolios",
@@ -15,12 +16,16 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function Page() {
+  const pagePath = "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios";
+
   return (
     <main
       className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
+      data-content-measurement-root={pagePath}
       data-page-cluster="vc"
       data-page-intent="vc-partner"
     >
+      <ContentMeasurementTracker pagePath={pagePath} cluster="vc" intent="vc-partner" />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs uppercase tracking-[0.14em] text-slate-400">VC authority page</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">

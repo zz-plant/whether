@@ -49,6 +49,8 @@ describe("cluster template metadata eligibility", () => {
       signalSummary: "Financing and spend pressure signal.",
       scenarioTitle: "Hiring",
       payload: {
+        currentCall: "Hold hiring pace.",
+        immediateAction: "Backfill only the most critical roles.",
         degraded: true,
         noindex: true,
         noindexReasons: ["freshness-stale"],
