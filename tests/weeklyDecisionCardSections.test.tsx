@@ -297,6 +297,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Confidence check/);
     assert.match(html, /Last read -&gt; This week -&gt; Threshold/);
     assert.match(html, /1 missing week in the 8-week window\./);
+    assert.match(html, /Read continuity/);
+    assert.match(html, /2026-02-06: missing confidence read/);
   });
 
   it("keeps missing signal detail copy neutral when delta cards are already present", () => {

@@ -2,6 +2,7 @@ import { buildCompactFreshnessMeta, formatTrustStripDisplay } from "../../../lib
 import { buildWeeklyCitationMetaLine, buildTrustMarker } from "../../../lib/report/trustStatus";
 import type { WeeklyDecisionCardViewModel } from "../../../lib/report/homeBriefModel";
 import { deltaLabelBySignal } from "../../../lib/report/briefFormatting";
+import { isImprovingSignalDelta } from "../../../lib/report/reportData";
 import {
   buildPolicyDetails,
   buildRoleHref,
@@ -9,6 +10,19 @@ import {
   getOwnerLabelForArea,
   resolveRoleView,
 } from "./policySupport";
+
+const formatDriverDeltaLabel = (delta: number) => {
+  const roundedDelta = Math.abs(delta) >= 10 ? delta.toFixed(0) : delta.toFixed(1);
+  return `${delta > 0 ? "+" : ""}${roundedDelta} vs last week`;
+};
+
+const formatTrajectoryDelta = (value: number) => {
+  if (value === 0) {
+    return "unchanged";
+  }
+
+  return `${value > 0 ? "+" : ""}${value.toFixed(1)}`;
+};
 
 export const buildWeeklyDecisionPresentation = ({
   model,
@@ -85,18 +99,113 @@ export const buildWeeklyDecisionPresentation = ({
           "Use the primary flip trigger to decide when this week’s posture should be revisited.",
         fallbackOwner: "CEO",
       });
-  const driverHighlights = (decision.reportDynamics.changedSignals ?? [])
-    .slice(0, 3)
-    .map((signal) => {
-      const matchingEvidence = model.diagnostics.evidenceItems.find((item) => item.key === signal.key);
-      const roundedDelta = Math.abs(signal.delta) >= 10 ? signal.delta.toFixed(0) : signal.delta.toFixed(1);
+  const evidenceByKey = new Map(
+    model.diagnostics.evidenceItems.map((item) => [item.key, item] as const),
+  );
+  const changedSignalByKey = new Map(
+    (decision.reportDynamics.changedSignals ?? []).map((signal) => [signal.key, signal] as const),
+  );
+  const changedSignalKeys = new Set((decision.reportDynamics.changedSignals ?? []).map((signal) => signal.key));
+  const availableContributions = (decision.reportDynamics.signalContributions ?? [])
+    .filter((item) => !item.unavailable);
+  const rankedContributionPool = changedSignalKeys.size > 0
+    ? availableContributions.filter((item) => changedSignalKeys.has(item.key))
+    : availableContributions;
+  const contributionRankedDrivers = rankedContributionPool
+    .map((item) => {
+      const matchingEvidence = evidenceByKey.get(item.key);
+      const changedSignal = changedSignalByKey.get(item.key);
+      const contributionLabel = item.normalizedPercentLabel;
+      const postureDirection: "tightening" | "opening" | "flat" = changedSignal
+        ? isImprovingSignalDelta(changedSignal.key, changedSignal.delta)
+          ? "opening"
+          : "tightening"
+        : "flat";
 
       return {
-        label: signal.label?.trim() || deltaLabelBySignal[signal.key],
-        deltaLabel: `${signal.delta > 0 ? "+" : ""}${roundedDelta} vs last week`,
-        implication: matchingEvidence?.immediateImplication ?? matchingEvidence?.supportingBullets[0] ?? "Moved enough to affect this week's operating posture.",
+        label: item.label?.trim() || deltaLabelBySignal[item.key],
+        weightLabel: `${contributionLabel} posture weight`,
+        weightPercent: Math.round(item.normalized * 100),
+        deltaLabel: changedSignal ? formatDriverDeltaLabel(changedSignal.delta) : "No fresh weekly delta",
+        implication:
+          matchingEvidence?.immediateImplication
+          ?? matchingEvidence?.supportingBullets[0]
+          ?? "Carried meaningful weight in this week's posture call.",
+        postureDirection,
+        postureDirectionLabel:
+          postureDirection === "opening"
+            ? "Opening posture"
+            : postureDirection === "tightening"
+              ? "Tightening posture"
+              : "Holding steady",
+        influence: item.normalized,
+        deltaMagnitude: Math.abs(changedSignal?.delta ?? 0),
       };
-    });
+    })
+    .filter((item) => item.influence > 0 || item.deltaMagnitude > 0)
+    .sort((left, right) => {
+      if (right.influence !== left.influence) {
+        return right.influence - left.influence;
+      }
+
+      if (right.deltaMagnitude !== left.deltaMagnitude) {
+        return right.deltaMagnitude - left.deltaMagnitude;
+      }
+
+      return left.label.localeCompare(right.label);
+    })
+    .slice(0, 3)
+    .map(({ label, weightLabel, weightPercent, deltaLabel, implication, postureDirection, postureDirectionLabel }) => ({
+      label,
+      weightLabel,
+      weightPercent,
+      deltaLabel,
+      implication,
+      postureDirection,
+      postureDirectionLabel,
+    }));
+  const driverHighlights = contributionRankedDrivers.length > 0
+    ? contributionRankedDrivers
+    : (decision.reportDynamics.changedSignals ?? [])
+        .slice(0, 3)
+        .map((signal) => {
+          const matchingEvidence = evidenceByKey.get(signal.key);
+          const postureDirection: "tightening" | "opening" = isImprovingSignalDelta(signal.key, signal.delta) ? "opening" : "tightening";
+
+          return {
+            label: signal.label?.trim() || deltaLabelBySignal[signal.key],
+            weightLabel: "Weekly move",
+            weightPercent: null,
+            deltaLabel: formatDriverDeltaLabel(signal.delta),
+            implication:
+              matchingEvidence?.immediateImplication
+              ?? matchingEvidence?.supportingBullets[0]
+              ?? "Moved enough to affect this week's operating posture.",
+            postureDirection,
+            postureDirectionLabel: postureDirection === "opening" ? "Opening posture" : "Tightening posture",
+          };
+        });
+  const recentMemorySteps = model.history.memoryRail.slice(-3);
+  const postureSteps = recentMemorySteps.map((item, index, steps) => ({
+    label:
+      steps.length === 1
+        ? "This week"
+        : steps.length === 2
+          ? index === 0
+            ? "Last week"
+            : "This week"
+          : index === 0
+            ? "Prior"
+            : index === 1
+              ? "Last week"
+              : "This week",
+    posture: item.posture,
+    detail: item.label,
+    isCurrent: index === steps.length - 1,
+  }));
+  const trajectoryDeltaSummary = model.diagnostics.postureTrajectory
+    ? `Tightness ${formatTrajectoryDelta(model.diagnostics.postureTrajectory.weeklyDelta.tightness)} · Risk appetite ${formatTrajectoryDelta(model.diagnostics.postureTrajectory.weeklyDelta.riskAppetite)}`
+    : undefined;
 
   return {
     activeRole: resolveRoleView(searchParams?.role),
@@ -113,6 +222,8 @@ export const buildWeeklyDecisionPresentation = ({
     comparisonSummary:
       model.sinceLastReview.items.find((item) => item.id === "posture-shift")?.detail
       ?? status.postureDelta,
+    postureSteps,
+    trajectoryDeltaSummary,
     snapshotGuardrail,
     snapshotWatch,
     effectiveFlipLabels,

@@ -84,7 +84,27 @@ export const ConfidenceMiniChart = ({
             label: "On the line",
             detail: "Sitting exactly on the decision threshold.",
             toneClass: "border-amber-400/25 bg-amber-500/8 text-amber-100",
-          };
+        };
+  const continuityPoints = confidenceHistory.map((point, index) => {
+    const isCurrent = index === currentHistoryIndex;
+    const isPrevious = index === previousHistoryIndex;
+    const roundedConfidence = typeof point.confidencePercent === "number"
+      ? Math.round(point.confidencePercent)
+      : null;
+
+    return {
+      key: `${point.recordDate}-${index}`,
+      isMissing: point.isMissing,
+      isCurrent,
+      isPrevious,
+      ariaLabel: point.isMissing
+        ? `${point.recordDate}: missing confidence read`
+        : `${point.recordDate}: ${roundedConfidence}% confidence${isCurrent ? " (this week)" : isPrevious ? ` (${previousLabel.toLowerCase()})` : ""}`,
+    };
+  });
+  const continuitySummary = missingWeeks > 0
+    ? `${missingWeeks} gap${missingWeeks === 1 ? "" : "s"} in the 8-week window`
+    : "Continuous 8-week read";
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
@@ -162,7 +182,46 @@ export const ConfidenceMiniChart = ({
               <span className="h-0 w-4 border-t border-slate-200" aria-hidden="true" />
               Threshold
             </span>
+            {missingWeeks > 0 ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
+                <span
+                  className="h-2.5 w-2.5 rounded-full border border-amber-300/80 bg-[repeating-linear-gradient(135deg,rgba(251,191,36,0.22),rgba(251,191,36,0.22)_2px,transparent_2px,transparent_4px)]"
+                  aria-hidden="true"
+                />
+                Missing read
+              </span>
+            ) : null}
           </div>
+          {continuityPoints.length > 0 ? (
+            <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                <span>Read continuity</span>
+                <span>{continuitySummary}</span>
+              </div>
+              <div
+                className="mt-2 grid gap-1.5"
+                style={{ gridTemplateColumns: `repeat(${continuityPoints.length}, minmax(0, 1fr))` }}
+              >
+                {continuityPoints.map((point) => (
+                  <span key={point.key} className="block">
+                    <span
+                      className={`block h-3 rounded-full border ${
+                        point.isMissing
+                          ? "border-amber-300/75 bg-[repeating-linear-gradient(135deg,rgba(251,191,36,0.22),rgba(251,191,36,0.22)_2px,transparent_2px,transparent_5px)]"
+                          : point.isCurrent
+                            ? "border-amber-300/90 bg-amber-300 shadow-[0_0_0_1px_rgba(15,23,42,0.7)]"
+                            : point.isPrevious
+                              ? "border-slate-200/90 bg-slate-950"
+                              : "border-slate-700/70 bg-slate-700/55"
+                      }`}
+                      title={point.ariaLabel}
+                    />
+                    <span className="sr-only">{point.ariaLabel}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <p className="mt-2 text-xs leading-5 text-slate-300">
             {thresholdStatus ? `${thresholdStatus.detail} ` : ""}
             {delta !== null

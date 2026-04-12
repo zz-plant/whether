@@ -41,6 +41,8 @@ type WeeklyCallModePanelProps = {
   inlineTrustLabel: string;
   inlineTrustTone: "stable" | "warning" | "historical";
   comparisonSummary: string;
+  postureSteps: Array<{ label: string; posture: string; detail: string; isCurrent: boolean }>;
+  trajectoryDeltaSummary?: string;
   stabilityRule: string;
   weeklyLeadershipSummary: {
     boldnessScore: number;
@@ -53,7 +55,15 @@ type WeeklyCallModePanelProps = {
     netDeltaLabel: string;
   };
   decisionBullets: Array<{ label: string; detail: string }>;
-  driverHighlights: Array<{ label: string; deltaLabel: string; implication: string }>;
+  driverHighlights: Array<{
+    label: string;
+    weightLabel: string;
+    weightPercent: number | null;
+    deltaLabel: string;
+    implication: string;
+    postureDirection: "tightening" | "opening" | "flat";
+    postureDirectionLabel: string;
+  }>;
   guardrailPolicyDetails: PolicyDetails;
   flipPolicyDetails: PolicyDetails;
   roleTranslations: RoleTranslation[];
@@ -93,6 +103,8 @@ export function WeeklyCallModePanel({
   inlineTrustLabel,
   inlineTrustTone,
   comparisonSummary,
+  postureSteps,
+  trajectoryDeltaSummary,
   stabilityRule,
   weeklyLeadershipSummary,
   decisionBullets,
@@ -153,6 +165,18 @@ export function WeeklyCallModePanel({
   const supportingDrivers = driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitQueue[0] ?? null;
   const deferredRevisitItems = revisitQueue.slice(1);
+  const driverToneClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
+    direction === "tightening"
+      ? "border-amber-400/25 bg-amber-500/8 text-amber-100"
+      : direction === "opening"
+        ? "border-emerald-400/25 bg-emerald-500/8 text-emerald-100"
+        : "border-slate-700/70 bg-slate-950/60 text-slate-300";
+  const driverBarClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
+    direction === "tightening"
+      ? "bg-amber-300"
+      : direction === "opening"
+        ? "bg-emerald-300"
+        : "bg-slate-500";
 
   return (
     <>
@@ -169,6 +193,30 @@ export function WeeklyCallModePanel({
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Last review -&gt; This week</p>
                   <p className="mt-1 text-xs leading-5 text-slate-200">{comparisonSummary}</p>
                 </div>
+                {postureSteps.length > 1 ? (
+                  <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Posture trajectory</p>
+                      {trajectoryDeltaSummary ? (
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
+                      ) : null}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {postureSteps.map((step, index) => (
+                        <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
+                          <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
+                            <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
+                            <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
+                          </article>
+                          {index < postureSteps.length - 1 ? (
+                            <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
               <article className={`max-w-sm rounded-[1.05rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${compactTrustToneClass}`}>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Can act now</p>
@@ -219,7 +267,16 @@ export function WeeklyCallModePanel({
                 {primaryDriver ? (
                   <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Top driver</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-100">{primaryDriver.label} {primaryDriver.deltaLabel}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-slate-100">{primaryDriver.label}</p>
+                      <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
+                        {primaryDriver.weightLabel}
+                      </span>
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(primaryDriver.postureDirection)}`}>
+                        {primaryDriver.postureDirectionLabel}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[11px] font-semibold text-slate-200">{primaryDriver.deltaLabel}</p>
                     <p className="mt-1 text-[11px] leading-5 text-slate-300">{primaryDriver.implication}</p>
                   </div>
                 ) : null}
@@ -233,8 +290,28 @@ export function WeeklyCallModePanel({
                         <ul className="space-y-2">
                           {supportingDrivers.map((driver) => (
                             <li key={`${driver.label}-${driver.deltaLabel}`} className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-2">
-                              <p className="text-xs font-semibold text-amber-50">{driver.label}</p>
-                              <p className="mt-0.5 text-[11px] font-semibold text-slate-200">{driver.deltaLabel}</p>
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-xs font-semibold text-amber-50">{driver.label}</p>
+                                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(driver.postureDirection)}`}>
+                                  {driver.postureDirectionLabel}
+                                </span>
+                              </div>
+                              {driver.weightPercent !== null ? (
+                                <div className="mt-2 h-1.5 rounded-full bg-slate-900/90">
+                                  <span
+                                    className={`block h-full rounded-full ${driverBarClass(driver.postureDirection)}`}
+                                    style={{ width: `${Math.max(12, driver.weightPercent)}%` }}
+                                  />
+                                </div>
+                              ) : null}
+                              <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em]">
+                                <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-slate-300">
+                                  {driver.weightLabel}
+                                </span>
+                                <span className={`rounded-full border px-2 py-0.5 ${driverToneClass(driver.postureDirection)}`}>
+                                  {driver.deltaLabel}
+                                </span>
+                              </div>
                             </li>
                           ))}
                         </ul>

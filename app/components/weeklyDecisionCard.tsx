@@ -111,6 +111,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     hasMaterialTrustDelta,
     trustStrip,
     comparisonSummary,
+    postureSteps,
+    trajectoryDeltaSummary,
     snapshotGuardrail,
     snapshotWatch,
     effectiveFlipLabels,
@@ -161,6 +163,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             inlineTrustLabel={inlineTrustMarker.label}
             inlineTrustTone={inlineTrustMarker.tone}
             comparisonSummary={comparisonSummary}
+            postureSteps={postureSteps}
+            trajectoryDeltaSummary={trajectoryDeltaSummary}
             stabilityRule={stabilityRule}
             weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
             decisionBullets={decisionBullets}

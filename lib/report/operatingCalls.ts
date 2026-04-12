@@ -28,6 +28,8 @@ export type ActionStripItem = {
   corridorProgressPercent?: number;
   tightenDistanceLabel?: string;
   reopenDistanceLabel?: string;
+  priorityDistancePoints?: number;
+  priorityOrderIndex?: number;
 };
 
 export type RoleAwareOperatingTemplate = {
@@ -251,7 +253,7 @@ export const resolveDecisionLaneState = ({
 };
 
 export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: CurrentScores): ActionStripItem[] =>
-  operatingLeverOrder.map((lever) => {
+  operatingLeverOrder.map((lever, index) => {
     const area = operatingLeverToDecisionArea[lever];
     const rule = findRule(rules, area);
     const laneState = resolveDecisionLaneState({ rule, scores });
@@ -267,6 +269,8 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
       corridorProgressPercent: laneState?.corridorProgressPercent,
       tightenDistanceLabel: laneState?.tightenDistanceLabel,
       reopenDistanceLabel: laneState?.reopenDistanceLabel,
+      priorityDistancePoints: laneState?.nearestPause?.pointsToLine ?? laneState?.nearestResume?.pointsToLine,
+      priorityOrderIndex: index,
     };
   });
 
