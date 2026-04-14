@@ -17,6 +17,9 @@
 - Test runtime contract: `bun run test` delegates to Bun's native test runner over `./tests` with recursive `.test.ts`/`.test.tsx` discovery; `node:test` and `node:assert/strict` imports are supported via Bun Node compatibility.
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 - Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
+- Agent preflight doctor: `bun run agent:doctor`
+- Agent task router: `bun run agent:route -- "<task>"`
+- Subagent handoff packet generator: `bun run agent:handoff -- --job "<job>"`
 
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
@@ -79,6 +82,7 @@ Available starter skills:
 - `feature-audit` → remove/move/modify UX/content audits
 - `pr-hygiene` → pre-commit and pre-PR validation checks
 - `agent-skill-architect` → create/upgrade repo-local skills with clear contracts
+- `subagent-handoff` → bounded delegation packets with read anchors, checks, and return shape
 - `regime-briefing-operator` → decision-ready weekly/regime briefings
 - `signal-provenance-audit` → source URL/timestamp/formula provenance audits
 - `executive-brief-pack` → leadership-ready strategy/export brief outputs
@@ -90,7 +94,7 @@ Repository path convention:
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, or `/system-skill-router`
+- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/subagent-handoff`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, or `/system-skill-router`
 
 When using skill outputs in a deliverable, preserve each skill's output-contract sections so reviewers can verify completeness quickly.
 

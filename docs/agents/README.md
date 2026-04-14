@@ -6,6 +6,23 @@ The goal is not to read every guide. The goal is to read the minimum set that le
 
 `signals -> posture -> decision -> artifact`
 
+## AX fast path
+
+Start here when you want the fastest correct repo orientation:
+
+1. read `../../AGENTS.md`
+2. read this file
+3. open exactly one task-specific guide from the router below
+4. find the canonical module or doc before broad search
+5. run the smallest meaningful validation for the touched surface
+
+If you will delegate work to a subagent, also read the delegation packet in `mcp-and-skills-playbook.md` before handing work off.
+
+Useful helpers:
+- `bun run agent:doctor`
+- `bun run agent:route -- "<task>"`
+- `bun run agent:handoff -- --job "<job>"`
+
 ## Fast start
 
 ### Minimal setup
@@ -97,6 +114,15 @@ Usually also inspect:
 - `../../.codex/skills/README.md`
 - `../../.roomodes` if you are using Roo workspace modes
 
+### If you plan to delegate
+
+Do this before spawning or briefing a subagent:
+
+- shape the task locally first; do not outsource initial ambiguity
+- limit the handoff to one bounded job with a clear done condition
+- pass only the relevant file paths, repo anchors, constraints, and checks
+- require changed files, validation, and open risks in the return
+
 ## Common blockers
 
 - **403/WAF**: verify `"$WHETHER_API_URL/api/health"`; if edge policy blocks CLI routes, use `GET /api/agent?cadence=weekly` from `agent-interface.md`.
@@ -113,7 +139,7 @@ Usually also inspect:
 - `data-and-platform.md` — provenance and platform readiness constraints
 - `quality-and-pr.md` — validation depth, commit hygiene, and PR quality bar
 - `ui-ux-standards.md` — accessibility, visual consistency, and interaction standards
-- `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows
+- `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows, including the canonical subagent handoff packet
 - `agent-interface.md` — HTTP and MCP entrypoints for agentic integrations
 
 If you are using Roo, repo-scoped workspace modes live in `../../.roomodes` and route common Whether jobs to the matching repo-local skills.
@@ -124,6 +150,7 @@ If you are using Roo, repo-scoped workspace modes live in `../../.roomodes` and 
 - **Decision transmission:** does the change make the output faster to scan, decide on, or share?
 - **Trust:** are provenance, freshness, and fallback behaviors preserved?
 - **Validation:** did you run the smallest meaningful checks?
+- **Delegation:** if work was handed off, was the task packet bounded enough to review fast?
 - **Documentation:** if behavior or workflow changed, did the canonical doc change too?
 
 ## Scope note

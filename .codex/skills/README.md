@@ -19,6 +19,7 @@ Use this index to decide whether a first-party Whether skill should be loaded be
 | `signal-provenance-audit` | Trust, provenance, freshness, and formula audits | Strategic interpretation without artifact verification | Provenance matrix, fix plan, go or no-go |
 | `executive-brief-pack` | Share-ready leadership artifacts from current Whether signals | Methodology-heavy explainers | Executive headline, bounded actions, citations |
 | `agent-skill-architect` | Creating or upgrading first-party repo-local skills | General product or engineering implementation | Skill spec, trigger test, maintenance notes |
+| `subagent-handoff` | Bounded subagent delegation packets with repo anchors and verification | Early ambiguity shaping or broad implementation work | Handoff packet, return contract, open risks |
 
 ## Selection rules
 
@@ -26,6 +27,25 @@ Use this index to decide whether a first-party Whether skill should be loaded be
 - If two skills seem relevant, define the order before using them.
 - If a task is not repeatable or lacks a stable output shape, do not force it into a skill.
 - If a skill would mostly restate repo docs, fix the docs or the skill instead of adding another skill.
+
+## Direct reasoning vs skill vs subagent
+
+Use this order to avoid unnecessary workflow overhead:
+
+- direct reasoning first for one-off implementation or tightly coupled debugging
+- a skill when the task has a repeatable workflow and fixed output shape
+- a subagent when the work is bounded enough to parallelize cleanly
+
+If you delegate a skill-shaped task, name the skill in the handoff and preserve its output contract instead of inventing a new return format.
+
+## Delegating skill-shaped work
+
+When a subagent is doing work that matches one of these skills:
+
+- pass the skill name explicitly
+- include the canonical repo anchors that skill depends on
+- keep the delegated job to one repeatable workflow
+- require the return to preserve the skill's section order when applicable
 
 ## Quality bar for first-party skills
 

@@ -30,6 +30,19 @@ Guardrails:
 - keep host allowlists narrow
 - avoid mutating tools unless the task needs them
 
+## Decide the execution mode first
+
+Pick the lightest mechanism that still gives a reliable result:
+
+- use direct reasoning for one-off work, tightly coupled edits, or ambiguous discovery
+- use a repo-local skill for repeatable jobs with a stable output contract
+- use a subagent for bounded work that can run in parallel with clear ownership
+
+Do not use delegation as a substitute for task shaping.
+Do not use a skill when the job has no stable review shape.
+
+If a delegated subtask also matches a repo-local skill, name that skill in the handoff so the subagent preserves the expected output contract.
+
 ## When to use a repo-local skill
 
 Use a skill when the task has a repeatable workflow and a stable review shape.
@@ -43,6 +56,16 @@ Good candidates:
 - executive brief generation from existing Whether artifacts
 
 Do not create or invoke a skill just because the task is complicated. If the workflow is one-off, direct reasoning is usually better.
+
+## Main-agent vs subagent responsibilities
+
+Keep these boundaries explicit:
+
+- the main agent owns scope, product intent, conflict resolution, and final synthesis
+- the subagent owns a bounded slice of execution inside a declared scope
+- the main agent decides whether the result is integrated, revised, or discarded
+
+Subagents should not invent new product surfaces, reinterpret core semantics, or expand scope unless the handoff explicitly allows it.
 
 ## Current first-party skills
 
@@ -69,6 +92,79 @@ Every first-party skill should define:
 - quality checks before finalizing
 - guardrails and fallback behavior
 - maintenance metadata so stale skills are easy to spot
+
+## Canonical subagent handoff packet
+
+Use this structure when handing work to a subagent:
+
+```text
+Job
+- one sentence on the exact task
+
+Why now
+- why this matters to the current user request
+
+Done when
+- observable completion condition
+
+Out of scope
+- what the subagent must not change or decide
+
+Write scope
+- files or directories it may edit
+
+Read anchors
+- the 2-5 docs or modules it must use to avoid drift
+
+Constraints
+- product rules, terminology, UX, or implementation constraints
+
+Verification
+- the minimum commands or checks to run
+
+Return contract
+- changed files
+- commands run and outcomes
+- open risks, drift, or follow-ups
+```
+
+This is the default Whether handoff shape because it keeps delegated work reviewable and prevents vague “go explore” tasks.
+
+Helper commands:
+
+- `bun run agent:route -- "<task>"` for the recommended docs, first files, and minimum checks
+- `bun run agent:doctor` for branch, dirty-worktree, relevant `AGENTS.md`, and task-profile preflight
+- `bun run agent:handoff -- --job "<job>"` to generate the canonical packet with repo defaults
+
+## Context compression rules for delegation
+
+Pass enough context to prevent drift, but not so much that the subagent has to re-orient from scratch.
+
+- prefer canonical file paths over long prose summaries
+- pass the target surface, not the whole repo map
+- include the relevant constraint or product rule verbatim if it is easy to misapply
+- cap read anchors to the minimum set that makes incorrect work unlikely
+- name assumptions explicitly instead of hiding them in a long brief
+
+Avoid:
+
+- dumping broad repo history
+- asking the subagent to rediscover the target file
+- mixing multiple unrelated jobs into one handoff
+- leaving verification or return shape unspecified
+
+## Good and bad delegation patterns
+
+Bad:
+
+- “Look through the report pipeline and decide what to improve.”
+- “Fix whatever is wrong with the homepage.”
+- “Review these docs and make them better.”
+
+Better:
+
+- “Tighten `docs/agents/README.md` so a new agent can find the right guide in under a minute; do not add new docs; verify links manually and report changed files plus risks.”
+- “Update `.codex/skills/README.md` to clarify overlap between `feature-audit` and `research-brief`; do not change any `SKILL.md`; return the exact wording changes and any remaining ambiguity.”
 
 ## Skill design rules for Whether
 
@@ -110,6 +206,8 @@ If the workflow now covers two distinct jobs, split the skill instead of expandi
 - missing repo anchors, causing policy or terminology drift
 - skills that say to run checks but never define which checks
 - skills that duplicate docs instead of routing to the right canonical doc
+- subagent handoffs with no write scope, no done condition, or no return contract
+- delegated tasks that should have stayed with the main agent because they were still ambiguous
 
 ## Maintenance loop
 
@@ -125,3 +223,8 @@ When you update a skill, also update:
 - [../../.codex/skills/README.md](../../.codex/skills/README.md) if discovery guidance changed
 - [README.md](README.md) if the recommended read path changed
 - [documentation.md](documentation.md) if doc ownership or update triggers changed
+
+When you update delegation guidance, also update:
+
+- [../../AGENTS.md](../../AGENTS.md) if repo-wide agent rules changed
+- [README.md](README.md) if the fast-path routing changed

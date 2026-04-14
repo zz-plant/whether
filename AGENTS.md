@@ -175,6 +175,38 @@ Before creating a new route, model, or export layer, check whether the behavior 
 
 ---
 
+## Execution loop for agents
+
+Use this order unless the user explicitly asks for a different workflow:
+
+1. orient with `AGENTS.md`, `docs/agents/README.md`, and the one guide that matches the task
+2. identify the canonical surface or module before broad search
+3. choose the smallest implementation that improves the product loop
+4. run the smallest meaningful verification for the changed behavior
+5. update the canonical doc if workflow, semantics, or contracts changed
+
+Do not spend major effort on repo-wide exploration before you know the target surface and likely validation path.
+
+---
+
+## Delegation rules for subagents
+
+Delegate only when the subtask is bounded, reviewable, and materially parallelizable.
+
+- Resolve task shape and product intent locally before delegating.
+- Give each subagent one clear job, one owner, and a tight write scope.
+- Pass only the minimum repo anchors needed to avoid drift.
+- Include the exact done condition, required checks, and expected return format.
+- Require the return to name changed files, commands run, and open risks or unanswered questions.
+- If a task already matches a repo-local skill, use that skill or explain why direct delegation is better.
+
+Bad delegation usually looks like “explore this area and decide what to do.”
+Good delegation looks like “update this bounded surface, under these constraints, and report back in this format.”
+
+When in doubt, keep discovery, architecture choices, and final synthesis in the main agent.
+
+---
+
 ## Decision framework for ambiguous changes
 
 If multiple valid implementations exist, choose in this order:
