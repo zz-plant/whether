@@ -51,6 +51,7 @@ export const summaryCardCadences: CadenceSummaryConfigByKey = {
         title: "Monthly posture",
         items: [summary.structured.posture.label, ...summary.structured.posture.summary],
       },
+      { title: "Planning language", items: [summary.structured.planningLanguage] },
       { title: "Bounded next actions", items: summary.structured.boundedNextActions },
       { title: "Top reversals", items: summary.structured.reversalConditions },
       { title: "Execution constraints", items: summary.structured.executionConstraints },

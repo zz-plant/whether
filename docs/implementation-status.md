@@ -5,7 +5,7 @@ This document consolidates delivery status across product roadmap audits, known 
 ## Snapshot
 
 - Milestones 5–8 are complete.
-- Summary-system follow-ups are complete.
+- Summary-system follow-ups are mostly complete; monthly `planningLanguage` parity is now shipped, while broader monthly section expansion remains open.
 - Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.38` with a repo-local install repair.
 
 ## Product roadmap (milestones 5–8)
@@ -30,7 +30,8 @@ This document consolidates delivery status across product roadmap audits, known 
 - [x] (P0) Shared `structured` → copy renderer and contract unification.
 - [x] (P1) Offline archive materialization for historical `structured` fields.
 - [x] (P1) API contract tests for `/api/weekly` and `/api/monthly` payload guarantees.
-- [x] (P2) Monthly section expansion toward weekly parity where operator value is clear.
+- [x] (P2) Monthly `planningLanguage` parity slice for structured output, copy rendering, and cadence card display.
+- [ ] (P2) Broader monthly section expansion toward weekly parity where operator value is clear.
 
 ## Stack modernization
 

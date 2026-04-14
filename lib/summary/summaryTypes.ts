@@ -31,6 +31,7 @@ export type MonthlyStructured = {
     label: string;
     summary: string[];
   };
+  planningLanguage: string;
   boundedNextActions: string[];
   reversalConditions: string[];
   executionConstraints: string[];

@@ -2,6 +2,8 @@
 
 This checklist covers the minimum instrumentation and product plumbing to put in place **before** publicly announcing premium availability.
 
+Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet.
+
 ## Goals
 - Preserve the free weekly posture ritual (`/`) as the acquisition and trust surface.
 - Measure where users hit premium intent (exports, integrations, API/data, planning depth).

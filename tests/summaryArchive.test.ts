@@ -70,6 +70,7 @@ describe("parseSummaryArchive", () => {
 
     assert.equal(monthly.cadence, "monthly");
     assert.equal(monthly.summary.structured.posture.label.length > 0, true);
+    assert.equal(monthly.summary.structured.planningLanguage.length > 0, true);
     assert.equal(monthly.summary.structured.boundedNextActions.length > 0, true);
     assert.equal(monthly.summary.structured.reversalConditions.length > 0, true);
     assert.deepEqual(monthly.summary.structured.executionConstraints, monthly.summary.constraints);

@@ -81,6 +81,7 @@ describe("CadenceSummaryCardAdapter", () => {
 
     const titles = [
       "Monthly posture",
+      "Planning language",
       "Bounded next actions",
       "Top reversals",
       "Execution constraints",

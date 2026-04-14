@@ -189,29 +189,20 @@ Validation note: click labels in this document were verified from the current ro
 - Step-by-step run sequence
 - Expected artifact and bounded rules
 
-## 9. Personalize the mandate for my company context
+## 9. Move into Planning when company context is needed
 
-**JTBD:** When the base weekly call is directionally right but too generic for my company, tailor it to stage, sector, and operating shape.
+**JTBD:** When the base weekly call needs company-specific guardrails or exceptions, carry it into Planning instead of using a separate personalization branch.
 
 **Clicks**
 1. Click `Decision Tools`.
 2. Review the `Start from this week's live call` block.
-3. In `Decision utilities`, click `Team context profile`.
-3. Set:
-   - `Stage`
-   - `Sector`
-   - `Team size`
-   - `Revenue band`
-   - `Cash runway`
-   - `Growth rate`
-   - `Business model`
-4. Click `Generate personalized mandate`.
+3. If company context matters, open Planning and use the export / governance sections to add the company-specific note.
+4. Copy or share the plan with the live weekly call preserved as the base.
 
 **Current output**
-- Personalized weekly mandate
-- Sector-adjusted interpretation
-- Tailored actions
-- Stage differentiation guidance
+- Planning handoff for company-specific context
+- Governance note or exception path
+- Shareable plan artifact with the live weekly call preserved as the base
 
 ## 10. Score whether to ship now or wait
 

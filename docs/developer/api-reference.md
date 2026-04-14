@@ -50,9 +50,11 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 
 ### D2) Premium billing readiness
 
+This is backend substrate for the pre-reveal premium flow. It supports checkout and webhook plumbing, but it is not a first-class public pricing surface.
+
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
-| `/api/billing/checkout` | POST | Creates Stripe Checkout sessions for premium plans (`pro`, `team`) before paywall reveal; requires an attributed premium `source` and supports `Idempotency-Key`. |
+| `/api/billing/checkout` | POST | Creates Stripe Checkout sessions for premium plans (`pro`, `team`) as pre-reveal backend plumbing; requires an attributed premium `source` and supports `Idempotency-Key`. |
 | `/api/billing/webhook` | POST | Stripe webhook receiver for `checkout.session.completed`; verifies `stripe-signature` via `STRIPE_WEBHOOK_SECRET` (accepts any matching `v1=` signature and enforces Stripe's 5-minute timestamp tolerance) and emits `premium_checkout_complete` telemetry when attribution metadata is valid. |
 
 ### E) Discover capabilities for tools/agents

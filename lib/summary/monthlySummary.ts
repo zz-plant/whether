@@ -81,12 +81,16 @@ export const buildMonthlyStructured = ({
     "Re-check the plan when any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);
+  const planningLanguage = transitionWatch
+    ? `Plan the month around ${guidance}, but keep scope reversible until the next read confirms stability.`
+    : `Plan the month around ${guidance}, and keep execution inside the current constraints.`;
 
   return {
     posture: {
       label: regimeLabel,
       summary: postureSummary,
     },
+    planningLanguage,
     boundedNextActions,
     reversalConditions,
     executionConstraints: constraints,

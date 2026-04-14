@@ -108,6 +108,7 @@ const MonthlyStructuredSchema = z.object({
     label: z.string(),
     summary: z.array(z.string()),
   }),
+  planningLanguage: z.string().optional(),
   boundedNextActions: z.array(z.string()),
   reversalConditions: z.array(z.string()),
   executionConstraints: z.array(z.string()),
@@ -150,21 +151,30 @@ const MonthlySummaryArchiveSchema = BaseSummarySchema.extend({
       }),
     }),
   ]).optional(),
-}).transform((summary): MonthlySummary => ({
-  ...summary,
-  structured:
-    summary.structured && "posture" in summary.structured
-      ? summary.structured
-      : buildMonthlyStructured({
-          regimeLabel: summary.regimeLabel,
-          guidance: summary.guidance,
-          confidence: summary.confidence,
-          intensity: summary.intensity,
-          transitionWatch: summary.transitionWatch,
-          constraints: summary.constraints,
-          provenance: summary.provenance,
-        }),
-}));
+}).transform((summary): MonthlySummary => {
+  const defaultStructured = buildMonthlyStructured({
+    regimeLabel: summary.regimeLabel,
+    guidance: summary.guidance,
+    confidence: summary.confidence,
+    intensity: summary.intensity,
+    transitionWatch: summary.transitionWatch,
+    constraints: summary.constraints,
+    provenance: summary.provenance,
+  });
+
+  return {
+    ...summary,
+    structured:
+      summary.structured && "posture" in summary.structured
+        ? {
+            ...defaultStructured,
+            ...summary.structured,
+            planningLanguage:
+              summary.structured.planningLanguage ?? defaultStructured.planningLanguage,
+          }
+        : defaultStructured,
+  };
+});
 
 const QuarterlySummaryArchiveSchema = BaseSummarySchema;
 const YearlySummaryArchiveSchema = BaseSummarySchema;

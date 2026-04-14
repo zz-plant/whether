@@ -60,6 +60,7 @@ describe("summaryCopyRenderer", () => {
             "Boundary watch: stable.",
           ],
         },
+        planningLanguage: "Plan the month around scale proven bets, and keep execution inside the current constraints.",
         boundedNextActions: [
           "Keep the month anchored to scale proven bets.",
           "Keep new commitments inside the current constraints.",
@@ -78,6 +79,8 @@ describe("summaryCopyRenderer", () => {
     });
 
     assert.match(copy, /MONTHLY POSTURE/);
+    assert.match(copy, /PLANNING LANGUAGE TO USE/);
+    assert.match(copy, /> Plan the month around scale proven bets/);
     assert.match(copy, /BOUNDED NEXT ACTIONS/);
     assert.match(copy, /TOP REVERSALS/);
     assert.match(copy, /EXECUTION CONSTRAINTS/);

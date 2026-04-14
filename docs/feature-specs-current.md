@@ -285,7 +285,7 @@ Decisions is an active first-class workflow surface in shipped navigation (`/dec
 action-first top fold anchored to the live weekly call:
 - one recommended next path derived from the live weekly call,
 - direct-answer and team-translation alternatives at lower visual weight,
-- then ship checklist, team-context profiling, and role/situation browsing below the primary chooser.
+- then ship checklist, Planning handoff, and role/situation browsing below the primary chooser.
 
 `/toolkits` remains available as the supporting instrument library for Decision Tools, but it is no longer treated as a peer primary hub in navigation.
 
@@ -363,7 +363,8 @@ $$
   - Coverage: `tests/summaryCopyRenderer.test.ts`
 - **P1 (implemented):** Offline archive materialization for historical `structured` fields, with guardrail coverage ensuring weekly/monthly entries are materialized.
 - **P1 (implemented):** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
-- **P2 (open):** Monthly section expansion toward weekly parity where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
+- **P2 (partially implemented):** Monthly `planningLanguage` parity is now shipped across structured output, copy rendering, and cadence-card display.
+- **P2 (open):** Broader monthly section expansion toward weekly parity remains open where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
 
 ### 5.3 Briefing exports
 Planning briefings support copy-ready briefs and executive narratives with sensor data and

@@ -32,10 +32,12 @@ describe("buildMonthlySummary", () => {
     assert.ok(summary.structured);
     assert.equal(summary.structured.posture.label, summary.regimeLabel);
     assert.equal(summary.structured.posture.summary.length > 0, true);
+    assert.equal(summary.structured.planningLanguage.length > 0, true);
     assert.equal(summary.structured.boundedNextActions.length > 0, true);
     assert.equal(summary.structured.reversalConditions.length > 0, true);
     assert.deepEqual(summary.structured.executionConstraints, summary.constraints);
     assert.match(summary.copy, /MONTHLY POSTURE/);
+    assert.match(summary.copy, /PLANNING LANGUAGE TO USE/);
     assert.match(summary.copy, /BOUNDED NEXT ACTIONS/);
     assert.match(summary.copy, /TOP REVERSALS/);
     assert.match(summary.copy, /EXECUTION CONSTRAINTS\n\n• /);
