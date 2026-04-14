@@ -15,12 +15,13 @@ describe("GlobalHeaderNavRail", () => {
       />,
     );
 
-    assert.match(html, /Browse workspaces/);
-    assert.match(html, /Decision Tools/);
-    assert.match(html, /flex-wrap/);
-    assert.match(html, /min-h-\[44px\]/);
+    assert.match(html, /Primary routes/);
+    assert.match(html, />Decision Tools</);
+    assert.match(html, /min-h-\[40px\]/);
+    assert.match(html, /rounded-full/);
     assert.doesNotMatch(html, /aria-label="Previous surface"/);
     assert.doesNotMatch(html, /aria-label="Next surface"/);
+    assert.doesNotMatch(html, /Browse workflow/);
   });
 
   it("explains how to open and traverse the default mobile rail", () => {
@@ -33,7 +34,7 @@ describe("GlobalHeaderNavRail", () => {
     );
 
     assert.match(html, /Open navigation/);
-    assert.match(html, /Open navigation, then swipe or use the arrows to move between the main pages\./);
+    assert.match(html, /Open navigation to move between the main pages\./);
     assert.match(html, /aria-label="Previous surface"/);
     assert.match(html, /aria-label="Next surface"/);
   });

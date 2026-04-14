@@ -44,10 +44,10 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Data trust/);
+    assert.match(html, /Approval readiness/);
     assert.match(html, /Approval lane/);
-    assert.match(html, /Reliability snapshot/);
-    assert.match(html, /Data source details/);
+    assert.match(html, /Reliability window/);
+    assert.match(html, /Source board/);
     assert.match(html, /\/method/);
   });
 
@@ -94,12 +94,11 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Start here/);
-    assert.match(html, /Decision focus/);
-    assert.doesNotMatch(html, /Follow-on/);
+    assert.match(html, /Weekly operating brief/);
+    assert.match(html, /Current operating call/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
-    assert.match(html, /Use one next move at a time\./);
+    assert.match(html, /Work left to right\./);
     assert.match(html, /href="#"/);
   });
 
@@ -128,9 +127,11 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Resolve one question/);
-    assert.match(html, /As-of Apr 1/);
+    assert.match(html, /As of Apr 1/);
+    assert.match(html, /Updated Apr 2/);
     assert.doesNotMatch(html, /Current report status/);
     assert.doesNotMatch(html, /Review order/);
+    assert.doesNotMatch(html, /Planning sequence/);
   });
 
   it("renders sidebar sequence rail", () => {
@@ -168,7 +169,6 @@ describe("ReportShell extracted sections", () => {
         currentPath="/signals"
         primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
         secondaryCta={{ href: "#thresholds", label: "See thresholds" }}
-        exportCta={{ href: "#ops-export-briefs", label: "Copy aligned brief" }}
       >
         <section>Body</section>
       </ReportShell>,
@@ -176,10 +176,10 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /href="#current-scores"/);
     assert.match(html, /href="#thresholds"/);
-    assert.match(html, /href="#ops-export-briefs"/);
     assert.match(html, /Open evidence appendix/);
     assert.match(html, /See thresholds/);
-    assert.match(html, /Copy aligned brief/);
+    assert.doesNotMatch(html, /Copy aligned brief/);
+    assert.doesNotMatch(html, /href="#ops-export-briefs"/);
     assert.match(html, /Deep evidence appendix\./);
   });
 

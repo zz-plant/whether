@@ -1,0 +1,47 @@
+{
+  "governanceLexicon": [
+    {
+      "slug": "reversibility",
+      "term": "Reversibility",
+      "definition": "The practical ability to unwind a decision inside a defined time window without creating second-order damage to customer trust, compliance posture, team morale, or cash runway.",
+      "boardPrompt": "What is the documented rollback path within 30 days, and who has standing authority to execute it?"
+    },
+    {
+      "slug": "escalation-thresholds",
+      "term": "Escalation thresholds",
+      "definition": "Pre-committed trigger levels that move a decision from delegated management control to executive or board-level review.",
+      "boardPrompt": "Which metric threshold, breach duration, and confidence band requires immediate board notification?"
+    },
+    {
+      "slug": "30-day-confirmation-logic",
+      "term": "30-day confirmation logic",
+      "definition": "A governance cadence where directional data must persist for roughly one operating month before capital posture changes are expanded or locked in.",
+      "boardPrompt": "Which indicators must confirm for 30 days before we increase commitments, and what do we do if confirmation fails?"
+    },
+    {
+      "slug": "capital-regime",
+      "term": "Capital regime",
+      "definition": "The current operating posture for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
+      "boardPrompt": "Given this capital regime, which commitments are mandatory, optional, deferred, or prohibited this quarter?"
+    }
+  ],
+  "canonicalCapitalDisciplinePath": "/resources/capital-discipline-venture-backed-companies",
+  "resourceSupportingPages": {
+    "decisionShieldOverview": {
+      "path": "/resources/decision-shield-overview",
+      "title": "Decision Shield Overview"
+    },
+    "capitalPostureTemplate": {
+      "path": "/resources/capital-posture-template",
+      "title": "Capital Posture Template"
+    },
+    "reversalTriggerChecklist": {
+      "path": "/resources/reversal-trigger-checklist",
+      "title": "Reversal Trigger Checklist"
+    },
+    "quarterlyCapitalPostureMemoExample": {
+      "path": "/resources/quarterly-capital-posture-memo-example",
+      "title": "Quarterly Capital Posture Memo Example"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { buildVersionedApiEnvelope, jsonResponse } from "../../../lib/api/edgeResponse";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryDelta } from "../../../lib/summary/summaryDelta";
@@ -29,18 +29,20 @@ export async function GET() {
     reportDynamics: reportData.reportDynamics,
   });
 
-  return NextResponse.json({
-    delta,
-    summaries: {
-      weekly: weeklySummary,
-      monthly: monthlySummary,
-    },
-    postureState,
-    deprecated: {
-      note: "Use postureState.currentState, postureState.lastCommittedChangeEvent, and postureState.whatFlipsNext for canonical posture semantics.",
-    },
-    generatedAt: new Date().toISOString(),
-    version: "v2",
-    degraded: !reportResult.ok,
-  });
+  return jsonResponse(
+    buildVersionedApiEnvelope({
+      delta,
+      summaries: {
+        weekly: weeklySummary,
+        monthly: monthlySummary,
+      },
+      postureState,
+      generatedAt: new Date().toISOString(),
+      version: "v2",
+      degraded: !reportResult.ok,
+      deprecated: {
+        note: "Use postureState.currentState, postureState.lastCommittedChangeEvent, and postureState.whatFlipsNext for canonical posture semantics.",
+      },
+    }),
+  );
 }

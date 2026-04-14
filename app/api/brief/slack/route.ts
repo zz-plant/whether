@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { buildVersionedApiEnvelope, jsonResponse } from "../../../../lib/api/edgeResponse";
 import { buildSlackBrief } from "../../../../lib/export/briefBuilders";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
@@ -18,12 +18,14 @@ export async function GET() {
   });
   const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
 
-  return NextResponse.json({
-    brief,
-    recordDate: treasury.record_date,
-    generatedAt: new Date().toISOString(),
-    version: "v1",
-    postureState,
-    degraded: !reportResult.ok,
-  });
+  return jsonResponse(
+    buildVersionedApiEnvelope({
+      brief,
+      recordDate: treasury.record_date,
+      generatedAt: new Date().toISOString(),
+      version: "v1",
+      postureState,
+      degraded: !reportResult.ok,
+    }),
+  );
 }

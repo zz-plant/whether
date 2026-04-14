@@ -14,8 +14,8 @@ export default function AboutPage() {
     <HubPageShell width="standard">
       <HubHero
         eyebrow="Why Whether exists"
-        title="A weekly macro brief built for operating decisions, not commentary."
-        description="Whether is an independent weekly brief. It turns public macro signals into a short weekly read so product and engineering leaders can decide what to slow down, what to defer, and what can keep moving."
+        title="A weekly operating brief for macro conditions."
+        description="Whether turns public macro signals into a short weekly brief so leadership teams can decide what to slow down, what to fund, and what to revisit before debate spreads across the org."
         stats={[
           { label: "Core loop", value: "Signals → posture → decision → shareable brief" },
           { label: "Use case", value: "Weekly leadership cadence", detail: "Built to scan, decide, and share in under a minute." },
@@ -24,33 +24,33 @@ export default function AboutPage() {
         ]}
       />
       <HubSection
-        title="What the product is trying to solve"
-        description="Whether should cut the weekly debate loop. It gives teams a shared starting point before they reopen hiring, roadmap, spending, or launch assumptions."
+        title="What it helps teams do"
+        description="Use one weekly read to align hiring, roadmap, spending, and launch decisions before the discussion sprawls."
       >
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
             <p className="weather-hub-section-eyebrow">Approach</p>
-            <p><span className="font-semibold text-slate-100">Start with the current read:</span> get to the operating stance first, then turn it into constraints and next steps.</p>
-            <p><span className="font-semibold text-slate-100">Make decisions clear:</span> guidance should include the action, the trigger, and what would make you reverse it.</p>
+            <p><span className="font-semibold text-slate-100">Start with the call:</span> get to the operating stance first, then turn it into constraints and next steps.</p>
+            <p><span className="font-semibold text-slate-100">Keep decisions bounded:</span> each recommendation should say what to do, what would stop it, and what would make you reopen it.</p>
           </div>
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
             <p className="weather-hub-section-eyebrow">Trust</p>
-            <p><span className="font-semibold text-slate-100">Sources:</span> public Treasury and macro datasets with transparent timestamps and refresh cadence.</p>
-            <p id="subscribe"><span className="font-semibold text-slate-100">Updates:</span> changes to the call, new tools, and confidence shifts should be easy to track.</p>
+            <p><span className="font-semibold text-slate-100">Sources:</span> public Treasury and macro datasets with visible timestamps and refresh cadence.</p>
+            <p id="subscribe"><span className="font-semibold text-slate-100">Updates:</span> changes to the call, confidence shifts, and new tools should be easy to track.</p>
             <p><span className="font-semibold text-slate-100">Contact:</span> hello@whether.app</p>
           </div>
         </div>
       </HubSection>
       <HubSection
         title="What to trust here — and what not to"
-        description="Whether should be explicit about what it can and cannot do so teams use it correctly."
+        description="Whether should be explicit about what it can and cannot do so teams use it with the right amount of confidence."
       >
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
             <p className="weather-hub-section-eyebrow">What it is</p>
-            <p><span className="font-semibold text-slate-100">Independent weekly brief:</span> Whether is a compact operating brief, not a large research institution with a broad publishing footprint.</p>
-            <p><span className="font-semibold text-slate-100">Best use:</span> weekly planning, clearer decisions, and meeting-ready summaries you can share quickly.</p>
-            <p><span className="font-semibold text-slate-100">How to judge it:</span> by freshness, source quality, confidence, and whether the brief stays useful when live data degrades.</p>
+            <p><span className="font-semibold text-slate-100">Independent weekly brief:</span> Whether is a compact decision artifact, not a broad macro publishing product.</p>
+            <p><span className="font-semibold text-slate-100">Best use:</span> weekly planning, faster decisions, and meeting-ready summaries you can share quickly.</p>
+            <p><span className="font-semibold text-slate-100">How to judge it:</span> by freshness, source quality, confidence, and whether it stays useful when live data degrades.</p>
           </div>
           <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
             <p className="weather-hub-section-eyebrow">What it is not</p>

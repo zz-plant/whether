@@ -71,7 +71,7 @@ export async function HomeWorkspaceBands({
         </div>
 
         <article className="weather-ritual-card px-4 py-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="max-w-3xl space-y-2">
               <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
                 <CheckIcon className="h-3.5 w-3.5" />
@@ -94,7 +94,7 @@ export async function HomeWorkspaceBands({
             </Link>
           </div>
 
-          <div className="mt-4 grid gap-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <div className="weather-transmission-segment px-3 py-3">
               <p className="text-[11px] font-medium text-amber-200">Stop line</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
@@ -107,29 +107,23 @@ export async function HomeWorkspaceBands({
                 {primaryExportAction?.label ?? "Open share brief"}
               </p>
             </div>
-            <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[11px] font-medium text-emerald-200">Weekly rhythm</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">
-                Carry the main action forward while the stop line stays visible.
-              </p>
-            </div>
           </div>
         </article>
       </section>
 
       <section
         id="audit-this-call"
-        className="scroll-mt-28 space-y-4 rounded-[1rem] border border-slate-800/60 bg-slate-950/18 px-4 py-4 sm:px-5 sm:py-5"
+        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5"
         aria-labelledby="audit-this-call-title"
       >
         <div className="weather-panel-header">
           <div className="weather-panel-header-copy">
             <p className="text-[11px] font-medium text-sky-200">Only if challenged</p>
             <h2 id="audit-this-call-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
-              Need proof?
+              Challenge the call with one check
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Open this only when someone still needs evidence, trust, or a deeper path.
+              Open one proof path, not a second dashboard.
             </p>
           </div>
         </div>
@@ -137,13 +131,13 @@ export async function HomeWorkspaceBands({
         <div className="grid gap-3 md:grid-cols-2">
           <Link
             href={"/signals#decision-summary" as Route}
-            className="weather-route-card weather-route-card-proof group min-h-[44px] rounded-[1rem] border border-slate-800/65 px-4 py-4 text-slate-100"
+            className="rounded-[1rem] border border-slate-800/65 bg-slate-950/45 px-4 py-4 text-slate-100 transition-colors hover:border-sky-400/45 hover:bg-slate-950/65"
           >
             <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
               <TrendUpIcon className="h-3.5 w-3.5" />
               <span>See what changed</span>
             </div>
-            <p className="mt-3 text-sm font-semibold group-hover:text-sky-100">Why the read moved</p>
+            <p className="mt-3 text-sm font-semibold">Why the read moved</p>
             <p className="mt-2 text-sm leading-6 text-slate-300">
               {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay when you need to challenge the call."}
             </p>
@@ -151,13 +145,13 @@ export async function HomeWorkspaceBands({
 
           <Link
             href={"/method#trust-snapshot" as Route}
-            className="weather-route-card weather-route-card-trust group min-h-[44px] rounded-[1rem] border border-slate-800/65 px-4 py-4 text-slate-100"
+            className="rounded-[1rem] border border-slate-800/65 bg-slate-950/45 px-4 py-4 text-slate-100 transition-colors hover:border-amber-400/45 hover:bg-slate-950/65"
           >
             <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
               <AuditIcon className="h-3.5 w-3.5" />
               <span>Check trust</span>
             </div>
-            <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">{workspaceModel.audit.trustStatusAction}</p>
+            <p className="mt-3 text-sm font-semibold">{workspaceModel.audit.trustStatusAction}</p>
             <p className="mt-2 text-sm leading-6 text-slate-300">
               {workspaceModel.audit.trustMarkerDetail}
             </p>
@@ -178,19 +172,19 @@ export async function HomeWorkspaceBands({
             </span>
           </summary>
 
-          <div className="mt-3 grid gap-3 lg:grid-cols-3">
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
             {deeperPaths.map((path) => (
               <Link
                 key={`${path.kicker}-${path.href}`}
                 href={path.href}
-                className={`weather-route-card group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors ${path.hoverClass}`}
+                className={`rounded-[1rem] border border-slate-800/55 bg-slate-950/40 px-3 py-3 text-slate-100 transition-colors ${path.hoverClass}`}
               >
                 <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
                   {path.icon}
                   <span>{path.kicker}</span>
                 </div>
-                <p className="mt-3 text-sm font-semibold text-slate-100">{path.title}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{path.detail}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
               </Link>
             ))}
           </div>

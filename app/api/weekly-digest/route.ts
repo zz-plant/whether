@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { buildVersionedApiEnvelope, jsonResponse } from "../../../lib/api/edgeResponse";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildWeeklyDigest } from "../../../lib/signalOps";
 import { buildPostureState } from "../../../lib/report/postureStateSource";
@@ -24,19 +24,21 @@ export async function GET() {
   const alertCount = alertsResult.alerts.length;
   const deliveryCount = deliveriesResult.deliveries.length;
 
-  return NextResponse.json({
-    version: "v1",
-    generatedAt: new Date().toISOString(),
-    digest,
-    postureState,
-    alertCount,
-    deliveryCount,
-    degraded,
-    backend,
-    deprecated: {
+  return jsonResponse(
+    buildVersionedApiEnvelope({
+      digest,
+      postureState,
       alertCount,
       deliveryCount,
-      note: "Top-level alertCount and deliveryCount remain canonical; deprecated nested aliases remain temporarily for compatibility while posture semantics come from postureState contract.",
-    },
-  });
+      degraded,
+      backend,
+      generatedAt: new Date().toISOString(),
+      version: "v1",
+      deprecated: {
+        alertCount,
+        deliveryCount,
+        note: "Top-level alertCount and deliveryCount remain canonical; deprecated nested aliases remain temporarily for compatibility while posture semantics come from postureState contract.",
+      },
+    }),
+  );
 }

@@ -171,7 +171,7 @@ export const ReportShell = (props: ReportShellProps) => {
   } = input;
   const resolvedPrimaryCta =
     inputPrimaryCta ?? (resolvedCurrentPath === "/" ? undefined : { href: "#weekly-action-summary", label: "This week" });
-  const resolvedExportCta = inputExportCta ?? { href: "/operations#ops-export-briefs", label: "Generate executive brief" };
+  const resolvedExportCta = inputExportCta ?? null;
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;

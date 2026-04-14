@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import type { ReportData, ReportDataFallback } from "../report/reportData";
 import { loadReportRouteContext } from "./reportRoute";
+import { buildVersionedApiEnvelope, jsonResponse } from "./edgeResponse";
 
 type CadenceRouteData = ReportData | ReportDataFallback;
 
@@ -25,14 +25,16 @@ export const buildCadenceRouteResponse = async <TSummary extends CadenceSummary>
   const summary = buildSummary(reportData);
   const extraPayload = buildExtraPayload ? await buildExtraPayload({ reportData, summary }) : {};
 
-  return NextResponse.json({
-    summary,
-    copy: summary.copy,
-    provenance: summary.provenance,
-    recordDateLabel: summary.recordDateLabel,
-    generatedAt: new Date().toISOString(),
-    version: "v1",
-    degraded,
-    ...extraPayload,
-  });
+  return jsonResponse(
+    buildVersionedApiEnvelope({
+      summary,
+      copy: summary.copy,
+      provenance: summary.provenance,
+      recordDateLabel: summary.recordDateLabel,
+      degraded,
+      generatedAt: new Date().toISOString(),
+      version: "v1",
+      ...extraPayload,
+    }),
+  );
 };

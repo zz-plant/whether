@@ -1,0 +1,170 @@
+[
+  {
+    "slug": "startup-funding-climate-this-week",
+    "keyword": "startup funding climate this week",
+    "title": "Startup Funding Climate This Week",
+    "category": "climate",
+    "shortAnswer": "Funding is open with guardrails, not universally easy.",
+    "directAnswer": "Run financing decisions with term quality gates while the window is open.",
+    "audience": "Founders, CFO, board operators",
+    "mappedDecisionAreas": [
+      "capital-raising",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 4
+  },
+  {
+    "slug": "is-it-risk-on-or-risk-off-for-startups",
+    "keyword": "is it risk-on or risk-off for startups",
+    "title": "Is It Risk-On or Risk-Off for Startups?",
+    "category": "climate",
+    "shortAnswer": "Current read is expansion with guardrails.",
+    "directAnswer": "Move faster on reversible bets; keep stop conditions explicit.",
+    "audience": "Leadership teams",
+    "mappedDecisionAreas": [
+      "expansion-bets",
+      "product-tempo",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 3
+  },
+  {
+    "slug": "should-startups-hire-engineers-right-now",
+    "keyword": "should startups hire engineers right now",
+    "title": "Should Startups Hire Engineers Right Now?",
+    "category": "decision",
+    "shortAnswer": "Yes for selective roles with short-cycle ROI proof.",
+    "directAnswer": "Approve only roles tied to delivery reliability or near-term revenue impact.",
+    "audience": "VP Engineering and founders",
+    "mappedDecisionAreas": [
+      "hiring",
+      "product-tempo",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 1
+  },
+  {
+    "slug": "should-startups-slow-roadmap-expansion",
+    "keyword": "should startups slow roadmap expansion",
+    "title": "Should Startups Slow Roadmap Expansion?",
+    "category": "decision",
+    "shortAnswer": "Yes—slow expansion scope, not core delivery commitments.",
+    "directAnswer": "Keep roadmap work tied to near-term retention or revenue; pause platform expansion bets until thresholds strengthen.",
+    "audience": "Product and engineering leadership",
+    "mappedDecisionAreas": [
+      "product-tempo",
+      "expansion-bets",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 2
+  },
+  {
+    "slug": "should-startups-raise-capital-now",
+    "keyword": "should startups raise capital now",
+    "title": "Should Startups Raise Capital Now?",
+    "category": "decision",
+    "shortAnswer": "Raise when it extends strategic optionality and preserves terms.",
+    "directAnswer": "If your next 12 months depend on financing certainty, start now from leverage.",
+    "audience": "CEO/CFO",
+    "mappedDecisionAreas": [
+      "capital-raising",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 5
+  },
+  {
+    "slug": "when-should-startups-cut-burn",
+    "keyword": "when should startups cut burn",
+    "title": "When Should Startups Cut Burn?",
+    "category": "decision",
+    "shortAnswer": "Cut burn when tightness worsens and raise-window strength weakens together.",
+    "directAnswer": "Pre-commit spend brakes before crossing tighter capital thresholds.",
+    "audience": "Finance and operations leaders",
+    "mappedDecisionAreas": [
+      "burn-discipline",
+      "capital-raising"
+    ],
+    "thresholdFocus": "tightness",
+    "featuredOrder": 6
+  },
+  {
+    "slug": "should-we-freeze-or-selectively-hire",
+    "keyword": "should we freeze hiring or selectively hire",
+    "title": "Should We Freeze Hiring or Selectively Hire?",
+    "category": "decision",
+    "shortAnswer": "Default to selective hiring with pre-committed stop triggers.",
+    "directAnswer": "Approve only reliability and revenue-adjacent roles with role-level payback windows and explicit pause conditions.",
+    "audience": "Founders, VP Engineering, CFO",
+    "mappedDecisionAreas": [
+      "hiring",
+      "burn-discipline",
+      "product-tempo"
+    ],
+    "thresholdFocus": "both"
+  },
+  {
+    "slug": "should-we-expand-sales-headcount-now",
+    "keyword": "should we expand sales headcount now",
+    "title": "Should We Expand Sales Headcount Now?",
+    "category": "decision",
+    "shortAnswer": "Expand only where pipeline quality and payback support it.",
+    "directAnswer": "Scale quota capacity in tranches tied to win-rate durability and cash conversion headroom.",
+    "audience": "CRO, CEO, finance leaders",
+    "mappedDecisionAreas": [
+      "hiring",
+      "expansion-bets",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both"
+  },
+  {
+    "slug": "should-we-delay-new-product-lines",
+    "keyword": "should we delay new product lines",
+    "title": "Should We Delay New Product Lines?",
+    "category": "decision",
+    "shortAnswer": "Delay net-new product lines unless near-term demand proof is strong.",
+    "directAnswer": "Protect core roadmap throughput and gate new lines behind adoption and payback milestones.",
+    "audience": "VP Product, CTO, strategy",
+    "mappedDecisionAreas": [
+      "product-tempo",
+      "expansion-bets",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both"
+  },
+  {
+    "slug": "how-fast-should-we-scale-go-to-market",
+    "keyword": "how fast should we scale go to market",
+    "title": "How Fast Should We Scale Go-To-Market?",
+    "category": "decision",
+    "shortAnswer": "Scale GTM pace with guardrails, not all at once.",
+    "directAnswer": "Increase spend and hiring in milestone-gated tranches with immediate rollback triggers on conversion or payback deterioration.",
+    "audience": "Growth and GTM operators",
+    "mappedDecisionAreas": [
+      "expansion-bets",
+      "burn-discipline",
+      "product-tempo"
+    ],
+    "thresholdFocus": "both"
+  },
+  {
+    "slug": "how-to-brief-executives-on-market-conditions",
+    "keyword": "how to brief executives on market conditions",
+    "title": "How to Brief Executives on Market Conditions",
+    "category": "explanation",
+    "shortAnswer": "Lead with decision delta, bounded rules, and flip triggers.",
+    "directAnswer": "Use a one-screen brief: what changed, what to revisit, what pauses/resumes, and what flips the call.",
+    "audience": "Chief of staff, strategy, and ops",
+    "mappedDecisionAreas": [
+      "burn-discipline",
+      "capital-raising",
+      "product-tempo"
+    ],
+    "thresholdFocus": "both"
+  }
+]

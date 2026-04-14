@@ -80,6 +80,9 @@ export default async function DecidePage({
   const recommendedAnswerPages = featuredAnswerPages.slice(0, 2);
   const recommendedStakeholderGuides = featuredStakeholders.slice(0, 2);
   const recommendedStageGuides = stageGuides.slice(0, 2);
+  const hasGuidedTranslationSelection = Boolean(
+    resolvedSearchParams?.stakeholder || resolvedSearchParams?.stage,
+  );
   const sectionLinks = [
     { href: "#unresolved-question-router", label: "Best next step" },
     { href: "#decide-secondary-paths", label: "More options" },
@@ -149,50 +152,63 @@ export default async function DecidePage({
             </Link>
           </article>
 
-          <article className="weather-hub-card scroll-mt-28 space-y-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">If the first path does not fit</p>
-              <p className="text-sm text-slate-200">Use one of these only if the recommended next step misses the question.</p>
-            </div>
-            <div id="direct-answers" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
-              <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
-              <div className="mt-3 space-y-2">
-                {recommendedAnswerPages.map((page) => (
-                  <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
-                    <p className="text-sm font-semibold text-slate-100">{page.title}</p>
-                    <p className="text-xs text-slate-300">{page.shortAnswer}</p>
-                  </Link>
-                ))}
+          <details
+            className="weather-hub-card weather-auto-chevron scroll-mt-28 px-4 py-4"
+            open={hasGuidedTranslationSelection}
+          >
+            <summary className="cursor-pointer list-none">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">If the first path does not fit</p>
+                <p className="text-sm text-slate-200">Open this only if the recommended next step misses the question.</p>
               </div>
-            </div>
-            <div id="guided-translation" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Role or stage view</p>
-              <p className="mt-2 text-sm text-slate-200">For one role, one company stage, or one team.</p>
-              <div className="mt-3 grid gap-2">
-                {recommendedStakeholderGuides.map((guide) => (
-                  <Link
-                    key={guide.slug}
-                    href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
-                    className="weather-hub-link-card space-y-1"
-                  >
-                    <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
-                    <p className="text-xs text-slate-300">{guide.tagline}</p>
-                  </Link>
-                ))}
-                {recommendedStageGuides.map((stage) => (
-                  <Link
-                    key={stage.slug}
-                    href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
-                    className="weather-hub-link-card space-y-1"
-                  >
-                    <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
-                    <p className="text-xs text-slate-300">{stage.primaryValue}</p>
-                  </Link>
-                ))}
+            </summary>
+            <div className="mt-4 space-y-4">
+              <div id="direct-answers" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
+                <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
+                <div className="mt-3 space-y-2">
+                  {recommendedAnswerPages.map((page) => (
+                    <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
+                      <p className="text-sm font-semibold text-slate-100">{page.title}</p>
+                      <p className="text-xs text-slate-300">{page.shortAnswer}</p>
+                    </Link>
+                  ))}
+                </div>
               </div>
+              <details
+                id="guided-translation"
+                className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4"
+                open={hasGuidedTranslationSelection}
+              >
+                <summary className="cursor-pointer list-none">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need role or stage translation?</p>
+                  <p className="mt-2 text-sm text-slate-200">Open this only if the question needs a role, company stage, or team-specific lens.</p>
+                </summary>
+                <div className="mt-4 grid gap-2">
+                  {recommendedStakeholderGuides.map((guide) => (
+                    <Link
+                      key={guide.slug}
+                      href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
+                      className="weather-hub-link-card space-y-1"
+                    >
+                      <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
+                      <p className="text-xs text-slate-300">{guide.tagline}</p>
+                    </Link>
+                  ))}
+                  {recommendedStageGuides.map((stage) => (
+                    <Link
+                      key={stage.slug}
+                      href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
+                      className="weather-hub-link-card space-y-1"
+                    >
+                      <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
+                      <p className="text-xs text-slate-300">{stage.primaryValue}</p>
+                    </Link>
+                  ))}
+                </div>
+              </details>
             </div>
-          </article>
+          </details>
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </HubSection>

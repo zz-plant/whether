@@ -139,23 +139,23 @@ export default async function OperationsPage({
     : isFallback
       ? "Using last verified snapshot"
       : liveNeedsCaution
-        ? "Low-confidence live read"
-        : "Live • Treasury verified";
+        ? "Live, but low confidence"
+        : "Live and current";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
         "Live refresh pending. Using last verified snapshot.")
       : liveNeedsCaution
-        ? "Live refresh is current, but signal reliability is LOW. Keep approvals staged until confidence improves."
-        : "Live refresh healthy. Next expected update: 15m.";
+        ? "The live refresh is current, but confidence is LOW. Keep approvals staged until confidence improves."
+        : "The live refresh is healthy. Next expected update: 15m.";
   const trustStatusAction = historicalSelection
-    ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
+    ? "Use historical data for retrospectives; switch back to live data before approving anything new."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : liveNeedsCaution
-        ? "Stage only reversible decisions until reliability improves or a stronger live refresh lands."
-        : "Evidence feed is live; carry the current plan forward and keep the stop lines visible.";
+        ? "Keep decisions reversible until confidence improves or a stronger live refresh lands."
+        : "Carry the plan forward and keep the stop lines visible.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback || liveNeedsCaution
@@ -190,16 +190,16 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Turn the weekly call into one approved plan, one visible stop line, and one share-ready brief."
+      pageSummary="Turn this week's call into a clear plan, visible stop lines, and a brief you can share."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
-        label: "Start with plan approval",
+        label: "Review the weekly plan",
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       decisionBanner={{
         label: "Start here",
-        decision: "Approve the week, keep the stop line visible, then package the brief.",
+        decision: "Approve the plan, keep the stop line visible, then package the brief.",
         horizon: "This week + month",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
@@ -207,7 +207,7 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Turn the weekly call into a few explicit decisions and keep the stop lines visible.",
+        call: "Turn this week's call into a few explicit decisions and keep the stop lines visible.",
         doNow: [
           actionNowShort,
           actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",
@@ -247,7 +247,7 @@ export default async function OperationsPage({
             id: "ops-monthly-action-summary",
             label: "Plan",
             title: "Weekly plan",
-            description: "Read this before changing team pace, spend, or priorities.",
+            description: "Review this before changing team pace, spend, or priorities.",
             summary: "Confirm what you should approve, hold, or revisit for this cycle.",
             owner: "CEO / COO",
             approvalStatus: "Approve this week's plan",
@@ -258,7 +258,7 @@ export default async function OperationsPage({
                 id="ops-monthly-action-summary-panel"
                 label="Start"
                 title="Weekly plan"
-                description="Read this before changing team pace, spend, or priorities."
+                description="Review this before changing team pace, spend, or priorities."
                 defaultOpen={true}
               >
                 <MonthlyActionSummaryPanel
@@ -291,7 +291,7 @@ export default async function OperationsPage({
                 <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
                   <p className="text-xs text-slate-300">
                     {showAllActionLanes
-                      ? "Showing the full rule list for deeper review."
+                      ? "Showing the full rule list for a deeper review."
                       : "Showing the top 3 rules in each area for the default weekly scan."}
                   </p>
                   <a
@@ -413,12 +413,12 @@ export default async function OperationsPage({
       <section id="ops-failure-patterns" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-failure-patterns-title">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Risk checks</p>
-          <h2 id="ops-failure-patterns-title" className="text-lg font-semibold text-slate-100">Watch the false-signal patterns before you approve the plan</h2>
-          <p className="text-sm text-slate-300">These warnings sit inside Planning so the team can test the weekly plan before going deeper.</p>
+          <h2 id="ops-failure-patterns-title" className="text-lg font-semibold text-slate-100">Pressure-test the plan before you approve it</h2>
+          <p className="text-sm text-slate-300">Use these warnings to catch weak assumptions before the plan goes out.</p>
         </div>
         {failureModes.length === 0 ? (
           <div className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-200">
-            No active warning right now. Keep the normal guardrails in force and go deeper only if the data gets stale or the signal gets weaker.
+            No active warning right now. Keep the standard guardrails in place and go deeper only if freshness drops or confidence weakens.
           </div>
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
@@ -442,8 +442,8 @@ export default async function OperationsPage({
 
       <section id="ops-edge-case-gate" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-edge-case-gate-title">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Stop here unless one bounded question remains</p>
-          <h2 id="ops-edge-case-gate-title" className="text-lg font-semibold text-slate-100">Escalate only when the weekly plan is already clear</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Only escalate if one bounded question remains</p>
+          <h2 id="ops-edge-case-gate-title" className="text-lg font-semibold text-slate-100">Open decision help only after the plan is clear</h2>
           <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open decision help only when one owner-specific or situation-specific call still needs a bounded answer after this review.</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -464,7 +464,7 @@ export default async function OperationsPage({
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Governance library</p>
             <h2 className="text-lg font-semibold text-slate-100">Board and governance resources</h2>
-            <p className="text-sm text-slate-300">The planning page should cover the weekly approval flow. Open these resources when you need a fuller board or governance version of the same work.</p>
+            <p className="text-sm text-slate-300">Planning should cover the weekly approval flow. Open these resources when you need a fuller board or governance version of the same work.</p>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {resourcePillarPages.map((pillar) => (

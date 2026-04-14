@@ -77,8 +77,8 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Turn the call into this week/);
     assert.match(html, /Make the plan/);
-    assert.match(html, /Need proof\?/);
-    assert.match(html, /Open this only when someone still needs evidence, trust, or a deeper path\./);
+    assert.match(html, /Challenge the call with one check/);
+    assert.match(html, /Open one proof path, not a second dashboard\./);
     assert.match(html, /Why the read moved/);
     assert.match(html, /Check trust/);
     assert.match(html, /More paths/);

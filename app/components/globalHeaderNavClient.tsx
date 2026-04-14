@@ -48,12 +48,10 @@ const routePresentation = {
 function NavigationLinkCard({
   link,
   index,
-  total,
   onIntent,
 }: {
   link: GlobalHeaderNavigationLink;
   index: number;
-  total: number;
   onIntent: (href: string) => void;
 }) {
   const presentation = routePresentation[link.href as keyof typeof routePresentation] ?? {
@@ -69,7 +67,7 @@ function NavigationLinkCard({
         title={link.boundary}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`weather-route-card group inline-flex min-h-[78px] min-w-[148px] flex-col items-start justify-start gap-1.5 px-3.5 py-3.5 text-left sm:h-full sm:min-w-0 ${
+        className={`weather-route-card group inline-flex min-h-[72px] min-w-[148px] flex-col items-start justify-start gap-1.5 px-3.5 py-3 text-left no-underline sm:h-full sm:min-w-0 ${
           link.isActive
             ? "border-sky-300/80 bg-sky-500/18 text-sky-50 shadow-[0_18px_34px_-26px_rgba(56,189,248,0.46)]"
             : "text-slate-100"
@@ -80,7 +78,7 @@ function NavigationLinkCard({
             {presentation.eyebrow}
           </span>
           <span className="weather-nav-card-index" aria-hidden="true">
-            {index + 1}/{total}
+            {index + 1}
           </span>
         </div>
         <span className="mt-1 font-[family:var(--weather-font-display)] text-sm font-semibold tracking-[-0.02em] sm:text-[1.02rem]">
@@ -88,13 +86,6 @@ function NavigationLinkCard({
         </span>
         <span className="text-[11px] font-medium leading-relaxed text-slate-200/90">
           {presentation.prompt}
-        </span>
-        <span
-          className={`mt-1 hidden text-[11px] leading-relaxed xl:block ${
-            link.isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"
-          }`}
-        >
-          {link.description}
         </span>
       </Link>
     </li>
@@ -108,11 +99,6 @@ function CompactNavigationLink({
   link: GlobalHeaderNavigationLink;
   onIntent: (href: string) => void;
 }) {
-  const presentation = routePresentation[link.href as keyof typeof routePresentation] ?? {
-    eyebrow: "Open when needed",
-    prompt: link.description,
-  };
-
   return (
     <li className="flex-shrink-0">
       <Link
@@ -120,17 +106,18 @@ function CompactNavigationLink({
         aria-current={link.isActive ? "page" : undefined}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        title={presentation.prompt}
-        className={`weather-route-card inline-flex min-h-[66px] min-w-[9.5rem] flex-col items-start justify-center gap-1 whitespace-nowrap rounded-[1.1rem] px-3.5 py-2.5 text-left touch-manipulation transition-colors ${
+        title={link.description}
+        className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-3 py-2 text-[13px] font-medium tracking-[0.01em] no-underline touch-manipulation transition-colors ${
           link.isActive
-            ? "border-slate-100/90 bg-slate-100 text-slate-950 shadow-[0_10px_24px_-18px_rgba(248,250,252,0.75)]"
-            : "text-slate-100 hover:border-slate-500/85 hover:text-slate-100"
+            ? "border-slate-700/80 bg-slate-900/80 text-slate-50"
+            : "border-transparent text-slate-400 hover:border-slate-800 hover:bg-slate-950/60 hover:text-slate-100"
         }`}
       >
-        <span className={`text-[9px] font-semibold uppercase tracking-[0.16em] ${link.isActive ? "text-slate-700" : "text-slate-400"}`}>
-          {presentation.eyebrow}
-        </span>
-        <span className="text-xs font-semibold tracking-[0.04em]">
+        <span
+          aria-hidden="true"
+          className={`h-1.5 w-1.5 rounded-full ${link.isActive ? "bg-sky-300" : "bg-slate-600"}`}
+        />
+        <span>
           {link.label}
         </span>
       </Link>
@@ -259,26 +246,16 @@ export function GlobalHeaderNavRail({
 
   if (variant === "compact") {
     return (
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[11px] font-medium text-slate-400">
-            Browse workspaces
-          </p>
-          <p className="text-[11px] text-slate-500">
-            {activeRouteLabel}
-          </p>
-        </div>
-        <nav aria-label="Primary routes">
-          <ul
-            ref={railRef}
-            className="flex gap-2 overflow-x-auto pb-1 sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
-          >
-            {navigationLinks.map((link) => (
-              <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />
-            ))}
-          </ul>
-        </nav>
-      </div>
+      <nav aria-label="Primary routes">
+        <ul
+          ref={railRef}
+          className="flex gap-1.5 overflow-x-auto pb-1 sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
+        >
+          {navigationLinks.map((link) => (
+            <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />
+          ))}
+        </ul>
+      </nav>
     );
   }
 
@@ -307,7 +284,7 @@ export function GlobalHeaderNavRail({
             {hasScrollableOverflow
               ? isMenuOpen
                 ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or use the arrows to move between the main pages.`
-                : "Open navigation, then swipe or use the arrows to move between the main pages."
+                : "Open navigation to move between the main pages."
               : "All main pages are visible once navigation is open."}
           </p>
         </div>
@@ -323,7 +300,6 @@ export function GlobalHeaderNavRail({
             key={link.href}
             link={link}
             index={index}
-            total={navigationLinks.length}
             onIntent={onIntent}
           />
         ))}

@@ -105,15 +105,15 @@ export const SignalsModeSwitcherSection = ({
     <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-          How much detail
+          Choose your depth
         </p>
         <h2 className="text-base font-semibold text-slate-100">
-          Start with the short read, then open deeper evidence only if needed.
+          Start with the short read, then open deeper evidence only if you need to defend it.
         </h2>
         <p className="text-sm text-slate-300">
           The short read tells you what changed, what it means this week, and what would make the
-          read wrong. The deeper view adds diagnostics and supporting checks only when the room
-          asks you to defend the read.
+          read wrong. The deeper view adds diagnostics, replay, and supporting checks only when
+          someone needs to see the proof behind the call.
         </p>
       </div>
       <RadioGroup
@@ -223,7 +223,7 @@ export const SignalsDecisionSummarySection = ({
           </p>
           <p className="mt-2 text-sm text-slate-200">
             {topDiagnosticCallouts[0]?.why ??
-              "Review the scorecard below to validate the main driver before you change posture."}
+              "Review the scorecard below to confirm the main driver before you change posture."}
           </p>
         </div>
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
@@ -274,7 +274,7 @@ export const SignalsDecisionSummarySection = ({
       </div>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-          How likely it is to hold
+          Confidence
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
       </div>
@@ -303,8 +303,8 @@ export const SignalsDecisionSummarySection = ({
           {regimeLabel} is the current funding environment.
         </h2>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          The question is whether this still supports the weekly read. The sections below show what
-          changed, why it matters, and what would overturn it.
+          Use this section to confirm that the weekly brief still fits the evidence. The sections
+          below show what changed, why it matters, and what would overturn the read.
         </p>
         <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
@@ -312,7 +312,7 @@ export const SignalsDecisionSummarySection = ({
               What to do
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              Run this week&apos;s plan with the do more and avoid rules shown here.
+              Run this week&apos;s plan with the start, stop, and watch rules shown here.
             </dd>
           </div>
           <div>
@@ -328,7 +328,7 @@ export const SignalsDecisionSummarySection = ({
               Check again
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              After the next refresh, or sooner if one of the watch lines breaks.
+              At the next refresh, or sooner if a watch line breaks.
             </dd>
           </div>
         </dl>
@@ -341,11 +341,11 @@ export const SignalsDecisionSummarySection = ({
           This week
         </p>
         <h3 className="text-lg font-semibold text-slate-100">
-          What this means for founder decisions
+          What founders should do this week
         </h3>
         <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
-            Do more of this
+            Lean in here
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
             {startItems.slice(0, 3).map((item) => (
@@ -355,7 +355,7 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <div className="rounded-xl border border-rose-800/60 bg-rose-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-200">
-            Be careful with
+            Hold or gate
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
             {stopItems.slice(0, 3).map((item) => (
@@ -365,7 +365,7 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <p className="text-xs text-slate-300">
           This read mostly comes down to three things: how hard it is to fund new bets, how open
-          markets are to risk, and whether rate conditions are improving or getting worse.
+          markets are to risk, and whether rate conditions are improving or worsening.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5">
@@ -512,11 +512,11 @@ export const SignalsNeedMoreProofSection = ({
         Need more detail?
       </p>
       <h2 className="text-lg font-semibold text-slate-100">
-        Open the deeper evidence only if the read still needs defending.
+        Open the deeper evidence only if the read still needs proof.
       </h2>
       <p className="text-sm text-slate-300">
         The deeper view adds diagnostics, historical replay, threshold tuning, and advanced filters.
-        Use it when the room asks why this moved, whether a past regime looked similar, or what
+        Use it when someone asks why this moved, whether a past regime looked similar, or what
         would make the read wrong.
       </p>
     </div>

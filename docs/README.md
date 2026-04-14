@@ -100,6 +100,7 @@ Use these when shaping follow-on work, not as sole implementation truth:
 Use these to explain why a decision was made or to support a new proposal:
 
 - `research/*.md`
+- `research/2026-04-14-i18n-user-facing-string-audit.md` for the current i18n-readiness audit of user-facing strings
 - `evidence/**`
 - audits such as `frontend-inefficiencies-audit.md`, `outstanding-issues-audit.md`, and similar review notes
 

@@ -204,7 +204,7 @@ export function CopyLeadershipArtifactsButtons({
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready artifact</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
             <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
-              Use this as the room-ready wording for this week’s call. Drop to shorter formats only when the audience already knows the recommendation.
+              Use this as the default room-ready wording. Open more formats only if the room needs a different reading level.
             </p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
@@ -243,7 +243,7 @@ export function CopyLeadershipArtifactsButtons({
               ? `Copied ${activeModeLabel.toLowerCase()} link.`
               : shareState === "error"
                 ? "Share failed. Copy fallback is available."
-                : "Default send is ready. Open more formats only if the room needs a shorter read or a heavier package."
+                : "Default path ready."
           }
         </p>
 

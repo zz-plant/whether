@@ -73,6 +73,15 @@ export function CommandCenterNavBlock({
     ? "max-w-xl text-[1.45rem] font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 sm:text-[1.6rem]"
     : "max-w-xl text-[1.7rem] font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50";
   const briefKicker = heroVariant === "compact" ? "Route brief" : "Weekly operating brief";
+  const hasUtilityActions = Boolean(secondaryCta || exportCta);
+  const introMetaLine = [
+    statusLabel,
+    trustStatusLabel,
+    `As of ${recordDateLabel}`,
+    showOfflineBadge ? offlineBadgeLabel : null,
+  ].filter(Boolean).join(" • ");
+  const decisionDeltaLine = decisionDiffs?.map((item) => item.label).join(" • ");
+  const shouldShowMissionSequence = heroVariant === "full" && missionSequenceItems.length > 0;
 
   return (
     <section
@@ -85,7 +94,7 @@ export function CommandCenterNavBlock({
       />
 
       <div className="space-y-4">
-        {roleSwitcher ? (
+        {roleSwitcher && heroVariant === "full" ? (
           <div className="weather-surface grid gap-2 rounded-[1.15rem] border border-slate-800/55 bg-slate-950/48 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
               Role-aware translation
@@ -112,67 +121,47 @@ export function CommandCenterNavBlock({
           </div>
         ) : null}
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] xl:items-start">
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <p className="weather-brief-kicker">{briefKicker}</p>
-              <div className="weather-brief-meta-rail">
-                <span className="weather-brief-meta-chip weather-brief-meta-chip-strong">
-                  {statusLabel}
-                </span>
-                <span className="weather-brief-meta-chip">
-                  {trustStatusLabel}
-                </span>
-                <span className="weather-brief-meta-chip">
-                  As of {recordDateLabel}
-                </span>
-                {showOfflineBadge ? (
-                  <span className="weather-brief-meta-chip weather-brief-meta-chip-caution">
-                    {offlineBadgeLabel}
-                  </span>
-                ) : null}
+        <article className="weather-priority-card relative overflow-hidden p-4 sm:p-5">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] xl:items-start">
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/35 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="space-y-4">
+              <div className="space-y-2.5">
+                <p className="weather-brief-kicker">{briefKicker}</p>
+                <p className="text-[11px] leading-5 text-slate-400">{introMetaLine}</p>
+                <h1 className={headingClassName}>{pageTitle}</h1>
+                <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-[15px]">
+                  <span>{pageSummary}</span>
+                  {summaryLink}
+                </p>
               </div>
-              <h1 className={headingClassName}>{pageTitle}</h1>
-              <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-[15px]">
-                <span>{pageSummary}</span>
-                {summaryLink}
-              </p>
-            </div>
 
-            <div className="weather-transmission-card p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
-                    Transmission
-                  </p>
-                  <p className="max-w-2xl text-sm leading-relaxed text-slate-200">
-                    Copy or share the current call, then move to the next workflow only if the room needs planning or proof.
-                  </p>
-                </div>
-                {nextStep ? (
-                  <span className="weather-brief-meta-chip">
-                    Next: {nextStep.description}
-                  </span>
-                ) : null}
-              </div>
-              <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
+              {decisionDeltaLine ? (
+                <p className="text-[12px] leading-5 text-slate-300" aria-label="Decision deltas">
+                  {decisionDeltaLine}
+                </p>
+              ) : null}
+
+              <div className="flex flex-wrap gap-2">
                 {primaryCta ? (
                   <ReportCta
                     href={primaryCta.href}
                     copyText={primaryCta.copyText}
                     copyTarget={primaryCta.copyTarget}
                     label={primaryCta.label}
-                    className="weather-cta weather-cta-primary w-full justify-center sm:w-auto"
+                    className="weather-cta weather-cta-primary px-4 py-2"
                   >
                     {primaryCta.label}
                   </ReportCta>
                 ) : null}
-                {secondaryCta || exportCta ? (
-                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
+                {hasUtilityActions ? (
+                  <div className="flex flex-wrap gap-2">
                     {secondaryCta ? (
                       <InternalAwareLink
                         href={secondaryCta.href}
-                        className="weather-pill inline-flex min-h-[46px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.08em] text-slate-100"
+                        className="weather-pill inline-flex min-h-[42px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-100"
                       >
                         {secondaryCta.label}
                       </InternalAwareLink>
@@ -184,7 +173,7 @@ export function CommandCenterNavBlock({
                         copyTarget={exportCta.copyTarget}
                         telemetryEvent={exportCta.telemetryEvent}
                         label={exportCta.label}
-                        className="weather-pill inline-flex min-h-[46px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.08em] text-slate-100"
+                        className="weather-pill inline-flex min-h-[42px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-100"
                       >
                         {exportCta.label}
                       </ReportCta>
@@ -193,59 +182,63 @@ export function CommandCenterNavBlock({
                 ) : null}
               </div>
             </div>
-          </div>
 
-          <article className="weather-priority-card relative overflow-hidden p-4 sm:p-5">
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/35 to-transparent"
-              aria-hidden="true"
-            />
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
-                  {decisionBanner?.label ?? "Current operating call"}
-                </p>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-                  {trustStatusLabel}
-                </span>
-              </div>
+            <div className="space-y-3 rounded-[1.1rem] border border-slate-800/70 bg-slate-950/38 p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
+                {decisionBanner?.label ?? "Current operating call"}
+              </p>
 
               <h2 className={decisionHeadingClassName}>{primaryDecisionText}</h2>
               <p className="max-w-lg text-sm leading-relaxed text-slate-200">{missionSupportText}</p>
-
-              {decisionDiffs?.length ? (
-                <ul className="flex flex-wrap gap-2" aria-label="Decision deltas">
-                  {decisionDiffs.map((item) => (
-                    <li
-                      key={item.label}
-                      className="inline-flex min-h-[28px] items-center rounded-full border border-slate-700/70 bg-slate-950/40 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-slate-100"
-                    >
-                      {item.label}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] text-slate-400">
                 <span>Updated {fetchedAtLabel}</span>
                 <span className="text-slate-700">•</span>
                 <span>{resolvedNextRefreshLabel}</span>
+                {nextStep ? (
+                  <>
+                    <span className="text-slate-700">•</span>
+                    <span>Next: {nextStep.description}</span>
+                  </>
+                ) : null}
               </div>
 
-              {decisionBanner?.evidenceHref ? (
+              {decisionBanner?.evidenceHref && !primaryCta ? (
                 <InternalAwareLink
                   href={decisionBanner.evidenceHref}
                   className="inline-flex min-h-[44px] items-center font-semibold tracking-[0.08em] text-sky-100 underline decoration-sky-400/45 underline-offset-4"
                 >
-                  Open the first proof block
+                  Open first section
                   <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
                 </InternalAwareLink>
               ) : null}
             </div>
-          </article>
-        </div>
+          </div>
+        </article>
 
-        {missionSequenceItems.length > 0 ? (
+        {roleSwitcher && heroVariant !== "full" ? (
+          <div className="weather-surface grid gap-2 rounded-[1.15rem] border border-slate-800/55 bg-slate-950/42 p-3 sm:grid-cols-2">
+            {roleSwitcher.options.map((option) => {
+              const isActive = option.key === roleSwitcher.active;
+              return (
+                <InternalAwareLink
+                  key={option.key}
+                  href={option.href}
+                  ariaCurrent={isActive ? "page" : undefined}
+                  className={`rounded-xl border px-3 py-3 text-sm font-semibold ${
+                    isActive
+                      ? "border-sky-300/70 bg-sky-500/12 text-slate-100"
+                      : "border-slate-800/70 bg-slate-950/50 text-slate-300 hover:border-sky-400/45 hover:text-slate-100"
+                  }`}
+                >
+                  {option.label}
+                </InternalAwareLink>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {shouldShowMissionSequence ? (
           <article className="weather-surface rounded-[1.15rem] border border-slate-800/55 bg-slate-950/42 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
