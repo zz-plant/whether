@@ -55,19 +55,13 @@ export default async function SignalsPage({
       currentPath="/signals"
       pageSummary="What changed, why it matters, and what would make this wrong."
       pageSummaryLink={{
-        href:
-          model.activeSignalsView === "detail"
-            ? "#evidence-priorities"
-            : "#decision-summary",
-        label:
-          model.activeSignalsView === "detail"
-            ? "Open the detailed evidence ↓"
-            : "Open the short read ↓",
+        href: "#decision-summary",
+        label: "Start with the operator read ↓",
       }}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
       headerVariant="evidence"
-      primaryCta={{ href: "#current-scores", label: "See what changed" }}
+      primaryCta={{ href: "#decision-summary", label: "Start with implication" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
@@ -75,11 +69,11 @@ export default async function SignalsPage({
       }}
       decisionBanner={{
         label: "Evidence",
-        decision: "The current evidence still supports this week's read.",
+        decision: "Use this to confirm or challenge the weekly call before changing the plan.",
         horizon: "Current cycle",
         confidence: model.trust.trustStatusLabel,
         effectiveDate: model.recordDateLabel,
-        evidenceHref: "#current-scores",
+        evidenceHref: "#decision-summary",
       }}
       decisionDiffs={[{ label: `Regime: ${model.regimeLabel}`, tone: "neutral" }]}
       commandBar={{
@@ -108,11 +102,6 @@ export default async function SignalsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
-      <SignalsModeSwitcherSection
-        activeSignalsView={model.activeSignalsView}
-        searchParams={resolvedSearchParams}
-      />
-
       <SignalsDecisionSummarySection
         decisionDeltaLabel={model.decisionDeltaLabel}
         triggerCondition={model.triggerCondition}
@@ -128,6 +117,11 @@ export default async function SignalsPage({
         startItems={model.startItems}
         stopItems={model.stopItems}
         topDiagnosticCallouts={model.topDiagnosticCallouts}
+      />
+
+      <SignalsModeSwitcherSection
+        activeSignalsView={model.activeSignalsView}
+        searchParams={resolvedSearchParams}
       />
 
       <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />

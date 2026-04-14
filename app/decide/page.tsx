@@ -99,11 +99,12 @@ export default async function DecidePage({
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Choose the right help"
       currentPath="/decide"
-      pageSummary="Pick the fastest path for the one open question."
+      pageSummary="Resolve one open question without reopening the whole weekly brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
-      sectionLinks={sectionLinks}
+      sectionLinks={sectionLinks.slice(0, 2)}
       heroVariant="compact"
-      primaryCta={{ href: "#unresolved-question-router", label: "Start with the best next step" }}
+      sidebarVariant="hidden"
+      primaryCta={{ href: "#unresolved-question-router", label: "Start with the recommended path" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
@@ -111,7 +112,7 @@ export default async function DecidePage({
       }}
       decisionBanner={{
         label: "Choose the right help",
-        decision: "Close one remaining question without reopening the weekly brief.",
+        decision: "Close one remaining question, then return to planning.",
         horizon: "This week",
         confidence: homeBriefModel.confidenceLabel,
         effectiveDate: reportData.recordDateLabel,

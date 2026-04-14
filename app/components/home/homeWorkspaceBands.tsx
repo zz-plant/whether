@@ -27,20 +27,20 @@ export async function HomeWorkspaceBands({
     <div className="space-y-6">
       <section
         id="approve-this-weeks-plan"
-        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
+        className="weather-panel scroll-mt-28 space-y-5 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
         aria-labelledby="approve-this-weeks-plan-title"
       >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
+        <div className="weather-panel-header">
+          <div className="weather-panel-header-copy">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Next</p>
-            <h2 id="approve-this-weeks-plan-title" className="text-lg font-semibold text-slate-100">
+            <h2 id="approve-this-weeks-plan-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
               Turn the call into this week&apos;s plan
             </h2>
-            <p className="max-w-2xl text-sm text-slate-300">
-              Approve or hold the week&apos;s hiring, spend, and roadmap moves here.
+            <p className="weather-panel-header-description text-sm text-slate-300">
+              Approve one plan, keep one stop line visible, and open the share brief only after the week&apos;s call is settled.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="weather-panel-header-aside">
             <Link
               href={workspaceModel.operations.continueHref as Route}
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"
@@ -48,23 +48,14 @@ export async function HomeWorkspaceBands({
               <CheckIcon className="h-3.5 w-3.5" />
               <span>Make the plan</span>
             </Link>
-            {primaryExportAction ? (
-              <Link
-                href={primaryExportAction.href as Route}
-                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100"
-              >
-                <CheckIcon className="h-3.5 w-3.5" />
-                <span>{primaryExportAction.label}</span>
-              </Link>
-            ) : null}
           </div>
         </div>
 
-        <div className="grid gap-px overflow-hidden rounded-[1.25rem] border border-slate-800/80 bg-slate-800/80 lg:grid-cols-[minmax(0,1.28fr)_minmax(0,0.72fr)]">
-          <article className="bg-emerald-500/8 px-4 py-4">
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.78fr)]">
+          <article className="weather-surface rounded-[1.2rem] border border-emerald-400/20 bg-emerald-500/8 px-4 py-4">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
               <CheckIcon className="h-3.5 w-3.5" />
-              <span>Carry this forward</span>
+              <span>Approve now</span>
             </div>
             <p className="mt-3 text-base font-semibold leading-7 text-slate-100">
               {workspaceModel.operations.approvalHeadline}
@@ -74,7 +65,7 @@ export async function HomeWorkspaceBands({
             </p>
           </article>
 
-          <article className="bg-slate-950/55 px-4 py-4">
+          <article className="weather-surface rounded-[1.2rem] border border-amber-400/20 bg-amber-500/8 px-4 py-4">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
               <ShieldIcon className="h-3.5 w-3.5" />
               <span>Stop line</span>
@@ -86,111 +77,125 @@ export async function HomeWorkspaceBands({
               {primaryGuardrail?.detail ?? "Do not loosen until the current stop line clears."}
             </p>
           </article>
+
+          <article className="weather-surface rounded-[1.2rem] border border-sky-400/18 bg-sky-500/8 px-4 py-4">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+              <CheckIcon className="h-3.5 w-3.5" />
+              <span>Share next</span>
+            </div>
+            <p className="mt-3 text-sm font-semibold text-slate-100">
+              {primaryExportAction?.label ?? "Open share brief"}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Package the approved call only after the week&apos;s plan is settled.
+            </p>
+            <Link
+              href={(primaryExportAction?.href ?? "/operations#ops-export-briefs") as Route}
+              className="mt-3 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-100 underline decoration-sky-400/45 underline-offset-4"
+            >
+              Open share brief
+            </Link>
+          </article>
         </div>
       </section>
 
       <section
         id="audit-this-call"
-        className="scroll-mt-28 space-y-4 border-t border-slate-800/80 pt-5"
+        className="weather-panel scroll-mt-28 space-y-5 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
         aria-labelledby="audit-this-call-title"
       >
-        <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Only if needed</p>
-          <h2 id="audit-this-call-title" className="text-lg font-semibold text-slate-100">
-            Need proof or another path?
-          </h2>
-          <p className="max-w-2xl text-sm text-slate-300">
-            Open these only when someone still needs the drivers, trust check, or one deeper tool after the weekly call is already clear.
-          </p>
+        <div className="weather-panel-header">
+          <div className="weather-panel-header-copy">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Only if challenged</p>
+            <h2 id="audit-this-call-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
+              Need proof or another path?
+            </h2>
+            <p className="weather-panel-header-description text-sm text-slate-300">
+              Open these only when someone still needs the drivers, trust check, or one deeper tool after the weekly call is already clear.
+            </p>
+          </div>
         </div>
 
-        <details className="weather-auto-chevron overflow-hidden rounded-[1.15rem] border border-slate-800/80 bg-slate-950/25">
-          <summary className="min-h-[44px] cursor-pointer list-none px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-            Open proof and deeper paths
-          </summary>
-          <div className="space-y-4 border-t border-slate-800/80 px-4 py-4">
-            <div className="grid gap-px overflow-hidden rounded-[1.15rem] border border-slate-800/80 bg-slate-800/80 lg:grid-cols-2">
-              <Link
-                href={"/signals" as Route}
-                className="group min-h-[44px] bg-slate-950/25 px-4 py-4 text-slate-100 transition hover:bg-slate-950/45"
-              >
-                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
-                  <TrendUpIcon className="h-3.5 w-3.5" />
-                  <span>See what changed</span>
-                </div>
-                <p className="mt-3 text-sm font-semibold group-hover:text-sky-100">Why the read moved</p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay before changing the call."}
-                </p>
-              </Link>
-
-              <Link
-                href={"/method" as Route}
-                className="group min-h-[44px] bg-slate-950/25 px-4 py-4 text-slate-100 transition hover:bg-slate-950/45"
-              >
-                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
-                  <AuditIcon className="h-3.5 w-3.5" />
-                  <span>Check trust</span>
-                </div>
-                <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">{workspaceModel.audit.trustStatusAction}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {workspaceModel.audit.trustMarkerDetail}
-                </p>
-              </Link>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <Link
+            href={"/signals#decision-summary" as Route}
+            className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
+          >
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+              <TrendUpIcon className="h-3.5 w-3.5" />
+              <span>See what changed</span>
             </div>
+            <p className="mt-3 text-sm font-semibold group-hover:text-sky-100">Why the read moved</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay before changing the call."}
+            </p>
+          </Link>
 
-            <div id="historical-replay-workspace" className="space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
-                One deeper path
-              </p>
-              <div className="grid gap-px overflow-hidden rounded-[1.15rem] border border-slate-800/80 bg-slate-800/80 lg:grid-cols-3">
-                <Link
-                  href={workspaceModel.translate.primaryPath.href as Route}
-                  className="group min-h-[44px] bg-slate-950/20 px-4 py-4 text-slate-100 transition hover:bg-slate-950/40"
-                >
-                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
-                    <LayoutGridIcon className="h-3.5 w-3.5" />
-                    <span>Resolve one question</span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">Open the most concrete path first</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">Use this only after the weekly call is clear.</p>
-                </Link>
+          <Link
+            href={"/method#trust-snapshot" as Route}
+            className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
+          >
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
+              <AuditIcon className="h-3.5 w-3.5" />
+              <span>Check trust</span>
+            </div>
+            <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">{workspaceModel.audit.trustStatusAction}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              {workspaceModel.audit.trustMarkerDetail}
+            </p>
+          </Link>
+        </div>
 
-                <Link
-                  href={workspaceModel.replay.openFullHref as Route}
-                  className="group min-h-[44px] bg-slate-950/20 px-4 py-4 text-slate-100 transition hover:bg-slate-950/40"
-                >
-                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
-                    <HistoryIcon className="h-3.5 w-3.5" />
-                    <span>Review a past week</span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold group-hover:text-violet-100">
-                    {replayPreview?.label ?? "Replay the baseline"}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    {replayPreview?.summary ?? workspaceModel.replay.summary}
-                  </p>
-                </Link>
-
-                <Link
-                  href={(toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route}
-                  className="group min-h-[44px] bg-slate-950/20 px-4 py-4 text-slate-100 transition hover:bg-slate-950/40"
-                >
-                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                    <LayoutGridIcon className="h-3.5 w-3.5" />
-                    <span>Use a tool</span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold group-hover:text-slate-50">
-                    {toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    {toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail}
-                  </p>
-                </Link>
+        <div id="historical-replay-workspace" className="space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
+            One deeper path
+          </p>
+          <div className="grid gap-3 lg:grid-cols-3">
+            <Link
+              href={workspaceModel.translate.primaryPath.href as Route}
+              className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
+                <LayoutGridIcon className="h-3.5 w-3.5" />
+                <span>Resolve one question</span>
               </div>
-            </div>
+              <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">Open the most concrete path first</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">Use this only after the weekly call is clear.</p>
+            </Link>
+
+            <Link
+              href={workspaceModel.replay.openFullHref as Route}
+              className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
+                <HistoryIcon className="h-3.5 w-3.5" />
+                <span>Review a past week</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold group-hover:text-violet-100">
+                {replayPreview?.label ?? "Replay the baseline"}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {replayPreview?.summary ?? workspaceModel.replay.summary}
+              </p>
+            </Link>
+
+            <Link
+              href={(toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route}
+              className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                <LayoutGridIcon className="h-3.5 w-3.5" />
+                <span>Use a tool</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold group-hover:text-slate-50">
+                {toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail}
+              </p>
+            </Link>
           </div>
-        </details>
+        </div>
       </section>
     </div>
   );

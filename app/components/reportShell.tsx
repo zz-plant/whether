@@ -253,7 +253,7 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-4 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
+          <div className={`mt-3 grid min-w-0 gap-4 xl:gap-5 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
             {hasSidebar ? (
               <aside className="order-2 hidden space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:block xl:sticky xl:top-28 xl:self-start">
                 {resolvedSectionLinks.length ? (
@@ -266,14 +266,14 @@ export const ReportShell = (props: ReportShellProps) => {
               </aside>
             ) : null}
 
-            <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
+            <div className={`order-1 min-w-0 space-y-6 lg:space-y-8 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={bodyExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
               {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
 
-              <div className="space-y-10 lg:space-y-12">
+              <div className="space-y-8 lg:space-y-10">
                 {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
@@ -282,7 +282,7 @@ export const ReportShell = (props: ReportShellProps) => {
                   return (
                     <div
                       key={sectionKey}
-                      className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}
+                      className={index === 0 ? "" : "border-t border-slate-800/70 pt-8 lg:pt-10"}
                     >
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (

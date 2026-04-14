@@ -94,11 +94,12 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Whether report/);
-    assert.match(html, /Decide now/);
-    assert.match(html, /Use in order/);
+    assert.match(html, /Start here/);
+    assert.match(html, /Decision focus/);
+    assert.match(html, /Follow-on/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
+    assert.match(html, /Use one next move at a time\./);
     assert.match(html, /href="#"/);
   });
 
@@ -211,7 +212,7 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Copy weekly brief/);
     assert.match(html, /href="#share-ready-artifact"/);
-    assert.match(html, /Decide this week&#x27;s pace in one screen\./);
+    assert.match(html, /The weekly brief stays primary\. Open another route only when the room needs proof, planning, or verification\./);
     assert.doesNotMatch(html, /Review order/);
   });
 });

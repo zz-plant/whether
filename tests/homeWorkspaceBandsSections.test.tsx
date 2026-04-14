@@ -78,11 +78,13 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /Turn the call into this week/);
     assert.match(html, /Make the plan/);
     assert.match(html, /Need proof or another path/);
-    assert.match(html, /Open proof and deeper paths/);
+    assert.match(html, /Open these only when someone still needs the drivers, trust check, or one deeper tool after the weekly call is already clear\./);
     assert.match(html, /Why the read moved/);
     assert.match(html, /Check trust/);
     assert.match(html, /One deeper path/);
     assert.match(html, /Resolve one question/);
+    assert.match(html, /Review a past week/);
+    assert.match(html, /Use a tool/);
     assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
     assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));
   });

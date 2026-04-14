@@ -16,7 +16,6 @@ import {
 type GlobalHeaderNavClientProps = {
   pathname?: string;
   variant?: "default" | "compact";
-  deferPathResolution?: boolean;
 };
 
 type GlobalHeaderNavRailProps = {
@@ -228,7 +227,7 @@ export function GlobalHeaderNavRail({
             {activeSurfaceCue ?? activeRouteLabel}
           </p>
           <p className="text-[11px] leading-relaxed text-slate-400">
-            Swipe through the main workspaces. The weekly brief stays primary.
+            Move between the core workspaces. Start with the weekly brief, then go deeper only when needed.
           </p>
         </div>
         <nav aria-label="Primary routes">
@@ -304,29 +303,16 @@ export function GlobalHeaderNavRail({
 export function GlobalHeaderNavClient({
   pathname,
   variant = "default",
-  deferPathResolution = false,
 }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
   const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const livePathname = pathname ?? currentPathname;
-  const resolvedPathname = deferPathResolution && !isHydrated ? null : livePathname;
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+  const resolvedPathname = pathname ?? currentPathname;
 
   const navigationLinks = useMemo(
-    () =>
-      resolvedPathname
-        ? resolveGlobalHeaderNavigationLinks(resolvedPathname)
-        : resolveGlobalHeaderNavigationLinks("/").map((link) => ({
-            ...link,
-            isActive: false,
-          })),
+    () => resolveGlobalHeaderNavigationLinks(resolvedPathname),
     [resolvedPathname],
   );
-  const activeRouteLabel = resolvedPathname ? resolveGlobalHeaderRouteLabel(resolvedPathname) : "Report";
+  const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
 
   const handleIntentPrefetch = (href: string) => {
     router.prefetch(href as Route);

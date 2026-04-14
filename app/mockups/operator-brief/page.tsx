@@ -155,21 +155,21 @@ export default async function OperatorBriefMockupPage({
           </div>
 
           <aside className="rounded-[1.6rem] border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-            <SectionLabel>Direction</SectionLabel>
+            <SectionLabel>Chosen direction</SectionLabel>
             <ul className="mt-3 space-y-3 text-sm text-slate-200">
               <li>Default to plain operating language.</li>
-              <li>Put one weekly call above every other surface.</li>
-              <li>Move proof and methodology behind explicit reveals.</li>
-              <li>Make the share artifact a first-class output.</li>
+              <li>Lead with one role-aware weekly call.</li>
+              <li>Attach proof to the active recommendation.</li>
+              <li>Keep the artifact visible, but secondary to the decision.</li>
             </ul>
           </aside>
         </div>
       </section>
 
       <MockupFrame
-        eyebrow="Mockup 01"
+        eyebrow="Chosen Direction"
         title="Role-First Weekly Brief"
-        summary="The primary experience becomes one role-aware operating card. No route choice, no macro vocabulary, and no trust workflow before the user understands the call."
+        summary="This is the source-of-truth concept for the redesign: one role-aware operating card first, proof second, artifact support third."
       >
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
           <article className="space-y-5 rounded-[1.75rem] border border-slate-700/70 bg-slate-950/65 p-4 sm:p-5">
@@ -245,7 +245,7 @@ export default async function OperatorBriefMockupPage({
           </article>
 
           <aside className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/65 p-4 sm:p-5">
-            <SectionLabel>What Changed Vs Today</SectionLabel>
+            <SectionLabel>Why This Wins</SectionLabel>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-200">
               <li>Default language is operational, not financial.</li>
               <li>The role toggle changes the translation, not the model.</li>
@@ -257,9 +257,9 @@ export default async function OperatorBriefMockupPage({
       </MockupFrame>
 
       <MockupFrame
-        eyebrow="Mockup 02"
+        eyebrow="Supporting Pattern"
         title="Recommendation + Proof Drawer"
-        summary="The second concept assumes the product should feel like a decision memo first. Supporting evidence appears as a compact drawer tied to the active recommendation, not as a separate analytical route."
+        summary="Use this as the supporting evidence pattern inside the chosen role-first brief, not as a competing homepage direction."
       >
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
           <article className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/65 p-5">
@@ -344,9 +344,9 @@ export default async function OperatorBriefMockupPage({
       </MockupFrame>
 
       <MockupFrame
-        eyebrow="Mockup 03"
-        title="Share Artifact First"
-        summary="The third concept assumes the product’s job is complete only when the user can send the weekly call to leadership without translating it themselves."
+        eyebrow="Supporting Pattern"
+        title="Artifact Support"
+        summary="Use this as the handoff pattern after the decision is clear. The artifact stays visible, but it does not outrank the weekly call."
       >
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
           <article className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/65 p-5">

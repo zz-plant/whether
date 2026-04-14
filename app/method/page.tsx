@@ -126,12 +126,13 @@ export default async function MethodPage() {
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Can you rely on this week's call?"
+      pageSummary="Check whether this week’s call is current enough and strong enough to use."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
-      sectionLinks={sectionLinks}
+      sectionLinks={sectionLinks.slice(0, 3)}
       heroVariant="compact"
       headerVariant="trust"
-      primaryCta={{ href: "#trust-snapshot", label: "Snapshot" }}
+      sidebarVariant="hidden"
+      primaryCta={{ href: "#trust-snapshot", label: "Start with trust snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/signals",
@@ -139,7 +140,7 @@ export default async function MethodPage() {
       }}
       decisionBanner={{
         label: "Trust",
-        decision: "Is the data current, how strong is the signal, and what would make the call wrong?",
+        decision: "Treat trust as a go, caution, or historical verdict before you widen commitments.",
         horizon: "This week",
         confidence: trustSummary,
         effectiveDate: reportData.recordDateLabel,

@@ -17,7 +17,7 @@ describe("GlobalHeaderNavRail", () => {
 
     assert.match(html, /Workspaces/);
     assert.match(html, /See what changed/);
-    assert.match(html, /Swipe through the main workspaces\. The weekly brief stays primary\./);
+    assert.match(html, /Move between the core workspaces\. Start with the weekly brief, then go deeper only when needed\./);
     assert.doesNotMatch(html, /aria-label="Previous surface"/);
     assert.doesNotMatch(html, /aria-label="Next surface"/);
   });
