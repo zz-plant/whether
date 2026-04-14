@@ -84,9 +84,9 @@ export function LiteracyAssistRouter({
   };
 
   return (
-    <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Question helper">
+    <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Need help with this page">
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Question helper</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Need help?</p>
         <h2 className="text-base font-semibold text-slate-100">{title}</h2>
         <p className="text-sm text-slate-300">{description}</p>
       </div>

@@ -205,13 +205,13 @@ export const TimeMachinePanel = ({
     <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Time Machine"
-          title="Replay a prior capital posture"
+          label="Past snapshots"
+          title="Replay an earlier month"
           titleId="time-machine-title"
           description={
             <>
-              Pull the latest available Treasury record on or before a chosen month to see the
-              historical posture read.
+              Pull the latest available Treasury record on or before a chosen month to see what the
+              report would have said then.
             </>
           }
           aside={
@@ -235,13 +235,13 @@ export const TimeMachinePanel = ({
             <p className="mt-3 type-data text-slate-300">
               {isHistorical ? (
                 <>
-                  You are replaying the macro posture from{" "}
+                  You are replaying the weekly read from{" "}
                   <span className="font-semibold text-slate-100">{selectedLabel}</span>. Compare
-                  against now ({latestRecordLabel}) before changing operating posture.
+                  against now ({latestRecordLabel}) before changing current plans.
                 </>
               ) : (
                 <>
-                  You are in the live now view ({latestRecordLabel}). Use Time Machine to replay
+                  You are in the live now view ({latestRecordLabel}). Use past snapshots to replay
                   the prior month before approving irreversible decisions.
                 </>
               )}
@@ -271,7 +271,7 @@ export const TimeMachinePanel = ({
         </div>
 
         <div className="mt-4 weather-surface weather-delta-card p-4" aria-label="Time navigation controls">
-          <p className="type-label text-slate-400">Time navigation</p>
+          <p className="type-label text-slate-400">Move through past snapshots</p>
           <p className="mt-2 text-sm text-slate-300">
             Move backward and forward month-by-month, then jump back to live data when you are done.
           </p>

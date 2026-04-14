@@ -76,14 +76,14 @@ export function OperationsExecutionStepper({
   const activeIndex = Math.max(steps.findIndex((step) => step.id === activeStepId), 0);
 
   return (
-    <section id="planning-stepper" className="space-y-4" aria-label="Planning execution stepper">
+    <section id="planning-stepper" className="space-y-4" aria-label="Planning steps">
       <div className="weather-panel relative overflow-hidden space-y-3 px-4 py-4">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
         <div className="max-w-3xl">
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
           <h2 className="mt-1 text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s sequence</h2>
           <p className="mt-1 text-xs leading-5 text-slate-300">
-            Choose a step to open its detail panel. Your place stays in the URL, so back and forward keep the sequence in sync.
+            Choose a step to open its detail panel. Back and forward keep your place in the sequence.
           </p>
         </div>
         <ol className="grid gap-3 md:grid-cols-4">
@@ -154,7 +154,7 @@ export function OperationsExecutionStepper({
                         {step.approvalStatus}
                       </span>
                       <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
-                        Reopen when: {step.changeSignal}
+                        Check again if: {step.changeSignal}
                       </span>
                       <a
                         href="#planning-stepper"
@@ -191,7 +191,7 @@ export function OperationsExecutionStepper({
                     {step.approvalStatus}
                   </span>
                   <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
-                    Reopen when: {step.changeSignal}
+                    Check again if: {step.changeSignal}
                   </span>
                 </div>
               </div>

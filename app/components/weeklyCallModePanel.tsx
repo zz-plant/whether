@@ -177,7 +177,7 @@ export function WeeklyCallModePanel({
   };
   const postureSummaryCards = [
     {
-      label: "Boldness budget",
+      label: "How aggressive to be",
       value: `${weeklyLeadershipSummary.boldnessScore}/100`,
       detail: signedBoldnessPointsLabel,
       className: compactMetricCardBase,
@@ -225,7 +225,7 @@ export function WeeklyCallModePanel({
                   </span>
                 </div>
                 <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  This week&apos;s role-first brief
+                  This week&apos;s recommendation
                 </p>
                 <h2 className={`${tierOneHeadingClassName} mt-2 text-lg sm:text-[1.7rem] sm:leading-[2.05rem]`}>{actionNowDetail}</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{supportingDeltaLine}</p>
@@ -289,7 +289,7 @@ export function WeeklyCallModePanel({
               <aside className="space-y-3">
                 <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_14px_24px_-22px_rgba(2,6,23,0.68)] ${compactTrustToneClass}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">Trust verdict</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">Can you rely on this?</p>
                     <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>
                       {inlineTrustLabel}
                     </span>
@@ -302,7 +302,7 @@ export function WeeklyCallModePanel({
                   </p>
                   <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                      Shareable line
+                      One-line version
                     </p>
                     <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">
                       {weeklyLeadershipSummary.shorthandLine}
@@ -315,7 +315,7 @@ export function WeeklyCallModePanel({
 
                 <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${revisitToneClass}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Revisit now</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Decisions to reopen</p>
                     {revisitQueue.length > 0 ? (
                       <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
                         {revisitQueue.length} decisions
@@ -348,7 +348,7 @@ export function WeeklyCallModePanel({
                   {deferredRevisitItems.length > 0 ? (
                     <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                       <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                        Revisit queue
+                        More to reopen
                       </summary>
                       <div className="mt-3 divide-y divide-slate-800/70">
                         {deferredRevisitItems.map((item) => (
@@ -374,7 +374,7 @@ export function WeeklyCallModePanel({
 
                 {flipSupport.length > 0 ? (
                   <article className="rounded-[1.1rem] border border-sky-400/20 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-22px_rgba(56,189,248,0.2)]">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip watch</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What would change this</p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {flipSupport.map((label) => (
                         <span key={label} className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
@@ -404,8 +404,8 @@ export function WeeklyCallModePanel({
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Artifact support</p>
-                  <h3 className="text-sm font-semibold text-slate-100">Share-ready handoff</h3>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Sharing help</p>
+                  <h3 className="text-sm font-semibold text-slate-100">Send this update</h3>
                   <p className="text-xs leading-5 text-slate-300">
                     Decide first. Use the weekly brief above as the default wording, then pick the format the room needs.
                   </p>
@@ -432,7 +432,7 @@ export function WeeklyCallModePanel({
                 <div className="space-y-3">
                   <details className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                     <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                      Source note
+                      Citation
                     </summary>
                     <div className="mt-3">
                       <p className="text-xs leading-5 text-slate-300">{citationMetaLine}</p>
@@ -463,7 +463,7 @@ export function WeeklyCallModePanel({
             {postureSteps.length > 1 ? (
               <details className="rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                 <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Trajectory since last review
+                  How this moved over time
                 </summary>
                 <div className="mt-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -511,7 +511,7 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(2,6,23,0.62)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Who should pay attention</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Best for</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
               <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>

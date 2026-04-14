@@ -41,7 +41,7 @@ const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
   const { previous, current, reasons, loggedAt } = entry;
 
   return [
-    "Whether Regime Alert Log",
+    "Whether Change Alerts",
     `Logged at: ${formatTimestamp(loggedAt)}`,
     `Previous record: ${formatRecordDate(previous.recordDate)} — ${previous.assessment.regime}`,
     `Current record: ${formatRecordDate(current.recordDate)} — ${current.assessment.regime}`,
@@ -220,12 +220,12 @@ export const RegimeAlertsPanel = () => {
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Regime alert log</p>
+            <p className="type-label text-slate-400">Change alerts</p>
             <h3 id="regime-alert-log-title" className="type-section text-slate-100">
-              Alert history and copy-ready summaries
+              Alert history and shareable summaries
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Review regime change alerts and deliver them through Slack, email, or webhook.
+              Review major environment-change alerts and send them by Slack, email, or webhook.
             </p>
             <p className="mt-2 text-xs text-slate-500">
               Delivery preferences and logs are scoped to this device&apos;s operator profile.

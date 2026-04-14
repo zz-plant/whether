@@ -272,33 +272,33 @@ export default async function OperationsPage({
           },
           {
             id: "ops-playbook",
-            label: "Guardrails",
-            title: "Guardrails",
-            description: "Use start, stop, and fence rules before you commit new work.",
-            summary: "Apply the top guardrails before approving new commitments.",
+            label: "Rules",
+            title: "Rules before you commit",
+            description: "Use do, don't, and limit rules before you commit new work.",
+            summary: "Apply the main rules before approving new commitments.",
             owner: "Function leads",
-            approvalStatus: "Set pause conditions",
+            approvalStatus: "Set stop lines",
             changeSignal: "A pause-if or change-course condition is hit",
             hashAliases: ["ops-playbook-panel"],
             children: (
               <SectionedReportPanel
                 id="ops-playbook-panel"
-                label="Guardrails"
+                label="Rules"
                 title="Approve or hold moves"
-                description="Use start, stop, and fence rules before you commit new work."
+                description="Use do, don't, and limit rules before you commit new work."
                 defaultOpen={true}
               >
                 <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
                   <p className="text-xs text-slate-300">
                     {showAllActionLanes
-                      ? "Showing full action lanes for deep execution checks."
-                      : "Showing top 3 items per lane for the default weekly execution scan."}
+                      ? "Showing the full rule list for deeper review."
+                      : "Showing the top 3 rules in each area for the default weekly scan."}
                   </p>
                   <a
                     href={buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes)}
                     className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
                   >
-                    {showAllActionLanes ? "Show top 3 only" : "Show full action lanes"}
+                    {showAllActionLanes ? "Show top 3 only" : "Show all rules"}
                   </a>
                 </div>
                 <PlaybookPanel

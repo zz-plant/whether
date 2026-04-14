@@ -27,7 +27,7 @@ export const FirstTimeGuidePanel = ({
             Recommended quick scan in three stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            Use this walkthrough to align on the core posture before you dive into deeper lanes.
+            Use this walkthrough to align on the core recommendation before you dive into deeper sections.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -82,7 +82,7 @@ export const FirstTimeGuidePanel = ({
             ))}
           </ul>
           <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
-            Tip: share the selected time-machine URL to keep assumptions aligned.
+            Tip: share the selected past-snapshot URL to keep assumptions aligned.
           </div>
         </aside>
       </div>
@@ -104,7 +104,7 @@ export const FirstTimeGuidePanel = ({
         </ul>
       </div>
       <p className="mt-4 text-xs text-slate-300">
-        Share the URL when you lock thresholds or time machine selections so every stakeholder sees
+        Share the URL when you lock watch lines or past-snapshot selections so every stakeholder sees
         the same posture assumptions.
       </p>
     </div>
@@ -121,7 +121,7 @@ export const BeginnerGlossaryPanel = () => (
             Translate finance terms into day-to-day product decisions
           </h3>
           <p className="mt-2 type-data text-slate-300">
-            New to Treasury data? Reference this glossary as needed to translate jargon into
+            New to Treasury data? Reference this glossary as needed to translate unfamiliar terms into
             concrete product moves before you share the report.
           </p>
         </div>

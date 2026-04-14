@@ -33,7 +33,7 @@ function RegimeProbabilityStrip({
   return (
     <article className="mt-2 border-t border-slate-800/50 pt-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className={`text-xs ${neutralLabel}`}>Risk distribution</p>
+        <p className={`text-xs ${neutralLabel}`}>Possible paths</p>
         <p className="text-[11px] text-slate-400">Most likely: {leadingState.label} {formatProbabilityPercent(leadingState.value)}</p>
       </div>
       <div className="mt-2 flex h-3 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
@@ -81,16 +81,16 @@ export function DiagnosticsSection({
     <>
       <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Decision detail">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Need deeper analysis?</p>
-        <h2 className={tierTwoHeading}>Decision detail</h2>
+        <h2 className={tierTwoHeading}>Why this changed</h2>
         <p className="text-xs leading-5 text-slate-300">Want the backing detail? Expand the sections below to see what changed, what to watch, and why.</p>
         <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
           <Accordion.Item value="since-last-review" className="group">
-            <DiagnosticsAccordionTrigger label="Delta" />
+            <DiagnosticsAccordionTrigger label="What changed" />
             <Accordion.Panel className={disclosurePanelClass}>
               <ul className="grid gap-2 sm:grid-cols-3">
                 <li className="border-l border-slate-700/60 pl-3 py-1"><p className={`text-xs ${neutralLabel}`}>Delta</p><p className="mt-1 text-xs text-slate-200">{firstDelta}</p></li>
-                <li className="border-l border-slate-700/60 pl-3 py-1"><p className={`text-xs ${neutralLabel}`}>Revisit</p><p className="mt-1 text-xs text-slate-200">{revisitDecisions ? `Yes — ${guardrail}` : "No — hold last week’s posture."}</p></li>
-                <li className="border-l border-slate-700/60 pl-3 py-1"><p className={`text-xs ${neutralLabel}`}>Flip line</p><p className="mt-1 text-xs text-slate-200">{regimeDistance.dimensionLabel} {flipDirection} {regimeDistance.thresholdValue.toFixed(1)} ({flipDistance} pts away).</p></li>
+                <li className="border-l border-slate-700/60 pl-3 py-1"><p className={`text-xs ${neutralLabel}`}>Reopen?</p><p className="mt-1 text-xs text-slate-200">{revisitDecisions ? `Yes — ${guardrail}` : "No — hold last week’s posture."}</p></li>
+                <li className="border-l border-slate-700/60 pl-3 py-1"><p className={`text-xs ${neutralLabel}`}>Change line</p><p className="mt-1 text-xs text-slate-200">{regimeDistance.dimensionLabel} {flipDirection} {regimeDistance.thresholdValue.toFixed(1)} ({flipDistance} pts away).</p></li>
               </ul>
               {changedItems.length > 1 ? (
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -105,7 +105,7 @@ export function DiagnosticsSection({
             </Accordion.Panel>
           </Accordion.Item>
           <Accordion.Item value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-            <DiagnosticsAccordionTrigger label="Evidence pack" />
+            <DiagnosticsAccordionTrigger label="Supporting proof" />
             <Accordion.Panel className={disclosurePanelClass}>
               <article className="py-1"><p className={`text-xs ${neutralLabel}`}>Evidence</p><ul className="mt-1 space-y-1 text-xs text-slate-200">{evidenceItems.map((item) => <li key={item.key}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>)}</ul></article>
               <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Drivers</p><p className="mt-1 text-xs text-slate-300">Top contributors: {topContributors}</p><p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary.replace(/\.$/, "")}</p></article>

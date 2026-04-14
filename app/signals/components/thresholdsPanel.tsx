@@ -103,13 +103,13 @@ export const ThresholdsPanel = ({
   const thresholdPresets = [
     {
       id: "balanced",
-      label: "Balanced",
+      label: "Standard",
       detail: "Default guardrails aligned with baseline regime behavior.",
       thresholds: appliedDefaults,
     },
     {
       id: "early-alert",
-      label: "Early alerts",
+      label: "Sooner warnings",
       detail: "Trip earlier so teams react sooner to tightening conditions.",
       thresholds: {
         baseRateTightness: 4.5,
@@ -119,7 +119,7 @@ export const ThresholdsPanel = ({
     },
     {
       id: "strict",
-      label: "Strict",
+      label: "Harder to flip",
       detail: "Require stronger moves before the posture label flips.",
       thresholds: {
         baseRateTightness: 6,
@@ -254,10 +254,10 @@ export const ThresholdsPanel = ({
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10 scroll-mt-28">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Capital posture thresholds"
-          title="Tune classification guardrails"
+          label="Watch-line settings"
+          title="Adjust when the environment label changes"
           titleId="thresholds-title"
-          description="Thresholds are URL-driven for deterministic back/forward behavior and auditability."
+          description="These values decide when the environment label changes. They stay in the URL so shared links match."
           aside={
             <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold tracking-[0.1em] text-slate-200">
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
@@ -270,7 +270,7 @@ export const ThresholdsPanel = ({
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick presets</p>
             <p className="mt-2 text-sm text-slate-300">
-              Start with one preset, then expand advanced controls only if you need custom guardrails.
+              Start with one preset, then expand the detailed controls only if you need custom watch lines.
             </p>
             <div className="mt-3 grid gap-3 md:grid-cols-3">
               {thresholdPresets.map((preset) => (
@@ -296,7 +296,7 @@ export const ThresholdsPanel = ({
               type="button"
               className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100 touch-manipulation"
             >
-              Advanced filters
+              Edit exact numbers
               <span className="text-[10px] text-slate-500">Show / hide</span>
             </Collapsible.Trigger>
             <Collapsible.Panel className="pt-4">
@@ -306,7 +306,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-base-rate"
                     name={THRESHOLD_PARAM_KEYS.baseRate}
-                    label="Base rate threshold (%)"
+                    label="Base-rate watch line (%)"
                     min={0}
                     max={10}
                     step={0.01}
@@ -321,7 +321,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-tightness"
                     name={THRESHOLD_PARAM_KEYS.tightness}
-                    label="Tightness score threshold"
+                    label="Funding-pressure score line"
                     min={0}
                     max={100}
                     step={0.01}
@@ -336,7 +336,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-risk"
                     name={THRESHOLD_PARAM_KEYS.risk}
-                    label="Risk appetite score"
+                    label="Investor-appetite score line"
                     min={0}
                     max={100}
                     step={0.01}
@@ -358,7 +358,7 @@ export const ThresholdsPanel = ({
                       {isPending ? (
                         <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
                       ) : null}
-                      {isPending ? "Applying" : "Apply thresholds"}
+                      {isPending ? "Applying" : "Apply watch lines"}
                     </button>
                     <button
                       type="button"
@@ -403,7 +403,7 @@ export const ThresholdsPanel = ({
                 type="button"
                 className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
               >
-                Transparency details
+                How this works
               </Collapsible.Trigger>
               <Collapsible.Panel className="mt-3 space-y-4">
                 <Popover.Root>
@@ -414,7 +414,7 @@ export const ThresholdsPanel = ({
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[9px] text-slate-400">
                       ?
                     </span>
-                    Threshold logic
+                    How the watch lines work
                   </Popover.Trigger>
                   <Popover.Portal>
                     <Popover.Positioner side="bottom" align="start" sideOffset={12}>

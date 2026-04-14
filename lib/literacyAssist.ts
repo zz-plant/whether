@@ -44,8 +44,8 @@ export const artifactModeLabels: Record<ArtifactMode, string> = {
 };
 
 export const literacyFocusLabels: Record<LiteracyAssistMode, string> = {
-  decision: "Decision help",
-  evidence: "Evidence help",
-  trust: "Trust help",
-  share: "Sharing help",
+  decision: "What to do",
+  evidence: "Why it changed",
+  trust: "Can I rely on it?",
+  share: "What to send",
 };

@@ -29,17 +29,17 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Action now, Pause if, and Change course if define the decision, with posture and regime score as context.",
+    detail: "Start with the recommendation, the stop line, and the recovery line. Everything else is supporting context.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
     label: "Proof",
-    detail: "Use the signal breakdown here, then open the data lane to see the source metrics.",
+    detail: "Open the evidence view only if someone asks why the call changed or what the key watch lines are.",
     example: "Example decision: confirm curve inversion before approving long bets.",
   },
   {
     label: "Actions",
-    detail: "Use the actions lane to brief leadership with clear, plain-English constraints.",
+    detail: "Use the planning page to turn the call into clear do, don't, and limit rules for the week.",
     example: "Example decision: focus on retention when risk appetite is cautious.",
   },
 ];
@@ -47,19 +47,19 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
   { text: "Confidence and trend indicate pacing quality before score context." },
-  { text: "Startup Climate Index remains available as contextual continuity metadata." },
+  { text: "Historical context is available, but the current decision stays primary." },
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "/operations#ops-playbook", label: "Planning" },
-  { href: "/signals?advanced=1#time-machine", label: "Time machine" },
+  { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
 ];
 
 export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   {
     value: "tightness",
-    term: "Cash availability (tightness)",
+    term: "Cash availability",
     summary:
       "How hard it is to access funding. Higher tightness means conserve cash and focus on runway.",
     why: "Why it matters: tight capital makes long payback projects riskier.",
@@ -85,7 +85,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "fallback-mode",
-    term: "Fallback mode",
+    term: "Saved-data mode",
     summary: "When live data is unavailable, the report uses the latest cached Treasury snapshot.",
     why: "Why it matters: stale inputs can mislead time-sensitive decisions.",
     usedInLabel: "Executive snapshot",
@@ -97,7 +97,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "How to use this glossary",
     bullets: [
-      { emphasis: "Current environment", detail: "anchors this week's posture." },
+      { emphasis: "Current environment", detail: "anchors this week's recommendation." },
       { emphasis: "Terms become constraints", detail: "for discussing bets." },
       { emphasis: "Linked sections", detail: "provide supporting evidence quickly." },
     ],
@@ -105,7 +105,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "Reading notes",
     bullets: [
-      { emphasis: "Posture badge", detail: "summarizes current operating posture." },
+      { emphasis: "Current environment label", detail: "summarizes the backdrop for this week's decision." },
       { emphasis: "Evidence maps to constraints", detail: "rather than forecasts." },
       { emphasis: "Exports support alignment", detail: "across teams." },
     ],

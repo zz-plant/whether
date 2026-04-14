@@ -15,7 +15,7 @@ type DecisionMemoryResponse = {
 
 const buildEntryCopyText = (entry: DecisionMemoryEntry) =>
   [
-    "Whether Decision Memory",
+    "Whether Saved Decisions",
     `Captured: ${formatTimestampUTC(entry.createdAt)}`,
     `Regime: ${entry.regime.label} (${formatDateUTC(entry.context.recordDate)})`,
     `Decision: ${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`,
@@ -50,7 +50,7 @@ export const DecisionMemoryPanel = () => {
       })
       .catch(() => {
         if (active) {
-          setStatusMessage("Unable to load Decision Memory right now.");
+          setStatusMessage("Unable to load saved decisions right now.");
           setEntries([]);
         }
       });
@@ -74,12 +74,12 @@ export const DecisionMemoryPanel = () => {
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Decision Memory</p>
+            <p className="type-label text-slate-400">Saved decisions</p>
             <h3 id="decision-memory-title" className="type-section text-slate-100">
-              Immutable audit trail for decision runs
+              Saved history for decision checks
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Each saved Decision Shield run stores inputs, verdict, thresholds, and source links.
+              Each saved decision check stores the inputs, result, stop line, and source links.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -114,7 +114,7 @@ export const DecisionMemoryPanel = () => {
         ) : entries.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
-              No Decision Memory entries yet. Save a Decision Shield verdict to start the audit trail.
+              No saved decisions yet. Save a decision check result to start the history.
             </p>
           </div>
         ) : (

@@ -31,42 +31,40 @@ export const PlaybookPanel = ({
   const visibleFenceItems = getVisibleActionLaneItems(fenceItems, showAllActionLanes);
   const visibleActionStripItems = getVisibleActionLaneItems(actionStripItems, showAllActionLanes);
   const playbookQuickLinks = [
-    { href: "/operations#ops-decision-shield", label: "Decision shield" },
-    { href: "/operations#ops-strategy-brief", label: "Strategy brief" },
-    { href: "/operations#ops-export-briefs", label: "Export briefs" },
+    { href: "/operations#ops-decision-shield", label: "Decision check" },
+    { href: "/operations#ops-strategy-brief", label: "Strategy summary" },
+    { href: "/operations#ops-export-briefs", label: "Share options" },
   ];
 
   return (
     <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
       <div className="weather-panel p-6">
         <div>
-          <p className="type-label text-slate-400">Playbook</p>
+          <p className="type-label text-slate-400">Rules for this week</p>
           <h3 id="playbook-title" className="type-section text-slate-100">
             {playbook?.title ?? "Operational Guidance"}
           </h3>
         </div>
         <div className="mt-4 weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Executive summary
-          </p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Summary</p>
           <p className="mt-2 text-sm text-slate-200">
             {playbook
               ? playbook.insight
               : "Playbook data unavailable. Use operating guardrails until data recovers."}
           </p>
           <p className="mt-3 text-xs text-slate-500">
-            Align the team on what to stop, start, and fence before approvals move forward.
+            Align the team on what to stop, start, and keep limited before approvals move forward.
           </p>
         </div>
         <CollapsibleDeepDive
-          label="Deep dive: playbook snapshot and action lanes"
+          label="Deep dive: rule summary and detailed lists"
           panelClassName="mt-4 space-y-6"
         >
           <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
             <div className="grid gap-4 lg:col-span-2 lg:grid-cols-3">
               <div className="weather-surface border-l-4 border-rose-500/50 bg-rose-500/10 p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-rose-100">
-                  Don&apos;t (stop)
+                  Stop
                 </p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {visibleStopItems.map((item) => (
@@ -78,7 +76,7 @@ export const PlaybookPanel = ({
               </div>
               <div className="weather-surface border-l-4 border-emerald-400/50 bg-emerald-500/10 p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-emerald-100">
-                  Do (start)
+                  Start
                 </p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {visibleStartItems.map((item) => (
@@ -89,7 +87,7 @@ export const PlaybookPanel = ({
                 </ul>
               </div>
               <div className="weather-surface border-l-4 border-sky-400/50 p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Keep limited</p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {visibleFenceItems.map((item) => (
                     <li key={item} className="break-words">
@@ -102,7 +100,7 @@ export const PlaybookPanel = ({
             <div className="grid gap-3">
               <div className="weather-surface p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Action strip contract
+                  Rules by area
                 </p>
                 <ul className="mt-3 space-y-2 text-xs text-slate-300">
                   {visibleActionStripItems.map((item) => (
@@ -122,7 +120,7 @@ export const PlaybookPanel = ({
               </div>
               <div className="weather-surface p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Playbook snapshot
+                  Weekly rule summary
                 </p>
                 {playbook ? (
                   <div className="mt-3 space-y-2 text-xs text-slate-300">

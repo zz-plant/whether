@@ -72,17 +72,17 @@ export const HomeInterpretationPanel = ({
   const reverseCue = pickCue(layer.bullets, "Reverse:");
 
   return (
-    <section id="interpretation-layer" className="weather-panel space-y-4 px-5 py-5" aria-label="Interpretation layer">
+    <section id="interpretation-layer" className="weather-panel space-y-4 px-5 py-5" aria-label="View for this situation">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Interpretation layer</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">View for this situation</p>
           <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
           <p className="text-xs text-slate-300">{layer.summary}</p>
           <p className="text-xs text-slate-400">Canonical decision lives above: action, guardrail, and flip condition.</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
           <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
-          <span>Role-specific read</span>
+          <span>Alternate view</span>
         </div>
       </div>
 

@@ -64,9 +64,9 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
     <section className={`${tierTwoPanel} ${sectionSpacing} border-slate-800/80 bg-[linear-gradient(180deg,rgba(6,11,20,0.92),rgba(3,8,16,0.98))]`} aria-label="Action strip">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h3 className={tierTwoHeading}>Per-lever guardrails</h3>
+          <h3 className={tierTwoHeading}>Rules by area</h3>
           <p className="mt-1 text-xs leading-5 text-slate-400">
-            Open this only when you need the domain-specific thresholds.
+            Open this only if you need the detailed rules for hiring, spend, roadmap, or fundraising.
           </p>
         </div>
       </div>
