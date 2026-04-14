@@ -101,10 +101,10 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const snapshotRegion = html.slice(html.indexOf("Current outlook"), html.indexOf('id="weekly-call-core"'));
+    const snapshotRegion = html.slice(html.indexOf("This week"), html.indexOf('id="weekly-call-core"'));
     assert.doesNotMatch(snapshotRegion, /Current conditions/);
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
-    assert.match(html, /Current outlook/);
+    assert.match(html, /This week/);
     assert.match(html, /Cloudy/);
     assert.match(html, /Flip risk is in play/i);
   });
@@ -194,7 +194,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const regimeIndex = html.indexOf("Current outlook");
+    const regimeIndex = html.indexOf("This week");
     const doNowIndex = html.indexOf(">Action now<");
     const callIndex = html.indexOf(">Current call<");
     const flipIndex = html.indexOf(">Change course if<");
@@ -205,8 +205,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.ok(flipIndex > doNowIndex);
   });
 
-  it("keeps secondary diagnostics under disclosure", () => {
-    // Contract: secondary diagnostics must remain behind disclosure / below fold.
+  it("keeps the home card focused on the brief and route handoff", () => {
+    // Contract: proof and role translation should live on route owners, not inside the home card.
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         model={buildWeeklyDecisionCardModel({
@@ -282,8 +282,10 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, />Diagnostics</);
     assert.match(html, />Why this week points here</);
-    assert.match(html, />How this lands across the company</);
+    assert.match(html, />What this means now</);
+    assert.doesNotMatch(html, />Diagnostics</);
+    assert.doesNotMatch(html, />Deep evidence</);
+    assert.doesNotMatch(html, />How this lands across the company</);
   });
 });

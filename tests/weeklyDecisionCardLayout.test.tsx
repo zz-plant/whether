@@ -89,8 +89,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /6 pts to flip/);
     assert.match(html, /Cloudy\./);
     assert.match(html, /Why this week points here/);
+    assert.match(html, /What this means now/);
     assert.match(html, /Act with caution/);
     assert.match(html, /Revisit queue/);
+    assert.doesNotMatch(html, /How this lands across the company/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
     assert.doesNotMatch(html, /Series B/);

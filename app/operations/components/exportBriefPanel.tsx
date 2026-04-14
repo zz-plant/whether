@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
@@ -13,17 +13,21 @@ import { formatNumberWithUnit, resolveWeekEndingIsoDateUTC } from "../../../lib/
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import type { CanonicalDecisionCopy } from "../../../lib/report/canonicalDecisionCopy";
 import {
+  buildWeeklyBoardSnippetPlainText,
+  buildWeeklyCallSnapshotPlainText,
   buildWeeklyOperatorBriefCardText,
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
   buildWeeklyOperatorBriefSlackBlocks,
 } from "../../../lib/export/weeklyOperatorBrief";
+import { buildExplainerBriefContent } from "../../../lib/export/explainerBrief";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import {
   buildBoundedDecisionLines,
   buildBoardSlideBullets,
   buildBoardBrief,
+  buildCallCitation,
   buildConstraintHeadlines,
   buildSlackBrief,
   type ModeledExportDecisionPayload,
@@ -52,8 +56,11 @@ const buildExportStamp = (
 
 type ExportDecisionModel = ModeledExportDecisionPayload & {
   confidenceLabel?: "HIGH" | "MED" | "LOW";
+  confidencePercent?: number;
   compactFlipConditionLabels?: string[];
   canonicalDecisionCopy?: CanonicalDecisionCopy;
+  decisionShiftSummary?: string;
+  trendLabel?: string;
 };
 
 const buildIssueTrackerMarkdownBrief = (
@@ -122,6 +129,18 @@ export const ExportBriefPanel = ({
   const lastLabelRef = useRef<string | null>(null);
   const { add } = Toast.useToastManager();
   const copyError = error;
+  const [overrideReason, setOverrideReason] = useState("");
+  const [overrideIndicator, setOverrideIndicator] = useState("");
+  const [overrideOwner, setOverrideOwner] = useState("");
+  const [overrideReversal, setOverrideReversal] = useState("");
+  const fallbackActive = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const hasOverride = [overrideReason, overrideIndicator, overrideOwner, overrideReversal].every(
+    (value) => value.trim().length > 0,
+  );
+  const overrideLine = hasOverride
+    ? `OVERRIDE ACTIVE: ${overrideReason.trim()} · Indicator: ${overrideIndicator.trim()} · Owner: ${overrideOwner.trim()} · Reverse when: ${overrideReversal.trim()}`
+    : "";
+  const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
 
   useEffect(() => {
     if (status === lastStatusRef.current) {
@@ -176,6 +195,13 @@ export const ExportBriefPanel = ({
     () => buildWeeklyOperatorBriefCardText(weeklyOperatorPayload),
     [weeklyOperatorPayload],
   );
+  const citation = useMemo(
+    () => buildCallCitation(assessment, treasury, {
+      postureWithStageLabel: decisionModel?.postureWithStageLabel,
+      operatingStanceLine: decisionModel?.operatingStanceLine,
+    }),
+    [assessment, treasury, decisionModel],
+  );
   const jiraMarkdownBrief = useMemo(
     () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "markdown"),
     [assessment, treasury, sensors, macroSeries, decisionModel]
@@ -196,6 +222,55 @@ export const ExportBriefPanel = ({
     () => buildBoardBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel }),
     [assessment, treasury, sensors, macroSeries, decisionModel],
   );
+  const boardNote = useMemo(
+    () => buildWeeklyBoardSnippetPlainText({
+      trustLine: fallbackActive
+        ? `TRUST: FALLBACK SNAPSHOT · As of ${treasury.record_date}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
+        : `TRUST: LIVE · As of ${treasury.record_date}`,
+      postureLine: `POSTURE: ${decisionModel?.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} · ${decisionModel?.confidenceLabel ?? "Score-based"} confidence${decisionModel?.confidencePercent ? ` (${Math.round(decisionModel.confidencePercent)}%)` : ""}`,
+      changedLine: `CHANGED: ${decisionModel?.decisionShiftSummary ?? "Use the current weekly call as the operating baseline."}`,
+      guardrailLine: `GUARDRAIL: ${decisionModel?.guardrailThreshold ?? weeklyOperatorPayload.pauseIf}`,
+      flipLine: `FLIP: ${decisionModel?.canonicalDecisionCopy?.flipTrigger ?? decisionModel?.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf}`,
+      stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
+    }),
+    [assessment.regime, decisionModel, fallbackActive, treasury, weeklyOperatorPayload],
+  );
+  const callSnapshot = useMemo(
+    () => buildWeeklyCallSnapshotPlainText({
+      regime: decisionModel?.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
+      call: decisionModel?.canonicalDecisionCopy?.operatingCall ?? decisionModel?.operatingStanceLine ?? weeklyOperatorPayload.currentCall,
+      trend: decisionModel?.trendLabel ?? "Current",
+      confidence: decisionModel?.confidencePercent
+        ? `${Math.round(decisionModel.confidencePercent)}% (${decisionModel?.confidenceLabel ?? "Score-based"})`
+        : decisionModel?.confidenceLabel ?? "Score-based confidence",
+      doNow: decisionModel?.canonicalDecisionCopy?.doNowLines[0] ?? decisionModel?.actionNow ?? weeklyOperatorPayload.actionNow,
+      avoid: decisionModel?.guardrailThreshold ?? weeklyOperatorPayload.pauseIf,
+      watch: decisionModel?.canonicalDecisionCopy?.flipTrigger ?? decisionModel?.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf,
+      flipConditions: decisionModel?.canonicalDecisionCopy?.flipConditions ?? decisionModel?.compactFlipConditionLabels ?? weeklyOperatorPayload.flipConditionLabels,
+    }),
+    [assessment.regime, decisionModel, weeklyOperatorPayload],
+  );
+  const explainerBrief = buildExplainerBriefContent({
+    boardSummary: applyOverride(boardBrief),
+    weeklyOperatorBrief: applyOverride(weeklyOperatorPlainText),
+    citation,
+  });
+  const meetingPack = [
+    "BOARD NOTE",
+    applyOverride(boardNote),
+    "",
+    "Call snapshot",
+    applyOverride(callSnapshot),
+    "",
+    "WEEKLY BRIEF",
+    applyOverride(weeklyOperatorPlainText),
+    "",
+    "BOARD SUMMARY",
+    applyOverride(boardBrief),
+    "",
+    "CITATION",
+    citation,
+  ].join("\n");
 
   const constraintHeadlines = useMemo(
     () => buildConstraintHeadlines(assessment, treasury),
@@ -227,6 +302,9 @@ export const ExportBriefPanel = ({
     isClipboardTargetDisabled(target, { status, activeTarget });
 
   const handlePrint = () => {
+    if (fallbackActive && !window.confirm("Cached snapshot active. Confirm export before sharing this brief.")) {
+      return;
+    }
     window.print();
     add({
       title: "Print dialog opened",
@@ -283,7 +361,7 @@ export const ExportBriefPanel = ({
               label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy weekly brief</span>}
               state={clipboardState("Weekly brief")}
               disabled={isCopyDisabled("Weekly brief")}
-              onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly brief")}
+              onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Weekly brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -291,21 +369,21 @@ export const ExportBriefPanel = ({
               }}
             />
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Slack brief</span>}
-              state={clipboardState("Slack brief")}
-              disabled={isCopyDisabled("Slack brief")}
-              onClick={() => void handleCopy(briefing, "Slack brief")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy explainer brief</span>}
+              state={clipboardState("Explainer brief")}
+              disabled={isCopyDisabled("Explainer brief")}
+              onClick={() => void handleCopy(explainerBrief, "Explainer brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
-                "data-premium-cta": "copy_slack_brief",
+                "data-premium-cta": "copy_explainer_brief",
               }}
             />
             <ClipboardActionRow
               label={<span className="inline-flex items-center gap-1.5"><DocumentIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy board summary</span>}
               state={clipboardState("Board summary")}
               disabled={isCopyDisabled("Board summary")}
-              onClick={() => void handleCopy(boardBrief, "Board summary")}
+              onClick={() => void handleCopy(applyOverride(boardBrief), "Board summary")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -324,6 +402,103 @@ export const ExportBriefPanel = ({
           </div>
         </div>
 
+        {hasOverride ? (
+          <div className="mt-4 rounded-lg border border-amber-300/30 bg-amber-500/10 p-4 text-xs leading-5 text-amber-100">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
+            <p className="mt-2">{overrideLine}</p>
+          </div>
+        ) : null}
+
+        <details className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
+          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
+            Board and governance formats
+          </summary>
+          <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
+            <p className="text-sm text-slate-300">
+              Use these when the same call needs a board-ready, citation-heavy, or governance-specific package.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <ClipboardActionRow
+                label="Copy board note"
+                state={clipboardState("Board note")}
+                disabled={isCopyDisabled("Board note")}
+                onClick={() => void handleCopy(applyOverride(boardNote), "Board note")}
+              />
+              <ClipboardActionRow
+                label="Copy meeting pack"
+                state={clipboardState("Meeting pack")}
+                disabled={isCopyDisabled("Meeting pack")}
+                onClick={() => void handleCopy(meetingPack, "Meeting pack")}
+              />
+              <ClipboardActionRow
+                label="Copy call snapshot"
+                state={clipboardState("Call snapshot")}
+                disabled={isCopyDisabled("Call snapshot")}
+                onClick={() => void handleCopy(applyOverride(callSnapshot), "Call snapshot")}
+              />
+              <ClipboardActionRow
+                label="Copy citation"
+                state={clipboardState("Citation")}
+                disabled={isCopyDisabled("Citation")}
+                onClick={() => void handleCopy(citation, "Citation")}
+              />
+            </div>
+            {fallbackActive ? (
+              <p className="text-[10px] leading-5 text-amber-200">
+                Cached snapshot active: confirm irreversible sharing actions before circulating this package.
+              </p>
+            ) : null}
+          </div>
+        </details>
+
+        <details className="mt-4 rounded-lg border border-amber-300/25 bg-amber-500/8 p-4">
+          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">
+            Company-specific exception
+          </summary>
+          <div className="mt-4 space-y-3 border-t border-amber-300/20 pt-4">
+            <p className="text-sm text-amber-50">
+              Use this only when the exported brief needs an explicit local exception layered onto the standard weekly call.
+            </p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Reason</span>
+                <input
+                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideReason}
+                  onChange={(event) => setOverrideReason(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Local indicator</span>
+                <input
+                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideIndicator}
+                  onChange={(event) => setOverrideIndicator(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Owner</span>
+                <input
+                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideOwner}
+                  onChange={(event) => setOverrideOwner(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Change course if</span>
+                <input
+                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideReversal}
+                  onChange={(event) => setOverrideReversal(event.target.value)}
+                />
+              </label>
+            </div>
+            <p className="text-[11px] leading-5 text-amber-100/80">
+              When active, the exception is appended to weekly brief, explainer brief, board note, meeting pack, call snapshot, and board summary exports.
+            </p>
+          </div>
+        </details>
+
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
             <p className="type-kicker"><WorkAppLabel app="slack" label="Slack brief" /></p>
@@ -335,7 +510,7 @@ export const ExportBriefPanel = ({
                 label="Copy weekly brief"
                 state={clipboardState("Weekly brief")}
                 disabled={isCopyDisabled("Weekly brief")}
-                onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly brief")}
+                onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Weekly brief")}
               />
               <ClipboardActionRow
                 label="Copy Slack format"
@@ -359,13 +534,13 @@ export const ExportBriefPanel = ({
                 label="Copy board summary"
                 state={clipboardState("Board summary")}
                 disabled={isCopyDisabled("Board summary")}
-                onClick={() => void handleCopy(boardBrief, "Board summary")}
+                onClick={() => void handleCopy(applyOverride(boardBrief), "Board summary")}
               />
               <Button
                 type="button"
                 onClick={() =>
                   handleDownload(
-                    briefing,
+                    applyOverride(weeklyOperatorPlainText),
                     `whether-weekly-operator-brief-${weeklyOperatorDate}.txt`
                   )
                 }
@@ -629,7 +804,7 @@ export const ExportBriefPanel = ({
               </p>
               <textarea
                 readOnly
-                value={briefing}
+              value={briefing}
                 rows={8}
                 className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
               />

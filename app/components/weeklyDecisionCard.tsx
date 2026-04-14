@@ -1,18 +1,14 @@
 import type { ReactNode } from "react";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
-import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
+import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
-import { InputInfluenceSection } from "./weekly-card/InputInfluenceSection";
-import {
-  MoreContextDisclosureBody,
-} from "./weekly-card/MoreContextDisclosureBody";
+import { MoreContextDisclosureBody } from "./weekly-card/MoreContextDisclosureBody";
 import { buildWeeklyDecisionPresentation } from "./weekly-card/presentationAdapter";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import {
   compactInset,
-  disclosureSummaryClass,
   sectionSpacing,
   tierOneHeading,
   tierOnePanel,
@@ -46,8 +42,8 @@ export { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 export { MoreContextDisclosureBody } from "./weekly-card/MoreContextDisclosureBody";
 
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
-  const { model, actions, diagnosticsLane, searchParams } = props;
-  const { status, decision, presentation, diagnostics, history, artifact } = model;
+  const { model, actions, searchParams } = props;
+  const { status, decision, presentation, diagnostics, artifact } = model;
   const {
     statusLabel,
     regimeKey,
@@ -62,21 +58,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = status;
   const {
     operatingStanceLine,
-    weeklyMemoLines,
-    guardrail,
-    immediateDecision,
     canonicalDecisionCopy,
-    reportDynamics,
-    transitionProbabilities,
-    decisionRules,
-    decisionMatrix,
     actionStripItems = [],
     startupVariantPolicy,
-    roleAwareTemplates,
     revisitDecisions,
     revisitQueue,
     decisionReadiness,
-    weeklyMovement,
   } = decision;
   const {
     whyItMattersLine,
@@ -85,26 +72,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const {
     regimeDistance,
     flipRiskMeter,
-    evidenceItems,
-    failureModes = [],
-    inputInfluence = [],
-    currentScores,
-    startupClimateIndex,
-    whyThisCall,
   } = diagnostics;
-  const {
-    memoryRail,
-    historicalTimeline,
-    historicalAnalogs,
-    lastYearComparison,
-    macroOverlay,
-  } = history;
-  const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel } = artifact;
   const {
-    activeRole,
-    roleHrefs,
-    roleTranslations,
     citationMetaLine,
     inlineTrustMarker,
     trustStateDetail,
@@ -171,9 +141,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             driverHighlights={driverHighlights}
             guardrailPolicyDetails={guardrailPolicyDetails}
             flipPolicyDetails={flipPolicyDetails}
-            roleTranslations={roleTranslations}
-            activeRole={activeRole}
-            roleHrefs={roleHrefs}
             glossaryHref={glossaryHref}
             citationMetaLine={citationMetaLine}
             citation={citation}
@@ -181,77 +148,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             confidenceHistory={confidenceHistory}
             confidenceTrend={confidenceTrend}
             confidencePercent={confidencePercent}
-          />
-        )}
-        influenceSection={inputInfluence.length > 0 ? (
-          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Input influence</span>
-              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-            </summary>
-            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
-              <InputInfluenceSection items={inputInfluence} />
-            </div>
-          </details>
-        ) : null}
-        diagnosticsSection={(
-          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Diagnostics</span>
-              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-            </summary>
-            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
-              {diagnosticsLane ?? (
-                <DiagnosticsSection
-                  weeklyMemoLines={weeklyMemoLines}
-                  immediateDecision={immediateDecision}
-                  revisitDecisions={revisitDecisions}
-                  guardrail={guardrail}
-                  regimeDistance={regimeDistance}
-                  postureWithStageLabel={postureWithStageLabel}
-                  statusLabel={statusLabel}
-                  trendLabel={trendLabel}
-                  confidencePercent={confidencePercent}
-                  decisionMatrix={decisionMatrix}
-                  decisionRules={decisionRules}
-                  roleAwareTemplates={roleAwareTemplates}
-                  evidenceItems={evidenceItems}
-                  reportDynamics={reportDynamics}
-                  weeklyMovement={weeklyMovement}
-                  transitionProbabilities={transitionProbabilities}
-                  failureModes={failureModes}
-                  sinceLastReview={sinceLastReview}
-                />
-              )}
-            </div>
-          </details>
-        )}
-        matrixSection={(
-          <details className="group rounded-lg border border-slate-800/55 bg-slate-950/35 px-2.5 py-2">
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Bounded rules matrix</span>
-              <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
-            </summary>
-            <div className="weather-disclosure-panel animate-collapsible-in mt-2">
-              <BoundedRulesMatrix
-                decisionMatrix={decisionMatrix}
-                decisionRules={decisionRules}
-                startupVariantPolicy={startupVariantPolicy}
-                currentScores={currentScores}
-              />
-            </div>
-          </details>
-        )}
-        contextSection={(
-          <MoreContextDisclosureBody
-            startupClimateIndex={startupClimateIndex}
-            evidenceItems={evidenceItems}
-            whyThisCall={whyThisCall}
-            memoryRail={memoryRail}
-            historicalTimeline={historicalTimeline}
-            historicalAnalogs={historicalAnalogs}
-            lastYearComparison={lastYearComparison}
-            macroOverlay={macroOverlay}
           />
         )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}

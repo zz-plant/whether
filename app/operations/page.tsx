@@ -12,7 +12,6 @@ import {
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
 import {
-  operationsDeveloperReferenceLinks,
   operationsSectionLinks,
 } from "../../lib/navigation/operationsNavigation";
 import {
@@ -385,8 +384,11 @@ export default async function OperationsPage({
                       reversalTrigger: snapshot.homeBriefModel.reversalTrigger,
                       actionStripItems: snapshot.homeBriefModel.actionStripItems,
                       confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+                      confidencePercent: snapshot.homeBriefModel.confidencePercent,
                       compactFlipConditionLabels: snapshot.homeBriefModel.compactFlipConditionLabels,
                       canonicalDecisionCopy: snapshot.canonicalDecisionCopy ?? undefined,
+                      decisionShiftSummary: snapshot.homeBriefModel.decisionShiftSummary,
+                      trendLabel: snapshot.homeBriefModel.trendLabel,
                     }}
                     provenance={treasuryProvenance}
                     showProvenance={false}
@@ -491,34 +493,6 @@ export default async function OperationsPage({
             <Link href={canonicalCapitalDisciplinePath as Route} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
               Open governance pillar
             </Link>
-          </div>
-        </div>
-      </details>
-
-      <details id="ops-implementation-handoffs" className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5">
-        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Need implementation handoffs?
-        </summary>
-        <div className="mt-4 space-y-4">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
-            <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Endpoint, terminal, and integration handoffs</h2>
-            <p className="text-sm text-slate-300">Use these docs only when the weekly plan is approved and you need implementation depth for delivery.</p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {operationsDeveloperReferenceLinks
-              .map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{link.label}</p>
-                  <p className="mt-2 text-sm text-slate-300">{link.description}</p>
-                </a>
-              ))}
           </div>
         </div>
       </details>

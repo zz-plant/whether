@@ -13,14 +13,6 @@ type PolicyDetails = {
   chips: string[];
 };
 
-type RoleTranslation = {
-  id: "finance" | "product";
-  label: string;
-  implication: string;
-  doLine: string;
-  holdLine: string;
-};
-
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
   operatingCall: string;
@@ -66,9 +58,6 @@ type WeeklyCallModePanelProps = {
   }>;
   guardrailPolicyDetails: PolicyDetails;
   flipPolicyDetails: PolicyDetails;
-  roleTranslations: RoleTranslation[];
-  activeRole: RoleTranslation["id"];
-  roleHrefs: Record<RoleTranslation["id"], string>;
   glossaryHref?: string;
   citationMetaLine: string;
   citation: string;
@@ -111,9 +100,6 @@ export function WeeklyCallModePanel({
   driverHighlights,
   guardrailPolicyDetails,
   flipPolicyDetails,
-  roleTranslations,
-  activeRole,
-  roleHrefs,
   glossaryHref,
   citationMetaLine,
   citation,
@@ -123,7 +109,6 @@ export function WeeklyCallModePanel({
   confidencePercent,
 }: WeeklyCallModePanelProps) {
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
-  const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
   const detailDisclosureBase = "mt-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2.5";
   const inlineTrustToneClass = inlineTrustTone === "stable"
     ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
@@ -133,9 +118,6 @@ export function WeeklyCallModePanel({
   const flipSupport = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== snapshotWatch.trim())
     .slice(0, 2);
-  const compactDecisionBullets = decisionBullets
-    .filter((item) => item.detail.trim().length > 0)
-    .slice(0, 3);
   const changedThisWeekDetail = compactChangedThisWeekDetail(
     decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.",
   );
@@ -219,7 +201,6 @@ export function WeeklyCallModePanel({
       className: compactMetricCardBase,
     },
   ] as const;
-  const supportingRationalePreview = activeRoleTranslation?.implication ?? whyItMattersLine ?? trustStatusSummary;
   const driverToneClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
     direction === "tightening"
       ? "border-amber-400/25 bg-amber-500/8 text-amber-100"
@@ -506,77 +487,29 @@ export function WeeklyCallModePanel({
                 ))}
               </div>
             </article>
+
+            {(whyItMattersLine || trustReason || glossaryHref) ? (
+              <article className="rounded-xl border border-slate-700/60 bg-slate-950/65 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(2,6,23,0.62)] xl:col-span-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">What this means now</p>
+                {whyItMattersLine ? <p className="mt-1 text-xs leading-5 text-slate-200">{whyItMattersLine}</p> : null}
+                {trustReason ? (
+                  <p className="mt-2 text-[11px] leading-5 text-slate-400">
+                    Using the last verified weekly read because {trustReason}
+                  </p>
+                ) : null}
+                {glossaryHref ? (
+                  <p className="mt-2 text-[11px] leading-5 text-slate-300">
+                    Need definitions?{" "}
+                    <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                      Open the glossary
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </article>
+            ) : null}
           </div>
         </CompactDisclosure>
-
-        {(whyItMattersLine || trustReason || activeRoleTranslation) ? (
-          <CompactDisclosure
-            queryKey="supportingRationale"
-            summary="How this lands across the company"
-            preview={supportingRationalePreview}
-            className="group weather-auto-chevron mt-3 rounded-xl border border-slate-700/60 bg-[linear-gradient(180deg,rgba(8,15,27,0.88),rgba(4,10,20,0.94))] px-3 py-3 shadow-[0_18px_32px_-28px_rgba(2,6,23,0.72)]"
-            summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"
-          >
-            {glossaryHref ? (
-              <p className="mt-2 text-[11px] leading-5 text-slate-300">
-                Need definitions?{" "}
-                <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                  Open the glossary
-                </Link>
-                .
-              </p>
-            ) : null}
-            {whyItMattersLine ? <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
-            {trustReason ? (
-              <p className="mt-2 text-[11px] leading-5 text-slate-400">
-                Using the last verified weekly read because {trustReason}
-              </p>
-            ) : null}
-            {compactDecisionBullets.length > 0 ? (
-              <ul className="mt-3 grid gap-2 md:grid-cols-3">
-                {compactDecisionBullets.map((item) => (
-                  <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
-                    <p className="mt-1 leading-5">{item.detail}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            {activeRoleTranslation ? (
-              <div className="mt-3 border-t border-slate-800/70 pt-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Team view</p>
-                  <div className="flex flex-wrap gap-2">
-                    {roleTranslations.map((role) => {
-                      const active = role.id === activeRole;
-                      return (
-                        <Link
-                          key={role.id}
-                          href={roleHrefs[role.id] as Route}
-                          className={active
-                            ? "min-h-[44px] rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100"
-                            : "min-h-[44px] rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"}
-                          aria-current={active ? "page" : undefined}
-                        >
-                          {role.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-                <p className="mt-2 text-sm font-semibold text-slate-100">{activeRoleTranslation.implication}</p>
-                <div className="mt-2 grid gap-2 md:grid-cols-2">
-                  <p className="rounded-lg border border-emerald-400/25 bg-emerald-500/8 px-3 py-2 text-xs leading-5 text-emerald-100">
-                    <span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do</span> {activeRoleTranslation.doLine}
-                  </p>
-                  <p className="rounded-lg border border-rose-400/25 bg-rose-500/8 px-3 py-2 text-xs leading-5 text-rose-100">
-                    <span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Don&apos;t</span> {activeRoleTranslation.holdLine}
-                  </p>
-                </div>
-              </div>
-            ) : null}
-          </CompactDisclosure>
-        ) : null}
       </article>
     </>
   );

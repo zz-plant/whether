@@ -69,10 +69,10 @@ The artifact rail now follows a routine-first hierarchy:
 - one recommended artifact mode,
 - one primary share/copy path,
 - quick variants for repeat readers (`delta brief`, `call snapshot`),
-- separate disclosures for board/governance repackaging and company-specific exceptions.
+- a direct handoff into Planning for board/governance repackaging and company-specific exceptions.
 Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
-The weekly brief sequence now favors `current call -> operating levers -> share actions -> deep evidence` rather than surfacing the evidence disclosure before the transmission surface.
+The weekly brief sequence now favors `current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
@@ -130,12 +130,11 @@ four-step progressive flow:
 Only one step is expanded at a time, while the other steps collapse into summary cards. The home
 Planning handoff also now uses a more stateful board treatment with explicit owner, approval-state,
 and change-course cues instead of sentence-only summaries. Existing
-hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
-implementation depth (integrations, API contracts, and CLI fallback) is linked from `/operations` into developer docs after the weekly plan is approved.
+hash deep links are preserved by mapping section-level hashes into the relevant step.
 The share step now also houses the operator follow-through surfaces that were previously disconnected from the core loop:
 - per-profile alert delivery controls and recent send history,
 - Decision Memory export and latest-entry recall,
-- share artifacts, delivery controls, and audit history in one checkpoint before the brief leaves the room.
+- share artifacts, explainer mode, board/governance repackaging, company-specific exceptions, delivery controls, and audit history in one checkpoint before the brief leaves the room.
 `/operations` now exposes the same mixed-literacy translation model as the Weekly Brief: a
 top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
 assist panels explain only the planning layer the user needs. The execution stepper itself now shows
@@ -145,7 +144,6 @@ Shared report-shell routes now avoid stacking a separate trust summary panel ahe
 ### 1.4 Planning workstreams
 - **Weekly plan** (`/operations`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
-- **Developer references** (linked from `/operations`): `docs/developer/api-reference.md`, `docs/developer/cli-fallback.md`, and `docs/developer/integrations.md`.
 
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English

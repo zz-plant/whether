@@ -35,7 +35,6 @@ const LeadershipArtifactActions = async ({
   return (
     <StreamedSectionReveal delay="medium">
       <CopyLeadershipArtifactsButtons
-        boardSnippet={artifactPayload.boardSnippetText}
         weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
         weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
         deltaOnlyBrief={artifactPayload.deltaOnlyBriefText}
@@ -43,6 +42,7 @@ const LeadershipArtifactActions = async ({
         citation={artifactPayload.callCitation}
         fallbackActive={fallbackActive}
         initialArtifactMode={initialArtifactMode}
+        moreFormatsHref="/operations#ops-export-briefs"
       />
     </StreamedSectionReveal>
   );

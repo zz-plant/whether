@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type ButtonHTMLAttributes } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { artifactModeLabels, type ArtifactMode } from "../../lib/literacyAssist";
 import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
-import { publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { buildExplainerBriefContent } from "../../lib/export/explainerBrief";
 import {
   ARTIFACT_MODE_QUERY_PARAM,
   buildArtifactShareText,
@@ -46,35 +47,7 @@ export const resolveCopyActionLabel = (state: CopyState, defaultLabel: string) =
   if (state === "error") return "Retry copy";
   return defaultLabel;
 };
-
-export const buildExplainerBriefContent = ({
-  boardSummary,
-  weeklyOperatorBrief,
-  citation,
-}: {
-  boardSummary: string;
-  weeklyOperatorBrief: string;
-  citation: string;
-}) => [
-  "EXPLAINER BRIEF",
-  "",
-  "What this call is saying",
-  boardSummary,
-  "",
-  "Plain-English guide",
-  "• Tightness = how hard it is to make long-payback commitments.",
-  "• Risk appetite = how willing markets are to support faster expansion.",
-  `• ${publicDecisionLabels.call} = the standing weekly operating summary.`,
-  `• ${publicDecisionLabels.action} = what to do this week.`,
-  `• ${publicDecisionLabels.threshold} = the trip line that pauses or tightens the call.`,
-  `• ${publicDecisionLabels.reversal} = what must improve before loosening again.`,
-  "",
-  "Weekly brief",
-  weeklyOperatorBrief,
-  "",
-  "Citation",
-  citation,
-].join("\n");
+export { buildExplainerBriefContent } from "../../lib/export/explainerBrief";
 
 function ActionButton({
   variant,
@@ -95,7 +68,6 @@ const trackFirstActionConversion = (action: PrimaryActionType) => {
 };
 
 export function CopyLeadershipArtifactsButtons({
-  boardSnippet,
   weeklyCallSnapshot,
   weeklyOperatorBrief,
   deltaOnlyBrief,
@@ -103,8 +75,8 @@ export function CopyLeadershipArtifactsButtons({
   citation,
   fallbackActive = false,
   initialArtifactMode = "operator",
+  moreFormatsHref = "/operations#ops-export-briefs",
 }: {
-  boardSnippet: string;
   weeklyCallSnapshot: string;
   weeklyOperatorBrief: string;
   deltaOnlyBrief: string;
@@ -112,6 +84,7 @@ export function CopyLeadershipArtifactsButtons({
   citation: string;
   fallbackActive?: boolean;
   initialArtifactMode?: ArtifactMode;
+  moreFormatsHref?: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -119,10 +92,6 @@ export function CopyLeadershipArtifactsButtons({
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const [artifactMode, setArtifactMode] = useState<ArtifactMode>(initialArtifactMode);
   const [shareState, setShareState] = useState<ShareState>("idle");
-  const [overrideReason, setOverrideReason] = useState("");
-  const [overrideIndicator, setOverrideIndicator] = useState("");
-  const [overrideOwner, setOverrideOwner] = useState("");
-  const [overrideReversal, setOverrideReversal] = useState("");
   const isCopying = status === "copying";
 
   const copyState = (target: CopyTarget): CopyState =>
@@ -133,13 +102,6 @@ export function CopyLeadershipArtifactsButtons({
         : status === "error"
           ? "error"
           : "idle";
-
-  const hasOverride = [overrideReason, overrideIndicator, overrideOwner, overrideReversal].every(
-    (value) => value.trim().length > 0,
-  );
-  const overrideLine = hasOverride
-    ? `OVERRIDE ACTIVE: ${overrideReason.trim()} · Indicator: ${overrideIndicator.trim()} · Owner: ${overrideOwner.trim()} · Reverse when: ${overrideReversal.trim()}`
-    : "";
 
   useEffect(() => {
     const requestedMode = searchParams.get(ARTIFACT_MODE_QUERY_PARAM);
@@ -158,49 +120,20 @@ export function CopyLeadershipArtifactsButtons({
     return nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname;
   };
 
-  const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
   const explainerBriefContent = buildExplainerBriefContent({
-    boardSummary: applyOverride(boardSummary),
-    weeklyOperatorBrief: applyOverride(weeklyOperatorBrief),
+    boardSummary,
+    weeklyOperatorBrief,
     citation,
   });
   const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Weekly brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
-    : applyOverride(weeklyOperatorBrief);
+    : weeklyOperatorBrief;
   const activeModeLabel = artifactModeLabels[artifactMode];
   const activeModeNote =
     artifactMode === "explainer"
       ? "The same recommendation, written in plainer language."
       : "Best for most leadership updates.";
-
-  const meetingPackContent = [
-    "BOARD NOTE",
-    applyOverride(boardSnippet),
-    "",
-    "Call snapshot",
-    applyOverride(weeklyCallSnapshot),
-    "",
-    "WEEKLY BRIEF",
-    applyOverride(weeklyOperatorBrief),
-    "",
-    "BOARD SUMMARY",
-    applyOverride(boardSummary),
-    "",
-    "CITATION",
-    citation,
-  ].join("\n");
-
-  const runExportPdf = () => {
-    window.print();
-  };
-
-  const handleExportPdf = () => {
-    if (fallbackActive && !window.confirm("Cached snapshot active. Confirm export before sharing this brief.")) {
-      return;
-    }
-    runExportPdf();
-  };
 
   const handleNativeShare = async () => {
     if (shareState === "sharing") {
@@ -218,7 +151,7 @@ export function CopyLeadershipArtifactsButtons({
     const shareText = buildArtifactShareText({
       mode: artifactMode,
       summary: activeModeLabel,
-      brief: applyOverride(primaryBriefContent),
+      brief: primaryBriefContent,
       url: currentUrl,
     });
     const payload = {
@@ -360,7 +293,7 @@ export function CopyLeadershipArtifactsButtons({
             type="button"
             onClick={() => {
               trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(applyOverride(deltaOnlyBrief), "Delta brief");
+              copyToClipboard(deltaOnlyBrief, "Delta brief");
             }}
             disabled={isCopying}
             aria-busy={isCopying}
@@ -372,7 +305,7 @@ export function CopyLeadershipArtifactsButtons({
             type="button"
             onClick={() => {
               trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(applyOverride(weeklyCallSnapshot), "Call snapshot");
+              copyToClipboard(weeklyCallSnapshot, "Call snapshot");
             }}
             disabled={isCopying}
             aria-busy={isCopying}
@@ -392,118 +325,33 @@ export function CopyLeadershipArtifactsButtons({
         </p>
       </article>
 
-      <details className="weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
-        <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-          Board and governance formats
-        </summary>
-        <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
-          <p className="text-[11px] leading-5 text-slate-400">
-            Use these when you need the same call packaged for a board, finance, or documentation-heavy audience.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-            <ActionButton
-              variant="secondary"
-              type="button"
-              onClick={() => copyToClipboard(applyOverride(boardSnippet), "Board note")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-            >
-              {copyLabel("Board note", "Copy board note")}
-            </ActionButton>
-            <ActionButton
-              variant="secondary"
-              type="button"
-              onClick={() => copyToClipboard(meetingPackContent, "Meeting pack")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-            >
-              {copyLabel("Meeting pack", "Copy meeting pack")}
-            </ActionButton>
-            <ActionButton
-              variant="secondary"
-              type="button"
-              onClick={() => copyToClipboard(applyOverride(boardSummary), "Board summary")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-            >
-              {copyLabel("Board summary", "Copy board summary")}
-            </ActionButton>
-            <ActionButton
-              variant="secondary"
-              type="button"
-              onClick={() => copyToClipboard(citation, "Citation")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-            >
-              {copyLabel("Citation", "Copy citation")}
-            </ActionButton>
-            <ActionButton variant="secondary" type="button" onClick={handleExportPdf}>
-              Print / PDF
-            </ActionButton>
+      <article className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Planning owns full packaging</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">Board, governance, and exception formats moved to Planning.</p>
           </div>
-          {fallbackActive ? (
-            <p className="px-1 text-[10px] text-amber-200">
-              Cached snapshot active: confirm irreversible sharing actions before export.
-            </p>
-          ) : null}
+          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+            Deeper export
+          </span>
         </div>
-      </details>
-
-      <details className="weather-auto-chevron rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-        <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-100">
-          Company-specific exception
-        </summary>
-        <div className="mt-3 space-y-3 border-t border-amber-400/15 pt-3">
-          <p className="max-w-2xl text-xs leading-5 text-amber-50">
-            Use this only when the shared brief needs a clearly stated company-specific exception.
+        <p className="mt-2 text-[11px] leading-5 text-slate-400">
+          Use home for the default weekly brief. Open Planning only when you need board-ready packaging, citation-heavy exports, or a company-specific exception.
+        </p>
+        {fallbackActive ? (
+          <p className="mt-2 text-[10px] leading-5 text-amber-200">
+            Cached snapshot active: confirm irreversible sharing actions in Planning before circulation.
           </p>
-
-          {hasOverride ? (
-            <div className="rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-100">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
-              <p className="mt-1">{overrideLine}</p>
-            </div>
-          ) : null}
-
-          <p className="text-xs leading-5 text-amber-100/80">
-            Best for board or executive updates that need an explicit local exception, not for routine edits or formatting tweaks.
-          </p>
-          <div className="grid gap-2 md:grid-cols-2">
-            <label className="space-y-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Reason</span>
-              <input
-                className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                value={overrideReason}
-                onChange={(event) => setOverrideReason(event.target.value)}
-              />
-            </label>
-            <label className="space-y-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Local indicator</span>
-              <input
-                className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                value={overrideIndicator}
-                onChange={(event) => setOverrideIndicator(event.target.value)}
-              />
-            </label>
-            <label className="space-y-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Owner</span>
-              <input
-                className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                value={overrideOwner}
-                onChange={(event) => setOverrideOwner(event.target.value)}
-              />
-            </label>
-            <label className="space-y-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Change course if</span>
-              <input
-                className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                value={overrideReversal}
-                onChange={(event) => setOverrideReversal(event.target.value)}
-              />
-            </label>
-          </div>
+        ) : null}
+        <div className="mt-3">
+          <Link
+            href={moreFormatsHref}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
+          >
+            Open Planning formats
+          </Link>
         </div>
-      </details>
+      </article>
     </div>
   );
 }

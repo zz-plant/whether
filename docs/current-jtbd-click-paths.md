@@ -28,17 +28,19 @@ Validation note: click labels in this document were verified from the current ro
 **Clicks**
 1. Open `/` or click `Weekly Brief`.
 2. Use one of:
-   - `Copy board snippet`
-   - `Copy weekly call snapshot`
    - `Copy delta brief`
-   - `Copy Weekly Operator Brief`
-3. If needed, open `More share actions`.
-4. Choose one of:
+   - `Copy call snapshot`
+   - `Copy weekly brief`
+   - `Share weekly brief`
+3. If needed, click `Open Planning formats`.
+4. In Planning, choose one of:
+   - `Copy explainer brief`
+   - `Copy board note`
    - `Copy meeting pack`
    - `Copy board summary`
    - `Copy citation`
-   - `Export / print PDF`
-5. Only if the company needs a temporary exception, open `Company-specific exception` and add the governance note before copying again.
+   - `Print / PDF`
+5. Only if the company needs a temporary exception, open `Company-specific exception` in Planning and add the governance note before copying again.
 
 **Current output**
 - Slack-ready weekly call snapshot
