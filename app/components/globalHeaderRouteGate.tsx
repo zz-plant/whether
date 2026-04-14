@@ -16,7 +16,7 @@ import { ThemeToggleButton } from "./themeToggleButton";
 
 const resolveReportHeaderAction = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/operations#ops-monthly-action-summary", label: "Make the plan" };
+    return { href: "/operations#ops-monthly-action-summary", label: "Open planning" };
   }
 
   if (pathname.startsWith("/signals")) {
@@ -66,7 +66,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 <Link href="/" className={GLOBAL_HEADER_BRAND_LINK_CLASSNAME}>
                   Whether
                 </Link>
-                {isReportRoute ? (
+                {isReportRoute && !isHomeBrief ? (
                   <span className="weather-tag weather-tag-slate">
                     Core workflow
                   </span>
@@ -78,7 +78,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 </p>
                 <p className="max-w-3xl text-[12px] leading-relaxed text-slate-300">
                   {isHomeBrief
-                    ? "Start with this week's call. Open proof or another workspace only if the room still needs it."
+                    ? "Read this week's call first. Open planning or proof only when the room needs the next step."
                     : (tagline.description ?? "Move to the next workflow only when the weekly brief needs support.")}
                 </p>
               </div>
@@ -120,9 +120,20 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </div>
           </div>
 
-          <nav aria-label="Global navigation">
-            <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-          </nav>
+          {isHomeBrief ? (
+            <details className="rounded-xl border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
+              <summary className="min-h-[44px] cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                Browse workspaces
+              </summary>
+              <div className="mt-3">
+                <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+              </div>
+            </details>
+          ) : (
+            <nav aria-label="Global navigation">
+              <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+            </nav>
+          )}
         </div>
       </div>
     </header>

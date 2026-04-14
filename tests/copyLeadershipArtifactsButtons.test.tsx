@@ -38,9 +38,9 @@ describe("CopyLeadershipArtifactsButtons", () => {
       citation: "Citation",
     });
 
-    assert.match(brief, /Current call = the standing weekly operating summary\./);
+    assert.match(brief, /Current call = the standing weekly recommendation\./);
     assert.match(brief, /Action now = what to do this week\./);
-    assert.match(brief, /Pause if = the trip line that pauses or tightens the call\./);
+    assert.match(brief, /Pause if = the trip line that pauses or tightens the recommendation\./);
     assert.match(brief, /Change course if = what must improve before loosening again\./);
     assert.doesNotMatch(brief, /stop line|reopen line/i);
   });

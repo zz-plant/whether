@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
-import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
@@ -13,9 +12,7 @@ import {
   tierOneHeading,
   tierOnePanel,
 } from "./weekly-card/shared";
-import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
 import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDecisionContent";
-import type { RegimeKey } from "../../lib/regimeEngine";
 import type {
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
@@ -37,24 +34,17 @@ export type WeeklyDecisionCardProps = {
 export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
 export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
 // Legacy hero export retained for isolated section tests only.
-export const DecisionCallHeader = DecisionHeroSection;
+export { DecisionHeroSection as DecisionCallHeader } from "./weekly-card/DecisionHeroSection";
 export { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 export { MoreContextDisclosureBody } from "./weekly-card/MoreContextDisclosureBody";
 
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const { model, actions, searchParams } = props;
-  const { status, decision, presentation, diagnostics, artifact } = model;
+  const { status, decision, presentation, artifact } = model;
   const {
-    statusLabel,
-    regimeKey,
-    postureLabel,
-    stageLabel,
-    postureWithStageLabel,
-    confidenceLabel,
     confidencePercent,
     confidenceHistory = [],
     confidenceTrend,
-    trendLabel,
   } = status;
   const {
     operatingStanceLine,
@@ -69,17 +59,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     whyItMattersLine,
     glossaryHref,
   } = presentation ?? {};
-  const {
-    regimeDistance,
-    flipRiskMeter,
-  } = diagnostics;
-  const { citation, recordDateLabel } = artifact;
+  const { citation } = artifact;
   const {
     citationMetaLine,
     inlineTrustMarker,
     trustStateDetail,
     hasMaterialTrustDelta,
-    trustStrip,
     comparisonSummary,
     postureSteps,
     trajectoryDeltaSummary,
@@ -92,25 +77,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     flipPolicyDetails,
   } = buildWeeklyDecisionPresentation({ model, searchParams });
   const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
-  const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-posture-brief-title">
-      <RegimeBanner
-        statusLabel={statusLabel}
-        regimeKey={resolvedRegimeKey}
-        postureLabel={postureLabel}
-        stageLabel={stageLabel}
-        postureWithStageLabel={postureWithStageLabel}
-        recordDateLabel={recordDateLabel}
-        confidencePercent={confidencePercent}
-        confidenceLabel={confidenceLabel}
-        trendLabel={trendLabel}
-        regimeDistance={regimeDistance}
-        flipRiskMeter={flipRiskMeter}
-        trustStrip={trustStrip}
-      />
-
+    <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-card-title">
+      <h2 id="weekly-decision-card-title" className="sr-only">
+        Weekly brief
+      </h2>
       <WeeklyDecisionContent
         modePanel={(
           <WeeklyCallModePanel

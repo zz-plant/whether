@@ -130,10 +130,6 @@ export function CopyLeadershipArtifactsButtons({
     ? explainerBriefContent
     : weeklyOperatorBrief;
   const activeModeLabel = artifactModeLabels[artifactMode];
-  const activeModeNote =
-    artifactMode === "explainer"
-      ? "The same recommendation, written with less shorthand and less market language."
-      : "Best for weekly leadership updates, staff notes, and recurring operating reviews.";
 
   const handleNativeShare = async () => {
     if (shareState === "sharing") {
@@ -214,43 +210,8 @@ export function CopyLeadershipArtifactsButtons({
         </div>
 
         <p className="mt-2 text-[11px] leading-5 text-slate-300">
-          {activeModeNote} Shared links keep the same version of the update open.
+          Shared links keep the same version of the update open.
         </p>
-
-        <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
-          {(["operator", "explainer"] as const).map((mode) => {
-            const active = mode === artifactMode;
-            return (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => {
-                  setArtifactMode(mode);
-                  router.push(buildArtifactModeRoute(mode), { scroll: false });
-                  setShareState("idle");
-                  if (mode !== artifactMode) {
-                    trackOperatorWorkflowEvent({
-                      type: "artifact_mode_selected",
-                      path: pathname,
-                      artifactMode: mode,
-                    });
-                  }
-                }}
-                aria-pressed={active}
-                className={`weather-pill inline-flex min-h-[44px] flex-col items-start px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] ${
-                  active ? "border-sky-300/80 bg-sky-500/10 text-slate-100" : "text-slate-300"
-                }`}
-              >
-                <span>{artifactModeLabels[mode]}</span>
-                <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
-                  {mode === "explainer"
-                    ? "For mixed audiences or anyone who does not know the model vocabulary."
-                    : "For leadership updates, weekly planning, and rooms that already know the format."}
-                </span>
-              </button>
-            );
-          })}
-        </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Primary update actions">
           <ActionButton
@@ -275,44 +236,7 @@ export function CopyLeadershipArtifactsButtons({
             {copyLabel(primaryBriefTarget, `Copy ${activeModeLabel.toLowerCase()}`)}
           </ActionButton>
         </div>
-      </article>
 
-      <article className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Shorter versions</p>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Faster read
-          </span>
-        </div>
-        <p className="mt-2 text-[11px] leading-5 text-slate-400">
-          Use the change-only version when people only need the weekly delta. Use the snapshot when you need the shortest possible read.
-        </p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <ActionButton
-            variant="secondary"
-            type="button"
-            onClick={() => {
-              trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(deltaOnlyBrief, "What changed only");
-            }}
-            disabled={isCopying}
-            aria-busy={isCopying}
-          >
-            {copyLabel("What changed only", "Copy what changed only")}
-          </ActionButton>
-          <ActionButton
-            variant="secondary"
-            type="button"
-            onClick={() => {
-              trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(weeklyCallSnapshot, "Quick snapshot");
-            }}
-            disabled={isCopying}
-            aria-busy={isCopying}
-          >
-            {copyLabel("Quick snapshot", "Copy quick snapshot")}
-          </ActionButton>
-        </div>
         <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400" role="status" aria-live="polite">
           {shareState === "shared"
             ? `${activeModeLabel} shared with its link.`
@@ -320,37 +244,105 @@ export function CopyLeadershipArtifactsButtons({
               ? `Copied ${activeModeLabel.toLowerCase()} link.`
               : shareState === "error"
                 ? "Share failed. Copy fallback is available."
-                : `Share the ${activeModeLabel.toLowerCase()} by default. Use the shorter versions only when people need a faster read.`
+                : "Default send is ready. Open more formats only if the room needs a shorter read or a heavier package."
           }
         </p>
-      </article>
 
-      <article className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a heavier package?</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">Board, governance, and exception formats live in Planning.</p>
+        <details className="weather-auto-chevron mt-3 rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
+          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            More formats
+          </summary>
+
+          <div className="mt-3 space-y-3">
+            <div className="grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
+              {(["operator", "explainer"] as const).map((mode) => {
+                const active = mode === artifactMode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => {
+                      setArtifactMode(mode);
+                      router.push(buildArtifactModeRoute(mode), { scroll: false });
+                      setShareState("idle");
+                      if (mode !== artifactMode) {
+                        trackOperatorWorkflowEvent({
+                          type: "artifact_mode_selected",
+                          path: pathname,
+                          artifactMode: mode,
+                        });
+                      }
+                    }}
+                    aria-pressed={active}
+                    className={`weather-pill inline-flex min-h-[44px] flex-col items-start px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] ${
+                      active ? "border-sky-300/80 bg-sky-500/10 text-slate-100" : "text-slate-300"
+                    }`}
+                  >
+                    <span>{artifactModeLabels[mode]}</span>
+                    <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
+                      {mode === "explainer"
+                        ? "Less shorthand for mixed audiences."
+                        : "Default leadership update."
+                      }
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <ActionButton
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  trackFirstActionConversion("copy_weekly_brief");
+                  copyToClipboard(deltaOnlyBrief, "What changed only");
+                }}
+                disabled={isCopying}
+                aria-busy={isCopying}
+              >
+                {copyLabel("What changed only", "Copy what changed only")}
+              </ActionButton>
+              <ActionButton
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  trackFirstActionConversion("copy_weekly_brief");
+                  copyToClipboard(weeklyCallSnapshot, "Quick snapshot");
+                }}
+                disabled={isCopying}
+                aria-busy={isCopying}
+              >
+                {copyLabel("Quick snapshot", "Copy quick snapshot")}
+              </ActionButton>
+            </div>
+
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a heavier package?</p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                  Board, governance, and exception formats live in Planning.
+                </p>
+              </div>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Deeper export
+              </span>
+            </div>
+            {fallbackActive ? (
+              <p className="text-[10px] leading-5 text-amber-200">
+                Cached snapshot active: confirm irreversible sharing actions in Planning before circulation.
+              </p>
+            ) : null}
+            <div>
+              <Link
+                href={moreFormatsHref}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Open Planning formats
+              </Link>
+            </div>
           </div>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Deeper export
-          </span>
-        </div>
-        <p className="mt-2 text-[11px] leading-5 text-slate-400">
-          Use home for the default update. Open Planning only when you need board-ready packaging, citation-heavy exports, or a company-specific exception.
-        </p>
-        {fallbackActive ? (
-          <p className="mt-2 text-[10px] leading-5 text-amber-200">
-            Cached snapshot active: confirm irreversible sharing actions in Planning before circulation.
-          </p>
-        ) : null}
-        <div className="mt-3">
-          <Link
-            href={moreFormatsHref}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
-          >
-            Open Planning formats
-          </Link>
-        </div>
+        </details>
       </article>
     </div>
   );

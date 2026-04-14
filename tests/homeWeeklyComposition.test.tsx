@@ -193,16 +193,15 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /This week/);
-    assert.match(html, /Week of Mar 5, 2026/);
+    assert.match(html, /This week&#x27;s recommendation/);
     assert.match(html, /Decision delta: tighten roadmap optionality while protecting core delivery\./);
-    assert.match(html, /Per-lever guardrails/);
+    assert.match(html, /Decision details/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Revisit now/);
     assert.match(html, /(Stop line|Pause if|Slow down if)/);
     assert.doesNotMatch(html, /Open Signals/);
     assert.match(html, /(Act now|Action now|Do this now)/);
-    assert.match(html, /Interpretation layer/);
+    assert.match(html, /View for this situation/);
     assert.match(html, /Company view/);
     assert.match(html, /Action:/);
     assert.match(html, /Trigger:/);
@@ -230,11 +229,11 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("This week");
+    const heroIndex = html.indexOf("This week&#x27;s recommendation");
     const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
     const rulesIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
-    const actionStripIndex = html.indexOf("Per-lever guardrails");
-    const interpretationIndex = html.indexOf("Interpretation layer");
+    const actionStripIndex = html.indexOf("Decision details");
+    const interpretationIndex = html.indexOf("View for this situation");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
     const auditIndex = html.indexOf('id="audit-this-call"');
     const replayIndex = html.indexOf('id="historical-replay-workspace"');
@@ -272,7 +271,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("A quick read for this week");
-    const cardIndex = html.indexOf("data-testid=\"weekly-regime-banner\"");
+    const cardIndex = html.indexOf("weekly-decision-card-title");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);

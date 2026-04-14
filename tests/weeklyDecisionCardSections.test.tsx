@@ -413,8 +413,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
     assert.match(detailsHtml, /Why this posture call/);
     assert.match(detailsHtml, /Posture history/);
-    assert.match(cardHtml, /Share-ready handoff/);
-    assert.match(cardHtml, /Source note/);
+    assert.match(cardHtml, /Share-ready artifact/);
+    assert.match(cardHtml, /Citation/);
     assert.match(cardHtml, /Copy citation/);
     assert.doesNotMatch(cardHtml, /Use this citation in meeting notes, board updates, or operating memos\./);
     assert.doesNotMatch(cardHtml, /Share actions stay in the transmission rail above\./);

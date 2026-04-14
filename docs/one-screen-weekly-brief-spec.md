@@ -187,6 +187,9 @@ Implementation guardrails:
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
 - Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
+- On `/`, the first scan should read as one dominant weekly decision card. Detailed per-area rules should stay available, but behind a closed-by-default disclosure instead of an always-open matrix.
+- On `/`, the share rail should default to one recommended artifact path first. Alternate artifact modes, shorter variants, and heavier packaging should live behind secondary disclosure UI.
+- On `/`, workspace navigation should stay de-emphasized. The homepage can expose a collapsed workspace chooser, but it should not compete visually with the weekly decision card.
 - Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Share actions should remain routine-first. Company-specific override controls must stay separate from default share actions.
 - Share actions should keep the operator brief primary, while also exposing a `delta-only brief` for repeat readers who only need this week’s change, reopen queue, and current guardrails.

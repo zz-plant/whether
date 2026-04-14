@@ -6,7 +6,6 @@ import {
   CheckIcon,
   HistoryIcon,
   LayoutGridIcon,
-  ShieldIcon,
   TrendUpIcon,
 } from "../uiIcons";
 
@@ -24,20 +23,20 @@ export async function HomeWorkspaceBands({
   const toolkitShortcut = workspaceModel.translate.toolkitShortcuts[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <section
         id="approve-this-weeks-plan"
-        className="weather-panel scroll-mt-28 space-y-5 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
+        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5"
         aria-labelledby="approve-this-weeks-plan-title"
       >
         <div className="weather-panel-header">
           <div className="weather-panel-header-copy">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Next</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">Next step</p>
             <h2 id="approve-this-weeks-plan-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
               Turn the call into this week&apos;s plan
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Approve one plan, keep one stop line visible, and open the share brief only after the week&apos;s call is settled.
+              Use this only after the weekly call is settled. Keep the rest of the page in support mode.
             </p>
           </div>
           <div className="weather-panel-header-aside">
@@ -51,11 +50,16 @@ export async function HomeWorkspaceBands({
           </div>
         </div>
 
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.78fr)]">
-          <article className="weather-surface rounded-[1.2rem] border border-emerald-400/20 bg-emerald-500/8 px-4 py-4">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
-              <CheckIcon className="h-3.5 w-3.5" />
-              <span>Approve now</span>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
+          <article className="weather-surface rounded-[1rem] border border-emerald-400/20 bg-emerald-500/8 px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
+                <CheckIcon className="h-3.5 w-3.5" />
+                <span>Approve now</span>
+              </div>
+              <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-100">
+                Primary
+              </span>
             </div>
             <p className="mt-3 text-base font-semibold leading-7 text-slate-100">
               {workspaceModel.operations.approvalHeadline}
@@ -63,37 +67,36 @@ export async function HomeWorkspaceBands({
             <p className="mt-2 text-sm leading-6 text-slate-300">
               {workspaceModel.operations.approvalDetail}
             </p>
-          </article>
-
-          <article className="weather-surface rounded-[1.2rem] border border-amber-400/20 bg-amber-500/8 px-4 py-4">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
-              <ShieldIcon className="h-3.5 w-3.5" />
-              <span>Stop line</span>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Stop line</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">
+                  {primaryGuardrail?.label ?? "Hold the current baseline"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share next</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">
+                  {primaryExportAction?.label ?? "Open share brief"}
+                </p>
+              </div>
             </div>
-            <p className="mt-3 text-sm font-semibold text-slate-100">
-              {primaryGuardrail?.label ?? "Hold the current baseline"}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              {primaryGuardrail?.detail ?? "Do not loosen until the current stop line clears."}
-            </p>
           </article>
 
-          <article className="weather-surface rounded-[1.2rem] border border-sky-400/18 bg-sky-500/8 px-4 py-4">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+          <article className="weather-surface rounded-[1rem] border border-slate-800/70 bg-slate-950/55 px-4 py-4">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               <CheckIcon className="h-3.5 w-3.5" />
-              <span>Share next</span>
+              <span>Support only</span>
             </div>
-            <p className="mt-3 text-sm font-semibold text-slate-100">
-              {primaryExportAction?.label ?? "Open share brief"}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              Package the approved call only after the week&apos;s plan is settled.
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Open Planning when the call needs packaging. Keep proof and tools as exception paths.
             </p>
             <Link
               href={(primaryExportAction?.href ?? "/operations#ops-export-briefs") as Route}
-              className="mt-3 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-100 underline decoration-sky-400/45 underline-offset-4"
+              className="mt-4 inline-flex min-h-[44px] w-full items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
-              Open share brief
+              <span>Open share brief</span>
+              <CheckIcon className="h-3.5 w-3.5" />
             </Link>
           </article>
         </div>
@@ -101,7 +104,7 @@ export async function HomeWorkspaceBands({
 
       <section
         id="audit-this-call"
-        className="weather-panel scroll-mt-28 space-y-5 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
+        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5"
         aria-labelledby="audit-this-call-title"
       >
         <div className="weather-panel-header">
@@ -111,12 +114,12 @@ export async function HomeWorkspaceBands({
               Need proof or another path?
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Open these only when someone still needs the drivers, trust check, or one deeper tool after the weekly call is already clear.
+              Keep this row subordinate to the weekly call. Open only when someone still needs proof, trust, or a deeper tool.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           <Link
             href={"/signals#decision-summary" as Route}
             className="weather-route-card group min-h-[44px] px-4 py-4 text-slate-100"
@@ -147,9 +150,12 @@ export async function HomeWorkspaceBands({
         </div>
 
         <div id="historical-replay-workspace" className="space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
-            One deeper path
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">
+              One deeper path
+            </p>
+            <p className="text-[11px] text-slate-400">Open only when the weekly call is already clear.</p>
+          </div>
           <div className="grid gap-3 lg:grid-cols-3">
             <Link
               href={workspaceModel.translate.primaryPath.href as Route}
