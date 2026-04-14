@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   ...buildPageMetadata({
     title: "Product management canon in macro context — Whether",
     description:
-      "Concept browsing now routes back into Decision Tools so operators stay inside the weekly decision loop.",
+      "Legacy route. Concept browsing now lives under Decision Tools.",
     path: "/concepts",
     imageAlt: "Product management concept timeline with macro context",
   }),

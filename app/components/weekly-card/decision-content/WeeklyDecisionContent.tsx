@@ -11,7 +11,7 @@ export function WeeklyDecisionContent({
 }: WeeklyDecisionContentProps) {
   return (
     <div className="space-y-4">
-      <section className="space-y-5" aria-label="Weekly decision transmission order">
+      <section className="space-y-5" aria-label="Weekly decision order">
         {modePanel}
       </section>
 
@@ -21,7 +21,7 @@ export function WeeklyDecisionContent({
             <span className="min-w-0">
               <span className="block text-slate-100">Decision details</span>
               <span className="mt-1 block text-[10px] font-normal normal-case tracking-normal text-slate-400">
-                Area rules and flip conditions
+                Rules by area and what would change the call
               </span>
             </span>
             <span aria-hidden="true" className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] text-slate-400 transition group-open:rotate-180">

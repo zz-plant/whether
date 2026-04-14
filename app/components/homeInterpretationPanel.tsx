@@ -78,11 +78,11 @@ export const HomeInterpretationPanel = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">View for this situation</p>
           <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
           <p className="text-xs text-slate-300">{layer.summary}</p>
-          <p className="text-xs text-slate-400">Canonical decision lives above: action, guardrail, and flip condition.</p>
+          <p className="text-xs text-slate-400">The main weekly decision stays above; this view just reframes it.</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
           <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
-          <span>Alternate view</span>
+          <span>Filtered view</span>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export const HomeInterpretationPanel = ({
           label="Action"
           icon={<BoltIcon className="h-3.5 w-3.5" />}
           toneClass="border-violet-500/45 bg-violet-500/10 text-violet-100"
-          body={actionCue ?? "Review the current decision call above."}
+          body={actionCue ?? "Start with the main decision above."}
         />
         <CueCard
           label="Trigger"
@@ -120,7 +120,7 @@ export const HomeInterpretationPanel = ({
           label="Reverse"
           icon={<CircleTargetIcon className="h-3.5 w-3.5" />}
           toneClass="border-sky-500/45 bg-sky-500/10 text-sky-100"
-          body={reverseCue ?? "Re-open pace once the flip condition is met."}
+          body={reverseCue ?? "Open pace back up once the change trigger is met."}
         />
       </div>
 

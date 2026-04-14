@@ -7,7 +7,7 @@ import { buildToolkitLibraryHref } from "../decide/components/toolkitLibraryPane
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Toolkits — task tools",
-  description: "Compatibility route for task tools under Decision Tools. Use it only after the question has already been narrowed.",
+  description: "Legacy route for task tools. Redirects to the toolkit library inside Decision Tools.",
   path: "/toolkits",
   imageAlt: "Whether toolkits",
 });

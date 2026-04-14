@@ -159,15 +159,15 @@ export function HomeFirstRunOrientation({
             <div className="grid gap-3 md:grid-cols-3">
               <article className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What it changes this week</p>
-                <p className="text-sm text-slate-100">Translate the signal stack into one operating posture so team leads leave with the same call.</p>
+                <p className="text-sm text-slate-100">Turn the market read into one operating stance so team leads start from the same call.</p>
               </article>
               <article className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to revisit</p>
-                <p className="text-sm text-slate-100">Pressure-test hiring pace, spend windows, and pipeline bets against the current guardrails before approvals.</p>
+                <p className="text-sm text-slate-100">Recheck hiring pace, spend windows, and pipeline bets against this week&apos;s limits before approving them.</p>
               </article>
               <article className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What flips the call</p>
-                <p className="text-sm text-slate-100">Track threshold movement and reversal conditions in the weekly brief; if a stop item triggers, reset the plan immediately.</p>
+                <p className="text-sm text-slate-100">Watch the change trigger in the weekly brief. If a stop signal hits, reset the plan.</p>
               </article>
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-slate-300">

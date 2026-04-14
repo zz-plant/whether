@@ -7,7 +7,7 @@ import { buildGuidedTranslationHref, type GuidedTranslationSearchParams } from "
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides — team-specific help",
   description:
-    "Compatibility route for team-specific help after Decision Tools has already narrowed the question.",
+    "Legacy route for team-specific help. Redirects to the matching path in Decision Tools.",
   path: "/guides",
   imageAlt: "Whether guides overview",
   imagePath: "/social/guides.svg",

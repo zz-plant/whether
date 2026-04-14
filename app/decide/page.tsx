@@ -64,14 +64,14 @@ export default async function DecidePage({
         href: "/decide/ship-checklist" as Route,
         kicker: "Best next step",
         title: "Start with one decision check",
-        detail: "This week has enough movement that you should pressure-test one concrete decision before widening into broader help.",
+        detail: "This week moved enough that it is worth checking one concrete decision before you open broader guidance.",
         cta: "Open decision check",
       }
     : {
         href: `/decide/${recommendedSituation.slug}` as Route,
         kicker: "Best next step",
         title: `Start with ${recommendedSituation.title}`,
-        detail: "Go straight to one focused path instead of browsing first.",
+        detail: "Go straight to the path that fits the question instead of browsing first.",
         cta: "Open focused path",
       };
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
@@ -92,8 +92,8 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       treasurySource={reportData.treasury.source}
       trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="Pick the next path."
-      trustStatusAction="Return to Planning when the question is closed."
+      trustStatusDetail="Pick the narrowest path that answers the question."
+      trustStatusAction="Return to Planning after the question is answered."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Choose the right help"
       currentPath="/decide"
@@ -106,7 +106,7 @@ export default async function DecidePage({
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operations",
-        description: "Return to the planning page next",
+        description: "Return to Planning next",
       }}
       decisionBanner={{
         label: "Choose the right help",
@@ -156,7 +156,7 @@ export default async function DecidePage({
             </div>
             <div id="direct-answers" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
-              <p className="mt-2 text-sm text-slate-200">For a yes / no question.</p>
+              <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
               <div className="mt-3 space-y-2">
                 {recommendedAnswerPages.map((page) => (
                   <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
@@ -168,7 +168,7 @@ export default async function DecidePage({
             </div>
             <div id="guided-translation" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Role or stage view</p>
-              <p className="mt-2 text-sm text-slate-200">For one role, one stage, or one team.</p>
+              <p className="mt-2 text-sm text-slate-200">For one role, one company stage, or one team.</p>
               <div className="mt-3 grid gap-2">
                 {recommendedStakeholderGuides.map((guide) => (
                   <Link

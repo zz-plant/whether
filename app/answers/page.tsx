@@ -6,7 +6,7 @@ export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Answers — quick answers",
-  description: "Compatibility route for quick answers after Decision Tools has already narrowed what needs answering.",
+  description: "Legacy route for quick answers. Redirects to the narrowest answer path in Decision Tools.",
   path: "/answers",
   imageAlt: "Whether operator answer cluster",
   imagePath: "/social/answers.svg",

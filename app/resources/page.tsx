@@ -6,7 +6,7 @@ import { noindexRobots } from "../../lib/seo/indexationPolicy";
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — board-ready exports",
   description:
-    "Compatibility route for board-ready exports after Planning is already set.",
+    "Legacy route for board-ready exports. Redirects to Planning.",
   path: "/resources",
   imageAlt: "Whether resources hub",
   imagePath: "/social/resources.svg",

@@ -5,7 +5,7 @@ import { noindexRobots } from "../../lib/seo/indexationPolicy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Posture guides — canonical on Weekly Brief",
-  description: "Posture is now canonical on Weekly Brief. This compatibility route redirects back into the live weekly call.",
+  description: "Legacy route. The live posture now lives in the Weekly Brief.",
   path: "/posture",
   imageAlt: "Whether posture",
   imagePath: "/social/posture.svg",
