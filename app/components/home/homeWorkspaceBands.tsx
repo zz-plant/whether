@@ -51,13 +51,22 @@ export async function HomeWorkspaceBands({
         </div>
 
         <div className="grid gap-3">
-          <article className="weather-surface rounded-[1rem] border border-emerald-400/18 bg-[linear-gradient(180deg,rgba(16,185,129,0.12),rgba(2,6,23,0.08))] px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
+          <article className="weather-ritual-card px-4 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
+                  <CheckIcon className="h-3.5 w-3.5" />
+                  <span>Approval packet</span>
+                </div>
+                <p className="text-[11px] leading-5 text-slate-300">
+                  Treat the weekly call as the operating boundary, then approve one plan against it.
+                </p>
+              </div>
               <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
                 <CheckIcon className="h-3.5 w-3.5" />
                 <span>Approve now</span>
               </div>
-              <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-semibold text-emerald-100">
+              <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-100">
                 Primary
               </span>
             </div>
@@ -67,17 +76,23 @@ export async function HomeWorkspaceBands({
             <p className="mt-2 text-sm leading-6 text-slate-300">
               {workspaceModel.operations.approvalDetail}
             </p>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+            <div className="mt-4 grid gap-2 lg:grid-cols-3">
+              <div className="weather-transmission-segment px-3 py-3">
                 <p className="text-[11px] font-medium text-amber-200">Stop line</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">
                   {primaryGuardrail?.label ?? "Hold the current baseline"}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-2">
+              <div className="weather-transmission-segment px-3 py-3">
                 <p className="text-[11px] font-medium text-sky-200">Share next</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">
                   {primaryExportAction?.label ?? "Open share brief"}
+                </p>
+              </div>
+              <div className="weather-transmission-segment px-3 py-3">
+                <p className="text-[11px] font-medium text-emerald-200">Weekly rhythm</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">
+                  Approve only the moves this week can support.
                 </p>
               </div>
             </div>
@@ -105,7 +120,7 @@ export async function HomeWorkspaceBands({
         <div className="grid gap-3 md:grid-cols-2">
           <Link
             href={"/signals#decision-summary" as Route}
-            className="weather-route-card group min-h-[44px] rounded-[1rem] border border-slate-800/65 bg-slate-950/28 px-4 py-4 text-slate-100"
+            className="weather-route-card weather-route-card-proof group min-h-[44px] rounded-[1rem] border border-slate-800/65 px-4 py-4 text-slate-100"
           >
             <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
               <TrendUpIcon className="h-3.5 w-3.5" />
@@ -119,7 +134,7 @@ export async function HomeWorkspaceBands({
 
           <Link
             href={"/method#trust-snapshot" as Route}
-            className="weather-route-card group min-h-[44px] rounded-[1rem] border border-slate-800/65 bg-slate-950/28 px-4 py-4 text-slate-100"
+            className="weather-route-card weather-route-card-trust group min-h-[44px] rounded-[1rem] border border-slate-800/65 px-4 py-4 text-slate-100"
           >
             <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
               <AuditIcon className="h-3.5 w-3.5" />
@@ -142,7 +157,7 @@ export async function HomeWorkspaceBands({
           <div className="grid gap-3 lg:grid-cols-3">
             <Link
               href={workspaceModel.translate.primaryPath.href as Route}
-              className="group min-h-[44px] rounded-[1rem] border border-slate-800/55 bg-slate-950/18 px-4 py-4 text-slate-100 transition-colors hover:border-amber-300/35"
+              className="weather-route-card weather-route-card-proof group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-amber-300/35"
             >
               <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
                 <LayoutGridIcon className="h-3.5 w-3.5" />
@@ -154,7 +169,7 @@ export async function HomeWorkspaceBands({
 
             <Link
               href={workspaceModel.replay.openFullHref as Route}
-              className="group min-h-[44px] rounded-[1rem] border border-slate-800/55 bg-slate-950/18 px-4 py-4 text-slate-100 transition-colors hover:border-violet-300/35"
+              className="weather-route-card weather-route-card-replay group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-violet-300/35"
             >
               <div className="flex items-center gap-2 text-[11px] font-medium text-violet-200">
                 <HistoryIcon className="h-3.5 w-3.5" />
@@ -170,7 +185,7 @@ export async function HomeWorkspaceBands({
 
             <Link
               href={(toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route}
-              className="group min-h-[44px] rounded-[1rem] border border-slate-800/55 bg-slate-950/18 px-4 py-4 text-slate-100 transition-colors hover:border-slate-500/55"
+              className="weather-route-card weather-route-card-utility group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-slate-500/55"
             >
               <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300">
                 <LayoutGridIcon className="h-3.5 w-3.5" />

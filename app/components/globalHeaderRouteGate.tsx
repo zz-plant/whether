@@ -16,23 +16,23 @@ import { ThemeToggleButton } from "./themeToggleButton";
 
 const resolveReportHeaderAction = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/operations#ops-monthly-action-summary", label: "Open planning" };
+    return { href: "/operations#ops-monthly-action-summary", label: "Open Planning Deck" };
   }
 
   if (pathname.startsWith("/signals")) {
-    return { href: "/operations#ops-monthly-action-summary", label: "Make the plan" };
+    return { href: "/operations#ops-monthly-action-summary", label: "Approve the Plan" };
   }
 
   if (pathname.startsWith("/operations")) {
-    return { href: "#ops-export-briefs", label: "Share the brief" };
+    return { href: "#ops-export-briefs", label: "Open Share Formats" };
   }
 
   if (pathname.startsWith("/decide")) {
-    return { href: "/operations#ops-monthly-action-summary", label: "Back to planning" };
+    return { href: "/operations#ops-monthly-action-summary", label: "Back to Weekly Plan" };
   }
 
   if (pathname.startsWith("/method")) {
-    return { href: "/signals#decision-summary", label: "Check evidence" };
+    return { href: "/signals#decision-summary", label: "Open First Proof Block" };
   }
 
   return null;
@@ -61,7 +61,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
   return (
     <header className="mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3">
-      <div className="weather-appbar weather-topbar px-4 py-2.5 sm:px-5 sm:py-3">
+      <div className="weather-appbar weather-topbar px-4 py-3 sm:px-5 sm:py-3.5">
         <div className="flex flex-col gap-2.5">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 space-y-1">
@@ -75,13 +75,18 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   </span>
                 ) : null}
               </div>
-              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                <p className="truncate text-[11px] font-semibold tracking-[0.04em] text-slate-200 sm:text-[12px]">
-                  {routeLabel}
+              <div className="min-w-0 space-y-1">
+                <p className="weather-brief-kicker">
+                  {isHomeBrief ? "Operator desk" : "Support workspace"}
                 </p>
-                <p className="text-[11px] leading-5 text-slate-400">
-                  {routeSummary}
-                </p>
+                <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                  <p className="truncate text-[11px] font-semibold tracking-[0.08em] text-slate-100 sm:text-[12px]">
+                    {routeLabel}
+                  </p>
+                  <p className="text-[11px] leading-5 text-slate-400">
+                    {routeSummary}
+                  </p>
+                </div>
               </div>
             </div>
 

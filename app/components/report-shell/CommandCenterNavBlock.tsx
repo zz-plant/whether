@@ -72,10 +72,11 @@ export function CommandCenterNavBlock({
   const decisionHeadingClassName = heroVariant === "compact"
     ? "max-w-xl text-[1.45rem] font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 sm:text-[1.6rem]"
     : "max-w-xl text-[1.7rem] font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50";
+  const briefKicker = heroVariant === "compact" ? "Route brief" : "Weekly operating brief";
 
   return (
     <section
-      className="weather-panel-static relative min-w-0 overflow-hidden px-4 py-4 sm:px-5"
+      className="weather-panel-static weather-brief-shell relative min-w-0 overflow-hidden px-4 py-4 sm:px-5 sm:py-5"
       aria-label="Page introduction"
     >
       <div
@@ -113,20 +114,22 @@ export function CommandCenterNavBlock({
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] xl:items-start">
           <div className="space-y-4">
-            <div className="space-y-2.5">
-              <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                <span>{heroVariant === "compact" ? "Use this route" : "Start here"}</span>
-                <span className="text-slate-700">•</span>
-                <span>{statusLabel}</span>
-                <span className="text-slate-700">•</span>
-                <span>{trustStatusLabel}</span>
-                <span className="text-slate-700">•</span>
-                <span>As-of {recordDateLabel}</span>
+            <div className="space-y-3">
+              <p className="weather-brief-kicker">{briefKicker}</p>
+              <div className="weather-brief-meta-rail">
+                <span className="weather-brief-meta-chip weather-brief-meta-chip-strong">
+                  {statusLabel}
+                </span>
+                <span className="weather-brief-meta-chip">
+                  {trustStatusLabel}
+                </span>
+                <span className="weather-brief-meta-chip">
+                  As of {recordDateLabel}
+                </span>
                 {showOfflineBadge ? (
-                  <>
-                    <span className="text-slate-700">•</span>
-                    <span className="text-amber-200">{offlineBadgeLabel}</span>
-                  </>
+                  <span className="weather-brief-meta-chip weather-brief-meta-chip-caution">
+                    {offlineBadgeLabel}
+                  </span>
                 ) : null}
               </div>
               <h1 className={headingClassName}>{pageTitle}</h1>
@@ -136,38 +139,59 @@ export function CommandCenterNavBlock({
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              {primaryCta ? (
-                <ReportCta
-                  href={primaryCta.href}
-                  copyText={primaryCta.copyText}
-                  copyTarget={primaryCta.copyTarget}
-                  label={primaryCta.label}
-                  className="weather-cta weather-cta-primary"
-                >
-                  {primaryCta.label}
-                </ReportCta>
-              ) : null}
-              {secondaryCta ? (
-                <InternalAwareLink
-                  href={secondaryCta.href}
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
-                >
-                  {secondaryCta.label}
-                </InternalAwareLink>
-              ) : null}
-              {exportCta ? (
-                <ReportCta
-                  href={exportCta.href}
-                  copyText={exportCta.copyText}
-                  copyTarget={exportCta.copyTarget}
-                  telemetryEvent={exportCta.telemetryEvent}
-                  label={exportCta.label}
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
-                >
-                  {exportCta.label}
-                </ReportCta>
-              ) : null}
+            <div className="weather-transmission-card p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
+                    Transmission
+                  </p>
+                  <p className="max-w-2xl text-sm leading-relaxed text-slate-200">
+                    Copy or share the current call, then move to the next workflow only if the room needs planning or proof.
+                  </p>
+                </div>
+                {nextStep ? (
+                  <span className="weather-brief-meta-chip">
+                    Next: {nextStep.description}
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
+                {primaryCta ? (
+                  <ReportCta
+                    href={primaryCta.href}
+                    copyText={primaryCta.copyText}
+                    copyTarget={primaryCta.copyTarget}
+                    label={primaryCta.label}
+                    className="weather-cta weather-cta-primary w-full justify-center sm:w-auto"
+                  >
+                    {primaryCta.label}
+                  </ReportCta>
+                ) : null}
+                {secondaryCta || exportCta ? (
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
+                    {secondaryCta ? (
+                      <InternalAwareLink
+                        href={secondaryCta.href}
+                        className="weather-pill inline-flex min-h-[46px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.08em] text-slate-100"
+                      >
+                        {secondaryCta.label}
+                      </InternalAwareLink>
+                    ) : null}
+                    {exportCta ? (
+                      <ReportCta
+                        href={exportCta.href}
+                        copyText={exportCta.copyText}
+                        copyTarget={exportCta.copyTarget}
+                        telemetryEvent={exportCta.telemetryEvent}
+                        label={exportCta.label}
+                        className="weather-pill inline-flex min-h-[46px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.08em] text-slate-100"
+                      >
+                        {exportCta.label}
+                      </ReportCta>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -179,7 +203,7 @@ export function CommandCenterNavBlock({
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
-                  {decisionBanner?.label ?? "Decision focus"}
+                  {decisionBanner?.label ?? "Current operating call"}
                 </p>
                 <span className="rounded-full border border-slate-700/70 bg-slate-950/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
                   {trustStatusLabel}
@@ -226,10 +250,10 @@ export function CommandCenterNavBlock({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  {missionSequenceTitle}
+                  {missionSequenceTitle || "Use this order"}
                 </p>
                 <p className="mt-1 text-[11px] text-slate-400">
-                  Use one next move at a time.
+                  Work left to right. Each step exists to support the weekly call, not compete with it.
                 </p>
               </div>
               {nextStep ? (
@@ -243,11 +267,11 @@ export function CommandCenterNavBlock({
                 <li key={`${item.phase}-${item.title}`}>
                   <InternalAwareLink
                     href={item.href}
-                    className="block rounded-xl border border-slate-800/70 bg-slate-950/60 px-3 py-3 transition-[transform,border-color,background-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/45 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    className="weather-sequence-card block px-3 py-3 transition-[transform,border-color,background-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/45 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100/78">
                           {item.phase}
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>

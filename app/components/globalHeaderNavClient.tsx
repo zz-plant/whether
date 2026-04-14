@@ -22,14 +22,44 @@ type GlobalHeaderNavRailProps = {
   onIntent: (href: string) => void;
 };
 
+const routePresentation = {
+  "/": {
+    eyebrow: "Read first",
+    prompt: "This week’s call",
+  },
+  "/signals": {
+    eyebrow: "Challenge it",
+    prompt: "Proof, drivers, & thresholds",
+  },
+  "/operations": {
+    eyebrow: "Approve it",
+    prompt: "Turn the call into a plan",
+  },
+  "/decide": {
+    eyebrow: "Close one gap",
+    prompt: "Resolve one open question",
+  },
+  "/method": {
+    eyebrow: "Verify it",
+    prompt: "Freshness, confidence, & sources",
+  },
+} as const;
+
 function NavigationLinkCard({
   link,
+  index,
+  total,
   onIntent,
 }: {
   link: GlobalHeaderNavigationLink;
+  index: number;
+  total: number;
   onIntent: (href: string) => void;
 }) {
-  const eyebrow = link.href === "/" ? "This week" : "Open when needed";
+  const presentation = routePresentation[link.href as keyof typeof routePresentation] ?? {
+    eyebrow: "Open when needed",
+    prompt: link.description,
+  };
 
   return (
     <li className="flex-shrink-0 sm:min-w-0">
@@ -45,14 +75,22 @@ function NavigationLinkCard({
             : "text-slate-100"
         }`}
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
-          {eyebrow}
-        </span>
+        <div className="flex w-full items-center justify-between gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
+            {presentation.eyebrow}
+          </span>
+          <span className="weather-nav-card-index" aria-hidden="true">
+            {index + 1}/{total}
+          </span>
+        </div>
         <span className="mt-1 font-[family:var(--weather-font-display)] text-sm font-semibold tracking-[-0.02em] sm:text-[1.02rem]">
           {link.label}
         </span>
+        <span className="text-[11px] font-medium leading-relaxed text-slate-200/90">
+          {presentation.prompt}
+        </span>
         <span
-          className={`mt-2 hidden text-[11px] leading-relaxed xl:block ${
+          className={`mt-1 hidden text-[11px] leading-relaxed xl:block ${
             link.isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"
           }`}
         >
@@ -70,7 +108,10 @@ function CompactNavigationLink({
   link: GlobalHeaderNavigationLink;
   onIntent: (href: string) => void;
 }) {
-  const isAnchor = link.href === "/";
+  const presentation = routePresentation[link.href as keyof typeof routePresentation] ?? {
+    eyebrow: "Open when needed",
+    prompt: link.description,
+  };
 
   return (
     <li className="flex-shrink-0">
@@ -79,15 +120,19 @@ function CompactNavigationLink({
         aria-current={link.isActive ? "page" : undefined}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`inline-flex min-h-[44px] items-center justify-center whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-semibold tracking-[0.04em] touch-manipulation transition-colors ${
+        title={presentation.prompt}
+        className={`weather-route-card inline-flex min-h-[66px] min-w-[9.5rem] flex-col items-start justify-center gap-1 whitespace-nowrap rounded-[1.1rem] px-3.5 py-2.5 text-left touch-manipulation transition-colors ${
           link.isActive
             ? "border-slate-100/90 bg-slate-100 text-slate-950 shadow-[0_10px_24px_-18px_rgba(248,250,252,0.75)]"
-            : isAnchor
-              ? "border-amber-300/35 bg-amber-400/8 text-amber-100 hover:border-amber-300/55 hover:text-amber-50"
-              : "border-slate-700/80 bg-slate-950/45 text-slate-300 hover:border-slate-500/85 hover:text-slate-100"
+            : "text-slate-100 hover:border-slate-500/85 hover:text-slate-100"
         }`}
       >
-        {link.label}
+        <span className={`text-[9px] font-semibold uppercase tracking-[0.16em] ${link.isActive ? "text-slate-700" : "text-slate-400"}`}>
+          {presentation.eyebrow}
+        </span>
+        <span className="text-xs font-semibold tracking-[0.04em]">
+          {link.label}
+        </span>
       </Link>
     </li>
   );
@@ -226,7 +271,7 @@ export function GlobalHeaderNavRail({
         <nav aria-label="Primary routes">
           <ul
             ref={railRef}
-            className="flex flex-wrap gap-2 pb-1 sm:flex-nowrap sm:overflow-x-auto sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
+            className="flex gap-2 overflow-x-auto pb-1 sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
           >
             {navigationLinks.map((link) => (
               <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />
@@ -273,8 +318,14 @@ export function GlobalHeaderNavRail({
         ref={railRef}
         className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto scroll-smooth pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
       >
-        {navigationLinks.map((link) => (
-          <NavigationLinkCard key={link.href} link={link} onIntent={onIntent} />
+        {navigationLinks.map((link, index) => (
+          <NavigationLinkCard
+            key={link.href}
+            link={link}
+            index={index}
+            total={navigationLinks.length}
+            onIntent={onIntent}
+          />
         ))}
       </ul>
       <div

@@ -115,7 +115,7 @@ export function HeroTrustProvenanceBlock({
   const currentApprovalLane = approvalBuckets?.[0];
 
   return (
-    <section className="weather-panel flex flex-col gap-3 px-4 py-4">
+    <section className="weather-panel weather-trust-board flex flex-col gap-3 px-4 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -125,7 +125,7 @@ export function HeroTrustProvenanceBlock({
               {controlHeadline}
             </span>
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Data trust
+              Approval readiness
             </span>
             {outageSeverity ? (
               <span
@@ -158,7 +158,7 @@ export function HeroTrustProvenanceBlock({
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <article className="weather-surface px-3 py-3">
+        <article className="weather-trust-lane px-3 py-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
             Approval lane
           </p>
@@ -177,9 +177,9 @@ export function HeroTrustProvenanceBlock({
           </p>
         </article>
 
-        <article className="weather-surface px-3 py-3">
+        <article className="weather-trust-lane px-3 py-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-            Reliability snapshot
+            Reliability window
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-slate-100">
@@ -210,9 +210,9 @@ export function HeroTrustProvenanceBlock({
         </article>
       </div>
 
-      <details className="weather-auto-chevron rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2">
+      <details className="weather-auto-chevron weather-transmission-segment rounded-xl px-3 py-2">
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Data source details
+            Source board
           </summary>
           <div className="mt-2">
             {trustProvenance ? (

@@ -198,20 +198,19 @@ export function CopyLeadershipArtifactsButtons({
 
   return (
     <div className="space-y-3">
-      <article className="rounded-xl border border-slate-700/70 bg-[linear-gradient(180deg,rgba(14,165,233,0.08),rgba(2,6,23,0.8))] px-3 py-3">
+      <article className="weather-transmission-card px-3 py-3 sm:px-4 sm:py-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Default send</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready artifact</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
+            <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
+              Use this as the room-ready wording for this week’s call. Drop to shorter formats only when the audience already knows the recommendation.
+            </p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
             Default
           </span>
         </div>
-
-        <p className="mt-2 text-[11px] leading-5 text-slate-300">
-          Shared links keep the same version of the update open.
-        </p>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Primary update actions">
           <ActionButton
@@ -248,9 +247,9 @@ export function CopyLeadershipArtifactsButtons({
           }
         </p>
 
-        <details className="weather-auto-chevron mt-3 rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
+        <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-            More formats
+            Choose a room fit
           </summary>
 
           <div className="mt-3 space-y-3">
