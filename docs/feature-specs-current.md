@@ -121,6 +121,12 @@ The section navigation now follows the active evidence mode so implication-first
 routed toward hidden detail-only sections. The top summary also includes persisted evidence and
 trust translation helpers for first-use definitions of `tightness`, `risk appetite`, `curve slope`,
 `confidence`, and `freshness`.
+The implication scorecards now use threshold-anchored meters with explicit distance-to-watch-line
+labels instead of equal-width safe/caution/risk bands. The inversion preview now shows a labeled
+zero line, time anchors, direct end labels, and visible breaks when monthly spread reads are
+missing. The deeper yield-curve diagnostics now direct-label multi-series lines, preserve gaps
+instead of connecting through missing data, and encode scatterplot recency through a chronological
+path plus a highlighted latest point.
 
 ### 1.3 Planning overview (/operations)
 Planning is the detailed execution depth page for the home workspace. The default surface is a

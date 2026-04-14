@@ -49,8 +49,24 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
                 {isCurrent ? "Current" : shiftLabel}
               </span>
             </div>
-            <div className="mt-3 h-1.5 rounded-full bg-slate-800/85">
-              <div className={`h-1.5 rounded-full ${isCurrent ? "bg-sky-300" : hasPostureShift ? "bg-amber-300" : "bg-slate-500"}`} style={{ width: `${Math.max(24, ((index + 1) / historicalTimeline.length) * 100)}%` }} />
+            <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  isCurrent
+                    ? "bg-sky-300"
+                    : hasPostureShift
+                      ? "bg-amber-300"
+                      : "bg-slate-500"
+                }`}
+                aria-hidden="true"
+              />
+              <span>
+                {previous
+                  ? hasPostureShift
+                    ? "Posture shifted here"
+                    : "Posture held here"
+                  : "Sequence start"}
+              </span>
             </div>
             <p className="mt-3 text-sm font-semibold text-slate-100">{item.posture}</p>
             {item.recordDate && item.summary ? <p className="mt-1 text-[11px] leading-5 text-slate-300">{item.recordDate} · {item.summary}</p> : null}

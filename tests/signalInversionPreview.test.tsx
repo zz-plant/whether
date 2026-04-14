@@ -22,5 +22,6 @@ describe("SignalInversionPreview", () => {
     assert.match(html, /Curve context/);
     assert.match(html, /Nov 2025/);
     assert.match(html, /Mar 2026/);
+    assert.match(html, /zero line/);
   });
 });

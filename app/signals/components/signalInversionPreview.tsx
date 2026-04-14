@@ -9,10 +9,14 @@ type YieldCurvePoint = {
 };
 
 type MonthlyPoint = {
+  key: string;
   label: string;
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
 };
+
+const CHART_WIDTH = 100;
+const CHART_HEIGHT = 44;
 
 const mean = (values: Array<number | null>) => {
   const numeric = values.filter((value): value is number => typeof value === "number");
@@ -36,8 +40,9 @@ const toMonthlyPoints = (series: YieldCurvePoint[]): MonthlyPoint[] => {
     grouped.set(key, [...(grouped.get(key) ?? []), point]);
   });
 
-  return Array.from(grouped.values())
-    .map((points) => ({
+  return Array.from(grouped.entries())
+    .map(([key, points]) => ({
+      key,
       label: formatMonthLabel(points[0].year, points[0].month),
       spread10Y2Y: mean(points.map((point) => point.spread10Y2Y)),
       spread2Y3M: mean(points.map((point) => point.spread2Y3M)),
@@ -45,24 +50,58 @@ const toMonthlyPoints = (series: YieldCurvePoint[]): MonthlyPoint[] => {
     .slice(-12);
 };
 
-const linePath = (values: Array<number | null>, width: number, height: number, min: number, max: number) => {
-  const valid = values
-    .map((value, index) => ({ value, index }))
-    .filter((point): point is { value: number; index: number } => typeof point.value === "number");
-  if (valid.length < 2) {
-    return "";
-  }
-
+const buildSegmentedLineSeries = ({
+  values,
+  width,
+  height,
+  min,
+  max,
+}: {
+  values: Array<number | null>;
+  width: number;
+  height: number;
+  min: number;
+  max: number;
+}) => {
   const range = max - min || 1;
   const step = width / Math.max(values.length - 1, 1);
+  const paths: string[] = [];
+  const points: Array<{ x: number; y: number; value: number; index: number }> = [];
+  const missingColumns: Array<{ x: number; width: number }> = [];
+  let currentPath: string[] = [];
+  let currentPoints: Array<{ x: number; y: number; value: number; index: number }> = [];
 
-  return valid
-    .map((point, index) => {
-      const x = point.index * step;
-      const y = height - ((point.value - min) / range) * height;
-      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
+  values.forEach((value, index) => {
+    if (typeof value !== "number") {
+      if (currentPath.length >= 2) {
+        paths.push(currentPath.join(" "));
+        points.push(...currentPoints);
+      }
+      currentPath = [];
+      currentPoints = [];
+      missingColumns.push({
+        x: Math.max(0, index * step - step / 2),
+        width: Math.max(step, 4),
+      });
+      return;
+    }
+
+    const x = index * step;
+    const y = height - ((value - min) / range) * height;
+    currentPath.push(`${currentPath.length === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`);
+    currentPoints.push({ x, y, value, index });
+  });
+
+  if (currentPath.length >= 2) {
+    paths.push(currentPath.join(" "));
+    points.push(...currentPoints);
+  }
+
+  return {
+    paths,
+    missingColumns,
+    lastPoint: points[points.length - 1] ?? null,
+  };
 };
 
 const formatBp = (value: number | null) =>
@@ -86,18 +125,25 @@ export function SignalInversionPreview({
   const numericSpreads = spreadValues.filter((value): value is number => typeof value === "number");
   const spreadMin = numericSpreads.length ? Math.min(...numericSpreads, 0) - 0.1 : -0.5;
   const spreadMax = numericSpreads.length ? Math.max(...numericSpreads, 0) + 0.1 : 0.5;
-  const zeroLineY = 44 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 44;
-  const latestX = 100;
-  const latest10Y2YY =
-    latest && typeof latest.spread10Y2Y === "number"
-      ? 44 - ((latest.spread10Y2Y - spreadMin) / (spreadMax - spreadMin || 1)) * 44
-      : null;
-  const latest2Y3MY =
-    latest && typeof latest.spread2Y3M === "number"
-      ? 44 - ((latest.spread2Y3M - spreadMin) / (spreadMax - spreadMin || 1)) * 44
-      : null;
+  const zeroLineY = CHART_HEIGHT - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * CHART_HEIGHT;
+  const spread10Y2YSeries = buildSegmentedLineSeries({
+    values: monthlyPoints.map((point) => point.spread10Y2Y),
+    width: CHART_WIDTH,
+    height: CHART_HEIGHT,
+    min: spreadMin,
+    max: spreadMax,
+  });
+  const spread2Y3MSeries = buildSegmentedLineSeries({
+    values: monthlyPoints.map((point) => point.spread2Y3M),
+    width: CHART_WIDTH,
+    height: CHART_HEIGHT,
+    min: spreadMin,
+    max: spreadMax,
+  });
+  const midPoint = monthlyPoints[Math.floor((monthlyPoints.length - 1) / 2)] ?? latest;
   const monthsInverted10Y2Y = countMonthsBelowZero(monthlyPoints.map((point) => point.spread10Y2Y));
   const monthsInverted2Y3M = countMonthsBelowZero(monthlyPoints.map((point) => point.spread2Y3M));
+  const hasGaps = spread10Y2YSeries.missingColumns.length > 0 || spread2Y3MSeries.missingColumns.length > 0;
 
   return (
     <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
@@ -111,29 +157,51 @@ export function SignalInversionPreview({
         </p>
       </header>
       <div className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
-        <svg viewBox="0 0 100 44" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
-          <rect x="0" y={zeroLineY} width="100" height={44 - zeroLineY} fill="rgba(244,63,94,0.12)" />
-          <rect x="0" y="0" width="100" height={zeroLineY} fill="rgba(16,185,129,0.08)" />
-          <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-          <path d={linePath(monthlyPoints.map((point) => point.spread10Y2Y), 100, 44, spreadMin, spreadMax)} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.6" />
-          <path d={linePath(monthlyPoints.map((point) => point.spread2Y3M), 100, 44, spreadMin, spreadMax)} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.6" />
-          {latest10Y2YY !== null ? (
+        <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
+          <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="rgba(244,63,94,0.12)" />
+          <rect x="0" y="0" width={CHART_WIDTH} height={zeroLineY} fill="rgba(16,185,129,0.08)" />
+          {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
+            <rect
+              key={`missing-${index}`}
+              x={column.x}
+              y="0"
+              width={column.width}
+              height={CHART_HEIGHT}
+              fill="rgba(148,163,184,0.08)"
+            />
+          ))}
+          <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
+          <text x="2" y={Math.max(6, zeroLineY - 2)} className="fill-slate-400 text-[5px] uppercase tracking-[0.12em]">
+            zero line
+          </text>
+          {spread10Y2YSeries.paths.map((path, index) => (
+            <path key={`10-2-${index}`} d={path} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.6" />
+          ))}
+          {spread2Y3MSeries.paths.map((path, index) => (
+            <path key={`2-3-${index}`} d={path} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.6" />
+          ))}
+          {spread10Y2YSeries.lastPoint ? (
             <>
-              <circle cx={latestX} cy={latest10Y2YY} r="1.8" fill="rgb(74 222 128)" />
-              <text x="98" y={Math.max(5, latest10Y2YY - 2)} textAnchor="end" className="fill-emerald-200 text-[6px] uppercase tracking-[0.14em]">
+              <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="rgb(74 222 128)" />
+              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" className="fill-emerald-200 text-[6px] uppercase tracking-[0.14em]">
                 10Y-2Y
               </text>
             </>
           ) : null}
-          {latest2Y3MY !== null ? (
+          {spread2Y3MSeries.lastPoint ? (
             <>
-              <circle cx={latestX} cy={latest2Y3MY} r="1.8" fill="rgb(250 204 21)" />
-              <text x="98" y={Math.min(42, latest2Y3MY + 5)} textAnchor="end" className="fill-amber-200 text-[6px] uppercase tracking-[0.14em]">
+              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="rgb(250 204 21)" />
+              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" className="fill-amber-200 text-[6px] uppercase tracking-[0.14em]">
                 2Y-3M
               </text>
             </>
           ) : null}
         </svg>
+        <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+          <span>{monthlyPoints[0]?.label}</span>
+          <span>{midPoint?.label}</span>
+          <span>{latest?.label}</span>
+        </div>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
           <span>10Y−2Y {formatBp(latest?.spread10Y2Y ?? null)}</span>
           <span>2Y−3M {formatBp(latest?.spread2Y3M ?? null)}</span>
@@ -149,6 +217,11 @@ export function SignalInversionPreview({
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
             Below zero = inversion pressure
           </span>
+          {hasGaps ? (
+            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
+              Breaks = missing monthly reads
+            </span>
+          ) : null}
         </div>
       </div>
     </section>

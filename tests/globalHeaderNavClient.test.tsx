@@ -15,9 +15,10 @@ describe("GlobalHeaderNavRail", () => {
       />,
     );
 
-    assert.match(html, /Workspaces/);
-    assert.match(html, /See what changed/);
-    assert.match(html, /Move between the core workspaces\. Start with the weekly brief, then go deeper only when needed\./);
+    assert.match(html, /Browse workspaces/);
+    assert.match(html, /Decision Tools/);
+    assert.match(html, /flex-wrap/);
+    assert.match(html, /min-h-\[44px\]/);
     assert.doesNotMatch(html, /aria-label="Previous surface"/);
     assert.doesNotMatch(html, /aria-label="Next surface"/);
   });

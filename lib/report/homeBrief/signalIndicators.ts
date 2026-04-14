@@ -173,30 +173,80 @@ const buildInputInfluenceDescription = ({
   key: RegimeSignalKey;
   rawValue: number | null;
   assessment: HomeReportData["assessment"];
-}): Pick<InputInfluenceItem, "pressureLabel" | "effectDetail" | "watchLabel" | "tone"> => {
+}): Pick<
+  InputInfluenceItem,
+  | "pressureLabel"
+  | "effectDetail"
+  | "watchLabel"
+  | "watchValue"
+  | "watchDistanceLabel"
+  | "watchBuffer"
+  | "chartDomain"
+  | "pressureDirection"
+  | "tone"
+> => {
   if (typeof rawValue !== "number") {
     return {
       pressureLabel: "Waiting on a fresh read",
       effectDetail: "This input is not carrying a current directional push into the call yet.",
       watchLabel: "Refresh pending",
+      watchValue: null,
+      watchDistanceLabel: "Watch line unavailable",
+      watchBuffer: null,
+      chartDomain: null,
+      pressureDirection: "higher-is-worse",
       tone: "neutral",
     };
   }
 
+  const buildChartDomain = ({
+    current,
+    threshold,
+    buffer,
+    minClamp,
+    maxClamp,
+  }: {
+    current: number;
+    threshold: number;
+    buffer: number;
+    minClamp?: number;
+    maxClamp?: number;
+  }) => {
+    const padding = Math.max(buffer * 1.5, Math.abs(current - threshold) * 0.7, 0.1);
+    const min = Math.min(current, threshold) - padding;
+    const max = Math.max(current, threshold) + padding;
+    return {
+      min: typeof minClamp === "number" ? Math.min(min, minClamp) : min,
+      max: typeof maxClamp === "number" ? Math.max(max, maxClamp) : max,
+    };
+  };
+
   if (key === "tightness") {
     const gap = rawValue - assessment.thresholds.tightnessRegime;
     const tightnessLine = assessment.thresholds.tightnessRegime.toFixed(1);
+    const threshold = assessment.thresholds.tightnessRegime;
+    const watchBuffer = 8;
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong defensive pull" : "Defensive pull",
           effectDetail: `Current tightness is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the caution line at ${tightnessLine}; approvals and fixed-cost tolerance stay tighter.`,
           watchLabel: `Caution line ${tightnessLine}`,
+          watchValue: threshold,
+          watchDistanceLabel: `${gap.toFixed(1)} pts above watch line`,
+          watchBuffer,
+          chartDomain: { min: 0, max: 100 },
+          pressureDirection: "higher-is-worse",
           tone: "warning",
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Expansion support" : "Room to loosen",
           effectDetail: `Current tightness is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the caution line at ${tightnessLine}; the call has room to loosen if other inputs confirm.`,
           watchLabel: `Caution line ${tightnessLine}`,
+          watchValue: threshold,
+          watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below watch line`,
+          watchBuffer,
+          chartDomain: { min: 0, max: 100 },
+          pressureDirection: "higher-is-worse",
           tone: "positive",
         };
   }
@@ -204,28 +254,53 @@ const buildInputInfluenceDescription = ({
   if (key === "riskAppetite") {
     const gap = rawValue - assessment.thresholds.riskAppetiteRegime;
     const riskLine = assessment.thresholds.riskAppetiteRegime.toFixed(1);
+    const threshold = assessment.thresholds.riskAppetiteRegime;
+    const watchBuffer = 8;
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong expansion support" : "Expansion support",
           effectDetail: `Current risk appetite is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the caution line at ${riskLine}; the call can carry larger reversible bets.`,
           watchLabel: `Caution line ${riskLine}`,
+          watchValue: threshold,
+          watchDistanceLabel: `${gap.toFixed(1)} pts above watch line`,
+          watchBuffer,
+          chartDomain: { min: 0, max: 100 },
+          pressureDirection: "lower-is-worse",
           tone: "positive",
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Risk-off pressure" : "Capping risk-taking",
           effectDetail: `Current risk appetite is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the caution line at ${riskLine}; bet size and expansion appetite stay capped.`,
           watchLabel: `Caution line ${riskLine}`,
+          watchValue: threshold,
+          watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below watch line`,
+          watchBuffer,
+          chartDomain: { min: 0, max: 100 },
+          pressureDirection: "lower-is-worse",
           tone: "warning",
         };
   }
 
   if (key === "baseRate") {
     const gap = rawValue - DEFAULT_THRESHOLDS.baseRateTightness;
+    const threshold = DEFAULT_THRESHOLDS.baseRateTightness;
+    const watchBuffer = 0.25;
+    const chartDomain = buildChartDomain({
+      current: rawValue,
+      threshold,
+      buffer: 0.35,
+      minClamp: 0,
+    });
     if (gap > 0.25) {
       return {
         pressureLabel: "Payback pressure",
         effectDetail: `${gap.toFixed(1)} pts above the cost-of-money line, so long-payback work needs harder proof.`,
-        watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+        watchLabel: `Cost-of-money line ${threshold.toFixed(1)}%`,
+        watchValue: threshold,
+        watchDistanceLabel: `${gap.toFixed(2)}% above watch line`,
+        watchBuffer,
+        chartDomain,
+        pressureDirection: "higher-is-worse",
         tone: "warning",
       };
     }
@@ -233,23 +308,45 @@ const buildInputInfluenceDescription = ({
       return {
         pressureLabel: "Rate relief",
         effectDetail: `${Math.abs(gap).toFixed(1)} pts below the cost-of-money line, so rates are not the main drag on approvals.`,
-        watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+        watchLabel: `Cost-of-money line ${threshold.toFixed(1)}%`,
+        watchValue: threshold,
+        watchDistanceLabel: `${Math.abs(gap).toFixed(2)}% below watch line`,
+        watchBuffer,
+        chartDomain,
+        pressureDirection: "higher-is-worse",
         tone: "positive",
       };
     }
     return {
       pressureLabel: "Neutral rate read",
       effectDetail: "Rates are near the cost-of-money line, so they are not giving the model a strong directional shove.",
-      watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+      watchLabel: `Cost-of-money line ${threshold.toFixed(1)}%`,
+      watchValue: threshold,
+      watchDistanceLabel: `${Math.abs(gap).toFixed(2)}% from watch line`,
+      watchBuffer,
+      chartDomain,
+      pressureDirection: "higher-is-worse",
       tone: "neutral",
     };
   }
 
+  const threshold = 0;
+  const watchBuffer = 0.1;
+  const chartDomain = buildChartDomain({
+    current: rawValue,
+    threshold,
+    buffer: 0.12,
+  });
   if (rawValue < -0.1) {
     return {
       pressureLabel: "Recession caution",
       effectDetail: "The curve is still inverted, so expansion confidence stays capped even if other inputs improve.",
       watchLabel: "Below 0.0% = inversion",
+      watchValue: threshold,
+      watchDistanceLabel: `${Math.abs(rawValue - threshold).toFixed(2)}% below watch line`,
+      watchBuffer,
+      chartDomain,
+      pressureDirection: "lower-is-worse",
       tone: "warning",
     };
   }
@@ -258,6 +355,11 @@ const buildInputInfluenceDescription = ({
       pressureLabel: "Expansion confidence",
       effectDetail: "The curve is positive, which supports a looser call if tightness also cooperates.",
       watchLabel: "Below 0.0% = inversion",
+      watchValue: threshold,
+      watchDistanceLabel: `${Math.abs(rawValue - threshold).toFixed(2)}% above watch line`,
+      watchBuffer,
+      chartDomain,
+      pressureDirection: "lower-is-worse",
       tone: "positive",
     };
   }
@@ -265,6 +367,11 @@ const buildInputInfluenceDescription = ({
     pressureLabel: "Boundary watch",
     effectDetail: "The curve is near flat, so it is not giving the model a strong directional push yet.",
     watchLabel: "Below 0.0% = inversion",
+    watchValue: threshold,
+    watchDistanceLabel: `${Math.abs(rawValue - threshold).toFixed(2)}% from watch line`,
+    watchBuffer,
+    chartDomain,
+    pressureDirection: "lower-is-worse",
     tone: "neutral",
   };
 };
@@ -303,6 +410,7 @@ export const buildInputInfluenceItems = ({
       key,
       label: indicator?.label ?? regimeSignalLabelByKey[key],
       valueLabel: indicator?.valueLabel ?? "—",
+      currentValue: indicator?.rawValue ?? null,
       pressureLabel: description.pressureLabel,
       effectDetail: description.effectDetail,
       influencePercent,
@@ -312,6 +420,11 @@ export const buildInputInfluenceItems = ({
         ? "No fresh weekly delta yet."
         : indicator?.trendDeltaLabel ?? "Weekly delta unavailable.",
       watchLabel: description.watchLabel,
+      watchValue: description.watchValue,
+      watchDistanceLabel: description.watchDistanceLabel,
+      watchBuffer: description.watchBuffer,
+      chartDomain: description.chartDomain,
+      pressureDirection: description.pressureDirection,
       sparkline: indicator?.sparkline ?? [],
       tone: description.tone,
     };

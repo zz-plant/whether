@@ -9,7 +9,6 @@ import {
   useCaseRoles,
 } from "../../lib/decisionDomainCatalog";
 import { HubSection } from "../components/hubPageShell";
-import { LiteracyAssistRouter } from "../components/literacyAssistControls";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
@@ -83,7 +82,6 @@ export default async function DecidePage({
   const recommendedStageGuides = stageGuides.slice(0, 2);
   const sectionLinks = [
     { href: "#unresolved-question-router", label: "Best next step" },
-    { href: "#translation-support", label: "If you still need help" },
     { href: "#decide-secondary-paths", label: "More options" },
   ];
 
@@ -131,8 +129,8 @@ export default async function DecidePage({
         updatedAt: reportData.fetchedAtLabel,
       }}
       structuredData={breadcrumbStructuredData}
-    >
-      <OperatorWorkflowRouteTracker />
+      >
+        <OperatorWorkflowRouteTracker />
       <HubSection
         id="unresolved-question-router"
         title="What still needs help?"
@@ -198,28 +196,6 @@ export default async function DecidePage({
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </HubSection>
-
-      <details id="translation-support" className="weather-panel weather-auto-chevron space-y-4 px-6 py-6" aria-labelledby="translation-support-title">
-        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          If you still need help
-        </summary>
-        <div className="mt-4 grid gap-3 border-t border-slate-800/80 pt-4">
-          <div className="space-y-2">
-            <h2 id="translation-support-title" className="text-lg font-semibold text-slate-100">Open a different kind of help</h2>
-            <p className="text-sm text-slate-300">Use this only if the recommended next step does not close the question.</p>
-          </div>
-          <LiteracyAssistRouter
-            title="Pick the next step"
-            description="Choose the help that matches the question."
-            targets={{
-              decision: { href: shouldStartWithChecker ? "/decide?assist=decision#unresolved-question-router" : `${recommendedPath.href}?assist=decision` },
-              evidence: { href: "/signals?assist=evidence&signalsView=detail#decision-summary" },
-              trust: { href: "/method?assist=trust" },
-              share: { href: "/operations?assist=share#ops-export-briefs" },
-            }}
-          />
-        </div>
-      </details>
 
       <details id="decide-secondary-paths" className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">

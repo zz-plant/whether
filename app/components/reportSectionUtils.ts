@@ -35,51 +35,107 @@ export const SPARKLINE_WIDTH = 160;
 export const SPARKLINE_HEIGHT = 40;
 const SPARKLINE_PADDING = 4;
 
-export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
-  const points = (history ?? [])
-    .filter((point): point is { date: string; value: number } => typeof point.value === "number")
-    .map((point) => ({ value: point.value }));
+const buildSegmentedPathSeries = ({
+  values,
+  toX,
+  toY,
+}: {
+  values: Array<number | null>;
+  toX: (index: number) => number;
+  toY: (value: number) => number;
+}) => {
+  const paths: string[] = [];
+  const points: Array<{ x: number; y: number; value: number; index: number }> = [];
+  const missingIndices: number[] = [];
+  let currentSegment: string[] = [];
+  let currentPoints: Array<{ x: number; y: number; value: number; index: number }> = [];
 
-  if (points.length === 0) {
+  values.forEach((value, index) => {
+    if (typeof value !== "number") {
+      if (currentSegment.length >= 2) {
+        paths.push(currentSegment.join(" "));
+        points.push(...currentPoints);
+      } else if (currentPoints.length === 1) {
+        points.push(...currentPoints);
+      }
+      currentSegment = [];
+      currentPoints = [];
+      missingIndices.push(index);
+      return;
+    }
+
+    const x = toX(index);
+    const y = toY(value);
+    currentSegment.push(`${currentSegment.length === 0 ? "M" : "L"} ${x} ${y}`);
+    currentPoints.push({ x, y, value, index });
+  });
+
+  if (currentSegment.length >= 2) {
+    paths.push(currentSegment.join(" "));
+    points.push(...currentPoints);
+  } else if (currentPoints.length === 1) {
+    points.push(...currentPoints);
+  }
+
+  return { paths, points, missingIndices };
+};
+
+export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
+  const values = (history ?? []).map((point) => (typeof point.value === "number" ? point.value : null));
+  const numericValues = values.filter((value): value is number => typeof value === "number");
+
+  if (numericValues.length === 0) {
     return null;
   }
 
-  const normalizedPoints = points.length === 1 ? [points[0], points[0]] : points;
-  const values = normalizedPoints.map((point) => point.value);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
+  const normalizedValues =
+    numericValues.length === 1
+      ? [numericValues[0], numericValues[0]]
+      : values;
+  const minValue = Math.min(...numericValues);
+  const maxValue = Math.max(...numericValues);
   const range = maxValue - minValue || 1;
   const innerWidth = SPARKLINE_WIDTH - SPARKLINE_PADDING * 2;
   const innerHeight = SPARKLINE_HEIGHT - SPARKLINE_PADDING * 2;
-  const coords = normalizedPoints.map((point, index) => {
-    const x = SPARKLINE_PADDING + (index / (normalizedPoints.length - 1)) * innerWidth;
-    const y =
-      SPARKLINE_HEIGHT -
-      SPARKLINE_PADDING -
-      ((point.value - minValue) / range) * innerHeight;
-    return { x, y, value: point.value };
+  const pointCount = normalizedValues.length;
+  const toX = (index: number) =>
+    SPARKLINE_PADDING + (index / Math.max(pointCount - 1, 1)) * innerWidth;
+  const toY = (value: number) =>
+    SPARKLINE_HEIGHT - SPARKLINE_PADDING - ((value - minValue) / range) * innerHeight;
+  const segmented = buildSegmentedPathSeries({
+    values: normalizedValues,
+    toX,
+    toY,
   });
-
-  const path = coords
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
-  const first = coords[0];
-  const last = coords[coords.length - 1];
+  const areas = segmented.paths.map((path) => {
+    const segmentPoints = path
+      .split("L")
+      .map((command) => command.replace("M", "").trim())
+      .filter(Boolean)
+      .map((point) => {
+        const [x, y] = point.split(" ").map(Number);
+        return { x, y };
+      });
+    const first = segmentPoints[0];
+    const last = segmentPoints[segmentPoints.length - 1];
+    const baseY = SPARKLINE_HEIGHT - SPARKLINE_PADDING;
+    return `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
+  });
+  const latest = segmented.points[segmented.points.length - 1];
+  const previous = segmented.points[segmented.points.length - 2] ?? latest;
   const baseY = SPARKLINE_HEIGHT - SPARKLINE_PADDING;
-  const area = `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
-  const latest = coords[coords.length - 1];
-  const previous = coords[coords.length - 2] ?? latest;
   const delta = latest.value - previous.value;
   const direction = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
-  const medianValue = [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? values[0];
-  const medianY =
-    SPARKLINE_HEIGHT -
-    SPARKLINE_PADDING -
-    ((medianValue - minValue) / range) * innerHeight;
+  const medianValue =
+    [...numericValues].sort((a, b) => a - b)[Math.floor(numericValues.length / 2)]
+    ?? numericValues[0];
+  const medianY = toY(medianValue);
 
   return {
-    path,
-    area,
+    path: segmented.paths[0] ?? "",
+    area: areas[0] ?? "",
+    paths: segmented.paths,
+    areas,
     latest,
     previous,
     delta,
@@ -87,6 +143,9 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
     medianY,
     minValue,
     maxValue,
+    missingIndices: segmented.missingIndices,
+    hasGaps: segmented.missingIndices.length > 0,
+    baselineY: baseY,
   };
 };
 

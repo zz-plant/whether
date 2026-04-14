@@ -1,5 +1,6 @@
 "use client";
 
+import { type ComponentProps } from "react";
 import { useState } from "react";
 
 type ThemeMode = "dark" | "light";
@@ -29,7 +30,9 @@ const getBootstrappedThemeMode = (): ThemeMode => {
   return "dark";
 };
 
-export function ThemeToggleButton() {
+type ThemeToggleButtonProps = Omit<ComponentProps<"button">, "children" | "onClick" | "type">;
+
+export function ThemeToggleButton({ className = "", ...props }: ThemeToggleButtonProps) {
   const [theme, setTheme] = useState<ThemeMode>(getBootstrappedThemeMode);
   const isDark = theme === "dark";
 
@@ -48,9 +51,10 @@ export function ThemeToggleButton() {
 
   return (
     <button
+      {...props}
       type="button"
       onClick={toggleTheme}
-      className="weather-pill inline-flex min-h-[48px] w-full items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] sm:w-auto"
+      className={`weather-pill inline-flex min-h-[48px] w-full items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] sm:w-auto ${className}`.trim()}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={!isDark}
       suppressHydrationWarning

@@ -19,7 +19,6 @@ import { ReportCta } from "./reportCta";
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
-import { ReportShellHeader, type ReportShellHeaderVariant } from "./reportShellHeader";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { WebVitalsTracker } from "./webVitalsTracker";
 import { InternalAwareLink } from "./report-shell/InternalAwareLink";
@@ -63,7 +62,6 @@ type ReportShellInput = {
   showOfflineBadge?: boolean;
   offlineBadgeLabel?: string;
   heroVariant?: "full" | "compact";
-  headerVariant?: ReportShellHeaderVariant;
   sidebarVariant?: "full" | "hidden";
   hideHeroChrome?: boolean;
   primaryCta?: ReportCtaProps;
@@ -92,7 +90,7 @@ type ReportShellModel = {
   status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
   page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
-  chrome?: Pick<ReportShellInput, "heroVariant" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
+  chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
   actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
@@ -152,7 +150,6 @@ export const ReportShell = (props: ReportShellProps) => {
     showOfflineBadge: resolvedShowOfflineBadge = false,
     offlineBadgeLabel: resolvedOfflineBadgeLabel = "Cached snapshot",
     heroVariant: resolvedHeroVariant = "full",
-    headerVariant: resolvedHeaderVariantInput,
     sidebarVariant: resolvedSidebarVariant = "full",
     hideHeroChrome: resolvedHideHeroChrome = false,
     primaryCta: inputPrimaryCta,
@@ -184,9 +181,6 @@ export const ReportShell = (props: ReportShellProps) => {
   const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
   const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
-  const resolvedHeaderVariant: ReportShellHeaderVariant = resolvedHeaderVariantInput ?? (resolvedHideHeroChrome ? "home-brief" : "standard");
-  const headerExportCta = resolvedCurrentPath === "/" ? resolvedExportCta : null;
-  const bodyExportCta = resolvedCurrentPath === "/" ? null : resolvedExportCta;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
   const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
   const showIntroBlock = !resolvedHideHeroChrome;
@@ -240,16 +234,6 @@ export const ReportShell = (props: ReportShellProps) => {
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
         <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
-          {showIntroBlock ? (
-            <ReportShellHeader
-              variant={resolvedHeaderVariant}
-              statusLabel={resolvedStatusLabel}
-              fetchedAtLabel={resolvedFetchedAtLabel}
-              recordDateLabel={resolvedRecordDateLabel}
-              pageTitle={resolvedPageTitle}
-              exportCta={headerExportCta}
-            />
-          ) : null}
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
@@ -267,7 +251,7 @@ export const ReportShell = (props: ReportShellProps) => {
             ) : null}
 
             <div className={`order-1 min-w-0 space-y-6 lg:space-y-8 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={bodyExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 

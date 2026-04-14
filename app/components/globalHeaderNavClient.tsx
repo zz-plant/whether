@@ -9,9 +9,6 @@ import {
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
-import {
-  resolvePrimaryNavigationSurfaceCue,
-} from "../../lib/navigation/informationArchitecture";
 
 type GlobalHeaderNavClientProps = {
   pathname?: string;
@@ -82,12 +79,12 @@ function CompactNavigationLink({
         aria-current={link.isActive ? "page" : undefined}
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
-        className={`weather-pill inline-flex min-h-[42px] items-center justify-center px-3.5 py-2 text-xs font-semibold tracking-[0.08em] touch-manipulation ${
+        className={`inline-flex min-h-[44px] items-center justify-center whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-semibold tracking-[0.04em] touch-manipulation transition-colors ${
           link.isActive
-            ? "border-sky-300/80 bg-sky-500/20 text-sky-50"
+            ? "border-slate-100/90 bg-slate-100 text-slate-950 shadow-[0_10px_24px_-18px_rgba(248,250,252,0.75)]"
             : isAnchor
-              ? "border-amber-300/45 bg-amber-400/10 text-amber-50 hover:border-amber-300/70"
-              : "border-slate-700/80 bg-slate-950/65 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+              ? "border-amber-300/35 bg-amber-400/8 text-amber-100 hover:border-amber-300/55 hover:text-amber-50"
+              : "border-slate-700/80 bg-slate-950/45 text-slate-300 hover:border-slate-500/85 hover:text-slate-100"
         }`}
       >
         {link.label}
@@ -107,7 +104,6 @@ export function GlobalHeaderNavRail({
   const [canScrollNext, setCanScrollNext] = useState(navigationLinks.length > 1);
   const railRef = useRef<HTMLUListElement | null>(null);
   const activeLink = navigationLinks.find((link) => link.isActive) ?? navigationLinks[0];
-  const activeSurfaceCue = activeLink ? resolvePrimaryNavigationSurfaceCue(activeLink.href) : null;
   const hasScrollableOverflow = canScrollPrev || canScrollNext;
 
   useEffect(() => {
@@ -219,21 +215,18 @@ export function GlobalHeaderNavRail({
   if (variant === "compact") {
     return (
       <div className="space-y-2">
-        <div className="min-w-0 space-y-0.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-            Workspaces
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[11px] font-medium text-slate-400">
+            Browse workspaces
           </p>
-          <p className="truncate text-[13px] font-medium text-slate-200">
-            {activeSurfaceCue ?? activeRouteLabel}
-          </p>
-          <p className="text-[11px] leading-relaxed text-slate-400">
-            Move between the core workspaces. Start with the weekly brief, then go deeper only when needed.
+          <p className="text-[11px] text-slate-500">
+            {activeRouteLabel}
           </p>
         </div>
         <nav aria-label="Primary routes">
           <ul
             ref={railRef}
-            className="flex gap-2 overflow-x-auto scroll-smooth pb-1 pr-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex flex-wrap gap-2 pb-1 sm:flex-nowrap sm:overflow-x-auto sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
           >
             {navigationLinks.map((link) => (
               <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />

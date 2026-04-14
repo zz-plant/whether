@@ -182,6 +182,8 @@ Implementation guardrails:
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - The top strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
+- The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
+- Homepage utility search should stay demoted behind a secondary `Search tools` action so the first-screen priority remains reading the weekly call.
 - The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.

@@ -143,6 +143,7 @@ export type RegimeSignalIndicator = {
 };
 
 type InputInfluenceTone = "warning" | "positive" | "neutral";
+export type ThresholdPressureDirection = "higher-is-worse" | "lower-is-worse";
 
 export type FlipRiskMeterState = {
   progressPercent: number;
@@ -174,6 +175,7 @@ export type InputInfluenceItem = {
   key: RegimeSignalKey;
   label: string;
   valueLabel: string;
+  currentValue: number | null;
   pressureLabel: string;
   effectDetail: string;
   influencePercent: number;
@@ -181,6 +183,11 @@ export type InputInfluenceItem = {
   trendArrow: "↑" | "↓" | "→";
   trendLabel: string;
   watchLabel: string;
+  watchValue: number | null;
+  watchDistanceLabel: string;
+  watchBuffer: number | null;
+  chartDomain: { min: number; max: number } | null;
+  pressureDirection: ThresholdPressureDirection;
   sparkline: number[];
   tone: InputInfluenceTone;
 };

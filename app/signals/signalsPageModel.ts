@@ -21,6 +21,7 @@ import {
   type SignalsView,
 } from "./signalsQueryState";
 import { loadSignalsPagePanels } from "./signalsPagePanels";
+import type { ThresholdPressureDirection } from "../../lib/report/homeBriefModel";
 
 export type SignalsPageSearchParams = {
   month?: string;
@@ -31,6 +32,45 @@ export type SignalsPageSearchParams = {
 export const buildSignalsPageModel = async (
   resolvedSearchParams?: SignalsPageSearchParams,
 ) => {
+  const buildChartDomain = ({
+    current,
+    threshold,
+    buffer,
+    minClamp,
+    maxClamp,
+  }: {
+    current: number;
+    threshold: number;
+    buffer: number;
+    minClamp?: number;
+    maxClamp?: number;
+  }) => {
+    const padding = Math.max(buffer * 1.5, Math.abs(current - threshold) * 0.7, 0.1);
+    const min = Math.min(current, threshold) - padding;
+    const max = Math.max(current, threshold) + padding;
+    return {
+      min: typeof minClamp === "number" ? Math.min(min, minClamp) : min,
+      max: typeof maxClamp === "number" ? Math.max(max, maxClamp) : max,
+    };
+  };
+
+  const buildWatchDistanceLabel = ({
+    current,
+    threshold,
+    unit,
+  }: {
+    current: number;
+    threshold: number;
+    unit: "pts" | "%";
+  }) => {
+    const delta = current - threshold;
+    const magnitude = unit === "pts" ? `${Math.abs(delta).toFixed(1)} pts` : `${Math.abs(delta).toFixed(2)}%`;
+    if (delta === 0) {
+      return `${magnitude} from watch line`;
+    }
+    return `${magnitude} ${delta > 0 ? "above" : "below"} watch line`;
+  };
+
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -268,28 +308,74 @@ export const buildSignalsPageModel = async (
   const scoreCards = [
     {
       label: "Tightness" as const,
-      value: `${assessment.scores.tightness}/100`,
-      threshold: `${assessment.thresholds.tightnessRegime}/100`,
+      valueLabel: `${assessment.scores.tightness}/100`,
+      currentValue: assessment.scores.tightness,
+      thresholdLabel: `${assessment.thresholds.tightnessRegime}/100`,
+      thresholdValue: assessment.thresholds.tightnessRegime,
       description:
         "Higher values mean market conditions are less forgiving for new long-payback bets.",
+      pressureDirection: "higher-is-worse" as ThresholdPressureDirection,
+      watchBuffer: 8,
+      chartDomain: { min: 0, max: 100 },
+      leftLabel: "More room",
+      rightLabel: "More pressure",
+      watchDistanceLabel: buildWatchDistanceLabel({
+        current: assessment.scores.tightness,
+        threshold: assessment.thresholds.tightnessRegime,
+        unit: "pts",
+      }),
       href: "#current-scores",
     },
     {
       label: "Risk appetite" as const,
-      value: `${assessment.scores.riskAppetite}/100`,
-      threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
+      valueLabel: `${assessment.scores.riskAppetite}/100`,
+      currentValue: assessment.scores.riskAppetite,
+      thresholdLabel: `${assessment.thresholds.riskAppetiteRegime}/100`,
+      thresholdValue: assessment.thresholds.riskAppetiteRegime,
       description: "Higher values mean markets are acting more willing to fund risk.",
+      pressureDirection: "lower-is-worse" as ThresholdPressureDirection,
+      watchBuffer: 8,
+      chartDomain: { min: 0, max: 100 },
+      leftLabel: "More pressure",
+      rightLabel: "More room",
+      watchDistanceLabel: buildWatchDistanceLabel({
+        current: assessment.scores.riskAppetite,
+        threshold: assessment.thresholds.riskAppetiteRegime,
+        unit: "pts",
+      }),
       href: "#current-scores",
     },
     {
       label: "Curve slope" as const,
-      value:
+      valueLabel:
         assessment.scores.curveSlope === null
           ? "N/A"
           : `${assessment.scores.curveSlope.toFixed(2)}%`,
-      threshold: "0.00%",
+      currentValue: assessment.scores.curveSlope,
+      thresholdLabel: "0.00%",
+      thresholdValue: 0,
       description:
         "10Y minus 2Y Treasury yield spread, used here as a forward-looking growth read.",
+      pressureDirection: "lower-is-worse" as ThresholdPressureDirection,
+      watchBuffer: 0.1,
+      chartDomain:
+        assessment.scores.curveSlope === null
+          ? null
+          : buildChartDomain({
+            current: assessment.scores.curveSlope,
+            threshold: 0,
+            buffer: 0.12,
+          }),
+      leftLabel: "More pressure",
+      rightLabel: "More room",
+      watchDistanceLabel:
+        assessment.scores.curveSlope === null
+          ? "Watch line unavailable"
+          : buildWatchDistanceLabel({
+            current: assessment.scores.curveSlope,
+            threshold: 0,
+            unit: "%",
+          }),
       href: "#current-scores",
     },
   ];

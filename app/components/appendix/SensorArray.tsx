@@ -179,16 +179,20 @@ export const SensorArray = ({
                         <stop offset="100%" stopColor="rgba(56,189,248,0)" />
                       </linearGradient>
                     </defs>
-                    <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
-                    <line x1={0} x2={SPARKLINE_WIDTH} y1={sparkline.medianY} y2={sparkline.medianY} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
-                    <path
-                      d={sparkline.path}
-                      fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="1.5"
-                      vectorEffect="non-scaling-stroke"
-                      pathLength={100}
-                    />
+                    {sparkline.areas.map((area, areaIndex) => (
+                      <path key={`area-${sensor.id}-${areaIndex}`} d={area} fill={`url(#${sparklineId})`} pathLength={100} />
+                    ))}
+                    {sparkline.paths.map((path, pathIndex) => (
+                      <path
+                        key={`path-${sensor.id}-${pathIndex}`}
+                        d={path}
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="1.5"
+                        vectorEffect="non-scaling-stroke"
+                        pathLength={100}
+                      />
+                    ))}
                     <circle cx={sparkline.latest.x} cy={sparkline.latest.y} r="1.8" fill="#e2e8f0" />
                   </svg>
                 ) : (
@@ -206,6 +210,11 @@ export const SensorArray = ({
                   {sparkline ? (
                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                       {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, sensor.unit)}
+                    </p>
+                  ) : null}
+                  {sparkline?.hasGaps ? (
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      Breaks mark missing readings
                     </p>
                   ) : null}
                   <p className="break-words">{sensor.explanation}</p>

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
-import { RelatedReportLinks } from "../components/relatedReportLinks";
 import { HistoricalBanner } from "../components/historicalBanner";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
-import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./signalsPageModel";
@@ -60,7 +58,6 @@ export default async function SignalsPage({
       }}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
-      headerVariant="evidence"
       primaryCta={{ href: "#decision-summary", label: "Start with implication" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
@@ -206,12 +203,6 @@ export default async function SignalsPage({
           { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
         ]}
         openPanelHref={model.timeMachineHref}
-      />
-
-      <RelatedReportLinks
-        title="Need more context?"
-        links={SIGNALS_RELATED_LINKS}
-        variant="compact"
       />
     </ReportShell>
   );

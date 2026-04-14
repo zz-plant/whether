@@ -96,7 +96,7 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Start here/);
     assert.match(html, /Decision focus/);
-    assert.match(html, /Follow-on/);
+    assert.doesNotMatch(html, /Follow-on/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
     assert.match(html, /Use one next move at a time\./);
@@ -198,7 +198,6 @@ describe("ReportShell extracted sections", () => {
         trustStatusAction="Proceed with planning."
         trustStatusTone="stable"
         currentPath="/"
-        headerVariant="home-brief"
         exportCta={{
           href: "#share-ready-artifact",
           label: "Copy weekly brief",
@@ -212,7 +211,7 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Copy weekly brief/);
     assert.match(html, /href="#share-ready-artifact"/);
-    assert.match(html, /The weekly brief stays primary\. Open another route only when the room needs proof, planning, or verification\./);
+    assert.match(html, /share-ready path\./);
     assert.doesNotMatch(html, /Review order/);
   });
 });

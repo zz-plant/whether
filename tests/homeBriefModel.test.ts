@@ -82,6 +82,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.inputInfluence.length, 4);
     assert.equal(model.inputInfluence[0]?.key, "tightness");
     assert.match(model.inputInfluence[0]?.effectDetail ?? "", /regime line|approvals/i);
+    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
+    assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
+    assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
     assert.equal(model.regimeSignalIndicators[0]?.label, "Capital tightness");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });

@@ -130,7 +130,6 @@ export default async function MethodPage() {
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
       sectionLinks={sectionLinks.slice(0, 3)}
       heroVariant="compact"
-      headerVariant="trust"
       sidebarVariant="hidden"
       primaryCta={{ href: "#trust-snapshot", label: "Start with trust snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}

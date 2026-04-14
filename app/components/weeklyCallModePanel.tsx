@@ -129,22 +129,14 @@ export function WeeklyCallModePanel({
   const revisitToneClass = revisitDecisions
     ? "border-amber-400/25 bg-amber-500/8 text-amber-50"
     : "border-emerald-400/25 bg-emerald-500/8 text-emerald-50";
-  const compactTrustToneClass = needsTrustWarning
-    ? "border-amber-400/25 bg-amber-500/8"
-    : "border-emerald-400/25 bg-emerald-500/8";
   const shouldShowReadinessCallout = needsTrustWarning || inlineTrustTone !== "stable" || Boolean(trustReason);
-  const readinessSummaryToneClass = decisionReadiness.tone === "stable"
-    ? "text-emerald-100"
-    : decisionReadiness.tone === "historical"
-      ? "text-violet-100"
-      : "text-amber-100";
   const trustStatusSummary = trustReason
     ? `Using the last clean snapshot because ${trustReason}`
     : trustStateDetail;
   const supportingDeltaLine = comparisonSummary.trim().length > 0
     ? comparisonSummary
     : weeklyLeadershipSummary.shorthandLine;
-  const compactMetricCardBase = "rounded-xl border border-slate-800/70 bg-slate-950/50 px-3 py-2.5";
+  const compactMetricCardBase = "rounded-xl border border-slate-800/65 bg-slate-950/35 px-3 py-3";
   const primaryDriver = driverHighlights[0] ?? null;
   const supportingDrivers = primaryDriver ? driverHighlights.slice(1, 3) : driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
@@ -181,7 +173,7 @@ export function WeeklyCallModePanel({
       label: "Aggression vs last week",
       value: aggressionDirectionLabel,
       detail: `${weeklyLeadershipSummary.boldnessScore}/100 now`,
-      className: compactMetricCardBase,
+      className: `${compactMetricCardBase} border-slate-700/80 bg-slate-900/65`,
     },
     {
       label: "Hiring backdrop",
@@ -211,72 +203,54 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className={`rounded-[1.35rem] border border-slate-800/85 bg-[linear-gradient(180deg,rgba(7,12,22,0.96),rgba(3,8,16,0.99))] p-3 shadow-[0_18px_34px_-30px_rgba(2,6,23,0.78)] sm:p-4 ${sectionSpacingClassName}`} aria-label="Weekly brief">
-        <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-3 overflow-hidden border-slate-800/80 bg-[linear-gradient(180deg,rgba(5,10,19,0.97),rgba(4,8,16,0.99))]`}>
+      <article className={`rounded-[1.1rem] border border-slate-800/75 bg-[linear-gradient(180deg,rgba(7,12,22,0.94),rgba(3,8,16,0.98))] p-3 shadow-[0_18px_34px_-32px_rgba(2,6,23,0.72)] sm:p-4 ${sectionSpacingClassName}`} aria-label="Weekly brief">
+        <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-2 overflow-hidden border-slate-800/70 bg-[linear-gradient(180deg,rgba(6,11,20,0.96),rgba(4,8,16,0.99))]`}>
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative space-y-4">
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.24fr)_minmax(18rem,0.76fr)]">
-              <article className="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/45 px-4 py-4 shadow-[0_16px_28px_-24px_rgba(2,6,23,0.72)]">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.32fr)_minmax(17rem,0.68fr)]">
+              <article className="rounded-[1rem] border border-slate-800/70 bg-slate-950/30 px-4 py-4 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.68)]">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-                    {selectedModeLabel}
-                  </span>
                   <span className="rounded-full border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
                     {decisionReadiness.label}
                   </span>
+                  <span className="text-[11px] font-medium text-slate-400">
+                    {selectedModeLabel}
+                  </span>
                 </div>
-                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  This week&apos;s recommendation
+                <h2 className={`${tierOneHeadingClassName} mt-3 text-xl leading-tight text-slate-50 sm:text-[1.95rem] sm:leading-[2.3rem]`}>
+                  {actionNowDetail}
+                </h2>
+                <p className="mt-2 max-w-3xl text-base font-semibold leading-7 text-slate-100">
+                  {operatingCall}
                 </p>
-                <h2 className={`${tierOneHeadingClassName} mt-2 text-lg sm:text-[1.7rem] sm:leading-[2.05rem]`}>{actionNowDetail}</h2>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{supportingDeltaLine}</p>
-
-                <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/50 px-3 py-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{publicDecisionLabels.call}</p>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(primaryDriver?.postureDirection ?? "flat")}`}>
-                      {weeklyLeadershipSummary.shorthandLine}
-                    </span>
-                  </div>
-                  <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-100">{operatingCall}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-300">
+                  <span className="font-semibold text-slate-100">{weeklyLeadershipSummary.shorthandLine}</span>
+                  <span>{Math.round(confidencePercent)}% confidence</span>
+                  <span>{inlineTrustLabel}</span>
+                  <span>{weeklyLeadershipSummary.boldnessScore}/100 boldness</span>
                 </div>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">{supportingDeltaLine}</p>
+                {shouldShowReadinessCallout ? (
+                  <p className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-[12px] leading-5 text-slate-300">
+                    {trustStatusSummary}
+                  </p>
+                ) : null}
 
-                <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
-
-                <dl className="mt-4 grid gap-2 lg:grid-cols-3">
-                  <div className="rounded-xl border border-emerald-400/15 bg-emerald-500/8 px-3 py-3">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">{publicDecisionLabels.action}</dt>
-                    <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</dd>
+                <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/52 px-3 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-amber-100">What changed this week</p>
+                    {primaryDriver ? (
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${driverToneClass(primaryDriver.postureDirection)}`}>
+                        {primaryDriver.label} {primaryDriver.deltaLabel}
+                      </span>
+                    ) : null}
                   </div>
-                  <div className="rounded-xl border border-rose-400/18 bg-rose-500/8 px-3 py-3">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">{publicDecisionLabels.threshold}</dt>
-                    <dd className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</dd>
-                  </div>
-                  <div className="rounded-xl border border-sky-400/18 bg-sky-500/8 px-3 py-3">
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">{publicDecisionLabels.reversal}</dt>
-                    <dd className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</dd>
-                  </div>
-                </dl>
-
-                <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">What changed</p>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{changedThisWeekDetail}</p>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{changedThisWeekDetail}</p>
                   {primaryDriver ? (
-                    <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-2.5 py-2.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-xs font-semibold text-slate-100">{primaryDriver.label}</p>
-                        <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
-                          {primaryDriver.weightLabel}
-                        </span>
-                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${driverToneClass(primaryDriver.postureDirection)}`}>
-                          {primaryDriver.deltaLabel}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-[11px] leading-5 text-slate-300">{primaryDriver.implication}</p>
-                    </div>
+                    <p className="mt-2 text-[12px] leading-5 text-slate-300">{primaryDriver.implication}</p>
                   ) : null}
                   {supportingDrivers.length > 0 ? (
-                    <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em]">
+                    <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold">
                       {supportingDrivers.map((driver) => (
                         <span key={`${driver.label}-${driver.deltaLabel}`} className={`rounded-full border px-2 py-0.5 ${driverToneClass(driver.postureDirection)}`}>
                           {driver.label} {driver.deltaLabel}
@@ -284,42 +258,64 @@ export function WeeklyCallModePanel({
                       ))}
                     </div>
                   ) : null}
-                </div>
+                </section>
+
+                <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
+
+                <section className="mt-4 rounded-[1rem] border border-slate-800/75 bg-slate-950/40 px-3 py-3">
+                  <dl className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                    <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/8 px-3 py-3">
+                      <dt className="text-[11px] font-medium text-emerald-200">{publicDecisionLabels.action}</dt>
+                      <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</dd>
+                    </div>
+                    <div className="rounded-lg border border-rose-400/18 bg-rose-500/8 px-3 py-3">
+                      <dt className="text-[11px] font-medium text-rose-200">{publicDecisionLabels.threshold}</dt>
+                      <dd className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</dd>
+                    </div>
+                    <div className="rounded-lg border border-sky-400/18 bg-sky-500/8 px-3 py-3">
+                      <dt className="text-[11px] font-medium text-sky-200">{publicDecisionLabels.reversal}</dt>
+                      <dd className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</dd>
+                    </div>
+                  </dl>
+                </section>
               </article>
 
               <aside className="space-y-3">
-                <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_14px_24px_-22px_rgba(2,6,23,0.68)] ${compactTrustToneClass}`}>
+                <article className="rounded-[1rem] border border-slate-800/70 bg-slate-950/28 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(2,6,23,0.64)]">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">Can you rely on this?</p>
-                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${inlineTrustToneClass}`}>
+                    <p className="text-[11px] font-medium text-slate-400">This week at a glance</p>
+                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>
                       {inlineTrustLabel}
                     </span>
                   </div>
-                  <p className={`mt-2 text-base font-semibold leading-6 ${readinessSummaryToneClass}`}>
-                    {decisionReadiness.label}
+                  <p className="mt-2 text-base font-semibold leading-6 text-slate-100">
+                    {weeklyLeadershipSummary.shorthandLine}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-slate-200">
-                    {shouldShowReadinessCallout ? trustStatusSummary : decisionReadiness.detail}
-                  </p>
-                  <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                      One-line version
-                    </p>
-                    <p className="mt-1 text-sm font-semibold leading-6 text-slate-100">
-                      {weeklyLeadershipSummary.shorthandLine}
-                    </p>
-                    {whyItMattersLine ? (
-                      <p className="mt-2 text-[11px] leading-5 text-slate-400">{whyItMattersLine}</p>
-                    ) : null}
-                  </div>
+                  {whyItMattersLine ? (
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{whyItMattersLine}</p>
+                  ) : null}
+                  <dl className="mt-3 space-y-2 text-[12px] leading-5">
+                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
+                      <dt className="text-slate-400">Aggression vs last week</dt>
+                      <dd className="font-semibold text-slate-100">{aggressionDirectionLabel}</dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
+                      <dt className="text-slate-400">Hiring backdrop</dt>
+                      <dd className="font-semibold text-slate-100">{formatBackdropValue(weeklyLeadershipSummary.hiringWindow, "hiring")}</dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
+                      <dt className="text-slate-400">Funding backdrop</dt>
+                      <dd className="font-semibold text-slate-100">{formatBackdropValue(weeklyLeadershipSummary.raiseWindow, "raise")}</dd>
+                    </div>
+                  </dl>
                 </article>
 
                 {(revisitDecisions || flipSupport.length > 0) ? (
-                <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${revisitToneClass}`}>
+                <article className={`rounded-[1rem] border px-3 py-3 shadow-[0_16px_28px_-28px_rgba(2,6,23,0.68)] ${revisitToneClass}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">What to watch this week</p>
+                    <p className="text-[11px] font-medium">Watch this week</p>
                     {revisitQueue.length > 0 ? (
-                      <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
+                      <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold text-amber-100">
                         {revisitQueue.length} decisions
                       </span>
                     ) : null}
@@ -343,19 +339,14 @@ export function WeeklyCallModePanel({
 
                   {featuredRevisitItem ? (
                     <div className="mt-4 border-t border-slate-800/70 pt-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Start with</p>
+                      <p className="text-[11px] font-medium text-amber-200">Start with</p>
                       <article className="mt-2 rounded-lg border border-slate-800/70 bg-slate-950/60 px-3 py-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-semibold text-slate-100">{featuredRevisitItem.label}</p>
-                          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
-                            Review
-                          </span>
-                        </div>
-                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Revisit now</p>
+                        <p className="text-sm font-semibold text-slate-100">{featuredRevisitItem.label}</p>
+                        <p className="mt-2 text-[11px] font-medium text-emerald-200">Revisit now</p>
                         <p className="mt-1 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.action}</p>
-                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Why it matters</p>
+                        <p className="mt-2 text-[11px] font-medium text-slate-400">Why it matters</p>
                         <p className="mt-1 text-[11px] leading-5 text-slate-400">{featuredRevisitItem.reason}</p>
-                        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">{publicDecisionLabels.reversal}</p>
+                        <p className="mt-2 text-[11px] font-medium text-sky-200">{publicDecisionLabels.reversal}</p>
                         <p className="mt-1 text-[11px] leading-5 text-sky-100">{featuredRevisitItem.flipCondition}.</p>
                       </article>
                     </div>
@@ -363,23 +354,18 @@ export function WeeklyCallModePanel({
 
                   {deferredRevisitItems.length > 0 ? (
                     <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                      <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                      <summary className="cursor-pointer list-none text-[11px] font-medium text-slate-300">
                         More to reopen
                       </summary>
                       <div className="mt-3 divide-y divide-slate-800/70">
                         {deferredRevisitItems.map((item) => (
                           <article key={item.id} className="py-3 first:pt-0 last:pb-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-sm font-semibold text-slate-100">{item.label}</p>
-                              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
-                                Review
-                              </span>
-                            </div>
-                            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Revisit now</p>
+                            <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                            <p className="mt-2 text-[11px] font-medium text-emerald-200">Revisit now</p>
                             <p className="mt-1 text-[11px] leading-5 text-slate-200">{item.action}</p>
-                            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Why it matters</p>
+                            <p className="mt-2 text-[11px] font-medium text-slate-400">Why it matters</p>
                             <p className="mt-1 text-[11px] leading-5 text-slate-400">{item.reason}</p>
-                            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">{publicDecisionLabels.reversal}</p>
+                            <p className="mt-2 text-[11px] font-medium text-sky-200">{publicDecisionLabels.reversal}</p>
                             <p className="mt-1 text-[11px] leading-5 text-sky-100">{item.flipCondition}.</p>
                           </article>
                         ))}
@@ -394,7 +380,7 @@ export function WeeklyCallModePanel({
             <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {postureSummaryCards.map((card) => (
                 <div key={card.label} className={card.className}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{card.label}</dt>
+                  <dt className="text-[11px] font-medium text-slate-400">{card.label}</dt>
                   <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
                   <dd className="mt-1 text-[11px] leading-5 text-slate-400">{card.detail}</dd>
                 </div>

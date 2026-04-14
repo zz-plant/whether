@@ -66,20 +66,6 @@ export function CommandCenterNavBlock({
   const primaryDecisionText =
     decisionBanner?.decision ??
     (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
-  const followOnLinks = [
-    nextStep
-      ? {
-          href: nextStep.href,
-          label: nextStep.description,
-        }
-      : null,
-    exportCta
-      ? {
-          href: exportCta.href,
-          label: exportCta.label,
-        }
-      : null,
-  ].filter((item): item is { href: string; label: string } => Boolean(item));
   const headingClassName = heroVariant === "compact"
     ? "max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-slate-100 sm:text-[2rem]"
     : "type-headline max-w-3xl text-slate-100";
@@ -170,22 +156,19 @@ export function CommandCenterNavBlock({
                   {secondaryCta.label}
                 </InternalAwareLink>
               ) : null}
+              {exportCta ? (
+                <ReportCta
+                  href={exportCta.href}
+                  copyText={exportCta.copyText}
+                  copyTarget={exportCta.copyTarget}
+                  telemetryEvent={exportCta.telemetryEvent}
+                  label={exportCta.label}
+                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+                >
+                  {exportCta.label}
+                </ReportCta>
+              ) : null}
             </div>
-
-            {followOnLinks.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-medium text-slate-400">
-                <span>Follow-on:</span>
-                {followOnLinks.map((link) => (
-                  <InternalAwareLink
-                    key={`${link.href}-${link.label}`}
-                    href={link.href}
-                    className="text-slate-300 underline decoration-slate-600/80 underline-offset-4 hover:text-slate-100"
-                  >
-                    {link.label}
-                  </InternalAwareLink>
-                ))}
-              </div>
-            ) : null}
           </div>
 
           <article className="weather-priority-card relative overflow-hidden p-4 sm:p-5">

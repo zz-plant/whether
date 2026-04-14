@@ -1,5 +1,6 @@
-import type { InputInfluenceItem } from "../../../lib/report/homeBriefModel";
-import { buildThresholdMarkerState } from "../../../lib/report/homeBriefPresentation";
+import type {
+  InputInfluenceItem,
+} from "../../../lib/report/homeBriefModel";
 import { sectionSpacing, tierOneHeading, tierOnePanel } from "./shared";
 
 const inputInfluenceToneClasses: Record<
@@ -20,148 +21,128 @@ const inputInfluenceToneClasses: Record<
   },
 };
 
-const clampSparklineValue = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
+const clampPercent = (value: number) => Math.min(96, Math.max(4, value));
 
-const buildSparklinePath = (
-  values: number[],
-  width: number,
-  height: number,
-  sharedDomain?: { min: number; max: number } | null,
-) => {
-  if (values.length === 0) {
-    return "";
-  }
+const normalizeToPercent = (value: number, min: number, max: number) =>
+  clampPercent(((value - min) / (max - min || 1)) * 100);
 
-  const min = sharedDomain?.min ?? Math.min(...values);
-  const max = sharedDomain?.max ?? Math.max(...values);
-  const yDomainPadding =
-    max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
-  const domainMin = min - yDomainPadding;
-  const domainMax = max + yDomainPadding;
-
-  return values
-    .map((value, index) => {
-      const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width;
-      const normalized =
-        (clampSparklineValue(value, domainMin, domainMax) - domainMin) /
-        (domainMax - domainMin || 1);
-      const y = height - normalized * height;
-      return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
-};
-
-const resolveSharedSparkDomain = (items: InputInfluenceItem[]) => {
-  const values = items.flatMap((item) => item.sparkline);
-  if (values.length === 0) {
+const buildThresholdMeterState = (item: InputInfluenceItem) => {
+  if (
+    item.currentValue === null
+    || item.watchValue === null
+    || item.chartDomain === null
+  ) {
     return null;
   }
 
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const padding =
-    max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.14;
+  const { min, max } = item.chartDomain;
+  const watchBuffer = item.watchBuffer ?? (max - min) * 0.1;
+  const currentPercent = normalizeToPercent(item.currentValue, min, max);
+  const thresholdPercent = normalizeToPercent(item.watchValue, min, max);
+
+  const buildSegment = (startValue: number, endValue: number) => {
+    const start = normalizeToPercent(startValue, min, max);
+    const end = normalizeToPercent(endValue, min, max);
+    return {
+      left: `${Math.min(start, end)}%`,
+      width: `${Math.max(end - start, 2)}%`,
+    };
+  };
+
+  if (item.pressureDirection === "higher-is-worse") {
+    return {
+      currentPercent,
+      thresholdPercent,
+      leftLabel: "More room",
+      rightLabel: "More pressure",
+      safe: buildSegment(min, Math.min(item.watchValue - watchBuffer, max)),
+      caution: buildSegment(
+        Math.max(min, item.watchValue - watchBuffer),
+        Math.min(item.watchValue, max),
+      ),
+      risk: buildSegment(item.watchValue, max),
+    };
+  }
 
   return {
-    min: min - padding,
-    max: max + padding,
+    currentPercent,
+    thresholdPercent,
+    leftLabel: "More pressure",
+    rightLabel: "More room",
+    risk: buildSegment(min, item.watchValue),
+    caution: buildSegment(
+      Math.max(min, item.watchValue),
+      Math.min(item.watchValue + watchBuffer, max),
+    ),
+    safe: buildSegment(Math.min(item.watchValue + watchBuffer, max), max),
   };
 };
 
-function InputInfluenceSparkline({
-  values,
-  tone,
-  label,
-  sharedDomain,
+function InputInfluenceThresholdGap({
+  item,
 }: {
-  values: number[];
-  tone: InputInfluenceItem["tone"];
-  label: string;
-  sharedDomain?: { min: number; max: number } | null;
+  item: InputInfluenceItem;
 }) {
-  if (values.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-          Recent path
-        </p>
-        <p className="mt-1 text-[11px] text-slate-400">Recent movement unavailable.</p>
-      </div>
-    );
-  }
-
-  const strokeClass =
-    tone === "warning"
-      ? "stroke-rose-300"
-      : tone === "positive"
-        ? "stroke-emerald-300"
-        : "stroke-slate-300";
-  const fillClass =
-    tone === "warning"
-      ? "fill-rose-300"
-      : tone === "positive"
-        ? "fill-emerald-300"
-        : "fill-slate-300";
-  const chartWidth = 84;
-  const chartHeight = 22;
-  const path = buildSparklinePath(values, chartWidth, chartHeight, sharedDomain);
-  const min = sharedDomain?.min ?? Math.min(...values);
-  const max = sharedDomain?.max ?? Math.max(...values);
-  const yDomainPadding =
-    max === min ? Math.max(1, Math.abs(max) * 0.08 || 1) : (max - min) * 0.12;
-  const domainMin = min - yDomainPadding;
-  const domainMax = max + yDomainPadding;
-  const currentValue = values[values.length - 1];
-  const currentX = values.length === 1 ? chartWidth / 2 : chartWidth;
-  const currentY = (() => {
-    const normalized =
-      (clampSparklineValue(currentValue, domainMin, domainMax) - domainMin) /
-      (domainMax - domainMin || 1);
-    return chartHeight - normalized * chartHeight;
-  })();
-
   return (
     <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-          Recent path
-        </p>
-        <p className="text-[10px] text-slate-400">{values.length}-read shared scale</p>
-      </div>
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="mt-2 h-7 w-full"
-        role="img"
-        aria-label={`${label} recent movement sparkline`}
-      >
-        <line
-          x1="0"
-          x2={chartWidth}
-          y1={chartHeight / 2}
-          y2={chartHeight / 2}
-          stroke="rgba(71,85,105,0.35)"
-          strokeWidth="1"
-          strokeDasharray="3 3"
-        />
-        <path
-          d={path}
-          fill="none"
-          className={strokeClass}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {path ? (
-          <circle
-            cx={currentX}
-            cy={currentY}
-            r="2.6"
-            className={fillClass}
-          />
-        ) : null}
-      </svg>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+        Threshold gap
+      </p>
+      <p className="mt-1 text-xs font-semibold text-slate-100">{item.watchDistanceLabel}</p>
+      <p className="mt-1 text-[11px] text-slate-400">
+        {item.currentValue === null || item.watchValue === null
+          ? "Waiting on a fresh read."
+          : `Current ${item.valueLabel} vs ${item.watchLabel}.`}
+      </p>
     </div>
+  );
+}
+
+function InputInfluenceThresholdMeter({
+  item,
+  toneFill,
+}: {
+  item: InputInfluenceItem;
+  toneFill: string;
+}) {
+  const meterState = buildThresholdMeterState(item);
+  if (!meterState) {
+    return <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>;
+  }
+
+  return (
+    <>
+      <div
+        className="relative mt-1.5 h-7 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60"
+        aria-hidden="true"
+      >
+        <span
+          className="absolute inset-y-0 bg-emerald-400/12"
+          style={{ left: meterState.safe.left, width: meterState.safe.width }}
+        />
+        <span
+          className="absolute inset-y-0 bg-amber-400/14"
+          style={{ left: meterState.caution.left, width: meterState.caution.width }}
+        />
+        <span
+          className="absolute inset-y-0 bg-rose-400/12"
+          style={{ left: meterState.risk.left, width: meterState.risk.width }}
+        />
+        <span
+          className="absolute inset-y-1 w-px bg-slate-300/90"
+          style={{ left: `${meterState.thresholdPercent}%` }}
+        />
+        <span
+          className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 shadow-[0_0_0_2px_rgba(15,23,42,0.6)] ${toneFill}`}
+          style={{ left: `${meterState.currentPercent}%` }}
+        />
+      </div>
+      <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+        <span>{meterState.leftLabel}</span>
+        <span>Watch line</span>
+        <span>{meterState.rightLabel}</span>
+      </div>
+    </>
   );
 }
 
@@ -169,8 +150,6 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
   if (items.length === 0) {
     return null;
   }
-
-  const sharedSparkDomain = resolveSharedSparkDomain(items);
 
   return (
     <article
@@ -190,12 +169,12 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
         </p>
       </div>
       <div className="rounded-xl border border-slate-700/70 bg-slate-950/55 px-3 py-2 text-[11px] text-slate-300">
-        Shared chart scale keeps the driver cards visually comparable, so the top pressure and nearest watch line stand out immediately.
+        Threshold-anchored meters replace the old shared spark scale, so each driver shows its own
+        watch line honestly instead of pretending unlike units are directly comparable.
       </div>
       <ul className="mt-3 grid gap-3 lg:grid-cols-2">
         {items.map((item, index) => {
           const tone = inputInfluenceToneClasses[item.tone];
-          const thresholdMarker = buildThresholdMarkerState(item.valueLabel, item.watchLabel);
           const forceLabel =
             item.influencePercent >= 32
               ? "High force"
@@ -255,45 +234,14 @@ export function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }
                   </p>
                   <p className="mt-1 text-xs font-semibold text-slate-100">{item.watchLabel}</p>
                 </div>
-                <InputInfluenceSparkline
-                  values={item.sparkline}
-                  tone={item.tone}
-                  label={item.label}
-                  sharedDomain={sharedSparkDomain}
-                />
+                <InputInfluenceThresholdGap item={item} />
               </div>
               <div className="mt-3">
                 <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-                  <span>Current vs trigger</span>
-                  <span>{item.watchLabel}</span>
+                  <span>Current vs watch line</span>
+                  <span>{item.watchDistanceLabel}</span>
                 </div>
-                {thresholdMarker ? (
-                  <>
-                    <div
-                      className="relative mt-1.5 h-6 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60"
-                      aria-hidden="true"
-                    >
-                      <span className="absolute inset-y-0 left-0 w-1/3 bg-emerald-400/10" />
-                      <span className="absolute inset-y-0 left-1/3 w-1/3 bg-amber-400/12" />
-                      <span className="absolute inset-y-0 right-0 w-1/3 bg-rose-400/10" />
-                      <span
-                        className="absolute inset-y-1 w-px bg-slate-300/90"
-                        style={{ left: `${thresholdMarker.thresholdPercent}%` }}
-                      />
-                      <span
-                        className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 shadow-[0_0_0_2px_rgba(15,23,42,0.6)] ${tone.fill}`}
-                        style={{ left: `${thresholdMarker.currentPercent}%` }}
-                      />
-                    </div>
-                    <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
-                      <span>Less pressure</span>
-                      <span>Trigger</span>
-                      <span>More pressure</span>
-                    </div>
-                  </>
-                ) : (
-                  <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>
-                )}
+                <InputInfluenceThresholdMeter item={item} toneFill={tone.fill} />
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800/90" aria-hidden="true">
                 <div

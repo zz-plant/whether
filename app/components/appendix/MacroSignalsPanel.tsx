@@ -91,16 +91,20 @@ export const MacroSignalsPanel = ({
                           <stop offset="100%" stopColor="rgba(251,191,36,0)" />
                         </linearGradient>
                       </defs>
-                      <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
-                      <line x1={0} x2={SPARKLINE_WIDTH} y1={sparkline.medianY} y2={sparkline.medianY} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
-                      <path
-                        d={sparkline.path}
-                        fill="none"
-                        stroke="#fbbf24"
-                        strokeWidth="1.5"
-                        vectorEffect="non-scaling-stroke"
-                        pathLength={100}
-                      />
+                      {sparkline.areas.map((area, areaIndex) => (
+                        <path key={`area-${signal.id}-${areaIndex}`} d={area} fill={`url(#${sparklineId})`} pathLength={100} />
+                      ))}
+                      {sparkline.paths.map((path, pathIndex) => (
+                        <path
+                          key={`path-${signal.id}-${pathIndex}`}
+                          d={path}
+                          fill="none"
+                          stroke="#fbbf24"
+                          strokeWidth="1.5"
+                          vectorEffect="non-scaling-stroke"
+                          pathLength={100}
+                        />
+                      ))}
                       <circle cx={sparkline.latest.x} cy={sparkline.latest.y} r="1.8" fill="#fde68a" />
                     </svg>
                   ) : (
@@ -113,6 +117,16 @@ export const MacroSignalsPanel = ({
                     {sparkline ? (
                       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                         {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, signal.unit)}
+                      </p>
+                    ) : null}
+                    {sparkline?.hasGaps ? (
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Breaks mark missing readings
+                      </p>
+                    ) : null}
+                    {!signal.isLive ? (
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Cache-backed read
                       </p>
                     ) : null}
                     <p>{signal.explanation}</p>

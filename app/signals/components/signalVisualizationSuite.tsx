@@ -36,6 +36,12 @@ type ChartPoint = {
   curveSignal: number | null;
 };
 
+type SegmentedLineSeries = {
+  paths: string[];
+  missingColumns: Array<{ x: number; width: number }>;
+  lastPoint: { x: number; y: number; value: number; index: number } | null;
+};
+
 const formatPercent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
 const formatBp = (value: number | null) => (typeof value === "number" ? `${value >= 0 ? "+" : ""}${value.toFixed(1)} bp` : "n/a");
 const toBp = (value: number | null) => (typeof value === "number" ? value * 100 : null);
@@ -93,21 +99,44 @@ const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] =>
   }));
 };
 
-const linePath = (values: Array<number | null>, width: number, height: number, min: number, max: number) => {
-  const valid = values
-    .map((value, index) => ({ value, index }))
-    .filter((point): point is { value: number; index: number } => typeof point.value === "number");
-  if (valid.length < 2) return "";
-
+const linePath = (
+  values: Array<number | null>,
+  width: number,
+  height: number,
+  min: number,
+  max: number,
+): SegmentedLineSeries => {
   const range = max - min || 1;
   const step = width / Math.max(values.length - 1, 1);
-  return valid
-    .map((point, i) => {
-      const x = point.index * step;
-      const y = height - ((point.value - min) / range) * height;
-      return `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
+  const paths: string[] = [];
+  const missingColumns: Array<{ x: number; width: number }> = [];
+  let currentPath: string[] = [];
+  let lastPoint: SegmentedLineSeries["lastPoint"] = null;
+
+  values.forEach((value, index) => {
+    if (typeof value !== "number") {
+      if (currentPath.length >= 2) {
+        paths.push(currentPath.join(" "));
+      }
+      currentPath = [];
+      missingColumns.push({
+        x: Math.max(0, index * step - step / 2),
+        width: Math.max(step, 4),
+      });
+      return;
+    }
+
+    const x = index * step;
+    const y = height - ((value - min) / range) * height;
+    currentPath.push(`${currentPath.length === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`);
+    lastPoint = { x, y, value, index };
+  });
+
+  if (currentPath.length >= 2) {
+    paths.push(currentPath.join(" "));
+  }
+
+  return { paths, missingColumns, lastPoint };
 };
 
 const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
@@ -138,6 +167,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const [cadence, setCadence] = useState<Cadence>("monthly");
   const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
   const latest = points.at(-1) ?? null;
+  const midPoint = points[Math.floor((points.length - 1) / 2)] ?? latest;
 
   const rateValues = points.flatMap((point) => [point.oneMonth, point.threeMonth, point.twoYear, point.tenYear]);
   const numericRates = rateValues.filter((value): value is number => typeof value === "number");
@@ -152,6 +182,31 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const monthlyScatter = byCadence(yieldCurveSeries, "monthly")
     .map((point) => ({ x: point.twoYear, y: point.spread10Y2Y, key: point.label }))
     .filter((point): point is { x: number; y: number; key: string } => typeof point.x === "number" && typeof point.y === "number");
+  const scatterPath = monthlyScatter.length >= 2
+    ? monthlyScatter
+      .map((point, index) => {
+        const x = toChartX(point.x, rateMin, rateMax, 100);
+        const y = toChartY(point.y, spreadMin, spreadMax, 72);
+        return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+      })
+      .join(" ")
+    : "";
+
+  const oneMonthSeries = linePath(points.map((point) => point.oneMonth), 100, 36, rateMin, rateMax);
+  const threeMonthSeries = linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax);
+  const twoYearSeries = linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax);
+  const tenYearSeries = linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax);
+  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax);
+  const spread2Y3MSeries = linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax);
+  const hasRateGaps =
+    oneMonthSeries.missingColumns.length > 0
+    || threeMonthSeries.missingColumns.length > 0
+    || twoYearSeries.missingColumns.length > 0
+    || tenYearSeries.missingColumns.length > 0;
+  const hasSpreadGaps =
+    spread10Y2YSeries.missingColumns.length > 0
+    || spread2Y3MSeries.missingColumns.length > 0;
+  const zeroLineY = 36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36;
 
   const topShocks = yieldCurveSeries
     .map((point, index) => {
@@ -214,12 +269,33 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               </div>
             </div>
             <svg viewBox="0 0 100 36" className="h-48 w-full" role="img" aria-label="1M, 3M, 2Y and 10Y rate stack">
-              <path d={linePath(points.map((point) => point.oneMonth), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(148 163 184)" strokeWidth="1.4" />
-              <path d={linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(125 211 252)" strokeWidth="1.4" />
-              <path d={linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(45 212 191)" strokeWidth="1.4" />
-              <path d={linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(165 180 252)" strokeWidth="1.4" />
+              {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
+                <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="rgb(148 163 184 / 0.08)" />
+              ))}
+              {oneMonthSeries.paths.map((path, index) => (
+                <path key={`1m-${index}`} d={path} fill="none" stroke="rgb(148 163 184)" strokeWidth="1.4" />
+              ))}
+              {threeMonthSeries.paths.map((path, index) => (
+                <path key={`3m-${index}`} d={path} fill="none" stroke="rgb(125 211 252)" strokeWidth="1.4" />
+              ))}
+              {twoYearSeries.paths.map((path, index) => (
+                <path key={`2y-${index}`} d={path} fill="none" stroke="rgb(45 212 191)" strokeWidth="1.4" />
+              ))}
+              {tenYearSeries.paths.map((path, index) => (
+                <path key={`10y-${index}`} d={path} fill="none" stroke="rgb(165 180 252)" strokeWidth="1.4" />
+              ))}
+              {oneMonthSeries.lastPoint ? <text x="98" y={Math.max(5, oneMonthSeries.lastPoint.y - 6)} textAnchor="end" className="fill-slate-300 text-[5px] uppercase tracking-[0.12em]">1M</text> : null}
+              {threeMonthSeries.lastPoint ? <text x="98" y={Math.max(5, threeMonthSeries.lastPoint.y - 2)} textAnchor="end" className="fill-sky-200 text-[5px] uppercase tracking-[0.12em]">3M</text> : null}
+              {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" className="fill-teal-200 text-[5px] uppercase tracking-[0.12em]">2Y</text> : null}
+              {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" className="fill-indigo-200 text-[5px] uppercase tracking-[0.12em]">10Y</text> : null}
             </svg>
+            <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+              <span>{points[0]?.label ?? "Start"}</span>
+              <span>{midPoint?.label ?? "Mid"}</span>
+              <span>{latest?.label ?? "Latest"}</span>
+            </div>
             <p className="text-xs text-slate-300">1M {formatPercent(latest?.oneMonth ?? null)} · 3M {formatPercent(latest?.threeMonth ?? null)} · 2Y {formatPercent(latest?.twoYear ?? null)} · 10Y {formatPercent(latest?.tenYear ?? null)}</p>
+            {hasRateGaps ? <p className="text-[11px] text-slate-500">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
@@ -228,22 +304,62 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <rect x="0" y="0" width="100" height="72" fill="rgb(2 6 23)" />
               {inDomain(0, rateMin, rateMax) ? <line x1={toChartX(0, rateMin, rateMax, 100)} y1="0" x2={toChartX(0, rateMin, rateMax, 100)} y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
               {inDomain(0, spreadMin, spreadMax) ? <line x1="0" y1={toChartY(0, spreadMin, spreadMax, 72)} x2="100" y2={toChartY(0, spreadMin, spreadMax, 72)} stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
-              {monthlyScatter.map((point) => {
+              {scatterPath ? <path d={scatterPath} fill="none" stroke="rgb(56 189 248 / 0.28)" strokeWidth="0.8" /> : null}
+              {monthlyScatter.map((point, index) => {
                 const x = toChartX(point.x, rateMin, rateMax, 100);
                 const y = toChartY(point.y, spreadMin, spreadMax, 72);
-                return <circle key={point.key} cx={x} cy={y} r="1.8" fill="rgb(56 189 248 / 0.75)" />;
+                const opacity = 0.25 + ((index + 1) / Math.max(monthlyScatter.length, 1)) * 0.65;
+                const isLatestPoint = point.key === monthlyScatter[monthlyScatter.length - 1]?.key;
+                return (
+                  <circle
+                    key={point.key}
+                    cx={x}
+                    cy={y}
+                    r={isLatestPoint ? "2.3" : "1.8"}
+                    fill={`rgb(56 189 248 / ${opacity.toFixed(2)})`}
+                    stroke={isLatestPoint ? "rgb(224 242 254 / 0.9)" : undefined}
+                    strokeWidth={isLatestPoint ? "0.5" : undefined}
+                  />
+                );
               })}
+              {monthlyScatter.length ? (
+                <text
+                  x={Math.min(98, toChartX(monthlyScatter[monthlyScatter.length - 1].x, rateMin, rateMax, 100) + 4)}
+                  y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, spreadMin, spreadMax, 72) - 4)}
+                  textAnchor="end"
+                  className="fill-sky-200 text-[5px] uppercase tracking-[0.12em]"
+                >
+                  latest
+                </text>
+              ) : null}
             </svg>
+            <p className="text-[11px] text-slate-500">Older months fade back; the path shows direction, not just position.</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">
             <PanelTitle title="3) Inversion timeline" subtitle="Spreads vs zero-line; below zero means inversion." />
             <svg viewBox="0 0 100 36" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline">
-              <line x1="0" y1={36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36} x2="100" y2={36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-              <path d={linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax)} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.4" />
-              <path d={linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax)} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.4" />
+              {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
+                <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="rgb(148 163 184 / 0.08)" />
+              ))}
+              <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
+              <text x="2" y={Math.max(6, zeroLineY - 2)} className="fill-slate-400 text-[5px] uppercase tracking-[0.12em]">zero</text>
+              {spread10Y2YSeries.paths.map((path, index) => (
+                <path key={`spread-10-2-${index}`} d={path} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.4" />
+              ))}
+              {spread2Y3MSeries.paths.map((path, index) => (
+                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.4" />
+              ))}
+              {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" className="fill-emerald-200 text-[5px] uppercase tracking-[0.12em]">10Y-2Y</text> : null}
+              {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" className="fill-amber-200 text-[5px] uppercase tracking-[0.12em]">2Y-3M</text> : null}
             </svg>
+            <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+              <span>{points[0]?.label ?? "Start"}</span>
+              <span>{midPoint?.label ?? "Mid"}</span>
+              <span>{latest?.label ?? "Latest"}</span>
+            </div>
             <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
+            {hasSpreadGaps ? <p className="text-[11px] text-slate-500">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">

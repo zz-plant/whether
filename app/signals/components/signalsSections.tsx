@@ -5,6 +5,7 @@ import { RadioGroup } from "@base-ui/react/radio-group";
 import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
+import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
 import {
   buildDiagnosticsExpansionHref,
   buildSignalsAdvancedHref,
@@ -27,44 +28,69 @@ const SIGNAL_LABEL_COPY: Record<string, string> = {
 };
 
 const displaySignalLabel = (label: string) => SIGNAL_LABEL_COPY[label] ?? label;
+const clampPercent = (value: number) => Math.min(96, Math.max(4, value));
 
-const parseComparableSignalValue = (value: string) => {
-  const normalized = value.replace(/,/g, "").trim();
-  const match = normalized.match(/^-?\d+(?:\.\d+)?/);
-  if (!match) {
+const normalizeBulletPosition = (value: number, domain: { min: number; max: number }) =>
+  clampPercent(((value - domain.min) / (domain.max - domain.min || 1)) * 100);
+
+const buildThresholdMeterState = ({
+  currentValue,
+  thresholdValue,
+  chartDomain,
+  watchBuffer,
+  pressureDirection,
+  leftLabel,
+  rightLabel,
+}: {
+  currentValue: number | null;
+  thresholdValue: number | null;
+  chartDomain: { min: number; max: number } | null;
+  watchBuffer: number;
+  pressureDirection: ThresholdPressureDirection;
+  leftLabel: string;
+  rightLabel: string;
+}) => {
+  if (currentValue === null || thresholdValue === null || chartDomain === null) {
     return null;
   }
 
-  return Number.parseFloat(match[0]);
-};
+  const buildSegment = (startValue: number, endValue: number) => {
+    const start = normalizeBulletPosition(startValue, chartDomain);
+    const end = normalizeBulletPosition(endValue, chartDomain);
+    return {
+      left: `${Math.min(start, end)}%`,
+      width: `${Math.max(end - start, 2)}%`,
+    };
+  };
 
-const resolveBulletChartDomain = ({
-  value,
-  threshold,
-  valueLabel,
-  thresholdLabel,
-}: {
-  value: number;
-  threshold: number;
-  valueLabel: string;
-  thresholdLabel: string;
-}) => {
-  const usesScoreScale = valueLabel.includes("/100") || thresholdLabel.includes("/100");
-  if (usesScoreScale) {
-    const min = Math.min(0, value, threshold);
-    const max = Math.max(100, value, threshold);
-    return { min, max };
+  if (pressureDirection === "higher-is-worse") {
+    return {
+      currentPercent: normalizeBulletPosition(currentValue, chartDomain),
+      thresholdPercent: normalizeBulletPosition(thresholdValue, chartDomain),
+      leftLabel,
+      rightLabel,
+      safe: buildSegment(chartDomain.min, Math.min(thresholdValue - watchBuffer, chartDomain.max)),
+      caution: buildSegment(
+        Math.max(chartDomain.min, thresholdValue - watchBuffer),
+        Math.min(thresholdValue, chartDomain.max),
+      ),
+      risk: buildSegment(thresholdValue, chartDomain.max),
+    };
   }
 
-  const min = Math.min(value, threshold);
-  const max = Math.max(value, threshold);
-  const padding = max === min ? Math.max(1, Math.abs(max) * 0.1 || 1) : (max - min) * 0.25;
-
-  return { min: min - padding, max: max + padding };
+  return {
+    currentPercent: normalizeBulletPosition(currentValue, chartDomain),
+    thresholdPercent: normalizeBulletPosition(thresholdValue, chartDomain),
+    leftLabel,
+    rightLabel,
+    risk: buildSegment(chartDomain.min, thresholdValue),
+    caution: buildSegment(
+      Math.max(chartDomain.min, thresholdValue),
+      Math.min(thresholdValue + watchBuffer, chartDomain.max),
+    ),
+    safe: buildSegment(Math.min(thresholdValue + watchBuffer, chartDomain.max), chartDomain.max),
+  };
 };
-
-const normalizeBulletPosition = (value: number, domain: { min: number; max: number }) =>
-  ((value - domain.min) / (domain.max - domain.min || 1)) * 100;
 
 export const SignalsModeSwitcherSection = ({
   activeSignalsView,
@@ -373,7 +399,20 @@ export const SignalsCurrentScoresSection = ({
 }: {
   scoreCardsByType: Record<
     "leading" | "lagging",
-    Array<{ label: string; value: string; threshold: string; description: string }>
+    Array<{
+      label: string;
+      valueLabel: string;
+      currentValue: number | null;
+      thresholdLabel: string;
+      thresholdValue: number | null;
+      description: string;
+      pressureDirection: ThresholdPressureDirection;
+      watchBuffer: number;
+      chartDomain: { min: number; max: number } | null;
+      leftLabel: string;
+      rightLabel: string;
+      watchDistanceLabel: string;
+    }>
   >;
 }) => (
   <section id="current-scores" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
@@ -391,25 +430,15 @@ export const SignalsCurrentScoresSection = ({
           </h3>
           <div className="grid gap-3 lg:grid-cols-3">
             {scoreCardsByType[type].map((card) => {
-              const currentValue = parseComparableSignalValue(card.value);
-              const thresholdValue = parseComparableSignalValue(card.threshold);
-              const bulletDomain =
-                currentValue !== null && thresholdValue !== null
-                  ? resolveBulletChartDomain({
-                    value: currentValue,
-                    threshold: thresholdValue,
-                    valueLabel: card.value,
-                    thresholdLabel: card.threshold,
-                  })
-                  : null;
-              const currentPosition =
-                bulletDomain && currentValue !== null
-                  ? normalizeBulletPosition(currentValue, bulletDomain)
-                  : null;
-              const thresholdPosition =
-                bulletDomain && thresholdValue !== null
-                  ? normalizeBulletPosition(thresholdValue, bulletDomain)
-                  : null;
+              const meterState = buildThresholdMeterState({
+                currentValue: card.currentValue,
+                thresholdValue: card.thresholdValue,
+                chartDomain: card.chartDomain,
+                watchBuffer: card.watchBuffer,
+                pressureDirection: card.pressureDirection,
+                leftLabel: card.leftLabel,
+                rightLabel: card.rightLabel,
+              });
 
               return (
                 <article key={card.label} className="weather-surface space-y-3 p-4">
@@ -417,36 +446,48 @@ export const SignalsCurrentScoresSection = ({
                     <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
                       {displaySignalLabel(card.label)}
                     </dt>
-                    <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
+                    <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.valueLabel}</dd>
                   </dl>
                   <div className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3">
                     <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                       <span>Current vs watch line</span>
-                      <span>{card.threshold}</span>
+                      <span>{card.watchDistanceLabel}</span>
                     </div>
-                    {currentPosition !== null && thresholdPosition !== null ? (
+                    {meterState ? (
                       <>
-                        <div className="relative mt-3 h-6 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/75" aria-hidden="true">
-                          <span className="absolute inset-y-0 left-0 w-1/3 bg-emerald-400/10" />
-                          <span className="absolute inset-y-0 left-1/3 w-1/3 bg-amber-400/12" />
-                          <span className="absolute inset-y-0 right-0 w-1/3 bg-rose-400/10" />
+                        <div className="relative mt-3 h-7 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/75" aria-hidden="true">
+                          <span
+                            className="absolute inset-y-0 bg-emerald-400/12"
+                            style={{ left: meterState.safe.left, width: meterState.safe.width }}
+                          />
+                          <span
+                            className="absolute inset-y-0 bg-amber-400/14"
+                            style={{ left: meterState.caution.left, width: meterState.caution.width }}
+                          />
+                          <span
+                            className="absolute inset-y-0 bg-rose-400/12"
+                            style={{ left: meterState.risk.left, width: meterState.risk.width }}
+                          />
                           <span
                             className="absolute inset-y-1 w-px bg-slate-200/90"
-                            style={{ left: `${thresholdPosition}%` }}
+                            style={{ left: `${meterState.thresholdPercent}%` }}
                           />
                           <span
                             className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 bg-sky-300 shadow-[0_0_0_2px_rgba(15,23,42,0.7)]"
-                            style={{ left: `${currentPosition}%` }}
+                            style={{ left: `${meterState.currentPercent}%` }}
                           />
                         </div>
                         <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
-                          <span>Less pressure</span>
+                          <span>{meterState.leftLabel}</span>
                           <span>Watch line</span>
-                          <span>More pressure</span>
+                          <span>{meterState.rightLabel}</span>
                         </div>
+                        <p className="mt-2 text-[11px] text-slate-400">
+                          Watch line: <span className="text-slate-200">{card.thresholdLabel}</span>
+                        </p>
                       </>
                     ) : (
-                      <p className="mt-2 text-xs text-slate-400">Watch line: {card.threshold}</p>
+                      <p className="mt-2 text-xs text-slate-400">Watch line: {card.thresholdLabel}</p>
                     )}
                   </div>
                   <p className="text-sm text-slate-300">{card.description}</p>
