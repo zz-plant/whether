@@ -96,7 +96,7 @@ export function GuidedTranslationPanels({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Selected team view</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Team view</p>
                 <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
               </div>
               <Link
@@ -119,7 +119,7 @@ export function GuidedTranslationPanels({
           </article>
 
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Stage-specific guidance</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">How this changes by stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {selectedStakeholder.stageSpecificContent.map((entry) => {
                 const stage = findStageGuide(entry.stageSlug);
@@ -164,7 +164,7 @@ export function GuidedTranslationPanels({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Selected stage view</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Stage view</p>
                 <h3 className="text-lg font-semibold text-slate-100">{selectedStage.title}</h3>
               </div>
               <Link
@@ -193,7 +193,7 @@ export function GuidedTranslationPanels({
           </article>
 
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Role-specific guidance for this stage</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">How each team should read this stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {relatedStakeholderGuides.map((guide) => (
                 <li key={guide.slug} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
@@ -230,7 +230,7 @@ export function GuidedTranslationPanels({
 
       <details className="weather-panel weather-auto-chevron space-y-3 px-5 py-5">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          {showStageLibrary ? "Browse the rest of the stage list" : `Open the rest of the stage list (${stageGuides.length})`}
+          {showStageLibrary ? "Browse the other stages" : `Open the other stages (${stageGuides.length})`}
         </summary>
         <div className="mt-4 space-y-4">
           {showStageLibrary ? (

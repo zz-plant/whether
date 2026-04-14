@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params;
   return {
     ...buildPageMetadata({
-      title: `Decision Tools: ${titleCase(slug)}`,
+      title: `Decision help: ${titleCase(slug)}`,
       description: "A practical entry point into the right toolkit and supporting context.",
       path: `/decide/${slug}`,
-      imageAlt: `Decision Tools ${titleCase(slug)}`,
+      imageAlt: `Decision help ${titleCase(slug)}`,
     }),
     robots: noindexRobots,
   };

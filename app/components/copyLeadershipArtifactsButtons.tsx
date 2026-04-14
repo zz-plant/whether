@@ -20,10 +20,10 @@ type PrimaryActionType = "copy_weekly_brief";
 type CopyTarget =
   | "Board note"
   | "Meeting pack"
-  | "Explainer brief"
-  | "Call snapshot"
-  | "Delta brief"
-  | "Weekly brief"
+  | "Plain-English update"
+  | "Quick snapshot"
+  | "What changed only"
+  | "Leadership update"
   | "Board summary"
   | "Citation";
 
@@ -125,15 +125,15 @@ export function CopyLeadershipArtifactsButtons({
     weeklyOperatorBrief,
     citation,
   });
-  const primaryBriefTarget = artifactMode === "explainer" ? "Explainer brief" : "Weekly brief";
+  const primaryBriefTarget = artifactMode === "explainer" ? "Plain-English update" : "Leadership update";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
     : weeklyOperatorBrief;
   const activeModeLabel = artifactModeLabels[artifactMode];
   const activeModeNote =
     artifactMode === "explainer"
-      ? "The same recommendation, written in plainer language."
-      : "Best for most leadership updates.";
+      ? "The same recommendation, written with less shorthand and less market language."
+      : "Best for weekly leadership updates, staff notes, and recurring operating reviews.";
 
   const handleNativeShare = async () => {
     if (shareState === "sharing") {
@@ -197,24 +197,24 @@ export function CopyLeadershipArtifactsButtons({
       : shareState === "error"
         ? "Retry share"
         : artifactMode === "explainer"
-          ? "Share explainer brief"
-          : "Share weekly brief";
+          ? "Share plain-English update"
+          : "Share leadership update";
 
   return (
     <div className="space-y-3">
       <article className="rounded-xl border border-slate-700/70 bg-[linear-gradient(180deg,rgba(14,165,233,0.08),rgba(2,6,23,0.8))] px-3 py-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Recommended path</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Default send</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Most common
+            Default
           </span>
         </div>
 
         <p className="mt-2 text-[11px] leading-5 text-slate-300">
-          {activeModeNote} Shared links keep the same version of the brief open.
+          {activeModeNote} Shared links keep the same version of the update open.
         </p>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
@@ -244,15 +244,15 @@ export function CopyLeadershipArtifactsButtons({
                 <span>{artifactModeLabels[mode]}</span>
                 <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
                   {mode === "explainer"
-                    ? "Plain-English version for teams with different levels of macro familiarity."
-                    : "Concise version for leadership updates and weekly planning."}
+                    ? "For mixed audiences or anyone who does not know the model vocabulary."
+                    : "For leadership updates, weekly planning, and rooms that already know the format."}
                 </span>
               </button>
             );
           })}
         </div>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Primary weekly brief actions">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Primary update actions">
           <ActionButton
             variant="primary"
             type="button"
@@ -279,13 +279,13 @@ export function CopyLeadershipArtifactsButtons({
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick variants</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Shorter versions</p>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Shorter versions
+            Faster read
           </span>
         </div>
         <p className="mt-2 text-[11px] leading-5 text-slate-400">
-          Use the delta brief when people only need what changed. Use the call snapshot when you need the shortest version.
+          Use the change-only version when people only need the weekly delta. Use the snapshot when you need the shortest possible read.
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <ActionButton
@@ -293,24 +293,24 @@ export function CopyLeadershipArtifactsButtons({
             type="button"
             onClick={() => {
               trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(deltaOnlyBrief, "Delta brief");
+              copyToClipboard(deltaOnlyBrief, "What changed only");
             }}
             disabled={isCopying}
             aria-busy={isCopying}
           >
-            {copyLabel("Delta brief", "Copy delta brief")}
+            {copyLabel("What changed only", "Copy what changed only")}
           </ActionButton>
           <ActionButton
             variant="secondary"
             type="button"
             onClick={() => {
               trackFirstActionConversion("copy_weekly_brief");
-              copyToClipboard(weeklyCallSnapshot, "Call snapshot");
+              copyToClipboard(weeklyCallSnapshot, "Quick snapshot");
             }}
             disabled={isCopying}
             aria-busy={isCopying}
           >
-            {copyLabel("Call snapshot", "Copy call snapshot")}
+            {copyLabel("Quick snapshot", "Copy quick snapshot")}
           </ActionButton>
         </div>
         <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400" role="status" aria-live="polite">
@@ -328,15 +328,15 @@ export function CopyLeadershipArtifactsButtons({
       <article className="rounded-xl border border-slate-700/70 bg-slate-950/80 px-3 py-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Planning owns full packaging</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">Board, governance, and exception formats moved to Planning.</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a heavier package?</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">Board, governance, and exception formats live in Planning.</p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             Deeper export
           </span>
         </div>
         <p className="mt-2 text-[11px] leading-5 text-slate-400">
-          Use home for the default weekly brief. Open Planning only when you need board-ready packaging, citation-heavy exports, or a company-specific exception.
+          Use home for the default update. Open Planning only when you need board-ready packaging, citation-heavy exports, or a company-specific exception.
         </p>
         {fallbackActive ? (
           <p className="mt-2 text-[10px] leading-5 text-amber-200">

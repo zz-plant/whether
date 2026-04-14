@@ -133,16 +133,16 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
 
   return [
     "",
-    "Startup environment — weekly call:",
-    `• Posture: ${modeled.postureWithStageLabel ?? "Current posture"}`,
+    "Current environment:",
+    `• Environment: ${modeled.postureWithStageLabel ?? "Current read"}`,
     `• Trend: ${(options?.trendLabel ?? "Stable").toUpperCase()}`,
-    `• Distance to regime change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
-    `• Regime shift watch: ${options?.transitionWatch ?? "OFF"}`,
+    `• Distance to change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
+    `• Change watch: ${options?.transitionWatch ?? "OFF"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Change course if: ${condition}`),
-    `• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.`,
-    ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
+    `• Check again: CEO + finance lead at the Mon/Thu operating review.`,
+    ...(trustMarkers.length > 0 ? [`• Use caution: ${trustMarkers.join(" · ")}`] : []),
     ...actionStrip,
   ];
 };
@@ -164,9 +164,9 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
 
   return [
     "",
-    `Interpretation context: ${layer.label} (${layer.view})`,
-    `Interpretation summary: ${layer.summary}`,
-    "Interpretation trust: translation layer only; canonical posture/confidence/thresholds unchanged.",
+    `View for ${layer.label}:`,
+    `Summary: ${layer.summary}`,
+    "Note: this is a reading aid only; the main recommendation, confidence, and stop lines do not change.",
     ...boundedBullets.map((bullet) => `• ${bullet}`),
     ...financialSummary.map((line) => `• ${line}`),
   ];
@@ -196,7 +196,7 @@ const buildDecisionTransmissionRiskBlock = (assessment: RegimeAssessment, option
 
   return [
     "",
-    "Decision transmission check:",
+    "Quick confidence check:",
     `• Confidence: ${confidenceLine}`,
     `• Why this could be wrong: ${whyCouldBeWrong}`,
     "• Change-course trigger: see Change course if and supporting signals above.",
@@ -209,7 +209,7 @@ const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
 
   return [
     "",
-    "Historical analogs:",
+    "Closest past periods:",
     ...analogs.slice(0, 3).map((analog) =>
       `• ${analog.date} · ${(analog.similarityScore * 100).toFixed(0)}% match · ${analog.implication}`
     ),
@@ -242,8 +242,8 @@ export const buildBoardSlideBullets = (
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? assessment.regime}`,
-  `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
+  `Environment: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? assessment.regime}`,
+  `Market pressure ${assessment.scores.tightness} / Expansion support ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...buildBoundedDecisionLines(assessment, options),
   ...buildInterpretationLayerBlock(options),
@@ -269,20 +269,20 @@ export const buildSlackBrief = (
   const financialImplications = buildFinancialImplicationsBlock(assessment);
 
   return [
-    `Whether Report Brief — ${treasury.record_date}`,
-    `Posture: ${modeled.postureWithStageLabel ?? assessment.regime}`,
-    `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
+    `Whether weekly update — ${treasury.record_date}`,
+    `Environment: ${modeled.postureWithStageLabel ?? assessment.regime}`,
+    `Market pressure: ${assessment.scores.tightness} | Expansion support: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
-    "Macro signals:",
+    "Signal check:",
     ...macroLines,
     "",
-    "Bounded decision (current call / action now / pause if / change course if):",
+    "Decision:",
     ...decisionHighlights,
     ...buildDecisionTransmissionRiskBlock(assessment, options),
     "",
-    "Constraints:",
+    "Operating limits:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
@@ -291,7 +291,7 @@ export const buildSlackBrief = (
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),
     "",
-    "Citations:",
+    "Sources:",
     ...citations,
     "",
     ...buildExportStamp(treasury, "Score-based posture confidence"),
@@ -315,14 +315,14 @@ export const buildConstraintHeadlines = (
   treasury: TreasuryData,
 ) => {
   const regimeLabel = formatRegimeLabel(assessment.regime);
-  const headline = `${regimeLabel}: capital tightness ${assessment.scores.tightness}/100 with bravery ${assessment.scores.riskAppetite}/100.`;
+  const headline = `${regimeLabel}: market pressure ${assessment.scores.tightness}/100 with expansion support ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.map((item) => `• ${item}`);
 
   return [
     `Whether Report Headlines — ${treasury.record_date}`,
     headline,
     "",
-    "Execution constraints:",
+    "Operating limits:",
     ...constraints,
     "",
     `Source: ${treasury.source}`,
@@ -336,10 +336,10 @@ export const buildCallCitation = (
   treasury: TreasuryData,
   options?: ExportLayerOptions,
 ) => [
-  `Whether call — ${treasury.record_date}`,
-  `Posture: ${options?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
+  `Whether weekly update — ${treasury.record_date}`,
+  `Environment: ${options?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,
-  `Source: ${treasury.source}`,
+  `Source note: ${treasury.source}`,
   ...buildInterpretationLayerBlock(options),
 ].join("\n");

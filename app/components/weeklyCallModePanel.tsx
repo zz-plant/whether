@@ -132,10 +132,6 @@ export function WeeklyCallModePanel({
   const compactTrustToneClass = needsTrustWarning
     ? "border-amber-400/25 bg-amber-500/8"
     : "border-emerald-400/25 bg-emerald-500/8";
-  const signedBoldnessDelta = `${weeklyLeadershipSummary.boldnessDelta >= 0 ? "+" : ""}${weeklyLeadershipSummary.boldnessDelta}`;
-  const signedBoldnessPointsLabel = weeklyLeadershipSummary.boldnessDelta === 0
-    ? "No change vs last week"
-    : `${signedBoldnessDelta} pts vs last week`;
   const shouldShowReadinessCallout = needsTrustWarning || inlineTrustTone !== "stable" || Boolean(trustReason);
   const readinessSummaryToneClass = decisionReadiness.tone === "stable"
     ? "text-emerald-100"
@@ -153,6 +149,11 @@ export function WeeklyCallModePanel({
   const supportingDrivers = primaryDriver ? driverHighlights.slice(1, 3) : driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
   const deferredRevisitItems = revisitDecisions ? revisitQueue.slice(1) : [];
+  const aggressionDirectionLabel = weeklyLeadershipSummary.boldnessDelta > 0
+    ? "More aggressive"
+    : weeklyLeadershipSummary.boldnessDelta < 0
+      ? "More defensive"
+      : "No change";
   const formatBackdropValue = (
     value: string,
     kind: "hiring" | "expansion" | "raise",
@@ -177,25 +178,25 @@ export function WeeklyCallModePanel({
   };
   const postureSummaryCards = [
     {
-      label: "How aggressive to be",
-      value: `${weeklyLeadershipSummary.boldnessScore}/100`,
-      detail: signedBoldnessPointsLabel,
+      label: "Aggression vs last week",
+      value: aggressionDirectionLabel,
+      detail: `${weeklyLeadershipSummary.boldnessScore}/100 now`,
       className: compactMetricCardBase,
     },
     {
-      label: "Hiring market",
+      label: "Hiring backdrop",
       value: formatBackdropValue(weeklyLeadershipSummary.hiringWindow, "hiring"),
       detail: "External backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Expansion market",
+      label: "Expansion backdrop",
       value: formatBackdropValue(weeklyLeadershipSummary.expansionWindow, "expansion"),
       detail: "External backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Raise market",
+      label: "Funding backdrop",
       value: formatBackdropValue(weeklyLeadershipSummary.raiseWindow, "raise"),
       detail: "External backdrop",
       className: compactMetricCardBase,
@@ -313,17 +314,32 @@ export function WeeklyCallModePanel({
                   </div>
                 </article>
 
+                {(revisitDecisions || flipSupport.length > 0) ? (
                 <article className={`rounded-[1.1rem] border px-3 py-3 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.7)] ${revisitToneClass}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">Decisions to reopen</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em]">What to watch this week</p>
                     {revisitQueue.length > 0 ? (
                       <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
                         {revisitQueue.length} decisions
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-2 text-base font-semibold leading-6">{revisitLabel}</p>
+                  <p className="mt-2 text-base font-semibold leading-6">
+                    {revisitDecisions ? revisitLabel : "No major reopen items right now."}
+                  </p>
                   {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
+                  {flipSupport.length > 0 ? (
+                    <div className="mt-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">This would change the call</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {flipSupport.map((label) => (
+                          <span key={label} className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
 
                   {featuredRevisitItem ? (
                     <div className="mt-4 border-t border-slate-800/70 pt-3">
@@ -371,18 +387,6 @@ export function WeeklyCallModePanel({
                     </details>
                   ) : null}
                 </article>
-
-                {flipSupport.length > 0 ? (
-                  <article className="rounded-[1.1rem] border border-sky-400/20 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-22px_rgba(56,189,248,0.2)]">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What would change this</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {flipSupport.map((label) => (
-                        <span key={label} className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
                 ) : null}
               </aside>
             </div>
@@ -407,7 +411,7 @@ export function WeeklyCallModePanel({
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Sharing help</p>
                   <h3 className="text-sm font-semibold text-slate-100">Send this update</h3>
                   <p className="text-xs leading-5 text-slate-300">
-                    Decide first. Use the weekly brief above as the default wording, then pick the format the room needs.
+                    Decide first. Use the leadership update above as the default wording, then pick the format the room needs.
                   </p>
                 </div>
                 <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
@@ -418,9 +422,9 @@ export function WeeklyCallModePanel({
               <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.86fr)]">
                 <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Default share</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-100">Weekly brief</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">Leadership update</p>
                   <p className="mt-2 text-xs leading-5 text-slate-300">
-                    Includes the call, action now, pause if, and change course if. Use the shorter variants only when the room already knows the call.
+                    Includes the call, action now, pause if, and change course if. Use the shorter versions only when the room already knows the recommendation.
                   </p>
                   {actions ? (
                     <div className="mt-3">

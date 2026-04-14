@@ -39,8 +39,8 @@ export const literacyAssistStorageKeys = {
 } as const satisfies Record<"focus" | LiteracyAssistMode | "artifactMode", string>;
 
 export const artifactModeLabels: Record<ArtifactMode, string> = {
-  operator: "Weekly brief",
-  explainer: "Explainer brief",
+  operator: "Leadership update",
+  explainer: "Plain-English update",
 };
 
 export const literacyFocusLabels: Record<LiteracyAssistMode, string> = {

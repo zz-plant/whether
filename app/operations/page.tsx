@@ -345,8 +345,8 @@ export default async function OperationsPage({
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Choose a weekly brief, an explainer brief, or a board-ready version.",
-            summary: "Start with the weekly brief, then switch to the explainer when people want more context.",
+            description: "Choose a leadership update, a plain-English update, or a board-ready version.",
+            summary: "Start with the leadership update, then switch to the plain-English version when people want more context.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",
@@ -363,7 +363,7 @@ export default async function OperationsPage({
                   id="ops-export-briefs-panel"
                   label="Share"
                   title="Share-ready brief"
-                  description="Start with the weekly brief. Use the explainer when people want more context."
+                  description="Start with the leadership update. Use the plain-English version when people want more context."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel
@@ -444,11 +444,11 @@ export default async function OperationsPage({
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Stop here unless one bounded question remains</p>
           <h2 id="ops-edge-case-gate-title" className="text-lg font-semibold text-slate-100">Escalate only when the weekly plan is already clear</h2>
-          <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open Decision Tools only when one owner-specific or situation-specific call still needs a bounded answer after this review.</p>
+          <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open decision help only when one owner-specific or situation-specific call still needs a bounded answer after this review.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-            Open Decision Tools
+            Open decision help
           </Link>
           <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Back to sharing options
