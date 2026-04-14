@@ -69,8 +69,8 @@ describe("home route render contract", () => {
       </>,
     );
 
-    const canonicalOrders = html.match(/Weekly decision transmission order/g) ?? [];
-    const shareArtifacts = html.match(/Share-ready artifact/g) ?? [];
+    const canonicalOrders = html.match(/aria-label=\"Weekly decision order\"/g) ?? [];
+    const shareArtifacts = html.match(/id=\"share-ready-artifact\"/g) ?? [];
     assert.equal(canonicalOrders.length, 1);
     assert.equal(shareArtifacts.length, 1);
   });

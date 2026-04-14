@@ -9,6 +9,94 @@ import type { ReportData, ReportDataFallback } from "../reportData";
 import type { buildTrustStatus } from "../trustStatus";
 import type { HomePageDiagnosticsLane, HomePageWorkspaceModel } from "./contracts";
 
+const resolvePrimarySituationPath = ({
+  direction,
+  confidenceLabel,
+}: {
+  direction: HomePageDiagnosticsLane["weeklyMovement"]["direction"];
+  confidenceLabel: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidenceLabel"];
+}) => {
+  if (direction === "defensive") {
+    return situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0];
+  }
+
+  if (direction === "expansionary" && confidenceLabel === "HIGH") {
+    return situationUseCaseDefinitions.find((entry) => entry.slug === "pricing-change") ?? situationUseCaseDefinitions[0];
+  }
+
+  return situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0];
+};
+
+const resolveApprovalDetail = ({
+  regimeKey,
+  confidenceLabel,
+  revisitDecisions,
+  trustStatusTone,
+  trustMarkerTone,
+  sourceDegraded,
+}: {
+  regimeKey: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["regimeKey"];
+  confidenceLabel: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidenceLabel"];
+  revisitDecisions: boolean;
+  trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+  trustMarkerTone: "stable" | "warning" | "historical";
+  sourceDegraded: boolean;
+}) => {
+  if (revisitDecisions) {
+    return "Revisit last week's approvals before you add fixed cost or sequence new bets.";
+  }
+
+  if (trustStatusTone !== "stable" || trustMarkerTone !== "stable" || sourceDegraded || confidenceLabel === "LOW") {
+    return "Stage the current plan behind the active stop line until trust and confidence improve.";
+  }
+
+  if (regimeKey === "EXPANSION") {
+    return "Press proven growth lanes this week and keep the stop line visible if conditions change.";
+  }
+
+  if (regimeKey === "VOLATILE") {
+    return "Advance the highest-conviction reversible moves this week and keep the stop line visible.";
+  }
+
+  if (regimeKey === "DEFENSIVE") {
+    return "Approve the highest-payback moves this week's call supports and keep the stop line visible.";
+  }
+
+  return "Limit approvals to cash-critical work until the stop line clears.";
+};
+
+const resolveRevisitHeadline = ({
+  revisitDecisions,
+  trustStatusTone,
+  confidenceLabel,
+}: {
+  revisitDecisions: boolean;
+  trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+  confidenceLabel: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidenceLabel"];
+}) => {
+  if (revisitDecisions) {
+    return "YES — revisit this week's approvals now.";
+  }
+
+  if (trustStatusTone !== "stable" || confidenceLabel === "LOW") {
+    return "NO — keep this week's plan staged behind the current stop line.";
+  }
+
+  return "NO — the current weekly plan can stay on track.";
+};
+
+const resolvePrimaryPathDetail = (slug: string) => {
+  if (slug === "pricing-change") {
+    return "Translate the stronger read into one concrete growth lever before widening scope elsewhere.";
+  }
+
+  if (slug === "avoid-premature-scaling") {
+    return "Use the most concrete downside path first before widening into broader browse.";
+  }
+
+  return "Use the most concrete operating path first before widening into broader browse.";
+};
+
 const buildSourceCoverageLine = (rows: ReportData["sourceHealth"] | ReportDataFallback["sourceHealth"]) => {
   const liveRows = rows.filter((row) => row.mode === "live").map((row) => row.sourceName);
   const snapshotRows = rows.filter((row) => row.mode === "snapshot").map((row) => row.sourceName);
@@ -75,9 +163,10 @@ export const buildHomeWorkspaceModel = ({
   const financeSummaryItems = actionStripItems.filter((item) =>
     item.lever === "investment-pace" || item.lever === "risk-tolerance"
   );
-  const currentSituationPath = diagnosticsLane.weeklyMovement.direction === "defensive"
-    ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
-    : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
+  const currentSituationPath = resolvePrimarySituationPath({
+    direction: diagnosticsLane.weeklyMovement.direction,
+    confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
+  });
   const toolkitShortcuts = decideHomeRecommendedToolkitSlugs
     .map((slug) => findToolkitDefinition(slug))
     .filter((toolkit): toolkit is NonNullable<typeof toolkit> => Boolean(toolkit))
@@ -125,9 +214,11 @@ export const buildHomeWorkspaceModel = ({
           modeLabel: formatSourceModeLabel(row.mode),
           freshnessStatus: formatSourceFreshnessLabel(row),
         })),
-      revisitHeadline: diagnosticsLane.revisitDecisions
-        ? "YES — revisit this week's approvals now."
-        : "NO — hold the current weekly baseline.",
+      revisitHeadline: resolveRevisitHeadline({
+        revisitDecisions: diagnosticsLane.revisitDecisions,
+        trustStatusTone,
+        confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
+      }),
       revisitDetail: diagnosticsLane.guardrail,
       flipHeadline: reportData.flipThreshold,
       flipDetail: weeklyDecisionCardModel.decision.reversalTrigger,
@@ -148,9 +239,14 @@ export const buildHomeWorkspaceModel = ({
     operations: {
       continueHref: "/operations#ops-monthly-action-summary",
       approvalHeadline: weeklyDecisionCardModel.decision.immediateDecision,
-      approvalDetail: diagnosticsLane.revisitDecisions
-        ? "Revisit last week's approvals before you add fixed cost or sequence new bets."
-        : "Hold the current weekly baseline unless a flip condition or trust warning fires.",
+      approvalDetail: resolveApprovalDetail({
+        regimeKey: weeklyDecisionCardModel.status.regimeKey,
+        confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
+        revisitDecisions: diagnosticsLane.revisitDecisions,
+        trustStatusTone,
+        trustMarkerTone,
+        sourceDegraded,
+      }),
       topGuardrails: actionStripItems.slice(0, 3).map((item) => ({
         key: item.lever,
         label: item.label,
@@ -170,7 +266,7 @@ export const buildHomeWorkspaceModel = ({
       primaryPath: {
         href: `/decide/${currentSituationPath.slug}`,
         title: currentSituationPath.title,
-        detail: "Use the most concrete operating path first before widening into broader browse.",
+        detail: resolvePrimaryPathDetail(currentSituationPath.slug),
         kicker: "Recommended unresolved path",
       },
       fallbackUtility: {

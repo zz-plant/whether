@@ -155,7 +155,7 @@ export default async function OperationsPage({
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : liveNeedsCaution
         ? "Stage only reversible decisions until reliability improves or a stronger live refresh lands."
-        : "Evidence feed is live; use it to confirm playbook moves and decision shields.";
+        : "Evidence feed is live; carry the current plan forward and keep the stop lines visible.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback || liveNeedsCaution
@@ -207,7 +207,7 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Turn the weekly call into a few explicit decisions and keep each move reversible.",
+        call: "Turn the weekly call into a few explicit decisions and keep the stop lines visible.",
         doNow: [
           actionNowShort,
           actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",

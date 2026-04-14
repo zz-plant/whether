@@ -21,6 +21,35 @@ export async function HomeWorkspaceBands({
   const primaryExportAction = workspaceModel.operations.exportActions[0];
   const replayPreview = workspaceModel.replay.preview[0];
   const toolkitShortcut = workspaceModel.translate.toolkitShortcuts[0];
+  const deeperPaths = [
+    {
+      href: workspaceModel.translate.primaryPath.href as Route,
+      kicker: "Resolve one question",
+      title: "Open the most concrete path first",
+      detail: "Use this only after the weekly call is clear.",
+      icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
+      toneClass: "text-amber-200",
+      hoverClass: "hover:border-amber-300/35",
+    },
+    {
+      href: workspaceModel.replay.openFullHref as Route,
+      kicker: "Review a past week",
+      title: replayPreview?.label ?? "Replay the baseline",
+      detail: replayPreview?.summary ?? workspaceModel.replay.summary,
+      icon: <HistoryIcon className="h-3.5 w-3.5" />,
+      toneClass: "text-violet-200",
+      hoverClass: "hover:border-violet-300/35",
+    },
+    {
+      href: (toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route,
+      kicker: "Use a tool",
+      title: toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title,
+      detail: toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail,
+      icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
+      toneClass: "text-slate-300",
+      hoverClass: "hover:border-slate-500/55",
+    },
+  ] as const;
 
   return (
     <div className="space-y-5">
@@ -39,7 +68,23 @@ export async function HomeWorkspaceBands({
               Use this only after the weekly call is settled. Keep the rest of the page in support mode.
             </p>
           </div>
-          <div className="weather-panel-header-aside">
+        </div>
+
+        <article className="weather-ritual-card px-4 py-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-3xl space-y-2">
+              <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
+                <CheckIcon className="h-3.5 w-3.5" />
+                <span>Primary approval lane</span>
+              </div>
+              <p className="text-base font-semibold leading-7 text-slate-100">
+                {workspaceModel.operations.approvalHeadline}
+              </p>
+              <p className="text-sm leading-6 text-slate-300">
+                {workspaceModel.operations.approvalDetail}
+              </p>
+            </div>
+
             <Link
               href={workspaceModel.operations.continueHref as Route}
               className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
@@ -48,56 +93,28 @@ export async function HomeWorkspaceBands({
               <span>Make the plan</span>
             </Link>
           </div>
-        </div>
 
-        <div className="grid gap-3">
-          <article className="weather-ritual-card px-4 py-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
-                  <CheckIcon className="h-3.5 w-3.5" />
-                  <span>Approval packet</span>
-                </div>
-                <p className="text-[11px] leading-5 text-slate-300">
-                  Treat the weekly call as the operating boundary, then approve one plan against it.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
-                <CheckIcon className="h-3.5 w-3.5" />
-                <span>Approve now</span>
-              </div>
-              <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-100">
-                Primary
-              </span>
+          <div className="mt-4 grid gap-2 lg:grid-cols-3">
+            <div className="weather-transmission-segment px-3 py-3">
+              <p className="text-[11px] font-medium text-amber-200">Stop line</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">
+                {primaryGuardrail?.label ?? "Hold the current baseline"}
+              </p>
             </div>
-            <p className="mt-3 text-base font-semibold leading-7 text-slate-100">
-              {workspaceModel.operations.approvalHeadline}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              {workspaceModel.operations.approvalDetail}
-            </p>
-            <div className="mt-4 grid gap-2 lg:grid-cols-3">
-              <div className="weather-transmission-segment px-3 py-3">
-                <p className="text-[11px] font-medium text-amber-200">Stop line</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">
-                  {primaryGuardrail?.label ?? "Hold the current baseline"}
-                </p>
-              </div>
-              <div className="weather-transmission-segment px-3 py-3">
-                <p className="text-[11px] font-medium text-sky-200">Share next</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">
-                  {primaryExportAction?.label ?? "Open share brief"}
-                </p>
-              </div>
-              <div className="weather-transmission-segment px-3 py-3">
-                <p className="text-[11px] font-medium text-emerald-200">Weekly rhythm</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">
-                  Approve only the moves this week can support.
-                </p>
-              </div>
+            <div className="weather-transmission-segment px-3 py-3">
+              <p className="text-[11px] font-medium text-sky-200">Share next</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">
+                {primaryExportAction?.label ?? "Open share brief"}
+              </p>
             </div>
-          </article>
-        </div>
+            <div className="weather-transmission-segment px-3 py-3">
+              <p className="text-[11px] font-medium text-emerald-200">Weekly rhythm</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100">
+                Carry the main action forward while the stop line stays visible.
+              </p>
+            </div>
+          </div>
+        </article>
       </section>
 
       <section
@@ -109,10 +126,10 @@ export async function HomeWorkspaceBands({
           <div className="weather-panel-header-copy">
             <p className="text-[11px] font-medium text-sky-200">Only if challenged</p>
             <h2 id="audit-this-call-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
-              Need proof or another path?
+              Need proof?
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Keep this row subordinate to the weekly call. Open only when someone still needs proof, trust, or a deeper tool.
+              Open this only when someone still needs evidence, trust, or a deeper path.
             </p>
           </div>
         </div>
@@ -128,7 +145,7 @@ export async function HomeWorkspaceBands({
             </div>
             <p className="mt-3 text-sm font-semibold group-hover:text-sky-100">Why the read moved</p>
             <p className="mt-2 text-sm leading-6 text-slate-300">
-              {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay before changing the call."}
+              {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay when you need to challenge the call."}
             </p>
           </Link>
 
@@ -147,59 +164,37 @@ export async function HomeWorkspaceBands({
           </Link>
         </div>
 
-        <div id="historical-replay-workspace" className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[11px] font-medium text-violet-200">
-              One deeper path
-            </p>
-            <p className="text-[11px] text-slate-400">Open only when the weekly call is already clear.</p>
-          </div>
-          <div className="grid gap-3 lg:grid-cols-3">
-            <Link
-              href={workspaceModel.translate.primaryPath.href as Route}
-              className="weather-route-card weather-route-card-proof group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-amber-300/35"
-            >
-              <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
-                <LayoutGridIcon className="h-3.5 w-3.5" />
-                <span>Resolve one question</span>
-              </div>
-              <p className="mt-3 text-sm font-semibold group-hover:text-amber-100">Open the most concrete path first</p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">Use this only after the weekly call is clear.</p>
-            </Link>
+        <details
+          id="historical-replay-workspace"
+          className="weather-auto-chevron rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
+        >
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+            <span className="min-w-0">
+              <span className="block text-[11px] font-medium text-violet-200">More paths</span>
+              <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper path only if the weekly call is already clear.</span>
+            </span>
+            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              Optional
+            </span>
+          </summary>
 
-            <Link
-              href={workspaceModel.replay.openFullHref as Route}
-              className="weather-route-card weather-route-card-replay group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-violet-300/35"
-            >
-              <div className="flex items-center gap-2 text-[11px] font-medium text-violet-200">
-                <HistoryIcon className="h-3.5 w-3.5" />
-                <span>Review a past week</span>
-              </div>
-              <p className="mt-3 text-sm font-semibold group-hover:text-violet-100">
-                {replayPreview?.label ?? "Replay the baseline"}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                {replayPreview?.summary ?? workspaceModel.replay.summary}
-              </p>
-            </Link>
-
-            <Link
-              href={(toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route}
-              className="weather-route-card weather-route-card-utility group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors hover:border-slate-500/55"
-            >
-              <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300">
-                <LayoutGridIcon className="h-3.5 w-3.5" />
-                <span>Use a tool</span>
-              </div>
-              <p className="mt-3 text-sm font-semibold group-hover:text-slate-50">
-                {toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                {toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail}
-              </p>
-            </Link>
+          <div className="mt-3 grid gap-3 lg:grid-cols-3">
+            {deeperPaths.map((path) => (
+              <Link
+                key={`${path.kicker}-${path.href}`}
+                href={path.href}
+                className={`weather-route-card group min-h-[44px] rounded-[1rem] border border-slate-800/55 px-4 py-4 text-slate-100 transition-colors ${path.hoverClass}`}
+              >
+                <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
+                  {path.icon}
+                  <span>{path.kicker}</span>
+                </div>
+                <p className="mt-3 text-sm font-semibold text-slate-100">{path.title}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{path.detail}</p>
+              </Link>
+            ))}
           </div>
-        </div>
+        </details>
       </section>
     </div>
   );

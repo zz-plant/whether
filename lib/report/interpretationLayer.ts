@@ -139,16 +139,16 @@ export const buildInterpretationLayer = ({
     const primaryOverlay = homeBriefModel.macroOverlay.slice(0, 1);
     const sectorShift = primaryOverlay[0]
       ? `${primaryOverlay[0].label}: ${primaryOverlay[0].detail}`
-      : "Apply sector sensitivity only when sector demand diverges from the base call.";
+      : homeBriefModel.decisionShiftSummary;
     return {
       view,
       label: "Sector view",
       summary:
-        "Apply the macro call through sector sensitivity before changing pace.",
+        "Translate the weekly call through sector demand context without rewriting the base posture.",
       bullets: [
         boundedLine("Action", sectorShift),
-        boundedLine("Trigger", "Tighten one notch if sector demand weakens faster than the base posture."),
-        boundedLine("Reverse", "Return to base once sector drag normalizes for two updates."),
+        boundedLine("Trigger", homeBriefModel.guardrail),
+        boundedLine("Reverse", homeBriefModel.reversalTrigger),
       ],
     };
   }
@@ -174,7 +174,7 @@ export const buildInterpretationLayer = ({
       view,
       label: "Company view",
       summary:
-        "Use bounded operator rules so teams know what to tighten now, what to stop, and when to reverse.",
+        "Translate the weekly call into company-specific bounded rules without changing the base posture.",
       bullets: adjustedRules
         .slice(0, 3)
         .map((rule) =>
@@ -200,11 +200,11 @@ export const buildInterpretationLayer = ({
       view,
       label: "Financial view",
       summary:
-        "Translate this week into bounded runway decisions: risk now vs downside, raise window, and burn delta.",
+        "Translate this week into bounded runway decisions: pace now, raise window, and burn range.",
       bullets: [
         boundedLine(
           "Action",
-          `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; protect downside now.`,
+          `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; set pace to match the current window.`,
         ),
         boundedLine(
           "Trigger",
@@ -212,7 +212,7 @@ export const buildInterpretationLayer = ({
         ),
         boundedLine(
           "Reverse",
-          `Burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%).`,
+          `Use burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%) to move faster or slower.`,
         ),
       ],
       financialAction: {
@@ -257,7 +257,7 @@ export const buildInterpretationLayer = ({
   return {
     view: "default",
     label: "Default view",
-    summary: "Core weekly interpretation for operators.",
+    summary: "Core weekly interpretation for operators. The canonical decision lives above.",
     bullets: canonicalBullets,
   };
 };

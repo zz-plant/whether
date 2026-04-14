@@ -71,7 +71,7 @@ describe("interpretation view panel", () => {
     );
 
     assert.match(html, /Default view/);
-    assert.match(html, /Canonical decision lives above/);
+    assert.match(html, /canonical decision lives above/i);
     assert.match(html, /Action: Changed: pressure rose versus last week\./);
     assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
   });
@@ -207,10 +207,10 @@ describe("interpretation view panel", () => {
     assert.match(financialHtml, /Financial view/);
     assert.match(financialHtml, /Runway risk/);
     assert.match(financialHtml, /Trigger: Raise window/);
-    assert.match(financialHtml, /Reverse: Burn delta/);
+    assert.match(financialHtml, /Reverse: Use burn delta/);
     assert.match(financialHtml, /Financial action summary/);
-    assert.match(sectorHtml, /Trigger: Tighten one notch if sector demand weakens faster than the base posture\./);
-    assert.match(sectorHtml, /Reverse: Return to base once sector drag normalizes for two updates\./);
+    assert.match(sectorHtml, /Trigger: Hold irreversible hiring\./);
+    assert.match(sectorHtml, /Reverse: Reopen if risk appetite rises above 55\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });

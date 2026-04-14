@@ -97,7 +97,7 @@ export const buildDecisionDeltaStripItems = ({
     {
       id: "revisit",
       label: "Revisit",
-      detail: revisitDecisions ? `YES — ${guardrail}` : "NO — Hold last week’s operating posture.",
+      detail: revisitDecisions ? `YES — ${guardrail}` : "NO — keep this week’s plan on the current track.",
       impact: revisitDecisions ? "high" : "low",
       href: sectionHrefByLabel.decide,
     },

@@ -110,11 +110,6 @@ export function WeeklyCallModePanel({
 }: WeeklyCallModePanelProps) {
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const detailDisclosureBase = "mt-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2.5";
-  const inlineTrustToneClass = inlineTrustTone === "stable"
-    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
-    : inlineTrustTone === "historical"
-      ? "border-violet-400/30 bg-violet-500/10 text-violet-100"
-      : "border-amber-400/30 bg-amber-500/10 text-amber-100";
   const flipSupport = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== snapshotWatch.trim())
     .slice(0, 2);
@@ -122,7 +117,7 @@ export function WeeklyCallModePanel({
     decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.",
   );
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
-  const revisitLabel = revisitDecisions ? "Yes. Last week's decisions need another look." : "No. Last week's decisions still hold.";
+  const revisitLabel = revisitDecisions ? "Yes. Last week's decisions need another look." : "No. This week's plan can stay on track.";
   const revisitDetail = revisitDecisions
     ? "Revisit last week's approvals before adding fixed cost."
     : "";
@@ -141,6 +136,7 @@ export function WeeklyCallModePanel({
   const supportingDrivers = primaryDriver ? driverHighlights.slice(1, 3) : driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
   const deferredRevisitItems = revisitDecisions ? revisitQueue.slice(1) : [];
+  const hasSecondaryLane = revisitDecisions || flipSupport.length > 0;
   const aggressionDirectionLabel = weeklyLeadershipSummary.boldnessDelta > 0
     ? "More aggressive"
     : weeklyLeadershipSummary.boldnessDelta < 0
@@ -207,7 +203,7 @@ export function WeeklyCallModePanel({
         <article id="weekly-call-core" className={`${tierOnePanelClassName} relative mt-2 overflow-hidden border-slate-800/70 bg-[linear-gradient(180deg,rgba(6,11,20,0.96),rgba(4,8,16,0.99))]`}>
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative space-y-4">
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.32fr)_minmax(17rem,0.68fr)]">
+            <div className={`grid gap-4 ${hasSecondaryLane ? "xl:grid-cols-[minmax(0,1.32fr)_minmax(17rem,0.68fr)]" : ""}`}>
               <article className="rounded-[1rem] border border-slate-800/70 bg-slate-950/30 px-4 py-4 shadow-[0_16px_28px_-26px_rgba(2,6,23,0.68)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
@@ -280,38 +276,9 @@ export function WeeklyCallModePanel({
                 </section>
               </article>
 
-              <aside className="space-y-3">
-                <article className="rounded-[1rem] border border-slate-800/70 bg-slate-950/28 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(2,6,23,0.64)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-medium text-slate-400">This week at a glance</p>
-                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${inlineTrustToneClass}`}>
-                      {inlineTrustLabel}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-base font-semibold leading-6 text-slate-100">
-                    {weeklyLeadershipSummary.shorthandLine}
-                  </p>
-                  {whyItMattersLine ? (
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{whyItMattersLine}</p>
-                  ) : null}
-                  <dl className="mt-3 space-y-2 text-[12px] leading-5">
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
-                      <dt className="text-slate-400">Aggression vs last week</dt>
-                      <dd className="font-semibold text-slate-100">{aggressionDirectionLabel}</dd>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
-                      <dt className="text-slate-400">Hiring backdrop</dt>
-                      <dd className="font-semibold text-slate-100">{formatBackdropValue(weeklyLeadershipSummary.hiringWindow, "hiring")}</dd>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/65 bg-slate-950/55 px-3 py-2">
-                      <dt className="text-slate-400">Funding backdrop</dt>
-                      <dd className="font-semibold text-slate-100">{formatBackdropValue(weeklyLeadershipSummary.raiseWindow, "raise")}</dd>
-                    </div>
-                  </dl>
-                </article>
-
-                {(revisitDecisions || flipSupport.length > 0) ? (
-                <article className={`rounded-[1rem] border px-3 py-3 shadow-[0_16px_28px_-28px_rgba(2,6,23,0.68)] ${revisitToneClass}`}>
+              {hasSecondaryLane ? (
+                <aside className="space-y-3">
+                  <article className={`rounded-[1rem] border px-3 py-3 shadow-[0_16px_28px_-28px_rgba(2,6,23,0.68)] ${revisitToneClass}`}>
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-[11px] font-medium">Watch this week</p>
                     {revisitQueue.length > 0 ? (
@@ -321,7 +288,7 @@ export function WeeklyCallModePanel({
                     ) : null}
                   </div>
                   <p className="mt-2 text-base font-semibold leading-6">
-                    {revisitDecisions ? revisitLabel : "No major reopen items right now."}
+                    {revisitDecisions ? revisitLabel : "No major reopen items right now; keep the main action moving."}
                   </p>
                   {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-200">{revisitDetail}</p> : null}
                   {flipSupport.length > 0 ? (
@@ -372,9 +339,9 @@ export function WeeklyCallModePanel({
                       </div>
                     </details>
                   ) : null}
-                </article>
-                ) : null}
-              </aside>
+                  </article>
+                </aside>
+              ) : null}
             </div>
 
             <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
@@ -392,33 +359,16 @@ export function WeeklyCallModePanel({
               aria-label="Share-ready artifact"
               className="rounded-[1.15rem] border border-slate-800/75 bg-slate-950/42 px-4 py-4 shadow-[0_14px_24px_-22px_rgba(2,6,23,0.68)]"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Sharing help</p>
-                  <h3 className="text-sm font-semibold text-slate-100">Send this update</h3>
-                  <p className="text-xs leading-5 text-slate-300">
-                    Decide first. Use the leadership update above as the default wording, then pick the format the room needs.
-                  </p>
-                </div>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Ready to send
-                </span>
-              </div>
-
-              <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.86fr)]">
-                <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Default share</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-100">Leadership update</p>
-                  <p className="mt-2 text-xs leading-5 text-slate-300">
-                    Includes the call, action now, pause if, and change course if. Use the shorter versions only when the room already knows the recommendation.
-                  </p>
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(17rem,0.78fr)]">
+                <div>
                   {actions ? (
-                    <div className="mt-3">
-                      {actions}
-                    </div>
-                  ) : null}
+                    actions
+                  ) : (
+                    <p className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3 text-xs leading-5 text-slate-300">
+                      Share actions are temporarily unavailable. Use the weekly call above as the copy-ready source.
+                    </p>
+                  )}
                 </div>
-
                 <div className="space-y-3">
                   <details className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                     <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">

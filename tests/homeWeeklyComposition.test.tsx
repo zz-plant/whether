@@ -193,7 +193,7 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /This week&#x27;s recommendation/);
+    assert.match(html, /Revise hiring and roadmap calls now\./);
     assert.match(html, /Decision delta: tighten roadmap optionality while protecting core delivery\./);
     assert.match(html, /Decision details/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
@@ -229,10 +229,10 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("This week&#x27;s recommendation");
+    const heroIndex = html.indexOf("Revise hiring and roadmap calls now.");
     const diagnosticsIndex = html.indexOf("Decision delta: tighten roadmap optionality while protecting core delivery.");
     const rulesIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
-    const actionStripIndex = html.indexOf("Decision details");
+    const actionStripIndex = html.indexOf("Revisit now");
     const interpretationIndex = html.indexOf("View for this situation");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
     const auditIndex = html.indexOf('id="audit-this-call"');

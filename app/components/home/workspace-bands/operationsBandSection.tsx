@@ -75,9 +75,9 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
 
           <section className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Hold the line if</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause pace if</p>
               <span className="rounded-full border border-amber-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-100">
-                Do not loosen
+                Stop line
               </span>
             </div>
             <div className="mt-3 space-y-2">
@@ -116,7 +116,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
               )) : (
                 <article className="rounded-lg border border-sky-400/20 bg-slate-950/45 px-2.5 py-2">
                   <p className="text-xs font-semibold text-slate-100">Planning reset</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-300">Open back up only after the current hold lines clear and the next weekly read confirms.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-300">Move faster again once the current stop line clears and the next weekly read confirms.</p>
                 </article>
               )}
             </div>

@@ -15,7 +15,18 @@ const interpretationLabels: Record<InterpretationView, string> = {
 
 const pickCue = (bullets: string[], prefix: "Action:" | "Trigger:" | "Reverse:") => {
   const line = bullets.find((bullet) => bullet.includes(prefix));
-  return line ? line.slice(line.indexOf(prefix) + prefix.length).trim() : null;
+  if (!line) {
+    return null;
+  }
+
+  const start = line.indexOf(prefix);
+  if (start === -1) {
+    return null;
+  }
+
+  const remainder = line.slice(start + prefix.length).trim();
+  const boundary = remainder.indexOf(" | ");
+  return (boundary >= 0 ? remainder.slice(0, boundary) : remainder).trim() || null;
 };
 
 const buildViewHref = (
@@ -114,13 +125,13 @@ export const HomeInterpretationPanel = ({
           label="Trigger"
           icon={<TrendUpIcon className="h-3.5 w-3.5" />}
           toneClass="border-amber-500/45 bg-amber-500/10 text-amber-100"
-          body={triggerCue ?? "Watch threshold pressure before expanding commitments."}
+          body={triggerCue ?? "Use the main pause line above."}
         />
         <CueCard
           label="Reverse"
           icon={<CircleTargetIcon className="h-3.5 w-3.5" />}
           toneClass="border-sky-500/45 bg-sky-500/10 text-sky-100"
-          body={reverseCue ?? "Open pace back up once the change trigger is met."}
+          body={reverseCue ?? "Use the main flip condition above."}
         />
       </div>
 

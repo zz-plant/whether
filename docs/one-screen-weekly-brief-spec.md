@@ -165,10 +165,10 @@ Canonical top-fold order on homepage must remain:
 1. **This week strip** (compact posture, trend, confidence, and flip trigger metadata only; no second operating call)
 2. **Action-first weekly call** (single canonical decision block with readiness/trust chips, `Action now`, `Current call`, and the bounded `What changed` / `Pause if` / `Change course if` triplet)
 3. **Compact backdrop row** (`Boldness budget` plus external market backdrops for hiring, expansion, and raise conditions)
-4. **Share actions + lower-emphasis detail** (share rail stays visible; trajectory and confidence continuity stay collapsed by default)
+4. **Share actions + lower-emphasis detail** (one routine-first artifact card stays visible; citation and continuity remain secondary collapsed details)
 5. **Why this call** disclosure (supporting evidence hidden behind details/summary)
 6. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
-7. **Planning next / exception paths** (Planning visible as the default next step; proof and deeper paths framed as exception routes)
+7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
@@ -191,7 +191,10 @@ Implementation guardrails:
 - Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
 - On `/`, the first scan should read as one dominant weekly decision card. Detailed per-area rules should stay available, but behind a closed-by-default disclosure instead of an always-open matrix.
 - On `/`, the share rail should default to one recommended artifact path first. Alternate artifact modes, shorter variants, and heavier packaging should live behind secondary disclosure UI.
+- On `/`, avoid double-wrapping share UI. The homepage should show one visible routine-first artifact card, with citation and confidence continuity as separate lower-emphasis details beside it.
+- On `/`, the secondary lane should focus on `Revisit now` and flip watch. Do not repeat backdrop or shorthand summaries there if those already appear in the main lane or compact backdrop row.
 - On `/`, workspace navigation should stay de-emphasized. The homepage can expose a collapsed workspace chooser, but it should not compete visually with the weekly decision card.
+- On `/`, deeper route choices after the weekly card should remain collapsed by default. Evidence and trust can stay visible as exception checks, but replay/tool links should not render as a second open dashboard row.
 - Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Share actions should remain routine-first. Company-specific override controls must stay separate from default share actions.
 - Share actions should keep the operator brief primary, while also exposing a `delta-only brief` for repeat readers who only need this week’s change, reopen queue, and current guardrails.

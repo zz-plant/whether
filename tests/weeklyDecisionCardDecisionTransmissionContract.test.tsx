@@ -104,12 +104,12 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     const snapshotRegion = html.slice(0, html.indexOf('id="weekly-call-core"'));
     assert.doesNotMatch(snapshotRegion, /Current conditions/);
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
-    assert.match(html, /This week&#x27;s recommendation/);
-    assert.match(html, /Can you rely on this\?/);
-    assert.match(html, /What to watch this week/);
+    assert.doesNotMatch(html, /This week at a glance/);
+    assert.match(html, /Watch this week/);
+    assert.match(html, /Aggression vs last week/);
   });
 
-  it("keeps top-fold sequence canonical: recommendation, current call, action now, change course if", () => {
+  it("keeps top-fold sequence canonical: recommendation, operating call, action now, change course if", () => {
     // Contract: top-fold sequence must stay stable for one-screen decision transmission.
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
@@ -194,9 +194,9 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const regimeIndex = html.indexOf("This week&#x27;s recommendation");
+    const regimeIndex = html.indexOf("Revise hiring and roadmap calls now.");
+    const callIndex = html.indexOf("Stage approvals and protect runway.");
     const doNowIndex = html.indexOf(">Action now<");
-    const callIndex = html.indexOf(">Current call<");
     const flipIndex = html.indexOf(">Change course if<");
 
     assert.ok(regimeIndex >= 0);

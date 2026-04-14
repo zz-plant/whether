@@ -14,10 +14,10 @@ export const regimePages: StartupRegimePage[] = [
   {
     slug: "expansion",
     title: "Expansion posture",
-    summary: "Risk appetite is supportive, tightness is contained, and long-cycle bets are allowed with milestones.",
-    hiring: "Add targeted capacity tied to validated growth levers.",
-    product: "Scale proven roadmap bets with release and ROI guardrails.",
-    finance: "Increase investment pace while protecting payback discipline.",
+    summary: "Risk appetite is supportive, tightness is contained, and teams can press proven growth lanes with visible stop lines.",
+    hiring: "Add targeted capacity in lanes already converting or compounding.",
+    product: "Scale proven roadmap bets and widen adjacent scope where ROI is already visible.",
+    finance: "Increase investment pace in validated lanes while keeping payback and stop lines explicit.",
     flipSignal: "Flip out if risk appetite drops below threshold or tightness rises above constraint trigger.",
   },
   {

@@ -82,7 +82,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
           <p className="mt-2 text-sm font-semibold">Is the read reliable enough to use?</p>
           <p className="mt-1 text-xs text-slate-300">How recent it is, how much is live, and where it came from.</p>
           <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/45 px-2.5 py-2 text-xs">
-            <p className="font-semibold text-slate-100">What to do with that</p>
+            <p className="font-semibold text-slate-100">How to act on it</p>
             <p className="mt-1 text-slate-300">{workspaceModel.audit.decisionImpactWindow}</p>
           </div>
         </Link>

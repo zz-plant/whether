@@ -77,11 +77,12 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Turn the call into this week/);
     assert.match(html, /Make the plan/);
-    assert.match(html, /Need proof or another path/);
-    assert.match(html, /Keep this row subordinate to the weekly call\. Open only when someone still needs proof, trust, or a deeper tool\./);
+    assert.match(html, /Need proof\?/);
+    assert.match(html, /Open this only when someone still needs evidence, trust, or a deeper path\./);
     assert.match(html, /Why the read moved/);
     assert.match(html, /Check trust/);
-    assert.match(html, /One deeper path/);
+    assert.match(html, /More paths/);
+    assert.match(html, /Open a deeper path only if the weekly call is already clear\./);
     assert.match(html, /Resolve one question/);
     assert.match(html, /Review a past week/);
     assert.match(html, /Use a tool/);

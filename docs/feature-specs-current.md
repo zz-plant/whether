@@ -47,7 +47,7 @@ The home page is now the canonical weekly workspace. The top fold keeps the `Wee
 hero plus share/copy actions, then the page continues as a compact handoff sequence:
 - planning handoff,
 - evidence/trust exception handoff,
-- deeper-surface chooser.
+- optional deeper-surface chooser.
 
 The home top fold now separates metadata from decision contract: a compact current-outlook strip
 shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
@@ -71,11 +71,12 @@ The artifact rail now follows a routine-first hierarchy:
 - quick variants for repeat readers (`delta brief`, `call snapshot`),
 - a direct handoff into Planning for board/governance repackaging and company-specific exceptions.
 On the homepage, the artifact rail is now visually collapsed behind one default path: the first scan exposes one recommended share/copy action, while alternate artifact modes and heavier packaging sit behind a `More formats` disclosure.
+Citation and continuity details remain adjacent but lower-emphasis, instead of repeating a second share summary around the primary artifact card.
 Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
 The weekly brief sequence now favors `current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
 The homepage global header now keeps the weekly brief calmer: it shows the direct next paths first, while the broader workspace chooser on `/` is tucked behind a collapsed `Browse workspaces` control rather than rendering as an always-open rail.
-The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, and proof/trust/deeper tools remain exception paths.
+The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/method` instead of reproducing those workflows inline.
