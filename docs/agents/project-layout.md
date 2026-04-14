@@ -16,3 +16,12 @@
 - Treat `lib/decisionDomainCatalog.ts` as the canonical operator-domain catalog (posture, decide, toolkits, failure modes); keep navigation IA concerns in `lib/navigation/informationArchitecture.ts`.
 - Keep user-facing behavior changes paired with nearby tests and docs updates.
 - Prefer local edits in existing modules over introducing new top-level structures.
+
+## Nested agent guides in high-churn areas
+
+Check local `AGENTS.md` files before editing these directories:
+- `lib/report/` — canonical report semantics, trust states, and shared decision copy
+- `app/components/weekly-card/` — weekly brief presentation and top-fold contract
+- `app/components/home/` — homepage orchestration and route handoffs
+- `app/operations/components/` — planning/export checkpoint behavior
+- `app/signals/` — evidence-route scope and signal diagnostics
