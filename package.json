@@ -32,6 +32,8 @@
     "agent:doctor": "node scripts/agent-workflow.mjs doctor",
     "agent:route": "node scripts/agent-workflow.mjs route",
     "agent:handoff": "node scripts/agent-workflow.mjs handoff",
+    "agent:index": "node scripts/agent-workflow.mjs index",
+    "agent:prewarm": "node scripts/agent-workflow.mjs prewarm",
     "ui:mockups": "printf '\\nMockups:\\n- http://127.0.0.1:3000/mockups\\n- http://127.0.0.1:3000/mockups/operator-brief?viewport=mobile&density=compact\\n- http://127.0.0.1:3000/mockups/operator-brief?viewport=desktop&density=comfortable\\n\\nFast loop:\\n- bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop\\n\\nRun `bun run dev` first if you want a persistent server.\\n'",
     "ui:shots": "node scripts/ui-capture.mjs",
     "ui:shots:list": "node scripts/ui-capture.mjs --list",

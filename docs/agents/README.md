@@ -21,7 +21,10 @@ If you will delegate work to a subagent, also read the delegation packet in `mcp
 Useful helpers:
 - `bun run agent:doctor`
 - `bun run agent:route -- "<task>"`
+- `bun run agent:route -- --local "<task>"`
 - `bun run agent:handoff -- --job "<job>"`
+- `bun run agent:index`
+- `bun run agent:prewarm`
 
 ## Fast start
 

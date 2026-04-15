@@ -133,8 +133,11 @@ This is the default Whether handoff shape because it keeps delegated work review
 Helper commands:
 
 - `bun run agent:route -- "<task>"` for the recommended docs, first files, and minimum checks
+- `bun run agent:route -- --local "<task>"` to let the local LM Studio model pick a known task profile using the cached repo index, with deterministic fallback
 - `bun run agent:doctor` for branch, dirty-worktree, relevant `AGENTS.md`, and task-profile preflight
 - `bun run agent:handoff -- --job "<job>"` to generate the canonical packet with repo defaults
+- `bun run agent:index` to refresh the repo cache under `artifacts/agent/`
+- `bun run agent:prewarm` to check LM Studio, warm the fast local model role, and refresh the repo cache
 
 ## Context compression rules for delegation
 

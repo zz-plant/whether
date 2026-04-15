@@ -19,7 +19,10 @@
 - Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
 - Agent preflight doctor: `bun run agent:doctor`
 - Agent task router: `bun run agent:route -- "<task>"`
+- Local-first agent task router: `bun run agent:route -- --local "<task>"`
 - Subagent handoff packet generator: `bun run agent:handoff -- --job "<job>"`
+- Agent repo index builder: `bun run agent:index`
+- Agent local-stack prewarm: `bun run agent:prewarm`
 
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
@@ -68,6 +71,9 @@ CLI ergonomics notes:
 - `whether status --compact` is the fastest shell read for the current operating call.
 - `whether agent --compact --json` gives agents a smaller structured handoff than the full `/api/agent` payload.
 - Local CLI runs auto-discover a healthy Whether API on common localhost dev ports when the default `http://localhost:3000` is unavailable.
+- `bun run agent:prewarm` checks LM Studio availability, warms the configured local role with `lmstudio-ensure-model`, and refreshes `artifacts/agent/`.
+- `bun run agent:route -- --local "<task>"` uses the local LM Studio endpoint when available and falls back to the deterministic keyword router if the local call fails or times out.
+- `bun run agent:index` refreshes `artifacts/agent/file-map.json`, `artifacts/agent/skills-map.json`, and `artifacts/agent/test-map.json` for faster routing.
 
 ## Baseline verification after setup
 - `bun run lint`
