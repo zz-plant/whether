@@ -103,8 +103,8 @@ export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
   if (href === "/signals") return "Open evidence";
   if (href === "/operations") return "Open planning";
   if (href === "/decide") return "Open decision tools";
-  if (href === "/method") return "Open trust";
-  if (href === "/toolkits") return "Open tools";
+  if (href === "/method") return "Check trust";
+  if (href === "/toolkits") return "Find a tool";
   return null;
 };
 

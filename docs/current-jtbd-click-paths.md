@@ -30,11 +30,11 @@ Validation note: click labels in this document were verified from the current ro
 2. Use one of:
    - `Copy weekly delta`
    - `Copy one-screen summary`
-   - `Copy leadership brief`
-   - `Share leadership brief`
+   - `Copy leadership team brief`
+   - `Share leadership team brief`
 3. If needed, click `Open full formats`.
 4. In Planning, choose one of:
-   - `Copy mixed-audience brief`
+   - `Copy plain-English brief`
    - `Copy board note`
    - `Copy meeting pack`
    - `Copy board summary`

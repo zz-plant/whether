@@ -88,6 +88,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           <WeeklyCallModePanel
             startupVariantPolicy={startupVariantPolicy}
             operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
+            actionNow={decision.actionNowShort?.trim() || canonicalDecisionCopy?.doNowLines[0] || decision.immediateDecision}
             snapshotGuardrail={snapshotGuardrail}
             snapshotWatch={snapshotWatch}
             revisitDecisions={revisitDecisions}

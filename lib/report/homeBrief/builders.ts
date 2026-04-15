@@ -329,8 +329,10 @@ export const buildHomeBriefModelInternal = (
     directionLabel: reportDynamics?.directionLabel,
     currentRegime: assessment.regime,
   });
-  const policyOverrideActive = assessment.policyAssessment.refusal.refused;
-  const policyOverrideReason = assessment.policyAssessment.refusal.reasons[0] ?? null;
+  const refusal = assessment.policyAssessment?.refusal;
+  const policyOverrideActive = refusal?.refused ?? false;
+  const policyOverrideReasons = refusal?.reasons ?? [];
+  const policyOverrideReason = policyOverrideReasons[0] ?? null;
   const effectiveOperatingStanceLine = policyOverrideActive
     ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
     : operatingStanceLine;
@@ -367,7 +369,7 @@ export const buildHomeBriefModelInternal = (
     isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
     isHistoricalSelection: Boolean(historicalSelection),
     policyRefusalActive: policyOverrideActive,
-    policyRefusalReasons: assessment.policyAssessment.refusal.reasons,
+    policyRefusalReasons: policyOverrideReasons,
   });
 
   const displayRegime = getRegimeDisplayLabel({

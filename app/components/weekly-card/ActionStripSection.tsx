@@ -1,5 +1,6 @@
 import { sectionSpacing, tierTwoHeading, tierTwoPanel } from "./shared";
 import type { ActionStripSectionProps } from "./types";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 
 const leverScaleLabels = ["Closed", "Guarded", "Staged", "Open"] as const;
 
@@ -81,15 +82,15 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                 </div>
                 <dl className="grid gap-3 sm:grid-cols-3 text-[11px] leading-5">
                   <div className="border-l-2 border-emerald-400/40 pl-3">
-                    <dt className="font-semibold text-emerald-200">Do now</dt>
+                    <dt className="font-semibold text-emerald-200">{publicDecisionLabels.action}</dt>
                     <dd className="mt-1 text-slate-100">{item.actionNow}</dd>
                   </div>
                   <div className="border-l-2 border-amber-400/40 pl-3">
-                    <dt className="font-semibold text-amber-200">Tighten if</dt>
+                    <dt className="font-semibold text-amber-200">{publicDecisionLabels.threshold}</dt>
                     <dd className="mt-1 text-slate-100">{item.triggerThreshold}</dd>
                   </div>
                   <div className="border-l-2 border-sky-400/40 pl-3">
-                    <dt className="font-semibold text-sky-200">Re-open when</dt>
+                    <dt className="font-semibold text-sky-200">{publicDecisionLabels.reversal}</dt>
                     <dd className="mt-1 text-slate-100">{item.reversalCondition}</dd>
                   </div>
                 </dl>
@@ -122,15 +123,15 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                     </div>
                     <dl className="grid gap-3 sm:grid-cols-3 text-[11px] leading-5">
                       <div className="border-l-2 border-emerald-400/40 pl-3">
-                        <dt className="font-semibold text-emerald-200">Do now</dt>
+                        <dt className="font-semibold text-emerald-200">{publicDecisionLabels.action}</dt>
                         <dd className="mt-1 text-slate-100">{item.actionNow}</dd>
                       </div>
                       <div className="border-l-2 border-amber-400/40 pl-3">
-                        <dt className="font-semibold text-amber-200">Tighten if</dt>
+                        <dt className="font-semibold text-amber-200">{publicDecisionLabels.threshold}</dt>
                         <dd className="mt-1 text-slate-100">{item.triggerThreshold}</dd>
                       </div>
                       <div className="border-l-2 border-sky-400/40 pl-3">
-                        <dt className="font-semibold text-sky-200">Re-open when</dt>
+                        <dt className="font-semibold text-sky-200">{publicDecisionLabels.reversal}</dt>
                         <dd className="mt-1 text-slate-100">{item.reversalCondition}</dd>
                       </div>
                     </dl>

@@ -61,6 +61,12 @@ export type HomeReportData = {
     regime: Regime;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
     scores: { tightness: number; riskAppetite: number; baseRate?: number; curveSlope?: number | null };
+    policyAssessment?: {
+      refusal?: {
+        refused?: boolean;
+        reasons?: string[];
+      };
+    };
   };
   regimeAlert: { previousRegime: Regime } | null;
   stopItems: string[];

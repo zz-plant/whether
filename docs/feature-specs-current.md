@@ -36,7 +36,7 @@ The homepage keeps interpretation layers optional and query-driven: the default 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/signals`, `/operations`, `/decide`, `/method` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
 Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
-Primary navigation now uses compact route-first labels in header/nav contexts (`Start here`, `Evidence`, `Plan`, `Resolve`, `Verify`) while in-flow homepage CTAs use a consistent `Open …` pattern such as `Open weekly plan`, `Open evidence`, and `Open trust`.
+Primary navigation now uses compact route-first labels in header/nav contexts (`Start here`, `Evidence`, `Plan`, `Resolve`, `Verify`) while in-flow homepage CTAs use the most natural task verb for each destination, such as `Open weekly plan`, `Open evidence`, and `Check trust`.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It

@@ -80,8 +80,8 @@ describe("HomeWorkspaceBands section composition", () => {
     assert.match(html, /Pressure-test the read with one check/);
     assert.match(html, /Open one evidence view, not a second dashboard\./);
     assert.match(html, /Why this week&#x27;s read moved|Why this week's read moved/);
-    assert.match(html, /Open trust/);
-    assert.match(html, /Open more paths/);
+    assert.match(html, /Check trust/);
+    assert.match(html, /More paths/);
     assert.match(html, /Open a deeper page only after the direction is clear\./);
     assert.match(html, /Answer one question/);
     assert.match(html, /Review a past week/);

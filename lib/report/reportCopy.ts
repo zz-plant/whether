@@ -32,7 +32,7 @@ export const PRIMARY_AUDIENCE_SUMMARY =
 export const PRIMARY_AUDIENCE_ACTION =
   "Before you commit, pressure-test that read against your own demand, retention, and cash signals.";
 export const PRIMARY_AUDIENCE_SHARE_GUIDANCE =
-  "Start with the leadership brief for your leadership team. Switch to the mixed-audience brief when the audience needs less shorthand.";
+  "Start with the leadership team brief. Switch to the plain-English brief when the audience needs less shorthand.";
 
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {

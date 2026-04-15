@@ -21,10 +21,10 @@ type PrimaryActionType = "copy_weekly_brief";
 type CopyTarget =
   | "Board note"
   | "Meeting pack"
-  | "Mixed-audience brief"
+  | "Plain-English brief"
   | "One-screen summary"
   | "Weekly delta"
-  | "Leadership brief"
+  | "Leadership team brief"
   | "Board summary"
   | "Citation";
 
@@ -126,7 +126,7 @@ export function CopyLeadershipArtifactsButtons({
     weeklyOperatorBrief,
     citation,
   });
-  const primaryBriefTarget = artifactMode === "explainer" ? "Mixed-audience brief" : "Leadership brief";
+  const primaryBriefTarget = artifactMode === "explainer" ? "Plain-English brief" : "Leadership team brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
     : weeklyOperatorBrief;
@@ -194,8 +194,8 @@ export function CopyLeadershipArtifactsButtons({
       : shareState === "error"
         ? "Retry share"
         : artifactMode === "explainer"
-          ? "Share mixed-audience brief"
-          : "Share leadership brief";
+          ? "Share plain-English brief"
+          : "Share leadership team brief";
 
   return (
     <div className="space-y-3">
@@ -281,7 +281,7 @@ export function CopyLeadershipArtifactsButtons({
                     <span>{artifactModeLabels[mode]}</span>
                     <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
                       {mode === "explainer"
-                        ? "For mixed audiences outside the leadership team."
+                        ? "For audiences outside the leadership team."
                         : "Default for your leadership team."
                       }
                     </span>

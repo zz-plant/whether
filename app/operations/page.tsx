@@ -352,8 +352,8 @@ export default async function OperationsPage({
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Choose the default leadership brief, a mixed-audience brief, or a board-ready version.",
-            summary: "Start with the leadership brief for your leadership team, then switch to the mixed-audience brief when readers want the shorthand translated.",
+            description: "Choose the default leadership team brief, a plain-English brief, or a board-ready version.",
+            summary: "Start with the leadership team brief, then switch to the plain-English brief when readers want the shorthand translated.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The audience needs a plainer or board-ready pack",
@@ -370,7 +370,7 @@ export default async function OperationsPage({
                   id="ops-export-briefs-panel"
                   label="Share"
                   title="Send this brief"
-                  description="Start with the leadership brief for the default leadership-team audience. Use the mixed-audience brief when people want the market terms translated."
+                  description="Start with the leadership team brief for the default leadership-team audience. Use the plain-English brief when people want the market terms translated."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel

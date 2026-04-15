@@ -9,7 +9,7 @@ export const buildExplainerBriefContent = ({
   weeklyOperatorBrief: string;
   citation: string;
 }) => [
-  "MIXED-AUDIENCE BRIEF",
+  "PLAIN-ENGLISH BRIEF",
   "",
   "Bottom line",
   boardSummary,
@@ -22,7 +22,7 @@ export const buildExplainerBriefContent = ({
   `• ${publicDecisionLabels.threshold} = the trip line that pauses or tightens the recommendation.`,
   `• ${publicDecisionLabels.reversal} = what must improve before loosening again.`,
   "",
-  "Leadership brief",
+  "Leadership team brief",
   weeklyOperatorBrief,
   "",
   "Source note",

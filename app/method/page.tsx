@@ -140,7 +140,7 @@ export default async function MethodPage() {
       sectionLinks={sectionLinks.slice(0, 3)}
       heroVariant="compact"
       sidebarVariant="hidden"
-      primaryCta={{ href: "#trust-snapshot", label: "Open trust snapshot" }}
+      primaryCta={{ href: "#trust-snapshot", label: "Check trust snapshot" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/signals",

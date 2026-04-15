@@ -21,6 +21,7 @@ type PolicyDetails = {
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
   operatingCall: string;
+  actionNow: string;
   snapshotGuardrail: string;
   snapshotWatch: string;
   revisitDecisions: boolean;
@@ -80,6 +81,7 @@ const compactChangedThisWeekDetail = (detail: string) => {
 export function WeeklyCallModePanel({
   startupVariantPolicy,
   operatingCall,
+  actionNow,
   snapshotGuardrail,
   snapshotWatch,
   revisitDecisions,
@@ -240,7 +242,7 @@ export function WeeklyCallModePanel({
                   ) : null}
                 </div>
                 <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  {publicDecisionLabels.action}
+                  What this means now
                 </p>
                 <h2 className={`${tierOneHeadingClassName} mt-3 max-w-4xl text-xl leading-tight text-slate-50 sm:text-[2.05rem] sm:leading-[2.4rem]`}>
                   {recommendationLine}
@@ -263,7 +265,7 @@ export function WeeklyCallModePanel({
                         {publicDecisionLabels.call}
                       </p>
                       <p className="mt-1 text-[11px] leading-5 text-slate-400">
-                        Standing posture behind this week&apos;s move.
+                        The standing recommendation this week.
                       </p>
                       <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
                     </div>
@@ -304,7 +306,7 @@ export function WeeklyCallModePanel({
                   <dl className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,1fr))]">
                     <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/8 px-3 py-3">
                       <dt className="text-[11px] font-medium text-emerald-200">{publicDecisionLabels.action}</dt>
-                      <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{recommendationLine}</dd>
+                      <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNow}</dd>
                     </div>
                     <div className="rounded-lg border border-rose-400/18 bg-rose-500/8 px-3 py-3">
                       <dt className="text-[11px] font-medium text-rose-200">{publicDecisionLabels.threshold}</dt>

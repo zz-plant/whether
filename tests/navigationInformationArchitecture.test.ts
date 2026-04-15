@@ -55,7 +55,7 @@ describe("navigation information architecture", () => {
     assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Open evidence");
     assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Open planning");
     assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Open decision tools");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Open trust");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Check trust");
     assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
     assert.equal(resolveNavigationRouteCue("/signals"), "/signals");
   });
