@@ -118,7 +118,7 @@ export const MethodologyContent = () => {
             The policy pilot publishes normalized signal traces and composite scores alongside the legacy model.
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-200">
-            <li>Normalization: rolling-window z-score with directional transforms and ±3σ clipping.</li>
+            <li>Normalization: history-window z-score with directional transforms and ±3σ clipping; Treasury inputs use the local 10-year archive when available.</li>
             <li>Composites: CTS = 0.5·BaseRate + 0.5·BBB, RAS = 0.7·Slope + 0.3·BBB.</li>
             <li>Banding: neutral (&lt;0.5), elevated (&lt;1.5), extreme (≥1.5) by absolute composite distance.</li>
             <li>

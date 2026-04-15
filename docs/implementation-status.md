@@ -6,7 +6,7 @@ This document consolidates delivery status across product roadmap audits, known 
 
 - Milestones 5–8 are complete.
 - Summary-system follow-ups are mostly complete; monthly `planningLanguage` parity is now shipped, while broader monthly section expansion remains open.
-- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.38` with a repo-local install repair.
+- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.41` with a repo-local install repair.
 
 ## Product roadmap (milestones 5–8)
 
@@ -83,6 +83,13 @@ This document consolidates delivery status across product roadmap audits, known 
 | `bun run build` | Pass with known upstream warnings | Vinext production build succeeds on Tailwind v4 and the repaired `0.0.38` install lane. Rolldown warning classes remain expected noise. |
 | `bun run check:vinext` | Pass (100% compatible) | `next/web-vitals` issue was removed by switching to `web-vitals`, and `next/font/google` was removed from the root layout in favor of CSS font loading. |
 | `bun run typecheck` | Pass | Cleanup of route/test contract drift and summary typing now leaves the active Vinext lane typecheck-clean. |
+
+### Vinext 0.0.41 maintenance uplift (2026-04-15)
+
+| Command | Outcome | Notes |
+| --- | --- | --- |
+| `bun run build` | Pass | Upgrading to `vinext@0.0.41` removes the prior Rolldown `treeshake.preset` option-validation warning on the active Vite 8 lane. |
+| `bun run check` | Pass | Full lint + typecheck + test suite passes once the local CLI discovery test is made deterministic against configured discovery ports. |
 
 ### Vinext install repair + 0.0.38 validation (2026-03-31)
 

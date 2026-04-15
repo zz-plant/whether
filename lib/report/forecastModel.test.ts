@@ -212,6 +212,152 @@ describe("buildForecastModel", () => {
     assert.equal(model.signalTrajectory.riskAppetite, "deteriorating");
   });
 
+  it("uses the latest macro move rather than the oldest history edge", () => {
+    const current = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.3,
+        curveSlope: 0.3,
+        recordDate: "2026-03-01",
+      }),
+    );
+    const previous = evaluateRegime(
+      buildTreasury({
+        baseRate: 4.9,
+        curveSlope: 0.55,
+        recordDate: "2026-02-01",
+      }),
+    );
+    const dynamics = buildReportDynamics({ current, previous });
+
+    const worseningLatestMove: MacroSeriesReading[] = [
+      {
+        id: "HY_CREDIT_SPREAD",
+        label: "HY spread",
+        value: 5.2,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "test",
+        sourceUrl: "https://example.com",
+        formulaUrl: "https://example.com",
+        record_date: "2026-03-01",
+        fetched_at: "2026-03-01T00:00:00.000Z",
+        isLive: true,
+        history: [
+          { date: "2025-12-01", value: 6.0 },
+          { date: "2026-01-01", value: 5.5 },
+          { date: "2026-02-01", value: 4.8 },
+          { date: "2026-03-01", value: 5.2 },
+        ],
+      },
+    ];
+    const improvingLatestMove: MacroSeriesReading[] = [
+      {
+        id: "HY_CREDIT_SPREAD",
+        label: "HY spread",
+        value: 4.8,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "test",
+        sourceUrl: "https://example.com",
+        formulaUrl: "https://example.com",
+        record_date: "2026-03-01",
+        fetched_at: "2026-03-01T00:00:00.000Z",
+        isLive: true,
+        history: [
+          { date: "2025-12-01", value: 6.0 },
+          { date: "2026-01-01", value: 5.5 },
+          { date: "2026-02-01", value: 5.2 },
+          { date: "2026-03-01", value: 4.8 },
+        ],
+      },
+    ];
+
+    const worseningModel = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: worseningLatestMove,
+    });
+    const improvingModel = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: improvingLatestMove,
+    });
+
+    const worseningDownside =
+      worseningModel.next4WeekProbabilities.Scarcity +
+      worseningModel.next4WeekProbabilities.Defensive;
+    const improvingDownside =
+      improvingModel.next4WeekProbabilities.Scarcity +
+      improvingModel.next4WeekProbabilities.Defensive;
+
+    assert.ok(worseningDownside > improvingDownside);
+  });
+
+  it("separates the 4-week and 90-day regime distributions when pressure persists", () => {
+    const current = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.05,
+        curveSlope: 0.48,
+        recordDate: "2026-03-01",
+      }),
+    );
+    const previous = evaluateRegime(
+      buildTreasury({
+        baseRate: 5,
+        curveSlope: 0.52,
+        recordDate: "2026-02-01",
+      }),
+    );
+    const dynamics = buildReportDynamics({ current, previous });
+
+    const model = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: [
+        {
+          id: "HY_CREDIT_SPREAD",
+          label: "HY spread",
+          value: 5.2,
+          unit: "%",
+          explanation: "",
+          sourceLabel: "test",
+          sourceUrl: "https://example.com",
+          formulaUrl: "https://example.com",
+          record_date: "2026-03-01",
+          fetched_at: "2026-03-01T00:00:00.000Z",
+          isLive: true,
+          history: [
+            { date: "2026-01-01", value: 4.6 },
+            { date: "2026-02-01", value: 4.7 },
+            { date: "2026-03-01", value: 5.2 },
+          ],
+        },
+        {
+          id: "VIX_INDEX",
+          label: "VIX",
+          value: 24,
+          unit: "index",
+          explanation: "",
+          sourceLabel: "test",
+          sourceUrl: "https://example.com",
+          formulaUrl: "https://example.com",
+          record_date: "2026-03-01",
+          fetched_at: "2026-03-01T00:00:00.000Z",
+          isLive: true,
+          history: [
+            { date: "2026-01-01", value: 17 },
+            { date: "2026-02-01", value: 18 },
+            { date: "2026-03-01", value: 24 },
+          ],
+        },
+      ],
+    });
+
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
+    assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
+    assert.notDeepEqual(model.next4WeekProbabilities, model.next90DayProbabilities);
+  });
+
   it("returns deterministic probabilities for identical inputs", () => {
     const current = evaluateRegime(
       buildTreasury({

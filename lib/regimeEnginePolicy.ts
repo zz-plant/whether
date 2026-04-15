@@ -1,6 +1,7 @@
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import { POLICY_BBB_WEIGHT_FOR_RAS, POLICY_SPEC_V1 } from "./policy/config";
 import { getGovernanceParametersForPosture } from "./policy/governance";
+import { getTreasuryPolicyHistory } from "./policy/history";
 import {
   clipZScore,
   computeCompositeScore,
@@ -18,21 +19,50 @@ import {
   type RegimeThresholds,
 } from "./regimeEngineCore";
 
+const POLICY_HISTORY_WINDOW_MONTHS = POLICY_SPEC_V1.rollingWindowYears * 12;
+const POLICY_FALLBACK_STD_DEV = {
+  BASE_RATE: 1,
+  CURVE_SLOPE: 0.75,
+  BBB_CREDIT_SPREAD: 0.75,
+  CPI_YOY: 1,
+  UNEMPLOYMENT_RATE: 0.75,
+} as const;
+
 const getSignalById = (macroSeries: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   macroSeries.find((entry) => entry.id === id) ?? null;
 
 const computeRollingStats = (
-  currentValue: number,
   historyValues: Array<number | null>,
   fallbackMean: number,
   fallbackStdDev = 1,
 ) => {
   const numericHistory = historyValues.filter((value): value is number => typeof value === "number");
-  const values = numericHistory.length > 0 ? numericHistory : [currentValue, fallbackMean];
+  if (numericHistory.length === 0) {
+    return { mean: fallbackMean, stdDev: fallbackStdDev };
+  }
+
+  const values = numericHistory;
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
   const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
   const stdDev = Math.sqrt(variance) || fallbackStdDev;
   return { mean, stdDev };
+};
+
+const getHistoricalValuesBeforeDate = (
+  history: MacroSeriesReading["history"] | undefined,
+  currentRecordDate: string,
+) => {
+  const currentTimestamp = Date.parse(`${currentRecordDate}T00:00:00.000Z`);
+  if (!Number.isFinite(currentTimestamp)) {
+    return [];
+  }
+
+  return (history ?? [])
+    .filter((point) => {
+      const pointTimestamp = Date.parse(`${point.date}T00:00:00.000Z`);
+      return Number.isFinite(pointTimestamp) && pointTimestamp < currentTimestamp;
+    })
+    .map((point) => point.value ?? null);
 };
 
 const classifyPolicyBand = (value: number): PolicyBand => {
@@ -58,6 +88,10 @@ export const computePolicyAssessment = (
   const bbb = getSignalById(macroSeries, "BBB_CREDIT_SPREAD");
   const cpi = getSignalById(macroSeries, "CPI_YOY");
   const unemployment = getSignalById(macroSeries, "UNEMPLOYMENT_RATE");
+  const treasuryHistory = getTreasuryPolicyHistory({
+    asOf: treasury.record_date,
+    months: POLICY_HISTORY_WINDOW_MONTHS,
+  });
 
   const normalizations: PolicySignalNormalization[] = [];
 
@@ -67,12 +101,13 @@ export const computePolicyAssessment = (
     direction: "HIGHER_IS_TIGHTER" | "HIGHER_IS_LOOSER",
     fallbackMean: number,
     history: Array<number | null> = [],
+    fallbackStdDev = 1,
   ) => {
     if (typeof value !== "number") {
       normalizations.push({ id, value: null, z: null, directionalZ: null, clippedZ: null });
       return null;
     }
-    const stats = computeRollingStats(value, history, fallbackMean);
+    const stats = computeRollingStats(history, fallbackMean, fallbackStdDev);
     const z = computeZScore(value, stats);
     const directionalZ = directionalNormalize(z, direction);
     const clippedZ = clipZScore(directionalZ, POLICY_SPEC_V1.zClip);
@@ -85,28 +120,40 @@ export const computePolicyAssessment = (
     baseRate.used === "MISSING" ? null : baseRate.value,
     "HIGHER_IS_TIGHTER",
     thresholds.baseRateTightness,
+    treasuryHistory.map((point) => point.baseRate),
+    POLICY_FALLBACK_STD_DEV.BASE_RATE,
   );
-  const slopeZ = pushNormalization("CURVE_SLOPE", slope, "HIGHER_IS_LOOSER", 0);
+  const slopeZ = pushNormalization(
+    "CURVE_SLOPE",
+    slope,
+    "HIGHER_IS_LOOSER",
+    0,
+    treasuryHistory.map((point) => point.curveSlope),
+    POLICY_FALLBACK_STD_DEV.CURVE_SLOPE,
+  );
   const bbbZ = pushNormalization(
     "BBB_CREDIT_SPREAD",
     bbb?.value ?? null,
     "HIGHER_IS_TIGHTER",
     2,
-    bbb?.history?.map((point) => point.value ?? null) ?? [],
+    getHistoricalValuesBeforeDate(bbb?.history, bbb?.record_date ?? treasury.record_date),
+    POLICY_FALLBACK_STD_DEV.BBB_CREDIT_SPREAD,
   );
   pushNormalization(
     "CPI_YOY",
     cpi?.value ?? null,
     "HIGHER_IS_TIGHTER",
     2.5,
-    cpi?.history?.map((point) => point.value ?? null) ?? [],
+    getHistoricalValuesBeforeDate(cpi?.history, cpi?.record_date ?? treasury.record_date),
+    POLICY_FALLBACK_STD_DEV.CPI_YOY,
   );
   pushNormalization(
     "UNEMPLOYMENT_RATE",
     unemployment?.value ?? null,
     "HIGHER_IS_TIGHTER",
     4,
-    unemployment?.history?.map((point) => point.value ?? null) ?? [],
+    getHistoricalValuesBeforeDate(unemployment?.history, unemployment?.record_date ?? treasury.record_date),
+    POLICY_FALLBACK_STD_DEV.UNEMPLOYMENT_RATE,
   );
 
   const cts = computeCompositeScore(

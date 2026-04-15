@@ -29,9 +29,31 @@ const AUTH_FAILURE = {
 
 const AUTH_CHECK_ENDPOINT = "/api/auth/status";
 const DEFAULT_API_BASE_URL = "http://localhost:3000";
-const LOCAL_API_PORT_CANDIDATES = [3000, 3001, 3002, 3003, 3004, 3005, 8787];
+const DEFAULT_LOCAL_API_PORT_CANDIDATES = [3000, 3001, 3002, 3003, 3004, 3005, 8787];
 const LOCAL_API_HOST_CANDIDATES = ["localhost", "127.0.0.1"];
 const LOCAL_API_DISCOVERY_TIMEOUT_MS = 150;
+
+const parseLocalApiPortCandidates = (rawValue) => {
+  if (typeof rawValue !== "string" || rawValue.trim().length === 0) {
+    return DEFAULT_LOCAL_API_PORT_CANDIDATES;
+  }
+
+  const parsed = Array.from(
+    new Set(
+      rawValue
+        .split(/[,\s]+/)
+        .map((token) => Number.parseInt(token, 10))
+        .filter((value) => Number.isInteger(value) && value > 0 && value <= 65_535),
+    ),
+  );
+
+  return parsed.length > 0 ? parsed : DEFAULT_LOCAL_API_PORT_CANDIDATES;
+};
+
+const RAW_LOCAL_API_PORT_CANDIDATES = process.env.WHETHER_LOCAL_API_PORT_CANDIDATES;
+const HAS_CUSTOM_LOCAL_API_PORT_CANDIDATES =
+  typeof RAW_LOCAL_API_PORT_CANDIDATES === "string" && RAW_LOCAL_API_PORT_CANDIDATES.trim().length > 0;
+const LOCAL_API_PORT_CANDIDATES = parseLocalApiPortCandidates(RAW_LOCAL_API_PORT_CANDIDATES);
 
 const HELP = `Whether CLI — decision terminal for operators
 
@@ -740,7 +762,7 @@ const buildLocalApiCandidateUrls = (currentApiBaseUrl) => {
     candidates.push(candidate);
   };
 
-  if (isLocalApiUrl(currentApiBaseUrl)) {
+  if (!HAS_CUSTOM_LOCAL_API_PORT_CANDIDATES && isLocalApiUrl(currentApiBaseUrl)) {
     try {
       const parsed = new URL(currentApiBaseUrl);
       pushCandidate(parsed.origin);

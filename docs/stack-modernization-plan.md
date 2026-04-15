@@ -222,14 +222,14 @@ These actions operationalize migration outcomes after the near-term spike and ga
 - Rewrote the only custom-class `@apply` chain (`.weather-control` -> `.weather-input`) that blocked the official upgrader path.
 - Upgraded the safe support-dependency slice in `package.json` / `bun.lock`: `@cloudflare/vite-plugin`, `@modelcontextprotocol/sdk`, `@tailwindcss/postcss`, `postcss`, `simple-icons`, `vite`, and `wrangler`.
 - Replaced `next/font/google` in `app/layout.tsx` with CSS font loading from `app/globals.css`, which removed the last repo-local Vinext compatibility gap on the stable pin.
-- Added `scripts/repair-vinext-install.mjs` and root `postinstall` wiring so the active `vinext@0.0.38` pin repairs Bun's incomplete install tree from the published tarball before build/deploy commands run.
+- Added `scripts/repair-vinext-install.mjs` and root `postinstall` wiring so the active Vinext pin repairs Bun's incomplete install tree from the published tarball before build/deploy commands run.
 - Swapped `next/web-vitals` for the official `web-vitals` package in `app/components/webVitalsTracker.tsx` so the pinned Vinext lane no longer reports that compatibility gap.
 
 ### Verification
 - `bun run lint` -> pass
 - `bun test tests/reportShellSections.test.tsx tests/weeklyDecisionCardLayout.test.tsx tests/homeWeeklyComposition.test.tsx tests/navigationInformationArchitecture.test.ts tests/reportShellNavigation.test.tsx tests/navigationOrientationBadge.test.tsx tests/staticHubNav.test.tsx tests/nextStepRail.test.tsx tests/monthlySummary.test.ts tests/summaryCopyRenderer.test.ts tests/cadenceSummaryCardAdapter.test.tsx tests/apiSummaryContracts.test.ts tests/summaryArchive.test.ts tests/summaryArchiveMigration.test.ts` -> pass (40/40)
-- `bun run build` -> pass with the known Rolldown/Vinext warning classes on repaired `vinext@0.0.38`
-- `bun run check:vinext` -> pass at 100% compatibility on repaired `vinext@0.0.38`
+- `bun run build` -> pass on repaired `vinext@0.0.41` without the prior Rolldown option-validation warnings
+- `bun run check:vinext` -> pass at 100% compatibility on repaired `vinext@0.0.41`
 - `bun run typecheck` -> pass
 
 ## Rollback strategy (required before production migration)

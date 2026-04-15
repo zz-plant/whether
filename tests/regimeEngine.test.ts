@@ -223,6 +223,49 @@ describe("regime assessment", () => {
     assert.equal(safetyAssessment.policyAssessment.posture, "SAFETY_MODE");
   });
 
+  it("preserves treasury normalization magnitude in the policy pilot", () => {
+    const nearThresholdAssessment = evaluateRegime({
+      source: "US Treasury",
+      record_date: "2026-03-31",
+      fetched_at: "2026-04-01T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 5.1,
+        twoYear: 4.8,
+        tenYear: 4.7,
+      },
+    });
+    const extremeAssessment = evaluateRegime({
+      source: "US Treasury",
+      record_date: "2026-03-31",
+      fetched_at: "2026-04-01T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 8,
+        twoYear: 4.8,
+        tenYear: 3.3,
+      },
+    });
+
+    const nearBaseRate = nearThresholdAssessment.policyAssessment.normalizations.find(
+      (item) => item.id === "BASE_RATE",
+    );
+    const extremeBaseRate = extremeAssessment.policyAssessment.normalizations.find(
+      (item) => item.id === "BASE_RATE",
+    );
+    const nearSlope = nearThresholdAssessment.policyAssessment.normalizations.find(
+      (item) => item.id === "CURVE_SLOPE",
+    );
+    const extremeSlope = extremeAssessment.policyAssessment.normalizations.find(
+      (item) => item.id === "CURVE_SLOPE",
+    );
+
+    assert.ok(
+      Math.abs(extremeBaseRate?.clippedZ ?? 0) > Math.abs(nearBaseRate?.clippedZ ?? 0),
+    );
+    assert.ok(Math.abs(extremeSlope?.clippedZ ?? 0) > Math.abs(nearSlope?.clippedZ ?? 0));
+  });
+
   it("refuses posture change when policy signal gaps are too large", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",

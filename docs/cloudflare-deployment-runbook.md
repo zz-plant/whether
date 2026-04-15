@@ -39,7 +39,7 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 ### Current toolchain notes
 
 - Tailwind now runs on v4 via [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) and [`postcss.config.js`](/Users/kanav/Documents/GitHub/whether-app/postcss.config.js) using `@tailwindcss/postcss`; the legacy `tailwind.config.ts` file was removed during the CSS-first migration.
-- Keep `vinext` pinned to `0.0.38`. This repo now repairs Bun's incomplete Vinext install during [`postinstall`](https://docs.npmjs.com/cli/v10/using-npm/scripts#life-cycle-scripts) via [`scripts/repair-vinext-install.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/repair-vinext-install.mjs), which restores missing `dist/` runtime files from the published tarball before build/deploy commands run.
+- Keep `vinext` pinned to `0.0.41`. This repo still repairs Bun's incomplete Vinext install during [`postinstall`](https://docs.npmjs.com/cli/v10/using-npm/scripts#life-cycle-scripts) via [`scripts/repair-vinext-install.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/repair-vinext-install.mjs), which restores missing `dist/` runtime files from the published tarball before build/deploy commands run.
 - Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
 - Root layout fonts now load from CSS in [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) instead of `next/font/google` in [`app/layout.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/layout.tsx), which removes the last repo-local compatibility gap on the active Vinext lane.
 
@@ -69,13 +69,9 @@ Real deploys now run a lightweight Wrangler auth preflight before upload:
 
 Dry-run commands skip this preflight because they do not upload.
 
-## Expected warnings (non-blocking)
+## Warning policy
 
-The warning classes below are currently expected from the Vinext/Rolldown toolchain and should be treated as upstream noise unless behavior changes:
-
-- Rolldown/Vinext plugin timing diagnostics during multi-environment builds
-- Rolldown option-validation warnings for `treeshake.preset` and `experimentalMinChunkSize`
-- `INEFFECTIVE_DYNAMIC_IMPORT` for `vinext/dist/shims/navigation.js` during SSR chunking
+The active `vinext@0.0.41` lane no longer emits the prior Rolldown option-validation warnings for `treeshake.preset` or `experimentalMinChunkSize` during `bun run build`.
 
 If CI reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or

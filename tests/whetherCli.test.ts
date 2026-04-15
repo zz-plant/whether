@@ -508,7 +508,12 @@ describe("whether cli", () => {
     });
 
     const port = await listenOnPreferredLocalPort(server);
-    const result = await runCli(["status", "--compact", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    const result = await runCli(["status", "--compact", "--json"], {
+      env: buildIsolatedEnv({
+        HOME: homeDir,
+        WHETHER_LOCAL_API_PORT_CANDIDATES: String(port),
+      }),
+    });
     await new Promise<void>((resolve) => server.close(() => resolve()));
     fs.rmSync(homeDir, { recursive: true, force: true });
 

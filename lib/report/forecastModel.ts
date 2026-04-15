@@ -65,6 +65,10 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MIN_SAMPLES_FOR_RANGE = 2;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
+const FORECAST_HORIZONS = {
+  nearTerm: { driftScale: 1, uncertaintyScale: 1 },
+  mediumTerm: { driftScale: 2.2, uncertaintyScale: 1.6 },
+} as const;
 
 type TransitionDurationSample = {
   from: ForecastRegimeLabel;
@@ -334,8 +338,8 @@ const computeMacroDownsideBias = (
   let weightTotal = 0;
 
   macroSeries.forEach((series) => {
-    const latest = series.history?.at(0)?.value;
-    const prior = series.history?.at(1)?.value;
+    const latest = series.history?.at(-1)?.value;
+    const prior = series.history?.at(-2)?.value;
     if (typeof latest !== "number" || typeof prior !== "number") {
       return;
     }
@@ -453,43 +457,19 @@ export const classifyCrossingRisk = ({
   return "low";
 };
 
-export const buildForecastModel = ({
+const buildScenarioWeights = ({
   assessment,
-  reportDynamics,
-  macroSeries,
+  projectedTightnessDrift,
+  projectedRiskDrift,
+  tightnessUncertainty,
+  riskUncertainty,
 }: {
   assessment: RegimeAssessment;
-  reportDynamics: ReportDynamics;
-  macroSeries: MacroSeriesReading[];
-}): ForecastModel => {
-  const tightnessDelta = findSignalDelta(reportDynamics, "tightness");
-  const riskDelta = findSignalDelta(reportDynamics, "riskAppetite");
-  const curveDelta = findSignalDelta(reportDynamics, "curveSlope");
-  const macroDownsideBias = computeMacroDownsideBias(macroSeries);
-
-  const projectedTightnessDrift = tightnessDelta + macroDownsideBias * 7;
-  const projectedRiskDrift = riskDelta - macroDownsideBias * 8;
-
-  const tightnessGap =
-    assessment.scores.tightness - assessment.thresholds.tightnessRegime;
-  const riskGap =
-    assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime;
-  const nearestDistance = Math.round(
-    Math.min(Math.abs(tightnessGap), Math.abs(riskGap)),
-  );
-
-  const volatilityScale = clamp(
-    1 +
-      reportDynamics.totalSignalChanges * 0.25 +
-      Math.abs(macroDownsideBias) * 1.5,
-    1,
-    3,
-  );
-  const tightnessUncertainty =
-    clamp(3 + Math.abs(projectedTightnessDrift) * 0.7, 3, 14) * volatilityScale;
-  const riskUncertainty =
-    clamp(3 + Math.abs(projectedRiskDrift) * 0.7, 3, 14) * volatilityScale;
-
+  projectedTightnessDrift: number;
+  projectedRiskDrift: number;
+  tightnessUncertainty: number;
+  riskUncertainty: number;
+}) => {
   const regimeWeights: Record<ForecastRegimeLabel, number> = {
     Expansion: 0,
     Mixed: 0,
@@ -540,6 +520,72 @@ export const buildForecastModel = ({
     });
   });
 
+  return { regimeWeights, crossingProbability };
+};
+
+export const buildForecastModel = ({
+  assessment,
+  reportDynamics,
+  macroSeries,
+}: {
+  assessment: RegimeAssessment;
+  reportDynamics: ReportDynamics;
+  macroSeries: MacroSeriesReading[];
+}): ForecastModel => {
+  const tightnessDelta = findSignalDelta(reportDynamics, "tightness");
+  const riskDelta = findSignalDelta(reportDynamics, "riskAppetite");
+  const curveDelta = findSignalDelta(reportDynamics, "curveSlope");
+  const macroDownsideBias = computeMacroDownsideBias(macroSeries);
+
+  const projectedTightnessDrift = tightnessDelta + macroDownsideBias * 7;
+  const projectedRiskDrift = riskDelta - macroDownsideBias * 8;
+
+  const tightnessGap =
+    assessment.scores.tightness - assessment.thresholds.tightnessRegime;
+  const riskGap =
+    assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime;
+  const nearestDistance = Math.round(
+    Math.min(Math.abs(tightnessGap), Math.abs(riskGap)),
+  );
+
+  const baseVolatilityScale = clamp(
+    1 +
+      reportDynamics.totalSignalChanges * 0.25 +
+      Math.abs(macroDownsideBias) * 1.5,
+    1,
+    3,
+  );
+  const nearTermScenario = buildScenarioWeights({
+    assessment,
+    projectedTightnessDrift:
+      projectedTightnessDrift * FORECAST_HORIZONS.nearTerm.driftScale,
+    projectedRiskDrift:
+      projectedRiskDrift * FORECAST_HORIZONS.nearTerm.driftScale,
+    tightnessUncertainty:
+      clamp(3 + Math.abs(projectedTightnessDrift) * 0.7, 3, 14) *
+      baseVolatilityScale *
+      FORECAST_HORIZONS.nearTerm.uncertaintyScale,
+    riskUncertainty:
+      clamp(3 + Math.abs(projectedRiskDrift) * 0.7, 3, 14) *
+      baseVolatilityScale *
+      FORECAST_HORIZONS.nearTerm.uncertaintyScale,
+  });
+  const mediumTermScenario = buildScenarioWeights({
+    assessment,
+    projectedTightnessDrift:
+      projectedTightnessDrift * FORECAST_HORIZONS.mediumTerm.driftScale,
+    projectedRiskDrift:
+      projectedRiskDrift * FORECAST_HORIZONS.mediumTerm.driftScale,
+    tightnessUncertainty:
+      clamp(3 + Math.abs(projectedTightnessDrift) * 0.7, 3, 14) *
+      baseVolatilityScale *
+      FORECAST_HORIZONS.mediumTerm.uncertaintyScale,
+    riskUncertainty:
+      clamp(3 + Math.abs(projectedRiskDrift) * 0.7, 3, 14) *
+      baseVolatilityScale *
+      FORECAST_HORIZONS.mediumTerm.uncertaintyScale,
+  });
+
   const momentum = classifyBoundaryMomentum({
     tightnessGap,
     riskGap,
@@ -548,14 +594,14 @@ export const buildForecastModel = ({
   });
 
   const crossingRisk = classifyCrossingRisk({
-    crossingProbability,
+    crossingProbability: nearTermScenario.crossingProbability,
     distance: nearestDistance,
     momentum,
   });
 
   return {
-    next4WeekProbabilities: normalizeProbabilities(regimeWeights),
-    next90DayProbabilities: normalizeProbabilities(regimeWeights),
+    next4WeekProbabilities: normalizeProbabilities(nearTermScenario.regimeWeights),
+    next90DayProbabilities: normalizeProbabilities(mediumTermScenario.regimeWeights),
     boundaryPressure: {
       distance: nearestDistance,
       momentum,

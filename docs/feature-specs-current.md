@@ -292,7 +292,7 @@ The regime assessment includes:
 ### 3.5 Policy-spec pilot layer (new)
 A policy-alignment pilot now runs **alongside** the legacy regime engine in the assessment payload:
 - Versioned policy metadata (`policy-v1`) is emitted for traceability.
-- Signal normalization fields include z-score, directional transform, and clipped z-score for base rate, slope, BBB spread, CPI YoY, and unemployment.
+- Signal normalization fields include z-score, directional transform, and clipped z-score for base rate, slope, BBB spread, CPI YoY, and unemployment; Treasury signals use the local long-range archive when available, while other policy signals normalize against the available local history window.
 - Composite outputs expose `cts` and `ras` values without replacing legacy tightness/risk-appetite outputs yet.
 - A refusal state is included when disagreement/volatility/data-gap guards trigger, returning explicit fallback directives (`NO_POSTURE_CHANGE_RECOMMENDED`, `REVERSIBLE_BETS_ONLY`).
 
