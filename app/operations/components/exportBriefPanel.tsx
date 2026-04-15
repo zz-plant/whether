@@ -43,6 +43,7 @@ import {
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { WorkAppLabel } from "../../components/workAppIcon";
 import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
+import { PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -337,7 +338,7 @@ export const ExportBriefPanel = ({
           titleId="export-briefs-title"
           description={
             <>
-              Leadership update and plain-English update options for different audiences.
+              {PRIMARY_AUDIENCE_SHARE_GUIDANCE}
             </>
           }
           aside={

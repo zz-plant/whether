@@ -185,6 +185,7 @@ Implementation guardrails:
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
 - Homepage utility search should stay demoted behind a secondary `Search tools` action so the first-screen priority remains reading the weekly call.
 - The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance.
+- The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
@@ -201,6 +202,7 @@ Implementation guardrails:
 - Share flow should present one recommended routine path first (`share` or `copy` the selected brief), keep quick variants lightweight, and push board/governance packaging plus company-specific exceptions behind clearly separate disclosures.
 - Citation + provenance belong near the lower fold: `Cite this call` stays separate from the share-action rail, and compact provenance remains immediately after the weekly card on `/`.
 - Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
+- The homepage should make the primary audience assumption explicit without adding a second explainer block: Whether defaults to U.S.-based operators and a U.S. market baseline, while still telling the operator to pressure-test the call against company-specific data.
 - Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.
 
 ## Slack screenshot card contract

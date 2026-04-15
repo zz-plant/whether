@@ -235,13 +235,13 @@ export const TimeMachinePanel = ({
             <p className="mt-3 type-data text-slate-300">
               {isHistorical ? (
                 <>
-                  You are replaying the weekly read from{" "}
+                  You are viewing the weekly snapshot from{" "}
                   <span className="font-semibold text-slate-100">{selectedLabel}</span>. Compare
                   against now ({latestRecordLabel}) before changing current plans.
                 </>
               ) : (
                 <>
-                  You are in the live now view ({latestRecordLabel}). Use past snapshots to replay
+                  You are in the current live view ({latestRecordLabel}). Use past snapshots to review
                   the prior month before approving irreversible decisions.
                 </>
               )}
@@ -264,7 +264,7 @@ export const TimeMachinePanel = ({
                 href={replayPreviousHref as Route}
                 className={`mt-3 ${centeredPillLinkClass}`}
               >
-                Replay previous month
+                View last month
               </ActionLink>
             ) : null}
           </div>

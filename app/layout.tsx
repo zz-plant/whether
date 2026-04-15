@@ -62,13 +62,13 @@ export const metadata: Metadata = {
   description: siteDescription,
   applicationName: "Whether",
   keywords: [
-    "macroeconomic signals",
+    "US market signals",
     "Treasury yield curve",
     "product strategy",
     "engineering strategy",
     "capital markets",
-    "capital posture classification",
-    "operational constraints"
+    "weekly market call",
+    "operating guardrails"
   ],
   authors: [{ name: "Whether" }],
   creator: "Whether",

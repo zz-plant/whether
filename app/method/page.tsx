@@ -8,6 +8,10 @@ import { buildCompactTrustSummary, buildDecisionReadinessState, buildFailureMode
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { ReportShell } from "../components/reportShell";
+import {
+  PRIMARY_AUDIENCE_ACTION,
+  PRIMARY_AUDIENCE_SUMMARY,
+} from "../../lib/report/reportCopy";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -15,7 +19,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Trust — freshness, confidence, and sources",
   description:
-    "Check whether this week's call is current, dependable, and backed by sources.",
+    "Check whether this week's U.S.-market brief is current, dependable, and backed by sources.",
   path: "/method",
   imageAlt: "Whether trust hub",
 });
@@ -131,7 +135,7 @@ export default async function MethodPage() {
       trustStatusTone={trustStatusTone}
       pageTitle="Trust"
       currentPath="/method"
-      pageSummary="Check whether this week's brief is current enough to act on."
+      pageSummary="Check whether this week's U.S.-market brief is current enough to act on."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
       sectionLinks={sectionLinks.slice(0, 3)}
       heroVariant="compact"
@@ -172,12 +176,15 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <HubSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's brief." className="scroll-mt-28">
+      <HubSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief." className="scroll-mt-28">
         <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
             {trustVerdict.label}
           </p>
           <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
+          <p className="text-xs leading-5 text-slate-400">
+            {PRIMARY_AUDIENCE_SUMMARY} {PRIMARY_AUDIENCE_ACTION}
+          </p>
         </article>
         <div className="grid gap-3 sm:grid-cols-3">
           <article className="weather-hub-card rounded-2xl px-4 py-4">
@@ -211,7 +218,7 @@ export default async function MethodPage() {
       <HubSection
         id="sources-freshness"
         title="Sources and freshness"
-        description="Where the current call came from and how current it is."
+        description="Where the current recommendation came from and how current it is."
         className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -250,7 +257,7 @@ export default async function MethodPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
-              <li><span className="text-slate-400">This call breaks if:</span> {reportData.flipThreshold}</li>
+              <li><span className="text-slate-400">This recommendation breaks if:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">Pause if:</span> {reportData.guardrailThreshold}</li>
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>
             </ul>
@@ -276,7 +283,7 @@ export default async function MethodPage() {
       >
         <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className="text-sm text-slate-200">
-            The scoring logic, stop lines, and change triggers behind this week&rsquo;s call.
+            The scoring logic, stop lines, and change triggers behind this week&rsquo;s recommendation.
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
             <li>• Read the formulas alongside the current confidence and freshness labels before making hard-to-reverse decisions.</li>
@@ -290,7 +297,7 @@ export default async function MethodPage() {
         </div>
       </HubSection>
 
-      <HubSection id="revisit-call" title="What would make this wrong?" className="scroll-mt-28">
+      <HubSection id="revisit-call" title="What would make this recommendation wrong?" className="scroll-mt-28">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 rounded-xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>

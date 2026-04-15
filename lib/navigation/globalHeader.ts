@@ -28,8 +28,8 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
 
   if (pathMatchesLink("/", normalizedPathname)) {
     return {
-      title: "Weekly operating brief for hiring, spend, and pace.",
-      description: "Start here for this week's call, next move, and pause line.",
+      title: "Weekly planning brief for hiring, spending, and growth pace.",
+      description: "Start here for this week's recommendation, next move, and pause line.",
     } as const;
   }
 
@@ -37,14 +37,14 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
 
   if (!activeLayer) {
     return {
-      title: "Operating posture navigation",
+      title: "Weekly planning views",
       description: null,
     } as const;
   }
 
   const parentLayer = activeLayer.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
   const actionDescriptionByKey: Partial<Record<NavigationLayer["key"], string>> = {
-    "weekly-brief": "See this week's call, next move, and pause line.",
+    "weekly-brief": "See this week's recommendation, next move, and pause line.",
     signals: "See what changed and what to watch.",
     operations: "Approve or hold hiring, spend, roadmap, and what to share.",
     decide: "Close one open question.",

@@ -106,7 +106,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.doesNotMatch(html, /This week at a glance/);
     assert.match(html, /Watch this week/);
-    assert.match(html, /Aggression vs last week/);
+    assert.match(html, /Boldness budget/);
   });
 
   it("keeps top-fold sequence canonical: recommendation, operating call, action now, change course if", () => {

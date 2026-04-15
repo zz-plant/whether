@@ -65,7 +65,7 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
         <p className="type-label text-slate-400">Financial implications</p>
         <h3 className="text-lg font-semibold text-slate-100">Runway planner</h3>
         <p className="mt-2 text-sm text-slate-300">
-          Model runway decisions against current posture so burn, raise timing, and reversal triggers stay aligned.
+          Check your runway plan against this week&apos;s market call so burn, fundraising timing, and reopen triggers stay aligned.
         </p>
         <button
           type="button"
@@ -76,7 +76,7 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
         </button>
         {showMethodology ? (
           <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk blends runway gap, burn multiple, growth, and regime posture. Decision knobs are derived from runway pressure + regime context (tightness and risk appetite) to set approval velocity, payback strictness, and reversibility requirements.
+            Runway risk combines runway gap, burn multiple, growth, and the current market setting. The planner turns that pressure plus regime context into practical guidance for approval pace, payback discipline, and how reversible new commitments should be.
           </div>
         ) : null}
       </div>

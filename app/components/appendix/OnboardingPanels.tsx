@@ -7,6 +7,9 @@ import {
   FIRST_TIME_GUIDE_NEXT_LINKS,
   FIRST_TIME_GUIDE_STEPS,
   GLOSSARY_USAGE_NOTES,
+  PRIMARY_AUDIENCE_ACTION,
+  PRIMARY_AUDIENCE_LABEL,
+  PRIMARY_AUDIENCE_SUMMARY,
 } from "../../../lib/report/reportCopy";
 
 export const FirstTimeGuidePanel = ({
@@ -27,8 +30,13 @@ export const FirstTimeGuidePanel = ({
             Recommended quick scan in three stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            Use this walkthrough to align on the core recommendation before you dive into deeper sections.
+            Use this walkthrough to align on the core recommendation before you dive into deeper sections. The product defaults to a U.S. market baseline so you can get to the decision faster.
           </p>
+        </div>
+        <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
+          <p className="text-xs text-slate-500">{PRIMARY_AUDIENCE_LABEL}</p>
+          <p className="mt-2 text-xs text-slate-200">{PRIMARY_AUDIENCE_SUMMARY}</p>
+          <p className="mt-1 text-xs text-slate-400">{PRIMARY_AUDIENCE_ACTION}</p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
           <p className="text-xs text-slate-500">Current snapshot</p>
@@ -105,7 +113,7 @@ export const FirstTimeGuidePanel = ({
       </div>
       <p className="mt-4 text-xs text-slate-300">
         Share the URL when you lock watch lines or past-snapshot selections so every stakeholder sees
-        the same posture assumptions.
+        the same posture assumptions and U.S. market baseline.
       </p>
     </div>
   </section>
@@ -121,14 +129,14 @@ export const BeginnerGlossaryPanel = () => (
             Translate finance terms into day-to-day product decisions
           </h3>
           <p className="mt-2 type-data text-slate-300">
-            New to Treasury data? Reference this glossary as needed to translate unfamiliar terms into
+            New to Treasury data? Reference this glossary as needed to translate unfamiliar U.S. market terms into
             concrete product moves before you share the report.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
           <p className="text-xs text-slate-500">Onboarding lens</p>
           <p className="mt-2 text-xs text-slate-200">Plain English over jargon</p>
-          <p className="mt-1 text-xs text-slate-400">Focus on constraints</p>
+          <p className="mt-1 text-xs text-slate-400">U.S. market terms, then constraints</p>
         </div>
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">

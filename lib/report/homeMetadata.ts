@@ -9,7 +9,7 @@ import { decisionTransmissionSearchDescription } from "./decisionTransmissionCop
 
 export type { HomePageSearchParams };
 
-const HOME_TITLE = "Weekly market call for leadership teams: act now, confidence, and flip triggers — Whether";
+const HOME_TITLE = "Weekly U.S. market brief for leadership teams: act now, confidence, and change triggers — Whether";
 const HOME_DESCRIPTION =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 

@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Whether",
     short_name: "Whether",
-    description: "Weekly operating brief for turning macro signals into clear decisions.",
+    description: "Weekly U.S. market brief for turning market signals into clear operating decisions.",
     start_url: "/",
     scope: "/",
     display: "standalone",
@@ -41,7 +41,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         name: "Evidence",
         short_name: "Evidence",
-        description: "Open the driver stack and thresholds.",
+        description: "Open the main drivers and thresholds.",
         url: "/signals",
       },
     ],

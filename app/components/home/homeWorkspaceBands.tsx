@@ -67,7 +67,7 @@ export async function HomeWorkspaceBands({
               Turn the call into this week&apos;s plan
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Use this only after the weekly call is settled. Keep the rest of the page in support mode.
+              Use this only after the weekly call is settled. The brief already assumes a U.S. market baseline, so this step is where you translate it into company-specific approvals.
             </p>
           </div>
         </div>

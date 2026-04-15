@@ -54,6 +54,9 @@ shows posture, trend, confidence, and flip-window context, and the canonical wee
 once below it with explicit `Action now`, `Pause if`, and `Change course if` fields. The share rail
 now keeps the weekly operator brief and short snapshot as the only default-scan actions, while board
 packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
+The weekly brief now also states its primary audience assumption directly: Whether defaults to
+U.S.-based operators and a U.S. market baseline, then asks the user to pressure-test that read
+against company-specific demand, retention, and cash signals.
 Operator-workflow telemetry still logs artifact-mode selection and route transitions across the core
 weekly loop.
 The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
@@ -158,7 +161,8 @@ Shared report-shell routes now avoid stacking a separate trust summary panel ahe
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
 glossary support lives under the Trust hub so operators can pull term translation without leaving
-the weekly brief flow.
+the weekly brief flow. The glossary now explicitly translates U.S. market and Treasury language for
+the product's primary user base instead of assuming macro fluency.
 
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.

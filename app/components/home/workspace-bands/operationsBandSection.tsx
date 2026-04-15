@@ -116,7 +116,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
               )) : (
                 <article className="rounded-lg border border-sky-400/20 bg-slate-950/45 px-2.5 py-2">
                   <p className="text-xs font-semibold text-slate-100">Planning reset</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-300">Move faster again once the current stop line clears and the next weekly read confirms.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-300">Move faster again once the current stop line clears and next week&apos;s update confirms it.</p>
                 </article>
               )}
             </div>

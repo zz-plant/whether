@@ -94,10 +94,10 @@ export const DataProvenanceStrip = ({
     ? <StatusLiveIcon className="h-2.5 w-2.5" />
     : <StatusStaticIcon className="h-2.5 w-2.5" />;
   const derivationLine = provenance.statusLabel === "Live (high confidence)"
-    ? "Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes."
+    ? "Derived from U.S. Treasury, inflation, labor, credit, and funding indicators updated every 15 minutes."
     : provenance.statusLabel === "Simulated (low)"
-      ? "Derived from modeled Treasury and macro inputs while live coverage is unavailable."
-      : "Derived from the latest Treasury and macro snapshots available this refresh.";
+      ? "Derived from modeled U.S. Treasury and macro inputs while live coverage is unavailable."
+      : "Derived from the latest U.S. Treasury and macro snapshots available this refresh.";
 
   const provenanceRows = [
     {

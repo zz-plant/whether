@@ -66,11 +66,11 @@ export const MethodologyContent = () => {
       <SecondaryPageHeader
         eyebrow="Formula notes"
         title="Methodology"
-        description="Deep technical reference: each signal includes a plain-English formula, model role, and direct source."
+        description="Technical reference: each signal includes a plain-English formula, how it affects the recommendation, and a direct source."
         aside={(
           <div className="weather-surface space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Source baseline</p>
-            <p className="text-sm text-slate-300">Canonical Treasury feed: FRED CSV Treasury series. Secondary validation source: US Treasury Fiscal Data API when running provenance checks.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Primary sources</p>
+            <p className="text-sm text-slate-300">Primary source: FRED Treasury series. Secondary check: U.S. Treasury Fiscal Data API for provenance verification.</p>
           </div>
         )}
       />
@@ -80,19 +80,19 @@ export const MethodologyContent = () => {
           <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What this model does</p>
             <p className="mt-3 text-sm text-slate-200">
-              It turns a bounded macro input set into a weekly operating posture so leaders can tighten, hold, or loosen plans without reopening every assumption from scratch.
+              It turns a small set of U.S. market inputs into a weekly recommendation so leaders can slow down, hold steady, or press harder without reopening every assumption from scratch.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What powers the call</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What powers the recommendation</p>
             <p className="mt-3 text-sm text-slate-200">
-              The canonical pacing inputs are intentionally compact: base rate, curve slope, BBB spread, CPI, and unemployment. They set market tempo; they do not claim to model company-specific demand, product quality, or execution.
+              The main inputs are intentionally compact: base rate, curve slope, BBB spread, CPI, and unemployment. They describe the U.S. market backdrop; they do not claim to model company-specific demand, product quality, or execution.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">How to read the outputs</p>
             <p className="mt-3 text-sm text-slate-200">
-              Hiring, spending, fundraising, and product-tempo guidance are translation-layer defaults. They are designed to be bounded and reversible, not presented as bespoke certainty.
+              Hiring, spending, fundraising, and product-tempo guidance are default starting points. They are designed to stay clear and reversible, not presented as company-specific certainty.
             </p>
           </article>
         </div>
@@ -127,7 +127,7 @@ export const MethodologyContent = () => {
             </li>
           </ul>
           <p className="mt-4 text-xs leading-6 text-slate-400">
-            Practical reading rule: the formulas improve transparency, but they do not expand the underlying data universe. Treat the composites as a compact macro interpretation layer, then pressure-test the output against your own company metrics before acting.
+            Practical reading rule: the formulas improve transparency, but they do not expand the underlying data universe. Treat the composites as a compact read on the market backdrop, then pressure-test the output against your own company metrics before acting.
           </p>
         </div>
       </SecondaryPageSection>

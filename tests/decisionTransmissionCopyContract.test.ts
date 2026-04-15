@@ -65,10 +65,10 @@ describe("decision transmission copy contract", () => {
 
     assert.match(decisionTransmissionSummaryLine, /what to do differently now/i);
     assert.match(decisionTransmissionSummaryLine, /how sure/i);
-    assert.match(decisionTransmissionSummaryLine, /flip the call/i);
+    assert.match(decisionTransmissionSummaryLine, /recommendation change/i);
     assert.match(metadata.description ?? "", /what to do differently now/i);
     assert.match(metadata.description ?? "", /how sure/i);
-    assert.match(metadata.description ?? "", /change our mind/i);
+    assert.match(metadata.description ?? "", /change the recommendation/i);
   });
 
   it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {

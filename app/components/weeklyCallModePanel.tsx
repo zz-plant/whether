@@ -5,6 +5,11 @@ import type { DecisionReadinessState } from "../../lib/report/trustStatus";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { RevisitQueueItem, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
+import {
+  PRIMARY_AUDIENCE_ACTION,
+  PRIMARY_AUDIENCE_LABEL,
+  PRIMARY_AUDIENCE_SUMMARY,
+} from "../../lib/report/reportCopy";
 import { CompactDisclosure } from "./compactDisclosure";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 
@@ -131,11 +136,9 @@ export function WeeklyCallModePanel({
   const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
   const deferredRevisitItems = revisitDecisions ? revisitQueue.slice(1) : [];
   const hasSecondaryLane = revisitDecisions || flipSupport.length > 0;
-  const aggressionDirectionLabel = weeklyLeadershipSummary.boldnessDelta > 0
-    ? "More aggressive"
-    : weeklyLeadershipSummary.boldnessDelta < 0
-      ? "More defensive"
-      : "No change";
+  const boldnessDeltaLabel = weeklyLeadershipSummary.boldnessDelta > 0
+    ? `+${weeklyLeadershipSummary.boldnessDelta}`
+    : `${weeklyLeadershipSummary.boldnessDelta}`;
   const formatBackdropValue = (
     value: string,
     kind: "hiring" | "expansion" | "raise",
@@ -160,27 +163,29 @@ export function WeeklyCallModePanel({
   };
   const postureSummaryCards = [
     {
-      label: "Aggression vs last week",
-      value: aggressionDirectionLabel,
-      detail: `${weeklyLeadershipSummary.boldnessScore}/100 now`,
+      label: "Boldness budget",
+      value: `${weeklyLeadershipSummary.boldnessScore} / 100`,
+      detail: weeklyLeadershipSummary.boldnessDelta === 0
+        ? "No change vs last week"
+        : `${boldnessDeltaLabel} vs last week`,
       className: `${compactMetricCardBase} border-slate-700/80 bg-slate-900/65`,
     },
     {
-      label: "Hiring backdrop",
+      label: "Hiring market",
       value: formatBackdropValue(weeklyLeadershipSummary.hiringWindow, "hiring"),
-      detail: "External backdrop",
+      detail: "U.S. labor backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Expansion backdrop",
+      label: "Expansion market",
       value: formatBackdropValue(weeklyLeadershipSummary.expansionWindow, "expansion"),
-      detail: "External backdrop",
+      detail: "U.S. demand backdrop",
       className: compactMetricCardBase,
     },
     {
-      label: "Funding backdrop",
+      label: "Funding market",
       value: formatBackdropValue(weeklyLeadershipSummary.raiseWindow, "raise"),
-      detail: "External backdrop",
+      detail: "U.S. funding backdrop",
       className: compactMetricCardBase,
     },
   ] as const;
@@ -205,14 +210,29 @@ export function WeeklyCallModePanel({
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative space-y-4">
             <div className={`grid gap-4 ${hasSecondaryLane ? "xl:grid-cols-[minmax(0,1.48fr)_minmax(15rem,0.52fr)]" : ""}`}>
-              <article className="rounded-[1rem] border border-slate-800/60 bg-slate-950/22 px-4 py-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-[0.7rem] border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
-                    {decisionReadiness.label}
-                  </span>
-                  <span className={`rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${trustChipClass}`}>
-                    {inlineTrustLabel}
-                  </span>
+              <article className="rounded-[1rem] border border-slate-800/60 bg-[linear-gradient(180deg,rgba(10,18,32,0.62),rgba(2,6,23,0.34))] px-4 py-4 shadow-[0_22px_50px_-36px_rgba(8,15,28,0.98)]">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-[0.7rem] border border-slate-700/80 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                      This week
+                    </span>
+                    <span className="rounded-[0.7rem] border border-emerald-400/25 bg-emerald-500/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
+                      {decisionReadiness.label}
+                    </span>
+                    <span className={`rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${trustChipClass}`}>
+                      {inlineTrustLabel}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      Net delta
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-slate-100">
+                      {weeklyLeadershipSummary.netDeltaLabel}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   {showModeChip ? (
                     <span className="text-[11px] font-medium text-slate-500">
                       {selectedModeLabel}
@@ -222,7 +242,7 @@ export function WeeklyCallModePanel({
                 <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                   Recommendation
                 </p>
-                <h2 className={`${tierOneHeadingClassName} mt-3 text-xl leading-tight text-slate-50 sm:text-[1.95rem] sm:leading-[2.3rem]`}>
+                <h2 className={`${tierOneHeadingClassName} mt-3 max-w-4xl text-xl leading-tight text-slate-50 sm:text-[2.05rem] sm:leading-[2.4rem]`}>
                   {recommendationLine}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-300">
@@ -235,6 +255,21 @@ export function WeeklyCallModePanel({
                     {trustStatusSummary}
                   </p>
                 ) : null}
+
+                <section className="mt-4 rounded-[1rem] border border-slate-700/75 bg-[linear-gradient(180deg,rgba(8,17,31,0.78),rgba(4,10,20,0.88))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="max-w-2xl">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                        {publicDecisionLabels.call}
+                      </p>
+                      <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-2.5 sm:max-w-[14rem]">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Use in the room</p>
+                      <p className="mt-1 text-[11px] leading-5 text-slate-200">{weeklyLeadershipSummary.shorthandLine}</p>
+                    </div>
+                  </div>
+                </section>
 
                 <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/52 px-3 py-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -263,11 +298,7 @@ export function WeeklyCallModePanel({
                 <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
 
                 <section className="mt-4 rounded-[1rem] border border-slate-800/75 bg-slate-950/40 px-3 py-3">
-                  <dl className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-4">
-                    <div className="rounded-lg border border-slate-700/70 bg-slate-950/55 px-3 py-3">
-                      <dt className="text-[11px] font-medium text-slate-300">{publicDecisionLabels.call}</dt>
-                      <dd className="mt-1 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</dd>
-                    </div>
+                  <dl className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,1fr))]">
                     <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/8 px-3 py-3">
                       <dt className="text-[11px] font-medium text-emerald-200">{publicDecisionLabels.action}</dt>
                       <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{recommendationLine}</dd>
@@ -285,87 +316,122 @@ export function WeeklyCallModePanel({
               </article>
 
               {hasSecondaryLane ? (
-                <aside className="space-y-3">
-                  <article className="rounded-[1rem] border border-slate-800/60 bg-slate-950/20 px-3 py-3 text-slate-100">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-medium text-slate-300">Watch this week</p>
-                    {revisitQueue.length > 0 ? (
-                      <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold text-slate-200">
-                        {revisitQueue.length} decisions
-                      </span>
+                <aside className="space-y-3 xl:pt-1">
+                  <article className="rounded-[1rem] border border-slate-800/60 bg-[linear-gradient(180deg,rgba(10,18,32,0.46),rgba(3,7,18,0.26))] px-3 py-3 text-slate-100">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[11px] font-medium text-slate-300">Watch this week</p>
+                      {revisitQueue.length > 0 ? (
+                        <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold text-slate-200">
+                          {revisitQueue.length} decisions
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-100">
+                      {revisitDecisions ? revisitLabel : "No major reopen items right now; keep the main action moving."}
+                    </p>
+                    {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-400">{revisitDetail}</p> : null}
+                    {flipSupport.length > 0 ? (
+                      <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">This would change the call</p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {flipSupport.map((label) => (
+                            <span key={label} className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
+                              {label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     ) : null}
-                  </div>
-                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-100">
-                    {revisitDecisions ? revisitLabel : "No major reopen items right now; keep the main action moving."}
-                  </p>
-                  {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-400">{revisitDetail}</p> : null}
-                  {flipSupport.length > 0 ? (
-                    <div className="mt-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">This would change the call</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {flipSupport.map((label) => (
-                          <span key={label} className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
 
-                  {featuredRevisitItem ? (
-                    <div className="mt-4 border-t border-slate-800/70 pt-3">
-                      <p className="text-[11px] font-medium text-slate-300">Start with</p>
-                      <article className="mt-2 rounded-lg border border-slate-800/70 bg-slate-950/60 px-3 py-3">
-                        <p className="text-sm font-semibold text-slate-100">{featuredRevisitItem.label}</p>
-                        <p className="mt-2 text-[11px] font-medium text-emerald-200">Revisit now</p>
-                        <p className="mt-1 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.action}</p>
-                        <p className="mt-2 text-[11px] font-medium text-slate-400">Why it matters</p>
-                        <p className="mt-1 text-[11px] leading-5 text-slate-400">{featuredRevisitItem.reason}</p>
-                        <p className="mt-2 text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</p>
-                        <p className="mt-1 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.flipCondition}.</p>
-                      </article>
-                    </div>
-                  ) : null}
-
-                  {deferredRevisitItems.length > 0 ? (
-                    <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
-                      <summary className="cursor-pointer list-none text-[11px] font-medium text-slate-300">
-                        More to reopen
-                      </summary>
-                      <div className="mt-3 divide-y divide-slate-800/70">
-                        {deferredRevisitItems.map((item) => (
-                          <article key={item.id} className="py-3 first:pt-0 last:pb-0">
-                            <p className="text-sm font-semibold text-slate-100">{item.label}</p>
-                            <p className="mt-2 text-[11px] font-medium text-emerald-200">Revisit now</p>
-                            <p className="mt-1 text-[11px] leading-5 text-slate-200">{item.action}</p>
-                            <p className="mt-2 text-[11px] font-medium text-slate-400">Why it matters</p>
-                            <p className="mt-1 text-[11px] leading-5 text-slate-400">{item.reason}</p>
-                            <p className="mt-2 text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</p>
-                            <p className="mt-1 text-[11px] leading-5 text-slate-200">{item.flipCondition}.</p>
-                          </article>
-                        ))}
+                    {featuredRevisitItem ? (
+                      <div className="mt-4 border-t border-slate-800/70 pt-3">
+                        <article className="rounded-lg border border-slate-800/70 bg-slate-950/60 px-3 py-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[11px] font-medium text-slate-300">Start with</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-100">{featuredRevisitItem.label}</p>
+                            </div>
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
+                              Revisit now
+                            </span>
+                          </div>
+                          <p className="mt-3 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.action}</p>
+                          <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                            <div>
+                              <dt className="text-[11px] font-medium text-slate-400">Why it matters</dt>
+                              <dd className="mt-1 text-[11px] leading-5 text-slate-400">{featuredRevisitItem.reason}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
+                              <dd className="mt-1 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.flipCondition}.</dd>
+                            </div>
+                          </dl>
+                        </article>
                       </div>
-                    </details>
-                  ) : null}
+                    ) : null}
+
+                    {deferredRevisitItems.length > 0 ? (
+                      <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
+                        <summary className="cursor-pointer list-none text-[11px] font-medium text-slate-300">
+                          More to reopen
+                        </summary>
+                        <div className="mt-3 divide-y divide-slate-800/70">
+                          {deferredRevisitItems.map((item) => (
+                            <article key={item.id} className="py-3 first:pt-0 last:pb-0">
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                                <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
+                                  Revisit now
+                                </span>
+                              </div>
+                              <p className="mt-2 text-[11px] leading-5 text-slate-200">{item.action}</p>
+                              <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                                <div>
+                                  <dt className="text-[11px] font-medium text-slate-400">Why it matters</dt>
+                                  <dd className="mt-1 text-[11px] leading-5 text-slate-400">{item.reason}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
+                                  <dd className="mt-1 text-[11px] leading-5 text-slate-200">{item.flipCondition}.</dd>
+                                </div>
+                              </dl>
+                            </article>
+                          ))}
+                        </div>
+                      </details>
+                    ) : null}
                   </article>
                 </aside>
               ) : null}
             </div>
 
-            <dl className="grid gap-2 rounded-[1rem] border border-slate-800/60 bg-slate-950/18 px-3 py-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-[1rem] border border-slate-800/60 bg-[linear-gradient(180deg,rgba(8,17,31,0.52),rgba(3,7,18,0.22))] px-3 py-3">
+              <div className="border-b border-slate-800/70 pb-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  {PRIMARY_AUDIENCE_LABEL}
+                </p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-300">
+                  {PRIMARY_AUDIENCE_SUMMARY}
+                </p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                  {PRIMARY_AUDIENCE_ACTION}
+                </p>
+              </div>
+              <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {postureSummaryCards.map((card) => (
-                <div key={card.label} className="rounded-lg border border-slate-800/55 bg-slate-950/42 px-3 py-2.5">
+                <div key={card.label} className={card.className}>
                   <dt className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500">{card.label}</dt>
                   <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
                   <dd className="mt-1 text-[10px] leading-4 text-slate-500">{card.detail}</dd>
                 </div>
               ))}
-            </dl>
+              </dl>
+            </div>
 
-            <article
+            <section
               id="share-ready-artifact"
-              aria-label="Share-ready artifact"
-              className="rounded-[1.15rem] border border-slate-800/75 bg-slate-950/42 px-4 py-4 shadow-[0_14px_24px_-22px_rgba(2,6,23,0.68)]"
+              aria-label="Share-ready brief"
+              className="space-y-3"
             >
               {actions ? (
                 actions
@@ -375,7 +441,7 @@ export function WeeklyCallModePanel({
                 </p>
               )}
 
-              <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
+              <details className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                 <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                   Proof and continuity
                 </summary>
@@ -428,7 +494,7 @@ export function WeeklyCallModePanel({
                   ) : null}
                 </div>
               </details>
-            </article>
+            </section>
           </div>
         </article>
 

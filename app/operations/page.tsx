@@ -38,7 +38,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Planning",
   description:
-    "Approve the weekly plan, guardrails, finance posture, and final brief for the current regime.",
+    "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
   path: "/operations",
   imageAlt: "Whether planning view",
   imagePath: "/social/operations.svg",
@@ -81,7 +81,7 @@ export default async function OperationsPage({
         name: "Whether Report — Planning",
         url: `${siteUrl}/operations`,
         description:
-          "Approve the weekly plan, guardrails, finance posture, and final brief for the current regime.",
+          "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -195,7 +195,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Turn this week's call into a clear plan, visible stop lines, and a brief you can share."
+      pageSummary="Turn this week's recommendation into a clear plan, visible stop lines, and a brief you can share."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
@@ -215,7 +215,7 @@ export default async function OperationsPage({
         call: "Turn this week's call into a few explicit decisions and keep the stop lines visible.",
         doNow: [
           actionNowShort,
-          actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",
+          actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this week's backdrop.",
         ],
         flipConditions: [
           flipThreshold,
@@ -395,8 +395,8 @@ export default async function OperationsPage({
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Choose a leadership update, a plain-English update, or a board-ready version.",
-            summary: "Start with the leadership update, then switch to the plain-English version when people want more context.",
+            description: "Choose the default U.S. leadership update, a plain-English explainer, or a board-ready version.",
+            summary: "Start with the leadership update for U.S. exec rooms, then switch to the plain-English version when people want the market terms translated.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The room needs an explainer or governance pack",
@@ -413,7 +413,7 @@ export default async function OperationsPage({
                   id="ops-export-briefs-panel"
                   label="Share"
                   title="Share-ready brief"
-                  description="Start with the leadership update. Use the plain-English version when people want more context."
+                  description="Start with the leadership update for the default U.S. exec room. Use the plain-English version when people want the market terms translated."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel
@@ -448,8 +448,8 @@ export default async function OperationsPage({
                 <SectionedReportPanel
                   id="ops-operator-requests-panel"
                   label="Coordinate"
-                  title="Operator requests"
-                  description="Current asks for operators driving execution."
+                  title="Execution asks"
+                  description="Current asks for the people driving execution."
                   defaultOpen={true}
                 >
                   <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
@@ -492,9 +492,9 @@ export default async function OperationsPage({
 
       <section id="ops-edge-case-gate" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-edge-case-gate-title">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Only escalate if one bounded question remains</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Only escalate if one clear question remains</p>
           <h2 id="ops-edge-case-gate-title" className="text-lg font-semibold text-slate-100">Open decision help only after the plan is clear</h2>
-          <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance posture, operator asks, and sharing. Open decision help only when one owner-specific or situation-specific call still needs a bounded answer after this review.</p>
+          <p className="text-sm text-slate-300">Stay in Planning for approvals, guardrails, finance decisions, execution asks, and sharing. Open decision help only when one owner-specific or situation-specific question still needs a clear answer after this review.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">

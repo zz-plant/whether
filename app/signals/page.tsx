@@ -22,9 +22,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Why the weekly read changed",
+  title: "Whether Report — Why the weekly brief changed",
   description:
-    "Why the weekly read changed: what moved, why it matters, and what would make it wrong.",
+    "Why the weekly brief changed: what moved, why it matters, and what would make the recommendation change.",
   path: "/signals",
   imageAlt: "Whether Report evidence overview",
   imagePath: "/social/signals.svg",
@@ -49,12 +49,12 @@ export default async function SignalsPage({
       trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Why the weekly read changed"
+      pageTitle="Why the weekly brief changed"
       currentPath="/signals"
-      pageSummary="What changed, why it matters, and what would make this wrong."
+      pageSummary="What changed, why it matters, and what would make this recommendation change."
       pageSummaryLink={{
         href: "#decision-summary",
-        label: "Start with the operator read ↓",
+        label: "Start with the summary ↓",
       }}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
@@ -66,13 +66,13 @@ export default async function SignalsPage({
       }}
       decisionBanner={{
         label: "Evidence",
-        decision: "Use this to confirm or challenge the weekly call before changing the plan.",
+        decision: "Use this to confirm or challenge the weekly recommendation before changing the plan.",
         horizon: "Current cycle",
         confidence: model.trust.trustStatusLabel,
         effectiveDate: model.recordDateLabel,
         evidenceHref: "#decision-summary",
       }}
-      decisionDiffs={[{ label: `Regime: ${model.regimeLabel}`, tone: "neutral" }]}
+      decisionDiffs={[{ label: `Backdrop: ${model.regimeLabel}`, tone: "neutral" }]}
       commandBar={{
         regime: model.assessment.regime,
         call: "Check what changed before you change the plan.",

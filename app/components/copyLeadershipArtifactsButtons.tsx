@@ -8,6 +8,7 @@ import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 import { artifactModeLabels, type ArtifactMode } from "../../lib/literacyAssist";
 import { trackOperatorWorkflowEvent } from "../../lib/operatorWorkflowTelemetry";
 import { buildExplainerBriefContent } from "../../lib/export/explainerBrief";
+import { PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../lib/report/reportCopy";
 import {
   ARTIFACT_MODE_QUERY_PARAM,
   buildArtifactShareText,
@@ -201,10 +202,10 @@ export function CopyLeadershipArtifactsButtons({
       <article className="weather-transmission-card px-3 py-3 sm:px-4 sm:py-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready artifact</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready brief</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
             <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
-              Use this as the default room-ready wording. Open more formats only if the room needs a different reading level.
+              {PRIMARY_AUDIENCE_SHARE_GUIDANCE}
             </p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">

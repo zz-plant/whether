@@ -181,8 +181,8 @@ export default async function DecidePage({
                 open={hasGuidedTranslationSelection}
               >
                 <summary className="cursor-pointer list-none">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need role or stage translation?</p>
-                  <p className="mt-2 text-sm text-slate-200">Open this only if the question needs a role, company stage, or team-specific lens.</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
+                  <p className="mt-2 text-sm text-slate-200">Open this only if the question needs a role-specific, company-stage, or team-specific view.</p>
                 </summary>
                 <div className="mt-4 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (
