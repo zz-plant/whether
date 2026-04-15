@@ -38,7 +38,7 @@ export function CadenceBandSection({ workspaceModel }: { workspaceModel: HomePag
         <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
           <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Supporting surfaces" accentClass="text-slate-300" />
           <p className="mt-2 text-sm font-semibold text-slate-100">Optional utility</p>
-          <article className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-3">
+          <article className="mt-3 rounded-[0.85rem] border border-slate-800/80 bg-slate-950/50 px-3 py-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recommended utility</p>
             <p className="text-xs font-semibold text-slate-100">{workspaceModel.translate.fallbackUtility.title}</p>
             <p className="mt-1 text-xs text-slate-300">{workspaceModel.translate.fallbackUtility.detail}</p>

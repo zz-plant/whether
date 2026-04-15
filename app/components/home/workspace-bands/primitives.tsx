@@ -34,7 +34,7 @@ export const HomeBandHeader = ({ step, kicker, title, description, icon, toneCla
 
 export const CardEyebrow = ({ icon, label, accentClass }: { icon: ReactNode; label: string; accentClass: string }) => (
   <p className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] ${accentClass}`}>
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-current/20 bg-slate-950/60">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-[0.7rem] border border-current/20 bg-slate-950/60">
       {icon}
     </span>
     <span>{label}</span>

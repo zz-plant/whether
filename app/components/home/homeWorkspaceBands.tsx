@@ -87,7 +87,7 @@ export async function HomeWorkspaceBands({
 
             <Link
               href={workspaceModel.operations.continueHref as Route}
-              className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
+              className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[0.95rem] px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
             >
               <CheckIcon className="h-3.5 w-3.5" />
               <span>Make the plan</span>
@@ -108,87 +108,89 @@ export async function HomeWorkspaceBands({
               </p>
             </div>
           </div>
-        </article>
-      </section>
-
-      <section
-        id="audit-this-call"
-        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5"
-        aria-labelledby="audit-this-call-title"
-      >
-        <div className="weather-panel-header">
-          <div className="weather-panel-header-copy">
-            <p className="text-[11px] font-medium text-sky-200">Only if challenged</p>
-            <h2 id="audit-this-call-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
-              Challenge the call with one check
-            </h2>
-            <p className="weather-panel-header-description text-sm text-slate-300">
-              Open one proof path, not a second dashboard.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <Link
-            href={"/signals#decision-summary" as Route}
-            className="rounded-[1rem] border border-slate-800/65 bg-slate-950/45 px-4 py-4 text-slate-100 transition-colors hover:border-sky-400/45 hover:bg-slate-950/65"
+          <details
+            id="audit-this-call"
+            className="weather-auto-chevron mt-4 rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
           >
-            <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
-              <TrendUpIcon className="h-3.5 w-3.5" />
-              <span>See what changed</span>
-            </div>
-            <p className="mt-3 text-sm font-semibold">Why the read moved</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay when you need to challenge the call."}
-            </p>
-          </Link>
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+              <span className="min-w-0">
+                <span className="block text-[11px] font-medium text-sky-200">Only if challenged</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-100">Challenge the call with one check.</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-400">Open one proof path, not a second dashboard.</span>
+              </span>
+              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Optional
+              </span>
+            </summary>
 
-          <Link
-            href={"/method#trust-snapshot" as Route}
-            className="rounded-[1rem] border border-slate-800/65 bg-slate-950/45 px-4 py-4 text-slate-100 transition-colors hover:border-amber-400/45 hover:bg-slate-950/65"
-          >
-            <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
-              <AuditIcon className="h-3.5 w-3.5" />
-              <span>Check trust</span>
-            </div>
-            <p className="mt-3 text-sm font-semibold">{workspaceModel.audit.trustStatusAction}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              {workspaceModel.audit.trustMarkerDetail}
-            </p>
-          </Link>
-        </div>
-
-        <details
-          id="historical-replay-workspace"
-          className="weather-auto-chevron rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
-        >
-          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
-            <span className="min-w-0">
-              <span className="block text-[11px] font-medium text-violet-200">More paths</span>
-              <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper path only if the weekly call is already clear.</span>
-            </span>
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-              Optional
-            </span>
-          </summary>
-
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            {deeperPaths.map((path) => (
+            <div className="mt-3 grid gap-2 md:grid-cols-2">
               <Link
-                key={`${path.kicker}-${path.href}`}
-                href={path.href}
-                className={`rounded-[1rem] border border-slate-800/55 bg-slate-950/40 px-3 py-3 text-slate-100 transition-colors ${path.hoverClass}`}
+                href={"/signals#decision-summary" as Route}
+                className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/45 hover:bg-slate-950/55"
               >
-                <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
-                  {path.icon}
-                  <span>{path.kicker}</span>
+                <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
+                  <TrendUpIcon className="h-3.5 w-3.5" />
+                  <span>See what changed</span>
                 </div>
-                <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
-                <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
+                <p className="mt-2 text-sm font-semibold">Why the read moved</p>
+                <p className="mt-1 text-xs leading-5 text-slate-300">
+                  {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay when you need to challenge the call."}
+                </p>
               </Link>
-            ))}
-          </div>
-        </details>
+
+              <Link
+                href={"/method#trust-snapshot" as Route}
+                className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-amber-400/45 hover:bg-slate-950/55"
+              >
+                <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
+                  <AuditIcon className="h-3.5 w-3.5" />
+                  <span>Check trust</span>
+                </div>
+                <p className="mt-2 text-sm font-semibold">{workspaceModel.audit.trustStatusAction}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-300">
+                  {workspaceModel.audit.trustMarkerDetail}
+                </p>
+              </Link>
+            </div>
+
+            <details
+              id="historical-replay-workspace"
+              className="weather-auto-chevron mt-3 rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
+            >
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+                <span className="min-w-0">
+                  <span className="block text-[11px] font-medium text-violet-200">More paths</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper path only if the weekly call is already clear.</span>
+                </span>
+                <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  Optional
+                </span>
+              </summary>
+
+              <div className="mt-3 space-y-2">
+                {deeperPaths.map((path) => (
+                  <Link
+                    key={`${path.kicker}-${path.href}`}
+                    href={path.href}
+                    className={`flex items-start justify-between gap-3 rounded-[0.95rem] border border-slate-800/55 bg-slate-950/32 px-3 py-3 text-slate-100 transition-colors ${path.hoverClass}`}
+                  >
+                    <div className="min-w-0">
+                      <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
+                        {path.icon}
+                        <span>{path.kicker}</span>
+                      </div>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
+                    </div>
+                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                      Open
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </details>
+          </details>
+        </article>
       </section>
     </div>
   );

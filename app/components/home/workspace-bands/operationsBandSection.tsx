@@ -28,7 +28,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
         toneClass="border-emerald-400/40 text-emerald-200"
         actions={<Link href={workspaceModel.operations.continueHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]"><CheckIcon className="h-3.5 w-3.5" /><span>Planning</span></Link>}
       />
-      <article className="rounded-2xl border border-slate-800/80 bg-slate-950/55 p-3">
+      <article className="rounded-xl border border-slate-800/80 bg-slate-950/55 p-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Weekly decision" accentClass="text-emerald-200" />
@@ -47,7 +47,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           <section className="rounded-xl border border-emerald-400/20 bg-emerald-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Approve now</p>
-              <span className="rounded-full border border-emerald-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
+              <span className="rounded-[0.65rem] border border-emerald-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
                 Approve now
               </span>
             </div>
@@ -76,7 +76,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           <section className="rounded-xl border border-amber-400/20 bg-amber-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause pace if</p>
-              <span className="rounded-full border border-amber-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-100">
+              <span className="rounded-[0.65rem] border border-amber-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-100">
                 Stop line
               </span>
             </div>
@@ -98,7 +98,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
           <section className="rounded-xl border border-sky-400/20 bg-sky-500/8 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Reopen if</p>
-              <span className="rounded-full border border-sky-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
+              <span className="rounded-[0.65rem] border border-sky-400/25 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
                 Recheck
               </span>
             </div>

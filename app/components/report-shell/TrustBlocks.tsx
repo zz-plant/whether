@@ -120,7 +120,7 @@ export function HeroTrustProvenanceBlock({
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}
+              className={`inline-flex min-h-[28px] items-center rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}
             >
               {controlHeadline}
             </span>
@@ -129,7 +129,7 @@ export function HeroTrustProvenanceBlock({
             </span>
             {outageSeverity ? (
               <span
-                className={`inline-flex min-h-[28px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                className={`inline-flex min-h-[28px] items-center rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
                   outageSeverity === "critical"
                     ? "border-rose-400/45 bg-rose-500/10 text-rose-100"
                     : outageSeverity === "blocking"
@@ -167,7 +167,7 @@ export function HeroTrustProvenanceBlock({
               {currentApprovalLane?.label ?? (isCompactStableState ? "Allowed now" : "Use caution")}
             </p>
             <span
-              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}
+              className={`rounded-[0.65rem] border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}
             >
               {trustReadiness.tone === "stable" ? "Clear" : "Watch"}
             </span>
@@ -210,7 +210,7 @@ export function HeroTrustProvenanceBlock({
         </article>
       </div>
 
-      <details className="weather-auto-chevron weather-transmission-segment rounded-xl px-3 py-2">
+      <details className="weather-auto-chevron weather-transmission-segment rounded-[0.95rem] px-3 py-2">
           <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
             Source board
           </summary>

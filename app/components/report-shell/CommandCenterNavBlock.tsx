@@ -95,7 +95,7 @@ export function CommandCenterNavBlock({
 
       <div className="space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
-          <div className="weather-surface grid gap-2 rounded-[1.15rem] border border-slate-800/55 bg-slate-950/48 p-3">
+          <div className="weather-surface grid gap-2 rounded-[1rem] border border-slate-800/55 bg-slate-950/48 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
               Role-aware translation
             </p>
@@ -183,7 +183,7 @@ export function CommandCenterNavBlock({
               </div>
             </div>
 
-            <div className="space-y-3 rounded-[1.1rem] border border-slate-800/70 bg-slate-950/38 p-4">
+            <div className="space-y-3 rounded-[0.95rem] border border-slate-800/70 bg-slate-950/38 p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
                 {decisionBanner?.label ?? "Current operating call"}
               </p>
@@ -217,7 +217,7 @@ export function CommandCenterNavBlock({
         </article>
 
         {roleSwitcher && heroVariant !== "full" ? (
-          <div className="weather-surface grid gap-2 rounded-[1.15rem] border border-slate-800/55 bg-slate-950/42 p-3 sm:grid-cols-2">
+          <div className="weather-surface grid gap-2 rounded-[1rem] border border-slate-800/55 bg-slate-950/42 p-3 sm:grid-cols-2">
             {roleSwitcher.options.map((option) => {
               const isActive = option.key === roleSwitcher.active;
               return (
@@ -239,7 +239,7 @@ export function CommandCenterNavBlock({
         ) : null}
 
         {shouldShowMissionSequence ? (
-          <article className="weather-surface rounded-[1.15rem] border border-slate-800/55 bg-slate-950/42 p-4">
+          <article className="weather-surface rounded-[1rem] border border-slate-800/55 bg-slate-950/42 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -269,7 +269,7 @@ export function CommandCenterNavBlock({
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
                       </div>
-                      <span className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+                      <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
                         {item.cta}
                       </span>
                     </div>

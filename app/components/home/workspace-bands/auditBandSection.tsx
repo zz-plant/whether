@@ -38,7 +38,7 @@ export function AuditBandSection({ workspaceModel }: { workspaceModel: HomePageW
       <article className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <CardEyebrow icon={<AuditIcon className="h-3.5 w-3.5" />} label="Can you rely on it?" accentClass="text-sky-200" />
-          <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}>
+          <span className={`inline-flex rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}>
             {workspaceModel.audit.trustMarkerLabel}
           </span>
         </div>

@@ -45,7 +45,7 @@ export function RegimeBanner(props: RegimeBannerProps) {
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
 
   return (
-    <header className={`z-10 rounded-2xl border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`z-10 rounded-[1rem] border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
         <div id="weekly-posture-brief-title" className="flex min-w-0 items-start gap-3">
           <span className="weather-icon-chip h-8 w-8 flex-shrink-0 text-slate-50"><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /></span>
@@ -59,14 +59,14 @@ export function RegimeBanner(props: RegimeBannerProps) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:max-w-[24rem]" aria-label="This week metadata">
-          <span className={`inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
             <TrendGlyph trendLabel={trendValue} />
             <span>{trendValue} trend</span>
           </span>
-          <span className="inline-flex rounded-full border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className="inline-flex rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {Math.round(confidencePercent)}% confidence ({confidenceLabel})
           </span>
-          <span className="inline-flex rounded-full border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className="inline-flex rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {flipRiskValue} to flip
           </span>
         </div>
