@@ -1,4 +1,5 @@
 "use client";
+import { useId } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 
 type ModeOption = { mode: StartupVariantMode; label: string };
@@ -32,29 +33,43 @@ export function StartupModeSelector({
   contentByMode: Partial<Record<StartupVariantMode, StartupModeContent>>;
   onModeChange?: (mode: StartupVariantMode) => void;
 }) {
+  const radioGroupName = `startup-mode-${useId()}`;
   const firstAvailableMode = options.find((option) => contentByMode[option.mode])?.mode;
   const effectiveMode = contentByMode[selectedMode] ? selectedMode : firstAvailableMode;
   const activeContent = (effectiveMode && contentByMode[effectiveMode]) || emptyModeContent;
 
   return (
     <>
-      <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Company mode</p>
-        <div className="flex flex-wrap gap-2">
+      <fieldset className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2">
+        <legend className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+          Company mode
+        </legend>
+        <div className="mt-2 flex flex-wrap gap-2">
           {options.map((option) => (
-            <button
+            <label
               key={option.mode}
-              type="button"
-              onClick={() => onModeChange?.(option.mode)}
-              className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${effectiveMode === option.mode ? "border-sky-400/70 bg-sky-500/20 text-sky-100" : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"}`}
-              aria-pressed={effectiveMode === option.mode}
+              className={`relative inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition touch-manipulation ${
+                effectiveMode === option.mode
+                  ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                  : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
+              }`}
             >
-              {option.label}
-            </button>
+              <input
+                type="radio"
+                name={radioGroupName}
+                value={option.mode}
+                checked={effectiveMode === option.mode}
+                onChange={() => onModeChange?.(option.mode)}
+                className="peer sr-only"
+              />
+              <span className="rounded-full peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-300">
+                {option.label}
+              </span>
+            </label>
           ))}
         </div>
         <p className="text-xs text-slate-300">{activeContent.description} Threshold emphasis: {activeContent.thresholdEmphasis}</p>
-      </div>
+      </fieldset>
 
       <div className="grid gap-2.5 sm:grid-cols-2">
         <div className="rounded-lg border border-emerald-500/35 bg-emerald-500/5 px-3 py-3 space-y-1.5">

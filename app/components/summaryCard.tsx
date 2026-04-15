@@ -7,7 +7,7 @@
 import { Accordion } from "@base-ui/react/accordion";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 import { ChevronDownIcon } from "./uiIcons";
 
@@ -73,6 +73,9 @@ export const SummaryCard = ({
       : "Copy failed. Select and copy the text above manually.";
   const visibleStructuredSections = structuredSections.filter((section) => section.items.length > 0);
   const hasStructuredSections = visibleStructuredSections.length > 0;
+  const rawSummaryKey = useId().replace(/:/g, "");
+  const rawSummaryTriggerId = `${rawSummaryKey}-raw-summary-trigger`;
+  const rawSummaryPanelId = `${rawSummaryKey}-raw-summary-panel`;
 
   return (
     <div className="weather-surface mt-4 p-4">
@@ -130,12 +133,16 @@ export const SummaryCard = ({
         <Accordion.Root defaultValue={[]} className="mt-4">
           <Accordion.Item value="raw-summary" className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
             <Accordion.Header>
-              <Accordion.Trigger className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation">
+              <Accordion.Trigger
+                id={rawSummaryTriggerId}
+                aria-controls={rawSummaryPanelId}
+                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation"
+              >
                 <span>Raw summary text</span>
                 <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Panel>
+            <Accordion.Panel id={rawSummaryPanelId} aria-labelledby={rawSummaryTriggerId}>
               <pre
                 tabIndex={0}
                 aria-label="Summary card text"

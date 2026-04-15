@@ -1395,6 +1395,7 @@ body::after {
   .weather-signal-cell,
   .weather-movement-fill::after,
   .weather-loading-beacon,
+  .weather-loading-progress::after,
   .weather-skeleton__shimmer,
   .weather-stream-reveal {
     animation: none;
@@ -1864,15 +1865,41 @@ html {
   100% { transform: scale(1); opacity: 0.8; }
 }
 
-@keyframes weather-skeleton-shimmer {
-  0% { transform: translate3d(-120%, 0, 0); }
-  100% { transform: translate3d(120%, 0, 0); }
+@keyframes weather-skeleton-breathe {
+  0%, 100% {
+    opacity: 0.58;
+    transform: scale(0.985);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes weather-skeleton-drift {
+  0%, 100% {
+    transform: translate3d(-6%, 0, 0);
+  }
+  50% {
+    transform: translate3d(6%, 0, 0);
+  }
 }
 
 @keyframes weather-loading-beacon {
   0% { transform: scale(0.85); opacity: 0.45; }
   50% { transform: scale(1); opacity: 1; }
   100% { transform: scale(0.85); opacity: 0.45; }
+}
+
+@keyframes weather-loading-progress {
+  0%, 100% {
+    opacity: 0.72;
+    transform: scaleX(0.32);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(0.84);
+  }
 }
 
 @keyframes weather-stream-reveal {
@@ -1916,27 +1943,39 @@ html {
 .weather-skeleton {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   background:
-    linear-gradient(180deg, rgba(71, 85, 105, 0.46), rgba(51, 65, 85, 0.34)),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(71, 85, 105, 0.08));
+    radial-gradient(circle at 20% 20%, rgba(125, 211, 252, 0.12), transparent 28%),
+    radial-gradient(circle at 78% 18%, rgba(226, 232, 240, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(71, 85, 105, 0.42), rgba(30, 41, 59, 0.36)),
+    linear-gradient(135deg, rgba(148, 163, 184, 0.1), rgba(71, 85, 105, 0.06));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     inset 0 0 0 1px rgba(15, 23, 42, 0.26);
 }
 
+.weather-skeleton::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 55%);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
 .weather-skeleton__shimmer {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(224, 242, 254, 0.06) 28%,
-    rgba(255, 255, 255, 0.18) 48%,
-    rgba(186, 230, 253, 0.08) 68%,
-    transparent 100%
-  );
-  animation: weather-skeleton-shimmer 1.9s ease-in-out infinite;
-  will-change: transform;
+  inset: -30% -12%;
+  background:
+    radial-gradient(circle at 24% 48%, rgba(125, 211, 252, 0.18), transparent 22%),
+    radial-gradient(circle at 76% 50%, rgba(255, 255, 255, 0.12), transparent 20%),
+    linear-gradient(90deg, transparent 0%, rgba(191, 219, 254, 0.08) 50%, transparent 100%);
+  mix-blend-mode: screen;
+  animation:
+    weather-skeleton-breathe 2.6s ease-in-out infinite,
+    weather-skeleton-drift 6s ease-in-out infinite;
+  will-change: opacity, transform;
 }
 
 .weather-loading-beacon {
@@ -1949,6 +1988,77 @@ html {
     0 0 0 1px rgba(103, 232, 249, 0.22),
     0 0 14px rgba(34, 211, 238, 0.4);
   animation: weather-loading-beacon 1.4s ease-in-out infinite;
+}
+
+.weather-loading-progress {
+  position: relative;
+  overflow: hidden;
+  height: 0.56rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.78));
+  box-shadow:
+    inset 0 0 0 1px rgba(71, 85, 105, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.weather-loading-progress::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  transform-origin: left center;
+  background:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.8), rgba(125, 211, 252, 0.9) 45%, rgba(224, 242, 254, 0.95) 100%);
+  box-shadow:
+    0 0 18px rgba(34, 211, 238, 0.26),
+    0 0 32px rgba(125, 211, 252, 0.12);
+  animation: weather-loading-progress 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.weather-loading-stage-rail {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.weather-loading-stage {
+  border-radius: 1rem;
+  border: 1px solid rgba(51, 65, 85, 0.82);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.78));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 40px rgba(2, 6, 23, 0.18);
+  padding: 0.95rem 1rem;
+}
+
+.weather-loading-stage[data-state="active"] {
+  border-color: rgba(56, 189, 248, 0.34);
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.82));
+}
+
+.weather-loading-stage[data-state="next"] {
+  border-color: rgba(71, 85, 105, 0.88);
+}
+
+.weather-loading-stage__badge {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(100, 116, 139, 0.72);
+  background: rgba(15, 23, 42, 0.86);
+  padding: 0.35rem 0.6rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.88);
+}
+
+.weather-loading-stage[data-state="active"] .weather-loading-stage__badge {
+  border-color: rgba(103, 232, 249, 0.34);
+  background: rgba(34, 211, 238, 0.12);
+  color: rgba(224, 242, 254, 1);
 }
 
 .weather-stream-reveal {

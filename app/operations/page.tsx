@@ -31,6 +31,7 @@ import { OperationsExecutionStepper } from "./components/operationsExecutionStep
 import { canonicalCapitalDisciplinePath, resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
+import { buildDecisionReadinessState } from "../../lib/report/trustStatus";
 
 
 export const runtime = "edge";
@@ -132,33 +133,37 @@ export default async function OperationsPage({
     : undefined;
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const confidenceLow = snapshot.homeBriefModel.confidenceLabel === "LOW";
-  const liveNeedsCaution = !historicalSelection && !isFallback && confidenceLow;
+  const decisionReadiness = buildDecisionReadinessState({
+    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+    freshnessLabel: fetchedAtLabel,
+    isFallbackSnapshot: isFallback,
+    isHistoricalSelection: Boolean(historicalSelection),
+  });
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
       ? "Using last verified snapshot"
-      : liveNeedsCaution
-        ? "Live, but low confidence"
+      : decisionReadiness.label === "Act with caution"
+        ? "Live, but approvals staged"
         : "Live and current";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
         "Live refresh pending. Using last verified snapshot.")
-      : liveNeedsCaution
-        ? "The live refresh is current, but confidence is LOW. Keep approvals staged until confidence improves."
+      : decisionReadiness.label === "Act with caution"
+        ? decisionReadiness.detail
         : "The live refresh is healthy. Next expected update: 15m.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; switch back to live data before approving anything new."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : liveNeedsCaution
+      : decisionReadiness.label === "Act with caution"
         ? "Keep decisions reversible until confidence improves or a stronger live refresh lands."
         : "Carry the plan forward and keep the stop lines visible.";
   const trustStatusTone = historicalSelection
     ? "historical"
-    : isFallback || liveNeedsCaution
+    : isFallback || decisionReadiness.tone === "warning"
       ? "warning"
       : "stable";
 
@@ -261,12 +266,57 @@ export default async function OperationsPage({
                 description="Review this before changing team pace, spend, or priorities."
                 defaultOpen={true}
               >
-                <MonthlyActionSummaryPanel
-                  assessment={assessment}
-                  provenance={treasuryProvenance}
-                  recordDateLabel={recordDateLabel}
-                  weeklyRecordDateLabel={weeklyRecordDateLabel}
-                />
+                <section className="weather-surface space-y-4 px-4 py-4">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">
+                      Weekly approval boundary
+                    </p>
+                    <p className="text-sm text-slate-300">
+                      Confirm the bounded weekly move first. Open the monthly roll-up only if you need the broader planning language or export payload.
+                    </p>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Action now</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">{actionNowShort}</p>
+                    </article>
+                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">
+                        {stopItems[0] ?? "Pause new fixed-cost approvals if the guardrail is hit."}
+                      </p>
+                    </article>
+                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">Change course if</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">{flipThreshold}</p>
+                    </article>
+                  </div>
+                  <p className="text-xs leading-5 text-slate-400">
+                    {snapshot.homeBriefModel.revisitDecisions
+                      ? "This week still has reopen pressure. Recheck last week’s approvals before adding fixed cost or widening scope."
+                      : "No reopen queue is active right now. Keep the current weekly plan unless one of the watch lines trips."}
+                  </p>
+                </section>
+
+                <details className="weather-auto-chevron rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3">
+                  <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+                    <span className="min-w-0">
+                      <span className="block text-[11px] font-medium text-slate-300">Monthly roll-up</span>
+                      <span className="mt-1 block text-sm font-semibold text-slate-100">Open the broader monthly planning language only if you need it.</span>
+                    </span>
+                    <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                      Optional
+                    </span>
+                  </summary>
+                  <div className="mt-4">
+                    <MonthlyActionSummaryPanel
+                      assessment={assessment}
+                      provenance={treasuryProvenance}
+                      recordDateLabel={recordDateLabel}
+                      weeklyRecordDateLabel={weeklyRecordDateLabel}
+                    />
+                  </div>
+                </details>
               </SectionedReportPanel>
             ),
           },

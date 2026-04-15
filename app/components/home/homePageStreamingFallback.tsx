@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LoadingStageRail } from "../loadingStageRail";
 import { Skeleton } from "../skeleton";
 import { WeeklyDiagnosticsFallback } from "./weeklyDiagnosticsFallback";
 
@@ -29,6 +30,25 @@ const resolveHistoricalContext = (searchParams?: HomePageStreamingFallbackProps[
 export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFallbackProps) => {
   const historicalContext = resolveHistoricalContext(searchParams);
   const contextLabel = historicalContext ?? "Current weekly brief";
+  const loadingStages = [
+    {
+      label: "Signal sync",
+      hint: historicalContext
+        ? "Loading the requested historical inputs and frozen trust context."
+        : "Refreshing this week’s macro inputs and confidence checks.",
+      state: "active" as const,
+    },
+    {
+      label: "Weekly call",
+      hint: "Rebuilding the bounded decision contract for the top fold.",
+      state: "next" as const,
+    },
+    {
+      label: "Plan handoff",
+      hint: "Staging the planning and evidence lanes underneath the brief.",
+      state: "queued" as const,
+    },
+  ];
 
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">
@@ -59,15 +79,28 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="max-w-2xl text-sm text-slate-100">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]">
+              <p className="max-w-2xl text-sm leading-relaxed text-slate-100">
                 {historicalContext ? "Selected historical weekly brief is loading." : "Current weekly brief is loading."}
               </p>
-              <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
-                <span className="weather-loading-beacon" />
-                Loading
-              </p>
+              <div className="rounded-[1.25rem] border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+                    <span className="weather-loading-beacon" />
+                    Loading
+                  </p>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Weekly sync</span>
+                </div>
+                <div className="weather-loading-progress mt-3" aria-hidden="true" />
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                  {historicalContext
+                    ? "Replay inputs and decision copy are being assembled for the selected snapshot."
+                    : "The weekly call is being rebuilt before the plan and trust lanes stream in."}
+                </p>
+              </div>
             </div>
+
+            <LoadingStageRail title="Brief sequence" items={loadingStages} />
 
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.9fr)]">
               <section className="grid gap-3 sm:grid-cols-2">

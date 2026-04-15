@@ -132,6 +132,8 @@ describe("ReportShell extracted sections", () => {
     assert.doesNotMatch(html, /Current report status/);
     assert.doesNotMatch(html, /Review order/);
     assert.doesNotMatch(html, /Planning sequence/);
+    assert.match(html, /sm:hidden/);
+    assert.match(html, /hidden space-y-3/);
   });
 
   it("renders sidebar sequence rail", () => {

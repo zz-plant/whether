@@ -200,6 +200,12 @@ The active answer catalog is now intentionally narrower and keeps only the highe
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
+Planning now opens with a weekly approval boundary before any broader monthly synthesis. The monthly action summary remains available as a secondary disclosure inside the first planning step instead of being the first primary payload.
+
+Report-shell route intros are now compressed more aggressively on mobile so the first page-specific task block lands faster in the viewport; the route brief still orients the operator, but no longer needs a second always-visible decision panel on small screens.
+
+Trust readiness language is now stricter on trust and planning surfaces: cached or medium-reliability states stay in staged-approval language (`use with caution` / `approvals staged`) instead of presenting as fully ready-to-use.
+
 ## 2) Data sourcing & provenance
 
 ### 2.1 Treasury yields (live + fallback)

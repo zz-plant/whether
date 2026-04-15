@@ -28,6 +28,11 @@ describe("StartupModeSelector", () => {
     assert.match(html, /Seed description/);
     assert.match(html, /Threshold emphasis: Seed threshold/);
     assert.match(html, /Seed do now/);
+    assert.match(html, /type="radio"/);
+    assert.match(html, /name="startup-mode-/);
+    assert.match(html, /value="seed"/);
+    assert.match(html, /checked=""/);
+    assert.doesNotMatch(html, /aria-pressed=/);
   });
 
   it("renders safe fallback copy when no mode content is available", () => {

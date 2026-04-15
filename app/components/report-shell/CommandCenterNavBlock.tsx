@@ -82,6 +82,7 @@ export function CommandCenterNavBlock({
   ].filter(Boolean).join(" • ");
   const decisionDeltaLine = decisionDiffs?.map((item) => item.label).join(" • ");
   const shouldShowMissionSequence = heroVariant === "full" && missionSequenceItems.length > 0;
+  const mobileDecisionText = decisionBanner?.decision ?? primaryDecisionText;
 
   return (
     <section
@@ -93,7 +94,7 @@ export function CommandCenterNavBlock({
         aria-hidden="true"
       />
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
           <div className="weather-surface grid gap-2 rounded-[1rem] border border-slate-800/55 bg-slate-950/48 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -121,14 +122,14 @@ export function CommandCenterNavBlock({
           </div>
         ) : null}
 
-        <article className="weather-priority-card relative overflow-hidden p-4 sm:p-5">
+        <article className="weather-priority-card relative overflow-hidden p-3 sm:p-5">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] xl:items-start">
             <div
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/35 to-transparent"
               aria-hidden="true"
             />
-            <div className="space-y-4">
-              <div className="space-y-2.5">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2">
                 <p className="weather-brief-kicker">{briefKicker}</p>
                 <p className="text-[11px] leading-5 text-slate-400">{introMetaLine}</p>
                 <h1 className={headingClassName}>{pageTitle}</h1>
@@ -136,6 +137,14 @@ export function CommandCenterNavBlock({
                   <span>{pageSummary}</span>
                   {summaryLink}
                 </p>
+                <div className="space-y-1 sm:hidden">
+                  <p className="text-sm font-semibold leading-6 text-slate-100">{mobileDecisionText}</p>
+                  <p className="text-xs leading-5 text-slate-400">{missionSupportText}</p>
+                  <p className="text-[11px] leading-5 text-slate-500">
+                    Updated {fetchedAtLabel} • {resolvedNextRefreshLabel}
+                    {nextStep ? ` • Next: ${nextStep.description}` : ""}
+                  </p>
+                </div>
               </div>
 
               {decisionDeltaLine ? (
@@ -183,7 +192,7 @@ export function CommandCenterNavBlock({
               </div>
             </div>
 
-            <div className="space-y-3 rounded-[0.95rem] border border-slate-800/70 bg-slate-950/38 p-4">
+            <div className="hidden space-y-3 rounded-[0.95rem] border border-slate-800/70 bg-slate-950/38 p-4 sm:block">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
                 {decisionBanner?.label ?? "Current operating call"}
               </p>

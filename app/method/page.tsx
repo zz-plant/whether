@@ -4,7 +4,7 @@ import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { HubSection } from "../components/hubPageShell";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
-import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
+import { buildCompactTrustSummary, buildDecisionReadinessState, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { ReportShell } from "../components/reportShell";
@@ -77,21 +77,26 @@ export default async function MethodPage() {
       href: "#sources-freshness",
     },
   ];
-  const confidenceLow = homeBriefModel.confidenceLabel === "LOW";
-  const trustStatusTone = reportData.historicalSelection
+  const decisionReadiness = buildDecisionReadinessState({
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    freshnessLabel: reportData.fetchedAtLabel,
+    isFallbackSnapshot: isFallback,
+    isHistoricalSelection: Boolean(reportData.historicalSelection),
+  });
+  const trustStatusTone = decisionReadiness.tone === "historical"
     ? "historical"
-    : isFallback || confidenceLow
+    : decisionReadiness.tone === "warning"
       ? "warning"
       : "stable";
   const trustStatusAction = trustStatusTone === "stable"
     ? "Safe to use for this week's plan while freshness and confidence hold."
     : trustStatusTone === "historical"
       ? "Use this view for comparison only; switch to the live brief before approving anything new."
-      : "Use this brief for reversible moves only until the live evidence strengthens.";
+      : "Use this brief for staged or reversible moves only until reliability improves.";
   const trustVerdict = trustStatusTone === "stable"
     ? {
         label: "Ready to use",
-        detail: "Freshness and confidence are strong enough to use the brief as written.",
+        detail: decisionReadiness.detail,
         toneClasses: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
       }
     : trustStatusTone === "historical"
@@ -102,7 +107,7 @@ export default async function MethodPage() {
         }
       : {
           label: "Use with caution",
-          detail: "The brief is still useful, but keep decisions reversible until confidence improves.",
+          detail: decisionReadiness.detail,
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
   const sectionLinks = [

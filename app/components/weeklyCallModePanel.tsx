@@ -236,12 +236,6 @@ export function WeeklyCallModePanel({
                   </p>
                 ) : null}
 
-                <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/46 px-3 py-3">
-                  <p className="text-[11px] font-medium text-slate-400">{publicDecisionLabels.call}</p>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
-                  <p className="mt-2 text-[12px] leading-5 text-slate-400">{comparisonSummary}</p>
-                </section>
-
                 <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/52 px-3 py-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-medium text-amber-100">What changed this week</p>
