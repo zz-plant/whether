@@ -53,7 +53,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const isHomeBrief = pathname === "/";
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
   const reportHeaderAction = resolveReportHeaderAction(pathname);
-  const routeSummary = isHomeBrief ? "This week's call comes first." : null;
+  const showCollapsedWorkflowPicker = isHomeBrief;
 
   return (
     <header className="mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3">
@@ -69,11 +69,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   {isHomeBrief ? "Weekly Brief" : routeLabel}
                 </span>
               </div>
-              {routeSummary ? (
-                <p className="mt-1 max-w-[42rem] text-[11px] leading-5 text-slate-400">
-                  {routeSummary}
-                </p>
-              ) : null}
             </div>
 
             <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-2 sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end">
@@ -113,18 +108,31 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </div>
           </div>
 
-          <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
-            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Browse workflow
-            </summary>
-            <div className="mt-3">
-              <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-            </div>
-          </details>
+          {showCollapsedWorkflowPicker ? (
+            <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2">
+              <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Browse workflow
+              </summary>
+              <div className="mt-3">
+                <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+              </div>
+            </details>
+          ) : (
+            <>
+              <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
+                <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                  Browse workflow
+                </summary>
+                <div className="mt-3">
+                  <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+                </div>
+              </details>
 
-          <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-2 md:block">
-            <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-          </nav>
+              <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-2 md:block">
+                <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+              </nav>
+            </>
+          )}
         </div>
       </div>
     </header>
