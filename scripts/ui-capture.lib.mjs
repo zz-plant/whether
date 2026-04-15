@@ -7,6 +7,7 @@ import { uiCaptureTargets } from "./ui-capture.config.mjs";
 export const DEFAULT_UI_CAPTURE_BASE_URL =
   process.env.UI_CAPTURE_BASE_URL ?? "http://127.0.0.1:3000";
 export const DEFAULT_UI_CAPTURE_OUT_DIR = "artifacts/ui";
+const HTML_ASSET_PATTERN = /<(?:link|script)\b[^>]+(?:href|src)="([^"]+)"/gi;
 
 export const readArgValue = (args, flag, fallback) => {
   const index = args.indexOf(flag);
@@ -48,27 +49,158 @@ export const parseCaptureOptions = (args) => {
 
 const isReachableStatus = (status) => status === 200 || status === 503;
 
+const extractPageAssetUrls = (html, baseUrl) => {
+  const assetUrls = new Set();
+
+  for (const match of html.matchAll(HTML_ASSET_PATTERN)) {
+    const rawUrl = match[1];
+    if (!rawUrl) continue;
+
+    try {
+      const resolvedUrl = new URL(rawUrl, baseUrl);
+      if (resolvedUrl.pathname.startsWith("/assets/")) {
+        assetUrls.add(resolvedUrl.toString());
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [...assetUrls];
+};
+
+const probeAssetUrl = async (assetUrl) => {
+  const fallbackFetch = async () => fetch(assetUrl, {
+    method: "GET",
+    signal: AbortSignal.timeout(2500),
+  });
+
+  try {
+    const response = await fetch(assetUrl, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(2500),
+    });
+
+    if (response.status === 405 || response.status === 501) {
+      const fallbackResponse = await fallbackFetch();
+      return {
+        ok: fallbackResponse.ok,
+        status: fallbackResponse.status,
+      };
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+    };
+  } catch (error) {
+    try {
+      const fallbackResponse = await fallbackFetch();
+      return {
+        ok: fallbackResponse.ok,
+        status: fallbackResponse.status,
+      };
+    } catch (fallbackError) {
+      return {
+        ok: false,
+        error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError),
+      };
+    }
+  }
+};
+
+export const probeHtmlAssetIntegrity = async (baseUrl) => {
+  const pageUrl = new URL("/", baseUrl).toString();
+
+  try {
+    const response = await fetch(pageUrl, {
+      method: "GET",
+      headers: { Accept: "text/html" },
+      signal: AbortSignal.timeout(4000),
+    });
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        pageUrl,
+        error: `${pageUrl} returned ${response.status}`,
+      };
+    }
+
+    const html = await response.text();
+    const assetUrls = extractPageAssetUrls(html, baseUrl);
+
+    if (assetUrls.length === 0) {
+      return {
+        ok: true,
+        pageUrl,
+        assetUrls,
+      };
+    }
+
+    const failingAssets = [];
+
+    for (const assetUrl of assetUrls.slice(0, 12)) {
+      const assetProbe = await probeAssetUrl(assetUrl);
+      if (!assetProbe.ok) {
+        const pathname = new URL(assetUrl).pathname;
+        failingAssets.push(
+          assetProbe.error ? `${pathname} (${assetProbe.error})` : `${pathname} (${assetProbe.status ?? "unknown"})`,
+        );
+      }
+    }
+
+    if (failingAssets.length > 0) {
+      return {
+        ok: false,
+        pageUrl,
+        assetUrls,
+        failingAssets,
+        error: `HTML referenced missing assets: ${failingAssets.join(", ")}`,
+      };
+    }
+
+    return {
+      ok: true,
+      pageUrl,
+      assetUrls,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      pageUrl,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+};
+
 export const probeBaseUrl = async (baseUrl) => {
   const healthUrl = new URL("/api/health", baseUrl).toString();
+  const assetProbe = await probeHtmlAssetIntegrity(baseUrl);
+
+  let healthStatus;
+  let healthError;
 
   try {
     const response = await fetch(healthUrl, {
       method: "GET",
       signal: AbortSignal.timeout(2500),
     });
-
-    return {
-      ok: isReachableStatus(response.status),
-      status: response.status,
-      healthUrl,
-    };
+    healthStatus = response.status;
   } catch (error) {
-    return {
-      ok: false,
-      error: error instanceof Error ? error.message : String(error),
-      healthUrl,
-    };
+    healthError = error instanceof Error ? error.message : String(error);
   }
+
+  const healthOk = healthStatus != null ? isReachableStatus(healthStatus) : false;
+
+  return {
+    ok: assetProbe.ok && (healthOk || healthError != null),
+    status: healthStatus,
+    healthUrl,
+    assetProbe,
+    error: assetProbe.ok ? undefined : assetProbe.error ?? healthError,
+    healthError,
+  };
 };
 
 export const ensureBaseUrlReachable = async (baseUrl) => {

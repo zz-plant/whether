@@ -41,13 +41,14 @@ bun run ui:iterate -- --no-dev
 
 What `ui:iterate` does:
 
-- reuses an already-running app when reachable
+- reuses an already-running app only when the weekly brief HTML and its referenced assets are coherent
 - otherwise starts `bun run dev` against the target host and port
-- waits for `/api/health` to come up
+- if a stale local server is occupying the requested port, auto-starts a clean local dev server on a nearby free port instead of capturing the broken one
+- waits for the homepage asset references to come up clean and probes `/api/health` when available
 - captures the requested mockup targets
 - writes a browsable screenshot gallery for quick review
 
-`ui:shots` remains available when you already own the dev server and only want raw capture + gallery output.
+`ui:shots` remains available when you already own the dev server and only want raw capture + gallery output, but it now fails fast if the base URL is serving HTML that references missing `/assets/*` files.
 
 ## URL controls
 
