@@ -41,7 +41,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "signals",
     href: "/signals",
     label: "Evidence",
-    navLabel: "See what changed",
+    navLabel: "Evidence",
     description: "See what changed, what drove it, and the thresholds worth watching.",
     boundary: "Use this when you want the proof behind the call.",
     group: "reference",
@@ -51,7 +51,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "operations",
     href: "/operations",
     label: "Planning",
-    navLabel: "Make the plan",
+    navLabel: "Plan",
     description: "Turn this week's read into decisions on hiring, spend, roadmap, and what to share.",
     boundary: "Use this when you are ready to turn the call into approvals.",
     group: "workflow",
@@ -61,7 +61,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "decide",
     href: "/decide",
     label: "Decision Tools",
-    navLabel: "Resolve one question",
+    navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",
     boundary: "Use this page when the brief is clear but one question still needs an answer.",
     group: "workflow",
@@ -71,7 +71,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "method",
     href: "/method",
     label: "Trust",
-    navLabel: "Check trust",
+    navLabel: "Verify",
     description: "Check freshness, confidence, source coverage, and what would change the call.",
     boundary: "Use this when you want to sanity-check the call before a big decision.",
     group: "reference",
@@ -100,8 +100,8 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
   if (href === "/") return "Start here";
-  if (href === "/signals") return "See what changed";
-  if (href === "/operations") return "Make the plan";
+  if (href === "/signals") return "Check proof";
+  if (href === "/operations") return "Set guardrails";
   if (href === "/decide") return "Resolve one question";
   if (href === "/method") return "Check trust";
   if (href === "/toolkits") return "Use a tool";

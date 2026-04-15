@@ -112,6 +112,7 @@ describe("agent workflow helpers", () => {
       const written = writeRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
       const loaded = readRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
 
+      assert.ok(loaded);
       assert.ok(fs.existsSync(written.paths.fileMap));
       assert.equal(loaded.index.fileMap.counts.tests, written.index.fileMap.counts.tests);
 

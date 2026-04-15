@@ -17,6 +17,8 @@ export async function HomeWorkspaceBands({
   workspaceModelPromise,
 }: HomeWorkspaceBandsProps) {
   const workspaceModel = await workspaceModelPromise;
+  const signalsDecisionSummaryHref: Route = "/signals#decision-summary";
+  const trustSnapshotHref: Route = "/method#trust-snapshot";
   const primaryGuardrail = workspaceModel.operations.topGuardrails[0];
   const primaryExportAction = workspaceModel.operations.exportActions[0];
   const replayPreview = workspaceModel.replay.preview[0];
@@ -125,7 +127,7 @@ export async function HomeWorkspaceBands({
 
             <div className="mt-3 grid gap-2 md:grid-cols-2">
               <Link
-                href={"/signals#decision-summary" as Route}
+                href={signalsDecisionSummaryHref}
                 className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/45 hover:bg-slate-950/55"
               >
                 <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
@@ -139,7 +141,7 @@ export async function HomeWorkspaceBands({
               </Link>
 
               <Link
-                href={"/method#trust-snapshot" as Route}
+                href={trustSnapshotHref}
                 className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-amber-400/45 hover:bg-slate-950/55"
               >
                 <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
