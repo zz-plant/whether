@@ -55,8 +55,8 @@
   },
   "packageManager": "bun@1.3.9",
   "dependencies": {
-    "@base-ui/react": "1.2.0",
-    "lucide-react": "^0.577.0",
+    "@base-ui/react": "1.4.0",
+    "lucide-react": "^1.8.0",
     "next": "16.2.3",
     "pdf-lib": "^1.17.1",
     "react": "19.2.5",
@@ -71,7 +71,7 @@
     "@modelcontextprotocol/sdk": "1.29.0",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.2.2",
-    "@types/node": "24.4.0",
+    "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
@@ -81,7 +81,7 @@
     "postcss": "8.5.10",
     "react-server-dom-webpack": "19.2.5",
     "tailwindcss": "^4.2.2",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "vinext": "0.0.41",
     "vite": "^8.0.8",
     "wrangler": "^4.83.0"

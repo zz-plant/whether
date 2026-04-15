@@ -1,6 +1,6 @@
 "use client";
 
-import { DrawerPreview as Drawer } from "@base-ui/react/drawer";
+import { Drawer } from "@base-ui/react/drawer";
 import { useRef, useState } from "react";
 import { useHapticFeedback } from "./useHapticFeedback";
 
