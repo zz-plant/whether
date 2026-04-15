@@ -66,7 +66,7 @@ describe("reportCopy", () => {
       notes: GLOSSARY_USAGE_NOTES,
     });
 
-    assert.match(serialized, /posture/i);
+    assert.match(serialized, /read/i);
     assert.match(serialized, /environment/i);
     assert.match(serialized, /U\.S\./i);
     assert.doesNotMatch(serialized, /climate.*stance/i);

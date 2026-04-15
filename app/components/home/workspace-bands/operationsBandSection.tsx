@@ -136,7 +136,7 @@ export function OperationsBandSection({ workspaceModel }: { workspaceModel: Home
             {financeSnapshot ? financeSnapshot.label : "Meeting-ready brief once planning is complete."}
           </p>
           <p className="mt-2 text-sm text-slate-300">
-            {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is what you carry into the room."}
+            {financeSnapshot ? financeSnapshot.actionNow : "The approved brief is what you carry into the meeting."}
           </p>
         </article>
       </div>

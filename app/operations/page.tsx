@@ -195,7 +195,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/operations"
-      pageSummary="Turn this week's recommendation into a clear plan, visible stop lines, and a brief you can share."
+      pageSummary="Turn this week's read into a clear plan, visible stop lines, and an update you can share."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
@@ -204,7 +204,7 @@ export default async function OperationsPage({
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       decisionBanner={{
         label: "Start here",
-        decision: "Approve the plan, keep the stop line visible, then package the brief.",
+        decision: "Approve the plan, keep the stop line visible, then package the update.",
         horizon: "This week + month",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
@@ -212,7 +212,7 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Turn this week's call into a few explicit decisions and keep the stop lines visible.",
+        call: "Turn this week's read into a few explicit decisions and keep the stop lines visible.",
         doNow: [
           actionNowShort,
           actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this week's backdrop.",
@@ -256,7 +256,7 @@ export default async function OperationsPage({
             summary: "Confirm what you should approve, hold, or revisit for this cycle.",
             owner: "CEO / COO",
             approvalStatus: "Approve this week's plan",
-            changeSignal: "The current call or priority posture changes",
+            changeSignal: "The weekly recommendation or priority direction changes",
             hashAliases: ["ops-monthly-action-summary-panel"],
             children: (
               <SectionedReportPanel
@@ -293,8 +293,8 @@ export default async function OperationsPage({
                   </div>
                   <p className="text-xs leading-5 text-slate-400">
                     {snapshot.homeBriefModel.revisitDecisions
-                      ? "This week still has reopen pressure. Recheck last week’s approvals before adding fixed cost or widening scope."
-                      : "No reopen queue is active right now. Keep the current weekly plan unless one of the watch lines trips."}
+                      ? "This week still has items to revisit. Recheck last week’s approvals before adding fixed cost or widening scope."
+                      : "Nothing else needs revisiting right now. Keep the current weekly plan unless one of the watch lines trips."}
                   </p>
                 </section>
 
@@ -368,10 +368,10 @@ export default async function OperationsPage({
             id: "ops-finance-strategy",
             label: "Finance",
             title: "Finance strategy",
-            description: "Budget posture and cash timing guidance for the quarter.",
-            summary: "Validate runway timing and budget posture before sharing the brief.",
+            description: "Budget direction and cash-timing guidance for the quarter.",
+            summary: "Validate runway timing and budget direction before sharing the brief.",
             owner: "CFO / finance lead",
-            approvalStatus: "Validate cash posture",
+            approvalStatus: "Validate cash plan",
             changeSignal: "Runway assumptions or financing windows move",
             hashAliases: ["ops-finance-strategy-panel"],
             children: (
@@ -379,7 +379,7 @@ export default async function OperationsPage({
                 id="ops-finance-strategy-panel"
                 label="Verify"
                 title="Finance strategy"
-                description="Budget posture and cash timing guidance for the quarter."
+                description="Budget direction and cash-timing guidance for the quarter."
                 defaultOpen={true}
               >
                 <FinanceStrategyPanel
@@ -396,10 +396,10 @@ export default async function OperationsPage({
             label: "Share",
             title: "Share the brief",
             description: "Choose the default U.S. leadership update, a plain-English explainer, or a board-ready version.",
-            summary: "Start with the leadership update for U.S. exec rooms, then switch to the plain-English version when people want the market terms translated.",
+            summary: "Start with the leadership update for a U.S. leadership audience, then switch to the plain-English version when people want the market terms translated.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
-            changeSignal: "The room needs an explainer or governance pack",
+            changeSignal: "The audience needs a plainer or board-ready pack",
             hashAliases: [
               "ops-export-briefs-panel",
               "ops-operator-requests",
@@ -413,7 +413,7 @@ export default async function OperationsPage({
                   id="ops-export-briefs-panel"
                   label="Share"
                   title="Share-ready brief"
-                  description="Start with the leadership update for the default U.S. exec room. Use the plain-English version when people want the market terms translated."
+                  description="Start with the leadership update for the default U.S. leadership audience. Use the plain-English version when people want the market terms translated."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel
@@ -508,13 +508,13 @@ export default async function OperationsPage({
 
       <details className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Need more board or governance detail?
+          Need a fuller board-ready pack?
         </summary>
         <div className="mt-4 space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Governance library</p>
-            <h2 className="text-lg font-semibold text-slate-100">Board and governance resources</h2>
-            <p className="text-sm text-slate-300">Planning should cover the weekly approval flow. Open these resources when you need a fuller board or governance version of the same work.</p>
+            <h2 className="text-lg font-semibold text-slate-100">Board-ready resources</h2>
+            <p className="text-sm text-slate-300">Planning should cover the weekly approval flow. Open these resources when you need a fuller board-ready version of the same work.</p>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {resourcePillarPages.map((pillar) => (

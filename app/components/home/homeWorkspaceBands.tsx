@@ -26,9 +26,9 @@ export async function HomeWorkspaceBands({
   const deeperPaths = [
     {
       href: workspaceModel.translate.primaryPath.href as Route,
-      kicker: "Resolve one question",
-      title: "Open the most concrete path first",
-      detail: "Use this only after the weekly call is clear.",
+      kicker: "Answer one question",
+      title: "Open the clearest next page first",
+      detail: "Use this only after the direction is clear.",
       icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
       toneClass: "text-amber-200",
       hoverClass: "hover:border-amber-300/35",
@@ -36,7 +36,7 @@ export async function HomeWorkspaceBands({
     {
       href: workspaceModel.replay.openFullHref as Route,
       kicker: "Review a past week",
-      title: replayPreview?.label ?? "Replay the baseline",
+      title: replayPreview?.label ?? "Review the previous baseline",
       detail: replayPreview?.summary ?? workspaceModel.replay.summary,
       icon: <HistoryIcon className="h-3.5 w-3.5" />,
       toneClass: "text-violet-200",
@@ -64,10 +64,10 @@ export async function HomeWorkspaceBands({
           <div className="weather-panel-header-copy">
             <p className="text-[11px] font-medium text-emerald-200">Next step</p>
             <h2 id="approve-this-weeks-plan-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
-              Turn the call into this week&apos;s plan
+              Turn this read into this week&apos;s plan
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Use this only after the weekly call is settled. The brief already assumes a U.S. market baseline, so this step is where you translate it into company-specific approvals.
+              Start here after you&apos;ve read the weekly update. The brief starts from U.S. market data, and this is where you turn that read into company-specific approvals.
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export async function HomeWorkspaceBands({
             <div className="max-w-3xl space-y-2">
               <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
                 <CheckIcon className="h-3.5 w-3.5" />
-                <span>Primary approval lane</span>
+                <span>Main planning path</span>
               </div>
               <p className="text-base font-semibold leading-7 text-slate-100">
                 {workspaceModel.operations.approvalHeadline}
@@ -98,13 +98,13 @@ export async function HomeWorkspaceBands({
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[11px] font-medium text-amber-200">Stop line</p>
+              <p className="text-[11px] font-medium text-amber-200">Pause first</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryGuardrail?.label ?? "Hold the current baseline"}
               </p>
             </div>
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[11px] font-medium text-sky-200">Share next</p>
+              <p className="text-[11px] font-medium text-sky-200">Send next</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryExportAction?.label ?? "Open share brief"}
               </p>
@@ -116,9 +116,9 @@ export async function HomeWorkspaceBands({
           >
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
               <span className="min-w-0">
-                <span className="block text-[11px] font-medium text-sky-200">Only if challenged</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-100">Challenge the call with one check.</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-400">Open one proof path, not a second dashboard.</span>
+                <span className="block text-[11px] font-medium text-sky-200">If someone asks why</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-100">Pressure-test the read with one check.</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-400">Open one evidence view, not a second dashboard.</span>
               </span>
               <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                 Optional
@@ -134,9 +134,9 @@ export async function HomeWorkspaceBands({
                   <TrendUpIcon className="h-3.5 w-3.5" />
                   <span>See what changed</span>
                 </div>
-                <p className="mt-2 text-sm font-semibold">Why the read moved</p>
+                <p className="mt-2 text-sm font-semibold">Why this week&apos;s read moved</p>
                 <p className="mt-1 text-xs leading-5 text-slate-300">
-                  {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See drivers, thresholds, and replay when you need to challenge the call."}
+                  {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See the main drivers, thresholds, and past weeks when you need to challenge the read."}
                 </p>
               </Link>
 
@@ -162,7 +162,7 @@ export async function HomeWorkspaceBands({
               <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
                 <span className="min-w-0">
                   <span className="block text-[11px] font-medium text-violet-200">More paths</span>
-                  <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper path only if the weekly call is already clear.</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper page only after the direction is clear.</span>
                 </span>
                 <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Optional

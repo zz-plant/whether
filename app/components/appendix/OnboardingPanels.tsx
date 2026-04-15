@@ -30,7 +30,7 @@ export const FirstTimeGuidePanel = ({
             Recommended quick scan in three stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            Use this walkthrough to align on the core recommendation before you dive into deeper sections. The product defaults to a U.S. market baseline so you can get to the decision faster.
+            Use this walkthrough to align on the core recommendation before you dive into deeper sections. Whether starts from a U.S. market read so you can get to the decision faster.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -113,7 +113,7 @@ export const FirstTimeGuidePanel = ({
       </div>
       <p className="mt-4 text-xs text-slate-300">
         Share the URL when you lock watch lines or past-snapshot selections so every stakeholder sees
-        the same posture assumptions and U.S. market baseline.
+        the same assumptions and U.S. market starting point.
       </p>
     </div>
   </section>

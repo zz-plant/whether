@@ -265,7 +265,7 @@ export function WeeklyCallModePanel({
                       <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
                     </div>
                     <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-2.5 sm:max-w-[14rem]">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Use in the room</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Say it this way</p>
                       <p className="mt-1 text-[11px] leading-5 text-slate-200">{weeklyLeadershipSummary.shorthandLine}</p>
                     </div>
                   </div>
@@ -327,12 +327,12 @@ export function WeeklyCallModePanel({
                       ) : null}
                     </div>
                     <p className="mt-2 text-sm font-semibold leading-6 text-slate-100">
-                      {revisitDecisions ? revisitLabel : "No major reopen items right now; keep the main action moving."}
+                      {revisitDecisions ? revisitLabel : "Nothing major needs revisiting right now. Keep the main action moving."}
                     </p>
                     {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-400">{revisitDetail}</p> : null}
                     {flipSupport.length > 0 ? (
                       <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">This would change the call</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">This would change the read</p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {flipSupport.map((label) => (
                             <span key={label} className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
@@ -373,7 +373,7 @@ export function WeeklyCallModePanel({
                     {deferredRevisitItems.length > 0 ? (
                       <details className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                         <summary className="cursor-pointer list-none text-[11px] font-medium text-slate-300">
-                          More to reopen
+                          More to revisit
                         </summary>
                         <div className="mt-3 divide-y divide-slate-800/70">
                           {deferredRevisitItems.map((item) => (
@@ -437,13 +437,13 @@ export function WeeklyCallModePanel({
                 actions
               ) : (
                 <p className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3 text-xs leading-5 text-slate-300">
-                  Share actions are temporarily unavailable. Use the weekly call above as the copy-ready source.
+                  Share actions are temporarily unavailable. Use the summary above as the copy-ready source.
                 </p>
               )}
 
               <details className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                 <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Proof and continuity
+                  Citation and history
                 </summary>
                 <div className="mt-3 space-y-3">
                   <div className="rounded-lg border border-slate-800/70 bg-slate-950/50 px-3 py-3">
@@ -500,14 +500,14 @@ export function WeeklyCallModePanel({
 
         <CompactDisclosure
           queryKey="moreContext"
-          summary="Why this week points here"
+          summary="Why this lands here"
           preview={guardrailPolicyDetails.summary}
           className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
           summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
         >
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(244,63,94,0.35)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this call points here</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this lands here</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {guardrailPolicyDetails.chips.map((chip) => (
@@ -523,7 +523,7 @@ export function WeeklyCallModePanel({
             </article>
 
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(56,189,248,0.35)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What flips this call</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">What would change this read</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">

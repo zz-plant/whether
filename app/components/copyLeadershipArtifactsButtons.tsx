@@ -250,7 +250,7 @@ export function CopyLeadershipArtifactsButtons({
 
         <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-            Choose a room fit
+            Choose the audience
           </summary>
 
           <div className="mt-3 space-y-3">
@@ -281,8 +281,8 @@ export function CopyLeadershipArtifactsButtons({
                     <span>{artifactModeLabels[mode]}</span>
                     <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
                       {mode === "explainer"
-                        ? "Less shorthand for mixed audiences."
-                        : "Default leadership update."
+                        ? "Less jargon for mixed audiences."
+                        : "Default for leadership teams."
                       }
                     </span>
                   </button>
@@ -319,18 +319,18 @@ export function CopyLeadershipArtifactsButtons({
 
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a heavier package?</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a fuller package?</p>
                 <p className="mt-1 text-[11px] leading-5 text-slate-400">
-                  Board, governance, and exception formats live in Planning.
+                  Board and approval-ready formats live in Planning.
                 </p>
               </div>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Deeper export
+                More formats
               </span>
             </div>
             {fallbackActive ? (
               <p className="text-[10px] leading-5 text-amber-200">
-                Cached snapshot active: confirm irreversible sharing actions in Planning before circulation.
+                Cached snapshot active: confirm the details in Planning before sharing externally.
               </p>
             ) : null}
             <div>

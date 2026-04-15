@@ -283,7 +283,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, />Why this week points here</);
+    assert.match(html, />Why this lands here</);
     assert.match(html, />What this means now</);
     assert.doesNotMatch(html, />Diagnostics</);
     assert.doesNotMatch(html, />Deep evidence</);

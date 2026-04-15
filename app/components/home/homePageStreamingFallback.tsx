@@ -75,7 +75,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
               <p className="max-w-2xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
-                This week&apos;s posture and bounded decision are loading.
+                This week&apos;s recommendation and decision rules are loading.
               </p>
             </div>
 
@@ -95,7 +95,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                 <p className="mt-3 text-sm leading-relaxed text-slate-300">
                   {historicalContext
                     ? "Replay inputs and decision copy are being assembled for the selected snapshot."
-                    : "The weekly call is being rebuilt before the plan and trust lanes stream in."}
+                    : "The weekly recommendation is being rebuilt before the plan and trust sections stream in."}
                 </p>
               </div>
             </div>

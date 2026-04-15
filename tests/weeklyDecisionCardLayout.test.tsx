@@ -75,7 +75,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Hiring market/);
     assert.match(html, /Expansion market/);
     assert.match(html, /Funding market/);
-    assert.match(html, /U\.S\. market baseline/);
+    assert.match(html, /Starting point: U\.S\. market/);
     assert.match(html, /U\.S\. labor backdrop/);
     assert.match(html, /U\.S\. demand backdrop/);
     assert.match(html, /U\.S\. funding backdrop/);
@@ -84,7 +84,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Pause if/);
     assert.match(html, /Change course if/);
     assert.match(html, /Watch this week/);
-    assert.match(html, /Why this week points here/);
+    assert.match(html, /Why this lands here/);
     assert.match(html, /What this means now/);
     assert.match(html, /Act with caution/);
     assert.doesNotMatch(html, /This week at a glance/);
@@ -246,7 +246,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const callCore = html.slice(
       html.indexOf('id="weekly-call-core"'),
-      html.indexOf("Why this call"),
+      html.indexOf("Why this lands here"),
     );
 
     assert.match(callCore, /Stage decisions\./);
@@ -255,7 +255,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Change course if/);
     assert.match(callCore, /Revisit now/);
     assert.match(callCore, /Share-ready brief/);
-    assert.match(callCore, /Confidence and continuity/);
+    assert.match(callCore, /Citation and history/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. This week&#x27;s plan can stay on track\./);
     assert.match(callCore, /Watch this week/);
     assert.doesNotMatch(callCore, /Default share/);

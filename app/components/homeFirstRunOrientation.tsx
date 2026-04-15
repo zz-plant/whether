@@ -76,7 +76,7 @@ export function HomeFirstRunOrientation({
             <div className="space-y-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">This week at a glance</p>
               <h2 className="text-sm font-semibold text-slate-100 sm:text-base">A quick read for this week</h2>
-              <p className="text-xs text-slate-300">See what changed, confirm the recommendation, then open the page you need.</p>
+              <p className="text-xs text-slate-300">See what changed, confirm the read, then open the page you need.</p>
             </div>
               <button
                 type="button"
@@ -159,14 +159,14 @@ export function HomeFirstRunOrientation({
             <div className="grid gap-3 md:grid-cols-3">
               <article className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What it changes this week</p>
-                <p className="text-sm text-slate-100">Turn the market update into one shared starting point so team leads begin from the same recommendation.</p>
+                <p className="text-sm text-slate-100">Turn the market update into one shared starting point so team leads begin from the same read.</p>
               </article>
               <article className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to revisit</p>
                 <p className="text-sm text-slate-100">Recheck hiring pace, spend windows, and pipeline bets against this week&apos;s limits before approving them.</p>
               </article>
               <article className="weather-surface space-y-2 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What changes the recommendation</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What changes the read</p>
                 <p className="text-sm text-slate-100">Watch the main trigger in the weekly brief. If it trips, reset the plan.</p>
               </article>
             </div>

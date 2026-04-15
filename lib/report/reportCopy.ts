@@ -26,38 +26,38 @@ export type GlossaryUsageNote = {
 
 export type HighlightBullet = { text: string };
 
-export const PRIMARY_AUDIENCE_LABEL = "U.S. market baseline";
+export const PRIMARY_AUDIENCE_LABEL = "Starting point: U.S. market";
 export const PRIMARY_AUDIENCE_SUMMARY =
-  "Whether defaults to a U.S. market baseline and uses U.S. Treasury, inflation, labor, credit, and funding signals as the starting point.";
+  "Whether starts with U.S. Treasury, inflation, labor, credit, and funding signals before you layer in company-specific context.";
 export const PRIMARY_AUDIENCE_ACTION =
-  "Use that baseline to set this week's pace, then pressure-test the recommendation against your own pipeline, retention, and cash data before you commit.";
+  "Use that starting point to set this week's pace, then check it against your own pipeline, retention, and cash data before you commit.";
 export const PRIMARY_AUDIENCE_SHARE_GUIDANCE =
-  "Leadership update is the default for U.S. leadership teams. Switch to the plain-English update when someone needs the market terms translated.";
+  "Start with the leadership update for leadership teams. Switch to the plain-English update when readers do not know the market shorthand.";
 
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
     detail:
-      "Start with the recommendation, the stop line, and the recovery line. The brief already assumes a U.S. market baseline, so align on the recommended posture first before debating edge cases.",
+      "Start with the main read, what to pause, and what would change it. The brief starts from a U.S. market view, so align on that first before debating edge cases.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
     label: "Proof",
     detail:
-      "Open the evidence view only if someone asks why the U.S. market read changed or what the key watch lines are.",
+      "Open the evidence view only if someone asks why the market view changed or which thresholds matter most.",
     example: "Example decision: confirm curve inversion before approving long bets.",
   },
   {
     label: "Actions",
     detail:
-      "Use the planning page to turn the weekly recommendation into clear company-specific do, don't, and limit rules for the week.",
+      "Use the planning page to turn the weekly read into clear company-specific do, don't, and limit rules for the week.",
     example: "Example decision: focus on retention when risk appetite is cautious.",
   },
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
-  { text: "The weekly brief defaults to a U.S. market baseline so teams do not have to translate the data source before using it." },
+  { text: "The weekly brief starts from a U.S. market read so teams can make a decision before debating edge cases." },
   { text: "Confidence and trend indicate pacing quality before score context." },
   { text: "Historical context is available, but the current decision stays primary." },
 ];
@@ -109,7 +109,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "How to use this glossary",
     bullets: [
-      { emphasis: "U.S. market baseline", detail: "anchors this week's recommendation before company-specific judgment kicks in." },
+      { emphasis: "U.S. market starting point", detail: "anchors this week's read before company-specific judgment kicks in." },
       { emphasis: "Terms become constraints", detail: "for discussing bets." },
       { emphasis: "Linked sections", detail: "provide supporting evidence quickly." },
     ],
