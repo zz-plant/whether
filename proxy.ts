@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-whether-pathname", request.nextUrl.pathname);
 
@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     },
   });
 }
+
+export default proxy;
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],

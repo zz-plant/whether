@@ -39,7 +39,7 @@ describe("expansion controls rendering", () => {
       }),
     );
 
-    assert.match(html, /Deep dive: playbook snapshot and action lanes/);
+    assert.match(html, /Deep dive: rule summary and detailed lists/);
     assert.doesNotMatch(html, /Stop 1/);
   });
 

@@ -51,6 +51,7 @@ describe("guided translation routing", () => {
     );
 
     assert.equal(defaultHtml, "");
-    assert.match(selectedHtml, /Selected team translation/);
+    assert.match(selectedHtml, /Selected view details/);
+    assert.match(selectedHtml, /Team view/);
   });
 });

@@ -152,7 +152,7 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
 
     assert.ok(html.indexOf("Hiring pace") < html.indexOf("Expansion bets"));
     assert.ok(html.indexOf("Expansion bets") < html.indexOf("Investment pace"));
-    assert.match(html, /Watch first/);
+    assert.match(html, /Rules by area/);
   });
 
   it("renders historical analog cards inside more context and continuity", () => {
@@ -177,13 +177,12 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
     assert.match(html, /Oct 3, 2025/);
   });
 
-  it("renders recent-movement sparklines for input influence cards", () => {
+  it("renders decision-details disclosure for operating rules", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard model={buildWeeklyDecisionCardModel()} />,
     );
 
-    assert.match(html, /Capital tightness recent movement sparkline/);
-    assert.match(html, /Risk appetite recent movement sparkline/);
-    assert.match(html, /Recent path/);
+    assert.match(html, /Decision details/);
+    assert.match(html, /Rules by area and what would change the call/);
   });
 });

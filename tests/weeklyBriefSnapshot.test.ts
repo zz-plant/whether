@@ -43,6 +43,6 @@ describe("buildWeeklyBriefSnapshot", () => {
     assert.equal(snapshot.postureState, postureState);
     assert.ok(snapshot.canonicalDecisionCopy);
     assert.equal(snapshot.weeklyDecisionCardModel.decision.immediateDecision.length > 0, true);
-    assert.match(snapshot.callCitation, /Whether call/);
+    assert.match(snapshot.callCitation, /Whether Report Brief/);
   });
 });

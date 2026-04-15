@@ -1,15 +1,22 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from "../lib/report/homeBriefModel";
+import { getWeeklyPostureHistory } from "../lib/summary/weeklyPostureHistory";
+import { REGIME_SHORT_LABELS } from "../lib/regimePresentation";
 
 describe("buildHomeBriefModel", () => {
   it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
+    const expectedPriorEntries = getWeeklyPostureHistory()
+      .filter((entry) => entry.record_date !== "Mar 19, 2026")
+      .slice(-3)
+      .map((entry) => ({
+        label: entry.record_date,
+        posture: REGIME_SHORT_LABELS[entry.regime],
+      }));
 
     assert.deepEqual(memoryRail, [
-      { label: "2026-03-13", posture: "Expansion" },
-      { label: "2026-03-20", posture: "Expansion" },
-      { label: "2026-03-25", posture: "Expansion" },
+      ...expectedPriorEntries,
       { label: "Mar 19, 2026", posture: "Defensive" },
     ]);
   });

@@ -32,7 +32,7 @@ describe("DiagnosticsSection", () => {
     assert.match(html, /Want the backing detail\?/);
     assert.match(html, /Decision detail/);
     assert.match(html, /Delta/);
-    assert.match(html, /Evidence pack/);
+    assert.match(html, /Supporting proof/);
     assert.doesNotMatch(html, /Regime history \(recent\)/);
   });
 });

@@ -3,6 +3,9 @@ import vinext from "vinext";
 import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ["@base-ui/react"],
+  },
   plugins: [
     vinext(),
     cloudflare({
