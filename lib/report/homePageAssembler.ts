@@ -14,10 +14,6 @@ import {
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
 import { resolveSectorKey } from "./sectorSensitivity";
 import { buildPostureState } from "./postureStateSource";
-import {
-  buildFlipConditionsWithoutTriggerDuplication,
-  type buildCanonicalDecisionCopy,
-} from "./canonicalDecisionCopy";
 import { homeSectionSequence } from "./homeSections";
 import type { HomePageSearchParams } from "./homeMetadata";
 import { loadHomePageReportData } from "./homePageData";
@@ -26,6 +22,7 @@ import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
 import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
 import { buildHomeStructuredData } from "./home/structuredData";
+import type { WeeklyCallContract } from "./weeklyCallContract";
 import type {
   ArtifactPayload,
   HomePageAssembly,
@@ -57,46 +54,21 @@ const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
   buildPostureState,
 };
 
-const dedupeCompactItems = (items: Array<string | undefined>, maxItems = 4) =>
-  items
-    .map((item) => item?.trim())
-    .filter((item): item is string => Boolean(item && item.length > 0))
-    .filter((item, index, values) => values.indexOf(item) === index)
-    .slice(0, maxItems);
-
 const buildCommandBarPayload = ({
   assessment,
-  homeBriefModel,
+  weeklyCall,
   weeklyDecisionCardModel,
   updatedAt,
-  canonicalDecisionCopy,
 }: {
   assessment: ReportData["assessment"];
-  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  weeklyCall: WeeklyCallContract;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   updatedAt: string;
-  canonicalDecisionCopy?: ReturnType<typeof buildCanonicalDecisionCopy> | null;
 }) => ({
   regime: assessment.regime,
-  call: canonicalDecisionCopy?.operatingCall ?? weeklyDecisionCardModel.decision.operatingStanceLine,
-  doNow: canonicalDecisionCopy?.doNowLines ?? dedupeCompactItems([
-    weeklyDecisionCardModel.decision.immediateDecision,
-    ...homeBriefModel.actionStripItems.map((item) => item.actionNow),
-  ], 3),
-  flipConditions: canonicalDecisionCopy
-    ? [
-        canonicalDecisionCopy.flipTrigger,
-        ...buildFlipConditionsWithoutTriggerDuplication({
-          flipTrigger: canonicalDecisionCopy.flipTrigger,
-          flipConditions: canonicalDecisionCopy.flipConditions,
-          maxItems: 3,
-        }),
-      ]
-    : dedupeCompactItems([
-        homeBriefModel.flipThreshold,
-        homeBriefModel.reversalTrigger,
-        ...homeBriefModel.compactFlipConditionLabels,
-      ], 4),
+  call: weeklyCall.currentCall,
+  doNow: weeklyCall.doNowBullets,
+  flipConditions: [weeklyCall.changeCourseIf, ...weeklyCall.flipConditionLabels].slice(0, 4),
   updatedAt,
   postureLabel: weeklyDecisionCardModel.status.postureWithStageLabel ?? weeklyDecisionCardModel.status.statusLabel,
   trendLabel: weeklyDecisionCardModel.status.trendLabel,
@@ -229,7 +201,7 @@ export const assembleHomePage = async ({
     degraded: !reportResult.ok,
     overlaySector: homepageOverlaySector,
   });
-  const { isFallback, trustStatus, freshnessMeta, displayRegime, homeBriefModel, weeklyDecisionCardModel } = baseSnapshot;
+  const { isFallback, trustStatus, freshnessMeta, homeBriefModel, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
   const {
     trustStatusLabel,
     trustStatusDetail,
@@ -307,6 +279,7 @@ export const assembleHomePage = async ({
 
   return {
     reportResult,
+    weeklyCall,
     weeklyDecisionCardModel,
     leadershipArtifactPayloadPromise: enrichedHomePageModelPromise.then(({ postureState, homeBriefModel: enrichedHomeBriefModel }) =>
       postureState
@@ -321,6 +294,7 @@ export const assembleHomePage = async ({
             interpretationView,
             forecast,
             freshnessLabel: freshnessMeta.updatedAtLabel,
+            weeklyCall,
           })
         : null
     ),
@@ -402,7 +376,7 @@ export const assembleHomePage = async ({
       structuredData: buildHomeStructuredData(),
       commandBar: buildCommandBarPayload({
         assessment,
-        homeBriefModel,
+        weeklyCall,
         weeklyDecisionCardModel,
         updatedAt: freshnessMeta.updatedAtLabel,
       }),

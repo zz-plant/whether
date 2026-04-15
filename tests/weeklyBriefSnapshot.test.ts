@@ -24,6 +24,9 @@ describe("buildWeeklyBriefSnapshot", () => {
     assert.equal(snapshot.canonicalDecisionCopy, null);
     assert.equal(snapshot.weeklyDecisionCardModel.status.statusLabel.length > 0, true);
     assert.equal(snapshot.trustStatus.trustStatusTone, "stable");
+    assert.equal(snapshot.weeklyDecisionCardModel.decision.immediateDecision, snapshot.weeklyCall.actionNow);
+    assert.equal(snapshot.weeklyDecisionCardModel.decision.guardrailThreshold, snapshot.weeklyCall.pauseIf);
+    assert.equal(snapshot.weeklyDecisionCardModel.decision.flipThreshold, snapshot.weeklyCall.changeCourseIf);
   });
 
   it("enriches the snapshot when posture state is provided", () => {

@@ -6,6 +6,7 @@ import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { publicDecisionLabels } from "../report/reportFormatting";
+import type { WeeklyCallContract } from "../report/weeklyCallContract";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
@@ -51,6 +52,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   flipConditionLabels = [],
   postureState,
   canonicalDecisionCopy,
+  weeklyCall,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
@@ -61,7 +63,24 @@ export const buildWeeklyOperatorBriefPayload = ({
   flipConditionLabels?: string[];
   postureState?: PostureStateContract;
   canonicalDecisionCopy?: CanonicalDecisionCopy;
+  weeklyCall?: WeeklyCallContract;
 }): WeeklyOperatorBriefPayload => {
+  if (weeklyCall) {
+    return {
+      date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
+      regimeStage: weeklyCall.regimeStage,
+      confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
+      currentCall: weeklyCall.currentCall,
+      actionNow: weeklyCall.actionNow,
+      pauseIf: weeklyCall.pauseIf,
+      changeCourseIf: weeklyCall.changeCourseIf,
+      doNowBullets: weeklyCall.doNowBullets,
+      whyCouldBeWrong: weeklyCall.whyCouldBeWrong,
+      flipTrigger: weeklyCall.changeCourseIf,
+      flipConditionLabels: weeklyCall.flipConditionLabels,
+    };
+  }
+
   const doNowBullets = actionStripItems.length > 0
     ? actionStripItems.slice(0, 3).map((item) => item.actionNow)
     : assessment.constraints.slice(0, 3);
@@ -141,12 +160,12 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     `${publicDecisionLabels.threshold}: ${payload.pauseIf}`,
     `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
     ...(supportingActionLines.length > 0
-      ? ["", "Supporting action-now lines:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
+      ? ["", "More action-now lines:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
     "",
     `Why this could be wrong: ${payload.whyCouldBeWrong}`,
     ...(payload.flipConditionLabels.length > 0
-      ? ["", "Supporting change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+      ? ["", "Other change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
       : []),
   ].join("\n");
 };
@@ -198,7 +217,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             {
               type: "mrkdwn",
               text: payload.flipConditionLabels.length > 0
-                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Supporting change-course signals:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
+                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Other change-course signals:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
                 : `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
             },
           ],

@@ -196,8 +196,11 @@ export const buildWeeklySummary = ({
   const transitionCue = assessment.diagnostics.transitionWatch
     ? " Evidence is near a regime boundary; tighten review cadence before expanding commitments."
     : "";
+  const refusalCue = assessment.policyAssessment.refusal.refused
+    ? ` Policy override active: ${assessment.policyAssessment.refusal.reasons[0] ?? "cross-signal disagreement or missing inputs"}. Keep approvals reversible only until signals reconcile.`
+    : "";
   const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;
-  const summary = `${stagedRegimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
+  const summary = `${stagedRegimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}${refusalCue}`;
   const title = recordDateLabel
     ? `Weekly action summary — ${recordDateLabel}`
     : "Weekly action summary";

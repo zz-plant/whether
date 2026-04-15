@@ -31,6 +31,7 @@ import type { PostureStateContract } from "./postureStateContract";
 import type { StartupClimateIndex } from "./homeBrief/scoring";
 import type { RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
+import type { WeeklyCallContract } from "./weeklyCallContract";
 import {
   buildFlipRiskMeterState,
   buildHomeBriefModelInternal,
@@ -471,6 +472,7 @@ export const buildWeeklyDecisionCardViewModel = ({
   confidenceTrend,
   canonicalDecisionCopy,
   isFallbackSnapshot,
+  weeklyCall,
 }: {
   homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
   statusLabel: string;
@@ -484,6 +486,7 @@ export const buildWeeklyDecisionCardViewModel = ({
   confidenceTrend?: ConfidenceTrendFraming;
   canonicalDecisionCopy?: CanonicalDecisionCopy;
   isFallbackSnapshot?: boolean;
+  weeklyCall?: WeeklyCallContract;
 }): WeeklyDecisionCardViewModel =>
   buildWeeklyDecisionCardViewModelInternal({
     homeBriefModel,
@@ -498,4 +501,5 @@ export const buildWeeklyDecisionCardViewModel = ({
     confidenceTrend,
     canonicalDecisionCopy,
     isFallbackSnapshot,
+    weeklyCall,
   });

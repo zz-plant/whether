@@ -223,6 +223,10 @@ export type CompactFreshnessMeta = {
   updatedAtLabel: string;
   confidenceCue: string;
   maxAge: "fresh" | "stale";
+  stalenessLabel: "fresh" | "stale" | "unknown";
+  mode: "live" | "cached" | "historical";
+  timestamp: string | null;
+  ageHours: number | null;
   line: string;
 };
 
@@ -241,12 +245,14 @@ export const buildCompactFreshnessMeta = ({
   updatedAtLabel,
   confidenceLabel,
   isFallbackSnapshot,
+  isHistoricalSelection = false,
   now = new Date(),
   staleAfterHours = 6,
 }: {
   updatedAtLabel: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   isFallbackSnapshot: boolean;
+  isHistoricalSelection?: boolean;
   now?: Date;
   staleAfterHours?: number;
 }): CompactFreshnessMeta => {
@@ -257,8 +263,22 @@ export const buildCompactFreshnessMeta = ({
   const staleByDate = normalizedUpdatedAt === "Unavailable" || ageHours === null;
   const staleByAge = ageHours !== null && ageHours > staleAfterHours;
   const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate || staleByAge ? "stale" : "fresh";
+  const stalenessLabel: "fresh" | "stale" | "unknown" = staleByDate
+    ? "unknown"
+    : staleByAge || isFallbackSnapshot
+      ? "stale"
+      : "fresh";
+  const mode: "live" | "cached" | "historical" = isHistoricalSelection
+    ? "historical"
+    : isFallbackSnapshot
+      ? "cached"
+      : "live";
   const confidenceCue = confidenceLabel === "HIGH" ? "high-reliability" : confidenceLabel === "MED" ? "mixed-reliability" : "low-reliability";
-  const fallbackCue = maxAge === "stale" ? "degraded" : "live";
+  const fallbackCue = mode === "historical"
+    ? "historical"
+    : maxAge === "stale"
+      ? "degraded"
+      : "live";
   const ageCue = ageHours === null
     ? ""
     : ageHours < 1
@@ -269,6 +289,10 @@ export const buildCompactFreshnessMeta = ({
     updatedAtLabel: normalizedUpdatedAt,
     confidenceCue,
     maxAge,
+    stalenessLabel,
+    mode,
+    timestamp: hasParseableTimestamp ? new Date(timestamp).toISOString() : null,
+    ageHours,
     line: `Updated ${normalizedUpdatedAt}${ageCue} · ${fallbackCue} · ${confidenceCue}`,
   };
 };

@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
-import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
@@ -69,12 +67,6 @@ describe("assembleHomePage streaming contract", () => {
     const artifactPayload = await homepage.leadershipArtifactPayloadPromise;
     const workspaceModel = await homepage.workspaceModelPromise;
     const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-    const homeBriefModel = buildHomeBriefModel(reportDataForCopy);
-    const canonicalDecisionCopy = buildCanonicalDecisionCopy({
-      homeBriefModel,
-      postureState,
-    });
-
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
     assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
@@ -88,8 +80,7 @@ describe("assembleHomePage streaming contract", () => {
       confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
       actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
       flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
-      postureState,
-      canonicalDecisionCopy,
+      weeklyCall: homepage.weeklyCall,
     });
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);

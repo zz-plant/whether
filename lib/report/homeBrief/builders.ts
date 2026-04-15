@@ -71,6 +71,7 @@ import type {
   WeeklyDecisionCardViewModel,
 } from "../homeBriefModel";
 import type { SectorKey } from "../sectorSensitivity";
+import type { WeeklyCallContract } from "../weeklyCallContract";
 
 export { extractExecutiveOperationalStance, buildMemoryRail };
 
@@ -328,6 +329,11 @@ export const buildHomeBriefModelInternal = (
     directionLabel: reportDynamics?.directionLabel,
     currentRegime: assessment.regime,
   });
+  const policyOverrideActive = assessment.policyAssessment.refusal.refused;
+  const policyOverrideReason = assessment.policyAssessment.refusal.reasons[0] ?? null;
+  const effectiveOperatingStanceLine = policyOverrideActive
+    ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
+    : operatingStanceLine;
 
   const failureModes: HomeBriefFailureMode[] = buildFailureModeWarnings({
     confidenceLabel,
@@ -341,9 +347,27 @@ export const buildHomeBriefModelInternal = (
   const revisitDecisions = (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable";
   const decisionReadiness = buildDecisionReadinessState({
     confidenceLabel,
-    freshnessLabel: fetchedAtLabel ?? "Unavailable",
+    freshnessState: {
+      updatedAtLabel: fetchedAtLabel ?? "Unavailable",
+      stalenessLabel: Boolean(treasury?.fallback_at || treasury?.fallback_reason)
+        ? "stale"
+        : treasury?.fetched_at
+          ? "fresh"
+          : "unknown",
+      mode: Boolean(historicalSelection)
+        ? "historical"
+        : Boolean(treasury?.fallback_at || treasury?.fallback_reason)
+          ? "cached"
+          : "live",
+      timestamp: treasury?.fetched_at ?? null,
+      ageHours: treasury?.fetched_at
+        ? Math.max(0, (Date.now() - Date.parse(treasury.fetched_at)) / 3_600_000)
+        : null,
+    },
     isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
     isHistoricalSelection: Boolean(historicalSelection),
+    policyRefusalActive: policyOverrideActive,
+    policyRefusalReasons: assessment.policyAssessment.refusal.reasons,
   });
 
   const displayRegime = getRegimeDisplayLabel({
@@ -440,7 +464,9 @@ export const buildHomeBriefModelInternal = (
   const actionStripItems = buildActionStripItems(decisionRules, currentScores);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
-  const conciseActionNow = actionNowShort?.trim();
+  const conciseActionNow = policyOverrideActive
+    ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
+    : actionNowShort?.trim();
   const canonicalFlipConditions: CanonicalFlipCondition[] = decisionRules.flatMap((rule) =>
     rule.flipConditions.map((condition) => ({
       area: rule.area,
@@ -498,7 +524,9 @@ export const buildHomeBriefModelInternal = (
     postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
     confidenceLabel: postureState?.currentState.confidenceLabel ?? confidenceLabel,
     confidencePercent: postureState?.currentState.confidencePercent ?? confidencePercent,
-    signalConfidenceReason,
+    signalConfidenceReason: policyOverrideActive
+      ? `${signalConfidenceReason} Policy override active: ${policyOverrideReason ?? "cross-signal disagreement or data gaps"}.`
+      : signalConfidenceReason,
     regimeHeader: {
       regime: displayRegime.label,
       confidence: formatConfidencePlainLabel(confidenceLabel),
@@ -512,9 +540,9 @@ export const buildHomeBriefModelInternal = (
     inputInfluence,
     postureTrajectory,
     currentScores,
-    operatingStanceLine,
+    operatingStanceLine: effectiveOperatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
-      operatingStanceLine,
+      operatingStanceLine: effectiveOperatingStanceLine,
       trendLabel,
       transitionWatch,
     }),
@@ -625,6 +653,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
   confidenceTrend,
   canonicalDecisionCopy,
   isFallbackSnapshot,
+  weeklyCall,
 }: {
   homeBriefModel: ReturnType<typeof buildHomeBriefModelInternal>;
   statusLabel: string;
@@ -638,8 +667,10 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
   confidenceTrend?: WeeklyDecisionCardViewModel["status"]["confidenceTrend"];
   canonicalDecisionCopy?: WeeklyDecisionCardViewModel["decision"]["canonicalDecisionCopy"];
   isFallbackSnapshot?: boolean;
+  weeklyCall?: WeeklyCallContract;
 }): WeeklyDecisionCardViewModel => {
-  const immediateDecision = canonicalDecisionCopy?.doNowLines[0]
+  const immediateDecision = weeklyCall?.actionNow
+    ?? canonicalDecisionCopy?.doNowLines[0]
     ?? homeBriefModel.actionNowShort?.trim()
     ?? (homeBriefModel.revisitDecisions
       ? "Revise hiring and roadmap calls now."
@@ -650,7 +681,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
   const readThisCardItems = buildReadThisCardItems({
     decisionShiftSummary: homeBriefModel.decisionShiftSummary,
     immediateDecision,
-    reversalTrigger: homeBriefModel.reversalTrigger,
+    reversalTrigger: weeklyCall?.changeCourseIf ?? homeBriefModel.reversalTrigger,
   });
 
   return {
@@ -672,16 +703,16 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       isFallbackSnapshot,
     },
     decision: {
-      operatingStanceLine: homeBriefModel.operatingStanceLine,
+      operatingStanceLine: weeklyCall?.currentCall ?? homeBriefModel.operatingStanceLine,
       weeklyMemoLines: homeBriefModel.weeklyMemoLines,
       netConstraintSummary: homeBriefModel.netConstraintSummary,
-      guardrail: homeBriefModel.guardrail,
-      reversalTrigger: homeBriefModel.reversalTrigger,
+      guardrail: weeklyCall?.pauseIf ?? homeBriefModel.guardrail,
+      reversalTrigger: weeklyCall?.changeCourseIf ?? homeBriefModel.reversalTrigger,
       actionNowShort: homeBriefModel.actionNowShort,
       immediateDecision,
-      guardrailThreshold: homeBriefModel.guardrailThreshold,
-      flipThreshold: homeBriefModel.flipThreshold,
-      compactFlipConditionLabels: homeBriefModel.compactFlipConditionLabels,
+      guardrailThreshold: weeklyCall?.pauseIf ?? homeBriefModel.guardrailThreshold,
+      flipThreshold: weeklyCall?.changeCourseIf ?? homeBriefModel.flipThreshold,
+      compactFlipConditionLabels: weeklyCall?.flipConditionLabels ?? homeBriefModel.compactFlipConditionLabels,
       canonicalDecisionCopy,
       canonicalFlipConditions: homeBriefModel.canonicalFlipConditions,
       reportDynamics,

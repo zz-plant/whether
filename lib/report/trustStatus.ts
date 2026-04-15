@@ -43,6 +43,11 @@ export type DecisionReadinessState = {
   detail: string;
 };
 
+export type SourceFreshnessState = Pick<
+  CompactFreshnessMeta,
+  "updatedAtLabel" | "stalenessLabel" | "mode" | "timestamp" | "ageHours"
+>;
+
 const FALLBACK_FRESHNESS_LABEL = "Unavailable";
 
 const normalizeFreshnessLabel = (freshnessLabel: string) => {
@@ -52,6 +57,41 @@ const normalizeFreshnessLabel = (freshnessLabel: string) => {
 
 const isUnavailableFreshness = (freshnessLabel: string) =>
   normalizeFreshnessLabel(freshnessLabel) === FALLBACK_FRESHNESS_LABEL;
+
+const resolveFreshnessState = ({
+  freshnessLabel,
+  freshnessState,
+  isFallbackSnapshot,
+  isHistoricalSelection,
+}: {
+  freshnessLabel?: string;
+  freshnessState?: Partial<SourceFreshnessState>;
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection?: boolean;
+}): SourceFreshnessState => {
+  if (freshnessState?.updatedAtLabel && freshnessState.stalenessLabel && freshnessState.mode) {
+    return {
+      updatedAtLabel: normalizeFreshnessLabel(freshnessState.updatedAtLabel),
+      stalenessLabel: freshnessState.stalenessLabel,
+      mode: freshnessState.mode,
+      timestamp: freshnessState.timestamp ?? null,
+      ageHours: typeof freshnessState.ageHours === "number" ? freshnessState.ageHours : null,
+    };
+  }
+
+  const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel ?? FALLBACK_FRESHNESS_LABEL);
+  return {
+    updatedAtLabel: normalizedFreshness,
+    stalenessLabel: isUnavailableFreshness(normalizedFreshness)
+      ? "unknown"
+      : isFallbackSnapshot
+        ? "stale"
+        : "fresh",
+    mode: isHistoricalSelection ? "historical" : isFallbackSnapshot ? "cached" : "live",
+    timestamp: null,
+    ageHours: null,
+  };
+};
 
 const hasStrongSignalDisagreement = (
   changedSignals: Array<{ delta: number }>,
@@ -342,16 +382,29 @@ export const resolveTrustReadinessCopy = ({
 export const buildDecisionReadinessState = ({
   confidenceLabel,
   freshnessLabel,
+  freshnessState,
   isFallbackSnapshot,
   isHistoricalSelection = false,
+  policyRefusalActive = false,
+  policyRefusalReasons = [],
 }: {
   confidenceLabel: "HIGH" | "MED" | "LOW";
-  freshnessLabel: string;
+  freshnessLabel?: string;
+  freshnessState?: Partial<SourceFreshnessState>;
   isFallbackSnapshot: boolean;
   isHistoricalSelection?: boolean;
+  policyRefusalActive?: boolean;
+  policyRefusalReasons?: string[];
 }): DecisionReadinessState => {
-  const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel);
-  const freshnessUnavailable = isUnavailableFreshness(normalizedFreshness);
+  const resolvedFreshness = resolveFreshnessState({
+    freshnessLabel,
+    freshnessState,
+    isFallbackSnapshot,
+    isHistoricalSelection,
+  });
+  const normalizedFreshness = resolvedFreshness.updatedAtLabel;
+  const freshnessWeak =
+    resolvedFreshness.stalenessLabel === "stale" || resolvedFreshness.stalenessLabel === "unknown";
 
   if (isHistoricalSelection) {
     return {
@@ -361,11 +414,19 @@ export const buildDecisionReadinessState = ({
     };
   }
 
-  if (confidenceLabel === "LOW" || freshnessUnavailable) {
+  if (confidenceLabel === "LOW" || freshnessWeak) {
     return {
       label: "Hold",
       tone: "warning",
       detail: "Confidence or freshness is too weak for new irreversible approvals. Wait for a verified live refresh.",
+    };
+  }
+
+  if (policyRefusalActive) {
+    return {
+      label: "Act with caution",
+      tone: "warning",
+      detail: `Policy override active: ${policyRefusalReasons[0] ?? "cross-signal disagreement or data gaps prevent a posture change"}. Keep approvals reversible until the override clears.`,
     };
   }
 
@@ -406,6 +467,10 @@ export const buildTrustStatus = ({
   stableAction,
   confidenceLabel = "MED",
   freshnessLabel = FALLBACK_FRESHNESS_LABEL,
+  freshnessState,
+  policyRefusalActive = false,
+  policyRefusalReasons = [],
+  historicalMacroCoverageLabel,
 }: {
   historicalSelection: boolean;
   isFallback: boolean;
@@ -415,31 +480,50 @@ export const buildTrustStatus = ({
   stableAction: string;
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
+  freshnessState?: Partial<SourceFreshnessState>;
+  policyRefusalActive?: boolean;
+  policyRefusalReasons?: string[];
+  historicalMacroCoverageLabel?: string | null;
 }) => {
   const confidenceLow = confidenceLabel === "LOW";
-  const freshnessUnavailable = isUnavailableFreshness(freshnessLabel);
+  const resolvedFreshness = resolveFreshnessState({
+    freshnessLabel,
+    freshnessState,
+    isFallbackSnapshot: isFallback,
+    isHistoricalSelection: historicalSelection,
+  });
+  const freshnessUnavailable = resolvedFreshness.stalenessLabel === "unknown";
+  const historicalMacroCoverageDetail = historicalSelection && historicalMacroCoverageLabel
+    ? ` Macro coverage: ${historicalMacroCoverageLabel}.`
+    : "";
 
   const label = historicalSelection
     ? "Historical snapshot"
     : isFallback
       ? "Using last verified snapshot"
+      : policyRefusalActive
+        ? "Live, but policy override active"
       : "Live • Treasury verified";
 
   const detail = historicalSelection
-    ? "Decision impact: keep today’s do now / hold / revisit path, but treat this view as retrospective only."
+    ? `Decision impact: keep today’s do now / hold / revisit path, but treat this view as retrospective only.${historicalMacroCoverageDetail}`
     : isFallback
       ? `Decision impact: keep today’s do now / hold / revisit path. Pause irreversible approvals until live data resumes.${fallbackReason ? ` Source issue: ${fallbackReason}` : ""}`
+      : policyRefusalActive
+        ? `Decision impact: live data is available, but policy signals are too noisy to change posture cleanly. Keep irreversible approvals gated.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
       : "Decision impact: proceed with today’s do now / hold / revisit path under normal approval cadence.";
 
   const action = historicalSelection
     ? `${historicalAction} Trigger: confidence LOW. Reversal: switch to current data before changing pace.`
     : isFallback
       ? `${fallbackAction} Trigger: confidence LOW or feed unavailable. Reversal: resume normal approvals after one verified live refresh.`
+      : policyRefusalActive
+        ? `Keep posture changes reversible-only until the policy override clears. Trigger: disagreement or missing signal coverage persists. Reversal: resume normal approvals once policy composites reconcile.`
       : `${stableAction} Trigger: confidence drops. Reversal: return to standard cadence once reliability recovers.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"
-    : isFallback
+    : isFallback || policyRefusalActive
       ? "warning"
       : "stable";
 
@@ -453,6 +537,8 @@ export const buildTrustStatus = ({
     ? "Retrospective only; do not use for live approvals."
     : isFallback
       ? "Outage window: safe for reversible pacing moves only until one live refresh lands."
+      : policyRefusalActive
+        ? "Override window: safe for staged, reversible moves only until policy disagreement clears."
       : "Live window: safe for near-term operating approvals under standard guardrails.";
 
   const outageExitGate = buildOutageExitGate({

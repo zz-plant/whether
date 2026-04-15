@@ -58,6 +58,7 @@ export const HomePageReportContent = async ({
     actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
     flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
     canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,
+    weeklyCall: homepage.weeklyCall,
   });
 
   return (

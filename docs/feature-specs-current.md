@@ -36,7 +36,7 @@ The homepage keeps interpretation layers optional and query-driven: the default 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/signals`, `/operations`, `/decide`, `/method` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
 Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
-Primary navigation now uses goal-first labels in header/nav contexts (`Start here`, `See what changed`, `Make the plan`, `Resolve one question`, `Check trust`) while canonical route names remain unchanged in specs and route-level copy.
+Primary navigation now uses compact route-first labels in header/nav contexts (`Start here`, `Evidence`, `Plan`, `Resolve`, `Verify`) while in-flow homepage CTAs use a consistent `Open …` pattern such as `Open weekly plan`, `Open evidence`, and `Open trust`.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
@@ -77,6 +77,7 @@ On the homepage, the artifact rail is now visually collapsed behind one default 
 Citation and continuity details remain adjacent but lower-emphasis, instead of repeating a second share summary around the primary artifact card.
 Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
 Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
+Those four lines now come from one shared weekly-call contract rather than route-local copy assembly, so the homepage card, copy CTA, command bar, and exported operator brief stay aligned on the core call.
 The weekly brief sequence now favors `current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
 The homepage global header now keeps the weekly brief calmer: it shows the direct next paths first, while the broader workspace chooser on `/` is tucked behind a collapsed `Browse workspaces` control rather than rendering as an always-open rail.
 The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
@@ -209,6 +210,7 @@ Planning now opens with a weekly approval boundary before any broader monthly sy
 Report-shell route intros are now compressed more aggressively on mobile so the first page-specific task block lands faster in the viewport; the route brief still orients the operator, but no longer needs a second always-visible decision panel on small screens.
 
 Trust readiness language is now stricter on trust and planning surfaces: cached or medium-reliability states stay in staged-approval language (`use with caution` / `approvals staged`) instead of presenting as fully ready-to-use.
+Trust/readiness computation now consumes structured freshness state (`fresh` / `stale` / `unknown` plus `live` / `cached` / `historical`) instead of relying on rendered freshness labels, so stale-but-present timestamps no longer pass as ready-to-use.
 
 ## 2) Data sourcing & provenance
 
@@ -229,6 +231,7 @@ Trust readiness language is now stricter on trust and planning surfaces: cached 
 - Historical Treasury snapshots are served from `data/time_machine_cache.json`.
 - The Time Machine UI validates available months, shows cache coverage, and uses cached
   summary archives for weekly/monthly/quarterly/yearly playback.
+- Historical assessment now attempts to align macro-series history to the selected `asOf` date and records explicit coverage labels (`historical aligned`, `historical aligned partial`, or `treasury-only`) so historical vs. live comparisons stay structurally comparable when data exists and honestly degraded when it does not.
 
 ## 3) Regime engine & scoring
 
@@ -296,7 +299,7 @@ A policy-alignment pilot now runs **alongside** the legacy regime engine in the 
 - Composite outputs expose `cts` and `ras` values without replacing legacy tightness/risk-appetite outputs yet.
 - A refusal state is included when disagreement/volatility/data-gap guards trigger, returning explicit fallback directives (`NO_POSTURE_CHANGE_RECOMMENDED`, `REVERSIBLE_BETS_ONLY`).
 
-This pilot is additive and backward-compatible: existing regime labels and threshold behavior remain active while policy outputs are validated.
+This pilot remains additive at the scoring layer, but refusal is now binding at the guidance layer: if the policy layer refuses a posture change, readiness is capped, operator copy shifts to reversible-only execution language, and export/share surfaces must not present the move as a clean posture upgrade or downgrade.
 
 ## 4) Decision support tooling
 

@@ -67,7 +67,7 @@ export async function HomeWorkspaceBands({
               Turn this read into this week&apos;s plan
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Start here after you&apos;ve read the weekly update. The brief starts from U.S. market data, and this is where you turn that read into company-specific approvals.
+              Start here after you&apos;ve read the weekly update. Use Planning to turn the weekly call into company-specific approvals and share-ready decisions.
             </p>
           </div>
         </div>
@@ -92,7 +92,7 @@ export async function HomeWorkspaceBands({
               className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[0.95rem] px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
             >
               <CheckIcon className="h-3.5 w-3.5" />
-              <span>Make the plan</span>
+              <span>Open weekly plan</span>
             </Link>
           </div>
 
@@ -132,7 +132,7 @@ export async function HomeWorkspaceBands({
               >
                 <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
                   <TrendUpIcon className="h-3.5 w-3.5" />
-                  <span>See what changed</span>
+                  <span>Open evidence</span>
                 </div>
                 <p className="mt-2 text-sm font-semibold">Why this week&apos;s read moved</p>
                 <p className="mt-1 text-xs leading-5 text-slate-300">
@@ -146,7 +146,7 @@ export async function HomeWorkspaceBands({
               >
                 <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
                   <AuditIcon className="h-3.5 w-3.5" />
-                  <span>Check trust</span>
+                  <span>Open trust</span>
                 </div>
                 <p className="mt-2 text-sm font-semibold">{workspaceModel.audit.trustStatusAction}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-300">
@@ -161,7 +161,7 @@ export async function HomeWorkspaceBands({
             >
               <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
                 <span className="min-w-0">
-                  <span className="block text-[11px] font-medium text-violet-200">More paths</span>
+                  <span className="block text-[11px] font-medium text-violet-200">Open more paths</span>
                   <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper page only after the direction is clear.</span>
                 </span>
                 <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">

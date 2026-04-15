@@ -52,10 +52,10 @@ describe("navigation information architecture", () => {
   it("exposes primary surface progress cues and route cues for navigation copy", () => {
     assert.equal(primaryNavigationSurfaceCount, 5);
     assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Check proof");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Set guardrails");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Resolve one question");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Check trust");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Open evidence");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Open planning");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Open decision tools");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Open trust");
     assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
     assert.equal(resolveNavigationRouteCue("/signals"), "/signals");
   });

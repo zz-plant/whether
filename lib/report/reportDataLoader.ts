@@ -165,6 +165,79 @@ const getLatestRecordDate = (dates: Array<string | null | undefined>) => {
   return latestDate;
 };
 
+const toUtcDateMs = (value: string) => Date.parse(`${value}T00:00:00.000Z`);
+
+const alignMacroSeriesToAsOf = (macroSeries: MacroSeriesReading[], asOf: string) => {
+  const asOfMs = toUtcDateMs(asOf);
+
+  if (!Number.isFinite(asOfMs)) {
+    return {
+      series: [],
+      coverage: {
+        mode: "treasury-only" as const,
+        label: "No aligned macro history available",
+        alignedCount: 0,
+        totalCount: macroSeries.length,
+      },
+    };
+  }
+
+  let alignedCount = 0;
+  const series = macroSeries.map((entry) => {
+    const historicalPoint = [...(entry.history ?? [])]
+      .filter((point) => Number.isFinite(toUtcDateMs(point.date)) && toUtcDateMs(point.date) <= asOfMs)
+      .sort((left, right) => toUtcDateMs(left.date) - toUtcDateMs(right.date))
+      .at(-1);
+    const canUseCurrentValue =
+      typeof entry.value === "number"
+      && Number.isFinite(toUtcDateMs(entry.record_date))
+      && toUtcDateMs(entry.record_date) <= asOfMs;
+
+    if (!historicalPoint && !canUseCurrentValue) {
+      return {
+        ...entry,
+        value: null,
+        record_date: asOf,
+        isLive: false,
+        history: (entry.history ?? []).filter((point) => toUtcDateMs(point.date) <= asOfMs),
+      };
+    }
+
+    alignedCount += 1;
+    return {
+      ...entry,
+      value: historicalPoint?.value ?? entry.value,
+      record_date: historicalPoint?.date ?? entry.record_date,
+      isLive: false,
+      history: (entry.history ?? []).filter((point) => toUtcDateMs(point.date) <= asOfMs),
+    };
+  });
+
+  const coverageMode =
+    alignedCount === 0
+      ? "treasury-only"
+      : alignedCount === macroSeries.length
+        ? "historical-aligned"
+        : "historical-partial";
+
+  const coverageLabel =
+    coverageMode === "historical-aligned"
+      ? "Historical macro aligned"
+      : coverageMode === "historical-partial"
+        ? `Historical macro partial (${alignedCount}/${macroSeries.length})`
+        : "Historical Treasury-only";
+
+  return {
+    series,
+    coverage: {
+      mode: coverageMode,
+      label: coverageLabel,
+      alignedCount,
+      totalCount: macroSeries.length,
+    },
+  };
+};
+
 export const loadReportDataUncachedInternal = async ({
   searchParams,
   options,
@@ -235,13 +308,18 @@ export const loadReportDataUncachedInternal = async ({
     ? liveTreasuryResult.value
     : treasury;
   const macroSeries = macroResult.value;
+  const alignedHistoricalMacro = historicalSelection
+    ? alignMacroSeriesToAsOf(macroSeries, treasury.record_date)
+    : null;
+  const assessmentMacroSeries = historicalSelection
+    ? alignedHistoricalMacro?.series ?? []
+    : macroSeries;
   const recordDateLabel = deps.formatDateUTC(treasury.record_date);
   const weeklyRecordDate = deps.resolveWeekEndingIsoDateUTC(treasury.record_date);
   const weeklyRecordDateLabel = deps.formatWeekEndingUTC(treasury.record_date);
   const fetchedAtLabel = deps.formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = deps.formatAgeHours(treasury.fetched_at, now);
   const sensors = deps.buildSensorReadings(treasury);
-  const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
   const assessment = deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries);
   const liveAssessment = shouldLoadHistoricalLiveComparison
     ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries)
@@ -287,7 +365,11 @@ export const loadReportDataUncachedInternal = async ({
     timestampLabel: deps.formatTimestampUTC(macroTimestamp),
     ageLabel: macroAgeLabel,
     statusLabel: historicalSelection
-      ? "Simulated (low)"
+      ? alignedHistoricalMacro?.coverage.mode === "historical-aligned"
+        ? "Historical aligned (medium)"
+        : alignedHistoricalMacro?.coverage.mode === "historical-partial"
+          ? "Historical aligned (partial)"
+          : "Treasury-only (low)"
       : canonicalInputs
         ? "Canonical snapshot (high confidence)"
         : macroSeries.some((signal) => Boolean((signal as { isLive?: boolean }).isLive))
@@ -399,6 +481,19 @@ export const loadReportDataUncachedInternal = async ({
     liveTreasury,
     macroProvenance,
     macroSeries,
+    macroCoverage: historicalSelection
+      ? alignedHistoricalMacro?.coverage ?? {
+        mode: "treasury-only" as const,
+        label: "Historical Treasury-only",
+        alignedCount: 0,
+        totalCount: macroSeries.length,
+      }
+      : {
+        mode: "live" as const,
+        label: "Live macro coverage",
+        alignedCount: macroSeries.length,
+        totalCount: macroSeries.length,
+      },
     playbook,
     recordDateLabel,
     weeklyRecordDate,
@@ -548,5 +643,11 @@ export const buildFallbackReportDataInternal = ({
     },
     stale: true,
     lastCachedTimestamp: fallbackTreasury.fetched_at,
+    macroCoverage: {
+      mode: historicalSelection ? "treasury-only" as const : "cached" as const,
+      label: historicalSelection ? "Historical Treasury-only" : "Cached macro snapshot unavailable",
+      alignedCount: 0,
+      totalCount: 0,
+    },
   };
 };

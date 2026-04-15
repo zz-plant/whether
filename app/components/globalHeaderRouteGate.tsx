@@ -87,7 +87,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                       href="/search"
                       className="weather-pill hidden min-h-[40px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
                     >
-                      Search tools
+                      Open tools
                     </Link>
                   ) : (
                     <Link
@@ -111,7 +111,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           {showCollapsedWorkflowPicker ? (
             <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2">
               <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                Browse workflow
+                Open workflow
               </summary>
               <div className="mt-3">
                 <GlobalHeaderNavClient pathname={pathname} variant="compact" />
@@ -121,7 +121,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             <>
               <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
                 <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Browse workflow
+                  Open workflow
                 </summary>
                 <div className="mt-3">
                   <GlobalHeaderNavClient pathname={pathname} variant="compact" />

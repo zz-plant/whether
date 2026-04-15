@@ -356,13 +356,13 @@ export const ExportBriefPanel = ({
         />
 
         <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Share choices</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Default briefs</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy leadership update</span>}
-              state={clipboardState("Leadership update")}
-              disabled={isCopyDisabled("Leadership update")}
-              onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Leadership update")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy leadership brief</span>}
+              state={clipboardState("Leadership brief")}
+              disabled={isCopyDisabled("Leadership brief")}
+              onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Leadership brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -370,10 +370,10 @@ export const ExportBriefPanel = ({
               }}
             />
             <ClipboardActionRow
-              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy plain-English update</span>}
-              state={clipboardState("Plain-English update")}
-              disabled={isCopyDisabled("Plain-English update")}
-              onClick={() => void handleCopy(explainerBrief, "Plain-English update")}
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy mixed-audience brief</span>}
+              state={clipboardState("Mixed-audience brief")}
+              disabled={isCopyDisabled("Mixed-audience brief")}
+              onClick={() => void handleCopy(explainerBrief, "Mixed-audience brief")}
               className="weather-button-primary"
               buttonProps={{
                 "data-premium-intent": "export_brief",
@@ -412,11 +412,11 @@ export const ExportBriefPanel = ({
 
         <details className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
-            Board and governance formats
+            Quick and governance formats
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
             <p className="text-sm text-slate-300">
-              Use these when the same call needs a board-ready, citation-heavy, or governance-specific package.
+              Use these when the same call needs a faster summary or a board-ready, governance-specific package.
             </p>
             <div className="flex flex-wrap gap-3">
               <ClipboardActionRow
@@ -432,10 +432,10 @@ export const ExportBriefPanel = ({
                 onClick={() => void handleCopy(meetingPack, "Meeting pack")}
               />
               <ClipboardActionRow
-                label="Copy quick snapshot"
-                state={clipboardState("Quick snapshot")}
-                disabled={isCopyDisabled("Quick snapshot")}
-                onClick={() => void handleCopy(applyOverride(callSnapshot), "Quick snapshot")}
+                label="Copy one-screen summary"
+                state={clipboardState("One-screen summary")}
+                disabled={isCopyDisabled("One-screen summary")}
+                onClick={() => void handleCopy(applyOverride(callSnapshot), "One-screen summary")}
               />
               <ClipboardActionRow
                 label="Copy citation"
@@ -495,7 +495,7 @@ export const ExportBriefPanel = ({
               </label>
             </div>
             <p className="text-[11px] leading-5 text-amber-100/80">
-              When active, the exception is appended to the leadership update, plain-English update, board note, meeting pack, quick snapshot, and board summary exports.
+              When active, the exception is appended to the leadership brief, mixed-audience brief, board note, meeting pack, one-screen summary, and board summary exports.
             </p>
           </div>
         </details>
@@ -508,10 +508,10 @@ export const ExportBriefPanel = ({
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <ClipboardActionRow
-                label="Copy leadership update"
-                state={clipboardState("Leadership update")}
-                disabled={isCopyDisabled("Leadership update")}
-                onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Leadership update")}
+                label="Copy leadership brief"
+                state={clipboardState("Leadership brief")}
+                disabled={isCopyDisabled("Leadership brief")}
+                onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Leadership brief")}
               />
               <ClipboardActionRow
                 label="Copy Slack format"
@@ -547,7 +547,7 @@ export const ExportBriefPanel = ({
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                Download leadership update
+                Download leadership brief
               </Button>
               <Button
                 type="button"

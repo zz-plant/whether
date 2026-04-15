@@ -10,6 +10,7 @@ import { buildInterpretationLayer, type InterpretationView } from "../interpreta
 import type { buildHomeBriefModel } from "../homeBriefModel";
 import type { buildPostureState } from "../postureStateSource";
 import type { ReportData } from "../reportData";
+import { buildWeeklyCallContract, type WeeklyCallContract } from "../weeklyCallContract";
 import type { ArtifactPayload } from "./contracts";
 
 type BuildArtifactPayloadArgs = {
@@ -23,6 +24,7 @@ type BuildArtifactPayloadArgs = {
   interpretationView: InterpretationView;
   forecast: ReportData["forecast"];
   freshnessLabel: string;
+  weeklyCall?: WeeklyCallContract;
 };
 
 type WeeklyOperatorBriefCopyInput = Parameters<typeof buildWeeklyOperatorBriefPayload>[0];
@@ -57,7 +59,7 @@ const buildDeltaOnlyBriefText = ({
     ...revisitLines,
     "",
     `Pause if: ${homeBriefModel.guardrail}`,
-    `Lean back in if: ${canonicalDecisionCopy.flipTrigger}`,
+    `Change course if: ${canonicalDecisionCopy.flipTrigger}`,
     `Trust: ${homeBriefModel.decisionReadiness.detail}`,
     `Data refreshed: ${freshnessLabel}`,
     "",
@@ -77,6 +79,7 @@ export const buildLeadershipArtifactPayload = async ({
   interpretationView,
   forecast,
   freshnessLabel,
+  weeklyCall: providedWeeklyCall,
 }: BuildArtifactPayloadArgs): Promise<ArtifactPayload | null> => {
   await Promise.resolve();
 
@@ -103,9 +106,14 @@ export const buildLeadershipArtifactPayload = async ({
       postureState,
     };
     const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+    const weeklyCall = providedWeeklyCall ?? buildWeeklyCallContract({
+      assessment,
+      homeBriefModel,
+    });
     const canonicalDecisionCopy = buildCanonicalDecisionCopy({
       homeBriefModel,
       postureState,
+      weeklyCall,
     });
     const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefCopyPayload({
       assessment,
@@ -117,6 +125,7 @@ export const buildLeadershipArtifactPayload = async ({
       flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
       postureState,
       canonicalDecisionCopy,
+      weeklyCall,
     });
     const callCitation = buildCallCitation(assessment, treasury, {
       interpretationLayer,
@@ -131,8 +140,8 @@ export const buildLeadershipArtifactPayload = async ({
           : `TRUST: LIVE · As of ${freshnessLabel}`,
         postureLine: `POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
         changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
-        guardrailLine: `GUARDRAIL: ${homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail}`,
-        flipLine: `FLIP: ${canonicalDecisionCopy.flipTrigger}`,
+        guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
+        flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
         stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
       }),
       weeklyOperatorBriefText: buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload),
@@ -141,10 +150,10 @@ export const buildLeadershipArtifactPayload = async ({
         call: canonicalDecisionCopy.operatingCall,
         trend: homeBriefModel.trendLabel,
         confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
-        doNow: canonicalDecisionCopy.doNowLines[0],
-        avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
-        watch: canonicalDecisionCopy.flipTrigger,
-        flipConditions: canonicalDecisionCopy.flipConditions,
+        doNow: weeklyCall.actionNow,
+        avoid: weeklyCall.pauseIf,
+        watch: weeklyCall.changeCourseIf,
+        flipConditions: weeklyCall.flipConditionLabels,
       }),
       deltaOnlyBriefText: buildDeltaOnlyBriefText({
         freshnessLabel,

@@ -1,5 +1,6 @@
 import type { PostureStateContract } from "./postureStateContract";
 import type { buildHomeBriefModel } from "./homeBriefModel";
+import type { WeeklyCallContract } from "./weeklyCallContract";
 
 export type CanonicalDecisionCopy = {
   currentRegimeLabel: string;
@@ -36,13 +37,17 @@ const FALLBACK_FLIP_TRIGGER = "Recheck thresholds on next refresh.";
 export const buildCanonicalDecisionCopy = ({
   homeBriefModel,
   postureState,
+  weeklyCall,
 }: {
   homeBriefModel: HomeBriefModel;
   postureState: PostureStateContract;
+  weeklyCall?: WeeklyCallContract;
 }): CanonicalDecisionCopy => {
   const doNowLines = [
+    weeklyCall?.actionNow,
     homeBriefModel.actionNowShort,
     ...homeBriefModel.actionStripItems.map((item) => item.actionNow),
+    weeklyCall?.pauseIf,
     homeBriefModel.guardrail,
   ]
     .map((line) => line?.trim())
@@ -62,12 +67,20 @@ export const buildCanonicalDecisionCopy = ({
     .filter((line) => line.length > 0)
     .filter((line, index, lines) => lines.indexOf(line) === index)
     .slice(0, 4);
+  const resolvedFlipTrigger =
+    (weeklyCall?.changeCourseIf ?? postureState.whatFlipsNext.flipTrigger.trim())
+    || flipConditions[0]
+    || FALLBACK_FLIP_TRIGGER;
 
   return {
-    currentRegimeLabel: homeBriefModel.postureWithStageLabel ?? homeBriefModel.postureLabel,
-    operatingCall: homeBriefModel.operatingStanceLine,
+    currentRegimeLabel: weeklyCall?.regimeStage ?? homeBriefModel.postureWithStageLabel ?? homeBriefModel.postureLabel,
+    operatingCall: weeklyCall?.currentCall ?? homeBriefModel.operatingStanceLine,
     doNowLines: doNowLines.length > 0 ? doNowLines : [FALLBACK_DO_NOW_LINE],
-    flipTrigger: postureState.whatFlipsNext.flipTrigger.trim() || flipConditions[0] || FALLBACK_FLIP_TRIGGER,
-    flipConditions: flipConditions.length > 0 ? flipConditions : [FALLBACK_FLIP_TRIGGER],
+    flipTrigger: resolvedFlipTrigger,
+    flipConditions: weeklyCall?.flipConditionLabels?.length
+      ? weeklyCall.flipConditionLabels
+      : flipConditions.length > 0
+        ? flipConditions
+        : [FALLBACK_FLIP_TRIGGER],
   };
 };

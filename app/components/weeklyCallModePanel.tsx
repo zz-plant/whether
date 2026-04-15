@@ -240,14 +240,14 @@ export function WeeklyCallModePanel({
                   ) : null}
                 </div>
                 <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Recommendation
+                  {publicDecisionLabels.action}
                 </p>
                 <h2 className={`${tierOneHeadingClassName} mt-3 max-w-4xl text-xl leading-tight text-slate-50 sm:text-[2.05rem] sm:leading-[2.4rem]`}>
                   {recommendationLine}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-300">
                   <span className="font-semibold text-slate-100">{weeklyLeadershipSummary.shorthandLine}</span>
-                  <span>{weeklyLeadershipSummary.boldnessScore}/100 boldness</span>
+                  <span>Boldness budget {weeklyLeadershipSummary.boldnessScore}/100</span>
                   <span>{Math.round(confidencePercent)}% confidence</span>
                 </div>
                 {shouldShowReadinessCallout ? (
@@ -262,10 +262,13 @@ export function WeeklyCallModePanel({
                       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                         {publicDecisionLabels.call}
                       </p>
+                      <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                        Standing posture behind this week&apos;s move.
+                      </p>
                       <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
                     </div>
                     <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-2.5 sm:max-w-[14rem]">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Say it this way</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Meeting shorthand</p>
                       <p className="mt-1 text-[11px] leading-5 text-slate-200">{weeklyLeadershipSummary.shorthandLine}</p>
                     </div>
                   </div>
@@ -332,7 +335,7 @@ export function WeeklyCallModePanel({
                     {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-400">{revisitDetail}</p> : null}
                     {flipSupport.length > 0 ? (
                       <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">This would change the read</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{publicDecisionLabels.reversal}</p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {flipSupport.map((label) => (
                             <span key={label} className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">
@@ -430,7 +433,7 @@ export function WeeklyCallModePanel({
 
             <section
               id="share-ready-artifact"
-              aria-label="Share-ready brief"
+              aria-label="Send this brief"
               className="space-y-3"
             >
               {actions ? (

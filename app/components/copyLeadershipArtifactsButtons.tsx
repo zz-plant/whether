@@ -21,10 +21,10 @@ type PrimaryActionType = "copy_weekly_brief";
 type CopyTarget =
   | "Board note"
   | "Meeting pack"
-  | "Plain-English update"
-  | "Quick snapshot"
-  | "What changed only"
-  | "Leadership update"
+  | "Mixed-audience brief"
+  | "One-screen summary"
+  | "Weekly delta"
+  | "Leadership brief"
   | "Board summary"
   | "Citation";
 
@@ -126,7 +126,7 @@ export function CopyLeadershipArtifactsButtons({
     weeklyOperatorBrief,
     citation,
   });
-  const primaryBriefTarget = artifactMode === "explainer" ? "Plain-English update" : "Leadership update";
+  const primaryBriefTarget = artifactMode === "explainer" ? "Mixed-audience brief" : "Leadership brief";
   const primaryBriefContent = artifactMode === "explainer"
     ? explainerBriefContent
     : weeklyOperatorBrief;
@@ -194,15 +194,15 @@ export function CopyLeadershipArtifactsButtons({
       : shareState === "error"
         ? "Retry share"
         : artifactMode === "explainer"
-          ? "Share plain-English update"
-          : "Share leadership update";
+          ? "Share mixed-audience brief"
+          : "Share leadership brief";
 
   return (
     <div className="space-y-3">
       <article className="weather-transmission-card px-3 py-3 sm:px-4 sm:py-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready brief</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Send this brief</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
             <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
               {PRIMARY_AUDIENCE_SHARE_GUIDANCE}
@@ -242,15 +242,15 @@ export function CopyLeadershipArtifactsButtons({
             ? `${activeModeLabel} shared with its link.`
             : shareState === "copied"
               ? `Copied ${activeModeLabel.toLowerCase()} link.`
-              : shareState === "error"
-                ? "Share failed. Copy fallback is available."
-                : "Default path ready."
+                : shareState === "error"
+                  ? "Share failed. Copy fallback is available."
+                  : "Ready to send."
           }
         </p>
 
         <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-            Choose the audience
+            Pick the reader
           </summary>
 
           <div className="mt-3 space-y-3">
@@ -281,8 +281,8 @@ export function CopyLeadershipArtifactsButtons({
                     <span>{artifactModeLabels[mode]}</span>
                     <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
                       {mode === "explainer"
-                        ? "Less jargon for mixed audiences."
-                        : "Default for leadership teams."
+                        ? "For mixed audiences outside the leadership team."
+                        : "Default for your leadership team."
                       }
                     </span>
                   </button>
@@ -290,30 +290,34 @@ export function CopyLeadershipArtifactsButtons({
               })}
             </div>
 
+            <p className="text-[11px] leading-5 text-slate-400">
+              Choose the default brief by audience. Use the quick variants below when readers already know the baseline.
+            </p>
+
             <div className="grid gap-2 sm:grid-cols-2">
               <ActionButton
                 variant="secondary"
                 type="button"
                 onClick={() => {
                   trackFirstActionConversion("copy_weekly_brief");
-                  copyToClipboard(deltaOnlyBrief, "What changed only");
+                  copyToClipboard(deltaOnlyBrief, "Weekly delta");
                 }}
                 disabled={isCopying}
                 aria-busy={isCopying}
               >
-                {copyLabel("What changed only", "Copy what changed only")}
+                {copyLabel("Weekly delta", "Copy weekly delta")}
               </ActionButton>
               <ActionButton
                 variant="secondary"
                 type="button"
                 onClick={() => {
                   trackFirstActionConversion("copy_weekly_brief");
-                  copyToClipboard(weeklyCallSnapshot, "Quick snapshot");
+                  copyToClipboard(weeklyCallSnapshot, "One-screen summary");
                 }}
                 disabled={isCopying}
                 aria-busy={isCopying}
               >
-                {copyLabel("Quick snapshot", "Copy quick snapshot")}
+                {copyLabel("One-screen summary", "Copy one-screen summary")}
               </ActionButton>
             </div>
 
@@ -338,7 +342,7 @@ export function CopyLeadershipArtifactsButtons({
                 href={moreFormatsHref}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
               >
-                Open Planning formats
+                Open full formats
               </Link>
             </div>
           </div>

@@ -26,13 +26,13 @@ export type GlossaryUsageNote = {
 
 export type HighlightBullet = { text: string };
 
-export const PRIMARY_AUDIENCE_LABEL = "Starting point: U.S. market";
+export const PRIMARY_AUDIENCE_LABEL = "U.S. market starting point";
 export const PRIMARY_AUDIENCE_SUMMARY =
-  "Whether starts with U.S. Treasury, inflation, labor, credit, and funding signals before you layer in company-specific context.";
+  "This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 export const PRIMARY_AUDIENCE_ACTION =
-  "Use that starting point to set this week's pace, then check it against your own pipeline, retention, and cash data before you commit.";
+  "Before you commit, pressure-test that read against your own demand, retention, and cash signals.";
 export const PRIMARY_AUDIENCE_SHARE_GUIDANCE =
-  "Start with the leadership update for leadership teams. Switch to the plain-English update when readers do not know the market shorthand.";
+  "Start with the leadership brief for your leadership team. Switch to the mixed-audience brief when the audience needs less shorthand.";
 
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {

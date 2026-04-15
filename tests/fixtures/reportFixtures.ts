@@ -188,6 +188,12 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
       statusLabel: "Live (high confidence)",
     },
     macroSeries: [],
+    macroCoverage: {
+      mode: "live",
+      label: "Live macro coverage",
+      alignedCount: 0,
+      totalCount: 0,
+    },
     playbook: null,
     recordDateLabel: "Mar 1, 2026",
     weeklyRecordDate: "2026-03-01",

@@ -171,19 +171,23 @@ Canonical top-fold order on homepage must remain:
 7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
+- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
   - **Action**: what to do now.
   - **Threshold**: the trip line that pauses/tightens the current call.
   - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
   - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
+- Decision readiness and trust must use structured freshness state, not display copy. Consumers should gate on machine-readable staleness (`fresh`, `stale`, `unknown`) and source mode (`live`, `cached`, `historical`) rather than inferring trust from a rendered timestamp string.
+- When the policy layer refuses a posture change, the canonical weekly-call payload must override the default regime phrasing with reversible-only execution language. Refusal is not decorative metadata; it constrains readiness, share copy, and exported brief text.
+- Historical playback should run through the same assessment path as live mode whenever aligned macro history exists. If macro history is partial or unavailable, the brief should explicitly label that degraded coverage rather than silently switching to a Treasury-only interpretation model.
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Top fold should visually prioritize one dominant action lane first, then a smaller secondary lane for `Revisit now` and `Decision readiness`. Avoid giving every summary block equal visual weight.
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - The top strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
-- Homepage utility search should stay demoted behind a secondary `Search tools` action so the first-screen priority remains reading the weekly call.
+- Homepage utility search should stay demoted behind a secondary `Open tools` action so the first-screen priority remains reading the weekly call.
 - The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance.
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.

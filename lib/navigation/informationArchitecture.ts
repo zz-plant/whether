@@ -100,11 +100,11 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
   if (href === "/") return "Start here";
-  if (href === "/signals") return "Check proof";
-  if (href === "/operations") return "Set guardrails";
-  if (href === "/decide") return "Resolve one question";
-  if (href === "/method") return "Check trust";
-  if (href === "/toolkits") return "Use a tool";
+  if (href === "/signals") return "Open evidence";
+  if (href === "/operations") return "Open planning";
+  if (href === "/decide") return "Open decision tools";
+  if (href === "/method") return "Open trust";
+  if (href === "/toolkits") return "Open tools";
   return null;
 };
 

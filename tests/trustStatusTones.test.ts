@@ -112,4 +112,40 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(hold.detail, /verified live refresh/i);
   });
 
+  it("treats stale structured freshness as hold even when a timestamp string exists", () => {
+    const hold = buildDecisionReadinessState({
+      confidenceLabel: "HIGH",
+      freshnessState: {
+        updatedAtLabel: "2026-03-01T00:00:00Z",
+        stalenessLabel: "stale",
+        mode: "live",
+        timestamp: "2026-03-01T00:00:00.000Z",
+        ageHours: 18,
+      },
+      isFallbackSnapshot: false,
+    });
+
+    assert.equal(hold.label, "Hold");
+    assert.match(hold.detail, /freshness is too weak/i);
+  });
+
+  it("caps readiness at caution when policy refusal is active", () => {
+    const caution = buildDecisionReadinessState({
+      confidenceLabel: "HIGH",
+      freshnessState: {
+        updatedAtLabel: "2026-03-01T00:00:00Z",
+        stalenessLabel: "fresh",
+        mode: "live",
+        timestamp: "2026-03-01T00:00:00.000Z",
+        ageHours: 1,
+      },
+      isFallbackSnapshot: false,
+      policyRefusalActive: true,
+      policyRefusalReasons: ["Composite disagreement exceeded threshold."],
+    });
+
+    assert.equal(caution.label, "Act with caution");
+    assert.match(caution.detail, /policy override active/i);
+  });
+
 });

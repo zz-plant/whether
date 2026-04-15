@@ -8,6 +8,7 @@ import { buildCompactFreshnessMeta, type CompactFreshnessMeta } from "./reportFo
 import { resolveSectorKey, type SectorKey } from "./sectorSensitivity";
 import { buildTrustStatus } from "./trustStatus";
 import type { PostureStateContract } from "./postureStateContract";
+import { buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 
 export type WeeklyBriefSnapshot = {
   reportData: ReportData | ReportDataFallback;
@@ -19,6 +20,7 @@ export type WeeklyBriefSnapshot = {
   postureState: PostureStateContract | null;
   homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
   canonicalDecisionCopy: CanonicalDecisionCopy | null;
+  weeklyCall: WeeklyCallContract;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   callCitation: string;
 };
@@ -88,6 +90,7 @@ export const buildWeeklyBriefSnapshot = ({
     updatedAtLabel: reportData.fetchedAtLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
     isFallbackSnapshot: isFallback,
+    isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
   const displayRegime = getRegimeDisplayLabel({
     regime: reportData.assessment.regime,
@@ -101,6 +104,10 @@ export const buildWeeklyBriefSnapshot = ({
     fallbackReason: reportData.treasury.fallback_reason ?? undefined,
     confidenceLabel: homeBriefModel.confidenceLabel,
     freshnessLabel: reportData.fetchedAtLabel,
+    freshnessState: freshnessMeta,
+    policyRefusalActive: reportData.assessment.policyAssessment.refusal.refused,
+    policyRefusalReasons: reportData.assessment.policyAssessment.refusal.reasons,
+    historicalMacroCoverageLabel: reportData.macroCoverage?.label ?? null,
     ...defaultTrustStatusCopy,
   });
   const canonicalDecisionCopy = postureState
@@ -109,6 +116,11 @@ export const buildWeeklyBriefSnapshot = ({
         postureState,
       })
     : null;
+  const weeklyCall = buildWeeklyCallContract({
+    assessment: reportData.assessment,
+    homeBriefModel,
+    canonicalDecisionCopy,
+  });
   const callCitation = buildCallCitation(reportData.assessment, reportData.treasury, {
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
   });
@@ -125,6 +137,7 @@ export const buildWeeklyBriefSnapshot = ({
     confidenceTrend: reportData.confidenceTrend,
     canonicalDecisionCopy: canonicalDecisionCopy ?? undefined,
     isFallbackSnapshot: isFallback && !reportData.historicalSelection,
+    weeklyCall,
   });
 
   return {
@@ -137,6 +150,7 @@ export const buildWeeklyBriefSnapshot = ({
     postureState,
     homeBriefModel,
     canonicalDecisionCopy,
+    weeklyCall,
     weeklyDecisionCardModel,
     callCitation,
   };

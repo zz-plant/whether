@@ -25,13 +25,10 @@ import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
-import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
-import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
 import { canonicalCapitalDisciplinePath, resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
-import { buildDecisionReadinessState } from "../../lib/report/trustStatus";
 
 
 export const runtime = "edge";
@@ -120,8 +117,6 @@ export default async function OperationsPage({
     startItems,
     statusLabel,
     stopItems,
-    actionNowShort,
-    flipThreshold,
     treasury,
     treasuryProvenance,
   } = reportData;
@@ -133,48 +128,16 @@ export default async function OperationsPage({
     : undefined;
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const decisionReadiness = buildDecisionReadinessState({
-    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-    freshnessLabel: fetchedAtLabel,
-    isFallbackSnapshot: isFallback,
-    isHistoricalSelection: Boolean(historicalSelection),
-  });
-  const trustStatusLabel = historicalSelection
-    ? "Historical snapshot"
-    : isFallback
-      ? "Using last verified snapshot"
-      : decisionReadiness.label === "Act with caution"
-        ? "Live, but approvals staged"
-        : "Live and current";
-  const trustStatusDetail = historicalSelection
-    ? "Viewing archived Treasury data for the selected month."
-    : isFallback
-      ? (treasury.fallback_reason ??
-        "Live refresh pending. Using last verified snapshot.")
-      : decisionReadiness.label === "Act with caution"
-        ? decisionReadiness.detail
-        : "The live refresh is healthy. Next expected update: 15m.";
-  const trustStatusAction = historicalSelection
-    ? "Use historical data for retrospectives; switch back to live data before approving anything new."
-    : isFallback
-      ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : decisionReadiness.label === "Act with caution"
-        ? "Keep decisions reversible until confidence improves or a stronger live refresh lands."
-        : "Carry the plan forward and keep the stop lines visible.";
-  const trustStatusTone = historicalSelection
-    ? "historical"
-    : isFallback || decisionReadiness.tone === "warning"
-      ? "warning"
-      : "stable";
+  const {
+    trustStatusLabel,
+    trustStatusDetail,
+    trustStatusAction,
+    trustStatusTone,
+  } = snapshot.trustStatus;
 
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
-  const actionStripItems = buildActionStripItems(
-    buildCanonicalBoundedDecisionRules({
-      regime: assessment.regime,
-      thresholds: assessment.thresholds,
-      scores: assessment.scores,
-    }),
-  );
+  const actionStripItems = snapshot.homeBriefModel.actionStripItems;
+  const weeklyCall = snapshot.weeklyCall;
   const operationsResourceLibrary = [
     resourceSupportingPages.capitalPostureTemplate,
     resourceSupportingPages.reversalTriggerChecklist,
@@ -212,15 +175,9 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Turn this week's read into a few explicit decisions and keep the stop lines visible.",
-        doNow: [
-          actionNowShort,
-          actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this week's backdrop.",
-        ],
-        flipConditions: [
-          flipThreshold,
-          stopItems[0] ?? "Escalate to leadership if a stop trigger is hit.",
-        ],
+        call: weeklyCall.currentCall,
+        doNow: weeklyCall.doNowBullets,
+        flipConditions: [weeklyCall.changeCourseIf, ...weeklyCall.flipConditionLabels].slice(0, 4),
         updatedAt: fetchedAtLabel,
       }}
       sectionLinks={operationsSectionLinks.plan}
@@ -278,17 +235,17 @@ export default async function OperationsPage({
                   <div className="grid gap-3 md:grid-cols-3">
                     <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Action now</p>
-                      <p className="mt-2 text-sm font-semibold text-slate-100">{actionNowShort}</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.actionNow}</p>
                     </article>
                     <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">
-                        {stopItems[0] ?? "Pause new fixed-cost approvals if the guardrail is hit."}
+                        {weeklyCall.pauseIf}
                       </p>
                     </article>
                     <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">Change course if</p>
-                      <p className="mt-2 text-sm font-semibold text-slate-100">{flipThreshold}</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.changeCourseIf}</p>
                     </article>
                   </div>
                   <p className="text-xs leading-5 text-slate-400">
@@ -395,8 +352,8 @@ export default async function OperationsPage({
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Choose the default U.S. leadership update, a plain-English explainer, or a board-ready version.",
-            summary: "Start with the leadership update for a U.S. leadership audience, then switch to the plain-English version when people want the market terms translated.",
+            description: "Choose the default leadership brief, a mixed-audience brief, or a board-ready version.",
+            summary: "Start with the leadership brief for your leadership team, then switch to the mixed-audience brief when readers want the shorthand translated.",
             owner: "Chief of staff / exec comms",
             approvalStatus: "Ready to circulate",
             changeSignal: "The audience needs a plainer or board-ready pack",
@@ -412,8 +369,8 @@ export default async function OperationsPage({
                 <SectionedReportPanel
                   id="ops-export-briefs-panel"
                   label="Share"
-                  title="Share-ready brief"
-                  description="Start with the leadership update for the default U.S. leadership audience. Use the plain-English version when people want the market terms translated."
+                  title="Send this brief"
+                  description="Start with the leadership brief for the default leadership-team audience. Use the mixed-audience brief when people want the market terms translated."
                   defaultOpen={true}
                 >
                   <ExportBriefPanel

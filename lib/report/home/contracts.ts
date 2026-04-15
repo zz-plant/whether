@@ -3,6 +3,7 @@ import type { buildTrustStatus } from "../trustStatus";
 import type { InterpretationLayer } from "../interpretationLayer";
 import type { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
 import type { loadHomePageReportData } from "../homePageData";
+import type { WeeklyCallContract } from "../weeklyCallContract";
 
 export type ArtifactPayload = {
   boardSummary: string;
@@ -175,6 +176,7 @@ export type HomePageAssembly = {
     } | null;
   };
   reportResult: Awaited<ReturnType<typeof loadHomePageReportData>>;
+  weeklyCall: WeeklyCallContract;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
