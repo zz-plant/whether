@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isWebVitalMetric } from "../../../../lib/webVitalsTelemetry";
+import { writeAnalytics } from "../../../../lib/telemetry/analyticsEngine";
 
 export const runtime = "edge";
 
@@ -16,7 +17,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
-  console.info("[web-vitals]", payload);
+  // value + delta are the two numerics worth promoting to typed columns;
+  // the rest of the payload (name, rating, path, etc.) lands in the JSON blob.
+  writeAnalytics("web-vitals", payload, {
+    doubles: [payload.value, payload.delta],
+  });
 
   return NextResponse.json({ ok: true }, { status: 202 });
 }

@@ -18,10 +18,27 @@ const toHours = (isoTimestamp: string, now = new Date()) => {
   return Number(((now.getTime() - timestamp) / 3_600_000).toFixed(2));
 };
 
-const getCommitSha = () =>
-  process.env.CF_PAGES_COMMIT_SHA ??
-  process.env.GITHUB_SHA ??
-  null;
+type WorkerVersionMetadata = {
+  id?: string;
+  tag?: string;
+  timestamp?: string;
+};
+
+const getCommitSha = () => {
+  // Workers Version Metadata binding (configured in wrangler.toml as
+  // `[version_metadata] binding = "CF_VERSION_METADATA"`). Available on the
+  // Workers runtime via globalThis at request time. `id` is the version UUID;
+  // `tag` is the optional human-readable tag, used as a secondary reference.
+  const versionMetadata = (globalThis as { CF_VERSION_METADATA?: WorkerVersionMetadata })
+    .CF_VERSION_METADATA;
+  return (
+    versionMetadata?.id ??
+    versionMetadata?.tag ??
+    process.env.CF_PAGES_COMMIT_SHA ??
+    process.env.GITHUB_SHA ??
+    null
+  );
+};
 
 type MonitorSourceHealthRow = {
   sourceName: string;

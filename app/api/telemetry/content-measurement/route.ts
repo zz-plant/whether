@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isContentMeasurementEvent } from "../../../../lib/contentMeasurement";
+import { writeAnalytics } from "../../../../lib/telemetry/analyticsEngine";
 
 export const runtime = "edge";
 
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   // Keep first-action telemetry non-blocking to preserve operator flow.
-  console.info("[content-measurement]", payload);
+  writeAnalytics("content-measurement", payload);
 
   return NextResponse.json({ ok: true }, { status: 202 });
 }

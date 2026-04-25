@@ -5,12 +5,49 @@ compatibility_flags = ["nodejs_compat"]
 upload_source_maps = false
 preview_urls = true
 
+# Tail logs and runtime errors stay in the Workers dashboard for the active deploy.
+# `head_sampling_rate = 1` keeps invocation logs unsampled while we tune cost.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [assets]
 binding = "ASSETS"
 not_found_handling = "none"
 
 [images]
 binding = "IMAGES"
+
+# Surfaces the deployed Worker version (id, tag, timestamp) at runtime so
+# `/api/health` and other surfaces can report a live commit/version reference
+# without relying on Pages-only env vars. See app/api/health/route.ts.
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
+# Workers Analytics Engine dataset for telemetry streams (web-vitals,
+# operator-workflow, content-measurement). lib/telemetry/analyticsEngine.ts
+# is the single write path; routes call writeAnalytics(stream, event).
+# Datasets are auto-created on first write, so no extra provisioning is needed.
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "whether_telemetry"
+
+# Durable KV for regime alerts, decision events, decision memory, alert preferences,
+# posture events, and ingestion snapshots. The repos in lib/storage/* and
+# lib/events/decisionEventStore.ts probe globalThis.WHETHER_DURABLE_KV first and
+# fall back to in-memory per-isolate storage when the binding is missing.
+#
+# To enable, provision once and uncomment:
+#   bunx wrangler kv namespace create WHETHER_DURABLE_KV
+#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --preview
+#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview
+#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview --preview
+# then paste the IDs below.
+#
+# [[kv_namespaces]]
+# binding = "WHETHER_DURABLE_KV"
+# id = "REPLACE_WITH_PRODUCTION_KV_ID"
+# preview_id = "REPLACE_WITH_PRODUCTION_PREVIEW_KV_ID"
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"
@@ -23,3 +60,22 @@ NEXT_PUBLIC_SITE_URL = "https://whether.work"
 
 [env.preview.images]
 binding = "IMAGES"
+
+[env.preview.version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.preview.observability]
+enabled = true
+head_sampling_rate = 1
+
+[[env.preview.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "whether_telemetry_preview"
+
+# Mirror of the production WHETHER_DURABLE_KV binding for the preview environment.
+# Provision and paste the preview-environment IDs before uncommenting.
+#
+# [[env.preview.kv_namespaces]]
+# binding = "WHETHER_DURABLE_KV"
+# id = "REPLACE_WITH_PREVIEW_ENV_KV_ID"
+# preview_id = "REPLACE_WITH_PREVIEW_ENV_PREVIEW_KV_ID"

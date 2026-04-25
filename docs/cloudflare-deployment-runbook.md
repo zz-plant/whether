@@ -61,6 +61,37 @@ bun run start
 bun run deploy:cloudflare:preview:dry-run
 ```
 
+## Runtime bindings
+
+The active `wrangler.toml` declares the following bindings on both the production and `env.preview` lanes:
+
+- `ASSETS` — Workers Static Assets binding for vinext output.
+- `IMAGES` — Workers Images binding used by the `/_vinext/image` worker route.
+- `CF_VERSION_METADATA` — Workers [Version Metadata](https://developers.cloudflare.com/workers/runtime-apis/bindings/version-metadata/) binding. Surfaces `id`, `tag`, and `timestamp` for the live deploy. `app/api/health/route.ts` reads `globalThis.CF_VERSION_METADATA.id` to populate the `commitSha` field, replacing the previous Pages-only `CF_PAGES_COMMIT_SHA` lookup.
+- `ANALYTICS` — Workers [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) dataset (`whether_telemetry` on production, `whether_telemetry_preview` on the preview lane). All three first-party telemetry routes (`/api/telemetry/web-vitals`, `/api/telemetry/operator-workflow`, `/api/telemetry/content-measurement`) write through `lib/telemetry/analyticsEngine.ts`. Schema: `index1 = stream`, `blob1 = stream`, `blob2 = JSON event payload`, with optional typed `doubles` (e.g. web-vitals `value` and `delta`). Datasets auto-create on first write — no extra provisioning needed. When the binding is absent (local dev / tests) the helper falls back to a tagged `console.info` line so behavior matches the previous black-hole path without throwing.
+
+`[observability] enabled = true` is set on both lanes so tail logs and runtime errors land in the Workers dashboard for the active deploy without extra plumbing. `head_sampling_rate` is `1` (no sampling) until invocation volume warrants tuning.
+
+### Optional: durable KV (`WHETHER_DURABLE_KV`)
+
+Several repositories (`lib/storage/regimeAlertRepository.ts`, `lib/storage/alertPreferenceRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/events/decisionEventStore.ts`, `lib/ingestion/store.ts`) probe `globalThis.WHETHER_DURABLE_KV` and silently fall back to in-memory storage when the binding is missing. The fallback is per-isolate and is lost on every redeploy, so any feature that depends on durable history (regime alert history, decision events, decision memory, alert preferences, ingestion snapshots) operates as `backend: "local-fallback"` until the binding is provisioned.
+
+To provision once and enable durable persistence:
+
+```bash
+# Production lane (top-level config)
+bunx wrangler kv namespace create WHETHER_DURABLE_KV
+bunx wrangler kv namespace create WHETHER_DURABLE_KV --preview
+
+# Preview lane (env.preview)
+bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview
+bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview --preview
+```
+
+Then paste the returned IDs into the commented `[[kv_namespaces]]` and `[[env.preview.kv_namespaces]]` blocks in `wrangler.toml` and uncomment them. After deploy, `/api/regime-alerts` and `/api/decision-events` should report `backend: "durable"` instead of `local-fallback`.
+
+The binding is intentionally left commented out by default so CI deploys do not fail wrangler validation when the namespace IDs have not yet been provisioned.
+
 ## Auth preflight
 
 Real deploys now run a lightweight Wrangler auth preflight before upload:
