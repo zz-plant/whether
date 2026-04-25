@@ -134,7 +134,7 @@ export async function HomeWorkspaceBands({
                   <TrendUpIcon className="h-3.5 w-3.5" />
                   <span>Open evidence</span>
                 </div>
-                <p className="mt-2 text-sm font-semibold">Why this week&apos;s read moved</p>
+                <p className="mt-2 text-sm font-semibold">{"Why this week's read moved"}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-300">
                   {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See the main drivers, thresholds, and past weeks when you need to challenge the read."}
                 </p>
@@ -154,43 +154,43 @@ export async function HomeWorkspaceBands({
                 </p>
               </Link>
             </div>
+          </details>
 
-            <details
-              id="historical-replay-workspace"
-              className="weather-auto-chevron mt-3 rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
-            >
-              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
-                <span className="min-w-0">
-                  <span className="block text-[11px] font-medium text-violet-200">More paths</span>
-                  <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper page only after the direction is clear.</span>
-                </span>
-                <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  Optional
-                </span>
-              </summary>
+          <details
+            id="historical-replay-workspace"
+            className="weather-auto-chevron mt-3 rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
+          >
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+              <span className="min-w-0">
+                <span className="block text-[11px] font-medium text-violet-200">More paths</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper page only after the direction is clear.</span>
+              </span>
+              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Optional
+              </span>
+            </summary>
 
-              <div className="mt-3 space-y-2">
-                {deeperPaths.map((path) => (
-                  <Link
-                    key={`${path.kicker}-${path.href}`}
-                    href={path.href}
-                    className={`flex items-start justify-between gap-3 rounded-[0.95rem] border border-slate-800/55 bg-slate-950/32 px-3 py-3 text-slate-100 transition-colors ${path.hoverClass}`}
-                  >
-                    <div className="min-w-0">
-                      <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
-                        {path.icon}
-                        <span>{path.kicker}</span>
-                      </div>
-                      <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
+            <div className="mt-3 space-y-2">
+              {deeperPaths.map((path) => (
+                <Link
+                  key={`${path.kicker}-${path.href}`}
+                  href={path.href}
+                  className={`flex items-start justify-between gap-3 rounded-[0.95rem] border border-slate-800/55 bg-slate-950/32 px-3 py-3 text-slate-100 transition-colors ${path.hoverClass}`}
+                >
+                  <div className="min-w-0">
+                    <div className={`flex items-center gap-2 text-[11px] font-medium ${path.toneClass}`}>
+                      {path.icon}
+                      <span>{path.kicker}</span>
                     </div>
-                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                      Open
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </details>
+                    <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
+                  </div>
+                  <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                    Open
+                  </span>
+                </Link>
+              ))}
+            </div>
           </details>
         </article>
       </section>

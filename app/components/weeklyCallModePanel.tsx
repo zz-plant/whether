@@ -10,7 +10,6 @@ import {
   PRIMARY_AUDIENCE_LABEL,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
-import { CompactDisclosure } from "./compactDisclosure";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 
 type PolicyDetails = {
@@ -440,6 +439,47 @@ export function WeeklyCallModePanel({
               </dl>
             </div>
 
+            {postureSteps.length > 1 || confidenceTrend ? (
+              <div className="rounded-[1rem] border border-slate-800/60 bg-[linear-gradient(180deg,rgba(8,17,31,0.52),rgba(3,7,18,0.22))] px-3 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Continuity</p>
+                  {trajectoryDeltaSummary ? (
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
+                  ) : null}
+                  {confidenceTrend ? (
+                    <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                      {Math.round(confidencePercent)}% confidence
+                    </span>
+                  ) : null}
+                </div>
+                {postureSteps.length > 1 ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {postureSteps.map((step, index) => (
+                      <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
+                        <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
+                          <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
+                          <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
+                        </article>
+                        {index < postureSteps.length - 1 ? (
+                          <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {confidenceTrend ? (
+                  <div className="mt-3 border-t border-slate-800/70 pt-3">
+                    <ConfidenceMiniChart
+                      confidenceHistory={confidenceHistory}
+                      confidenceTrend={confidenceTrend}
+                      currentConfidencePercent={confidencePercent}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
             <section
               id="share-ready-artifact"
               aria-label="Send this brief"
@@ -455,68 +495,31 @@ export function WeeklyCallModePanel({
 
               <details className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2.5">
                 <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Citation and history
+                  Citation
                 </summary>
-                <div className="mt-3 space-y-3">
+                <div className="mt-3">
                   <div className="rounded-lg border border-slate-800/70 bg-slate-950/50 px-3 py-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Citation</p>
-                    <p className="mt-2 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
+                    <p className="text-xs leading-5 text-slate-300">{citationMetaLine}</p>
                     <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs leading-5 text-slate-300">
                       {citation}
                     </pre>
                   </div>
-
-                  {confidenceTrend ? (
-                    <div className="rounded-lg border border-slate-800/70 bg-slate-950/50 px-3 py-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Confidence and continuity</p>
-                      <div className="mt-3">
-                        <ConfidenceMiniChart
-                          confidenceHistory={confidenceHistory}
-                          confidenceTrend={confidenceTrend}
-                          currentConfidencePercent={confidencePercent}
-                        />
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {postureSteps.length > 1 ? (
-                    <div className="rounded-lg border border-slate-800/70 bg-slate-950/50 px-3 py-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">How this moved over time</p>
-                        {trajectoryDeltaSummary ? (
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
-                        ) : null}
-                      </div>
-                      <p className="mt-2 text-[11px] leading-5 text-slate-300">{comparisonSummary}</p>
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        {postureSteps.map((step, index) => (
-                          <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
-                            <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
-                              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
-                              <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
-                              <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
-                            </article>
-                            {index < postureSteps.length - 1 ? (
-                              <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
-                            ) : null}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
                 </div>
               </details>
             </section>
           </div>
         </article>
 
-        <CompactDisclosure
-          queryKey="moreContext"
-          summary="Why this lands here"
-          preview={guardrailPolicyDetails.summary}
-          className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}
-          summaryClassName="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300"
-        >
+        <details className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}>
+          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <span className="min-w-0 flex-1">
+              <span className="block">Why this lands here</span>
+              <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-slate-400">
+                {guardrailPolicyDetails.summary}
+              </span>
+            </span>
+            <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          </summary>
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3 shadow-[0_14px_24px_-24px_rgba(244,63,94,0.35)]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Why this lands here</p>
@@ -574,7 +577,7 @@ export function WeeklyCallModePanel({
               </article>
             ) : null}
           </div>
-        </CompactDisclosure>
+        </details>
       </article>
     </>
   );
