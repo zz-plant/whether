@@ -13,6 +13,10 @@
 
 # Redundant WASM copies (runtime uses root server WASM, not assets copy)
 assets/resvg-*.wasm
+assets/yoga-*.wasm
+
+# Duplicate CSS (identical file exists in client/assets/)
+server/assets/index-*.css
 
 # Social OG images served from _headers, not from client public
 social/

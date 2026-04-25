@@ -40,6 +40,12 @@ const run = async () => {
     return;
   }
 
+  // Skip repair when running in CI with restored node_modules cache
+  // (tarball download adds 2-5s to every CI run; cache already preserves dist/)
+  if (process.env.CI && process.env.SKIP_VINEXT_REPAIR !== "false") {
+    return;
+  }
+
   const tempDir = await mkdtemp(join(tmpdir(), "whether-vinext-repair-"));
 
   try {

@@ -2,6 +2,7 @@ name = "whether"
 main = "./worker/index.ts"
 compatibility_date = "2026-03-15"
 compatibility_flags = ["nodejs_compat"]
+upload_source_maps = false
 preview_urls = true
 
 [assets]
