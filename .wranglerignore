@@ -1,0 +1,24 @@
+# Cloudflare Workers upload ignore rules
+# These files are not needed in the production worker and add unnecessary upload bytes.
+
+# Git/hidden placeholder files
+.gitkeep
+.assetsignore
+.DS_Store
+
+# Dev-only artifacts
+.cache/
+.vite/
+**/*.map
+
+# Redundant WASM copies (runtime uses root server WASM, not assets copy)
+assets/resvg-*.wasm
+
+# Social OG images served from _headers, not from client public
+social/
+
+# Downloads served separately
+downloads/
+
+# Duplicate manifest files
+.vite/manifest.json

@@ -36,8 +36,5 @@ jobs:
       - name: Check Vinext compatibility
         run: bun run check:vinext
 
-      - name: Build app output
-        run: bun run build
-
       - name: Build Cloudflare Worker output
         run: bun run build:cloudflare

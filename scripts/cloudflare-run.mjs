@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 const [action, ...rawArgs] = process.argv.slice(2);
@@ -28,7 +28,9 @@ if (targetEnv) {
 }
 
 if (action === "build") {
-  process.exit(runVinext(["build"], childEnv));
+  const status = runVinext(["build"], childEnv);
+  if (status === 0) dedupeWasmArtifacts();
+  process.exit(status);
 }
 
 const deployArgs = rebuildDeployArgs(parsed, targetEnv);
@@ -42,6 +44,7 @@ if (!parsed.skipBuild && !parsed.dryRun) {
   if (buildStatus !== 0) {
     process.exit(buildStatus);
   }
+  dedupeWasmArtifacts();
   deployArgs.push("--skip-build");
 }
 
@@ -111,6 +114,24 @@ function runVinext(args, env) {
   });
 
   return result.status ?? 1;
+}
+
+function dedupeWasmArtifacts() {
+  const wasmRoot = join("dist", "server", "resvg.wasm");
+  if (!existsSync(wasmRoot)) return;
+
+  try {
+    const entries = readdirSync(join("dist", "server", "assets")).filter(
+      (f) => f.startsWith("resvg-") && f.endsWith(".wasm"),
+    );
+    for (const entry of entries) {
+      const assetPath = join("dist", "server", "assets", entry);
+      rmSync(assetPath, { force: true });
+      console.log(`[cloudflare-run] Removed duplicate WASM asset: assets/${entry}`);
+    }
+  } catch {
+    // assets dir may be empty or missing
+  }
 }
 
 function ensureWranglerAuth(env) {
