@@ -22,6 +22,15 @@ export const retiredSitemapPaths = [
   "/briefing",
   "/plan",
   "/brief/stage",
+  "/startup-macro-posture",
+  "/concepts",
+  "/concepts/audience",
+  "/concepts/conflicts",
+  "/concepts/focus",
+  "/posture",
+  "/learn/failure-modes",
+  "/about",
+  "/confidence",
 ] as const;
 
 const retiredPathSet = new Set<string>(retiredSitemapPaths);

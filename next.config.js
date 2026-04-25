@@ -26,20 +26,26 @@ export const solutionRedirectPairs = [
 ];
 
 export const canonicalSurfaceRedirectPairs = [
+  // Legacy posture → root
   ["/startup-macro-posture/index", "/method#formula-reference"],
   ["/startup-macro-posture/:regime", "/"],
   ["/startup-macro-posture", "/"],
+  // Legacy methodology → Trust hub
   ["/methodology", "/method#formula-reference"],
+  // Consolidated under Trust hub
   ["/sources", "/method#sources-freshness"],
   ["/confidence", "/method#confidence-limits"],
+  // Decision answer root → Decide hub
   ["/answers", "/decide#direct-answers"],
-  ["/learn", "/learn/failure-modes"],
+  // Learn root → Trust hub
+  ["/learn", "/method"],
+  // Concepts (all paths) → Trust hub
+  ["/concepts/:path*", "/method"],
+  // Guides staging redirects
   ["/guides/stage/:stage", "/guides?stage=:stage"],
   ["/guides/stage", "/guides?library=stages"],
   ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
-  ["/concepts/conflicts", "/concepts?view=conflicts"],
-  ["/concepts/focus/:focus", "/concepts?focus=:focus"],
-  ["/concepts/audience/:audience", "/concepts?audience=:audience"],
+  // Operations sub-pages flattened
   ["/operations/data", "/operations"],
   ["/operations/cli", "/operations"],
   ["/operations/integrations", "/operations"],

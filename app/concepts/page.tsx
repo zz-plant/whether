@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductConceptTimelinePage() {
-  permanentRedirect("/decide#guided-translation");
+  permanentRedirect("/method");
 }

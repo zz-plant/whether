@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ...buildPageMetadata({
     title: "Concept article redirect — Whether",
     description:
-      "Concept detail pages now route back into Decision Tools so operators stay inside the live weekly decision flow.",
+      "Concept detail pages now route back into Trust so operators stay inside the live weekly decision flow.",
     path: "/concepts",
     imageAlt: "Concept redirect",
   }),
@@ -22,5 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default async function ConceptArticlePage(_props: ConceptArticlePageProps) {
-  permanentRedirect("/decide#guided-translation");
+  permanentRedirect("/method");
 }
