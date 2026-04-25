@@ -27,31 +27,34 @@ export async function HomeWorkspaceBands({
     {
       href: workspaceModel.translate.primaryPath.href as Route,
       kicker: "Decide",
-      title: "Open the clearest next page",
-      detail: "Resolve one remaining open question. Use this only after the plan direction is set.",
+      title: "Answer one question",
+      detail:
+        workspaceModel.translate.primaryPath.detail
+        ?? "Resolve one remaining open question. Use this only after the plan direction is set.",
       icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
       toneClass: "text-amber-200",
-      hoverClass: "hover:border-amber-300/35",
+      hoverClass: "hover:border-amber-300/45",
     },
     {
       href: workspaceModel.replay.openFullHref as Route,
       kicker: "Replay",
-      title: replayPreview?.label ?? "Review a prior week",
+      title: "Review a past week",
       detail: replayPreview?.summary ?? workspaceModel.replay.summary,
       icon: <HistoryIcon className="h-3.5 w-3.5" />,
       toneClass: "text-violet-200",
-      hoverClass: "hover:border-violet-300/35",
+      hoverClass: "hover:border-violet-300/45",
     },
     {
       href: (toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route,
       kicker: "Toolkit",
-      title: toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title,
+      title: "Use a tool",
       detail: toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail,
       icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
-      toneClass: "text-slate-300",
-      hoverClass: "hover:border-slate-500/55",
+      toneClass: "text-slate-200",
+      hoverClass: "hover:border-slate-500/65",
     },
   ] as const;
+
 
   return (
     <div className="space-y-5">
@@ -118,9 +121,9 @@ export async function HomeWorkspaceBands({
               <span className="min-w-0">
                 <span className="block text-[11px] font-medium text-sky-200">If someone asks why</span>
                 <span className="mt-1 block text-sm font-semibold text-slate-100">Pressure-test the read with one check.</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-400">Open one evidence view, not a second dashboard.</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">Open one evidence view, not a second dashboard.</span>
               </span>
-              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                 Optional
               </span>
             </summary>
@@ -165,7 +168,7 @@ export async function HomeWorkspaceBands({
                 <span className="block text-[11px] font-medium text-violet-200">More paths</span>
                 <span className="mt-1 block text-sm font-semibold text-slate-100">Open a deeper page only after the direction is clear.</span>
               </span>
-              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                 Optional
               </span>
             </summary>
@@ -185,7 +188,7 @@ export async function HomeWorkspaceBands({
                     <p className="mt-2 text-sm font-semibold text-slate-100">{path.title}</p>
                     <p className="mt-1 text-xs leading-5 text-slate-300">{path.detail}</p>
                   </div>
-                  <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                  <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                     Open
                   </span>
                 </Link>

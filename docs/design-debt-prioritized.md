@@ -17,11 +17,11 @@ Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`,
 | --- | --- | --- | --- | --- |
 | DD-001 | P0 | Mobile global nav scroll affordance | Design + Frontend | Shipped (2026-03-31) |
 | DD-002 | P1 | IA taxonomy/nav alignment with canonical hubs | Product + Frontend | Open |
-| DD-003 | P1 | Theme toggle accessibility semantics | Frontend | Open |
-| DD-004 | P1 | Homepage (`/`) progressive disclosure on mobile | Product + Frontend | Open |
-| DD-005 | P2 | Consolidate duplicate CTA patterns on primary pages | Product + Frontend | Open |
-| DD-006 | P2 | Improve dark-theme secondary text contrast tokens | Design system + Frontend | Open |
-| DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Open |
+| DD-003 | P1 | Theme toggle accessibility semantics | Frontend | Shipped (2026-04-24) — dynamic `aria-label` + `aria-pressed` already in `themeToggleButton.tsx` |
+| DD-004 | P1 | Homepage (`/`) progressive disclosure on mobile | Product + Frontend | Partial (2026-04-25) — delta panel made visually dominant; posture summary stays compact (2-col on mobile); Continuity, Citation, More-paths and revisit deck collapsed via `<details>`. Remaining: scroll length still long; consider collapsing posture-summary band on mobile. |
+| DD-005 | P2 | Consolidate duplicate CTA patterns on primary pages | Product + Frontend | Open — header `Copy weekly brief` and in-card `Send this brief` still both present; needs an explicit canonical-action decision. |
+| DD-006 | P2 | Improve dark-theme secondary text contrast tokens | Design system + Frontend | Partial (2026-04-25) — bumped `slate-400/500 → slate-300/400` across `WeeklyCallModePanel` (posture summary, continuity steps, trajectory delta) and `HomeWorkspaceBands` (audit/Optional/Open chips, evidence note). System-wide token pass deferred to Phase 2. |
+| DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Open — workspace band labels normalised to "Answer one question / Review a past week / Use a tool" (2026-04-25); broader naming sweep pending. |
 | DD-008 | P3 | Toolkit search feedback affordances | Frontend | Open |
 
 ## Priority 1 — High leverage

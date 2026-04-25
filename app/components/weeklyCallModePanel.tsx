@@ -189,50 +189,50 @@ export function WeeklyCallModePanel({
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                   What this means now
                 </p>
-                <h2 className={`${tierOneHeadingClassName} mt-3 max-w-4xl text-xl leading-tight text-slate-50 sm:text-[2.05rem] sm:leading-[2.4rem]`}>
+                <h2 className={`${tierOneHeadingClassName} mt-2 max-w-4xl text-[1.4rem] font-semibold leading-[1.18] text-slate-50 sm:text-[2.15rem] sm:leading-[1.08]`}>
                   {recommendationLine}
                 </h2>
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-300">
-                  <span className="font-semibold text-slate-100">{weeklyLeadershipSummary.shorthandLine}</span>
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-200">
+                  <span className="font-semibold text-slate-50">{weeklyLeadershipSummary.shorthandLine}</span>
+                  <span aria-hidden="true" className="text-slate-600">·</span>
                   <span>Boldness budget {weeklyLeadershipSummary.boldnessScore}/100</span>
+                  <span aria-hidden="true" className="text-slate-600">·</span>
                   <span>{Math.round(confidencePercent)}% confidence</span>
                 </div>
+
                 {shouldShowReadinessCallout ? (
                   <p className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-[12px] leading-5 text-slate-300">
                     {trustStatusSummary}
                   </p>
                 ) : null}
 
-                <section className="mt-4 rounded-[1rem] border border-slate-700/75 bg-[linear-gradient(180deg,rgba(8,17,31,0.78),rgba(4,10,20,0.88))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <section className="mt-4 rounded-[1rem] border border-slate-700/70 bg-[linear-gradient(180deg,rgba(8,17,31,0.72),rgba(4,10,20,0.84))] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                  <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
                     <div className="max-w-2xl">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                         {publicDecisionLabels.call}
                       </p>
-                      <p className="mt-1 text-[11px] leading-5 text-slate-400">
-                        The standing recommendation this week.
-                      </p>
-                      <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
+                      <p className="mt-1.5 text-sm font-semibold leading-6 text-slate-50">{operatingCall}</p>
                     </div>
-                    <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-2.5 sm:max-w-[14rem]">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Meeting shorthand</p>
-                      <p className="mt-1 text-[11px] leading-5 text-slate-200">{weeklyLeadershipSummary.shorthandLine}</p>
+                    <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-2 sm:max-w-[14rem]">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Meeting shorthand</p>
+                      <p className="mt-1 text-[11px] leading-5 text-slate-100">{weeklyLeadershipSummary.shorthandLine}</p>
                     </div>
                   </div>
                 </section>
 
-                <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/52 px-3 py-3">
+                <section className="mt-4 rounded-[0.95rem] border border-amber-400/30 bg-[linear-gradient(180deg,rgba(45,32,11,0.55),rgba(28,18,5,0.65))] px-3.5 py-3.5 shadow-[0_18px_38px_-32px_rgba(251,191,36,0.45)]">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       {primaryDriver ? (
-                        <span aria-hidden="true" className="text-base leading-none">
+                        <span aria-hidden="true" className="text-base leading-none text-amber-200">
                           {primaryDriver.postureDirection === "tightening" ? "⬇" : primaryDriver.postureDirection === "opening" ? "⬆" : "→"}
                         </span>
                       ) : null}
-                      <p className="text-sm font-medium text-amber-100">What changed this week</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-200">What changed this week</p>
                     </div>
                     {primaryDriver ? (
                       <span className={`rounded-[0.65rem] border px-2 py-0.5 text-[10px] font-semibold ${driverToneClass(primaryDriver.postureDirection)}`}>
@@ -240,9 +240,9 @@ export function WeeklyCallModePanel({
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-50">{changedThisWeekDetail}</p>
+                  <p className="mt-2 text-[15px] font-semibold leading-6 text-slate-50">{changedThisWeekDetail}</p>
                   {primaryDriver ? (
-                    <p className="mt-2 text-[12px] leading-5 text-slate-300">{primaryDriver.implication}</p>
+                    <p className="mt-2 text-[12px] leading-5 text-slate-200">{primaryDriver.implication}</p>
                   ) : null}
                   {supportingDrivers.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold">
@@ -377,12 +377,12 @@ export function WeeklyCallModePanel({
                   {PRIMARY_AUDIENCE_ACTION}
                 </p>
               </div>
-              <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              <dl className="mt-3 grid gap-2 grid-cols-2 xl:grid-cols-4">
               {postureSummaryCards.map((card) => (
                 <div key={card.label} className={card.className}>
-                  <dt className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500">{card.label}</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
-                  <dd className="mt-1 text-[10px] leading-4 text-slate-500">{card.detail}</dd>
+                  <dt className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">{card.label}</dt>
+                  <dd className="mt-1 text-sm font-semibold text-slate-50">{card.value}</dd>
+                  <dd className="mt-1 text-[10px] leading-4 text-slate-400">{card.detail}</dd>
                 </div>
               ))}
               </dl>
@@ -393,7 +393,7 @@ export function WeeklyCallModePanel({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Continuity</p>
                   {trajectoryDeltaSummary ? (
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{trajectoryDeltaSummary}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">{trajectoryDeltaSummary}</p>
                   ) : null}
                   {confidenceTrend ? (
                     <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
@@ -406,9 +406,9 @@ export function WeeklyCallModePanel({
                     {postureSteps.map((step, index) => (
                       <div key={`${step.label}-${step.detail}`} className="flex items-center gap-2">
                         <article className={`min-w-[8rem] rounded-lg border px-2.5 py-2 ${step.isCurrent ? "border-sky-400/30 bg-sky-500/8" : "border-slate-800/70 bg-slate-950/55"}`}>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{step.label}</p>
-                          <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-100"}`}>{step.posture}</p>
-                          <p className="mt-1 text-[10px] leading-4 text-slate-400">{step.detail}</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{step.label}</p>
+                          <p className={`mt-1 text-xs font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-50"}`}>{step.posture}</p>
+                          <p className="mt-1 text-[10px] leading-4 text-slate-300">{step.detail}</p>
                         </article>
                         {index < postureSteps.length - 1 ? (
                           <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
