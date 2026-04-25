@@ -124,6 +124,19 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           />
         )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
+        topPinnedRule={
+          actionStripItems.length > 0
+            ? (() => {
+                const top = actionStripItems[0];
+                return {
+                  label: top.label,
+                  actionNow: top.actionNow,
+                  triggerThreshold: top.triggerThreshold,
+                  reversalCondition: top.reversalCondition,
+                };
+              })()
+            : undefined
+        }
       />
     </section>
   );

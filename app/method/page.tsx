@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
-import { HubSection } from "../components/hubPageShell";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { buildCompactTrustSummary, buildDecisionReadinessState, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
@@ -12,6 +12,39 @@ import {
   PRIMARY_AUDIENCE_ACTION,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
+
+function MethodSection({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  const headingId = `method-${id}-heading`;
+  return (
+    <section
+      id={id}
+      aria-labelledby={headingId}
+      className="weather-panel space-y-5 px-5 py-5 scroll-mt-28"
+    >
+      <div>
+        <h2 id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -176,7 +209,7 @@ export default async function MethodPage() {
       }}
       structuredData={breadcrumbStructuredData}
     >
-      <HubSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief." className="scroll-mt-28">
+      <MethodSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief.">
         <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
             {trustVerdict.label}
@@ -213,13 +246,12 @@ export default async function MethodPage() {
             </p>
           </article>
         </div>
-      </HubSection>
+      </MethodSection>
 
-      <HubSection
+      <MethodSection
         id="sources-freshness"
         title="Sources and freshness"
         description="Where the current recommendation came from and how current it is."
-        className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
@@ -244,13 +276,12 @@ export default async function MethodPage() {
             </div>
           </article>
         </div>
-      </HubSection>
+      </MethodSection>
 
-      <HubSection
+      <MethodSection
         id="confidence-limits"
         title="Approval limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
-        className="scroll-mt-28"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
@@ -273,13 +304,12 @@ export default async function MethodPage() {
             </div>
           </article>
         </div>
-      </HubSection>
+      </MethodSection>
 
-      <HubSection
+      <MethodSection
         id="formula-reference"
         title="Formula reference"
         description="How this score is built."
-        className="scroll-mt-28"
       >
         <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
           <p className="text-sm text-slate-200">
@@ -295,9 +325,9 @@ export default async function MethodPage() {
             <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source provenance</Link>
           </div>
         </div>
-      </HubSection>
+      </MethodSection>
 
-      <HubSection id="revisit-call" title="What would make this recommendation wrong?" className="scroll-mt-28">
+      <MethodSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 rounded-xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>
@@ -327,13 +357,13 @@ export default async function MethodPage() {
             </ul>
           </article>
         </div>
-      </HubSection>
+      </MethodSection>
 
-      <HubSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas." className="scroll-mt-28">
+      <MethodSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
         <pre className="weather-hub-card overflow-x-auto rounded-2xl px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>
-      </HubSection>
+      </MethodSection>
 
       <BeginnerGlossaryPanel />
     </ReportShell>

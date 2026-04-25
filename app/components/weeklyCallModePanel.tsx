@@ -278,7 +278,14 @@ export function WeeklyCallModePanel({
 
                 <section className="mt-4 rounded-[0.95rem] border border-slate-800/75 bg-slate-950/52 px-3 py-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-amber-100">What changed this week</p>
+                    <div className="flex items-center gap-2">
+                      {primaryDriver ? (
+                        <span aria-hidden="true" className="text-base leading-none">
+                          {primaryDriver.postureDirection === "tightening" ? "⬇" : primaryDriver.postureDirection === "opening" ? "⬆" : "→"}
+                        </span>
+                      ) : null}
+                      <p className="text-sm font-medium text-amber-100">What changed this week</p>
+                    </div>
                     {primaryDriver ? (
                       <span className={`rounded-[0.65rem] border px-2 py-0.5 text-[10px] font-semibold ${driverToneClass(primaryDriver.postureDirection)}`}>
                         {primaryDriver.label} {primaryDriver.deltaLabel}

@@ -1,19 +1,54 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 
 type WeeklyDecisionContentProps = {
   modePanel: ReactNode;
   actionStripSection: ReactNode;
+  /** The top-priority bounded rule to surface above the fold (action + threshold + reversal). */
+  topPinnedRule?: {
+    label: string;
+    actionNow: string;
+    triggerThreshold: string;
+    reversalCondition: string;
+  };
 };
 
 export function WeeklyDecisionContent({
   modePanel,
   actionStripSection,
+  topPinnedRule,
 }: WeeklyDecisionContentProps) {
+  const pinnedRuleId = useId();
+
   return (
     <div className="space-y-4">
       <section className="space-y-5" aria-label="Weekly decision order">
         {modePanel}
       </section>
+
+      {topPinnedRule ? (
+        <section
+          aria-labelledby={pinnedRuleId}
+          className="rounded-[1rem] border border-sky-400/20 bg-[linear-gradient(180deg,rgba(10,18,32,0.55),rgba(2,6,23,0.45))] px-4 py-3 sm:px-5 sm:py-4"
+        >
+          <p id={pinnedRuleId} className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+            {topPinnedRule.label}
+          </p>
+          <dl className="mt-3 grid gap-3 text-[11px] leading-5 sm:grid-cols-3">
+            <div className="border-l-2 border-emerald-400/40 pl-3">
+              <dt className="font-semibold text-emerald-200">Action</dt>
+              <dd className="mt-1 text-slate-100">{topPinnedRule.actionNow}</dd>
+            </div>
+            <div className="border-l-2 border-amber-400/40 pl-3">
+              <dt className="font-semibold text-amber-200">Threshold</dt>
+              <dd className="mt-1 text-slate-100">{topPinnedRule.triggerThreshold}</dd>
+            </div>
+            <div className="border-l-2 border-sky-400/40 pl-3">
+              <dt className="font-semibold text-sky-200">Reversal</dt>
+              <dd className="mt-1 text-slate-100">{topPinnedRule.reversalCondition}</dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
 
       {actionStripSection ? (
         <details className="group rounded-[1rem] border border-slate-800/80 bg-slate-950/35 px-4 py-3 sm:px-5 sm:py-4">
