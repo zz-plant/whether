@@ -13,24 +13,24 @@ export type ScrollPlan = {
 
 export const homeScrollPlan: ScrollPlan = {
   eyebrow: "What follows",
-  title: "Keep the brief as the only source of truth",
+  title: "Start from the weekly call, then follow the loop",
   description:
-    "Go deeper only if the brief still leaves a real question.",
+    "Plan first, audit only when challenged, go deeper only when one question remains.",
   items: [
     {
-      href: "#audit-this-call",
-      label: "Evidence",
-      summary: "Proof and trust checks when the brief gets challenged.",
+      href: "#approve-this-weeks-plan",
+      label: "Plan",
+      summary: "Turn the weekly call into approvals before spending more time in proof.",
     },
     {
-      href: "#approve-this-weeks-plan",
-      label: "Planning",
-      summary: "Approve or hold this week's moves.",
+      href: "#audit-this-call",
+      label: "Audit",
+      summary: "Open evidence or check trust only when the call gets challenged.",
     },
     {
       href: "#historical-replay-workspace",
-      label: "Depth",
-      summary: "Only for the last unresolved question.",
+      label: "Resolve",
+      summary: "Use a tool, replay a past week, or answer one remaining question.",
     },
   ],
 };

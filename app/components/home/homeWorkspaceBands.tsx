@@ -26,17 +26,17 @@ export async function HomeWorkspaceBands({
   const deeperPaths = [
     {
       href: workspaceModel.translate.primaryPath.href as Route,
-      kicker: "Answer one question",
-      title: "Open the clearest next page first",
-      detail: "Use this only after the direction is clear.",
+      kicker: "Decide",
+      title: "Open the clearest next page",
+      detail: "Resolve one remaining open question. Use this only after the plan direction is set.",
       icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
       toneClass: "text-amber-200",
       hoverClass: "hover:border-amber-300/35",
     },
     {
       href: workspaceModel.replay.openFullHref as Route,
-      kicker: "Review a past week",
-      title: replayPreview?.label ?? "Review the previous baseline",
+      kicker: "Replay",
+      title: replayPreview?.label ?? "Review a prior week",
       detail: replayPreview?.summary ?? workspaceModel.replay.summary,
       icon: <HistoryIcon className="h-3.5 w-3.5" />,
       toneClass: "text-violet-200",
@@ -44,7 +44,7 @@ export async function HomeWorkspaceBands({
     },
     {
       href: (toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route,
-      kicker: "Use a tool",
+      kicker: "Toolkit",
       title: toolkitShortcut?.title ?? workspaceModel.translate.fallbackUtility.title,
       detail: toolkitShortcut?.detail ?? workspaceModel.translate.fallbackUtility.detail,
       icon: <LayoutGridIcon className="h-3.5 w-3.5" />,
