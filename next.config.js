@@ -30,6 +30,9 @@ export const canonicalSurfaceRedirectPairs = [
   ["/startup-macro-posture/index", "/method#formula-reference"],
   ["/startup-macro-posture/:regime", "/"],
   ["/startup-macro-posture", "/"],
+  // Posture stub pages (deleted) → root
+  ["/posture", "/"],
+  ["/posture/:slug", "/"],
   // Legacy methodology → Trust hub
   ["/methodology", "/method#formula-reference"],
   // Consolidated under Trust hub
@@ -37,10 +40,18 @@ export const canonicalSurfaceRedirectPairs = [
   ["/confidence", "/method#confidence-limits"],
   // Decision answer root → Decide hub
   ["/answers", "/decide#direct-answers"],
-  // Learn root → Trust hub
+  // Learn root + failure modes → Trust hub
   ["/learn", "/method"],
+  ["/learn/failure-modes", "/method#revisit-call"],
+  ["/learn/failure-modes/:slug", "/method#revisit-call"],
   // Concepts (all paths) → Trust hub
   ["/concepts/:path*", "/method"],
+  // About → Trust hub
+  ["/about", "/method"],
+  // Decide redirect stubs
+  ["/decide/team-context", "/operations#ops-monthly-action-summary"],
+  // Resources root → Planning
+  ["/resources", "/operations#ops-export-briefs"],
   // Guides staging redirects
   ["/guides/stage/:stage", "/guides?stage=:stage"],
   ["/guides/stage", "/guides?library=stages"],

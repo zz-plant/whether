@@ -5,8 +5,6 @@ import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
 import { metadata as decideMetadata } from "../app/decide/page";
 import { metadata as guidesMetadata } from "../app/guides/page";
 import { metadata as operationsMetadata } from "../app/operations/page";
-import { metadata as postureMetadata } from "../app/posture/page";
-import { metadata as resourcesMetadata } from "../app/resources/page";
 import { metadata as signalsMetadata } from "../app/signals/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";
 
@@ -43,11 +41,9 @@ describe("hub route social assets", () => {
 
   it("maps the highest-priority hubs to dedicated SVG assets", () => {
     const expectedAssets: Array<{ metadata: Metadata; imagePath: string }> = [
-      { metadata: postureMetadata, imagePath: "/social/posture.svg" },
       { metadata: signalsMetadata, imagePath: "/social/signals.svg" },
       { metadata: operationsMetadata, imagePath: "/social/operations.svg" },
       { metadata: decideMetadata, imagePath: "/social/decide.svg" },
-      { metadata: resourcesMetadata, imagePath: "/social/resources.svg" },
       { metadata: guidesMetadata, imagePath: "/social/guides.svg" },
     ];
 

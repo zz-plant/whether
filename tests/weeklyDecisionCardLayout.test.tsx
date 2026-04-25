@@ -94,8 +94,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
     assert.match(html, /Whether weekly brief citation/);
-    assert.match(html, /Confidence and continuity/);
-    assert.match(html, /(Last read|Last week) -&gt; This week -&gt; Threshold/);
+    assert.match(html, /Continuity/);
     assert.match(html, /Copy weekly brief/);
     assert.doesNotMatch(html, /Default share/);
 
@@ -255,7 +254,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Change course if/);
     assert.match(callCore, /Revisit now/);
     assert.match(callCore, /Send this brief/);
-    assert.match(callCore, /Citation and history/);
+    assert.match(callCore, /Citation/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. This week&#x27;s plan can stay on track\./);
     assert.match(callCore, /Watch this week/);
     assert.doesNotMatch(callCore, /Default share/);

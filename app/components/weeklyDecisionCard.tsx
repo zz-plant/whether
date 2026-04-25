@@ -86,41 +86,43 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       <WeeklyDecisionContent
         modePanel={(
           <WeeklyCallModePanel
-            startupVariantPolicy={startupVariantPolicy}
-            operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
-            actionNow={decision.actionNowShort?.trim() || canonicalDecisionCopy?.doNowLines[0] || decision.immediateDecision}
-            snapshotGuardrail={snapshotGuardrail}
-            snapshotWatch={snapshotWatch}
-            revisitDecisions={revisitDecisions}
-            revisitQueue={revisitQueue}
-            decisionReadiness={decisionReadiness}
-            effectiveFlipLabels={effectiveFlipLabels}
-            compactInsetClassName={compactInset}
-            tierOnePanelClassName={tierOnePanel}
-            sectionSpacingClassName={sectionSpacing}
-            tierOneHeadingClassName={tierOneHeading}
-            whyItMattersLine={whyItMattersLine}
-            needsTrustWarning={hasMaterialTrustDelta}
-            trustStateDetail={trustStateDetail}
-            trustReason={status.isFallbackSnapshot ? artifact.freshnessLine : undefined}
-            inlineTrustLabel={inlineTrustMarker.label}
-            inlineTrustTone={inlineTrustMarker.tone}
-            comparisonSummary={comparisonSummary}
-            postureSteps={postureSteps}
-            trajectoryDeltaSummary={trajectoryDeltaSummary}
-            stabilityRule={stabilityRule}
-            weeklyLeadershipSummary={decision.weeklyLeadershipSummary}
-            decisionBullets={decisionBullets}
-            driverHighlights={driverHighlights}
-            guardrailPolicyDetails={guardrailPolicyDetails}
-            flipPolicyDetails={flipPolicyDetails}
-            glossaryHref={glossaryHref}
-            citationMetaLine={citationMetaLine}
-            citation={citation}
-            actions={actions}
-            confidenceHistory={confidenceHistory}
-            confidenceTrend={confidenceTrend}
-            confidencePercent={confidencePercent}
+            model={{
+              startupVariantPolicy,
+              operatingCall: canonicalDecisionCopy?.operatingCall ?? operatingStanceLine,
+              actionNow: decision.actionNowShort?.trim() || canonicalDecisionCopy?.doNowLines[0] || decision.immediateDecision,
+              snapshotGuardrail,
+              snapshotWatch,
+              revisitDecisions,
+              revisitQueue,
+              decisionReadiness,
+              effectiveFlipLabels,
+              compactInsetClassName: compactInset,
+              tierOnePanelClassName: tierOnePanel,
+              sectionSpacingClassName: sectionSpacing,
+              tierOneHeadingClassName: tierOneHeading,
+              whyItMattersLine,
+              needsTrustWarning: hasMaterialTrustDelta,
+              trustStateDetail,
+              trustReason: status.isFallbackSnapshot ? artifact.freshnessLine : undefined,
+              inlineTrustLabel: inlineTrustMarker.label,
+              inlineTrustTone: inlineTrustMarker.tone,
+              comparisonSummary,
+              postureSteps,
+              trajectoryDeltaSummary,
+              stabilityRule,
+              weeklyLeadershipSummary: decision.weeklyLeadershipSummary,
+              decisionBullets,
+              driverHighlights,
+              guardrailPolicyDetails,
+              flipPolicyDetails,
+              glossaryHref,
+              citationMetaLine,
+              citation,
+              actions,
+              confidenceHistory,
+              confidenceTrend,
+              confidencePercent,
+            }}
           />
         )}
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}

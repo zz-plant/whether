@@ -1,9 +1,5 @@
 import Link from "next/link";
 import type { Route } from "next";
-import type { ReactNode } from "react";
-import type { DecisionReadinessState } from "../../lib/report/trustStatus";
-import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
-import type { RevisitQueueItem, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
   PRIMARY_AUDIENCE_ACTION,
@@ -11,66 +7,14 @@ import {
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
 import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
+import type { CallModePanelModel } from "./weekly-card/callModePanelModel";
 
 type PolicyDetails = {
   summary: string;
   chips: string[];
 };
 
-type WeeklyCallModePanelProps = {
-  startupVariantPolicy: StartupVariantPolicy;
-  operatingCall: string;
-  actionNow: string;
-  snapshotGuardrail: string;
-  snapshotWatch: string;
-  revisitDecisions: boolean;
-  revisitQueue: RevisitQueueItem[];
-  decisionReadiness: DecisionReadinessState;
-  effectiveFlipLabels: string[];
-  compactInsetClassName: string;
-  tierOnePanelClassName: string;
-  sectionSpacingClassName: string;
-  tierOneHeadingClassName: string;
-  whyItMattersLine?: string;
-  needsTrustWarning?: boolean;
-  trustStateDetail: string;
-  trustReason?: string;
-  inlineTrustLabel: string;
-  inlineTrustTone: "stable" | "warning" | "historical";
-  comparisonSummary: string;
-  postureSteps: Array<{ label: string; posture: string; detail: string; isCurrent: boolean }>;
-  trajectoryDeltaSummary?: string;
-  stabilityRule: string;
-  weeklyLeadershipSummary: {
-    boldnessScore: number;
-    boldnessDelta: number;
-    notchShiftLabel: string;
-    shorthandLine: string;
-    hiringWindow: string;
-    expansionWindow: string;
-    raiseWindow: string;
-    netDeltaLabel: string;
-  };
-  decisionBullets: Array<{ label: string; detail: string }>;
-  driverHighlights: Array<{
-    label: string;
-    weightLabel: string;
-    weightPercent: number | null;
-    deltaLabel: string;
-    implication: string;
-    postureDirection: "tightening" | "opening" | "flat";
-    postureDirectionLabel: string;
-  }>;
-  guardrailPolicyDetails: PolicyDetails;
-  flipPolicyDetails: PolicyDetails;
-  glossaryHref?: string;
-  citationMetaLine: string;
-  citation: string;
-  actions?: ReactNode;
-  confidenceHistory: WeeklyConfidencePoint[];
-  confidenceTrend?: ConfidenceTrendFraming;
-  confidencePercent: number;
-};
+export type { CallModePanelModel } from "./weekly-card/callModePanelModel";
 
 const compactChangedThisWeekDetail = (detail: string) => {
   const lead = detail.split(/\b(?:Do now|Action|Flip):/i)[0]?.trim();
@@ -78,42 +22,47 @@ const compactChangedThisWeekDetail = (detail: string) => {
 };
 
 export function WeeklyCallModePanel({
-  startupVariantPolicy,
-  operatingCall,
-  actionNow,
-  snapshotGuardrail,
-  snapshotWatch,
-  revisitDecisions,
-  revisitQueue,
-  decisionReadiness,
-  effectiveFlipLabels,
-  compactInsetClassName,
-  tierOnePanelClassName,
-  sectionSpacingClassName,
-  tierOneHeadingClassName,
-  whyItMattersLine,
-  needsTrustWarning = false,
-  trustStateDetail,
-  trustReason,
-  inlineTrustLabel,
-  inlineTrustTone,
-  comparisonSummary,
-  postureSteps,
-  trajectoryDeltaSummary,
-  stabilityRule,
-  weeklyLeadershipSummary,
-  decisionBullets,
-  driverHighlights,
-  guardrailPolicyDetails,
-  flipPolicyDetails,
-  glossaryHref,
-  citationMetaLine,
-  citation,
-  actions,
-  confidenceHistory,
-  confidenceTrend,
-  confidencePercent,
-}: WeeklyCallModePanelProps) {
+  model,
+}: {
+  model: CallModePanelModel;
+}) {
+  const {
+    startupVariantPolicy,
+    operatingCall,
+    actionNow,
+    snapshotGuardrail,
+    snapshotWatch,
+    revisitDecisions,
+    revisitQueue,
+    decisionReadiness,
+    effectiveFlipLabels,
+    compactInsetClassName,
+    tierOnePanelClassName,
+    sectionSpacingClassName,
+    tierOneHeadingClassName,
+    whyItMattersLine,
+    needsTrustWarning = false,
+    trustStateDetail,
+    trustReason,
+    inlineTrustLabel,
+    inlineTrustTone,
+    comparisonSummary,
+    postureSteps,
+    trajectoryDeltaSummary,
+    stabilityRule,
+    weeklyLeadershipSummary,
+    decisionBullets,
+    driverHighlights,
+    guardrailPolicyDetails,
+    flipPolicyDetails,
+    glossaryHref,
+    citationMetaLine,
+    citation,
+    actions,
+    confidenceHistory,
+    confidenceTrend,
+    confidencePercent,
+  } = model;
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const detailDisclosureBase = "mt-2 rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-2.5";
   const flipSupport = effectiveFlipLabels
@@ -197,7 +146,7 @@ export function WeeklyCallModePanel({
         ? "border-violet-400/25 bg-violet-500/8 text-violet-100"
         : "border-slate-700/70 bg-slate-950/60 text-slate-200";
   const showModeChip = selectedModeLabel !== "Default";
-  const driverToneClass = (direction: WeeklyCallModePanelProps["driverHighlights"][number]["postureDirection"]) =>
+  const driverToneClass = (direction: CallModePanelModel["driverHighlights"][number]["postureDirection"]) =>
     direction === "tightening"
       ? "border-amber-400/25 bg-amber-500/8 text-amber-100"
       : direction === "opening"

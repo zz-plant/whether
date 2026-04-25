@@ -20,6 +20,7 @@ export function useCommandCenterPreferences() {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const queryRef = useRef(query);
   const isExpandedRef = useRef(isExpanded);
+  const filterRef = useRef(filter);
   const hasUserSetFilterRef = useRef(false);
 
   const persistQuery = (value: string) => {
@@ -76,28 +77,29 @@ export function useCommandCenterPreferences() {
   }, [query]);
 
   useEffect(() => {
-    const persistCurrentQuery = () => {
+    const persistCurrentState = () => {
       persistQuery(queryRef.current);
+      sessionStorage.setItem(FILTER_STORAGE_KEY, filterRef.current);
     };
     const persistOnHidden = () => {
       if (document.visibilityState !== "hidden") {
         return;
       }
-      persistCurrentQuery();
+      persistCurrentState();
     };
 
-    window.addEventListener("pagehide", persistCurrentQuery);
+    window.addEventListener("pagehide", persistCurrentState);
     document.addEventListener("visibilitychange", persistOnHidden);
 
     return () => {
-      window.removeEventListener("pagehide", persistCurrentQuery);
+      window.removeEventListener("pagehide", persistCurrentState);
       document.removeEventListener("visibilitychange", persistOnHidden);
-      persistCurrentQuery();
+      persistCurrentState();
     };
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
+    filterRef.current = filter;
   }, [filter]);
 
   useEffect(() => {
@@ -118,6 +120,7 @@ export function useCommandCenterPreferences() {
 
   const handleCollapse = () => {
     persistQuery(queryRef.current);
+    sessionStorage.setItem(FILTER_STORAGE_KEY, filterRef.current);
     setIsExpanded(false);
   };
 
