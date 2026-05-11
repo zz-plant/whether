@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
@@ -9,6 +10,9 @@ import { HomePageStreamingFallback } from "./components/home/homePageStreamingFa
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import { decisionTransmissionSummaryLine } from "../lib/report/decisionTransmissionCopy";
 import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
+import { buildWeeklyTrustCueLine } from "../lib/report/trustStatus";
+import { parseOperatorContextFromCookies } from "../lib/report/operatorContext";
+import { OperatorContextWrapper } from "./components/home/operatorContextWrapper";
 import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
@@ -44,22 +48,74 @@ export const HomePageReportContent = async ({
   searchParams?: HomePageSearchParams | Promise<HomePageSearchParams>;
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
+
+  // Read operator context from cookies for personalization
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+  const operatorContext = parseOperatorContextFromCookies(cookieHeader);
+
+  const homepage = await assembleHomePage({
+    searchParams: resolvedSearchParams,
+    operatorContext,
+  });
   const initialArtifactMode = isArtifactMode(resolvedSearchParams?.artifactMode)
     ? resolvedSearchParams.artifactMode
     : undefined;
   const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
+  const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel;
+  const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
+  const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
+  const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
+  const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
+  const regime = homepage.reportShell.regime;
+
   const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
     assessment: reportData.assessment,
     treasury: reportData.treasury,
     date: reportData.weeklyRecordDate,
-    postureWithStageLabel: homepage.weeklyDecisionCardModel.status.postureWithStageLabel,
-    confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
-    actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
-    flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
-    canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,
+    postureWithStageLabel: postureLabel,
+    confidenceLabel,
+    actionStripItems: actionItems,
+    flipConditionLabels,
+    canonicalDecisionCopy: canonicalDecision,
     weeklyCall: homepage.weeklyCall,
   });
+
+  const trustCue = buildWeeklyTrustCueLine({
+    confidenceLabel,
+    freshnessLabel: homepage.reportShell.fetchedAtLabel,
+    transitionWatch: "OFF",
+  });
+
+  const structuredDecisionData = {
+    "@context": "https://schema.org",
+    "@type": "Report",
+    "name": `Whether Weekly Brief — ${reportData.weeklyRecordDate}`,
+    "about": "US Macro Operating Posture for Startup and Product Leaders",
+    "datePublished": reportData.weeklyRecordDate,
+    "result": {
+      "posture": postureLabel,
+      "regime": regime,
+      "confidence": confidenceLabel,
+      "decisions": actionItems.map((item) => ({
+        "action": item.actionNow,
+        "threshold": item.triggerThreshold,
+        "reversal": item.reversalCondition,
+      })),
+      "canonicalDecisionCopy": canonicalDecision,
+      "provenance": {
+        "source": homepage.reportShell.treasurySource,
+        "dataDate": homepage.reportShell.recordDateLabel,
+        "refreshedAt": homepage.reportShell.fetchedAtLabel,
+        "confidence": confidenceLabel,
+        "trustStatus": homepage.reportShell.trustStatusLabel,
+        "trustDetail": homepage.reportShell.trustStatusDetail ?? "",
+      },
+      "trustCue": trustCue,
+      "briefMdUrl": "/brief.md",
+      "agentApiUrl": "/api/agent?cadence=weekly",
+    },
+  };
 
   return (
     <ReportShell
@@ -90,7 +146,7 @@ export const HomePageReportContent = async ({
           outageExitGate: homepage.reportShell.outageExitGate,
           degradedSourceRows: homepage.reportShell.degradedSourceRows,
           showOfflineBadge: homepage.reportShell.showOfflineBadge,
-          inlineTrustPlacement: "hidden",
+          inlineTrustPlacement: "before-content",
           provenance: homepage.reportShell.provenance,
         },
         chrome: {
@@ -129,6 +185,12 @@ export const HomePageReportContent = async ({
         },
       }}
     >
+      <script
+        type="application/ld+json"
+        id="whether-structured-data"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
+      />
+      <OperatorContextWrapper />
       <HomeRoutePrefetch />
       <HomeWhatChangedSection
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}

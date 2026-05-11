@@ -15,6 +15,7 @@ import {
   type PolicyAssessment,
   type PolicyBand,
   type PolicyPosture,
+  type PolicyRefusalState,
   type PolicySignalNormalization,
   type RegimeThresholds,
 } from "./regimeEngineCore";
@@ -169,7 +170,7 @@ export const computePolicyAssessment = (
     POLICY_BBB_WEIGHT_FOR_RAS,
   );
 
-  const posture: PolicyPosture =
+  const rawPosture: PolicyPosture =
     cts >= POLICY_SPEC_V1.bands.neutralMax && ras >= POLICY_SPEC_V1.bands.neutralMax
       ? "SAFETY_MODE"
       : cts <= -POLICY_SPEC_V1.bands.neutralMax && ras <= -POLICY_SPEC_V1.bands.neutralMax
@@ -182,26 +183,35 @@ export const computePolicyAssessment = (
   const volatility30d = computeVolatility([cts, ras, legacyTightness / 100, legacyRiskAppetite / 100]);
 
   const missingCount = normalizations.filter((entry) => entry.clippedZ === null).length;
-  const reasons: string[] = [];
+  const refusalReasons: string[] = [];
   if (agreement >= POLICY_SPEC_V1.refusal.disagreementThreshold) {
-    reasons.push("Composite disagreement exceeded threshold.");
+    refusalReasons.push("Composite disagreement exceeded threshold.");
   }
   if (volatility30d >= POLICY_SPEC_V1.refusal.volatilityThreshold) {
-    reasons.push("Composite volatility exceeded threshold.");
+    refusalReasons.push("Composite volatility exceeded threshold.");
   }
   if (missingCount > POLICY_SPEC_V1.refusal.maxMissingSignalCount) {
-    reasons.push("Data gaps exceed allowed signal count.");
+    refusalReasons.push("Data gaps exceed allowed signal count.");
   }
 
-  const refusal =
-    reasons.length > 0
-      ? {
-          refused: true,
-          reasons,
-          fallbackMessage: "NO_POSTURE_CHANGE_RECOMMENDED" as const,
-          executionMode: "REVERSIBLE_BETS_ONLY" as const,
-        }
-      : { refused: false, reasons: [] };
+  const shouldRefuse = refusalReasons.length > 0;
+
+  // Always produce a posture — refuse only when data is truly missing,
+  // otherwise degrade gracefully to TRANSITION with a caution label.
+  const posture: PolicyPosture =
+    missingCount > POLICY_SPEC_V1.refusal.maxMissingSignalCount
+      ? "TRANSITION" // Data too sparse: stay in transition, no forced call
+      : rawPosture;
+
+  const refusal: PolicyRefusalState = shouldRefuse
+    ? {
+        refused: true,
+        reasons: refusalReasons,
+        // Always produce a posture-backed message, never a dead-end
+        fallbackMessage: "PROCEED_WITH_CAUTION" as const,
+        executionMode: "REVERSIBLE_BETS_ONLY" as const,
+      }
+    : { refused: false, reasons: [] };
 
   return {
     version: POLICY_SPEC_V1.version,

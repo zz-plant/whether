@@ -9,6 +9,7 @@ import { resolveSectorKey, type SectorKey } from "./sectorSensitivity";
 import { buildTrustStatus } from "./trustStatus";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
+import type { OperatorContext } from "./operatorContext";
 
 export type WeeklyBriefSnapshot = {
   reportData: ReportData | ReportDataFallback;
@@ -37,6 +38,7 @@ type BuildWeeklyBriefSnapshotArgs = {
   degraded: boolean;
   overlaySector?: SectorKey;
   postureState?: PostureStateContract | null;
+  operatorContext?: OperatorContext;
 };
 
 const defaultTrustStatusCopy = {
@@ -80,11 +82,12 @@ export const buildWeeklyBriefSnapshot = ({
   degraded,
   overlaySector = "b2b-saas",
   postureState = null,
+  operatorContext,
 }: BuildWeeklyBriefSnapshotArgs): WeeklyBriefSnapshot => {
   const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
   const homeBriefModel = buildHomeBriefModel(
     buildHomeBriefInput(reportData, postureState),
-    { overlaySector },
+    { overlaySector, operatorContext },
   );
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: reportData.fetchedAtLabel,

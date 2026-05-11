@@ -154,6 +154,52 @@ describe("regime assessment", () => {
 
 
   it("maps aligned policy signals to risk-on and safety postures", () => {
+    const baseMacro = {
+      id: "BBB_CREDIT_SPREAD" as const,
+      label: "BBB",
+      value: 1.2,
+      unit: "%" as const,
+      explanation: "",
+      sourceLabel: "FRED",
+      sourceUrl: "https://fred.stlouisfed.org/",
+      formulaUrl: "/method#formula-reference",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
+      isLive: true,
+      history: [
+        { date: "2024-09-01", value: 2.5 },
+        { date: "2024-08-01", value: 2.6 },
+      ],
+    };
+
+    const baseCPI = {
+      id: "CPI_YOY" as const,
+      label: "CPI",
+      value: 2.5,
+      unit: "%" as const,
+      explanation: "",
+      sourceLabel: "BLS",
+      sourceUrl: "https://bls.gov/",
+      formulaUrl: "/method#formula-reference",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
+      isLive: true,
+    };
+
+    const baseUnemployment = {
+      id: "UNEMPLOYMENT_RATE" as const,
+      label: "Unemployment",
+      value: 4.0,
+      unit: "%" as const,
+      explanation: "",
+      sourceLabel: "BLS",
+      sourceUrl: "https://bls.gov/",
+      formulaUrl: "/method#formula-reference",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
+      isLive: true,
+    };
+
     const riskOnTreasury: TreasuryData = {
       source: "US Treasury",
       record_date: "2026-02-01",
@@ -167,23 +213,9 @@ describe("regime assessment", () => {
     };
 
     const riskOnAssessment = evaluateRegime(riskOnTreasury, undefined, [
-      {
-        id: "BBB_CREDIT_SPREAD",
-        label: "BBB",
-        value: 1.2,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/method#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-        history: [
-          { date: "2024-09-01", value: 2.5 },
-          { date: "2024-08-01", value: 2.6 },
-        ],
-      },
+      { ...baseMacro, value: 1.2, history: [{ date: "2024-09-01", value: 2.5 }, { date: "2024-08-01", value: 2.6 }] },
+      baseCPI,
+      baseUnemployment,
     ]);
 
     assert.equal(riskOnAssessment.policyAssessment.posture, "RISK_ON");
@@ -201,23 +233,9 @@ describe("regime assessment", () => {
     };
 
     const safetyAssessment = evaluateRegime(safetyTreasury, undefined, [
-      {
-        id: "BBB_CREDIT_SPREAD",
-        label: "BBB",
-        value: 3.0,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/method#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-        history: [
-          { date: "2024-09-01", value: 2.0 },
-          { date: "2024-08-01", value: 2.1 },
-        ],
-      },
+      { ...baseMacro, value: 3.0, history: [{ date: "2024-09-01", value: 2.0 }, { date: "2024-08-01", value: 2.1 }] },
+      baseCPI,
+      baseUnemployment,
     ]);
 
     assert.equal(safetyAssessment.policyAssessment.posture, "SAFETY_MODE");
@@ -282,7 +300,7 @@ describe("regime assessment", () => {
 
     const assessment = evaluateRegime(treasury);
     assert.equal(assessment.policyAssessment.refusal.refused, true);
-    assert.equal(assessment.policyAssessment.refusal.fallbackMessage, "NO_POSTURE_CHANGE_RECOMMENDED");
+    assert.equal(assessment.policyAssessment.refusal.fallbackMessage, "PROCEED_WITH_CAUTION");
     assert.equal(assessment.policyAssessment.refusal.executionMode, "REVERSIBLE_BETS_ONLY");
     assert.equal(assessment.policyAssessment.governanceParameters.rollbackRequirement, "REVERSIBLE_ONLY");
   });

@@ -23,6 +23,7 @@ import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
 import { buildHomeStructuredData } from "./home/structuredData";
 import type { WeeklyCallContract } from "./weeklyCallContract";
+import type { OperatorContext } from "./operatorContext";
 import type {
   ArtifactPayload,
   HomePageAssembly,
@@ -152,8 +153,10 @@ const buildDeferredHomeSupportModels = ({
 
 export const assembleHomePage = async ({
   searchParams,
+  operatorContext,
 }: {
   searchParams?: HomePageSearchParams;
+  operatorContext?: OperatorContext;
 }, dependencies: Partial<HomePageAssemblerDependencies> = {}): Promise<HomePageAssembly> => {
   const resolvedDependencies = {
     ...defaultHomePageAssemblerDependencies,
@@ -200,6 +203,7 @@ export const assembleHomePage = async ({
     reportData,
     degraded: !reportResult.ok,
     overlaySector: homepageOverlaySector,
+    operatorContext,
   });
   const { isFallback, trustStatus, freshnessMeta, homeBriefModel, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
   const {
@@ -249,6 +253,7 @@ export const assembleHomePage = async ({
         degraded: !reportResult.ok,
         overlaySector: homepageOverlaySector,
         postureState,
+        operatorContext,
       });
 
       return {

@@ -32,6 +32,7 @@ import type { StartupClimateIndex } from "./homeBrief/scoring";
 import type { RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { WeeklyCallContract } from "./weeklyCallContract";
+import type { OperatorContext } from "./operatorContext";
 import {
   buildFlipRiskMeterState,
   buildHomeBriefModelInternal,
@@ -378,7 +379,7 @@ export type WeeklyDecisionCardViewModel = {
 
 export const buildHomeBriefModel = (
   data: HomeReportData,
-  options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
+  options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode; operatorContext?: OperatorContext },
 ) => buildHomeBriefModelInternal(data, options);
 
 const normalizeDecisionTransmissionConfidence = (label: string | undefined): DecisionTransmission["confidence"] => {

@@ -1,13 +1,18 @@
 import type { RegimeKey } from "../regimeEngine";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
+import {
+  adjustKnobForContext,
+  type CompanyStage,
+  type RateSensitivity,
+} from "./operatorContext";
 
 /**
  * Loop stage owner: posture → decision.
  *
  * This module translates committed regime state into bounded operating knobs and
- * lock commitments. It should stay UI-agnostic and consume only normalized
- * posture inputs from report/model layers.
+ * lock commitments. Knobs are now continuous (magnitude-aware) and respect
+ * operator context (company stage + rate sensitivity) for personalization.
  */
 
 export const operatingLeverOrder = [
@@ -99,6 +104,10 @@ export type DecisionKnobContext = {
   transition: Pick<RegimeStateTransition, "pending" | "committed" | "candidateState" | "transitionReason">;
   nearestThresholdGap: number;
   weakSignalCount: number;
+  /** Raw tightness score (0–100) for continuous interpolation */
+  tightnessScore: number;
+  /** Raw risk appetite score (0–100) for continuous interpolation */
+  riskAppetiteScore: number;
 };
 
 export type WeeklyLockCommitment = {
@@ -156,16 +165,72 @@ const getPendingBias = (key: DecisionKnob["key"], context: DecisionKnobContext) 
   return direction < 0 ? conservativeBias : -conservativeBias;
 };
 
+/**
+ * Continuous playbook: interpolate knob values based on score magnitudes,
+ * not just hard regime boundaries. A tightness of 71 (barely SCARCITY) should
+ * produce different knobs than tightness of 98 (deep SCARCITY).
+ */
+const getRegimeBoundary = (regime: RegimeKey): { tightness: number; riskAppetite: number } | null => {
+  // Return the "ideal center" for each regime as interpolation targets
+  switch (regime) {
+    case "SCARCITY": return { tightness: 85, riskAppetite: 15 };
+    case "DEFENSIVE": return { tightness: 75, riskAppetite: 30 };
+    case "VOLATILE": return { tightness: 60, riskAppetite: 55 };
+    case "EXPANSION": return { tightness: 15, riskAppetite: 85 };
+    default: return null;
+  }
+};
+
+const interpolateKnobValue = (
+  key: DecisionKnob["key"],
+  tightnessScore: number,
+  riskAppetiteScore: number,
+): number => {
+  // Compute a continuous "conservative index" from 0 (max expansion) to 1 (max scarcity)
+  // based on how far the current scores are from the EXPANSION ideal.
+  const expansionTarget = getRegimeBoundary("EXPANSION")!;
+  const scarcityTarget = getRegimeBoundary("SCARCITY")!;
+
+  const tightnessDistance = (tightnessScore - expansionTarget.tightness) /
+    Math.max(scarcityTarget.tightness - expansionTarget.tightness, 1);
+  const riskAppetiteDistance = (expansionTarget.riskAppetite - riskAppetiteScore) /
+    Math.max(expansionTarget.riskAppetite - scarcityTarget.riskAppetite, 1);
+
+  // Conservative index: 0 = expansion, 1 = scarcity
+  const conservativeIndex = clampKnobValue(
+    (tightnessDistance + riskAppetiteDistance) / 2
+  );
+
+  // Interpolate between EXPANSION and SCARCITY knob values
+  const expansionValue = knobsByRegime["EXPANSION"][key];
+  const scarcityValue = knobsByRegime["SCARCITY"][key];
+
+  return expansionValue + (scarcityValue - expansionValue) * conservativeIndex;
+};
+
 export const deriveDecisionKnobs = (context: DecisionKnobContext): DecisionKnob[] => {
   const baseline = knobsByRegime[context.committedState];
 
   return knobKeyOrder.map((key) => {
-    const delta = getPendingBias(key, context);
+    const pendingDelta = getPendingBias(key, context);
+
+    // Use continuous interpolation when scores are available, fall back to discrete regime baseline
+    const continuousValue = interpolateKnobValue(
+      key,
+      context.tightnessScore,
+      context.riskAppetiteScore,
+    );
+
+    // Blend: 70% continuous, 30% discrete regime baseline
+    // This keeps the regime as an anchor while adding magnitude sensitivity
+    const blendedValue = Math.round(continuousValue * 0.7 + baseline[key] * 0.3);
+    const finalValue = clampKnobValue(blendedValue + pendingDelta);
+
     return {
       key,
       label: knobLabels[key],
-      value: clampKnobValue(baseline[key] + delta),
-      delta,
+      value: finalValue,
+      delta: pendingDelta,
       levelLabels: knobLevelLabels[key],
       rationale: buildKnobRationale(key, context),
     };

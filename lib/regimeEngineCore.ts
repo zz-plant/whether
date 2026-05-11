@@ -79,7 +79,7 @@ export interface PolicyConfidenceIndex {
 export interface PolicyRefusalState {
   refused: boolean;
   reasons: string[];
-  fallbackMessage?: "NO_POSTURE_CHANGE_RECOMMENDED";
+  fallbackMessage?: "NO_POSTURE_CHANGE_RECOMMENDED" | "PROCEED_WITH_CAUTION";
   executionMode?: "REVERSIBLE_BETS_ONLY";
 }
 

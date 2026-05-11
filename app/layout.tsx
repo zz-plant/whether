@@ -5,6 +5,11 @@ import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
 
+const BRIEF_MD_URL = `${siteUrl}/brief.md`;
+const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
+const LLMS_TXT_URL = `${siteUrl}/llms.txt`;
+const WELL_KNOWN_MANIFEST_URL = `${siteUrl}/.well-known/whether-agent.json`;
+
 const siteName = websiteName;
 const siteDescription = defaultSiteDescription;
 const socialImageUrl = buildSocialImageUrl();
@@ -127,6 +132,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Agent discovery: machine-readable alternates for browser-based AI agents */}
+        <link rel="alternate" type="text/markdown" href={BRIEF_MD_URL} title="Whether Weekly Brief (Markdown)" />
+        <link rel="alternate" type="application/json" href={AGENT_API_URL} title="Whether Weekly Brief (JSON)" />
+        <link rel="alternate" type="text/plain" href={LLMS_TXT_URL} title="Whether for LLMs" />
+        <link rel="llm" href={LLMS_TXT_URL} />
+        <link rel="mcp-manifest" type="application/json" href={WELL_KNOWN_MANIFEST_URL} />
         <Script id="whether-persisted-ui-bootstrap" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: buildPersistedUiBootstrapScript() }} />
       </head>
       <body>

@@ -166,6 +166,8 @@ const getKnobLevel = (
     },
     nearestThresholdGap: Math.abs(runwayGap) * 3,
     weakSignalCount: 0,
+    tightnessScore: 70,
+    riskAppetiteScore: 50,
   });
   const knob = knobs.find((item) => item.key === key);
   if (!knob) {
