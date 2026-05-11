@@ -30,7 +30,7 @@ describe("reportCopy", () => {
       assert.ok(entry.term);
       assert.ok(entry.summary);
       assert.ok(entry.why.startsWith("Why it matters:"));
-      assert.ok(entry.usedInHref.startsWith("#"));
+      assert.ok(entry.usedInHref.startsWith("/"));
     });
   });
 

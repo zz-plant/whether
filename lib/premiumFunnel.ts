@@ -86,5 +86,7 @@ export const dispatchPremiumFunnelEvent = async (
     return;
   }
 
-  console.info("[premium-funnel]", payload);
+  if (process.env.NODE_ENV === "development") {
+    console.info("[premium-funnel]", payload);
+  }
 };

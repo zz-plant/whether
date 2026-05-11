@@ -7,7 +7,7 @@ import {
   buildPageMetadata,
   organizationName,
   serializeJsonLd,
-} from "../../../lib/pageMetadata";
+} from "../../../lib/seo";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,

@@ -94,11 +94,6 @@ export const toolkitDefinitions: ToolkitDefinition[] = decisionDomainCatalog.too
 export const failureModeDefinitions: FailureModeDefinition[] =
   decisionDomainCatalog.failureModeDefinitions;
 
-export const recommendedSituationToolkits: Record<SituationUseCaseSlug, ToolkitSlug[]> =
-  Object.fromEntries(
-    situationUseCaseDefinitions.map((entry) => [entry.slug, [...entry.recommendedToolkitSlugs]]),
-  ) as Record<SituationUseCaseSlug, ToolkitSlug[]>;
-
 export const useCaseRoleStaticParams = useCaseRoles.map((entry) => ({ slug: entry.slug }));
 export const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ slug }));
 export const decideStaticParams = [...useCaseRoleStaticParams, ...situationUseCaseStaticParams];

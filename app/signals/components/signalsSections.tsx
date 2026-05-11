@@ -4,6 +4,7 @@ import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
+import type { TreasuryData } from "../../../lib/types";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
 import {
@@ -615,6 +616,19 @@ export const SignalsEvidencePrioritiesSection = ({
   </section>
 );
 
+type YieldCurvePoint = {
+  year: number;
+  month: number;
+  recordDate: string;
+  oneMonth: number | null;
+  threeMonth: number | null;
+  twoYear: number | null;
+  tenYear: number | null;
+  spread10Y2Y: number | null;
+  spread2Y3M: number | null;
+  curveSignal: number | null;
+};
+
 export const SignalsDiagnosticsSection = ({
   showFullDiagnostics,
   searchParams,
@@ -626,9 +640,9 @@ export const SignalsDiagnosticsSection = ({
   showFullDiagnostics: boolean;
   searchParams?: Record<string, string | undefined>;
   topDiagnosticCallouts: Array<{ label: string; why: string }>;
-  SignalVisualizationSuite: ComponentType<any> | null;
-  treasury: any;
-  yieldCurveSeries: any;
+  SignalVisualizationSuite: ComponentType<{ treasury: TreasuryData; yieldCurveSeries: YieldCurvePoint[] }> | null;
+  treasury: TreasuryData;
+  yieldCurveSeries: YieldCurvePoint[];
 }) => (
   <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics">
     <div className="flex flex-wrap items-start justify-between gap-3">

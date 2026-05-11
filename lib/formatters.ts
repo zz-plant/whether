@@ -120,12 +120,8 @@ export const formatScoreValue = (value: number) => value.toFixed(0);
 
 export const formatMonthYearShortUtc = (date: Date) => monthYearShortUtcFormatter.format(date);
 
-export const formatMonthDayYearUtc = (date: Date) => monthDayYearUtcFormatter.format(date);
-
 export const formatConceptPublishedLabel = (year: number, month: number) =>
   formatMonthYearShortUtc(new Date(Date.UTC(year, month - 1, 1)));
-
-export const formatPublishedLabel = formatConceptPublishedLabel;
 
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);

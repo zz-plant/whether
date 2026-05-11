@@ -2,33 +2,6 @@ export type LiteracyAssistMode = "decision" | "evidence" | "trust" | "share";
 
 export type ArtifactMode = "operator" | "explainer";
 
-export const literacyAssistOptions: Array<{
-  id: LiteracyAssistMode;
-  label: string;
-  description: string;
-}> = [
-  {
-    id: "decision",
-    label: "What Should We Do Now?",
-    description: "Show the move to make now, what to pause, and what would change the call.",
-  },
-  {
-    id: "evidence",
-    label: "Why Is The Call Changing?",
-    description: "Explain the main signals and thresholds in plain operating language.",
-  },
-  {
-    id: "trust",
-    label: "Can We Rely On This?",
-    description: "Turn freshness, confidence, and fallback state into a clear use-or-caution read.",
-  },
-  {
-    id: "share",
-    label: "Which Brief Should I Send?",
-    description: "Point me to the right brief, snapshot, or update to share.",
-  },
-] as const;
-
 export const literacyAssistStorageKeys = {
   focus: "whether.literacy.focus",
   decision: "whether.literacy.decisionHelp",
@@ -41,11 +14,4 @@ export const literacyAssistStorageKeys = {
 export const artifactModeLabels: Record<ArtifactMode, string> = {
   operator: "Leadership team brief",
   explainer: "Plain-English brief",
-};
-
-export const literacyFocusLabels: Record<LiteracyAssistMode, string> = {
-  decision: "What to do",
-  evidence: "Why it changed",
-  trust: "Can I rely on it?",
-  share: "What to send",
 };

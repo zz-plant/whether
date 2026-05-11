@@ -35,7 +35,7 @@ describe("scroll plans", () => {
   });
 
   it("keeps the primary page scroll sequences aligned to their intended first stops", () => {
-    assert.equal(homeScrollPlan.items[0]?.href, "#audit-this-call");
+    assert.equal(homeScrollPlan.items[0]?.href, "#approve-this-weeks-plan");
     assert.equal(signalsScrollPlan.items[0]?.href, "#decision-summary");
     assert.equal(operationsScrollPlan.items[0]?.href, "#ops-monthly-action-summary");
     assert.equal(operationsScrollPlan.items[1]?.href, "#ops-failure-patterns");

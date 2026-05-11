@@ -72,8 +72,10 @@ function addedTypeAssertions(diffRange) {
     if (!line.startsWith("+") || line.startsWith("+++")) continue;
 
     const code = line.slice(1);
-    const hasAssertion = /\sas\s+[A-Za-z_$<{(]/.test(code);
-    const safePattern = /\sas\s+const\b/.test(code);
+    // Strip single-line comments before matching to avoid false positives
+    const codeWithoutComments = code.replace(/\/\/.*/g, "");
+    const hasAssertion = /\sas\s+[A-Za-z_$<{\(]/.test(codeWithoutComments);
+    const safePattern = /\sas\s+const\b/.test(codeWithoutComments);
 
     if (hasAssertion && !safePattern) {
       offenders.push(code.trim());

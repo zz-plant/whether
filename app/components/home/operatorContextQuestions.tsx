@@ -10,6 +10,42 @@ const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 year
 type CompanyStage = "pre-seed" | "seed" | "series-a" | "series-b-plus" | "public";
 type RateSensitivity = "high" | "medium" | "low";
 
+const STAGE_KEYS: readonly CompanyStage[] = [
+  "pre-seed",
+  "seed",
+  "series-a",
+  "series-b-plus",
+  "public",
+];
+
+const RATE_KEYS: readonly RateSensitivity[] = ["high", "medium", "low"];
+
+function isValidStage(value: string | null): CompanyStage | null {
+  if (!value) return null;
+  switch (value) {
+    case "pre-seed":
+    case "seed":
+    case "series-a":
+    case "series-b-plus":
+    case "public":
+      return value;
+    default:
+      return null;
+  }
+}
+
+function isValidSensitivity(value: string | null): RateSensitivity | null {
+  if (!value) return null;
+  switch (value) {
+    case "high":
+    case "medium":
+    case "low":
+      return value;
+    default:
+      return null;
+  }
+}
+
 const STAGE_LABELS: Record<CompanyStage, string> = {
   "pre-seed": "Pre-seed",
   "seed": "Seed",
@@ -70,11 +106,11 @@ export function useOperatorContext(): {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    const stage = getCookie(COOKIE_STAGE) as CompanyStage | null;
-    const sensitivity = getCookie(COOKIE_RATE_SENSITIVITY) as RateSensitivity | null;
+    const stageRaw = getCookie(COOKIE_STAGE);
+    const sensitivityRaw = getCookie(COOKIE_RATE_SENSITIVITY);
     const dismissedCookie = getCookie(COOKIE_DISMISSED);
-    setCompanyStage(stage);
-    setRateSensitivity(sensitivity);
+    setCompanyStage(isValidStage(stageRaw));
+    setRateSensitivity(isValidSensitivity(sensitivityRaw));
     setDismissed(dismissedCookie === "1");
   }, []);
 
@@ -136,7 +172,7 @@ export const OperatorContextBanner = ({
             What stage is your company?
           </p>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(STAGE_LABELS) as CompanyStage[]).map((stage) => (
+            {STAGE_KEYS.map((stage) => (
               <button
                 key={stage}
                 onClick={() => handleStageSelect(stage)}
@@ -167,7 +203,7 @@ export const OperatorContextBanner = ({
             Stage: {selectedStage ? STAGE_SHORT[selectedStage] : ""}
           </p>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(RATE_LABELS) as RateSensitivity[]).map((sensitivity) => (
+            {RATE_KEYS.map((sensitivity) => (
               <button
                 key={sensitivity}
                 onClick={() => handleSensitivitySelect(sensitivity)}
