@@ -49,12 +49,12 @@
 
 ## VIII. IA boundary checklist (current navigation model)
 - **Weekly Brief (`/`):** the only canonical weekly workspace and first stop for posture, decision delta, and shareable artifact.
-- **Evidence (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
-- **Planning (`/operations`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
-- **Decision Tools (`/decide`):** role translation only (founder, product, finance, strategy views).
+- **Evidence (`/evidence`):** evidence only (drivers, thresholds, timestamps, historical context).
+- **Planning (`/planning`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
+- **Decision Tools (`/resolve`):** role translation only (founder, product, finance, strategy views).
 - **Toolkits (`/toolkits`):** runnable instruments/templates only; do not restate posture logic or evidence narrative.
 - **Learn (`/learn`):** diagnostic and conceptual references only; no new canonical guidance should originate here.
-- **Trust (`/method`):** transparency only (formulas, sources, cadence, limitations).
+- **Trust (`/trust`):** transparency only (formulas, sources, cadence, limitations).
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
 
 ## IX. Homepage weekly brief motion guardrails
@@ -76,7 +76,7 @@
 - Keep touch/manipulation and min-height behavior intact; only add `className` overrides for layout positioning (e.g., `mt-auto`, `justify-center`, icon gaps), not to remove focus affordances.
 
 ## XI. Report Shell Hierarchy
-- Scope: shared report-shell routes such as `/signals`, `/operations`, `/decide`, and `/method`.
+- Scope: shared report-shell routes such as `/evidence`, `/planning`, `/resolve`, and `/trust`.
 - MUST: get the first page-specific task block on screen quickly. Shared chrome should orient the user, not delay the workflow.
 - MUST: keep pre-content chrome to distinct tiers only:
   - global route context,

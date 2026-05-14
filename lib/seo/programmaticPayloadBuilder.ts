@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { decideClusterStaticParams } from "../../app/decide/clusterRoutes";
+import { decideClusterStaticParams } from "../../app/resolve/clusterRoutes";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seoRouteClusters";
 import { toolkitClusterStaticParams } from "../../app/toolkits/clusterRoutes";
 import { findUseCaseRole, findToolkitDefinition } from "../decisionDomainCatalog";
@@ -10,7 +10,7 @@ import type { DecisionArea } from "../report/boundedDecisionRules";
 import type { ReportData } from "../report/reportData";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { getLatestTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
-import { findSignalsCluster } from "../../app/signals/clusterRoutes";
+import { findSignalsCluster } from "../../app/evidence/clusterRoutes";
 
 const ARTIFACT_ROOT = join(process.cwd(), "artifacts", "seo-payloads");
 const MANIFEST_PATH = join(ARTIFACT_ROOT, "manifest.json");
@@ -91,7 +91,7 @@ export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => 
     kind: "decide" as const,
     slug: route.slug,
     cluster: route.cluster,
-    url: `/decide/${route.slug}/${route.cluster}`,
+    url: `/resolve/${route.slug}/${route.cluster}`,
   }));
 
   const toolkitRoutes = toolkitClusterStaticParams.map((route) => ({
@@ -105,7 +105,7 @@ export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => 
     kind: "signal-scenario" as const,
     cluster: route.signalSlug,
     scenario: route.decisionScenario,
-    url: `/signals/${route.signalSlug}/${route.decisionScenario}`,
+    url: `/evidence/${route.signalSlug}/${route.decisionScenario}`,
   }));
 
   return [...decideRoutes, ...toolkitRoutes, ...signalRoutes]

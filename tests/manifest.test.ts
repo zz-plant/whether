@@ -13,7 +13,7 @@ describe("web app manifest", () => {
     assert.equal(value.scope, "/");
     assert.equal(value.theme_color, "#020617");
     assert.equal(value.background_color, "#020617");
-    assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/operations"));
-    assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/signals"));
+    assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/planning"));
+    assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/evidence"));
   });
 });

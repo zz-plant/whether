@@ -66,6 +66,6 @@ For contributor workflow and repo policy, use:
 - `../agents/README.md`
 
 For in-product machine-route discovery, use:
-- `/operations` (developer references are linked from the page)
+- `/planning` (developer references are linked from the page)
 
 Keep new discovery copy aligned with that surface so endpoint guidance does not fragment across the repo.

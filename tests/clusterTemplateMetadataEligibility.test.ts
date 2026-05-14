@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildDecideClusterMetadata } from "../app/decide/[slug]/[cluster]/page";
-import { buildSignalDecisionScenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
+import { buildDecideClusterMetadata } from "../app/resolve/[slug]/[cluster]/page";
+import { buildSignalDecisionScenarioMetadata } from "../app/evidence/[cluster]/[decision-scenario]/page";
 import { buildToolkitClusterMetadata } from "../app/toolkits/[slug]/[cluster]/page";
 
 describe("cluster template metadata eligibility", () => {

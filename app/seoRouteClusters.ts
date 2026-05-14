@@ -1,6 +1,6 @@
 import type { DecisionArea } from "../lib/report/boundedDecisionRules";
 import { useCaseRoles, type ToolkitSlug } from "../lib/decisionDomainCatalog";
-import { indexableSignalsClusters } from "./signals/clusterRoutes";
+import { indexableSignalsClusters } from "./evidence/clusterRoutes";
 
 export type DecisionScenarioDefinition = {
   slug: DecisionArea;

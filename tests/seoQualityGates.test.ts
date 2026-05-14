@@ -5,7 +5,7 @@ import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 describe("seo quality gates", () => {
   it("passes when decision, freshness, uniqueness, thin-page, and trust gates pass", () => {
     const result = evaluateSeoQualityGates({
-      pageKey: "/decide/ceo/capital-raising",
+      pageKey: "/resolve/ceo/capital-raising",
       currentCall: "Run financing decisions with strict term gates.",
       immediateAction: "Prioritize extension runway and diligence prep.",
       triggerThreshold: "Trigger tighter mode if tightness > 70.",
@@ -22,7 +22,7 @@ describe("seo quality gates", () => {
       interpretationLabel: "capital strategy",
       siblingsInCluster: [
         {
-          pageKey: "/decide/board/capital-raising",
+          pageKey: "/resolve/board/capital-raising",
           interpretationLabel: "board oversight",
           evidenceTitles: ["Treasury volatility"],
         },
@@ -77,7 +77,7 @@ describe("seo quality gates", () => {
 
   it("fails uniqueness when sibling pages share the same data points and interpretation", () => {
     const result = evaluateSeoQualityGates({
-      pageKey: "/signals/capital-tightness-watch/hiring",
+      pageKey: "/evidence/capital-tightness-watch/hiring",
       currentCall: "Hold hiring pace.",
       immediateAction: "Backfill only critical roles.",
       triggerThreshold: "Trigger tighter mode if tightness > 70.",
@@ -94,7 +94,7 @@ describe("seo quality gates", () => {
       interpretationLabel: "same-view",
       siblingsInCluster: [
         {
-          pageKey: "/signals/capital-tightness-watch/product-tempo",
+          pageKey: "/evidence/capital-tightness-watch/product-tempo",
           interpretationLabel: "same-view",
           evidenceTitles: ["Treasury volatility", "Credit spreads"],
         },

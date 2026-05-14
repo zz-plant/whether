@@ -39,7 +39,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <Link href="/decide#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+      <Link href="/resolve#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         ← Back to Decision Tools toolkit library
       </Link>
       <section className="weather-panel space-y-3 px-6 py-6">

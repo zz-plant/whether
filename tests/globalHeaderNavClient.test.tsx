@@ -8,7 +8,7 @@ describe("GlobalHeaderNavRail", () => {
   it("keeps the compact rail focused on workspace switching", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavRail
-        navigationLinks={resolveGlobalHeaderNavigationLinks("/signals")}
+        navigationLinks={resolveGlobalHeaderNavigationLinks("/evidence")}
         activeRouteLabel="Evidence"
         variant="compact"
         onIntent={() => {}}

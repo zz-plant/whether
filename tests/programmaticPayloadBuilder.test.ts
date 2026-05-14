@@ -19,8 +19,8 @@ describe("programmatic payload builder", () => {
     const output = await generateProgrammaticPayloadArtifacts();
     assert.ok(output.version.length > 0);
 
-    const record = await readProgrammaticPayload("/decide/ceo/capital-raising");
-    assert.equal(record.url, "/decide/ceo/capital-raising");
+    const record = await readProgrammaticPayload("/resolve/ceo/capital-raising");
+    assert.equal(record.url, "/resolve/ceo/capital-raising");
     assert.ok(record.delta.changedSignals.length >= 0);
     assert.ok(record.payload.currentCall.length > 0);
     assert.equal(record.payload.noindex, false);

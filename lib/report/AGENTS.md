@@ -12,7 +12,7 @@ Use this guide when editing:
 ## What this directory owns
 
 - Canonical report semantics and typed contracts
-- Decision transmission copy that should stay consistent across `/`, `/operations`, `/decide`, exports, and SEO surfaces
+- Decision transmission copy that should stay consistent across `/`, `/planning`, `/resolve`, exports, and SEO surfaces
 - Trust-state labels and degraded/fallback behavior
 - Home-brief model assembly and view-model contracts
 - Shared formatting helpers for bounded decision phrasing
@@ -41,7 +41,7 @@ Typical downstream renderers:
 - `app/components/weeklyCallModePanel.tsx`
 - `app/components/weekly-card/*`
 - `app/components/home/*`
-- `app/operations/components/*`
+- `app/planning/components/*`
 
 ## Working rules
 
@@ -66,7 +66,7 @@ When semantics change, update:
 
 ## Anti-patterns seen in this repo
 
-- Rewording the same decision labels independently in `/`, `/operations`, and export builders
+- Rewording the same decision labels independently in `/`, `/planning`, and export builders
 - Moving trust language into multiple parallel summaries
 - Letting components invent local “friendlier” labels that drift from canonical decision semantics
 - Treating exports as a separate brief instead of a transmission layer of the same call

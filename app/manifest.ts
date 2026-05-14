@@ -36,13 +36,13 @@ export default function manifest(): MetadataRoute.Manifest {
         name: "Planning",
         short_name: "Planning",
         description: "Open approvals, guardrails, and operating levers.",
-        url: "/operations",
+        url: "/planning",
       },
       {
         name: "Evidence",
         short_name: "Evidence",
         description: "Open the main drivers and thresholds.",
-        url: "/signals",
+        url: "/evidence",
       },
     ],
   };

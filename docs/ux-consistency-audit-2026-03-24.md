@@ -1,7 +1,7 @@
 # UX Consistency Opportunities (Operations + Method)
 
 Date: 2026-03-24  
-Scope reviewed: `/operations`, `/method` mobile captures plus shared shell components.
+Scope reviewed: `/planning`, `/trust` mobile captures plus shared shell components.
 
 ## Why this matters
 
@@ -11,8 +11,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 1) Unify top-of-page shell hierarchy across report surfaces (High)
 - **Observed drift**
-  - `/operations` uses `ReportShell` + `ReportShellHeader` with status chip, page nav, and stat cards.
-  - `/method` uses `HubPageShell` + `HubHero` and then separate breadcrumb/hero stack.
+  - `/planning` uses `ReportShell` + `ReportShellHeader` with status chip, page nav, and stat cards.
+  - `/trust` uses `HubPageShell` + `HubHero` and then separate breadcrumb/hero stack.
   - Mobile screenshots show visibly different top structures, spacing rhythm, and control grouping for pages that are both in the primary operating loop.
 - **Risk to decision transmission**
   - Users must re-learn page framing and where to find trust/status metadata.
@@ -22,8 +22,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 2) Standardize primary action model in the hero band (High)
 - **Observed drift**
-  - `/operations` top controls emphasize route tabs and a single full-width search affordance.
-  - `/method` hero shows two side-by-side buttons (`SEARCH`, `LIGHT`) plus a horizontal section rail.
+  - `/planning` top controls emphasize route tabs and a single full-width search affordance.
+  - `/trust` hero shows two side-by-side buttons (`SEARCH`, `LIGHT`) plus a horizontal section rail.
 - **Risk**
   - Action priority is unclear because button semantics and hierarchy differ by page.
 - **Recommendation**
@@ -32,8 +32,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 3) Align navigation paradigms (tabs vs chips vs breadcrumb) (High)
 - **Observed drift**
-  - `/operations`: dense pill tabs near the top and no breadcrumb visible in the same band.
-  - `/method`: breadcrumb appears below hero and section chips are horizontally scrollable with “SWIPE FOR MORE SECTIONS.”
+  - `/planning`: dense pill tabs near the top and no breadcrumb visible in the same band.
+  - `/trust`: breadcrumb appears below hero and section chips are horizontally scrollable with “SWIPE FOR MORE SECTIONS.”
 - **Risk**
   - Mixed paradigms increase orientation cost and reduce confidence in where the user is in the system.
 - **Recommendation**
@@ -45,8 +45,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 4) Normalize status metadata presentation (High)
 - **Observed drift**
-  - “Signals updated” and “Record date” are shown as stat cards in `/operations` header.
-  - `/method` places trust/freshness values inside hero stats and body cards with different phrasing and visual weight.
+  - “Signals updated” and “Record date” are shown as stat cards in `/planning` header.
+  - `/trust` places trust/freshness values inside hero stats and body cards with different phrasing and visual weight.
 - **Risk**
   - Temporal trust data is harder to compare across pages.
 - **Recommendation**
@@ -54,8 +54,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 5) Consolidate typography scale + heading rhythm (Medium)
 - **Observed drift**
-  - `/method` hero uses a very large headline style.
-  - `/operations` emphasizes uppercase labels and medium-sized utility copy in the shell.
+  - `/trust` hero uses a very large headline style.
+  - `/planning` emphasizes uppercase labels and medium-sized utility copy in the shell.
 - **Risk**
   - Hierarchy feels like different products; scannability drops when moving page-to-page.
 - **Recommendation**
@@ -63,8 +63,8 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 
 ### 6) Make control width behavior consistent on mobile (Medium)
 - **Observed drift**
-  - `/operations` search button spans full width.
-  - `/method` top actions are half-width side-by-side pills.
+  - `/planning` search button spans full width.
+  - `/trust` top actions are half-width side-by-side pills.
 - **Risk**
   - Tap-target expectations differ and primary action salience becomes inconsistent.
 - **Recommendation**
@@ -110,7 +110,7 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 ## Suggested implementation sequence
 
 1. Define canonical header/action/nav contracts in shared shell primitives.
-2. Migrate `/method` and `/operations` to the same contract before further surface expansion.
+2. Migrate `/trust` and `/planning` to the same contract before further surface expansion.
 3. Tokenize typography/surface tiers and replace ad-hoc classes.
 4. Add route-level visual regression snapshots for key mobile breakpoints.
 
@@ -127,5 +127,5 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 - `app/components/reportShell.tsx`
 - `app/components/reportShellHeader.tsx`
 - `app/components/hubPageShell.tsx`
-- `app/operations/page.tsx`
-- `app/method/page.tsx`
+- `app/planning/page.tsx`
+- `app/trust/page.tsx`

@@ -154,20 +154,20 @@ const workspaceModel: HomePageWorkspaceModel = {
   replay: {
     initialDate: "2026-03-01",
     summary: "Replay the prior monthly snapshot before locking the plan.",
-    openFullHref: "/signals?advanced=1#time-machine",
+    openFullHref: "/evidence?advanced=1#time-machine",
     preview: [{ key: "week-1", label: "Last month", summary: "More expansionary than today." }],
   },
   operations: {
-    continueHref: "/operations#ops-monthly-action-summary",
+    continueHref: "/planning#ops-monthly-action-summary",
     approvalHeadline: "Revisit hiring and roadmap calls now.",
     approvalDetail: "Recheck fixed-cost approvals before you expand commitments.",
     topGuardrails: [{ key: "hiring", label: "Hiring", detail: "Backfills only until the trigger clears." }],
     financeSnapshot: [{ key: "burn", label: "Burn", actionNow: "Stage spend to proof points.", reversalCondition: "Reverse after tighter conditions ease." }],
-    exportActions: [{ href: "/operations#ops-export-briefs", label: "Open share brief" }],
+    exportActions: [{ href: "/planning#ops-export-briefs", label: "Open share brief" }],
   },
   translate: {
-    primaryPath: { href: "/decide/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime.", kicker: "Recommended unresolved path" },
-    fallbackUtility: { href: "/decide/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime." },
+    primaryPath: { href: "/resolve/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime.", kicker: "Recommended unresolved path" },
+    fallbackUtility: { href: "/resolve/ship-checklist", title: "Whether to ship checklist", detail: "Score one go / wait / kill launch decision against the current regime." },
     toolkitShortcuts: [],
   },
 };
@@ -255,9 +255,9 @@ describe("weekly card and interpretation panel composition", () => {
           changeSummary="Decision delta: tighten optional spend this week."
           decisionNow="Stage decisions and protect runway while transition watch is on."
           destinations={[
-            { href: "/signals", label: "Signals", description: "Check what changed in the signals and why the weekly call moved." },
-            { href: "/operations", label: "Operations", description: "Approve or hold hiring, spend, and pacing decisions for this week." },
-            { href: "/decide", label: "Decide", description: "Translate the weekly call into role-specific decisions." },
+            { href: "/evidence", label: "Signals", description: "Check what changed in the signals and why the weekly call moved." },
+            { href: "/planning", label: "Operations", description: "Approve or hold hiring, spend, and pacing decisions for this week." },
+            { href: "/resolve", label: "Decide", description: "Translate the weekly call into role-specific decisions." },
           ]}
         />
         <WeeklyDecisionCard

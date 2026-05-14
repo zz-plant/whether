@@ -6,7 +6,7 @@ Analyzed:
 
 - `.vercel/output/static/_worker.js/__next-on-pages-dist__/webpack/*.js`
 - `.vercel/output/functions/*.func/index.js`
-- target routes: `/signals`, `/operations`, `/twitter-image`
+- target routes: `/evidence`, `/planning`, `/twitter-image`
 
 ## Baseline (before changes)
 
@@ -34,7 +34,7 @@ Analyzed:
 
 ## Heavy import contributors identified
 
-### `app/signals/page.tsx`
+### `app/evidence/page.tsx`
 
 - Advanced and diagnostic panels are heavy and not needed in the default executive scan path:
   - `TimeMachinePanel` (depends on `@base-ui/react/field`, `@base-ui/react/input`, `@base-ui/react/popover`, `@base-ui/react/tabs`)
@@ -43,9 +43,9 @@ Analyzed:
   - `SignalVisualizationSuite`
 - `getSummaryArchive()` was imported at top level even when advanced mode was closed.
 
-### `app/operations/page.tsx`
+### `app/planning/page.tsx`
 
-- Panel imports are broad and route-local (`appendixSections` + export/runway panels), but those are core to default `/operations` rendering and were left eager for now.
+- Panel imports are broad and route-local (`appendixSections` + export/runway panels), but those are core to default `/planning` rendering and were left eager for now.
 
 ### `app/twitter-image.tsx`
 
@@ -54,7 +54,7 @@ Analyzed:
 
 ## Changes applied
 
-1. Route-level lazy server imports in `app/signals/page.tsx`:
+1. Route-level lazy server imports in `app/evidence/page.tsx`:
    - load `getSummaryArchive()` only when `advanced=1`
    - load `SignalVisualizationSuite` only when `diagnostics=all`
    - load `AdvancedThresholdsSection`, `TimeMachinePanel`, and `RegimeTimelinePanel` only when `advanced=1`

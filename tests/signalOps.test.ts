@@ -86,7 +86,7 @@ const basePayload = (
   previousAssessment,
   currentAssessment,
   sourceUrls: ["https://example.com"],
-  timeMachineHref: "/signals?advanced=1#time-machine",
+  timeMachineHref: "/evidence?advanced=1#time-machine",
 });
 
 describe("signalOps", () => {

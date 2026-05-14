@@ -234,7 +234,7 @@ export type TrustStripDisplay = {
   freshnessBadge: string;
   confidenceBadge: string;
   provenanceBadge: string;
-  provenanceHref: "/method";
+  provenanceHref: "/trust";
   fallbackBadge: string | null;
   warningCopy: string | null;
   commitmentLabel: "Decision ready" | "Review before commitment";
@@ -333,7 +333,7 @@ export const formatTrustStripDisplay = ({
     freshnessBadge,
     confidenceBadge,
     provenanceBadge,
-    provenanceHref: "/method",
+    provenanceHref: "/trust",
     fallbackBadge: degraded ? "Fallback active" : null,
     warningCopy: degraded ? "Some inputs are degraded—review before commitment." : null,
     commitmentLabel: degraded ? "Review before commitment" : "Decision ready",

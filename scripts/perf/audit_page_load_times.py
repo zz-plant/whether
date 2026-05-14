@@ -15,10 +15,10 @@ from typing import Any
 
 URLS = [
     "https://whether.work/",
-    "https://whether.work/signals",
-    "https://whether.work/operations",
-    "https://whether.work/operations/decisions",
-    "https://whether.work/operations/briefings",
+    "https://whether.work/evidence",
+    "https://whether.work/planning",
+    "https://whether.work/planning/decisions",
+    "https://whether.work/planning/briefings",
     "https://whether.work/methodology",
     "https://whether.work/guides",
     "https://whether.work/solutions",

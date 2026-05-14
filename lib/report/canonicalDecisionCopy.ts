@@ -31,7 +31,7 @@ export const buildFlipConditionsWithoutTriggerDuplication = ({
 
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
-const FALLBACK_DO_NOW_LINE = "Hold last week's bounded operating rules until thresholds move.";
+const FALLBACK_DO_NOW_LINE = "Hold last week's rules until thresholds move.";
 const FALLBACK_FLIP_TRIGGER = "Recheck thresholds on next refresh.";
 
 export const buildCanonicalDecisionCopy = ({

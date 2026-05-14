@@ -80,7 +80,7 @@ Validation note: click labels in this document were verified from the current ro
    - `Open curve slope`
    - `Inspect threshold logic`
 4. If the question is about provenance or uncertainty, click `Trust`.
-5. On `/method`, open:
+5. On `/trust`, open:
    - `Sources and freshness`
    - `Confidence and limits`
    - `Open formula reference`

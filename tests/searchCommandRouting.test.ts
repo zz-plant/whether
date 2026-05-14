@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { resolveSearchCommandHref } from "../app/search/page";
-import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/decide/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resolve/components/toolkitLibraryPanels";
 import { searchIndex } from "../lib/search/searchIndex";
 
 describe("search command routing", () => {
@@ -12,15 +12,15 @@ describe("search command routing", () => {
   });
 
   it("routes trust and risk queries into canonical trust anchors", () => {
-    assert.equal(resolveSearchCommandHref("confidence", searchIndex("confidence")), "/method#trust-snapshot");
-    assert.equal(resolveSearchCommandHref("failure mode", searchIndex("failure mode")), "/method#revisit-call");
+    assert.equal(resolveSearchCommandHref("confidence", searchIndex("confidence")), "/trust#trust-snapshot");
+    assert.equal(resolveSearchCommandHref("failure mode", searchIndex("failure mode")), "/trust#revisit-call");
   });
 });
 
 describe("toolkit library routing", () => {
   it("builds decide toolkit shortlist URLs", () => {
-    assert.equal(buildToolkitLibraryHref(), "/decide#toolkit-library");
-    assert.equal(buildToolkitLibraryHref("rollback"), "/decide?toolkitQuery=rollback#toolkit-library");
+    assert.equal(buildToolkitLibraryHref(), "/resolve#toolkit-library");
+    assert.equal(buildToolkitLibraryHref("rollback"), "/resolve?toolkitQuery=rollback#toolkit-library");
   });
 
   it("defaults to a routed shortlist and filters when a query is present", () => {

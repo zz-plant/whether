@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SectionedReportPanel } from "../app/operations/components/sectionedReportPanel";
+import { SectionedReportPanel } from "../app/planning/components/sectionedReportPanel";
 
 describe("SectionedReportPanel", () => {
   it("renders a static section header and body without nested disclosure controls", () => {

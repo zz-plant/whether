@@ -55,25 +55,25 @@ export const RegimeAssessmentCard = ({
     {
       id: "curve-slope",
       label: curveSlopeLabel,
-      href: "/signals#sensor-array",
+      href: "/evidence#sensor-array",
       linkLabel: "View curve slope",
     },
     {
       id: "base-rate",
       label: baseRateLabel,
-      href: "/signals#sensor-array",
+      href: "/evidence#sensor-array",
       linkLabel: "View base rate",
     },
     {
       id: "tightness",
       label: tightnessLabel,
-      href: "/signals#thresholds",
+      href: "/evidence#thresholds",
       linkLabel: "View thresholds",
     },
     {
       id: "risk-appetite",
       label: riskLabel,
-      href: "/signals#thresholds",
+      href: "/evidence#thresholds",
       linkLabel: "View thresholds",
     },
   ];

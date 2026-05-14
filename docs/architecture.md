@@ -126,7 +126,7 @@ Summary APIs live under `app/api/*` and mirror the time horizon they serve:
 
 Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and only falls back to hydration when legacy records are encountered.
 
-Default brief assembly should stay on the smaller derived history paths: `data/summary_memory_rail_weekly.json` + `lib/summary/weeklyPostureHistory.ts` for the homepage memory rail and `data/summary_monthly_regime_history.json` + `lib/summary/monthlyRegimeHistory.ts` for forecast-history regime points. Keep `lib/summary/summaryArchive.ts` as the canonical full-history loader for advanced `/signals` historical views and Time Machine playback, not the default path for homepage or forecast assembly.
+Default brief assembly should stay on the smaller derived history paths: `data/summary_memory_rail_weekly.json` + `lib/summary/weeklyPostureHistory.ts` for the homepage memory rail and `data/summary_monthly_regime_history.json` + `lib/summary/monthlyRegimeHistory.ts` for forecast-history regime points. Keep `lib/summary/summaryArchive.ts` as the canonical full-history loader for advanced `/evidence` historical views and Time Machine playback, not the default path for homepage or forecast assembly.
 
 Use `bun run summary-archive:migrate-structured` to materialize `structured` blocks into the checked-in archive and keep runtime hydration as fallback-only behavior.
 
@@ -208,6 +208,6 @@ lib/
 ## Client provider placement (global vs scoped)
 - Keep `app/layout.tsx` server-first and limit it to true shell concerns (document metadata, skip link, and shared header).
 - Scope client providers to the smallest route subtree that needs them:
-  - `app/signals/layout.tsx` wraps only the signals experience with `ToastProviderRoot` because summary-copy toasts are rendered from the time machine summary cards.
-  - `app/operations/layout.tsx` wraps operations routes with `ToastProviderRoot` and `PremiumFunnelTracker` because operations panels emit both toast notifications and premium CTA telemetry attributes.
+  - `app/evidence/layout.tsx` wraps only the signals experience with `ToastProviderRoot` because summary-copy toasts are rendered from the time machine summary cards.
+  - `app/planning/layout.tsx` wraps operations routes with `ToastProviderRoot` and `PremiumFunnelTracker` because operations panels emit both toast notifications and premium CTA telemetry attributes.
 - Avoid attaching interaction trackers or toast infrastructure to unrelated routes; this reduces client-side work on pages that do not present those interactions.

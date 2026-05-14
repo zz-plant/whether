@@ -241,7 +241,7 @@ export type StartupVariantPolicy = {
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
-export type StartRouteDeltaRoute = "/signals" | "/operations" | "/decide";
+export type StartRouteDeltaRoute = "/evidence" | "/planning" | "/resolve";
 
 export type StartRouteDeltaItem = {
   id: "posture-shift" | "top-driver" | "trigger-risk";

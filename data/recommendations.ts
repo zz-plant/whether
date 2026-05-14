@@ -209,7 +209,7 @@ export const insightDatabase = {
             tags: ["treasury", "yield curve", "base rate", "cash tightness"],
             recommendation: {
               label: "Decision shield: hiring approvals",
-              href: "/operations#decision-shield",
+              href: "/planning#decision-shield",
             },
           },
           {
@@ -242,7 +242,7 @@ export const insightDatabase = {
             tags: ["treasury", "base rate", "cost of capital"],
             recommendation: {
               label: "Decision shield: pricing posture",
-              href: "/operations#decision-shield",
+              href: "/planning#decision-shield",
             },
           },
           {
@@ -255,7 +255,7 @@ export const insightDatabase = {
             tags: ["yield curve", "methodology", "risk appetite"],
             recommendation: {
               label: "Playbook: efficiency guardrails",
-              href: "/operations#playbook",
+              href: "/planning#playbook",
             },
           },
         ],
@@ -275,7 +275,7 @@ export const insightDatabase = {
             tags: ["curve slope", "risk appetite", "buyer caution"],
             recommendation: {
               label: "Decision shield: roadmap bets",
-              href: "/operations#decision-shield",
+              href: "/planning#decision-shield",
             },
           },
           {
@@ -308,7 +308,7 @@ export const insightDatabase = {
             tags: ["treasury", "base rate", "expansion"],
             recommendation: {
               label: "Playbook: growth stance",
-              href: "/operations#playbook",
+              href: "/planning#playbook",
             },
           },
           {
@@ -321,7 +321,7 @@ export const insightDatabase = {
             tags: ["curve slope", "risk on", "funding"],
             recommendation: {
               label: "Decision shield: growth bets",
-              href: "/operations#decision-shield",
+              href: "/planning#decision-shield",
             },
           },
         ],

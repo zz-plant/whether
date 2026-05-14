@@ -20,5 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default async function FailureModeDetailPage(_props: { params: Promise<Params> }) {
-  permanentRedirect("/method#revisit-call");
+  permanentRedirect("/trust#revisit-call");
 }

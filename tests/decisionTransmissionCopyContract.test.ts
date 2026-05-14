@@ -63,12 +63,12 @@ describe("decision transmission copy contract", () => {
   it("keeps homepage summary and metadata focused on action, confidence, and flip framing", async () => {
     const metadata = await buildHomeMetadata();
 
-    assert.match(decisionTransmissionSummaryLine, /what to do differently now/i);
-    assert.match(decisionTransmissionSummaryLine, /how sure/i);
-    assert.match(decisionTransmissionSummaryLine, /recommendation change/i);
-    assert.match(metadata.description ?? "", /what to do differently now/i);
-    assert.match(metadata.description ?? "", /how sure/i);
-    assert.match(metadata.description ?? "", /change the recommendation/i);
+    assert.match(decisionTransmissionSummaryLine, /what to do now/i);
+    assert.match(decisionTransmissionSummaryLine, /what would flip/i);
+    assert.match(decisionTransmissionSummaryLine, /flip the call/i);
+    assert.match(metadata.description ?? "", /what to do now/i);
+    assert.match(metadata.description ?? "", /what would flip/i);
+    assert.match(metadata.description ?? "", /flip the call/i);
   });
 
   it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {

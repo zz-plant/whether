@@ -44,7 +44,7 @@ This mapping uses existing modules first and documents ownership + dependency di
 - `buildRoleAwareOperatingTemplates`
 
 **Allowed dependencies**
-- normalized report models/signals
+- normalized report models/evidence
 - deterministic decision libraries (`boundedDecisionRules`, `regimeEngine`, `thresholds`)
 
 **Must not depend on**
@@ -55,7 +55,7 @@ This mapping uses existing modules first and documents ownership + dependency di
 **Owner modules**
 - `app/components/weeklyDecisionCard.tsx`
 - homepage sections/components under `app/components/home/*`
-- export components under `app/operations/components/*`
+- export components under `app/planning/components/*`
 - export builders under `lib/export/*`
 
 **Tagged functions/components**

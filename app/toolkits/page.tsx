@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
-import { buildToolkitLibraryHref } from "../decide/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({

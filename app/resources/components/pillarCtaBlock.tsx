@@ -16,7 +16,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
       <p className="text-sm text-slate-200">{body}</p>
       <div className="flex flex-wrap gap-3">
         <Link
-          href="/operations"
+          href="/planning"
           className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100"
           data-conversion-event="demo/contact"
           data-conversion-surface="pillar-cta"
@@ -34,7 +34,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           {downloadLabel}
         </Link>
         <Link
-          href="/operations#ops-export-briefs"
+          href="/planning#ops-export-briefs"
           className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100"
           data-conversion-event="request"
           data-conversion-surface="pillar-cta"

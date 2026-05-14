@@ -27,19 +27,19 @@ const routePresentation = {
     eyebrow: "Read first",
     prompt: "This week’s call",
   },
-  "/signals": {
+  "/evidence": {
     eyebrow: "Challenge it",
     prompt: "Proof, drivers, & thresholds",
   },
-  "/operations": {
+  "/planning": {
     eyebrow: "Approve it",
     prompt: "Turn the call into a plan",
   },
-  "/decide": {
+  "/resolve": {
     eyebrow: "Close one gap",
     prompt: "Resolve one open question",
   },
-  "/method": {
+  "/trust": {
     eyebrow: "Verify it",
     prompt: "Freshness, confidence, & sources",
   },

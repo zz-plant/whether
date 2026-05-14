@@ -74,8 +74,8 @@ Technical JTBD:
 
 Keep in delivery shell:
 - `/`
-- `/operations`
-- `/signals`
+- `/planning`
+- `/evidence`
 - export and planning surfaces tied to the live weekly call
 
 Move toward content-system ownership:

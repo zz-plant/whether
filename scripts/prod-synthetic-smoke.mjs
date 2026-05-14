@@ -4,17 +4,17 @@ const baseUrl = (process.argv[2] ?? "https://whether.work").replace(/\/$/, "");
 
 const pageChecks = [
   { path: "/", required: ["weekly-posture-brief-title", "share-ready-artifact", "approve-this-weeks-plan"] },
-  { path: "/signals", required: ["signal"] },
-  { path: "/operations", required: ["operations"] },
+  { path: "/evidence", required: ["signal"] },
+  { path: "/planning", required: ["operations"] },
   { path: "/toolkits", required: ["toolkits"] },
-  { path: "/decide", required: ["decide"] },
-  { path: "/operations/data", required: ["data"] },
+  { path: "/resolve", required: ["decide"] },
+  { path: "/planning/data", required: ["data"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];
 
 const redirectChecks = [
-  { from: "/learn", to: "/method" },
+  { from: "/learn", to: "/trust" },
 ];
 
 const retiredRouteChecks = ["/operate", "/templates"];

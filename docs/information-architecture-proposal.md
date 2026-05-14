@@ -5,13 +5,13 @@ Align navigation to the operator loop so leaders can move from posture to decisi
 
 ## Rationalized primary IA
 - **Weekly Brief** (`/`) for the canonical weekly call, bounded decision delta, and share artifact.
-- **Evidence** (`/signals`) for evidence depth, thresholds, and historical replay.
-- **Planning** (`/operations`) for execution guardrails, finance posture, and export actions.
-- **Decision Tools** (`/decide`) for role, situation, and utility-based decision translation.
-- **Trust** (`/method`) for trust, sources, formulas, and confidence limits.
+- **Evidence** (`/evidence`) for evidence depth, thresholds, and historical replay.
+- **Planning** (`/planning`) for execution guardrails, finance posture, and export actions.
+- **Decision Tools** (`/resolve`) for role, situation, and utility-based decision translation.
+- **Trust** (`/trust`) for trust, sources, formulas, and confidence limits.
 
 Recommended in-product sequence:
-`/` → `/signals` only if proof is needed → `/operations` to approve the live plan → `/decide` only if one owner-specific edge case remains → `/method` when the call needs a trust audit.
+`/` → `/evidence` only if proof is needed → `/planning` to approve the live plan → `/resolve` only if one owner-specific edge case remains → `/trust` when the call needs a trust audit.
 
 ## Supporting surfaces
 - **Toolkits** (`/toolkits`) is a supporting instrument library under **Decision Tools**, not a peer workflow hub.
@@ -21,7 +21,7 @@ Recommended in-product sequence:
 ## Shared secondary-surface contract
 Every secondary root should declare and render the same contract:
 - **Intent label:** what downstream helper job the page serves.
-- **Canonical parent hub:** the primary workflow hub this surface feeds (`/decide`, `/operations`, or `/method`).
+- **Canonical parent hub:** the primary workflow hub this surface feeds (`/resolve`, `/planning`, or `/trust`).
 - **Return CTA:** explicit "Start from Weekly Brief" and "Return to parent hub" actions at the top of the page.
 
 This contract keeps secondary pages indexable/discoverable while reinforcing the canonical operator loop:
@@ -36,9 +36,9 @@ This contract keeps secondary pages indexable/discoverable while reinforcing the
 - Keep the global nav limited to the five primary hubs.
 - Order the workflow hubs to match the operator loop users are asked to follow in-product: **Weekly Brief → Evidence → Planning → Decision Tools → Trust**.
 - Surface helper-library discovery inside the parent hubs first:
-  - `/decide` should expose fast tools, direct answers, and one curated translation layer before users ever need the full role or situation library.
-  - Full role and situation browse inside `/decide` should stay collapsed behind a secondary “open library” affordance.
-  - `/operations` should expose the live approval sequence first and keep governance-resource discovery behind an explicit “need deeper board material?” gate.
+  - `/resolve` should expose fast tools, direct answers, and one curated translation layer before users ever need the full role or situation library.
+  - Full role and situation browse inside `/resolve` should stay collapsed behind a secondary “open library” affordance.
+  - `/planning` should expose the live approval sequence first and keep governance-resource discovery behind an explicit “need deeper board material?” gate.
 - Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decision Tools`, `Learn` → `Trust`).
 - Prefer search result grouping by operator job (`check`, `approve`, `resolve`, `diagnose`, `trust`) instead of by content type.
 - Keep first-party CTAs pointed at primary hubs unless the user already needs a supporting surface.

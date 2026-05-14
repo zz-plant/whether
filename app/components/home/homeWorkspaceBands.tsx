@@ -15,8 +15,8 @@ export async function HomeWorkspaceBands({
   workspaceModelPromise,
 }: HomeWorkspaceBandsProps) {
   const workspaceModel = await workspaceModelPromise;
-  const signalsDecisionSummaryHref: Route = "/signals#decision-summary";
-  const trustSnapshotHref: Route = "/method#trust-snapshot";
+  const signalsDecisionSummaryHref: Route = "/evidence#decision-summary";
+  const trustSnapshotHref: Route = "/trust#trust-snapshot";
   const primaryGuardrail = workspaceModel.operations.topGuardrails[0];
   const primaryExportAction = workspaceModel.operations.exportActions[0];
   const toolkitShortcut = workspaceModel.translate.toolkitShortcuts[0];
@@ -36,7 +36,7 @@ export async function HomeWorkspaceBands({
               Turn this read into this week&apos;s plan
             </h2>
             <p className="weather-panel-header-description text-sm text-slate-300">
-              Start here after you&apos;ve read the weekly update. Use Planning to turn the weekly call into company-specific approvals and share-ready decisions.
+              Open Planning to turn the weekly call into approvals and share-ready decisions.
             </p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export async function HomeWorkspaceBands({
           <div id="historical-replay-workspace" className="mt-3 rounded-[0.95rem] border border-slate-800/60 bg-slate-950/20 px-3 py-3">
             <p className="text-[11px] font-medium text-violet-200">More tools (after plan)</p>
             <p className="mt-1 text-xs leading-5 text-slate-300">
-              Use replay, decide flows, and toolkits only after the weekly plan direction is set.
+              Replay, decide, and toolkit flows work best once the weekly plan direction is set.
             </p>
             <div className="mt-2 flex flex-wrap gap-3 text-xs">
               <Link href={workspaceModel.translate.primaryPath.href as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Answer one question</Link>

@@ -2,7 +2,7 @@
 
 Completed in this patch:
 - Redirect aliases for `/operate`, `/templates`, `/toolkit`
-- Safe report loader + degraded rendering on `/` and `/operations`
+- Safe report loader + degraded rendering on `/` and `/planning`
 - Expanded safe-loader adoption across additional page and API report consumers
 - Per-dial semantics and rationale text for operating dials
 - Canonical regime formatter adopted in report + export surfaces

@@ -208,7 +208,7 @@ These actions operationalize migration outcomes after the near-term spike and ga
 ### Visual QA entry criteria
 - `bun run build` and `bun run build:pages` pass on migration branch.
 - Zero layout breakage in one-screen weekly brief above the fold.
-- No clipping/contrast regressions in export/share surfaces (`/operations`).
+- No clipping/contrast regressions in export/share surfaces (`/planning`).
 - Screenshot diff spot-check approved for: homepage hero + weekly decision card, operations export panel, answers detail page shell.
 
 ## 2026-03-31 Tailwind v4 + support dependency execution

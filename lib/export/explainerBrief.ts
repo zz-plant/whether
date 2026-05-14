@@ -68,7 +68,7 @@ export const buildExplainerBriefContent = ({
 
   // Quick reference for terms
   sections.push("Need definitions?");
-  sections.push("Open the glossary at /method#beginner-glossary to translate any unfamiliar U.S. market terms.");
+  sections.push("Open the glossary at /trust#beginner-glossary to translate any unfamiliar U.S. market terms.");
   sections.push("Or scan this quick reference:");
   sections.push("• Cash availability (capital tightness) → higher = conserve cash");
   sections.push("• Market risk appetite → lower = de-risk launches");

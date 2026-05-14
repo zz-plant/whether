@@ -15,7 +15,7 @@ export function LiveDataFallbackAlert({
   sourceLabel,
   effectiveRecordDate,
   fallbackReason,
-  signalsHref = "/signals",
+  signalsHref = "/evidence",
   followUpLabel = "Check live status",
 }: LiveDataFallbackAlertProps) {
   const sourceLine = sourceLabel ? `Source in use: ${sourceLabel}. ` : "";

@@ -68,8 +68,8 @@ describe("buildDecisionTransmission", () => {
 
     assert.equal(transmission.boundedRules.length, 1);
     assert.equal(transmission.boundedRules[0]?.manualReviewRequired, true);
-    assert.match(transmission.boundedRules[0]?.triggerThreshold ?? "", /manual review required/i);
-    assert.match(transmission.boundedRules[0]?.reversalCondition ?? "", /manual review required/i);
+    assert.match(transmission.boundedRules[0]?.triggerThreshold ?? "", /review thresholds manually/i);
+    assert.match(transmission.boundedRules[0]?.reversalCondition ?? "", /review reversal conditions manually/i);
   });
 
   it("labels stale data when fetched timestamp exceeds freshness window", () => {

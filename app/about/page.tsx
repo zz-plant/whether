@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  permanentRedirect("/method");
+  permanentRedirect("/trust");
 }

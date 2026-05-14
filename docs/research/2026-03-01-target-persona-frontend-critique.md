@@ -50,7 +50,7 @@ Maya considers the experience successful if she can quickly answer:
 
 ### P0 — Create a compact “Why this is credible” trust module near the decision card
 - 3 bullets max: data inputs, rule logic, update cadence.
-- Link out to full methodology/signals for deeper review.
+- Link out to full methodology/evidence for deeper review.
 - Why for Maya: gives immediate confidence without forcing deep reading first.
 
 ### P1 — Introduce persona mode toggles: “Operator view” vs “Analyst view”

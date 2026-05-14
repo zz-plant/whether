@@ -64,8 +64,8 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   { href: "#executive-snapshot", label: "Leadership summary" },
-  { href: "/operations#ops-playbook", label: "Planning" },
-  { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
+  { href: "/planning#ops-playbook", label: "Planning" },
+  { href: "/evidence?advanced=1#time-machine", label: "Past snapshots" },
 ];
 
 export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
@@ -101,7 +101,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "The baseline cost of money set by the Federal Reserve. Higher means borrowing costs more.",
     why: "Why it matters: the base rate affects your cost of capital, burn planning, and debt decisions.",
     usedInLabel: "Signal diagnostics",
-    usedInHref: "/signals",
+    usedInHref: "/evidence",
   },
   {
     value: "regime",
@@ -141,7 +141,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "A decision with a clear action, a threshold to pause, and a condition to reverse. Unlike generic advice, it tells you exactly when to stop and go.",
     why: "Why it matters: bounded rules remove ambiguity—you know what to do, what to watch, and when to change.",
     usedInLabel: "Planning page",
-    usedInHref: "/operations",
+    usedInHref: "/planning",
   },
   {
     value: "fallback-mode",
@@ -190,17 +190,17 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
 
 export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
-    href: "/operations",
+    href: "/planning",
     label: "Planning",
     description: "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
   },
   {
-    href: "/method",
+    href: "/trust",
     label: "Trust",
     description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
-    href: "/method#beginner-glossary",
+    href: "/trust#beginner-glossary",
     label: "Trust & glossary",
     description: "Open trust details and plain-English definitions for teams that need U.S. market term translation.",
   },
@@ -213,12 +213,12 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     description: "Use the live weekly recommendation before opening deeper evidence or execution paths.",
   },
   {
-    href: "/operations",
+    href: "/planning",
     label: "Planning",
     description: "Turn the current market backdrop into concrete execution guidance.",
   },
   {
-    href: "/method#beginner-glossary",
+    href: "/trust#beginner-glossary",
     label: "Trust & glossary",
     description: "Review trust status, confidence limits, and the plain-English U.S. market glossary in one place.",
   },

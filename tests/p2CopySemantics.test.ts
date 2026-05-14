@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildDecisionAnswerContextSummary } from "../app/answers/decisionAnswerCopy";
-import { buildShareText } from "../app/operations/components/decisionShieldUtils";
-import { buildStrategyBrief } from "../app/operations/components/strategyBriefPanel";
+import { buildShareText } from "../app/planning/components/decisionShieldUtils";
+import { buildStrategyBrief } from "../app/planning/components/strategyBriefPanel";
 import {
   buildExecutiveMemo,
   buildGuardrailChecklist,
-} from "../app/operations/components/executiveBriefingPanel";
+} from "../app/planning/components/executiveBriefingPanel";
 import { evaluateDecision } from "../lib/decisionShield";
 import { insightDatabase } from "../data/recommendations";
 import { buildAssessmentFixture } from "./fixtures/reportFixtures";

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { parseMonthInput } from "../app/signals/components/timeMachineUtils";
+import { parseMonthInput } from "../app/evidence/components/timeMachineUtils";
 
 describe("time machine panel month parsing", () => {
   it("parses well-formed YYYY-MM input", () => {

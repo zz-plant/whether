@@ -14,8 +14,8 @@ Use this guide when editing the home route shell, workspace bands, route handoff
 ## What this directory must not own
 
 - The canonical weekly-call semantics themselves
-- Deep evidence/trust workflows that belong on `/signals` or `/method`
-- Export payload semantics that belong in `lib/report/*` or `/operations`
+- Deep evidence/trust workflows that belong on `/evidence` or `/trust`
+- Export payload semantics that belong in `lib/report/*` or `/planning`
 - Standalone surfaces that duplicate the weekly brief loop
 
 ## Homepage sequencing rules

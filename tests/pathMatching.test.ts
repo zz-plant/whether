@@ -9,7 +9,7 @@ describe("pathMatchesLink", () => {
   });
 
   it("does not match unrelated paths", () => {
-    assert.equal(pathMatchesLink("/decide", "/use-cases"), false);
-    assert.equal(pathMatchesLink("/decide", "/concepts"), false);
+    assert.equal(pathMatchesLink("/resolve", "/use-cases"), false);
+    assert.equal(pathMatchesLink("/resolve", "/concepts"), false);
   });
 });

@@ -31,9 +31,9 @@ export const PlaybookPanel = ({
   const visibleFenceItems = getVisibleActionLaneItems(fenceItems, showAllActionLanes);
   const visibleActionStripItems = getVisibleActionLaneItems(actionStripItems, showAllActionLanes);
   const playbookQuickLinks = [
-    { href: "/operations#ops-decision-shield", label: "Decision check" },
-    { href: "/operations#ops-strategy-brief", label: "Strategy summary" },
-    { href: "/operations#ops-export-briefs", label: "Share options" },
+    { href: "/planning#ops-decision-shield", label: "Decision check" },
+    { href: "/planning#ops-strategy-brief", label: "Strategy summary" },
+    { href: "/planning#ops-export-briefs", label: "Share options" },
   ];
 
   return (

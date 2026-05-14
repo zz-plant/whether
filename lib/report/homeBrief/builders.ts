@@ -735,7 +735,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     presentation: {
       whyItMattersLine,
       readThisCardItems,
-      glossaryHref: "/method#beginner-glossary",
+      glossaryHref: "/trust#beginner-glossary",
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,

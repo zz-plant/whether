@@ -6,9 +6,9 @@
 **Goal:** Turn this week’s regime signal into concrete operating calls in under 5 minutes.
 
 ## Routes traversed
-1. `/` → `/signals` → `/operations`
-2. `/` → `/decide` (attempted from home nav, then validated via direct route)
-3. `/` → `/method` → `/learn` (method link from home looped back to `/`; then validated via direct route)
+1. `/` → `/evidence` → `/planning`
+2. `/` → `/resolve` (attempted from home nav, then validated via direct route)
+3. `/` → `/trust` → `/learn` (method link from home looped back to `/`; then validated via direct route)
 
 ## What worked
 - **Route 1 is the strongest narrative chain**: posture on home, evidence on Signals, execution framing on Operations.
@@ -22,9 +22,9 @@
 
 2. **Make primary route progression explicit.**
    - Recommended “next-step” rail on each page:
-     - Home: `Review evidence` → `/signals`
-     - Signals: `Apply to operating plan` → `/operations`
-     - Operations: `Translate by role` → `/decide`
+     - Home: `Review evidence` → `/evidence`
+     - Signals: `Apply to operating plan` → `/planning`
+     - Operations: `Translate by role` → `/resolve`
    - This would reduce navigation guesswork for time-constrained leaders.
 
 3. **Clarify Command Center vs. global nav wording.**
@@ -111,8 +111,8 @@
 - Route traversal and UI density checks were performed in a live local run using Playwright against `bun run dev`.
 - Observed page-level interaction counts:
   - `/`: 34 links, 48 buttons
-  - `/signals`: 48 links, 12 buttons
-  - `/operations`: 37 links, 34 buttons
-  - `/decide`: 13 links, 2 buttons
-  - `/method`: 12 links, 2 buttons
+  - `/evidence`: 48 links, 12 buttons
+  - `/planning`: 37 links, 34 buttons
+  - `/resolve`: 13 links, 2 buttons
+  - `/trust`: 12 links, 2 buttons
   - `/learn`: 16 links, 2 buttons

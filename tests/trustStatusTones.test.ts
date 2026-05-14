@@ -19,7 +19,7 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "stable");
     assert.match(result.trustStatusLabel, /Live • Treasury verified/);
-    assert.match(result.trustStatusDetail, /do now \/ hold \/ revisit/);
+    assert.match(result.trustStatusDetail, /Use the weekly call/);
     assert.match(result.trustStatusAction, /Trigger: confidence drops/);
     assert.match(result.trustStatusAction, /Reversal: return to standard cadence/);
     assert.equal(result.outageType, "live-data");
@@ -40,8 +40,8 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Using last verified snapshot/);
-    assert.match(result.trustStatusDetail, /keep today’s do now \/ hold \/ revisit path/);
-    assert.match(result.trustStatusDetail, /Source issue: Treasury API timeout/);
+    assert.match(result.trustStatusDetail, /Use the weekly call/);
+    assert.match(result.trustStatusDetail, /Source: Treasury API timeout/);
     assert.match(result.trustStatusAction, /Trigger: confidence LOW or feed unavailable/);
     assert.match(result.trustStatusAction, /Reversal: resume normal approvals/);
     assert.equal(result.outageType, "feed-unavailable");
@@ -109,7 +109,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /verified live refresh/i);
+    assert.match(hold.detail, /live update/i);
   });
 
   it("treats stale structured freshness as hold even when a timestamp string exists", () => {

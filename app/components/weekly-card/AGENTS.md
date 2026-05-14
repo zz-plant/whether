@@ -16,7 +16,7 @@ Use this guide when editing the homepage top fold, weekly decision card hierarch
 - Canonical posture, trust, or threshold semantics
 - Export-specific behavior
 - Alternate workflow routing logic that belongs to home orchestration
-- Long-form explanatory copy that belongs in `/signals` or `/method`
+- Long-form explanatory copy that belongs in `/evidence` or `/trust`
 
 ## Non-negotiable contract
 

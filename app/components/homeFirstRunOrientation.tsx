@@ -171,10 +171,10 @@ export function HomeFirstRunOrientation({
               </article>
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-              <Link href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+              <Link href="/planning" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
                 See the full plan
               </Link>
-              <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+              <Link href="/evidence" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
                 See the full evidence view
               </Link>
             </div>

@@ -54,7 +54,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
           hasMeaningfulDelta: true,
           fallbackCopy: "",
           items: [
-            { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened. Slow approvals and preserve runway.", href: "/signals" },
+            { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened. Slow approvals and preserve runway.", href: "/evidence" },
           ],
         }}
         regimeDistance={{
@@ -131,7 +131,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
           hasMeaningfulDelta: true,
           fallbackCopy: "",
           items: [
-            { id: "top-driver", label: "Top driver change", detail: "Risk appetite improved. Recheck reversible approvals.", href: "/signals" },
+            { id: "top-driver", label: "Top driver change", detail: "Risk appetite improved. Recheck reversible approvals.", href: "/evidence" },
           ],
         }}
         regimeDistance={{
@@ -200,7 +200,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
           hasMeaningfulDelta: true,
           fallbackCopy: "",
           items: [
-            { id: "top-driver", label: "Top driver change", detail: "Risk appetite neared the flip band.", href: "/signals" },
+            { id: "top-driver", label: "Top driver change", detail: "Risk appetite neared the flip band.", href: "/evidence" },
           ],
         }}
         regimeDistance={{
@@ -309,7 +309,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
       sinceLastReview: {
         hasMeaningfulDelta: true,
         items: [
-          { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/signals" },
+          { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/evidence" },
         ],
       },
     });

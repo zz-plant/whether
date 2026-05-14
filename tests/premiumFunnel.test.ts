@@ -32,7 +32,7 @@ describe("premium funnel helpers", () => {
       isValidPremiumFunnelEvent({
         type: "premium_checkout_complete",
         source: "export_brief",
-        path: "/operations",
+        path: "/planning",
         planCandidate: "pro",
         seatBand: "2-5",
         occurredAt: new Date().toISOString(),
@@ -43,7 +43,7 @@ describe("premium funnel helpers", () => {
       isValidPremiumFunnelEvent({
         type: "premium_intent",
         source: "pricing",
-        path: "/operations",
+        path: "/planning",
         occurredAt: new Date().toISOString(),
       }),
       false,
@@ -52,7 +52,7 @@ describe("premium funnel helpers", () => {
       isValidPremiumFunnelEvent({
         type: "premium_checkout_start",
         source: "export_brief",
-        path: "/operations",
+        path: "/planning",
         planCandidate: "enterprise",
         occurredAt: new Date().toISOString(),
       }),
@@ -69,7 +69,7 @@ describe("premium funnel helpers", () => {
       {
         type: "premium_intent",
         source: "export_brief",
-        path: "/operations",
+        path: "/planning",
         occurredAt: new Date().toISOString(),
       },
       "https://example.com/webhook",

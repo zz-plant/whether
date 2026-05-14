@@ -267,14 +267,14 @@ describe("buildSlackBrief", () => {
       failureModes: [
         {
           warning: "Boundary whipsaw risk: call is near a flip threshold with unstable weekly motion.",
-          mitigationCheck: "Mitigation check: require one confirming read before escalating fixed-cost commitments.",
+          mitigationCheck: "Require one confirming week before escalating fixed-cost commitments.",
         },
       ],
     });
 
     assert.match(brief, /False-signal warning:/);
-    assert.match(brief, /Boundary whipsaw risk:/);
-    assert.match(brief, /Mitigation check:/);
+    assert.match(brief, /Boundary whipsaw/);
+    assert.match(brief, /Require one confirming/);
   });
 
   it("adds compact historical analog references when provided", () => {

@@ -261,7 +261,7 @@ export const buildWeeklyDecisionCardModel = (
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
       { label: "What would reverse the call", detail: "If risk appetite rises above 55, reopen selective hiring." },
     ],
-    glossaryHref: "/method#beginner-glossary",
+    glossaryHref: "/trust#beginner-glossary",
     ...overrides.presentation,
   },
   diagnostics: {
@@ -407,9 +407,9 @@ export const buildWeeklyDecisionCardModel = (
     hasMeaningfulDelta: true,
     fallbackCopy: "",
     items: [
-      { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/decide" },
-      { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/signals" },
-      { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/operations" },
+      { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/resolve" },
+      { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/evidence" },
+      { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/planning" },
     ],
     ...overrides.sinceLastReview,
   },

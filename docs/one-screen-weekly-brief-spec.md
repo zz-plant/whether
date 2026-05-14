@@ -26,6 +26,8 @@ If leaders start saying “we’re +1 bold this week,” the surface is working.
 4. **Bounded downside:** explicit conditional triggers define what changes if wrong.
 5. **Slack portability:** screenshot is decision-complete and clean at preview scale.
 
+Note: "One screen" in this spec refers to the Slack screenshot card (the top-fold decision card). The full homepage scrolls below the card with workspace handoff sections (planning, evidence, trust, replay, toolkits). The screenshot card must be one viewport with no scroll; the page below it is intentionally scrollable.
+
 ---
 
 ## Exact one-screen layout contract
@@ -239,7 +241,7 @@ Required compression rules:
 - `Stability: Week 3 / Avg 8`
 - `Net: Slightly more aggressive.`
 
-### Visual and copy constraints
+### Visual and copy constraints (applies to Slack screenshot card only)
 - One card, one viewport, no scroll.
 - No footnotes.
 - No methodology callouts.
@@ -290,7 +292,7 @@ Track adoption signals tied to ritualization:
 
 ## Non-goals
 - Teaching macro frameworks on this surface.
-- Replicating deep evidence/method pages in-line.
+- Replicating deep evidence/trust pages in-line.
 - Adding new upstream datasets before improving compression and legibility.
 
 ## Contract note: `/` ↔ canonical rules ↔ `/answers`

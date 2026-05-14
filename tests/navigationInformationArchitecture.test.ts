@@ -42,30 +42,30 @@ describe("navigation information architecture", () => {
     assert.equal(labels.size, navigationLayers.length);
 
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/signals"], "Evidence");
-    assert.equal(navigationLabelByPath["/operations"], "Planning");
-    assert.equal(navigationLabelByPath["/decide"], "Decision Tools");
+    assert.equal(navigationLabelByPath["/evidence"], "Evidence");
+    assert.equal(navigationLabelByPath["/planning"], "Planning");
+    assert.equal(navigationLabelByPath["/resolve"], "Decision Tools");
     assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
-    assert.equal(navigationLabelByPath["/method"], "Trust");
+    assert.equal(navigationLabelByPath["/trust"], "Trust");
   });
 
   it("exposes primary surface progress cues and route cues for navigation copy", () => {
     assert.equal(primaryNavigationSurfaceCount, 5);
     assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/signals"), "Open evidence");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/operations"), "Open planning");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/decide"), "Open decision tools");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/method"), "Check trust");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/evidence"), "Open evidence");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/planning"), "Open planning");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/resolve"), "Open decision tools");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/trust"), "Check trust");
     assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
-    assert.equal(resolveNavigationRouteCue("/signals"), "/signals");
+    assert.equal(resolveNavigationRouteCue("/evidence"), "/evidence");
   });
 
   it("keeps canonical route transitions for Decide and Method", () => {
     const decideLayer = navigationLayers.find((layer) => layer.key === "decide");
     const methodLayer = navigationLayers.find((layer) => layer.key === "method");
 
-    assert.equal(decideLayer?.href, "/decide");
-    assert.equal(methodLayer?.href, "/method");
+    assert.equal(decideLayer?.href, "/resolve");
+    assert.equal(methodLayer?.href, "/trust");
     assert.equal(decideLayer?.href.startsWith("#"), false);
     assert.equal(methodLayer?.href.startsWith("#"), false);
   });

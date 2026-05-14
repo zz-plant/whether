@@ -12,7 +12,7 @@ The deploy completed successfully, but there are **two actionable issues** in th
 
 **Evidence in log:**
 - `Invalid prerender config for /concepts/[slug]` (and `.rsc`)
-- Similar warnings for `/decide/[slug]`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/library/failure-modes/[slug]`, `/posture/[slug]`, `/solutions/career-paths/[role]`, `/toolkits/[slug]`
+- Similar warnings for `/resolve/[slug]`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/library/failure-modes/[slug]`, `/posture/[slug]`, `/solutions/career-paths/[role]`, `/toolkits/[slug]`
 
 **Likely root cause:** A mismatch between current Next.js prerender configuration emitted by `next build` (Next 16.1.6) and the parser/expectations in `@cloudflare/next-on-pages` 1.13.16.
 
@@ -73,7 +73,7 @@ Dynamic App Router routes exporting `dynamicParams`, `generateStaticParams`, and
 - `/concepts/[slug]`
 - `/concepts/audience/[audience]`
 - `/concepts/focus/[focus]`
-- `/decide/[slug]`
+- `/resolve/[slug]`
 - `/guides/[stakeholder]`
 - `/guides/stage/[stage]`
 - `/library/failure-modes/[slug]`

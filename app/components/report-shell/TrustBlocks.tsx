@@ -281,10 +281,10 @@ export function HeroTrustProvenanceBlock({
       <p className="text-[11px] text-slate-400">
         For formulas and full trust context, see{" "}
         <Link
-          href="/method"
+          href="/trust"
           className="underline decoration-slate-500/80 underline-offset-2"
         >
-          /method
+          /trust
         </Link>
         .
       </p>

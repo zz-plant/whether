@@ -1,8 +1,8 @@
 export const decisionTransmissionSummaryLine =
-  "What to do differently now, how sure to be, and what would make this recommendation change.";
+  "What changed, what to do now, and what would flip the call.";
 
 export const decisionTransmissionSearchDescription =
-  "Shows what changed, what to do differently now, how sure to be, and what would make us change the recommendation across hiring, fundraising, and runway.";
+  "Shows what changed, what to do now, and what would flip the call across hiring, fundraising, and runway.";
 
 export const homeDecisionFaqItems = [
   {
@@ -13,11 +13,11 @@ export const homeDecisionFaqItems = [
   {
     question: "What should we do differently right now?",
     answer:
-      "The brief spells out what to do now, what to pause, and what would make the recommendation change.",
+      "The brief shows what to do now, what to pause, and what would flip the call.",
   },
   {
     question: "How sure are we, and what would change our mind?",
     answer:
-      "Confidence and freshness markers show how much to trust the recommendation, alongside the main sign that would make it change.",
+      "Confidence and freshness markers show how much to trust the call, and the one sign that would flip it.",
   },
 ] as const;

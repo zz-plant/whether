@@ -76,7 +76,7 @@ export function CopyLeadershipArtifactsButtons({
   citation,
   fallbackActive = false,
   initialArtifactMode = "operator",
-  moreFormatsHref = "/operations#ops-export-briefs",
+  moreFormatsHref = "/planning#ops-export-briefs",
 }: {
   weeklyCallSnapshot: string;
   weeklyOperatorBrief: string;

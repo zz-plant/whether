@@ -68,7 +68,7 @@ Examples:
 2. Keep each mockup focused on one strong product idea.
 3. Use the built-in viewport and density controls to compare scan behavior.
 4. Use `artifacts/ui/index.html` as the default comparison surface before moving on.
-5. Only pull the winning idea into `/`, `/signals`, `/operations`, `/decide`, or `/method` after the concept is visually coherent.
+5. Only pull the winning idea into `/`, `/evidence`, `/planning`, `/resolve`, or `/trust` after the concept is visually coherent.
 
 ## Scope rules
 

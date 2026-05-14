@@ -39,7 +39,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "signals",
-    href: "/signals",
+    href: "/evidence",
     label: "Evidence",
     navLabel: "Evidence",
     description: "See what changed, what drove it, and the thresholds worth watching.",
@@ -49,7 +49,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "operations",
-    href: "/operations",
+    href: "/planning",
     label: "Planning",
     navLabel: "Plan",
     description: "Turn this week's read into decisions on hiring, spend, roadmap, and what to share.",
@@ -59,7 +59,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "decide",
-    href: "/decide",
+    href: "/resolve",
     label: "Decision Tools",
     navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",
@@ -69,7 +69,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "method",
-    href: "/method",
+    href: "/trust",
     label: "Trust",
     navLabel: "Verify",
     description: "Check freshness, confidence, source coverage, and what would change the call.",
@@ -100,10 +100,10 @@ export const primaryNavigationSurfaceIndexByHref = primaryNavigationLayers.reduc
 
 export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
   if (href === "/") return "Start here";
-  if (href === "/signals") return "Open evidence";
-  if (href === "/operations") return "Open planning";
-  if (href === "/decide") return "Open decision tools";
-  if (href === "/method") return "Check trust";
+  if (href === "/evidence") return "Open evidence";
+  if (href === "/planning") return "Open planning";
+  if (href === "/resolve") return "Open decision tools";
+  if (href === "/trust") return "Check trust";
   if (href === "/toolkits") return "Find a tool";
   return null;
 };
@@ -125,7 +125,7 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
 export const trustHubAliases: ReadonlyArray<{ href: Route; canonicalHref: Route; status: "legacy-alias" | "subordinate"; note: string }> = [
   {
     href: "/methodology",
-    canonicalHref: "/method",
+    canonicalHref: "/trust",
     status: "legacy-alias",
     note: "Methodology permanently redirects to the Trust formula reference anchor.",
   },

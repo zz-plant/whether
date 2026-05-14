@@ -71,8 +71,8 @@ graph TB
     
     subgraph "App Layer"
         C1 --> D1[/app/page.tsx]
-        C2 --> D2[/signals]
-        C3 --> D3[/decide/[slug]]
+        C2 --> D2[/evidence]
+        C3 --> D3[/resolve/[slug]]
         C4 --> D4[/api/* endpoints]
     end
     
@@ -395,7 +395,7 @@ This section is important because it draws hard lines between data prep, decisio
 - `deriveDecisionKnobs` - operating lever derivation
 
 **Allowed dependencies:**
-- normalized report models/signals
+- normalized report models/evidence
 - deterministic decision libraries (`boundedDecisionRules`, `regimeEngine`, `thresholds`)
 
 **What this layer should do:**
@@ -411,7 +411,7 @@ This section is important because it draws hard lines between data prep, decisio
 **Owner modules:**
 - `app/components/weeklyDecisionCard.tsx`
 - homepage sections under `app/components/home/*`
-- export components under `app/operations/components/*`
+- export components under `app/planning/components/*`
 
 **Tagged functions/components:**
 - `WeeklyDecisionCard` - decision card component
@@ -470,8 +470,8 @@ These are the safest places to extend the system without blurring the architectu
 
 - **Global (`app/layout.tsx`)**: Server-first, shell concerns only (metadata, skip link, shared header)
 - **Scoped providers**:
-  - `app/signals/layout.tsx`: ToastProviderRoot for time machine summaries
-  - `app/operations/layout.tsx`: ToastProviderRoot + PremiumFunnelTracker
+  - `app/evidence/layout.tsx`: ToastProviderRoot for time machine summaries
+  - `app/planning/layout.tsx`: ToastProviderRoot + PremiumFunnelTracker
 
 ---
 

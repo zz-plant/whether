@@ -37,11 +37,11 @@ It does **not** change macro scoring logic, regime methodology, or source-data p
 
 ### 4.1 Primary navigation
 1. `/briefing` (default)
-2. `/signals`
+2. `/evidence`
 3. `/playbook`
 4. `/scenarios`
 5. `/history`
-6. `/method`
+6. `/trust`
 
 ### 4.2 Legacy route posture
 This project is pre-production, so frontend v2 does not need legacy-route preservation.
@@ -71,13 +71,13 @@ Required sections (top-to-bottom):
 6. Evidence strip (source/date/freshness chips).
 7. Export tray (copy/email/markdown/pdf).
 
-### 5.2 `/signals`
+### 5.2 `/evidence`
 Required sections:
 - Signal family cards (rates, inflation, labor, credit).
 - Threshold + breach status per signal.
 - Reason-code expansion.
 - Provenance/fallback visibility per series.
-- “Why this call is credible” trust module linking to `/method`.
+- “Why this call is credible” trust module linking to `/trust`.
 
 ### 5.3 `/playbook`
 Required sections:
@@ -100,9 +100,9 @@ Required sections:
 - Weekly/monthly/quarterly pivot.
 - Two-point compare mode.
 - Cache coverage visibility.
-- Deep links into matching briefing/signals states.
+- Deep links into matching briefing/evidence states.
 
-### 5.6 `/method`
+### 5.6 `/trust`
 Required sections:
 - Inputs/rules/cadence summary block.
 - Formula and threshold references.
@@ -219,7 +219,7 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 ## 13) Validation checklist
 - Route QA for all v2 routes and removal of deprecated aliases.
 - Accessibility audit (focus, semantics, keyboard path).
-- Contract tests for required fields from summary/signals/scenario/history APIs.
+- Contract tests for required fields from summary/evidence/scenario/history APIs.
 - Smoke test of briefing export success + failure behavior.
 
 ## 14) Risks and open questions
@@ -231,7 +231,7 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 
 ### Open questions
 - Long-term canonical home: `/` vs `/briefing`?
-- Timeline for preserving `/operations/*` compatibility paths?
+- Timeline for preserving `/planning/*` compatibility paths?
 - Default role selection strategy for first-time playbook users?
 
 ## 15) Non-goals

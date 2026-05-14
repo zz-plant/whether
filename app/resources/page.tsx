@@ -15,5 +15,5 @@ export const metadata: Metadata = buildPageMetadata({
 metadata.robots = noindexRobots;
 
 export default function ResourcesPage() {
-  permanentRedirect("/operations#ops-export-briefs");
+  permanentRedirect("/planning#ops-export-briefs");
 }

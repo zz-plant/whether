@@ -46,13 +46,13 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
 const OPERATING_LEVER_FALLBACK = {
-  actionNow: "Keep current operating posture until a rule refresh is available.",
-  triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
-  reversalCondition: "Loosen only when threshold conditions recover and hold.",
+  actionNow: "Hold current posture until rules refresh.",
+  triggerThreshold: "Tighten if confidence and threshold signals worsen.",
+  reversalCondition: "Loosen when threshold conditions recover and hold.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
 
-const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Threshold unavailable — manual review required.";
-const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "Reversal condition unavailable — manual review required.";
+const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Unavailable — review thresholds manually.";
+const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "Unavailable — review reversal conditions manually.";
 
 const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
 
@@ -148,18 +148,18 @@ const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" 
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(
-    /(tightness|risk appetite)\s*(>=|<=|>|<|falls below|rises above|crosses below|crosses above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
+    /(tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|falls below|rises above|crosses below|crosses above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
   );
 
   return Array.from(matches, (match) => ({
     metric: match[1].toLowerCase() === "risk appetite" ? "riskAppetite" : "tightness",
-    operator: (["falls below", "crosses below", "below"].includes(match[2].toLowerCase())
+    operator: (["falls below", "crosses below", "below"].includes(match[3].toLowerCase())
       ? "<"
-      : ["rises above", "crosses above", "above"].includes(match[2].toLowerCase())
+      : ["rises above", "crosses above", "above"].includes(match[3].toLowerCase())
         ? ">"
-        : match[2]) as RuleThresholdCondition["operator"],
-    value: Number(match[3]),
-    label: `${match[1]} ${match[2]} ${match[3]}`,
+        : match[3]) as RuleThresholdCondition["operator"],
+    value: Number(match[4]),
+    label: `${match[1]} ${match[3]} ${match[4]}`,
   }));
 };
 

@@ -52,7 +52,7 @@ To be fully rigorous before implementation starts, the plan still needs:
 5. **Policy-change governance checklist** encoded as machine-checkable metadata (version, rationale, effective date, migration note).
 
 ### Net assessment
-- **Conceptual/methodological rigor**: plan > current implementation.
+- **Conceptual/trustological rigor**: plan > current implementation.
 - **Production-readiness today**: current implementation > plan (because implemented).
 - **Best path**: treat the plan as a stronger target operating model, then convert unresolved decisions into concrete, test-backed policy constants before code cutover.
 

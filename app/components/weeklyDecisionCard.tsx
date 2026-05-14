@@ -76,7 +76,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     guardrailPolicyDetails,
     flipPolicyDetails,
   } = buildWeeklyDecisionPresentation({ model, searchParams });
-  const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
+  const stabilityRule = "Wait for two confirming weeks before acting on posture shifts, unless the flip trigger fires at HIGH confidence.";
 
   return (
     <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-card-title">

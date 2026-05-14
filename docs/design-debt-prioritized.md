@@ -1,7 +1,7 @@
 # Design debt audit (UI walkthrough + frontend code cross-reference)
 
 Date: 2026-03-04
-Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`, `/method` (desktop + mobile). Note: `/start` was retired before this cleanup.
+Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`, `/trust` (desktop + mobile). Note: `/start` was retired before this cleanup.
 
 ## Priority 0 — Fix immediately
 
@@ -29,7 +29,7 @@ Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`,
 2. **Information architecture drift between intended hub model and surfaced navigation labels/routes.**
    - **Why it matters:** Product framing previously emphasized a retired Command Center (`/start`) and clear layer boundaries, but primary nav currently favors `/` + `/evidence` naming and omits several decision surfaces from top-level navigation.
    - **UI evidence:** Header hubs are `Weekly Capital Posture Brief`, `Evidence appendix`, `Operations`, `Resources`, `Reference`.
-   - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/signals`, `/decide`, `/toolkits`, `/learn`, `/method`.
+   - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/evidence`, `/resolve`, `/toolkits`, `/learn`, `/trust`.
    - **Recommendation:** Align global navigation taxonomy with IA boundaries and make the homepage weekly path prominence explicit.
 
 3. **Theme toggle has stale accessibility labeling and weak mode semantics.**
@@ -52,7 +52,7 @@ Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`,
    - **Recommendation:** Reduce to one canonical primary action per viewport context and demote secondary actions into one expandable affordance.
 
 6. **Dark theme contrast hierarchy is subtle for secondary metadata and chip text.**
-   - **Why it matters:** Long-form scanning (timestamps, helper text, tertiary labels) is effortful; risk grows in dense data views like `/signals`.
+   - **Why it matters:** Long-form scanning (timestamps, helper text, tertiary labels) is effortful; risk grows in dense data views like `/evidence`.
    - **UI evidence:** Secondary labels and metadata read close to background luminance in several panels.
    - **Code signals:** Heavy reliance on adjacent slate tones (`text-slate-300/400` on dark translucent surfaces).
    - **Recommendation:** Tighten color token contrast for helper text and metadata; run targeted contrast audits for core panel primitives.
@@ -61,7 +61,7 @@ Scope clicked: `/`, `/signals`, `/operations`, `/decide`, `/toolkits`, `/learn`,
 
 7. **Inconsistent naming between "Evidence" and "Signals" concepts across routes and copy.**
    - **Why it matters:** The same conceptual layer is referred to by multiple labels, increasing comprehension cost for returning users.
-   - **Code signals:** Navigation and page-link icon maps include both `Evidence appendix` and `Evidence` labels while route-level user journeys also refer to `/signals`.
+   - **Code signals:** Navigation and page-link icon maps include both `Evidence appendix` and `Evidence` labels while route-level user journeys also refer to `/evidence`.
    - **Recommendation:** Standardize one user-facing term and map legacy aliases only as redirects/metadata, not visible nav labels.
 
 8. **Search/filter UX on Toolkits is functional but low-feedback.**

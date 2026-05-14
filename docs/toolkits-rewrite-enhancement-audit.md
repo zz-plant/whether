@@ -11,7 +11,7 @@ This audit answers: **which toolkit pages need a rewrite vs targeted enhancement
 | `/toolkits` | **Enhancement** | Core structure is correct (search + inventory grid), but selection support is weak for fast operator routing. Keep the route; add stronger “pick the right toolkit now” affordances. |
 | `/toolkits/[slug]` | **Rewrite (content architecture), not route** | Detail pages are comprehensive but read like a long checklist. They should lead with decision delta, bounded thresholds, and reversal triggers before method detail. |
 | `/` toolkit block | **Enhancement** | This section already supports the “run one toolkit” path; tune progressive disclosure and recommendation quality rather than rebuild. |
-| `/decide/[slug]` recommended toolkits | **Enhancement** | Routing logic and linkage exist; improve recommendation clarity with “why this toolkit now” context and tighter ordering. |
+| `/resolve/[slug]` recommended toolkits | **Enhancement** | Routing logic and linkage exist; improve recommendation clarity with “why this toolkit now” context and tighter ordering. |
 
 ## Per-page notes
 
@@ -58,7 +58,7 @@ Enhancements needed:
 Why enhancement (not rewrite):
 - Page role is valid and aligned with weekly ritual; this is prioritization and compression work.
 
-### 4) `/decide/[slug]` toolkit recommendations — enhancement
+### 4) `/resolve/[slug]` toolkit recommendations — enhancement
 
 Current strengths:
 - Has route-level recommendation wiring for role and situation entry points.
@@ -76,5 +76,5 @@ Why enhancement (not rewrite):
 
 1. Rewrite `/toolkits/[slug]` top section into decision-first summaries.
 2. Upgrade `/toolkits` selection affordances and recovery states.
-3. Tighten `/decide/[slug]` recommendation rationale and ordering.
+3. Tighten `/resolve/[slug]` recommendation rationale and ordering.
 4. Tune `/` toolkit card compression for mobile decisiveness.

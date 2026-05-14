@@ -1,21 +1,21 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { buildDiagnosticsExpansionHref } from "../app/signals/page";
-import { buildActionsExpansionHref } from "../app/operations/page";
+import { buildDiagnosticsExpansionHref } from "../app/evidence/page";
+import { buildActionsExpansionHref } from "../app/planning/page";
 import { getVisibleActionLaneItems } from "../app/components/appendixSections";
 
 describe("expansion controls rendering", () => {
-  it("persists /signals expansion state through query params", () => {
+  it("persists /evidence expansion state through query params", () => {
     const href = buildDiagnosticsExpansionHref({ focus: "growth", year: "2025", month: "2" }, true);
 
-    assert.equal(href, "/signals?focus=growth&year=2025&month=2&diagnostics=all#signal-diagnostics");
+    assert.equal(href, "/evidence?focus=growth&year=2025&month=2&diagnostics=all#signal-diagnostics");
   });
 
-  it("persists /operations expansion state through query params", () => {
+  it("persists /planning expansion state through query params", () => {
     const href = buildActionsExpansionHref({ year: "2025", month: "2" }, true);
 
-    assert.equal(href, "/operations?year=2025&month=2&actions=all#ops-playbook");
+    assert.equal(href, "/planning?year=2025&month=2&actions=all#ops-playbook");
   });
 
   it("renders PlaybookPanel collapsed by default behind disclosure", () => {

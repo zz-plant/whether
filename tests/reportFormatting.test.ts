@@ -86,7 +86,7 @@ describe("reportFormatting regime signal helpers", () => {
     assert.equal(live.freshnessBadge, "Freshness fresh");
     assert.equal(live.confidenceBadge, "Signal reliability HIGH");
     assert.equal(live.provenanceBadge, "Provenance 4");
-    assert.equal(live.provenanceHref, "/method");
+    assert.equal(live.provenanceHref, "/trust");
     assert.equal(live.warningCopy, null);
     assert.equal(live.commitmentLabel, "Decision ready");
 

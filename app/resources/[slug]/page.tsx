@@ -40,7 +40,7 @@ import {
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 
 type Params = { slug: string };
-const RESOURCES_RETURN_HREF = "/operations" as const;
+const RESOURCES_RETURN_HREF = "/planning" as const;
 const RESOURCES_RETURN_LABEL = "Return to Planning";
 
 export const revalidate = 21600;
@@ -126,7 +126,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   if (isRetiredResourceArticleSlug(slug)) {
-    permanentRedirect("/operations#ops-export-briefs");
+    permanentRedirect("/planning#ops-export-briefs");
   }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {

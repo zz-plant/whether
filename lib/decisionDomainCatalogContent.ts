@@ -206,7 +206,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Treating top-line growth as PMF", "Scaling channels before cohort quality is stable"],
-      canonLinks: [{ label: "PMF routing", href: "/decide" }],
+      canonLinks: [{ label: "PMF routing", href: "/resolve" }],
     },
     {
       slug: "focus",
@@ -268,7 +268,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Adding projects without explicit trade-offs"],
-      canonLinks: [{ label: "Roadmap routing", href: "/decide" }],
+      canonLinks: [{ label: "Roadmap routing", href: "/resolve" }],
     },
     {
       slug: "rollback",
@@ -326,7 +326,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Making irreversible bets without contingency paths"],
-      canonLinks: [{ label: "Irreversibility trust check", href: "/method" }],
+      canonLinks: [{ label: "Irreversibility trust check", href: "/trust" }],
     },
     {
       slug: "decision-rights",
@@ -346,7 +346,7 @@ export const rawDecisionDomainCatalog = {
       decisionArtifact: "Decision rights matrix with escalation ladder and weekly governance cadence.",
       timeToRun: "60 minutes to map rights, plus 15-minute weekly operating review.",
       recommendedParticipants:
-        "Exec sponsor, function leads, and program/operations owner who tracks decision cycle time.",
+        "Exec sponsor, function leads, and program/planning owner who tracks decision cycle time.",
       prepChecklist: [
         "Gather 5-10 recent decisions that slipped, escalated late, or bounced between teams.",
         "Document current (implicit) approvers so hidden bottlenecks are visible.",
@@ -388,7 +388,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Confusing consensus with accountability"],
-      canonLinks: [{ label: "Governance routing", href: "/decide" }],
+      canonLinks: [{ label: "Governance routing", href: "/resolve" }],
     },
     {
       slug: "launch-gates",
@@ -447,7 +447,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Launching on optimism without threshold evidence"],
-      canonLinks: [{ label: "Launch trust checks", href: "/method" }],
+      canonLinks: [{ label: "Launch trust checks", href: "/trust" }],
     },
     {
       slug: "ops-capacity",
@@ -511,7 +511,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Assuming normal capacity under stress"],
-      canonLinks: [{ label: "Capacity trust checks", href: "/method" }],
+      canonLinks: [{ label: "Capacity trust checks", href: "/trust" }],
     },
     {
       slug: "claims",
@@ -570,7 +570,7 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Publishing AI claims without operational proof"],
-      canonLinks: [{ label: "Claims and trust", href: "/method" }],
+      canonLinks: [{ label: "Claims and trust", href: "/trust" }],
     },
   ],
   failureModes,
@@ -594,7 +594,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
       ],
-      linkedConcepts: [{ label: "Posture decision routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Posture decision routing", href: "/resolve" }],
     },
     {
       slug: "premature-scaling",
@@ -615,7 +615,7 @@ export const rawDecisionDomainCatalog = {
         { label: "PMF Toolkit", href: "/toolkits/pmf" },
         { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
       ],
-      linkedConcepts: [{ label: "PMF decision routing", href: "/decide" }],
+      linkedConcepts: [{ label: "PMF decision routing", href: "/resolve" }],
     },
     {
       slug: "irreversibility",
@@ -636,7 +636,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
         { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
       ],
-      linkedConcepts: [{ label: "Decision quality routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Decision quality routing", href: "/resolve" }],
     },
     {
       slug: "proxy-lock-in",
@@ -657,7 +657,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
         { label: "PMF Toolkit", href: "/toolkits/pmf" },
       ],
-      linkedConcepts: [{ label: "Measurement routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Measurement routing", href: "/resolve" }],
     },
     {
       slug: "feedback-latency",
@@ -678,7 +678,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
       ],
-      linkedConcepts: [{ label: "Signal interpretation routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Signal interpretation routing", href: "/resolve" }],
     },
     {
       slug: "portfolio-thrash",
@@ -699,7 +699,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
         { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
       ],
-      linkedConcepts: [{ label: "Execution routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Execution routing", href: "/resolve" }],
     },
     {
       slug: "governance-theater",
@@ -720,7 +720,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
         { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
       ],
-      linkedConcepts: [{ label: "Governance routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Governance routing", href: "/resolve" }],
     },
     {
       slug: "fragility-under-stress",
@@ -741,7 +741,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
         { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
       ],
-      linkedConcepts: [{ label: "Reliability routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Reliability routing", href: "/resolve" }],
     },
     {
       slug: "complexity-debt",
@@ -762,7 +762,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
         { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
       ],
-      linkedConcepts: [{ label: "Architecture and execution routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Architecture and execution routing", href: "/resolve" }],
     },
     {
       slug: "risk-externalization",
@@ -783,7 +783,7 @@ export const rawDecisionDomainCatalog = {
         { label: "Claims Integrity Toolkit", href: "/toolkits/claims" },
         { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
       ],
-      linkedConcepts: [{ label: "Trust and risk routing", href: "/decide" }],
+      linkedConcepts: [{ label: "Trust and risk routing", href: "/resolve" }],
     },
   ],
 } as const;

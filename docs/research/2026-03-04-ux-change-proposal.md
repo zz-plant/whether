@@ -6,14 +6,14 @@ Improve executive decision speed for the weekly planning flow while aligning wit
 ## Repo-context constraints used for reprioritization
 1. `docs/implementation-status.md` shows one remaining milestone UX item: **promote export/share actions directly into the Overview header**.
 2. `docs/design-improvements-priority.md` marks multiple mobile/navigation improvements as implemented and identifies the **returning-visitor delta layer** as the primary pending design backlog item.
-3. `docs/information-architecture-proposal.md` sets the canonical route model (`/`, `/signals`, `/operations`, `/decide`, etc.), so proposals should reinforce this IA rather than introduce a competing structure.
+3. `docs/information-architecture-proposal.md` sets the canonical route model (`/`, `/evidence`, `/planning`, `/resolve`, etc.), so proposals should reinforce this IA rather than introduce a competing structure.
 
 ## Reprioritized UX changes
 
 ### Now (P0): close already-identified gaps first
 
 #### 1) Promote share/export actions into Overview header (ship-completion item)
-- Move a single canonical action (`Copy weekly brief`) into the primary header region on `/` and mirror equivalent action placement on `/operations`.
+- Move a single canonical action (`Copy weekly brief`) into the primary header region on `/` and mirror equivalent action placement on `/planning`.
 - Keep one action label pattern across surfaces to remove duplicate CTA phrasing.
 - Include confidence + source metadata in copied output.
 
@@ -55,7 +55,7 @@ Improve executive decision speed for the weekly planning flow while aligning wit
 **Why later**
 - High value, but requires stronger recommendation-model governance and cross-role QA.
 
-#### 6) Lightweight weekly-path rail across `/ → /signals → /operations → /decide`
+#### 6) Lightweight weekly-path rail across `/ → /evidence → /planning → /resolve`
 - Add a compact progress indicator and one next-step CTA per route.
 - Ensure Back button reverses state changes in strict sequence.
 
@@ -65,15 +65,15 @@ Improve executive decision speed for the weekly planning flow while aligning wit
 ## Updated success metrics (ordered by delivery phases)
 
 ### P0 metrics
-- Header share/export usage on sessions reaching `/` or `/operations`: **>45%**.
+- Header share/export usage on sessions reaching `/` or `/planning`: **>45%**.
 - Returning-user time-to-understand-change (landing to first delta interaction): **<10s median**.
 
 ### P1 metrics
 - Time-to-first-action from `/`: **<20s median**.
-- Core flow completion (`/` → `/signals` → `/operations`): **+20%**.
+- Core flow completion (`/` → `/evidence` → `/planning`): **+20%**.
 
 ### P2 metrics
-- Role toggle adoption on sessions reaching `/operations`/`/decide`: **>35%**.
+- Role toggle adoption on sessions reaching `/planning`/`/resolve`: **>35%**.
 - First-click correctness on primary route CTA: **>90%**.
 
 ## Sequencing recommendation

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
-import { buildGuidedTranslationHref, type GuidedTranslationSearchParams } from "../decide/components/guidedTranslationPanels";
+import { buildGuidedTranslationHref, type GuidedTranslationSearchParams } from "../resolve/components/guidedTranslationPanels";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides — team-specific help",

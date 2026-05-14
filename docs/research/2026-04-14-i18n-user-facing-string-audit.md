@@ -53,8 +53,8 @@ There is no app-level locale abstraction, no message catalog, and no `t()`-style
 Representative files:
 
 - `app/page.tsx`
-- `app/operations/page.tsx`
-- `app/method/page.tsx`
+- `app/planning/page.tsx`
+- `app/trust/page.tsx`
 - `app/components/reportShell.tsx`
 - `lib/report/reportCopy.ts`
 - `lib/navigation/informationArchitecture.ts`
@@ -71,7 +71,7 @@ These files pin date/number output to `en-US`:
 - `lib/formatters.ts`
 - `lib/timeMachine/monthFormatting.ts`
 - `lib/report/homeBrief/historyAndContext.ts`
-- `app/signals/components/thresholdsPanel.tsx`
+- `app/evidence/components/thresholdsPanel.tsx`
 
 Representative examples:
 
@@ -183,14 +183,14 @@ Impact:
 Highest-volume files from the extraction pass:
 
 1. `lib/decisionDomainCatalogContent.ts`
-2. `app/signals/components/signalsSections.tsx`
+2. `app/evidence/components/evidenceSections.tsx`
 3. `app/mockups/operator-brief/page.tsx`
-4. `app/method/page.tsx`
+4. `app/trust/page.tsx`
 5. `lib/resourceArticles.ts`
-6. `app/operations/components/exportBriefPanel.tsx`
-7. `app/operations/page.tsx`
+6. `app/planning/components/exportBriefPanel.tsx`
+7. `app/planning/page.tsx`
 8. `lib/report/reportCopy.ts`
-9. `app/signals/signalsPageModel.ts`
+9. `app/evidence/evidencePageModel.ts`
 10. `app/about/page.tsx`
 
 Rough concentration by area:

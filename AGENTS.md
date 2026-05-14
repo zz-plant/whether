@@ -239,7 +239,7 @@ When making product-facing changes, start by checking these areas:
 - `lib/regimeEngine.ts`
 
 ### Export / transmission surfaces
-- existing export components under `app/operations/components/`
+- existing export components under `app/planning/components/`
 - shared export helpers in `lib/export*`
 - provenance / trust helpers in `lib/report/*`
 

@@ -48,7 +48,7 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Approval lane/);
     assert.match(html, /Reliability window/);
     assert.match(html, /Source board/);
-    assert.match(html, /\/method/);
+    assert.match(html, /\/trust/);
   });
 
   it("prefers canonical treasury source attribution when provenance is present", () => {
@@ -80,7 +80,7 @@ describe("ReportShell extracted sections", () => {
         recordDateLabel="Mar 5"
         primaryCta={{ href: "#weekly", label: "Start" }}
         secondaryCta={{ href: "#evidence", label: "Evidence" }}
-        exportCta={{ href: "/operations", label: "Export" }}
+        exportCta={{ href: "/planning", label: "Export" }}
         statusLabel="DEFENSIVE"
         trustStatusLabel="HIGH"
         fetchedAtLabel="Mar 6"
@@ -168,7 +168,7 @@ describe("ReportShell extracted sections", () => {
         trustStatusDetail="Stable feed"
         trustStatusAction="Proceed with planning."
         trustStatusTone="stable"
-        currentPath="/signals"
+        currentPath="/evidence"
         primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
         secondaryCta={{ href: "#thresholds", label: "See thresholds" }}
       >

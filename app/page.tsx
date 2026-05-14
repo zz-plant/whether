@@ -18,6 +18,7 @@ import {
   HomeRevisitFlipSection,
   HomeWhatChangedSection,
 } from "./components/home/homeBriefSections";
+import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -167,7 +168,7 @@ export const HomePageReportContent = async ({
             },
           },
           nextStep: {
-            href: "/operations",
+            href: "/planning",
             description: "Turn this into a weekly plan",
           },
         },
@@ -191,6 +192,7 @@ export const HomePageReportContent = async ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
       />
       <OperatorContextWrapper />
+      <FirstVisitBanner />
       <HomeRoutePrefetch />
       <HomeWhatChangedSection
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
@@ -199,13 +201,11 @@ export const HomePageReportContent = async ({
         searchParams={resolvedSearchParams}
         initialArtifactMode={initialArtifactMode}
       />
-      {homepage.interpretationLayer.view !== "default" || Boolean(homepage.fallbackAlert) ? (
-        <HomeRevisitFlipSection
-          interpretationLayer={homepage.interpretationLayer}
-          interpretationSearchParams={homepage.interpretationSearchParams}
-          fallbackAlert={homepage.fallbackAlert}
-        />
-      ) : null}
+      <HomeRevisitFlipSection
+        interpretationLayer={homepage.interpretationLayer}
+        interpretationSearchParams={homepage.interpretationSearchParams}
+        fallbackAlert={homepage.fallbackAlert}
+      />
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
     </ReportShell>
   );

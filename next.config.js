@@ -15,51 +15,51 @@ const buildPermanentRedirects = (pairs) =>
 export const solutionRedirectPairs = [
   ["/solutions/engineering-capacity", "/toolkits/ops-capacity"],
   ["/solutions/product-roadmapping", "/toolkits/focus"],
-  ["/solutions/market-regime-playbook", "/decide/ops-risk"],
-  ["/solutions/career-paths", "/decide/product"],
-  ["/solutions/career-paths/senior-product-manager", "/decide/product"],
-  ["/solutions/career-paths/group-product-manager", "/decide/product"],
-  ["/solutions/career-paths/director-of-product", "/decide/product"],
-  ["/solutions/career-paths/vp-product", "/decide/ceo"],
-  ["/solutions/career-paths/product-strategy-chief-of-staff", "/decide/ops-risk"],
-  ["/solutions/:path*", "/decide"],
+  ["/solutions/market-regime-playbook", "/resolve/ops-risk"],
+  ["/solutions/career-paths", "/resolve/product"],
+  ["/solutions/career-paths/senior-product-manager", "/resolve/product"],
+  ["/solutions/career-paths/group-product-manager", "/resolve/product"],
+  ["/solutions/career-paths/director-of-product", "/resolve/product"],
+  ["/solutions/career-paths/vp-product", "/resolve/ceo"],
+  ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
+  ["/solutions/:path*", "/resolve"],
 ];
 
 export const canonicalSurfaceRedirectPairs = [
   // Legacy posture → root
-  ["/startup-macro-posture/index", "/method#formula-reference"],
+  ["/startup-macro-posture/index", "/trust#formula-reference"],
   ["/startup-macro-posture/:regime", "/"],
   ["/startup-macro-posture", "/"],
   // Posture stub pages (deleted) → root
   ["/posture", "/"],
   ["/posture/:slug", "/"],
   // Legacy methodology → Trust hub
-  ["/methodology", "/method#formula-reference"],
+  ["/methodology", "/trust#formula-reference"],
   // Consolidated under Trust hub
-  ["/sources", "/method#sources-freshness"],
-  ["/confidence", "/method#confidence-limits"],
+  ["/sources", "/trust#sources-freshness"],
+  ["/confidence", "/trust#confidence-limits"],
   // Decision answer root → Decide hub
-  ["/answers", "/decide#direct-answers"],
+  ["/answers", "/resolve#direct-answers"],
   // Learn root + failure modes → Trust hub
-  ["/learn", "/method"],
-  ["/learn/failure-modes", "/method#revisit-call"],
-  ["/learn/failure-modes/:slug", "/method#revisit-call"],
+  ["/learn", "/trust"],
+  ["/learn/failure-modes", "/trust#revisit-call"],
+  ["/learn/failure-modes/:slug", "/trust#revisit-call"],
   // Concepts (all paths) → Trust hub
-  ["/concepts/:path*", "/method"],
+  ["/concepts/:path*", "/trust"],
   // About → Trust hub
-  ["/about", "/method"],
+  ["/about", "/trust"],
   // Decide redirect stubs
-  ["/decide/team-context", "/operations#ops-monthly-action-summary"],
+  ["/resolve/team-context", "/planning#ops-monthly-action-summary"],
   // Resources root → Planning
-  ["/resources", "/operations#ops-export-briefs"],
+  ["/resources", "/planning#ops-export-briefs"],
   // Guides staging redirects
   ["/guides/stage/:stage", "/guides?stage=:stage"],
   ["/guides/stage", "/guides?library=stages"],
   ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
   // Operations sub-pages flattened
-  ["/operations/data", "/operations"],
-  ["/operations/cli", "/operations"],
-  ["/operations/integrations", "/operations"],
+  ["/planning/data", "/planning"],
+  ["/planning/cli", "/planning"],
+  ["/planning/integrations", "/planning"],
 ];
 
 export const redirectEntries = [

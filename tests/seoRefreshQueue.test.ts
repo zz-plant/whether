@@ -23,11 +23,11 @@ describe("seo refresh queue", () => {
       payloadRecords: [
         {
           ...basePage,
-          url: "/decide/ceo/capital-raising",
+          url: "/resolve/ceo/capital-raising",
         },
       ],
       metricsByUrl: {
-        "/decide/ceo/capital-raising": {
+        "/resolve/ceo/capital-raising": {
           trafficTier: "high",
           ctaConversionRate: 0.08,
         },
@@ -41,7 +41,7 @@ describe("seo refresh queue", () => {
     assert.equal(result.queue[0]?.noindexNow, true);
     assert.equal(result.queue[0]?.priority, "p0");
     assert.ok(result.queue[0]?.reasons.includes("freshness-stale"));
-    assert.equal(result.statusByUrl["/decide/ceo/capital-raising"]?.slaState, "due-soon");
+    assert.equal(result.statusByUrl["/resolve/ceo/capital-raising"]?.slaState, "due-soon");
   });
 
   it("queues high-tier low-conversion pages without forcing noindex", () => {
@@ -49,7 +49,7 @@ describe("seo refresh queue", () => {
       payloadRecords: [
         {
           ...basePage,
-          url: "/signals/risk-appetite-watch/hiring",
+          url: "/evidence/risk-appetite-watch/hiring",
           snapshot: {
             ...basePage.snapshot,
             fetchedAtIso: "2026-03-18T00:00:00.000Z",
@@ -57,7 +57,7 @@ describe("seo refresh queue", () => {
         },
       ],
       metricsByUrl: {
-        "/signals/risk-appetite-watch/hiring": {
+        "/evidence/risk-appetite-watch/hiring": {
           organicEntrances30d: 2200,
           ctaConversionRate: 0.01,
         },
@@ -112,17 +112,17 @@ describe("seo refresh queue", () => {
       payloadRecords: [
         {
           ...basePage,
-          url: "/decide/ceo/runway-planning",
+          url: "/resolve/ceo/runway-planning",
         },
       ],
       metricsByUrl: {
-        "/decide/ceo/runway-planning": {
+        "/resolve/ceo/runway-planning": {
           trafficTier: "high",
           ctaConversionRate: 0.01,
         },
       },
       previousStatusByUrl: {
-        "/decide/ceo/runway-planning": {
+        "/resolve/ceo/runway-planning": {
           lastRefreshRequestedAtIso: "2026-03-01T00:00:00.000Z",
           lastRefreshedAtIso: null,
         },
@@ -131,8 +131,8 @@ describe("seo refresh queue", () => {
       staleAfterHours: 24 * 14,
     });
 
-    assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
-    assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaState, "overdue");
+    assert.equal(result.statusByUrl["/resolve/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
+    assert.equal(result.statusByUrl["/resolve/ceo/runway-planning"]?.slaState, "overdue");
   });
 
   it("flags sustained high-intent underperformers as merge-or-prune candidates", () => {

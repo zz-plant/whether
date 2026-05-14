@@ -7,7 +7,7 @@ import {
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
-import { buildToolkitLibraryHref } from "../decide/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 
 export const runtime = "edge";
 
@@ -43,22 +43,22 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   if (commandJob === "resolve") {
     return results.some((entry) => entry.type === "toolkit")
       ? buildToolkitLibraryHref(query)
-      : "/decide#unresolved-question-router";
+      : "/resolve#unresolved-question-router";
   }
 
   if (commandJob === "risk") {
-    return "/method#revisit-call";
+    return "/trust#revisit-call";
   }
 
   if (commandJob === "trust") {
-    return "/method#trust-snapshot";
+    return "/trust#trust-snapshot";
   }
 
   if (commandJob === "approve") {
-    return "/operations#ops-monthly-action-summary";
+    return "/planning#ops-monthly-action-summary";
   }
 
-  return "/signals#decision-summary";
+  return "/evidence#decision-summary";
 };
 
 const searchIntentPrompts = [
@@ -91,7 +91,7 @@ export default async function SearchPage({
   const activeJob = isSearchEntityJob(normalizedJob) ? normalizedJob : undefined;
 
   if (!query) {
-    permanentRedirect("/decide#unresolved-question-router");
+    permanentRedirect("/resolve#unresolved-question-router");
   }
 
   const matchingResults = searchIndex(query);
@@ -100,5 +100,5 @@ export default async function SearchPage({
     : matchingResults;
   const commandHref = resolveSearchCommandHref(query, results, activeJob);
 
-  permanentRedirect(commandHref ?? "/decide#unresolved-question-router");
+  permanentRedirect(commandHref ?? "/resolve#unresolved-question-router");
 }

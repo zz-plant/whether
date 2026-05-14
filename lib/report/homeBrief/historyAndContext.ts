@@ -320,7 +320,7 @@ export const buildStartRouteDeltaBlock = ({
       id: "posture-shift" as const,
       label: "Posture shift",
       detail: `Posture moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check decision posture before committing irreversible work.`,
-      href: "/decide" as const,
+      href: "/resolve" as const,
     });
   }
 
@@ -331,7 +331,7 @@ export const buildStartRouteDeltaBlock = ({
       detail: topDriverEvidence?.immediateImplication
         ? `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}. ${topDriverEvidence.immediateImplication}`
         : `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}; trend is ${trendLabel.toLowerCase()}.`,
-      href: "/signals" as const,
+      href: "/evidence" as const,
     });
   }
 
@@ -341,7 +341,7 @@ export const buildStartRouteDeltaBlock = ({
     detail: topFailureMode
       ? `${topFailureMode} Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`
       : `Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`,
-    href: "/operations" as const,
+    href: "/planning" as const,
   });
 
   return {

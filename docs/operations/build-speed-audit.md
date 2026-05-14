@@ -41,7 +41,7 @@ Based on the 2026-03-12 CI log, the slowest stages are:
    - While warnings do not currently fail the build, they can indicate fallback behavior that defeats intended caching and may add internal adapter work.
 
 5. **Only pre-render canonical combinations**
-   - Some combinatorial routes (e.g. `/decide/[slug]/[cluster]`, `/toolkits/[slug]/[cluster]`, `/signals/[cluster]/[decision-scenario]`) likely generate many pages with similar payloads.
+   - Some combinatorial routes (e.g. `/resolve/[slug]/[cluster]`, `/toolkits/[slug]/[cluster]`, `/evidence/[cluster]/[decision-scenario]`) likely generate many pages with similar payloads.
    - Pre-render the highest-traffic/canonical set; serve the rest dynamically with ISR.
 
 6. **Trim worker bundle hot spots**

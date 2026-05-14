@@ -13,25 +13,25 @@ import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { ThemeToggleButton } from "./themeToggleButton";
 
-const resolveReportHeaderAction = (pathname: string) => {
+const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/operations#ops-monthly-action-summary", label: "Planning" };
+    return { href: "/evidence", label: "Open evidence" };
   }
 
-  if (pathname.startsWith("/signals")) {
-    return { href: "/operations#ops-monthly-action-summary", label: "Planning" };
+  if (pathname.startsWith("/evidence")) {
+    return { href: "/planning", label: "Open planning" };
   }
 
-  if (pathname.startsWith("/operations")) {
-    return { href: "#ops-export-briefs", label: "Share formats" };
+  if (pathname.startsWith("/planning")) {
+    return { href: "/resolve", label: "Resolve questions" };
   }
 
-  if (pathname.startsWith("/decide")) {
-    return { href: "/operations#ops-monthly-action-summary", label: "Back to plan" };
+  if (pathname.startsWith("/resolve")) {
+    return { href: "/trust", label: "Verify call" };
   }
 
-  if (pathname.startsWith("/method")) {
-    return { href: "/signals#decision-summary", label: "Evidence" };
+  if (pathname.startsWith("/trust")) {
+    return { href: "/", label: "Back to brief" };
   }
 
   return null;
@@ -52,7 +52,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const isReportRoute = isReportShellRoute(pathname);
   const isHomeBrief = pathname === "/";
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
-  const reportHeaderAction = resolveReportHeaderAction(pathname);
+  const reportHeaderAction = reportHeaderNextStep(pathname);
   const showCollapsedWorkflowPicker = isHomeBrief;
 
   return (
@@ -109,14 +109,27 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
 
           {showCollapsedWorkflowPicker ? (
-            <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2">
-              <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                Browse workflow
-              </summary>
-              <div className="mt-3">
-                <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-              </div>
-            </details>
+            <nav aria-label="Workflow steps" className="flex items-center gap-1 overflow-x-auto py-1">
+              {[1, 2, 3, 4, 5].map((step) => {
+                const href = step === 1 ? "/" : step === 2 ? "/evidence" : step === 3 ? "/planning" : step === 4 ? "/resolve" : "/trust";
+                const label = step === 1 ? "Brief" : step === 2 ? "Evidence" : step === 3 ? "Plan" : step === 4 ? "Resolve" : "Verify";
+                const isActive = step === 1;
+                return (
+                  <Link
+                    key={step}
+                    href={href}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
+                      isActive
+                        ? "border border-sky-400/60 bg-sky-400/10 text-sky-100"
+                        : "border border-slate-700/50 text-slate-400 hover:border-slate-500/70 hover:text-slate-200"
+                    }`}
+                  >
+                    <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${isActive ? "bg-sky-400/30 text-sky-100" : "bg-slate-800 text-slate-500"}`}>{step}</span>
+                    <span>{label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
           ) : (
             <>
               <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">

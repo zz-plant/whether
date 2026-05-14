@@ -51,9 +51,9 @@ const workspaceModel: HomePageWorkspaceModel = {
     flipDetail: "detail",
     evidenceMovers: [],
   },
-  replay: { initialDate: "2026-03-01", summary: "summary", openFullHref: "/signals", preview: [] },
+  replay: { initialDate: "2026-03-01", summary: "summary", openFullHref: "/evidence", preview: [] },
   operations: {
-    continueHref: "/operations",
+    continueHref: "/planning",
     approvalHeadline: "approval",
     approvalDetail: "detail",
     topGuardrails: [],
@@ -61,8 +61,8 @@ const workspaceModel: HomePageWorkspaceModel = {
     exportActions: [],
   },
   translate: {
-    primaryPath: { href: "/decide/ceo", title: "CEO", detail: "detail", kicker: "Recommended path" },
-    fallbackUtility: { href: "/decide/situation", title: "Situation", detail: "detail" },
+    primaryPath: { href: "/resolve/ceo", title: "CEO", detail: "detail", kicker: "Recommended path" },
+    fallbackUtility: { href: "/resolve/situation", title: "Situation", detail: "detail" },
     toolkitShortcuts: [],
   },
 };

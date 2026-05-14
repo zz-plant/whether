@@ -173,7 +173,7 @@ export const ChangeSinceLastReadPanel = ({
                   ].filter(Boolean),
                 ),
               ),
-              timeMachineHref: `/signals?advanced=1#time-machine`,
+              timeMachineHref: `/evidence?advanced=1#time-machine`,
             }),
           }).catch(() => {
             // Ignore network failures and keep local alerting as fallback.
@@ -189,15 +189,15 @@ export const ChangeSinceLastReadPanel = ({
 
   const timeMachineLink = useMemo(() => {
     if (!previous) {
-      return "/signals?advanced=1#time-machine";
+      return "/evidence?advanced=1#time-machine";
     }
     const date = new Date(previous.recordDate);
     if (Number.isNaN(date.valueOf())) {
-      return "/signals?advanced=1#time-machine";
+      return "/evidence?advanced=1#time-machine";
     }
     const month = date.getUTCMonth() + 1;
     const year = date.getUTCFullYear();
-    return buildTimeMachineHref("/signals?advanced=1#time-machine", { month, year });
+    return buildTimeMachineHref("/evidence?advanced=1#time-machine", { month, year });
   }, [previous]);
 
   const hasChange =

@@ -26,7 +26,7 @@ This review flags product and engineering risks paired with concrete opportuniti
 - **Risk:** The repo contains numerous resource/concept/solution pages, which can drift from current posture language and reduce trust if stale.
 - **Opportunity:** Add an automated freshness stamp and “last reviewed against weekly posture” check for SEO pages, with a lightweight stale-content warning in generation workflows.
 
-## 7) Methodology alias (`/methodology`) should remain a redirect to `/method#formula-reference`
+## 7) Methodology alias (`/methodology`) should remain a redirect to `/trust#formula-reference`
 - **Risk:** Duplicate naming for closely related methodology content can confuse users and fragment inbound links.
 - **Opportunity:** Pick one canonical route, redirect the other permanently, and normalize internal links/site metadata to reduce routing ambiguity.
 
