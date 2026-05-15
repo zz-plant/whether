@@ -23,7 +23,7 @@ export function LiveDataFallbackAlert({
 
   return (
     <section
-      className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100"
+      className="weather-surface-secondary border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-100"
       aria-live="polite"
     >
       <p className="font-semibold">Data state: cached snapshot active.</p>

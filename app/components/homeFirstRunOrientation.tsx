@@ -67,7 +67,7 @@ export function HomeFirstRunOrientation({
       {!dismissed ? (
         <section
           data-weather-first-run-orientation="true"
-          className="weather-panel space-y-4 px-4 py-4 sm:px-5"
+          className="weather-surface-secondary space-y-4 px-4 py-4 sm:px-5"
           aria-label="First-run orientation"
           data-testid="first-run-orientation"
           suppressHydrationWarning
@@ -116,7 +116,7 @@ export function HomeFirstRunOrientation({
         </section>
       ) : null}
 
-      <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Next step rail">
+      <section className="weather-surface-secondary space-y-3 px-4 py-4 sm:px-5" aria-label="Next step rail">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Next step</p>
         <div className="flex flex-wrap gap-2">
           {quickActions.map((action) => {
@@ -146,7 +146,7 @@ export function HomeFirstRunOrientation({
         </div>
       </section>
 
-      <details className="weather-panel weather-auto-chevron space-y-4 px-5 py-4" id="why-whether">
+      <details className="weather-surface-secondary weather-auto-chevron space-y-4 px-5 py-4" id="why-whether">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
           More context
         </summary>

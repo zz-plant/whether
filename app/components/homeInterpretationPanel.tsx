@@ -83,7 +83,7 @@ export const HomeInterpretationPanel = ({
   const reverseCue = pickCue(layer.bullets, "Reverse:");
 
   return (
-    <section id="interpretation-layer" className="weather-panel space-y-4 px-5 py-5" aria-label="View for this situation">
+    <section id="interpretation-layer" className="weather-surface-secondary space-y-4 px-5 py-5" aria-label="View for this situation">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">View for this situation</p>

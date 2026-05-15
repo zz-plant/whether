@@ -22,7 +22,7 @@ export function FirstVisitBanner() {
   };
 
   return (
-    <div className="weather-panel mx-auto mb-4 max-w-3xl rounded-lg border border-sky-400/30 bg-sky-400/5 px-4 py-3 text-sm text-slate-200">
+    <div className="weather-surface-secondary mx-auto mb-4 max-w-3xl px-4 py-3 text-sm text-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-slate-100">

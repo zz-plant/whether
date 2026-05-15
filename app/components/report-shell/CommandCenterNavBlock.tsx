@@ -97,9 +97,9 @@ export function CommandCenterNavBlock({
       <div className="space-y-3 sm:space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
           <div className="weather-surface grid gap-2 rounded-[1rem] border border-slate-800/55 bg-slate-950/48 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Role-aware translation
-            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Role-aware translation
+              </p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {roleSwitcher.options.map((option) => {
                 const isActive = option.key === roleSwitcher.active;
@@ -193,7 +193,7 @@ export function CommandCenterNavBlock({
             </div>
 
             <div className="hidden space-y-3 rounded-[0.95rem] border border-slate-800/70 bg-slate-950/38 p-4 sm:block">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-100/80">
                 {decisionBanner?.label ?? "Current operating call"}
               </p>
 
@@ -251,7 +251,7 @@ export function CommandCenterNavBlock({
           <article className="weather-surface rounded-[1rem] border border-slate-800/55 bg-slate-950/42 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                   {missionSequenceTitle || "Use this order"}
                 </p>
                 <p className="mt-1 text-[11px] text-slate-400">
@@ -273,12 +273,12 @@ export function CommandCenterNavBlock({
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100/78">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100/78">
                           {item.phase}
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
                       </div>
-                      <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+                      <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-300">
                         {item.cta}
                       </span>
                     </div>

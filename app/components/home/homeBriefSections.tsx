@@ -74,7 +74,7 @@ const ShareReadyStrip = async ({
   }
 
   return (
-    <div className="weather-panel mb-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs text-slate-200">
+    <div className="weather-surface-secondary mb-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs text-slate-200">
       <p>
         <span className="font-semibold text-slate-100">Share-ready:</span>{" "}
         Weekly brief copy + citation available.
@@ -92,7 +92,7 @@ export const HomeKeyTermsDisclosure = () => {
   const entries = BEGINNER_GLOSSARY_ENTRIES.filter((entry) => HOMEPAGE_GLOSSARY_VALUES.includes(entry.value));
 
   return (
-    <details className="weather-panel group mx-0 mb-4 rounded-lg border border-slate-800/70 bg-slate-950/40 px-4 py-3">
+    <details className="weather-surface-secondary group mx-0 mb-4 px-4 py-3">
       <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-200">
         Key terms
       </summary>
@@ -188,7 +188,7 @@ const InterpretationViewPills = ({
   activeView: InterpretationView;
   searchParams?: Record<string, string | undefined>;
 }) => (
-  <div className="weather-panel px-4 py-3">
+  <div className="weather-surface-secondary px-4 py-3">
     <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">View as</p>
     <nav className="flex flex-wrap gap-1.5" aria-label="Interpretation view">
       {interpretationViews.map((view) => (

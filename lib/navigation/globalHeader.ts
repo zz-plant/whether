@@ -7,7 +7,7 @@ import {
 import { pathMatchesLink } from "./pathMatching";
 import { reportShellCorePaths } from "../report/reportNavigation";
 
-const fallbackLabel = "Report";
+const fallbackLabel = "Page";
 
 export const normalizePathname = (pathname: string) =>
   pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
@@ -37,7 +37,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
 
   if (!activeLayer) {
     return {
-      title: "Weekly planning views",
+      title: fallbackLabel,
       description: null,
     } as const;
   }

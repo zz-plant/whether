@@ -24,11 +24,17 @@ export async function HomeWorkspaceBands({
 
   return (
     <div className="space-y-5">
-      <section
+      <details
         id="approve-this-weeks-plan"
-        className="weather-panel scroll-mt-28 space-y-4 px-4 py-4 sm:px-5 sm:py-5"
+        className="weather-surface-secondary scroll-mt-28 px-4 py-4 sm:px-5 sm:py-5 [&>summary]:flex [&>summary]:items-center [&>summary]:justify-between [&>summary]:cursor-pointer sm:[&>summary]:cursor-default sm:[&>summary]:list-none"
         aria-labelledby="approve-this-weeks-plan-title"
+        open={true}
       >
+      <summary className="sm:hidden text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+        <span>Workspace tools</span>
+        <span className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-[10px] text-slate-500 sm:hidden" aria-hidden="true">▾</span>
+      </summary>
+      <div className="space-y-4">
         <div className="weather-panel-header">
           <div className="weather-panel-header-copy">
             <p className="text-[11px] font-medium text-emerald-200">Next step</p>
@@ -138,7 +144,8 @@ export async function HomeWorkspaceBands({
             </div>
           </div>
         </article>
-      </section>
+      </div>
+    </details>
     </div>
   );
 }

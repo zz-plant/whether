@@ -52,7 +52,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
 
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">
-      <section className="weather-panel px-4 py-4 sm:px-5 sm:py-5">
+      <section className="weather-surface-secondary px-4 py-4 sm:px-5 sm:py-5">
         <article className="weather-appbar relative z-20 border-slate-800/70 px-4 py-4 sm:px-6 sm:py-5">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">

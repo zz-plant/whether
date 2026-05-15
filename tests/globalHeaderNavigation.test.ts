@@ -26,7 +26,7 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/planning/cli"), "Plan");
     assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Verify");
-    assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Report");
+    assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
 
   it("marks only one primary link active for nested paths", () => {

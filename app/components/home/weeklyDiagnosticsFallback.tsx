@@ -2,7 +2,7 @@ import { Skeleton } from "../skeleton";
 
 export const WeeklyDiagnosticsFallback = () => (
   <section aria-label="Workspace updates pending" className="home-band-stack" aria-busy="true">
-    <article className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short space-y-4 px-4 py-4 sm:px-5">
+    <article className="home-band home-band--audit home-band-shell weather-surface-secondary weather-section-stage weather-section-stage--short space-y-4 px-4 py-4 sm:px-5">
       <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="home-band-kicker">Evidence + trust</p>
@@ -35,7 +35,7 @@ export const WeeklyDiagnosticsFallback = () => (
       </div>
     </article>
 
-    <article className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium space-y-4 px-4 py-4 sm:px-5">
+    <article className="home-band home-band--operations home-band-shell weather-surface-secondary weather-section-stage weather-section-stage--medium space-y-4 px-4 py-4 sm:px-5">
       <div className="home-band-shell__header flex items-center justify-between gap-2">
         <div className="space-y-1">
           <p className="home-band-kicker">Planning</p>

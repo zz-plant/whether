@@ -44,7 +44,7 @@ export function StartupModeSection({
   ) as Partial<Record<StartupVariantMode, StartupModeContent>>;
 
   return (
-    <div className="weather-panel px-4 py-4 sm:px-5 sm:py-5">
+    <div className="weather-surface-secondary px-4 py-4 sm:px-5 sm:py-5">
       <StartupModeSelector
         options={options}
         selectedMode={selectedMode}

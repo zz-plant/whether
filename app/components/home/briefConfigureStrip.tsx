@@ -49,7 +49,7 @@ export function BriefConfigureStrip() {
   if (!visible && !ticker && !stage) return null;
 
   return (
-    <div className="weather-panel mx-auto mb-4 max-w-3xl rounded-lg border border-slate-800/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
+    <div className="weather-surface-secondary mx-auto mb-4 max-w-3xl px-4 py-3 text-sm text-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
