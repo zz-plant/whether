@@ -1,5 +1,7 @@
 import type { RegimeAssessment, RegimeChangeReason } from "./regimeEngine";
+import { buildRegimeChangeReasons } from "./regimeEngineDiagnostics";
 import { applyConfidenceGate, buildDecisionDeltaRules } from "./alerts/decisionDeltaRules";
+import { getRegimeAlertRepository } from "./storage/regimeAlertRepository";
 
 export type AlertChannel = "slack" | "email" | "webhook";
 
@@ -158,6 +160,63 @@ export const buildDeliverySummary = (alert: RegimeAlertEvent) => {
     .map((delta) => `${delta.decisionArea}:${delta.code}`)
     .join(", ");
   return `${alert.payload.currentAssessment.regime} (${alert.payload.currentRecordDate}) · ${deltas || "signals-updated"}`;
+};
+
+export const buildRegimeAlertPayload = (
+  previousAssessment: RegimeAssessment,
+  currentAssessment: RegimeAssessment,
+  previousRecordDate: string,
+  currentRecordDate: string,
+  timeMachineHref: string,
+): SignalAlertPayload => {
+  const reasons = buildRegimeChangeReasons(previousAssessment, currentAssessment);
+  return buildSignalAlertPayload({
+    previousRecordDate,
+    currentRecordDate,
+    previousAssessment,
+    currentAssessment,
+    reasons,
+    sourceUrls: [],
+    timeMachineHref,
+  });
+};
+
+export const writeRegimeTransitionAlert = async (
+  previousAssessment: RegimeAssessment | null,
+  currentAssessment: RegimeAssessment,
+  previousRecordDate: string | undefined,
+  currentRecordDate: string,
+  timeMachineHref: string,
+): Promise<boolean> => {
+  if (!previousAssessment) return false;
+  if (currentAssessment.regime === previousAssessment.regime) return false;
+  const committed = currentAssessment.regimeTransition?.committed ?? true;
+  if (!committed) return false;
+
+  const repository = getRegimeAlertRepository();
+  const latest = await repository.latestAlert();
+
+  const payload = buildRegimeAlertPayload(
+    previousAssessment,
+    currentAssessment,
+    previousRecordDate ?? previousAssessment.scores.baseRate.toString(),
+    currentRecordDate,
+    timeMachineHref,
+  );
+
+  if (!shouldCreateSignalAlert(payload, latest ?? undefined)) return false;
+
+  const logEntry = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    eventId: crypto.randomUUID(),
+    sourceVersion: "v1",
+    canonicalTimestampSource: "request-received-at" as const,
+    payload,
+  };
+
+  await repository.appendAlert(logEntry);
+  return true;
 };
 
 export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {

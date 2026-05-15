@@ -18,6 +18,7 @@ type ServerAlert = {
     previousAssessment: { regime: string };
     currentAssessment: { regime: string };
     reasons: Array<{ code: string; message: string }>;
+    timeMachineHref?: string;
   };
 };
 
@@ -38,7 +39,7 @@ const formatTimestamp = (value: string) => formatTimestampUTC(value);
 const formatRecordDate = (value: string) => formatDateUTC(value);
 
 const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
-  const { previous, current, reasons, loggedAt } = entry;
+  const { previous, current, reasons, loggedAt, timeMachineHref } = entry;
 
   return [
     "Whether Change Alerts",
@@ -47,7 +48,8 @@ const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
     `Current record: ${formatRecordDate(current.recordDate)} — ${current.assessment.regime}`,
     "Reasons:",
     ...reasons.map((reason) => `• ${reason.code}: ${reason.message}`),
-  ].join("\n");
+    timeMachineHref ? `Time Machine: ${timeMachineHref}` : "",
+  ].filter(Boolean).join("\n");
 };
 
 const mapServerAlerts = (alerts: ServerAlert[]): RegimeAlertLogEntry[] =>
@@ -67,6 +69,7 @@ const mapServerAlerts = (alerts: ServerAlert[]): RegimeAlertLogEntry[] =>
       } as RegimeAlertLogEntry["current"]["assessment"],
     },
     reasons: entry.payload.reasons,
+    timeMachineHref: entry.payload.timeMachineHref,
   }));
 
 export const RegimeAlertsPanel = () => {
@@ -309,6 +312,14 @@ export const RegimeAlertsPanel = () => {
                       </li>
                     ))}
                   </ul>
+                  {entry.timeMachineHref ? (
+                    <a
+                      href={entry.timeMachineHref}
+                      className="mt-3 inline-flex text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200 hover:text-sky-100"
+                    >
+                      View regime history →
+                    </a>
+                  ) : null}
                   {error ? (
                     <p className="mt-3 text-xs text-rose-300">
                       Clipboard access unavailable. Try manually selecting the alert text.

@@ -16,4 +16,5 @@ export type RegimeAlertLogEntry = {
     assessment: RegimeAssessment;
   };
   reasons: RegimeChangeReason[];
+  timeMachineHref?: string;
 };
