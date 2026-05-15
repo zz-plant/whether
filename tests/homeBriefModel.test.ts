@@ -92,7 +92,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
-    assert.equal(model.regimeSignalIndicators[0]?.label, "Capital tightness");
+    assert.equal(model.regimeSignalIndicators[0]?.label, "Cash availability");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
@@ -178,7 +178,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     const momentumReason = model.whyThisCall.find((reason) => reason.key === "momentum" || reason.label === "Momentum" || reason.label === "What moved this week")?.detail ?? "";
-    assert.match(momentumReason, /Risk appetite improving this week; improving overall\./);
+    assert.match(momentumReason, /Market risk appetite improving this week; improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 
@@ -499,9 +499,9 @@ describe("buildHomeBriefModel", () => {
 
     const capitalRow = model.decisionMatrix.rows.find((row) => row.key === "capital");
     assert.ok(capitalRow);
-    assert.match(capitalRow?.cells.flip.text ?? "", /tightness\s*</i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /cash availability\s*</i);
     assert.match(capitalRow?.cells.flip.text ?? "", /and/i);
-    assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /market risk appetite\s*>/i);
   });
 
   it("preserves decimal flip thresholds in matrix scan copy", () => {

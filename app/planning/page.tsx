@@ -194,6 +194,11 @@ export default async function OperationsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
+      <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-[11px] leading-5 text-slate-400">
+        This page turns the weekly call from the{" "}
+        <Link href="/" className="font-semibold text-sky-200 hover:text-sky-100">homepage brief</Link>{" "}
+        into a plan with guardrails, finance direction, and share-ready formats.
+      </p>
       {!historicalSelection && isFallback ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}

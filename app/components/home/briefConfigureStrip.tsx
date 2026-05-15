@@ -55,6 +55,9 @@ export function BriefConfigureStrip() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             Configure your brief
           </p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-400">
+            Tailor this brief to your situation &mdash; adjusts which decisions are highlighted and how they&apos;re framed.
+          </p>
           {visible ? (
             <div className="mt-2 flex flex-wrap items-end gap-2">
               <div className="min-w-0 flex-1">

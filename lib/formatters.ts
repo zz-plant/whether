@@ -36,7 +36,7 @@ const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
 const formatUnitSuffix = (unit: string) => {
-  if (unit === "bps") return " bps";
+  if (unit === "bps") return " bps (basis points)";
   if (unit === "index") return "";
   return unit;
 };

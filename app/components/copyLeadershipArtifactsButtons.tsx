@@ -203,14 +203,46 @@ export function CopyLeadershipArtifactsButtons({
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Send this brief</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{activeModeLabel}</p>
             <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
               {PRIMARY_AUDIENCE_SHARE_GUIDANCE}
             </p>
           </div>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Default
-          </span>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
+          {(["operator", "explainer"] as const).map((mode) => {
+            const active = mode === artifactMode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => {
+                  setArtifactMode(mode);
+                  router.push(buildArtifactModeRoute(mode), { scroll: false });
+                  setShareState("idle");
+                  if (mode !== artifactMode) {
+                    trackOperatorWorkflowEvent({
+                      type: "artifact_mode_selected",
+                      path: pathname,
+                      artifactMode: mode,
+                    });
+                  }
+                }}
+                aria-pressed={active}
+                className={`weather-pill inline-flex min-h-[44px] flex-col items-start px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] ${
+                  active ? "border-sky-300/80 bg-sky-500/10 text-slate-100" : "text-slate-300"
+                }`}
+              >
+                <span>{artifactModeLabels[mode]}</span>
+                <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
+                  {mode === "explainer"
+                    ? "Jargon-free version for team members who don't follow macro."
+                    : "Standard brief with decision terms for your leadership team."
+                  }
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Primary update actions">
@@ -250,50 +282,10 @@ export function CopyLeadershipArtifactsButtons({
 
         <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-            Pick the reader
+            More copy formats
           </summary>
 
           <div className="mt-3 space-y-3">
-            <div className="grid gap-2 sm:grid-cols-2" aria-label="Artifact mode">
-              {(["operator", "explainer"] as const).map((mode) => {
-                const active = mode === artifactMode;
-                return (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => {
-                      setArtifactMode(mode);
-                      router.push(buildArtifactModeRoute(mode), { scroll: false });
-                      setShareState("idle");
-                      if (mode !== artifactMode) {
-                        trackOperatorWorkflowEvent({
-                          type: "artifact_mode_selected",
-                          path: pathname,
-                          artifactMode: mode,
-                        });
-                      }
-                    }}
-                    aria-pressed={active}
-                    className={`weather-pill inline-flex min-h-[44px] flex-col items-start px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] ${
-                      active ? "border-sky-300/80 bg-sky-500/10 text-slate-100" : "text-slate-300"
-                    }`}
-                  >
-                    <span>{artifactModeLabels[mode]}</span>
-                    <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
-                      {mode === "explainer"
-                        ? "For audiences outside the leadership team."
-                        : "Default for your leadership team."
-                      }
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <p className="text-[11px] leading-5 text-slate-400">
-              Choose the default brief by audience. Use the quick variants below when readers already know the baseline.
-            </p>
-
             <div className="grid gap-2 sm:grid-cols-2">
               <ActionButton
                 variant="secondary"

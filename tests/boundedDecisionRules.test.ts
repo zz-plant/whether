@@ -17,17 +17,17 @@ describe("bounded decision rule formatting", () => {
       scores: { tightness: 0.9, riskAppetite: 56 },
     });
 
-    assert.match(rules[0].scope, /current tightness 0\.9 and risk appetite 56\.?0?/i);
-    assert.match(rules[0].pauseTrigger, /tightness rises above 6\.4/i);
+    assert.match(rules[0].scope, /current cash availability 0\.9 and market risk appetite 56\.?0?/i);
+    assert.match(rules[0].pauseTrigger, /cash availability tightens above 6\.4/i);
   });
 
   it("keeps decimal thresholds intact when compacting reversal copy", () => {
     assert.equal(
       extractCompactClause(
-        "Tightness < 0.0 and Risk appetite > 54. Resume staged approvals next refresh.",
+        "Cash availability < 0.0 and Market risk appetite > 54. Resume staged approvals next refresh.",
         "fallback",
       ),
-      "Tightness < 0.0 and Risk appetite > 54",
+      "Cash availability < 0.0 and Market risk appetite > 54",
     );
 
     const rules = buildCanonicalBoundedDecisionRules({
@@ -38,7 +38,7 @@ describe("bounded decision rule formatting", () => {
 
     assert.equal(
       formatBoundedDecisionReverse(rules[0]!),
-      "staged approvals when tightness is below 0.0 and risk appetite is above 54",
+      "staged approvals when cash availability eases below 0.0 and market risk appetite is above 54",
     );
   });
 });
@@ -101,7 +101,7 @@ it("keeps caution and reopen distances available with crossing/above-below thres
   assert.ok(hiringItem);
   assert.doesNotMatch(hiringItem.tightenDistanceLabel ?? "", /unavailable/i);
   assert.doesNotMatch(hiringItem.reopenDistanceLabel ?? "", /unavailable/i);
-  assert.match(hiringItem.reopenDistanceLabel ?? "", /tightness|risk appetite/i);
+  assert.match(hiringItem.reopenDistanceLabel ?? "", /cash availability|market risk appetite/i);
 });
 
 

@@ -186,7 +186,7 @@ describe("buildSlackBrief", () => {
   it("formats bps values with readable spacing", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /BBB credit spread \(OAS\): 174\.00 bps · refreshed 2026-03-04/);
+    assert.match(brief, /BBB credit spread \(OAS\): 174\.00 bps \(basis points\) · refreshed 2026-03-04/);
   });
 
   it("carries interpretation context into board and citation artifacts", () => {

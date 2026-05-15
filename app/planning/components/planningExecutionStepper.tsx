@@ -134,8 +134,8 @@ export function OperationsExecutionStepper({
                   </span>
                   <span className="text-sm font-semibold tracking-[0.01em] text-slate-100">{step.title}</span>
                   <span className="text-xs text-slate-300">{stepStateLabel(index, activeIndex)}</span>
-                  <span className="text-[11px] text-slate-300">Owner: {step.owner}</span>
-                  <span className="text-[11px] text-slate-300">{step.approvalStatus}</span>
+                  {step.owner ? <span className="text-[11px] text-slate-300">Owner: {step.owner}</span> : null}
+                  {step.approvalStatus ? <span className="text-[11px] text-slate-300">{step.approvalStatus}</span> : null}
                 </a>
               </li>
             );
@@ -158,15 +158,21 @@ export function OperationsExecutionStepper({
                     <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
                     <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
-                        Owner: {step.owner}
-                      </span>
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
-                        {step.approvalStatus}
-                      </span>
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
-                        Check again if: {step.changeSignal}
-                      </span>
+                      {step.owner ? (
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                          Owner: {step.owner}
+                        </span>
+                      ) : null}
+                      {step.approvalStatus ? (
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                          {step.approvalStatus}
+                        </span>
+                      ) : null}
+                      {step.changeSignal ? (
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                          Check again if: {step.changeSignal}
+                        </span>
+                      ) : null}
                       <a
                         href="#planning-stepper"
                         className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"

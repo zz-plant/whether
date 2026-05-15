@@ -26,7 +26,7 @@ export function FirstVisitBanner() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-slate-100">
-            Weekly macro signals → what to do this week. Start with the card above.
+            Weekly macro signals → what to do this week. Start with the weekly decision card.
           </p>
         </div>
         <button

@@ -251,6 +251,13 @@ export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
   { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
   { pattern: /\bregime\b/gi, replacement: "operating environment" },
   { pattern: /\bposture\b/gi, replacement: "operating stance" },
+  { pattern: /\bHY OAS stress\b/gi, replacement: "high-yield bond market stress" },
+  { pattern: /\bEquity volatility shock\b/gi, replacement: "stock market volatility" },
+  { pattern: /\bFinancial conditions tightening\b/gi, replacement: "financial conditions tightening" },
+  { pattern: /\bVC funding slowdown\b/gi, replacement: "VC funding is slowing" },
+  { pattern: /\bTech layoff pressure\b/gi, replacement: "tech layoffs are rising" },
+  { pattern: /\bCash tightness\b/gi, replacement: "Cash availability" },
+  { pattern: /\bCurve slope\b/gi, replacement: "Recession warning gauge" },
 ];
 
 export const applyPlainEnglishSubstitutions = (text: string): string => {

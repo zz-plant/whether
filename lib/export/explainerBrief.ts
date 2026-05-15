@@ -57,7 +57,7 @@ export const buildExplainerBriefContent = ({
 
   // Leadership team brief (translated)
   const plainOperatorBrief = applyPlainEnglishSubstitutions(weeklyOperatorBrief);
-  sections.push("Leadership team brief");
+  sections.push("Simplified leadership brief");
   sections.push(plainOperatorBrief);
   sections.push("");
 

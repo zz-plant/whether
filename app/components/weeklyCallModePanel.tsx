@@ -292,7 +292,7 @@ export function WeeklyCallModePanel({
                     {revisitDetail ? <p className="mt-1 text-xs leading-5 text-slate-400">{revisitDetail}</p> : null}
                     {flipSupport.length > 0 ? (
                       <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{publicDecisionLabels.reversal}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Flip triggers</p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {flipSupport.map((label) => (
                             <span key={label} className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-200">

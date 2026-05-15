@@ -45,7 +45,7 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
     label: "Proof",
     detail:
       "Open the evidence view only if someone asks why the market view changed or which thresholds matter most.",
-    example: "Example decision: confirm curve inversion before approving long bets.",
+    example: "Example decision: check the recession warning gauge before approving long-payback projects.",
   },
   {
     label: "Actions",
@@ -58,7 +58,7 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
   { text: "The weekly brief starts from a U.S. market read so teams can make a decision before debating edge cases." },
-  { text: "Confidence and trend indicate pacing quality before score context." },
+  { text: "Confidence and trend tell you how reliable this week's read is before you dig into the score details." },
   { text: "Historical context is available, but the current decision stays primary." },
 ];
 

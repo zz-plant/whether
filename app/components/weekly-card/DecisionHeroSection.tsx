@@ -53,7 +53,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
         <div id="weekly-posture-brief-title" className="space-y-3">
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-300">
             <span className="weather-decision-chip rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100" data-priority="true">Weekly operating call</span>
-            <span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{resolvedPostureLabel} - {resolvedStageLabel}</span>
+            <span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{resolvedPostureLabel}</span><span className="text-slate-600">/</span><span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{resolvedStageLabel}</span>
             <span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">Confidence {confidenceLabel} / {confidencePercent}%</span>
             <span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">Trend {trendLabel}</span>
           </div>
@@ -105,7 +105,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
             <dl className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-3">
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Market posture</dt>
-                <dd className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} - {resolvedStageLabel}</dd>
+                <dd className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} / {resolvedStageLabel}</dd>
               </div>
               <div className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-3">
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">What would change this call</dt>

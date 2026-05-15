@@ -314,7 +314,7 @@ export default async function MethodPage() {
 
       <MethodSection
         id="confidence-limits"
-        title="Approval limits"
+        title="Confidence and reliability limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

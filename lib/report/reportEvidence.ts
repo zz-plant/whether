@@ -131,17 +131,17 @@ const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =
   );
 
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  tightness: "Cash tightness",
-  riskAppetite: "Risk appetite",
-  baseRate: "Base rate",
-  curveSlope: "Curve slope",
+  tightness: "Cash availability",
+  riskAppetite: "Market risk appetite",
+  baseRate: "Fed interest rate",
+  curveSlope: "Recession warning gauge",
 };
 
 const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
   tightness: "Capital conditions",
-  riskAppetite: "Risk appetite",
-  baseRate: "Policy rate pressure",
-  curveSlope: "Yield-curve signal",
+  riskAppetite: "Market risk appetite",
+  baseRate: "Fed interest rate",
+  curveSlope: "Recession warning gauge",
 };
 
 const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {

@@ -132,7 +132,7 @@ export const buildWeeklyCallContract = ({
   const whyCouldBeWrong = policyOverrideActive
     ? "Policy composites disagree or signal coverage is incomplete; this week’s directional call may overstate conviction."
     : homeBriefModel.confidenceLabel === "HIGH"
-      ? "Cross-signal confirmation could still fade; keep irreversible approvals gated until the next weekly checkpoint."
+      ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the call."
       : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.";
 
   return {

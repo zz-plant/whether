@@ -57,7 +57,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("HY OAS stress");
+    contributors.push("High-yield bond market stress");
     weakReadCount += 1;
   }
 
@@ -72,7 +72,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Financial conditions tightening");
+    contributors.push("Financial conditions are tightening");
     weakReadCount += 1;
   }
 
@@ -87,7 +87,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Equity volatility shock");
+    contributors.push("Stock market volatility is high");
     weakReadCount += 1;
   }
 
@@ -184,26 +184,26 @@ export const buildSignalInfluence = ({
 }): RegimeSignalInfluence[] => [
   {
     key: "tightness",
-    label: "Cash tightness",
+    label: "Cash availability",
     influence: Math.abs(tightness - thresholds.tightnessRegime),
     unavailable: false,
   },
   {
     key: "riskAppetite",
-    label: "Risk appetite",
+    label: "Market risk appetite",
     influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
     unavailable: false,
   },
   {
     key: "baseRate",
-    label: "Base rate",
+    label: "Fed interest rate",
     influence:
       typeof baseRate === "number" ? Math.abs(baseRate - thresholds.baseRateTightness) : null,
     unavailable: typeof baseRate !== "number",
   },
   {
     key: "curveSlope",
-    label: "Curve slope",
+    label: "Recession warning gauge",
     influence: typeof curveSlope === "number" ? Math.abs(curveSlope) : null,
     unavailable: typeof curveSlope !== "number",
   },
@@ -297,11 +297,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentTightnessThreshold,
     up: {
       code: "tightness-upshift",
-      message: `Tightness crossed above ${currentTightnessThreshold}.`,
+      message: `Cash availability crossed above ${currentTightnessThreshold}.`,
     },
     down: {
       code: "tightness-downshift",
-      message: `Tightness fell below ${currentTightnessThreshold}.`,
+      message: `Cash availability fell below ${currentTightnessThreshold}.`,
     },
   });
 
@@ -312,11 +312,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentRiskThreshold,
     up: {
       code: "risk-appetite-upshift",
-      message: `Risk appetite crossed above ${currentRiskThreshold}.`,
+      message: `Market risk appetite crossed above ${currentRiskThreshold}.`,
     },
     down: {
       code: "risk-appetite-downshift",
-      message: `Risk appetite fell below ${currentRiskThreshold}.`,
+      message: `Market risk appetite fell below ${currentRiskThreshold}.`,
     },
   });
 
@@ -327,11 +327,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentBaseRateThreshold,
     up: {
       code: "base-rate-upshift",
-      message: `Base rate crossed above ${currentBaseRateThreshold}%.`,
+      message: `Fed interest rate crossed above ${currentBaseRateThreshold}%.`,
     },
     down: {
       code: "base-rate-downshift",
-      message: `Base rate fell below ${currentBaseRateThreshold}%.`,
+      message: `Fed interest rate fell below ${currentBaseRateThreshold}%.`,
     },
   });
 
@@ -339,9 +339,9 @@ export const buildRegimeChangeReasons = (
   const currentSlope = current.scores.curveSlope;
   if (previousSlope !== null && currentSlope !== null) {
     if (previousSlope >= 0 && currentSlope < 0) {
-      pushReason("curve-slope-negative", "Curve slope turned negative.");
+      pushReason("curve-slope-negative", "Recession warning gauge turned negative (yield curve inverted).");
     } else if (previousSlope <= 0 && currentSlope > 0) {
-      pushReason("curve-slope-positive", "Curve slope turned positive.");
+      pushReason("curve-slope-positive", "Recession warning gauge turned positive (yield curve normal).");
     }
   }
 

@@ -108,7 +108,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /live update/i);
+    assert.match(hold.detail, /fresh data/i);
   });
 
   it("treats stale structured freshness as hold even when a timestamp string exists", () => {
@@ -125,7 +125,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /too weak/i);
+    assert.match(hold.detail, /fresh data|contracts/i);
   });
 
   it("caps readiness at caution when policy refusal is active", () => {

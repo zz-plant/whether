@@ -25,10 +25,10 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 };
 
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Capital tightness",
-  riskAppetite: "Risk appetite",
-  baseRate: "Base rate",
-  curveSlope: "Yield curve slope",
+  tightness: "Cash availability",
+  riskAppetite: "Market risk appetite",
+  baseRate: "Fed interest rate",
+  curveSlope: "Recession warning gauge",
 };
 
 export const buildRegimeAlert = (
@@ -53,18 +53,18 @@ export const buildRegimeAlert = (
 
   if (wasTight !== isTight) {
     reasons.push(
-      `Tightness moved ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
+      `Cash availability moved ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
     );
   }
   if (wasBrave !== isBrave) {
     reasons.push(
-      `Risk appetite moved ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
+      `Market risk appetite moved ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
     );
   }
   if (reasons.length === 0) {
     reasons.push(
-      `Capital posture shifted as tightness (${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)}) ` +
-        `and risk appetite (${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}) moved across boundaries.`
+      `Capital posture shifted as cash availability (${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)}) ` +
+        `and market risk appetite (${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}) moved across boundaries.`
     );
   }
 
@@ -75,7 +75,7 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `Capital posture moved from ${previous.regime} to ${current.regime}.`,
+    summary: `Operating stance moved from ${previous.regime} to ${current.regime}.`,
   };
 };
 

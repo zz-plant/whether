@@ -212,10 +212,10 @@ export const HomePageReportContent = async ({
         interpretationSearchParams={homepage.interpretationSearchParams}
         fallbackAlert={homepage.fallbackAlert}
       />
-      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
       <Suspense fallback={null}>
         <HomeKeyTermsDisclosure />
       </Suspense>
+      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
     </ReportShell>
   );
 };

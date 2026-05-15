@@ -144,15 +144,15 @@ export type DecisionLaneState = {
 const stateLabelByStep = ["Closed", "Guarded", "Staged", "Open"] as const;
 const progressByStep = [12, 38, 70, 92] as const;
 
-const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Tightness");
+const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Market risk appetite" : "Cash availability");
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(
-    /(tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|falls below|rises above|crosses below|crosses above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
+    /(cash availability|market risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
   );
 
   return Array.from(matches, (match) => ({
-    metric: match[1].toLowerCase() === "risk appetite" ? "riskAppetite" : "tightness",
+    metric: match[1].toLowerCase().includes("risk appetite") || match[1].toLowerCase().includes("risk") ? "riskAppetite" : "tightness",
     operator: (["falls below", "crosses below", "below"].includes(match[3].toLowerCase())
       ? "<"
       : ["rises above", "crosses above", "above"].includes(match[3].toLowerCase())

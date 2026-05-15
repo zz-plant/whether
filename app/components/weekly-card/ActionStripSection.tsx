@@ -3,6 +3,12 @@ import type { ActionStripSectionProps } from "./types";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 
 const leverScaleLabels = ["Closed", "Guarded", "Staged", "Open"] as const;
+const laneStatePlainLabels: Record<string, string> = {
+  Closed: "Closed (not open)",
+  Guarded: "Caution (limited)",
+  Staged: "Partial (phased)",
+  Open: "Open (full)",
+};
 
 const compareActionStripPriority = (
   left: ActionStripSectionProps["items"][number],
@@ -50,7 +56,7 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
       <ul className="mt-4 overflow-hidden rounded-[1rem] border border-slate-800/75 bg-slate-950/35 divide-y divide-slate-800/75">
         {visibleItems.map((item) => {
           const currentStep = item.currentStateStep ?? 1;
-          const currentLabel = item.currentStateLabel ?? leverScaleLabels[currentStep];
+          const currentLabel = laneStatePlainLabels[item.currentStateLabel ?? leverScaleLabels[currentStep]] ?? item.currentStateLabel ?? leverScaleLabels[currentStep];
 
           return (
             <li key={item.lever} className="px-4 py-4">

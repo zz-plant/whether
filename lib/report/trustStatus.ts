@@ -394,7 +394,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: "Confidence or freshness too weak for big bets. Wait for a live update.",
+      detail: "Keep current operations running. Pause new hires, vendor contracts, or capital commitments until fresh data arrives.",
     };
   }
 

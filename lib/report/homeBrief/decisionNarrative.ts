@@ -193,7 +193,7 @@ export const buildWhyItMattersLine = ({
     return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
   }
 
-  return "Even with a stable posture, the model is setting how fast teams hire, spend, and approve long-payback work this week.";
+  return "Stable posture means no new signal to change pace. Keep last week's approval rules in force until a material delta shifts the call.";
 };
 
 export const buildReadThisCardItems = ({
