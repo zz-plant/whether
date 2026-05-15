@@ -58,7 +58,7 @@ export default async function SignalsPage({
       }}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
-      primaryCta={{ href: "#decision-summary", label: "Start with implication" }}
+      primaryCta={{ href: "#decision-summary", label: "Start with what changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/planning",

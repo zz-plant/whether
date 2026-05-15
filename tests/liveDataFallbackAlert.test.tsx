@@ -14,8 +14,8 @@ describe("live data fallback alert", () => {
       />
     );
 
-    assert.match(html, /Source in use: https:\/\/api\.fiscaldata\.treasury\.gov\./);
-    assert.match(html, /Effective date in brief: 2026-03-07\./);
-    assert.match(html, /Fallback reason: FRED Treasury fetch error: 500/);
+    assert.match(html, /Source: https:\/\/api\.fiscaldata\.treasury\.gov\./);
+    assert.match(html, /Effective: 2026-03-07\./);
+    assert.match(html, /Reason: FRED Treasury fetch error: 500/);
   });
 });

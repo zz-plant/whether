@@ -211,7 +211,7 @@ export const buildWhyThisCall = ({
     },
     {
       key: "signal-reliability",
-      label: "Signal reliability",
+      label: "Confidence",
       detail:
         transitionWatch === "ON"
           ? "Transition watch is ON; check next release before irreversible commitments."

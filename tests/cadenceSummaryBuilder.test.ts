@@ -51,18 +51,13 @@ const assertCadenceCopy = ({
     "Execution constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    "Provenance:",
+    "Source:",
     `Source: ${provenance.sourceLabel} (${provenance.sourceUrl})`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
     "",
-    "Compliance stamp:",
-    "- Internal use only",
-    "- Governance artifact; not investment advice.",
-    `- Source: ${provenance.sourceLabel} (${provenance.sourceUrl})`,
-    `- Timestamp: ${provenance.timestampLabel}`,
-    "- Confidence: Live",
-    "- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.",
+    "Internal use only",
+    `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Confidence: Live`,
   ].join("\n");
 
   assert.equal(summary.copy, expectedCopy);

@@ -127,10 +127,10 @@ export default async function MethodPage() {
       ? "warning"
       : "stable";
   const trustStatusAction = trustStatusTone === "stable"
-    ? "Safe to use for this week's plan while freshness and confidence hold."
+    ? "Safe for this week's plan while freshness and confidence hold."
     : trustStatusTone === "historical"
-      ? "Use this view for comparison only; switch to the live brief before approving anything new."
-      : "Use this brief for staged or reversible moves only until reliability improves.";
+      ? "Comparison only. Switch to live brief before approving anything new."
+      : "Use for staged moves only until confidence improves.";
   const trustVerdict = trustStatusTone === "stable"
     ? {
         label: "Ready to use",
@@ -140,7 +140,7 @@ export default async function MethodPage() {
     : trustStatusTone === "historical"
       ? {
           label: "Historical only",
-          detail: "This is useful for comparison, not for live approvals.",
+          detail: "Comparison only. Not for live approvals.",
           toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
         }
       : {
@@ -183,7 +183,7 @@ export default async function MethodPage() {
       }}
       decisionBanner={{
         label: "Trust",
-        decision: "Decide whether this week's brief is ready to use, needs a lighter touch, or is only useful for comparison.",
+        decision: "Is this week's brief ready to use, or only useful for comparison?",
         horizon: "This week",
         confidence: trustSummary,
         effectiveDate: reportData.recordDateLabel,
@@ -268,7 +268,7 @@ export default async function MethodPage() {
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Use in the room</p>
             <p className="text-sm text-slate-200">
-              Use this board when someone asks whether the weekly call is current enough to share or approve against. If either source weakens, keep decisions reversible until the next clean read.
+              Check whether the weekly call is current enough to share or approve against.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Full freshness check</Link>
@@ -299,7 +299,7 @@ export default async function MethodPage() {
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Meeting citation</p>
             <p className="text-sm text-slate-200">{citationLine}</p>
-            <p className="text-xs text-slate-400">Use this in a recap or sourcing note. The full decision still lives in the Weekly Brief.</p>
+            <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
             <div className="flex flex-wrap gap-2 text-xs">
               <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Snapshot</Link>
               <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula notes</Link>
@@ -330,7 +330,7 @@ export default async function MethodPage() {
           <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Escalation rule</p>
             <p className="text-sm text-slate-200">
-              If a warning or revisit trigger hits, go back to the Weekly Brief, confirm freshness, and restate the approval rule before moving ahead.
+              If a warning or revisit trigger fires, confirm freshness before moving ahead.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Recheck freshness</Link>
@@ -350,13 +350,13 @@ export default async function MethodPage() {
             The scoring logic, stop lines, and change triggers behind this week&rsquo;s recommendation.
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
-            <li>• Read the formulas alongside the current confidence and freshness labels before making hard-to-reverse decisions.</li>
-            <li>• Check that the change trigger and stop line match the weekly brief before changing team pace.</li>
-            <li>• Write down the reversal condition before reopening fixed-cost approvals.</li>
+            <li>• Read formulas alongside current confidence and freshness labels before irreversible decisions.</li>
+            <li>• Check that the change trigger and stop line match the weekly brief.</li>
+            <li>• Note the reversal condition before reopening fixed-cost approvals.</li>
           </ul>
           <div className="flex flex-wrap gap-2 text-xs">
             <Link href="#confidence-limits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Confidence limits</Link>
-            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source provenance</Link>
+            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source health</Link>
           </div>
         </div>
       </MethodSection>

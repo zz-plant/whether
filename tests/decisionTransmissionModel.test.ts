@@ -47,7 +47,7 @@ describe("buildDecisionTransmission", () => {
     const transmission = buildDecisionTransmission(buildBaseInput());
 
     assert.equal(transmission.provenance.length, 1);
-    assert.equal(transmission.provenance[0]?.sourceLabel, "Provenance unavailable");
+    assert.equal(transmission.provenance[0]?.sourceLabel, "Sources unavailable");
     assert.equal(transmission.provenance[0]?.reference, "fallback:manual-source-review-required");
     assert.equal(transmission.provenance[0]?.isFallback, true);
   });

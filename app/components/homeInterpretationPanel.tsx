@@ -89,7 +89,7 @@ export const HomeInterpretationPanel = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">View for this situation</p>
           <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
           <p className="text-xs text-slate-300">{layer.summary}</p>
-          <p className="text-xs text-slate-400">The main weekly decision stays above; this view just reframes it.</p>
+          <p className="text-xs text-slate-400">Same decision, framed for your context.</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
           <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />

@@ -417,7 +417,7 @@ export const ExportBriefPanel = ({
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
             <p className="text-sm text-slate-300">
-              Use these when the same call needs a faster summary or a direct citation.
+              Faster summaries and citations.
             </p>
             <div className="flex flex-wrap gap-3">
               <ClipboardActionRow
@@ -448,7 +448,7 @@ export const ExportBriefPanel = ({
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
             <p className="text-sm text-slate-300">
-              Use these when the same call needs a board-ready or governance-specific package.
+              Board-ready and governance-specific packages.
             </p>
             <div className="flex flex-wrap gap-3">
               <ClipboardActionRow
@@ -478,7 +478,7 @@ export const ExportBriefPanel = ({
           </summary>
           <div className="mt-4 space-y-3 border-t border-amber-300/20 pt-4">
             <p className="text-sm text-amber-50">
-              Use this only when the exported brief needs an explicit local exception layered onto the standard weekly call.
+              Add a company-specific exception to all exports.
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">

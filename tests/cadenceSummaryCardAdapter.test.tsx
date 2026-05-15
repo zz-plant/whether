@@ -85,7 +85,7 @@ describe("CadenceSummaryCardAdapter", () => {
       "Bounded next actions",
       "Top reversals",
       "Execution constraints",
-      "Provenance",
+      "Source",
     ];
 
     let previousIndex = -1;

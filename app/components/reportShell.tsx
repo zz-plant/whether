@@ -12,7 +12,7 @@ import {
   type ReportSectionLink,
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
-import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
+import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 import { ReportCta } from "./reportCta";
@@ -280,7 +280,7 @@ export const ReportShell = (props: ReportShellProps) => {
               </div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
-                <p>{INFORMATIONAL_NOTICE}</p>
+                <p>{INTERNAL_USE_LABEL}</p>
               </footer>
             </div>
           </div>

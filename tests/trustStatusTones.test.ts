@@ -19,8 +19,7 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "stable");
     assert.match(result.trustStatusLabel, /Live • Treasury verified/);
-    assert.match(result.trustStatusDetail, /Use the weekly call/);
-    assert.match(result.trustStatusAction, /Trigger: confidence drops/);
+    assert.equal(result.trustStatusDetail, "Proceed with normal approvals.");
     assert.match(result.trustStatusAction, /Reversal: return to standard cadence/);
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
@@ -40,9 +39,9 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Using last verified snapshot/);
-    assert.match(result.trustStatusDetail, /Use the weekly call/);
-    assert.match(result.trustStatusDetail, /Source: Treasury API timeout/);
-    assert.match(result.trustStatusAction, /Trigger: confidence LOW or feed unavailable/);
+    assert.match(result.trustStatusDetail, /Pause big bets until live data resumes/);
+    assert.match(result.trustStatusDetail, /Treasury API timeout/);
+    assert.match(result.trustStatusAction, /Use cached read for pacing/);
     assert.match(result.trustStatusAction, /Reversal: resume normal approvals/);
     assert.equal(result.outageType, "feed-unavailable");
     assert.equal(result.outageSeverity, "critical");
@@ -60,8 +59,8 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "historical");
     assert.match(result.trustStatusLabel, /Historical snapshot/);
-    assert.match(result.trustStatusDetail, /retrospective only/);
-    assert.match(result.trustStatusAction, /Trigger: confidence LOW/);
+    assert.match(result.trustStatusDetail, /Retrospective only/);
+    assert.match(result.trustStatusAction, /Use this view for retrospective review/);
     assert.match(result.trustStatusAction, /Reversal: switch to current data/);
     assert.equal(result.outageType, "historical-snapshot");
   });
@@ -126,7 +125,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /freshness is too weak/i);
+    assert.match(hold.detail, /too weak/i);
   });
 
   it("caps readiness at caution when policy refusal is active", () => {
@@ -145,7 +144,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.match(caution.detail, /policy override active/i);
+    assert.match(caution.detail, /Policy override/i);
   });
 
 });

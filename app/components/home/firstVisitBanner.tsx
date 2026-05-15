@@ -26,10 +26,7 @@ export function FirstVisitBanner() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-slate-100">
-            Whether is a weekly operating brief for startup leaders.
-          </p>
-          <p className="mt-1 text-slate-400">
-            It turns macro signals into what to do this week. Start with the card above, then share it.
+            Weekly macro signals → what to do this week. Start with the card above.
           </p>
         </div>
         <button

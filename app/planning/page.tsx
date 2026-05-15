@@ -166,7 +166,7 @@ export default async function OperationsPage({
       }}
       secondaryCta={{ href: "/", label: "Return to Weekly Brief" }}
       decisionBanner={{
-        label: "Start here",
+        label: "Review",
         decision: "Approve the plan, keep the stop line visible, then package the update.",
         horizon: "This week + month",
         confidence: trustStatusLabel,
@@ -225,7 +225,7 @@ export default async function OperationsPage({
                       Weekly approval boundary
                     </p>
                     <p className="text-sm text-slate-300">
-                      Confirm the bounded weekly move first. Open the monthly roll-up only if you need the broader planning language or export payload.
+                      Confirm this week&apos;s move first. Open the monthly roll-up for broader context.
                     </p>
                   </div>
                   <div className="grid gap-3 md:grid-cols-3">
@@ -246,8 +246,8 @@ export default async function OperationsPage({
                   </div>
                   <p className="text-xs leading-5 text-slate-400">
                     {snapshot.homeBriefModel.revisitDecisions
-                      ? "This week still has items to revisit. Recheck last week’s approvals before adding fixed cost or widening scope."
-                      : "Nothing else needs revisiting right now. Keep the current weekly plan unless one of the watch lines trips."}
+                      ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."
+                      : "No items to revisit. Keep the current plan unless a watch line trips."}
                   </p>
                 </section>
 
@@ -255,7 +255,7 @@ export default async function OperationsPage({
                   <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
                     <span className="min-w-0">
                       <span className="block text-[11px] font-medium text-slate-300">Monthly roll-up</span>
-                      <span className="mt-1 block text-sm font-semibold text-slate-100">Open the broader monthly planning language only if you need it.</span>
+                      <span className="mt-1 block text-sm font-semibold text-slate-100">Monthly planning context.</span>
                     </span>
                     <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                       Optional
@@ -290,8 +290,8 @@ export default async function OperationsPage({
                 <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
                   <p className="text-xs text-slate-300">
                     {showAllActionLanes
-                      ? "Showing the full rule list for a deeper review."
-                      : "Showing the top 3 rules in each area for the default weekly scan."}
+                      ? "Full rule list."
+                      : "Top 3 rules per area."}
                   </p>
                   <a
                     href={buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes)}

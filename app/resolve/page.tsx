@@ -64,14 +64,14 @@ export default async function DecidePage({
         href: "/resolve/ship-checklist" as Route,
         kicker: "Best next step",
         title: "Start with one decision check",
-        detail: "This week moved enough that it is worth checking one concrete decision before you open broader guidance.",
+        detail: "This week moved enough to check one decision before opening broader guidance.",
         cta: "Open decision check",
       }
     : {
         href: `/resolve/${recommendedSituation.slug}` as Route,
         kicker: "Best next step",
         title: `Start with ${recommendedSituation.title}`,
-        detail: "Go straight to the path that fits the question instead of browsing first.",
+        detail: "Go straight to the path that fits the question.",
         cta: "Open focused path",
       };
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
@@ -159,7 +159,7 @@ export default async function DecidePage({
             <summary className="cursor-pointer list-none">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">If the first path does not fit</p>
-                <p className="text-sm text-slate-200">Open this only if the recommended next step misses the question.</p>
+                <p className="text-sm text-slate-200">If the recommended next step doesn&apos;t fit.</p>
               </div>
             </summary>
             <div className="mt-4 space-y-4">
@@ -182,7 +182,7 @@ export default async function DecidePage({
               >
                 <summary className="cursor-pointer list-none">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
-                  <p className="mt-2 text-sm text-slate-200">Open this only if the question needs a role-specific, company-stage, or team-specific view.</p>
+                  <p className="mt-2 text-sm text-slate-200">For role-specific or company-stage views.</p>
                 </summary>
                 <div className="mt-4 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (

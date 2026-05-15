@@ -73,7 +73,7 @@ export const buildCadenceSummary = ({
     "Execution constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    "Provenance:",
+    "Source:",
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,

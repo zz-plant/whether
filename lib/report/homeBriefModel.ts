@@ -462,7 +462,7 @@ export const buildDecisionTransmission = (
     provenance:
       provenance.length > 0
         ? provenance
-        : [{ sourceLabel: "Provenance unavailable", reference: "fallback:manual-source-review-required", isFallback: true }],
+        : [{ sourceLabel: "Sources unavailable", reference: "fallback:manual-source-review-required", isFallback: true }],
   };
 };
 

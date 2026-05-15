@@ -95,10 +95,9 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Weekly operating brief/);
-    assert.match(html, /Current operating call/);
+    assert.match(html, /Decision summary/);
     assert.match(html, /Start/);
     assert.match(html, /Planning sequence/);
-    assert.match(html, /Work left to right\./);
     assert.match(html, /href="#"/);
   });
 
@@ -132,8 +131,7 @@ describe("ReportShell extracted sections", () => {
     assert.doesNotMatch(html, /Current report status/);
     assert.doesNotMatch(html, /Review order/);
     assert.doesNotMatch(html, /Planning sequence/);
-    assert.match(html, /sm:hidden/);
-    assert.match(html, /hidden space-y-3/);
+    assert.doesNotMatch(html, /sm:hidden/);
   });
 
   it("renders sidebar sequence rail", () => {

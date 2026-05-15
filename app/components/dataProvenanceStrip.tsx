@@ -71,7 +71,7 @@ const statusDataMode = {
 
 export const DataProvenanceStrip = ({
   provenance,
-  label = "Data provenance",
+  label = "Data source",
   variant = "full",
 }: {
   provenance: DataProvenance;

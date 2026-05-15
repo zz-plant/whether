@@ -330,7 +330,7 @@ export const DecisionShieldPanel = ({
               Commit to the next move
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Apply this week&apos;s call to a specific decision, then circulate the readout as an operator recommendation, not a guarantee.
+              Apply this week&apos;s call to a specific decision, then share the readout with your team.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">

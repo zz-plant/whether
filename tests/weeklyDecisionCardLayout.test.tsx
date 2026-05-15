@@ -66,8 +66,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-decision-card-title/);
     assert.match(html, /Revise hiring and roadmap calls now\./);
-    assert.match(html, /Signal reliability MED/);
-    assert.match(html, /Signal reliability MED/);
+    assert.match(html, /Confidence MED/);
+    assert.match(html, /Confidence MED/);
     assert.match(html, />Act with caution</);
     assert.match(html, /Weekly decision strip: current call, action now, pause if, and change course if\./);
     assert.match(html, /Action now/);

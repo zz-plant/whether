@@ -171,14 +171,9 @@ export const AssumptionLockPanel = () => {
             </>
           }
           aside={
-            <>
-              <p className="text-right text-xs text-slate-400">
-                Risk posture, threshold tolerance, and stance are stored in the URL.
-              </p>
-              <p className="text-right text-xs text-slate-400">
-                Use the banner to confirm the lock during reviews.
-              </p>
-            </>
+            <p className="text-right text-xs text-slate-400">
+              Settings are stored in the URL for sharing.
+            </p>
           }
         />
 

@@ -37,7 +37,7 @@ export async function HomeWorkspaceBands({
       <div className="space-y-4">
         <div className="weather-panel-header">
           <div className="weather-panel-header-copy">
-            <p className="text-[11px] font-medium text-emerald-200">Next step</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Next step</p>
             <h2 id="approve-this-weeks-plan-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
               Turn this read into this week&apos;s plan
             </h2>
@@ -50,10 +50,10 @@ export async function HomeWorkspaceBands({
         <article className="weather-ritual-card px-4 py-4">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="max-w-3xl space-y-2">
-              <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-200">
-                <CheckIcon className="h-3.5 w-3.5" />
-                <span>Main planning path</span>
-              </div>
+                <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
+                  <CheckIcon className="h-3.5 w-3.5" />
+                  <span>Main planning path</span>
+                </div>
               <p className="text-base font-semibold leading-7 text-slate-100">
                 {workspaceModel.operations.approvalHeadline}
               </p>
@@ -73,13 +73,13 @@ export async function HomeWorkspaceBands({
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[11px] font-medium text-amber-200">Pause first</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pause first</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryGuardrail?.label ?? "Hold the current baseline"}
               </p>
             </div>
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[11px] font-medium text-sky-200">Send next</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Send next</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryExportAction?.label ?? "Open share brief"}
               </p>
@@ -91,9 +91,9 @@ export async function HomeWorkspaceBands({
           >
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
               <span className="min-w-0">
-                <span className="block text-[11px] font-medium text-sky-200">If someone asks why</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">If someone asks why</span>
                 <span className="mt-1 block text-sm font-semibold text-slate-100">Pressure-test this call</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">Use one proof path before opening deeper workflows.</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">Check the evidence or trust status before sharing.</span>
               </span>
               <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                 Optional
@@ -132,10 +132,7 @@ export async function HomeWorkspaceBands({
           </details>
 
           <div id="historical-replay-workspace" className="mt-3 rounded-[0.95rem] border border-slate-800/60 bg-slate-950/20 px-3 py-3">
-            <p className="text-[11px] font-medium text-violet-200">More tools (after plan)</p>
-            <p className="mt-1 text-xs leading-5 text-slate-300">
-              Replay, decide, and toolkit flows work best once the weekly plan direction is set.
-            </p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">More tools</p>
             <div className="mt-2 flex flex-wrap gap-3 text-xs">
               <Link href={workspaceModel.translate.primaryPath.href as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Answer one question</Link>
               <Link href={workspaceModel.replay.openFullHref as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Review a past week</Link>

@@ -85,6 +85,6 @@ describe("summaryCopyRenderer", () => {
     assert.match(copy, /TOP REVERSALS/);
     assert.match(copy, /EXECUTION CONSTRAINTS/);
     assert.match(copy, /EXECUTION CONSTRAINTS\n\n• Sequence delivery around revenue durability/);
-    assert.match(copy, /Provenance:\nSource: US Treasury \(https:\/\/example\.com\/source\)/);
+    assert.match(copy, /Source:\nSource: US Treasury \(https:\/\/example\.com\/source\)/);
   });
 });

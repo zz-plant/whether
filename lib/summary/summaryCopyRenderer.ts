@@ -167,7 +167,7 @@ export const renderMonthlySummaryCopy = ({
     "",
     ...toBullets(structured.executionConstraints),
     "",
-    "Provenance:",
+    "Source:",
     `Source: ${structured.provenance.source}`,
     `Timestamp: ${structured.provenance.timestamp}`,
     `Data age: ${structured.provenance.dataAge}`,

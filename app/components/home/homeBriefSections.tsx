@@ -36,7 +36,7 @@ const LeadershipArtifactActions = async ({
   if (!artifactPayload) {
     return (
       <p className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
-        Sharing tools are temporarily unavailable. Use the weekly call card as your decision reference while we restore exports.
+        Can&apos;t share right now. Use the card above.
       </p>
     );
   }
@@ -240,7 +240,6 @@ export const HomeRevisitFlipSection = ({
           sourceLabel={fallbackAlert.sourceLabel}
           effectiveRecordDate={fallbackAlert.effectiveRecordDate}
           fallbackReason={fallbackAlert.fallbackReason}
-          followUpLabel="Review live evidence"
         />
       </StreamedSectionReveal>
     ) : null}

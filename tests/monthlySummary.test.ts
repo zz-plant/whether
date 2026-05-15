@@ -41,7 +41,7 @@ describe("buildMonthlySummary", () => {
     assert.match(summary.copy, /BOUNDED NEXT ACTIONS/);
     assert.match(summary.copy, /TOP REVERSALS/);
     assert.match(summary.copy, /EXECUTION CONSTRAINTS\n\n• /);
-    assert.match(summary.copy, /Provenance:\nSource: /);
+    assert.match(summary.copy, /Source:\nSource: /);
     assert.equal(summary.structured.provenance.dataAge, "2h");
   });
 });
