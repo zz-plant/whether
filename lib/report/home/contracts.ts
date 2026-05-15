@@ -12,6 +12,7 @@ export type ArtifactPayload = {
   weeklyCallSnapshotText: string;
   deltaOnlyBriefText: string;
   callCitation: string;
+  meetingPackText: string;
 };
 
 export type HomePageDiagnosticsLane = {

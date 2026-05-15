@@ -11,6 +11,7 @@ import { OperatorWorkflowRouteTracker } from "../operatorWorkflowRouteTracker";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import type { ArtifactMode } from "../../../lib/literacyAssist";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
+import { DownloadBriefingPackButton } from "../downloadBriefingPackButton";
 import { interpretationViews } from "../../../lib/report/interpretationLayer";
 import type { InterpretationView } from "../../../lib/report/interpretationLayer";
 import type { Route } from "../../../lib/navigation/routeType";
@@ -21,12 +22,14 @@ type ArtifactActionsProps = {
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
   initialArtifactMode?: ArtifactMode;
+  recordDateLabel?: string;
 };
 
 const LeadershipArtifactActions = async ({
   leadershipArtifactPayloadPromise,
   fallbackActive,
   initialArtifactMode,
+  recordDateLabel,
 }: ArtifactActionsProps) => {
   const artifactPayload = await leadershipArtifactPayloadPromise;
 
@@ -40,16 +43,22 @@ const LeadershipArtifactActions = async ({
 
   return (
     <StreamedSectionReveal delay="medium">
-      <CopyLeadershipArtifactsButtons
-        weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
-        weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
-        deltaOnlyBrief={artifactPayload.deltaOnlyBriefText}
-        boardSummary={artifactPayload.boardSummary}
-        citation={artifactPayload.callCitation}
-        fallbackActive={fallbackActive}
-        initialArtifactMode={initialArtifactMode}
-        moreFormatsHref="/planning#ops-export-briefs"
-      />
+      <div className="space-y-4">
+        <DownloadBriefingPackButton
+          meetingPackText={artifactPayload.meetingPackText}
+          recordDate={recordDateLabel ?? "weekly"}
+        />
+        <CopyLeadershipArtifactsButtons
+          weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
+          weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
+          deltaOnlyBrief={artifactPayload.deltaOnlyBriefText}
+          boardSummary={artifactPayload.boardSummary}
+          citation={artifactPayload.callCitation}
+          fallbackActive={fallbackActive}
+          initialArtifactMode={initialArtifactMode}
+          moreFormatsHref="/planning#ops-export-briefs"
+        />
+      </div>
     </StreamedSectionReveal>
   );
 };
@@ -126,6 +135,7 @@ export const HomeWhatChangedSection = ({
             leadershipArtifactPayloadPromise={leadershipArtifactPayloadPromise}
             fallbackActive={fallbackActive}
             initialArtifactMode={initialArtifactMode}
+            recordDateLabel={weeklyDecisionCardModel.artifact.recordDateLabel}
           />
         </Suspense>
       )}

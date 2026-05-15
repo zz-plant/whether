@@ -132,29 +132,50 @@ export const buildLeadershipArtifactPayload = async ({
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
     });
 
+    const boardSnippetText = buildWeeklyBoardSnippetPlainText({
+      trustLine: treasury.fallback_at || treasury.fallback_reason
+        ? `TRUST: FALLBACK SNAPSHOT · As of ${freshnessLabel}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
+        : `TRUST: LIVE · As of ${freshnessLabel}`,
+      postureLine: `POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
+      changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
+      guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
+      flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
+      stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
+    });
+    const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
+    const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
+      regime: canonicalDecisionCopy.currentRegimeLabel,
+      call: canonicalDecisionCopy.operatingCall,
+      trend: homeBriefModel.trendLabel,
+      confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
+      doNow: weeklyCall.actionNow,
+      avoid: weeklyCall.pauseIf,
+      watch: weeklyCall.changeCourseIf,
+      flipConditions: weeklyCall.flipConditionLabels,
+    });
+
+    const meetingPackText = [
+      "BOARD NOTE",
+      boardSnippetText,
+      "",
+      "Call snapshot",
+      weeklyCallSnapshotText,
+      "",
+      "WEEKLY BRIEF",
+      weeklyOperatorBriefText,
+      "",
+      "BOARD SUMMARY",
+      boardSummary,
+      "",
+      "CITATION",
+      callCitation,
+    ].join("\n");
+
     return {
       boardSummary,
-      boardSnippetText: buildWeeklyBoardSnippetPlainText({
-        trustLine: treasury.fallback_at || treasury.fallback_reason
-          ? `TRUST: FALLBACK SNAPSHOT · As of ${freshnessLabel}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
-          : `TRUST: LIVE · As of ${freshnessLabel}`,
-        postureLine: `POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
-        changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
-        guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
-        flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
-        stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
-      }),
-      weeklyOperatorBriefText: buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload),
-      weeklyCallSnapshotText: buildWeeklyCallSnapshotPlainText({
-        regime: canonicalDecisionCopy.currentRegimeLabel,
-        call: canonicalDecisionCopy.operatingCall,
-        trend: homeBriefModel.trendLabel,
-        confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
-        doNow: weeklyCall.actionNow,
-        avoid: weeklyCall.pauseIf,
-        watch: weeklyCall.changeCourseIf,
-        flipConditions: weeklyCall.flipConditionLabels,
-      }),
+      boardSnippetText,
+      weeklyOperatorBriefText,
+      weeklyCallSnapshotText,
       deltaOnlyBriefText: buildDeltaOnlyBriefText({
         freshnessLabel,
         homeBriefModel,
@@ -162,6 +183,7 @@ export const buildLeadershipArtifactPayload = async ({
         citation: callCitation,
       }),
       callCitation,
+      meetingPackText,
     };
   } catch (error) {
     console.error("[home] leadership artifact export unavailable", error);

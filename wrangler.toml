@@ -36,18 +36,10 @@ dataset = "whether_telemetry"
 # posture events, and ingestion snapshots. The repos in lib/storage/* and
 # lib/events/decisionEventStore.ts probe globalThis.WHETHER_DURABLE_KV first and
 # fall back to in-memory per-isolate storage when the binding is missing.
-#
-# To enable, provision once and uncomment:
-#   bunx wrangler kv namespace create WHETHER_DURABLE_KV
-#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --preview
-#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview
-#   bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview --preview
-# then paste the IDs below.
-#
-# [[kv_namespaces]]
-# binding = "WHETHER_DURABLE_KV"
-# id = "REPLACE_WITH_PRODUCTION_KV_ID"
-# preview_id = "REPLACE_WITH_PRODUCTION_PREVIEW_KV_ID"
+[[kv_namespaces]]
+binding = "WHETHER_DURABLE_KV"
+id = "cb5c7f5947e94592b4127aa25fa8541d"
+preview_id = "d116663399244346bd302324b485e8f3"
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"
@@ -73,9 +65,7 @@ binding = "ANALYTICS"
 dataset = "whether_telemetry_preview"
 
 # Mirror of the production WHETHER_DURABLE_KV binding for the preview environment.
-# Provision and paste the preview-environment IDs before uncommenting.
-#
-# [[env.preview.kv_namespaces]]
-# binding = "WHETHER_DURABLE_KV"
-# id = "REPLACE_WITH_PREVIEW_ENV_KV_ID"
-# preview_id = "REPLACE_WITH_PREVIEW_ENV_PREVIEW_KV_ID"
+[[env.preview.kv_namespaces]]
+binding = "WHETHER_DURABLE_KV"
+id = "d116663399244346bd302324b485e8f3"
+preview_id = "d116663399244346bd302324b485e8f3"
