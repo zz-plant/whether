@@ -3,12 +3,12 @@ import { spawnSync } from "node:child_process";
 const baseUrl = (process.argv[2] ?? "https://whether.work").replace(/\/$/, "");
 
 const pageChecks = [
-  { path: "/", required: ["weekly-posture-brief-title", "share-ready-artifact", "approve-this-weeks-plan"] },
-  { path: "/evidence", required: ["signal"] },
-  { path: "/planning", required: ["operations"] },
-  { path: "/toolkits", required: ["toolkits"] },
-  { path: "/resolve", required: ["decide"] },
-  { path: "/planning/data", required: ["data"] },
+  { path: "/", required: ["weekly brief", "share-ready-artifact", "open weekly plan"] },
+  { path: "/evidence", required: ["evidence", "what this means now"] },
+  { path: "/planning", required: ["planning", "weekly plan", "decision help"] },
+  { path: "/toolkits", required: ["resolve", "toolkit-library"] },
+  { path: "/resolve", required: ["resolve", "toolkit-library"] },
+  { path: "/planning/data", required: ["planning", "data"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];

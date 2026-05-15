@@ -46,7 +46,7 @@ function getDiffRange() {
   try {
     const hasHeadParent = sh("git", ["rev-parse", "--verify", "HEAD~1"]);
     if (hasHeadParent) {
-      return "HEAD~1...HEAD";
+      return "HEAD~1";
     }
   } catch {
     return "HEAD";

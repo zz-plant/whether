@@ -21,6 +21,29 @@ type DigestResponse = {
   backend: string;
 };
 
+const isDigestResponse = (value: unknown): value is DigestResponse => {
+  if (!value || typeof value !== "object") return false;
+  const digest = Reflect.get(value, "digest");
+  const postureState = Reflect.get(value, "postureState");
+  const currentState = postureState && typeof postureState === "object"
+    ? Reflect.get(postureState, "currentState")
+    : null;
+
+  return (
+    Boolean(digest)
+    && typeof digest === "object"
+    && typeof Reflect.get(digest, "summary") === "string"
+    && Array.isArray(Reflect.get(digest, "bullets"))
+    && Boolean(currentState)
+    && typeof currentState === "object"
+    && typeof Reflect.get(currentState, "confidenceLabel") === "string"
+    && typeof Reflect.get(value, "alertCount") === "number"
+    && typeof Reflect.get(value, "degraded") === "boolean"
+    && typeof Reflect.get(value, "generatedAt") === "string"
+    && typeof Reflect.get(value, "backend") === "string"
+  );
+};
+
 const formatDigestText = (data: DigestResponse): string => {
   const { digest, generatedAt, alertCount, degraded } = data;
   const bullets = Array.isArray(digest.bullets) ? digest.bullets : [];
@@ -50,7 +73,8 @@ export function WeeklyDigestDownload() {
     try {
       const response = await fetch("/api/weekly-digest");
       if (!response.ok) throw new Error("Digest API unavailable");
-      const data = (await response.json()) as DigestResponse;
+      const data = await response.json();
+      if (!isDigestResponse(data)) throw new Error("Digest API returned an invalid payload");
       const text = formatDigestText(data);
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);

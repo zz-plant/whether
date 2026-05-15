@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { GlobalHeader } from "./components/globalHeader";
+import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
 
@@ -141,11 +142,13 @@ export default function RootLayout({
         <Script id="whether-persisted-ui-bootstrap" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: buildPersistedUiBootstrapScript() }} />
       </head>
       <body>
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
-        <GlobalHeader />
-        {children}
+        <ToastProviderRoot>
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <GlobalHeader />
+          {children}
+        </ToastProviderRoot>
       </body>
     </html>
   );
