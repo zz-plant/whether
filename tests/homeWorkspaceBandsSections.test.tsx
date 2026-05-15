@@ -68,24 +68,14 @@ const workspaceModel: HomePageWorkspaceModel = {
 };
 
 describe("HomeWorkspaceBands section composition", () => {
-  it("composes compact planning, challenge, and optional follow-on sections with stable IDs", async () => {
+  it("composes compact planning section with stable IDs", async () => {
     const component = await HomeWorkspaceBands({ workspaceModelPromise: Promise.resolve(workspaceModel) });
     const html = renderToStaticMarkup(component);
 
-    assert.match(html, /id="audit-this-call"/);
     assert.match(html, /id="approve-this-weeks-plan"/);
-    assert.match(html, /id="historical-replay-workspace"/);
     assert.match(html, /Turn this read into this week/);
     assert.match(html, /Open weekly plan/);
-    assert.match(html, /Pressure-test this call/);
-    assert.match(html, /Check the evidence or trust status before sharing\./);
-    assert.match(html, /Why this week&#x27;s read moved|Why this week's read moved/);
-    assert.match(html, /Check trust/);
-    assert.match(html, /More tools/);
-    assert.match(html, /Answer one question/);
-    assert.match(html, /Review a past week/);
-    assert.match(html, /Use a tool/);
-    assert.ok(html.indexOf("approve-this-weeks-plan") < html.indexOf("audit-this-call"));
-    assert.ok(html.indexOf("audit-this-call") < html.indexOf("historical-replay-workspace"));
+    assert.match(html, /Pause first/);
+    assert.match(html, /Send next/);
   });
 });

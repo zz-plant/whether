@@ -63,29 +63,6 @@ const LeadershipArtifactActions = async ({
   );
 };
 
-const ShareReadyStrip = async ({
-  leadershipArtifactPayloadPromise,
-}: {
-  leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
-}) => {
-  const artifactPayload = await leadershipArtifactPayloadPromise;
-  if (!artifactPayload) {
-    return null;
-  }
-
-  return (
-    <div className="weather-surface-secondary mb-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs text-slate-200">
-      <p>
-        <span className="font-semibold text-slate-100">Share-ready:</span>{" "}
-        Weekly brief copy + citation available.
-      </p>
-      <p className="text-slate-400">
-        {artifactPayload.callCitation}
-      </p>
-    </div>
-  );
-};
-
 const HOMEPAGE_GLOSSARY_VALUES = ["regime", "posture", "confidence", "tightness", "risk-appetite", "flip-condition", "guardrail"];
 
 export const HomeKeyTermsDisclosure = () => {
@@ -123,9 +100,6 @@ export const HomeWhatChangedSection = ({
 }) => (
   <>
     <OperatorWorkflowRouteTracker />
-    <Suspense fallback={null}>
-      <ShareReadyStrip leadershipArtifactPayloadPromise={leadershipArtifactPayloadPromise} />
-    </Suspense>
     <WeeklyDecisionCard
       model={weeklyDecisionCardModel}
       searchParams={searchParams}

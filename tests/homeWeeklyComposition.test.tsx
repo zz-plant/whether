@@ -235,17 +235,12 @@ describe("weekly card and interpretation panel composition", () => {
     const actionStripIndex = html.indexOf("Revisit now");
     const interpretationIndex = html.indexOf("View for this situation");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
-    const auditIndex = html.indexOf('id="audit-this-call"');
-    const replayIndex = html.indexOf('id="historical-replay-workspace"');
-
     assert.ok(heroIndex > -1);
     assert.ok(diagnosticsIndex > heroIndex);
     assert.ok(rulesIndex > -1);
     assert.ok(actionStripIndex > rulesIndex);
     assert.ok(executionIndex > actionStripIndex);
-    assert.ok(auditIndex > executionIndex);
-    assert.ok(replayIndex > auditIndex);
-    assert.ok(interpretationIndex > replayIndex);
+    assert.ok(interpretationIndex > executionIndex);
   });
 
   it("renders orientation strip before the weekly decision card without replacing core card content", () => {

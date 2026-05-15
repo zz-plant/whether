@@ -21,6 +21,7 @@ import {
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
+import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -200,22 +201,26 @@ export const HomePageReportContent = async ({
       <BriefConfigureStrip />
       <FirstVisitBanner />
       <HomeRoutePrefetch />
-      <HomeWhatChangedSection
-        weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
-        leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
-        fallbackActive={homepage.fallbackActive}
-        searchParams={resolvedSearchParams}
-        initialArtifactMode={initialArtifactMode}
-      />
+      <ErrorBoundary label="Weekly decision card">
+        <HomeWhatChangedSection
+          weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
+          leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
+          fallbackActive={homepage.fallbackActive}
+          searchParams={resolvedSearchParams}
+          initialArtifactMode={initialArtifactMode}
+        />
+      </ErrorBoundary>
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}
         interpretationSearchParams={homepage.interpretationSearchParams}
         fallbackAlert={homepage.fallbackAlert}
       />
-      <Suspense fallback={null}>
+      <Suspense fallback={<div className="h-24 animate-pulse rounded-xl bg-slate-950/30" />}>
         <HomeKeyTermsDisclosure />
       </Suspense>
-      <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
+      <ErrorBoundary label="Workspace bands">
+        <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
+      </ErrorBoundary>
     </ReportShell>
   );
 };

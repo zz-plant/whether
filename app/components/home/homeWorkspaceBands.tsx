@@ -1,11 +1,7 @@
 import Link from "next/link";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import type { Route } from "../../../lib/navigation/routeType";
-import {
-  AuditIcon,
-  CheckIcon,
-  TrendUpIcon,
-} from "../uiIcons";
+import { CheckIcon } from "../uiIcons";
 
 type HomeWorkspaceBandsProps = {
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
@@ -15,12 +11,8 @@ export async function HomeWorkspaceBands({
   workspaceModelPromise,
 }: HomeWorkspaceBandsProps) {
   const workspaceModel = await workspaceModelPromise;
-  const signalsDecisionSummaryHref: Route = "/evidence#decision-summary";
-  const trustSnapshotHref: Route = "/trust#trust-snapshot";
   const primaryGuardrail = workspaceModel.operations.topGuardrails[0];
   const primaryExportAction = workspaceModel.operations.exportActions[0];
-  const toolkitShortcut = workspaceModel.translate.toolkitShortcuts[0];
-  const moreToolsHref = workspaceModel.operations.continueHref as Route;
 
   return (
     <div className="space-y-5">
@@ -83,61 +75,6 @@ export async function HomeWorkspaceBands({
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryExportAction?.label ?? "Open share brief"}
               </p>
-            </div>
-          </div>
-          <details
-            id="audit-this-call"
-            className="weather-auto-chevron mt-4 rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3"
-          >
-            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
-              <span className="min-w-0">
-                <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">If someone asks why</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-100">Pressure-test this call</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">Check the evidence or trust status before sharing.</span>
-              </span>
-              <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                Optional
-              </span>
-            </summary>
-
-            <div className="mt-3 grid gap-2 md:grid-cols-2">
-              <Link
-                href={signalsDecisionSummaryHref}
-                className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/45 hover:bg-slate-950/55"
-              >
-                <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
-                  <TrendUpIcon className="h-3.5 w-3.5" />
-                  <span>Open evidence</span>
-                </div>
-                <p className="mt-2 text-sm font-semibold">{"Why this week's read moved"}</p>
-                <p className="mt-1 text-xs leading-5 text-slate-300">
-                  {workspaceModel.audit.evidenceMovers[0]?.detail ?? "See the main drivers, thresholds, and past weeks when you need to challenge the read."}
-                </p>
-              </Link>
-
-              <Link
-                href={trustSnapshotHref}
-                className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/38 px-3 py-3 text-slate-100 transition-colors hover:border-amber-400/45 hover:bg-slate-950/55"
-              >
-                <div className="flex items-center gap-2 text-[11px] font-medium text-amber-200">
-                  <AuditIcon className="h-3.5 w-3.5" />
-                  <span>Check trust</span>
-                </div>
-                <p className="mt-2 text-sm font-semibold">{workspaceModel.audit.trustStatusAction}</p>
-                <p className="mt-1 text-xs leading-5 text-slate-300">
-                  {workspaceModel.audit.trustMarkerDetail}
-                </p>
-              </Link>
-            </div>
-          </details>
-
-          <div id="historical-replay-workspace" className="mt-3 rounded-[0.95rem] border border-slate-800/60 bg-slate-950/20 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">More tools</p>
-            <div className="mt-2 flex flex-wrap gap-3 text-xs">
-              <Link href={workspaceModel.translate.primaryPath.href as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Answer one question</Link>
-              <Link href={workspaceModel.replay.openFullHref as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Review a past week</Link>
-              <Link href={(toolkitShortcut?.href ?? workspaceModel.translate.fallbackUtility.href) as Route} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">Use a tool</Link>
-              <Link href={moreToolsHref} className="text-slate-200 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">More tools</Link>
             </div>
           </div>
         </article>

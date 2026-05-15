@@ -79,7 +79,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /U\.S\. labor backdrop/);
     assert.match(html, /U\.S\. demand backdrop/);
     assert.match(html, /U\.S\. funding backdrop/);
-    assert.match(html, />What changed this week</);
+    assert.match(html, /Changed this week:/);
     assert.match(html, /Revisit now/);
     assert.match(html, /Watch for/);
     assert.match(html, /Clears when/);
