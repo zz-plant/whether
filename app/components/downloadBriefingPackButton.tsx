@@ -81,7 +81,8 @@ export function DownloadBriefingPackButton({
     });
     try {
       const pdfBytes = await generatePdf(meetingPackText);
-      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
+      const pdfArray = Array.from(pdfBytes);
+      const blob = new Blob([new Uint8Array(pdfArray)], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;

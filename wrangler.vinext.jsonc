@@ -12,6 +12,13 @@
   "images": {
     "binding": "IMAGES"
   },
+  "kv_namespaces": [
+    {
+      "binding": "WHETHER_DURABLE_KV",
+      "id": "cb5c7f5947e94592b4127aa25fa8541d",
+      "preview_id": "d116663399244346bd302324b485e8f3"
+    }
+  ],
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://whether.work"
   }
