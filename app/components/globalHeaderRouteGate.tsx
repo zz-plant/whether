@@ -60,8 +60,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
   const reportHeaderAction = reportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
-  const showCollapsedWorkflowPicker = isHomeBrief;
-
   return (
     <header className="mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3">
       <div className="weather-appbar weather-topbar px-4 py-3 sm:px-5 sm:py-3">
@@ -115,44 +113,19 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </div>
           </div>
 
-          {showCollapsedWorkflowPicker ? (
-            <nav aria-label="Workflow steps" className="flex items-center gap-1 overflow-x-auto py-1">
-              {[1, 2, 3, 4, 5].map((step) => {
-                const href = step === 1 ? "/" : step === 2 ? "/evidence" : step === 3 ? "/planning" : step === 4 ? "/resolve" : "/trust";
-                const label = step === 1 ? "Brief" : step === 2 ? "Evidence" : step === 3 ? "Plan" : step === 4 ? "Resolve" : "Verify";
-                const isActive = step === 1;
-                return (
-                  <Link
-                    key={step}
-                    href={href}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
-                      isActive
-                        ? "border border-sky-400/60 bg-sky-400/10 text-sky-100"
-                        : "border border-slate-700/50 text-slate-400 hover:border-slate-500/70 hover:text-slate-200"
-                    }`}
-                  >
-                    <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${isActive ? "bg-sky-400/30 text-sky-100" : "bg-slate-800 text-slate-500"}`}>{step}</span>
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-          ) : (
-            <>
-              <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
-                <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Browse workflow
-                </summary>
-                <div className="mt-3">
-                  <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-                </div>
-              </details>
+          {/* Unified compact workflow nav — one system for all routes */}
+          <details className="rounded-2xl border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
+            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              Browse workflow
+            </summary>
+            <div className="mt-3">
+              <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+            </div>
+          </details>
 
-              <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-2 md:block">
-                <GlobalHeaderNavClient pathname={pathname} variant="compact" />
-              </nav>
-            </>
-          )}
+          <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-2 md:block">
+            <GlobalHeaderNavClient pathname={pathname} variant="compact" />
+          </nav>
         </div>
       </div>
     </header>

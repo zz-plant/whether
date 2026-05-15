@@ -11,10 +11,12 @@ export type RateSensitivity = "high" | "medium" | "low";
 export interface OperatorContext {
   companyStage: CompanyStage | null;
   rateSensitivity: RateSensitivity | null;
+  ticker: string | null;
 }
 
 const COOKIE_STAGE = "whether-company-stage";
 const COOKIE_RATE_SENSITIVITY = "whether-rate-sensitivity";
+const COOKIE_TICKER = "whether-ticker";
 
 const VALID_STAGES: ReadonlySet<string> = new Set([
   "pre-seed",
@@ -39,11 +41,12 @@ export const parseOperatorContextFromCookies = (
   cookieHeader: string | null,
 ): OperatorContext => {
   if (!cookieHeader) {
-    return { companyStage: null, rateSensitivity: null };
+    return { companyStage: null, rateSensitivity: null, ticker: null };
   }
 
   const stageRaw = parseCookieValue(cookieHeader, COOKIE_STAGE);
   const sensitivityRaw = parseCookieValue(cookieHeader, COOKIE_RATE_SENSITIVITY);
+  const tickerRaw = parseCookieValue(cookieHeader, COOKIE_TICKER);
 
   const companyStage: CompanyStage | null =
     stageRaw && VALID_STAGES.has(stageRaw) ? (stageRaw as CompanyStage) : null;
@@ -53,7 +56,9 @@ export const parseOperatorContextFromCookies = (
       ? (sensitivityRaw as RateSensitivity)
       : null;
 
-  return { companyStage, rateSensitivity };
+  const ticker: string | null = tickerRaw && tickerRaw.trim().length > 0 ? tickerRaw.trim().toUpperCase() : null;
+
+  return { companyStage, rateSensitivity, ticker };
 };
 
 /**

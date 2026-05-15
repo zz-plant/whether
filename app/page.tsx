@@ -17,8 +17,10 @@ import {
   HomeDecisionSection,
   HomeRevisitFlipSection,
   HomeWhatChangedSection,
+  HomeKeyTermsDisclosure,
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
+import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -152,7 +154,9 @@ export const HomePageReportContent = async ({
         },
         chrome: {
           sidebarVariant: "hidden",
-          hideHeroChrome: true,
+          hideHeroChrome: false,
+          heroVariant: "compact",
+          ambientMode: "standard",
         },
         actions: {
           exportCta: {
@@ -193,6 +197,7 @@ export const HomePageReportContent = async ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
       />
       <OperatorContextWrapper />
+      <BriefConfigureStrip />
       <FirstVisitBanner />
       <HomeRoutePrefetch />
       <HomeWhatChangedSection
@@ -208,6 +213,9 @@ export const HomePageReportContent = async ({
         fallbackAlert={homepage.fallbackAlert}
       />
       <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
+      <Suspense fallback={null}>
+        <HomeKeyTermsDisclosure />
+      </Suspense>
     </ReportShell>
   );
 };

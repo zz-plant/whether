@@ -88,7 +88,7 @@ const ShareReadyStrip = async ({
 
 const HOMEPAGE_GLOSSARY_VALUES = ["regime", "posture", "confidence", "tightness", "risk-appetite", "flip-condition", "guardrail"];
 
-const KeyTermsDisclosure = () => {
+export const HomeKeyTermsDisclosure = () => {
   const entries = BEGINNER_GLOSSARY_ENTRIES.filter((entry) => HOMEPAGE_GLOSSARY_VALUES.includes(entry.value));
 
   return (
@@ -141,7 +141,6 @@ export const HomeWhatChangedSection = ({
       )}
     />
     <StartupModeSection startupVariantPolicy={weeklyDecisionCardModel.decision.startupVariantPolicy} />
-    <KeyTermsDisclosure />
   </>
 );
 
