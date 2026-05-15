@@ -32,6 +32,7 @@ import {
   buildSlackBrief,
   type ModeledExportDecisionPayload,
 } from "../../../lib/export/briefBuilders";
+import { WeeklyDigestDownload } from "./weeklyDigestDownload";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import {
@@ -431,6 +432,7 @@ export const ExportBriefPanel = ({
                 disabled={isCopyDisabled("Citation")}
                 onClick={() => void handleCopy(citation, "Citation")}
               />
+              <WeeklyDigestDownload />
             </div>
             {fallbackActive ? (
               <p className="text-[10px] leading-5 text-amber-200">

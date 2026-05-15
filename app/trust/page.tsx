@@ -4,6 +4,7 @@ import Link from "next/link";
 import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
+import { SourceHealthPanel } from "../components/sourceHealthPanel";
 import { buildCompactTrustSummary, buildDecisionReadinessState, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -275,6 +276,10 @@ export default async function MethodPage() {
               <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula notes</Link>
             </div>
           </article>
+        </div>
+        <div className="mt-6">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Per-source status</p>
+          <SourceHealthPanel rows={reportData.sourceHealth} />
         </div>
       </MethodSection>
 
