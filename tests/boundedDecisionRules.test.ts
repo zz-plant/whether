@@ -83,7 +83,7 @@ it("ensures every operating lever item includes bounded decision fields", () => 
   assert.equal(items.length, 5);
   for (const item of items) {
     assert.ok(item.label.trim().length > 0);
-    assert.ok(item.actionNow.trim().length > 0);
+    assert.ok(item.areaActionNow.trim().length > 0);
     assert.ok(item.triggerThreshold.trim().length > 0);
     assert.ok(item.reversalCondition.trim().length > 0);
   }

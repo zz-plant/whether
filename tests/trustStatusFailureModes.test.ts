@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildFailureModeWarnings } from "../lib/report/trustStatus";
+import { buildTrustWarnings } from "../lib/report/trustStatus";
 
-describe("buildFailureModeWarnings", () => {
+describe("buildTrustWarnings", () => {
   it("activates boundary-whipsaw when confidence is low near transition with multiple changes", () => {
-    const warnings = buildFailureModeWarnings({
+    const warnings = buildTrustWarnings({
       confidenceLabel: "LOW",
       transitionWatch: "ON",
       freshnessLabel: "Mar 9, 2026 09:00 UTC",
@@ -17,7 +17,7 @@ describe("buildFailureModeWarnings", () => {
   });
 
   it("deactivates boundary-whipsaw when confidence recovers even with signal movement", () => {
-    const warnings = buildFailureModeWarnings({
+    const warnings = buildTrustWarnings({
       confidenceLabel: "MED",
       transitionWatch: "ON",
       freshnessLabel: "Mar 9, 2026 09:00 UTC",
@@ -30,7 +30,7 @@ describe("buildFailureModeWarnings", () => {
   });
 
   it("activates and clears stale-cached warning based on fallback and freshness", () => {
-    const activeWarnings = buildFailureModeWarnings({
+    const activeWarnings = buildTrustWarnings({
       confidenceLabel: "HIGH",
       transitionWatch: "OFF",
       freshnessLabel: "Unavailable",
@@ -41,7 +41,7 @@ describe("buildFailureModeWarnings", () => {
     });
     assert.ok(activeWarnings.some((warning) => warning.id === "stale-cached"));
 
-    const clearedWarnings = buildFailureModeWarnings({
+    const clearedWarnings = buildTrustWarnings({
       confidenceLabel: "HIGH",
       transitionWatch: "OFF",
       freshnessLabel: "Mar 9, 2026 09:00 UTC",
@@ -54,7 +54,7 @@ describe("buildFailureModeWarnings", () => {
   });
 
   it("activates anomaly-divergence only when anomaly threshold is met", () => {
-    const activeWarnings = buildFailureModeWarnings({
+    const activeWarnings = buildTrustWarnings({
       confidenceLabel: "MED",
       transitionWatch: "ON",
       freshnessLabel: "Mar 9, 2026 09:00 UTC",
@@ -64,7 +64,7 @@ describe("buildFailureModeWarnings", () => {
     });
     assert.ok(activeWarnings.some((warning) => warning.id === "anomaly-divergence"));
 
-    const clearedWarnings = buildFailureModeWarnings({
+    const clearedWarnings = buildTrustWarnings({
       confidenceLabel: "MED",
       transitionWatch: "ON",
       freshnessLabel: "Mar 9, 2026 09:00 UTC",

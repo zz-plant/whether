@@ -16,7 +16,7 @@ export const buildWeeklyDecisionCardModel = (
   status: {
     statusLabel: "DEFENSIVE",
     regimeKey: "DEFENSIVE",
-    postureLabel: "Defensive",
+    postureLabel: "Cloudy",
     stageLabel: "Watchful",
     postureWithStageLabel: "Defensive — Watchful",
     postureDelta: "Worse than last week",
@@ -24,7 +24,7 @@ export const buildWeeklyDecisionCardModel = (
     confidencePercent: 68,
     signalConfidenceReason: "Reason: regime boundary proximity + volatile macro signals",
     regimeHeader: {
-      regime: "Defensive",
+      regime: "Cloudy",
       confidence: "Medium (mixed signal reliability)",
       primaryRisk: "Downside: Capital tightness tightened (1.0).",
     },
@@ -96,9 +96,9 @@ export const buildWeeklyDecisionCardModel = (
           key: "burn",
           label: "Burn",
           cells: {
-            approve: { text: "Approve critical fixed cost only.", detail: "Tie spend to near-term proof.", action: "Approve critical fixed cost only.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open once the reversal trigger prints." },
-            delay: { text: "Delay discretionary expansion.", detail: "Protect runway while confidence is mixed.", action: "Delay discretionary expansion.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open once the reversal trigger prints." },
-            flip: { text: "Re-open spend bands.", detail: "Flip after the reversal trigger prints.", action: "Approve critical fixed cost only.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open spend bands." },
+            approve: { text: "Approve critical fixed cost only.", detail: "Tie spend to near-term proof.", action: "Approve critical fixed cost only.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open once the conditions reverse." },
+            delay: { text: "Delay discretionary expansion.", detail: "Protect runway while confidence is mixed.", action: "Delay discretionary expansion.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open once the conditions reverse." },
+            flip: { text: "Re-open spend bands.", detail: "Flip after the conditions reverse.", action: "Approve critical fixed cost only.", threshold: "Pause burn expansion if tightness rises.", reversal: "Re-open spend bands." },
           },
         },
       ],
@@ -251,13 +251,13 @@ export const buildWeeklyDecisionCardModel = (
       raiseWindow: "Narrowing",
       netDeltaLabel: "Slightly more defensive than last week.",
     },
-    weeklyMovement: { score: 1.2, direction: "tightening", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." },
+    weeklyMovement: { score: 1.2, direction: "tightening", summary: "Model pressure increased by +1.2 this week; tighten approvals until a conditions reverse." },
     ...overrides.decision,
   },
   presentation: {
     whyItMattersLine: "External conditions shape how aggressively teams hire, spend, and approve long-payback work this week.",
     readThisCardItems: [
-      { label: "What changed", detail: "Pressure rose versus last week." },
+      { label: "What changed", detail: "Pressure rose compared to last week." },
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
       { label: "What would reverse the call", detail: "If risk appetite rises above 55, reopen selective hiring." },
     ],
@@ -365,15 +365,15 @@ export const buildWeeklyDecisionCardModel = (
       detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
       triggerLabel: "Tightness above 70.0.",
     },
-    regimeVelocity: { status: "insufficient_history", from: "Expansion", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },
+    regimeVelocity: { status: "insufficient_history", from: "Sunny", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },
     whyThisCall: [{ label: "Momentum", detail: "Capital tightness tightened this week." }],
     evidenceItems: [{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }],
     failureModes: [],
     ...overrides.diagnostics,
   },
   history: {
-    memoryRail: [{ label: "Now", posture: "Defensive" }],
-    historicalTimeline: [{ label: "2026", posture: "Defensive" }],
+    memoryRail: [{ label: "Now", posture: "Cloudy" }],
+    historicalTimeline: [{ label: "2026", posture: "Cloudy" }],
     historicalAnalogs: [
       {
         date: "2025-10-03",

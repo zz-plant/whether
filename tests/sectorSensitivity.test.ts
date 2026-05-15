@@ -13,8 +13,8 @@ describe("deriveSectorAdjustedPosture", () => {
       "b2b-saas",
     );
 
-    assert.equal(output.basePostureLabel, "Expansion");
-    assert.match(output.adjustedPostureLabel, /Expansion\+/);
+    assert.equal(output.basePostureLabel, "Sunny");
+    assert.match(output.adjustedPostureLabel, /Sunny\+/);
     assert.match(output.adjustmentStrength, /light|moderate|strong/);
     assert.equal(output.actionBias, "loosen");
     assert.ok(output.adjustmentDelta > 0);
@@ -30,8 +30,8 @@ describe("deriveSectorAdjustedPosture", () => {
       "infrastructure",
     );
 
-    assert.equal(output.basePostureLabel, "Defensive");
-    assert.match(output.adjustedPostureLabel, /Defensive-/);
+    assert.equal(output.basePostureLabel, "Cloudy");
+    assert.match(output.adjustedPostureLabel, /Cloudy-/);
     assert.equal(output.actionBias, "tighten");
     assert.match(output.reversalCondition, /Reverse overlay bias/);
     assert.ok(output.adjustmentDelta < 0);
@@ -102,9 +102,9 @@ describe("deriveSectorAdjustedPosture", () => {
       "consumer",
     );
 
-    assert.equal(output.adjustedPostureLabel, "Mixed (neutral)");
+    assert.equal(output.adjustedPostureLabel, "Stormy (neutral)");
     assert.equal(output.adjustmentStrength, "none");
     assert.equal(output.actionBias, "hold");
-    assert.equal(output.postureVariant, "stable");
+    assert.equal(output.postureVariant, "neutral");
   });
 });

@@ -57,7 +57,7 @@ describe("personalized mandates", () => {
 
     assert.match(output.headline, /VOLATILE mandate/);
     assert.equal(output.tailoredActions.length, 4);
-    assert.match(output.sectorOverlay.adjustedPostureLabel, /Mixed-|Mixed|Mixed\+/);
+    assert.match(output.sectorOverlay.adjustedPostureLabel, /Stormy-|Stormy|Stormy\+/);
     assert.match(output.recommendation, /Sector overlay:/);
     assert.match(output.output.Instruction, /Runway constraint:/);
     assert.equal(output.output.Confidence, "LOW");

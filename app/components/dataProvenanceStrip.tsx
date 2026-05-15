@@ -183,7 +183,7 @@ export const DataProvenanceStrip = ({
   }
 
   return (
-    <div className="weather-surface space-y-2 rounded-2xl border-slate-800/80 bg-slate-950/50 px-4 py-3 text-[0.65rem] font-semibold text-slate-300 shadow-none">
+    <div className="weather-surface space-y-2 rounded-2xl border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
@@ -198,7 +198,7 @@ export const DataProvenanceStrip = ({
         </span>
         <Popover.Root>
           <Popover.Trigger
-            className={`weather-chip rounded-full border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
+            className={`weather-chip inline-flex min-h-[44px] items-center rounded-full border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
               statusStyle ?? "border-slate-700 text-slate-200"
             }`}
           >
@@ -207,7 +207,7 @@ export const DataProvenanceStrip = ({
           <Popover.Portal>
             <Popover.Positioner side="top" align="center" sideOffset={8}>
               <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
                 <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-[11px] text-slate-300">
                   <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>

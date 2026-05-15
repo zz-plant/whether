@@ -24,7 +24,7 @@ describe("P2 beginner copy semantics", () => {
       summary.summaryLine,
       "Operating posture: Guarded Expansion · Weekly momentum: deteriorating · Revisit decisions: YES",
     );
-    assert.equal(summary.classificationLine, "Underlying regime classification: Expansion.");
+    assert.equal(summary.classificationLine, "Underlying regime classification: Sunny.");
   });
 
   it("uses posture-context language in Decision Shield shares", () => {
@@ -51,6 +51,6 @@ describe("P2 beginner copy semantics", () => {
     assert.doesNotMatch(strategyBrief, /^Regime:/m);
     assert.match(executiveMemo, /Posture context: Cloudy/);
     assert.doesNotMatch(executiveMemo, /^Regime:/m);
-    assert.match(checklist, /Pause-if Checklist — Defensive/);
+    assert.match(checklist, /Pause-if Checklist — Cloudy/);
   });
 });

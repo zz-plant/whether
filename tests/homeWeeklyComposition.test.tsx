@@ -88,7 +88,7 @@ const buildHomeCardModel = (overrides: WeeklyDecisionCardModelOverrides = {}) =>
       ],
       regimeVelocity: {
         status: "ok",
-        from: "Expansion",
+        from: "Sunny",
         to: "Mixed",
         sampleSize: 4,
         lowerBoundMonths: 3,

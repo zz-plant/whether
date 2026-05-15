@@ -109,7 +109,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-3 h-6 w-28 rounded-full bg-slate-500/40" />
                 </article>
                 <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Action now</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Do now</p>
                   <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/40" />
                   <Skeleton className="mt-2 h-5 w-8/12 rounded-full bg-slate-500/32" />
                 </article>
@@ -118,11 +118,11 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-3 h-5 w-24 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pause if</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Watch for</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Change course if</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Clears when</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
               </section>

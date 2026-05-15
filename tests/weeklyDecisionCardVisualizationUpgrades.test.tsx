@@ -85,9 +85,9 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
       model: buildWeeklyDecisionCardModel({
         history: {
           memoryRail: [
-            { label: "Mar 21, 2026", posture: "Volatile" },
+            { label: "Mar 21, 2026", posture: "Stormy" },
             { label: "Mar 28, 2026", posture: "Mixed" },
-            { label: "Apr 4, 2026", posture: "Defensive" },
+            { label: "Apr 4, 2026", posture: "Cloudy" },
           ],
         },
         diagnostics: {
@@ -105,7 +105,7 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
       presentation.postureSteps.map((step) => step.label),
       ["Prior", "Last week", "This week"],
     );
-    assert.equal(presentation.postureSteps[2]?.posture, "Defensive");
+    assert.equal(presentation.postureSteps[2]?.posture, "Cloudy");
     assert.equal(presentation.trajectoryDeltaSummary, "Tightness +2.0 · Risk appetite -4.0");
   });
 

@@ -8,7 +8,7 @@ describe("HistorySection", () => {
     const html = renderToStaticMarkup(
       <HistorySection
         historicalTimeline={[
-          { label: "Jan 2026", posture: "Defensive", month: 1, year: 2026 },
+          { label: "Jan 2026", posture: "Cloudy", month: 1, year: 2026 },
           { label: "Feb 2026", posture: "Mixed", month: 2, year: 2026, isCurrent: true },
         ]}
       />,

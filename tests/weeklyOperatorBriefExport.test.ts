@@ -97,7 +97,7 @@ describe("weekly operator brief export adapters", () => {
       treasury,
       confidenceLabel: "MED",
       canonicalDecisionCopy: {
-        currentRegimeLabel: "Defensive",
+        currentRegimeLabel: "Cloudy",
         operatingCall: "Protect runway.",
         doNowLines: ["Hold fixed burn."],
         flipTrigger: "Tightness < 65",

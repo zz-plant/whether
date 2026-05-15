@@ -59,7 +59,7 @@ const treasury: TreasuryData = {
 const postureState: PostureStateContract = {
   currentState: {
     regime: "DEFENSIVE",
-    postureLabel: "Defensive",
+    postureLabel: "Cloudy",
     confidenceLabel: "MED",
     confidencePercent: 68,
     transitionWatch: "ON",
@@ -85,7 +85,7 @@ describe("canonical decision copy contract", () => {
     const canonical = buildCanonicalDecisionCopy({
       homeBriefModel: {
         postureWithStageLabel: "Defensive — Watchful",
-        postureLabel: "Defensive",
+        postureLabel: "Cloudy",
         operatingStanceLine: "Stage approvals and protect runway.",
         actionNowShort: "Pause net-new fixed burn commitments this week.",
         actionStripItems: [
@@ -158,7 +158,7 @@ describe("canonical decision copy contract", () => {
     const canonical = buildCanonicalDecisionCopy({
       homeBriefModel: {
         postureWithStageLabel: "Defensive — Watchful",
-        postureLabel: "Defensive",
+        postureLabel: "Cloudy",
         operatingStanceLine: "Stage approvals and protect runway.",
         actionNowShort: "Pause net-new fixed burn commitments this week.",
         actionStripItems: [{ label: "Hiring", actionNow: "Keep hiring to critical backfills only." }],

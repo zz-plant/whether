@@ -222,7 +222,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     selectedYear: 2026,
     sensors: [],
     startItems: [],
-    statusLabel: "Defensive",
+    statusLabel: "Cloudy",
     stopItems: ["Pause non-core hiring."],
     actionStripItems: [],
     actionNowShort: "Stage decisions. Avoid irreversible spend.",

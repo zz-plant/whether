@@ -51,7 +51,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         diagnostics: {
           regimeVelocity: {
             status: "ok",
-            from: "Expansion",
+            from: "Sunny",
             to: "Mixed",
             sampleSize: 4,
             lowerBoundMonths: 3,
@@ -121,7 +121,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         confidencePercent: 92,
         signalConfidenceReason: "Reason: broad agreement across signals; boundary distance is wide",
         regimeHeader: {
-          regime: "Defensive",
+          regime: "Cloudy",
           confidence: "High (safe for near-term operating cadence)",
           primaryRisk: "Downside: Potential stale snapshot bias: live signal freshness is degraded.",
         },
@@ -182,7 +182,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       diagnostics: {
         regimeVelocity: {
           status: "ok",
-          from: "Expansion",
+          from: "Sunny",
           to: "Mixed",
           sampleSize: 4,
           lowerBoundMonths: 3,

@@ -101,7 +101,7 @@ export type RegimePlainEnglish = {
 
 export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
   SCARCITY: {
-    plainLabel: "Defend",
+    plainLabel: "Freezing",
     stance: "Protect cash and extend runway above all else.",
     whatItMeans:
       "Money is tight and markets are risk-averse. Your primary job is survival — preserve cash, cut non-essential spend, and focus on what keeps the lights on.",
@@ -119,7 +119,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
     ],
   },
   DEFENSIVE: {
-    plainLabel: "Conserve",
+    plainLabel: "Cloudy",
     stance: "Gate new commitments to short-payback work only.",
     whatItMeans:
       "Conditions are cautious but not critical. Approve only work that pays back quickly. Keep a cash buffer and avoid bets that take years to prove out.",
@@ -137,8 +137,8 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
     ],
   },
   VOLATILE: {
-    plainLabel: "Guarded Expand",
-    stance: "Approve only reversible bets with explicit checkpoint exits.",
+    plainLabel: "Stormy",
+    stance: "Approve only reversible moves with clear checkpoint exits.",
     whatItMeans:
       "Conditions are mixed — some signals support growth, others warn caution. Make small, reversible moves. Set clear success/failure checkpoints for every new initiative.",
     doExamples: [
@@ -155,7 +155,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
     ],
   },
   EXPANSION: {
-    plainLabel: "Expand",
+    plainLabel: "Sunny",
     stance: "Scale proven bets with milestone-based approval gates.",
     whatItMeans:
       "Money is flowing and markets are confident. This is the time to invest in growth — with discipline. Scale what's working, don't chase everything.",
@@ -243,10 +243,10 @@ export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
   { pattern: /\bRisk appetite\b/gi, replacement: "Market risk appetite" },
   { pattern: /\bYield curve slope\b/gi, replacement: "Recession warning gauge" },
   { pattern: /\bBase rate\b/gi, replacement: "Fed interest rate" },
-  { pattern: /\bSCARCITY\b/g, replacement: "Defend mode" },
-  { pattern: /\bDEFENSIVE\b/g, replacement: "Conserve mode" },
-  { pattern: /\bVOLATILE\b/g, replacement: "Guarded Expand mode" },
-  { pattern: /\bEXPANSION\b/g, replacement: "Expand mode" },
+  { pattern: /\bSCARCITY\b/g, replacement: "Freezing" },
+  { pattern: /\bDEFENSIVE\b/g, replacement: "Cloudy" },
+  { pattern: /\bVOLATILE\b/g, replacement: "Stormy" },
+  { pattern: /\bEXPANSION\b/g, replacement: "Sunny" },
   { pattern: /\btightness\b/gi, replacement: "cash availability" },
   { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
   { pattern: /\bregime\b/gi, replacement: "operating environment" },

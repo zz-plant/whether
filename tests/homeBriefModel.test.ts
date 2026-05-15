@@ -17,7 +17,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.deepEqual(memoryRail, [
       ...expectedPriorEntries,
-      { label: "Mar 19, 2026", posture: "Defensive" },
+      { label: "Mar 19, 2026", posture: "Cloudy" },
     ]);
   });
   it("derives stable labels and decision rules from brief inputs", () => {
@@ -133,9 +133,9 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /Changed: no material signal shift\./);
+    assert.match(model.decisionShiftSummary, /No material shift this week\./);
     assert.match(model.decisionShiftSummary, /Do now:/);
-    assert.match(model.decisionShiftSummary, /Flip:/);
+    assert.match(model.decisionShiftSummary, /Clears when:/);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
@@ -482,7 +482,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.equal(model.decisionMatrix.columns.length, 3);
-    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Flip"]);
+    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Change course if"]);
     assert.equal(model.decisionMatrix.rows.length, 4);
 
     for (const row of model.decisionMatrix.rows) {
@@ -546,7 +546,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
     assert.match(matrix.rows[3]?.cells.flip.text ?? "", /resumes tighten stance/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
-    assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Watch for thresholds weaken/);
+    assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
     assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Tightness ≤/);
   });
 

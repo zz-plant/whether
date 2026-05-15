@@ -111,8 +111,8 @@ export const SignalsModeSwitcherSection = ({
         </h2>
         <p className="text-sm text-slate-300">
           The short read tells you what changed, what it means this week, and what would make the
-          read wrong. The deeper view adds diagnostics, replay, and supporting checks only when
-          someone needs to see the proof behind the call.
+          assessment wrong. The deeper view adds diagnostics, replay, and supporting checks only when
+          someone needs to see the evidence behind the recommendation.
         </p>
       </div>
       <div
@@ -131,7 +131,7 @@ export const SignalsModeSwitcherSection = ({
             id: "detail",
             label: "Deeper evidence",
             detail:
-              "Diagnostics, replay, and the checks that would overturn the read.",
+              "Diagnostics, replay, and the checks that would overturn the assessment.",
           },
         ] as const).map((item) => (
           <button
@@ -213,7 +213,7 @@ export const SignalsDecisionSummarySection = ({
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Best read right now
+            Current outlook
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
             {actionNowShort ?? "Hold the current operating posture while thresholds hold."}
@@ -230,7 +230,7 @@ export const SignalsDecisionSummarySection = ({
         </div>
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            What would make this wrong
+            What would change this
           </p>
           {showMicroDecisionRows ? (
             <div className="mt-2 space-y-2 text-sm text-slate-200">
@@ -306,7 +306,7 @@ export const SignalsDecisionSummarySection = ({
         </h2>
         <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
           Use this section to confirm that the weekly brief still fits the evidence. The sections
-          below show what changed, why it matters, and what would overturn the read.
+           below show what changed, why it matters, and what would overturn the outlook.
         </p>
         <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
@@ -322,7 +322,7 @@ export const SignalsDecisionSummarySection = ({
               If this is wrong
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
-              You can overhire or overcommit if funding conditions weaken faster than expected.
+              You risk over-hiring or over-committing if funding conditions weaken faster than expected.
             </dd>
           </div>
           <div>
@@ -366,8 +366,8 @@ export const SignalsDecisionSummarySection = ({
           </ul>
         </div>
         <p className="text-xs text-slate-300">
-          This read mostly comes down to three things: how hard it is to fund new bets, how open
-          markets are to risk, and whether rate conditions are improving or worsening.
+          This outlook comes down to three things: how hard it is to fund new bets, how open
+          markets are to risk, and whether interest rates are rising or falling.
         </p>
       </article>
       <article className="weather-surface space-y-3 p-5">
@@ -421,7 +421,7 @@ export const SignalsCurrentScoresSection = ({
     <header className="space-y-2">
       <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Key numbers</p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        The three numbers most responsible for this week&apos;s read.
+        The three numbers most responsible for this week&apos;s outlook.
       </h2>
     </header>
     <div className="space-y-4">
@@ -514,12 +514,12 @@ export const SignalsNeedMoreProofSection = ({
         Need more detail?
       </p>
       <h2 className="text-lg font-semibold text-slate-100">
-        Open the deeper evidence only if the read still needs proof.
+        Open the deeper evidence only if the outlook still needs proof.
       </h2>
       <p className="text-sm text-slate-300">
         The deeper view adds diagnostics, historical replay, threshold tuning, and advanced filters.
-        Use it when someone asks why this moved, whether a past regime looked similar, or what
-        would make the read wrong.
+         Use it when someone asks why this moved, whether a past regime looked similar, or what
+         would make the outlook wrong.
       </p>
     </div>
       <a

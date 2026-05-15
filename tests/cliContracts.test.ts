@@ -81,7 +81,7 @@ describe("cli contracts", () => {
   it("builds scenario contract", () => {
     const scenario = buildScenarioContract({
       postureBefore: "Guarded Expansion",
-      postureAfter: "Expansion",
+      postureAfter: "Sunny",
       inputs: { tightness: 58, riskAppetite: 56 },
     });
     assert.equal(scenario.version, "v1");

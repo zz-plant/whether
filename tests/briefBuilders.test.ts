@@ -145,7 +145,7 @@ describe("buildSlackBrief", () => {
           {
             lever: "hiring-stance",
             label: "Hiring stance",
-            actionNow: "Limit net new hiring.",
+            areaActionNow: "Limit net new hiring.",
             triggerThreshold: "Pause approvals when tightness > 70.",
             reversalCondition: "Resume when tightness < 64.",
           },
@@ -153,7 +153,7 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(current call \/ action now \/ pause if \/ change course if\):/);
+    assert.match(brief, /Bounded decision \(Forecast \/ Do now \/ Watch for \/ Clears when\):/);
     assert.match(brief, /• Forecast: Constraint one/);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Watch for: Pause approvals when tightness > 70\./);
@@ -231,7 +231,7 @@ describe("buildSlackBrief", () => {
         {
           lever: "hiring-stance",
           label: "Hiring stance",
-          actionNow: "Backfills only",
+          areaActionNow: "Backfills only",
           triggerThreshold: "Pause net-new hiring if tightness > 76",
           reversalCondition: "Resume staged approvals when tightness < 66",
         },
@@ -246,7 +246,6 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Forecast:/);
     assert.match(brief, /• Re-check owner\/cadence: Owner: CEO \+ Finance lead/);
     assert.match(brief, /• Trust markers: Confidence: Guarded · Freshness: Stale/);
-    assert.match(brief, /• Do now: Backfills only/);
     assert.match(brief, /Do now: Backfills only/);
     assert.match(brief, /Watch for: Pause net-new hiring if tightness > 76/);
     assert.match(brief, /Clears when: Resume staged approvals when tightness < 66/);

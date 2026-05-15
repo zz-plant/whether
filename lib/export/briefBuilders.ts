@@ -279,7 +279,7 @@ export const buildSlackBrief = (
     "Signal check:",
     ...macroLines,
     "",
-    "Bounded decision (current call / action now / pause if / change course if):",
+    `Bounded decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
     ...decisionHighlights,
     ...buildDecisionTransmissionRiskBlock(assessment, options),
     "",

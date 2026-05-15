@@ -258,7 +258,7 @@ export function WeeklyCallModePanel({
                 <p className="sr-only">Weekly decision strip: current call, action now, pause if, and change course if.</p>
 
                 <section className="mt-4 rounded-[1rem] border border-slate-800/75 bg-slate-950/40 px-3 py-3">
-                  <dl className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,1fr))]">
+                  <dl className="grid gap-3 md:grid-cols-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,1fr))]">
                     <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/8 px-3 py-3">
                       <dt className="text-[11px] font-medium text-emerald-200">{publicDecisionLabels.action}</dt>
                       <dd className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNow}</dd>
@@ -377,7 +377,7 @@ export function WeeklyCallModePanel({
                   {PRIMARY_AUDIENCE_ACTION}
                 </p>
               </div>
-              <dl className="mt-3 grid gap-2 grid-cols-2 xl:grid-cols-4">
+              <dl className="mt-3 grid gap-2 grid-cols-2 xl:grid-cols-4 break-words">
               {postureSummaryCards.map((card) => (
                 <div key={card.label} className={card.className}>
                   <dt className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">{card.label}</dt>

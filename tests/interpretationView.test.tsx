@@ -50,7 +50,7 @@ const decisionRules: BoundedDecisionRule[] = [
 ];
 
 const homeBriefModel = {
-  decisionShiftSummary: "Changed: pressure rose versus last week.",
+  decisionShiftSummary: "Pressure rose compared to last week.",
   guardrail: "Hold irreversible hiring.",
   reversalTrigger: "Reopen if risk appetite rises above 55.",
   macroOverlay: [{ label: "Sector sensitivity", detail: "Consumer teams should stage expansions." }],
@@ -72,7 +72,7 @@ describe("interpretation view panel", () => {
 
     assert.match(html, /Default view/);
     assert.match(html, /canonical decision lives above/i);
-    assert.match(html, /Action: Changed: pressure rose versus last week\./);
+    assert.match(html, /Action: Pressure rose compared to last week\./);
     assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
   });
 
@@ -155,7 +155,7 @@ describe("interpretation view panel", () => {
 
     assert.match(company.summary, /unavailable this week/i);
     assert.equal(company.bullets.length, 3);
-    assert.match(company.bullets[0], /Action: Changed: pressure rose versus last week\./);
+    assert.match(company.bullets[0], /Action: Pressure rose compared to last week\./);
     assert.match(company.bullets[1], /Trigger: Hold irreversible hiring\./);
     assert.match(company.bullets[2], /Reverse: Reopen if risk appetite rises above 55\./);
   });

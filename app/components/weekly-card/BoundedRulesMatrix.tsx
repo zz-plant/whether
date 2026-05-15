@@ -39,7 +39,7 @@ const CorridorScale = () => (
     ].map((item) => (
       <span key={item.label} className="space-y-1">
         <span className={`block h-2 rounded-full ${item.className}`} />
-        <span className="block text-center text-[9px] font-semibold uppercase tracking-[0.1em] text-slate-500">{item.label}</span>
+        <span className="block text-center text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">{item.label}</span>
       </span>
     ))}
   </div>
@@ -148,7 +148,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
                 <div className="relative mt-2 overflow-hidden rounded-full border border-slate-800/70 bg-slate-900/90" aria-hidden="true">
                   <div className="grid h-7 grid-cols-3">
                     {corridorSegmentOrder.map((segment) => (
-                      <span key={segment.key} className={`flex items-center justify-center border-r border-slate-900/70 text-[9px] font-semibold uppercase tracking-[0.08em] ${segment.className}`}>
+                      <span key={segment.key} className={`flex items-center justify-center border-r border-slate-900/70 text-[10px] font-semibold uppercase tracking-[0.08em] ${segment.className}`}>
                         {segment.label}
                       </span>
                     ))}
@@ -164,7 +164,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
                 </div>
               </div>
             ) : null}
-            <div className="mt-3 grid gap-2 lg:grid-cols-3">
+            <div className="mt-3 grid gap-2 md:grid-cols-3 lg:grid-cols-3">
               <section className={`rounded-lg border px-2.5 py-2 ${corridorTone.now.panel}`}>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Allowed now</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">{corridor.now.text}</p>

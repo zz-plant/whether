@@ -97,7 +97,7 @@ export function OperationsExecutionStepper({
             Choose a step to open its detail panel. Back and forward keep your place in the sequence.
           </p>
         </div>
-        <ol className="grid gap-3 md:grid-cols-4">
+        <ol className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
           {steps.map((step, index) => {
             const isActive = step.id === activeStepId;
             const cardTone = isActive

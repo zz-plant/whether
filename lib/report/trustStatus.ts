@@ -490,12 +490,12 @@ export const buildTrustStatus = ({
       : "Proceed with normal approvals.";
 
   const action = historicalSelection
-    ? `${historicalAction} Change course if: switch to current data before changing pace.`
+    ? `${historicalAction} Clears when: switch to current data before changing pace.`
     : isFallback
-      ? `${fallbackAction} Change course if: resume normal approvals after one live update.`
+      ? `${fallbackAction} Clears when: resume normal approvals after one live update.`
       : policyRefusalActive
-        ? `Keep posture changes reversible until the policy override clears. Change course if: resume normal approvals once policy signals reconcile.`
-      : `${stableAction} Change course if: return to standard cadence once confidence recovers.`;
+        ? `Keep posture changes reversible until the policy override clears. Clears when: resume normal approvals once policy signals reconcile.`
+      : `${stableAction} Clears when: return to standard cadence once confidence recovers.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

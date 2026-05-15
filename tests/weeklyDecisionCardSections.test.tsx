@@ -14,7 +14,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
+        postureLabel="Cloudy"
         stageLabel="Watchful"
         netConstraintSummary="Pressure remains elevated."
         meetingShorthand="Do now: revise decisions this week."
@@ -23,7 +23,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={70}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Defensive",
+          regime: "Cloudy",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -91,7 +91,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="EXPANSION"
-        postureLabel="Expansion"
+        postureLabel="Sunny"
         stageLabel="Late"
         netConstraintSummary="Constraints eased."
         meetingShorthand="Do now: speed reversible bets."
@@ -100,7 +100,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={74}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Defensive",
+          regime: "Cloudy",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -160,7 +160,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="EXPANSION"
-        postureLabel="Expansion"
+        postureLabel="Sunny"
         stageLabel="Late"
         netConstraintSummary="Constraints eased."
         meetingShorthand="Do now: speed reversible bets."
@@ -169,7 +169,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={74}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Defensive",
+          regime: "Cloudy",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -232,13 +232,13 @@ describe("WeeklyDecisionCard extracted sections", () => {
         model={buildWeeklyDecisionCardModel({
           status: {
             statusLabel: "DEFENSIVE",
-            postureLabel: "Defensive",
+            postureLabel: "Cloudy",
             stageLabel: "Watchful",
             postureDelta: "No worse than last week",
             confidenceLabel: "MED",
             confidencePercent: 69,
             signalConfidenceReason: "Boundary distance is moderate.",
-            regimeHeader: { regime: "Defensive", confidence: "Medium", primaryRisk: "Tightness still elevated." },
+            regimeHeader: { regime: "Cloudy", confidence: "Medium", primaryRisk: "Tightness still elevated." },
             trendLabel: "Mixed",
             confidenceHistory: [
               { recordDate: "2026-01-30", confidencePercent: 62, isMissing: false },
@@ -274,7 +274,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
               pointsToFlip: 6,
               thresholdDirection: "riseAbove",
             },
-            regimeVelocity: { status: "insufficient_history", from: "Defensive", to: "Defensive", sampleSize: 0, displayLabel: "Flat" },
+            regimeVelocity: { status: "insufficient_history", from: "Cloudy", to: "Cloudy", sampleSize: 0, displayLabel: "Flat" },
             whyThisCall: [],
             evidenceItems: [],
           },
@@ -363,7 +363,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Decision rules/);
     assert.match(html, /Allowed now/);
     assert.match(html, /Caution line/);
-    assert.match(html, /Reopen \/ flip/);
+    assert.match(html, /Change course if/);
 
   });
 
@@ -375,10 +375,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
         startupClimateIndex={{ score: 62, status: "Stable", breakdown: [{ label: "Capital", score: 60 }] }}
         evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
         whyThisCall={[{ label: "Momentum", detail: "No material change" }]}
-        memoryRail={[{ label: "W-1", posture: "Defensive" }]}
+        memoryRail={[{ label: "W-1", posture: "Cloudy" }]}
         historicalTimeline={[
-          { label: "Jan 31, 2026", posture: "Defensive", month: 1, year: 2026, recordDate: "2026-01-31", summary: "Hold approvals" },
-          { label: "Feb 28, 2026", posture: "Scarcity", month: 2, year: 2026, recordDate: "2026-02-28", summary: "Tighten hiring" },
+          { label: "Jan 31, 2026", posture: "Cloudy", month: 1, year: 2026, recordDate: "2026-01-31", summary: "Hold approvals" },
+          { label: "Feb 28, 2026", posture: "Freezing", month: 2, year: 2026, recordDate: "2026-02-28", summary: "Tighten hiring" },
         ]}
         historicalAnalogs={[]}
         lastYearComparison={null}
@@ -397,8 +397,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
         startupClimateIndex={{ score: 62, status: "Stable", breakdown: [{ label: "Capital", score: 60 }] }}
         evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
         whyThisCall={[{ label: "Momentum", detail: "No material change" }]}
-        memoryRail={[{ label: "W-1", posture: "Defensive" }]}
-        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+        memoryRail={[{ label: "W-1", posture: "Cloudy" }]}
+        historicalTimeline={[{ label: "2026", posture: "Cloudy" }]}
         historicalAnalogs={[]}
         lastYearComparison={null}
         macroOverlay={[{ label: "VC", detail: "Muted" }]}

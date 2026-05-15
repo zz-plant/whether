@@ -93,8 +93,8 @@ export function MoreContextDisclosureBody({
             </ul>
           </section>
 
-          <details className="group rounded-lg border border-slate-800/45 bg-slate-950/30 px-2.5 py-2">
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <details className="group rounded-lg border-l-2 border-slate-700/50 bg-slate-950/25 px-2.5 py-2">
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none text-slate-400`}>
               <span>Additional context</span>
               <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
             </summary>
