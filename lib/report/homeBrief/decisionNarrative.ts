@@ -27,15 +27,15 @@ export const buildDecisionShiftSummary = ({
   reversalTrigger: string;
 }) => {
   if (changeCount === 0 || directionLabel === "stable") {
-    return `Changed: no material signal shift. Do now: keep approval pace and ship only commitments with clear payback windows. Flip: ${reversalTrigger}`;
+    return `No material shift this week. Do now: keep approval pace and focus on commitments with clear payback windows. Clears when: ${reversalTrigger}`;
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return `Changed: pressure eased versus last week. Do now: speed approvals for reversible bets and keep payback discipline explicit. Flip: ${reversalTrigger}`;
+    return `Pressure eased compared to last week. Do now: speed approvals for reversible bets and keep payback discipline. Clears when: ${reversalTrigger}`;
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return `Changed: pressure rose versus last week. Do now: slow approvals, narrow experiments, and require tighter payback windows. Flip: ${reversalTrigger}`;
+    return `Pressure rose compared to last week. Do now: slow approvals, narrow experiments, and tighten payback windows. Clears when: ${reversalTrigger}`;
   }
-  return `Changed: signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with explicit stop triggers. Flip: ${reversalTrigger}`;
+  return `Signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with clear stop triggers. Clears when: ${reversalTrigger}`;
 };
 
 export const buildWeeklyMovementMetric = ({
@@ -65,23 +65,23 @@ export const buildWeeklyMovementMetric = ({
   if (score >= 0.25) {
     return {
       score,
-      direction: "defensive" as const,
-      summary: `Model pressure increased by +${score.toFixed(1)} this week; tighten approvals until a reversal trigger prints.`,
+      direction: "tightening" as const,
+      summary: `Pressure increased by +${score.toFixed(1)} this week; tighten approvals until conditions reverse.`,
     };
   }
 
   if (score <= -0.25) {
     return {
       score,
-      direction: "expansionary" as const,
-      summary: `Model pressure eased by ${score.toFixed(1)} this week; release only reversible bets while watching flip thresholds.`,
+      direction: "easing" as const,
+      summary: `Pressure eased by ${score.toFixed(1)} this week; approve only reversible bets while watching for reversal triggers.`,
     };
   }
 
   return {
     score,
-    direction: "neutral" as const,
-    summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force.",
+    direction: "stable" as const,
+    summary: "Pressure is flat this week; keep the current call and guardrails in force.",
   };
 };
 
@@ -182,18 +182,18 @@ export const buildWhyItMattersLine = ({
   weeklyMovement,
 }: {
   weeklyMovement: {
-    direction: "defensive" | "expansionary" | "neutral";
+    direction: "tightening" | "easing" | "stable";
   };
 }) => {
-  if (weeklyMovement.direction === "defensive") {
+  if (weeklyMovement.direction === "tightening") {
     return "Fixed-cost mistakes are getting more expensive, so long-payback bets now need harder proof and tighter approval discipline.";
   }
 
-  if (weeklyMovement.direction === "expansionary") {
+  if (weeklyMovement.direction === "easing") {
     return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
   }
 
-  return "Stable posture means no new signal to change pace. Keep last week's approval rules in force until a material delta shifts the call.";
+  return "Stable posture means no new signal to change pace. Keep last week's approval rules until a significant change shifts the forecast.";
 };
 
 export const buildReadThisCardItems = ({

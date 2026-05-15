@@ -15,7 +15,7 @@ import type {
   TransitionVelocityEstimate,
 } from "./forecastModel";
 import type { RegimeSignalKey } from "./reportFormatting";
-import type { DecisionReadinessState, FailureModeWarning } from "./trustStatus";
+import type { DecisionReadinessState, TrustWarning } from "./trustStatus";
 import type {
   BoundedDecisionRule,
   ScopedVariantDecisionAdjustment,
@@ -200,7 +200,7 @@ export type InputInfluenceItem = {
   tone: InputInfluenceTone;
 };
 
-export type HomeBriefFailureMode = FailureModeWarning;
+export type HomeBriefTrustWarning = TrustWarning;
 
 export type DecisionMatrixColumnKey = "approve" | "delay" | "flip";
 
@@ -281,6 +281,7 @@ export type WeeklyDecisionCardViewModel = {
     statusLabel: string;
     regimeKey?: RegimeKey;
     postureLabel: string;
+    /** Maturity stage of the current regime (Early/Mid/Late). Not to be confused with planning stepper steps or lane state steps. */
     stageLabel: string;
     postureWithStageLabel?: string;
     postureDelta: string;
@@ -302,11 +303,16 @@ export type WeeklyDecisionCardViewModel = {
     operatingStanceLine: string;
     weeklyMemoLines: string[];
     netConstraintSummary: string;
+    /** Prose description of the pause-if condition. e.g. "Pause net-new hiring if cash availability rises above 76." */
     guardrail: string;
+    /** Prose description of the condition that reverses the pause. Same concept as guardrail but for what re-opens approvals. */
     reversalTrigger: string;
+    /** Compact action imperative extracted from the bounded decision rules. */
     actionNowShort?: string;
     immediateDecision: string;
+    /** Numeric threshold for the guardrail line, used for gauge/visual display. Distinct from guardrail (which is prose). */
     guardrailThreshold?: string;
+    /** Numeric threshold for the flip condition, used for gauge/visual display. */
     flipThreshold?: string;
     compactFlipConditionLabels?: string[];
     canonicalDecisionCopy?: CanonicalDecisionCopy;
@@ -326,7 +332,7 @@ export type WeeklyDecisionCardViewModel = {
     weeklyLeadershipSummary: WeeklyLeadershipSummary;
     weeklyMovement: {
       score: number;
-      direction: "defensive" | "expansionary" | "neutral";
+      direction: "tightening" | "easing" | "stable";
       summary: string;
     };
   };

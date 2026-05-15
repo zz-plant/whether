@@ -8,24 +8,24 @@ export const REGIME_ORDER: readonly RegimeKey[] = [
 ] as const;
 
 export const REGIME_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
-  EXPANSION: "Expansion",
+  SCARCITY: "Freezing",
+  DEFENSIVE: "Cloudy",
+  VOLATILE: "Stormy",
+  EXPANSION: "Sunny",
 };
 
 export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Mixed",
-  EXPANSION: "Expansion",
+  SCARCITY: "Freezing",
+  DEFENSIVE: "Cloudy",
+  VOLATILE: "Stormy",
+  EXPANSION: "Sunny",
 };
 
 export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Transitional",
-  EXPANSION: "Expansion",
+  SCARCITY: "Freezing",
+  DEFENSIVE: "Cloudy",
+  VOLATILE: "Stormy",
+  EXPANSION: "Sunny",
 };
 
 export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
@@ -36,6 +36,7 @@ export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
 };
 
 export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
+// Used by RegimeBadgeIcon in regimeIcons.tsx — icon name must match the component prop type.
 
 export const REGIME_WEATHER_ICONS: Record<RegimeKey, RegimeWeatherIcon> = {
   SCARCITY: "snowflake",

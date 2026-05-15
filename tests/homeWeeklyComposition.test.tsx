@@ -28,7 +28,7 @@ const decisionRules: BoundedDecisionRule[] = [
     doNow: ["Backfills only."],
     avoidNow: ["Avoid speculative hiring."],
     scope: "",
-    pauseTrigger: "Pause if tightness rises above 72.",
+    pauseTrigger: "Watch for tightness rises above 72.",
     resumeTrigger: "Resume if tightness falls below 64.",
     flipConditions: [{ metric: "tightness", operator: "<", value: 64, label: "Tightness < 64" }],
     rationale: "",
@@ -198,9 +198,9 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Decision details/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Revisit now/);
-    assert.match(html, /(Stop line|Pause if|Slow down if)/);
+    assert.match(html, /(Stop line|Watch for|Slow down if)/);
     assert.doesNotMatch(html, /Open Signals/);
-    assert.match(html, /(Act now|Action now|Do this now)/);
+    assert.match(html, /(Do now|Forecast|Clears when)/);
     assert.match(html, /View for this situation/);
     assert.match(html, /Company view/);
     assert.match(html, /Action:/);

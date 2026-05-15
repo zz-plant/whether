@@ -20,7 +20,7 @@ const resolvePrimarySituationPath = ({
     return situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0];
   }
 
-  if (direction === "expansionary" && confidenceLabel === "HIGH") {
+  if (direction === "easing" && confidenceLabel === "HIGH") {
     return situationUseCaseDefinitions.find((entry) => entry.slug === "pricing-change") ?? situationUseCaseDefinitions[0];
   }
 
@@ -255,7 +255,7 @@ export const buildHomeWorkspaceModel = ({
       financeSnapshot: financeSummaryItems.map((item) => ({
         key: item.lever,
         label: item.label,
-        actionNow: item.actionNow,
+        actionNow: item.areaActionNow,
         reversalCondition: item.reversalCondition,
       })),
       exportActions: [

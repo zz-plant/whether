@@ -105,6 +105,6 @@ describe("deriveSectorAdjustedPosture", () => {
     assert.equal(output.adjustedPostureLabel, "Mixed (neutral)");
     assert.equal(output.adjustmentStrength, "none");
     assert.equal(output.actionBias, "hold");
-    assert.equal(output.postureVariant, "neutral");
+    assert.equal(output.postureVariant, "stable");
   });
 });

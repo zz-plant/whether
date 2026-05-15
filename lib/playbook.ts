@@ -78,7 +78,7 @@ const buildPlaybookOperatingLevers = ({
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: stripItem?.actionNow ?? CANONICAL_RULE_FALLBACK.actionNow,
+      actionNow: stripItem?.areaActionNow ?? CANONICAL_RULE_FALLBACK.actionNow,
       triggerThreshold: stripItem?.triggerThreshold ?? CANONICAL_RULE_FALLBACK.triggerThreshold,
       reversalCondition: stripItem?.reversalCondition ?? CANONICAL_RULE_FALLBACK.reversalCondition,
     };

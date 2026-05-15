@@ -251,7 +251,7 @@ export const buildWeeklyDecisionCardModel = (
       raiseWindow: "Narrowing",
       netDeltaLabel: "Slightly more defensive than last week.",
     },
-    weeklyMovement: { score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." },
+    weeklyMovement: { score: 1.2, direction: "tightening", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." },
     ...overrides.decision,
   },
   presentation: {

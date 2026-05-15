@@ -11,10 +11,10 @@ export type DecisionPhraseTriplet = {
 };
 
 export const publicDecisionLabels = {
-  call: "Current call",
-  action: "Action now",
-  threshold: "Pause if",
-  reversal: "Change course if",
+  call: "Forecast",
+  action: "Do now",
+  threshold: "Watch for",
+  reversal: "Clears when",
   evidence: "Evidence",
 } as const;
 

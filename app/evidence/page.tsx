@@ -49,9 +49,9 @@ export default async function SignalsPage({
       trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Why the weekly brief changed"
+      pageTitle="Why the forecast shifted"
       currentPath="/evidence"
-      pageSummary="What changed, why it matters, and what would make this recommendation change."
+      pageSummary="What moved, why it matters, and what would shift the forecast."
       pageSummaryLink={{
         href: "#decision-summary",
         label: "Start with the summary ↓",

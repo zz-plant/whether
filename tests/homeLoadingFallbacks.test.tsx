@@ -13,9 +13,9 @@ describe("homepage loading fallbacks", () => {
 
     assert.match(html, /Weekly brief/);
     assert.match(html, /Weekly brief loading/);
-    assert.match(html, /Action now/);
-    assert.match(html, /Pause if/);
-    assert.match(html, /Change course if/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Watch for/);
+    assert.match(html, /Clears when/);
     assert.match(html, /Preparing compact evidence and trust handoff\./);
     assert.doesNotMatch(html, /Shared-card continuity/);
   });

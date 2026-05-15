@@ -158,7 +158,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Planning"
       currentPath="/planning"
-      pageSummary="Turn this week's read into a clear plan, visible stop lines, and an update you can share."
+      pageSummary="Prepare for this week's conditions: set guardrails, check runway, brief the team."
       pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",

@@ -1,23 +1,23 @@
 export const decisionTransmissionSummaryLine =
-  "What changed, what to do now, and what would flip the call.";
+  "This week's forecast: what to do, what to watch, and when conditions shift.";
 
 export const decisionTransmissionSearchDescription =
-  "Shows what changed, what to do now, and what would flip the call across hiring, fundraising, and runway.";
+  "Weekly forecast showing what to do, what to watch for, and when conditions shift across hiring, fundraising, and runway.";
 
 export const homeDecisionFaqItems = [
   {
     question: "What changed this week?",
     answer:
-      "The Weekly Brief shows which signals moved enough to change this week's recommendation.",
+      "The weekly brief shows which signals moved enough to shift this week's outlook.",
   },
   {
     question: "What should we do differently right now?",
     answer:
-      "The brief shows what to do now, what to pause, and what would flip the call.",
+      "The brief shows what to do now, what to watch for, and when the conditions change.",
   },
   {
     question: "How sure are we, and what would change our mind?",
     answer:
-      "Confidence and freshness markers show how much to trust the call, and the one sign that would flip it.",
+      "Confidence and freshness markers show how much to trust this week's outlook, and what would change it.",
   },
 ] as const;

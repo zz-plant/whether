@@ -261,7 +261,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
             roleAwareTemplates: [],
             executiveOperationalStance: { expand: [], avoid: [] },
             revisitDecisions: false,
-            weeklyMovement: { score: 0, direction: "neutral", summary: "steady" },
+            weeklyMovement: { score: 0, direction: "stable", summary: "steady" },
           },
           diagnostics: {
             regimeSignalIndicators: [],

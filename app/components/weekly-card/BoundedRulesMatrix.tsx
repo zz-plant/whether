@@ -176,7 +176,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
                 <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.caution.detail}</p>
               </section>
               <section className={`rounded-lg border px-2.5 py-2 ${corridorTone.blocked.panel}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Reopen / flip</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Change course if</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">{corridor.blocked.text}</p>
                 <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.blocked.detail}</p>
               </section>

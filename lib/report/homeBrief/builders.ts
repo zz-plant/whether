@@ -24,7 +24,7 @@ import {
 } from "../reportFormatting";
 import {
   buildDecisionReadinessState,
-  buildFailureModeWarnings,
+  buildTrustWarnings,
 } from "../trustStatus";
 import {
   buildScopedVariantDecisionAdjustment,
@@ -62,7 +62,7 @@ import type {
   BoundaryDimension,
   BoundaryDirection,
   CanonicalFlipCondition,
-  HomeBriefFailureMode,
+  HomeBriefTrustWarning,
   HomeBriefHistoricalAnalog,
   HomeReportData,
   PostureTrajectoryState,
@@ -337,7 +337,7 @@ export const buildHomeBriefModelInternal = (
     ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
     : operatingStanceLine;
 
-  const failureModes: HomeBriefFailureMode[] = buildFailureModeWarnings({
+  const failureModes: HomeBriefTrustWarning[] = buildTrustWarnings({
     confidenceLabel,
     transitionWatch,
     freshnessLabel: fetchedAtLabel ?? "Unavailable",

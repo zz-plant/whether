@@ -97,7 +97,7 @@ export const buildDecisionMatrixPayload = ({
     columns: [
       { key: "approve", label: "Approve" },
       { key: "delay", label: "Delay" },
-      { key: "flip", label: "Flip" },
+      { key: "flip", label: "Change course if" },
     ],
     rows,
   };

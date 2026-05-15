@@ -74,7 +74,7 @@ export const buildWeeklyCallContract = ({
   const defaultActionNow =
     canonicalDecisionCopy?.doNowLines[0]
     ?? homeBriefModel.actionNowShort
-    ?? actionStripItems[0]?.actionNow
+    ?? actionStripItems[0]?.areaActionNow
     ?? defaultCurrentCall;
   const defaultPauseIf =
     actionStripItems[0]?.triggerThreshold
@@ -105,7 +105,7 @@ export const buildWeeklyCallContract = ({
     : dedupeLines(
         canonicalDecisionCopy?.doNowLines.length
           ? canonicalDecisionCopy.doNowLines
-          : [defaultActionNow, ...actionStripItems.map((item) => item.actionNow), homeBriefModel.guardrail],
+          : [defaultActionNow, ...actionStripItems.map((item) => item.areaActionNow), homeBriefModel.guardrail],
         3,
       );
   const defaultFlipConditionLabels = canonicalDecisionCopy

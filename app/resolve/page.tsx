@@ -49,7 +49,7 @@ export default async function DecidePage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel } = snapshot;
-  const recommendedSituation = homeBriefModel.weeklyMovement.direction === "defensive"
+  const recommendedSituation = homeBriefModel.weeklyMovement.direction === "tightening"
     ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
     : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
   const shouldStartWithChecker = homeBriefModel.revisitDecisions;

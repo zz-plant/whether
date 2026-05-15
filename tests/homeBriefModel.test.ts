@@ -84,7 +84,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
     assert.equal(typeof model.weeklyMovement.score, "number");
-    assert.match(model.weeklyMovement.direction, /defensive|expansionary|neutral/);
+    assert.match(model.weeklyMovement.direction, /tightening|easing|stable/);
     assert.equal(model.regimeSignalIndicators.length, 4);
     assert.equal(model.inputInfluence.length, 4);
     assert.equal(model.inputInfluence[0]?.key, "tightness");
@@ -154,7 +154,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
-    assert.equal(model.weeklyMovement.direction, "neutral");
+    assert.equal(model.weeklyMovement.direction, "stable");
     assert.equal(model.weeklyMovement.score, 0);
   });
 
@@ -546,7 +546,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
     assert.match(matrix.rows[3]?.cells.flip.text ?? "", /resumes tighten stance/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
-    assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
+    assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Watch for thresholds weaken/);
     assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Tightness ≤/);
   });
 

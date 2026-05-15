@@ -106,6 +106,6 @@ describe("integration briefs", () => {
 
   it("builds linear payload", () => {
     const payload = buildWeeklyMandatePayload("linear", assessment, treasury, postureState) as { labels: string[] };
-    assert.ok(payload.labels.includes("defensive"));
+    assert.ok(payload.labels.includes("tightening"));
   });
 });

@@ -19,26 +19,26 @@ export type DataProvenance = {
 
 const statusStyles = {
   "Live (high confidence)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
-  "Canonical snapshot (high confidence)": "border-sky-300/55 bg-sky-400/10 text-sky-100",
-  "Cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
-  "Cached (fallback)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
-  "Simulated (low)": "border-slate-600/70 bg-slate-800/40 text-slate-200",
+  "Archived snapshot (high)": "border-sky-300/55 bg-sky-400/10 text-sky-100",
+  "Previously cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
+  "Fallback active (low)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
+  "Modeled estimate (low)": "border-slate-600/70 bg-slate-800/40 text-slate-200",
 } as const;
 
 const statusDescriptions = {
   "Live (high confidence)": "Streaming feeds updated within the last 24 hours.",
-  "Canonical snapshot (high confidence)": "Canonical snapshot generated from curated Treasury and macro inputs.",
-  "Cached (medium)": "Latest available data cached from our last refresh.",
-  "Cached (fallback)": "Fallback snapshot is active while live feeds recover.",
-  "Simulated (low)": "Modeled inputs or backfilled estimates where live data is absent.",
+  "Archived snapshot (high)": "Historical archive generated from curated Treasury and macro inputs.",
+  "Previously cached (medium)": "Latest available data cached from our last refresh.",
+  "Fallback active (low)": "Fallback snapshot is active while live feeds recover.",
+  "Modeled estimate (low)": "Modeled inputs or backfilled estimates where live data is absent.",
 } as const;
 
 const statusConfidence = {
   "Live (high confidence)": 100,
-  "Canonical snapshot (high confidence)": 92,
-  "Cached (medium)": 64,
-  "Cached (fallback)": 52,
-  "Simulated (low)": 28,
+  "Archived snapshot (high)": 92,
+  "Previously cached (medium)": 64,
+  "Fallback active (low)": 52,
+  "Modeled estimate (low)": 28,
 } as const;
 
 const statusDataMode = {
@@ -47,23 +47,23 @@ const statusDataMode = {
     icon: "live",
     className: "weather-data-mode weather-data-mode-dynamic",
   },
-  "Canonical snapshot (high confidence)": {
-    label: "Static · canonical snapshot",
+  "Archived snapshot (high)": {
+    label: "Static · historical archive",
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
-  "Cached (medium)": {
-    label: "Static · cached snapshot",
+  "Previously cached (medium)": {
+    label: "Static · cached reading",
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
-  "Cached (fallback)": {
-    label: "Static · fallback snapshot",
+  "Fallback active (low)": {
+    label: "Static · fallback source",
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
-  "Simulated (low)": {
-    label: "Static · simulated model",
+  "Modeled estimate (low)": {
+    label: "Static · model estimate",
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
@@ -95,7 +95,7 @@ export const DataProvenanceStrip = ({
     : <StatusStaticIcon className="h-2.5 w-2.5" />;
   const derivationLine = provenance.statusLabel === "Live (high confidence)"
     ? "Derived from U.S. Treasury, inflation, labor, credit, and funding indicators updated every 15 minutes."
-    : provenance.statusLabel === "Simulated (low)"
+    : provenance.statusLabel === "Modeled estimate (low)"
       ? "Derived from modeled U.S. Treasury and macro inputs while live coverage is unavailable."
       : "Derived from the latest U.S. Treasury and macro snapshots available this refresh.";
 

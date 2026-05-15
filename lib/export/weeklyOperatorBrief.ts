@@ -82,7 +82,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   }
 
   const doNowBullets = actionStripItems.length > 0
-    ? actionStripItems.slice(0, 3).map((item) => item.actionNow)
+    ? actionStripItems.slice(0, 3).map((item) => item.areaActionNow)
     : assessment.constraints.slice(0, 3);
 
   const normalizedFlipConditionLabels = flipConditionLabels
@@ -115,7 +115,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     });
   const currentCall =
     canonicalDecisionCopy?.operatingCall
-    ?? actionStripItems[0]?.actionNow
+    ?? actionStripItems[0]?.areaActionNow
     ?? assessment.constraints[0]
     ?? "Hold bounded operating discipline.";
   const actionNow =

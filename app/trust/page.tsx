@@ -5,7 +5,7 @@ import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { SourceHealthPanel } from "../components/sourceHealthPanel";
-import { buildCompactTrustSummary, buildDecisionReadinessState, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
+import { buildCompactTrustSummary, buildDecisionReadinessState, buildTrustWarnings, buildWeeklyCitationMetaLine } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { ReportShell } from "../components/reportShell";
@@ -85,7 +85,7 @@ export default async function MethodPage() {
     recordDateLabel: reportData.recordDateLabel,
     freshnessLabel: reportData.fetchedAtLabel,
   });
-  const warnings = buildFailureModeWarnings({
+  const warnings = buildTrustWarnings({
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
     freshnessLabel: reportData.fetchedAtLabel,
@@ -168,9 +168,9 @@ export default async function MethodPage() {
       trustStatusDetail={`Coverage: ${sourceCoverage}`}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
-      pageTitle="Trust"
-      currentPath="/trust"
-      pageSummary="Check whether this week's U.S.-market brief is current enough to act on."
+      pageTitle="Forecast confidence"
+
+      pageSummary="Check whether this week's forecast is current enough to act on."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
       sectionLinks={sectionLinks.slice(0, 3)}
       heroVariant="compact"

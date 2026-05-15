@@ -59,7 +59,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             roleAwareTemplates: [],
             executiveOperationalStance: { expand: ["Expand carefully"], avoid: ["Avoid fixed-cost expansion"] },
             revisitDecisions: true,
-            weeklyMovement: { score: 1, direction: "defensive", summary: "Movement" },
+            weeklyMovement: { score: 1, direction: "tightening", summary: "Movement" },
           },
           diagnostics: {
             regimeSignalIndicators: [],
@@ -152,7 +152,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             roleAwareTemplates: [],
             executiveOperationalStance: { expand: ["Expand carefully"], avoid: ["Avoid fixed-cost expansion"] },
             revisitDecisions: true,
-            weeklyMovement: { score: 1, direction: "defensive", summary: "Movement" },
+            weeklyMovement: { score: 1, direction: "tightening", summary: "Movement" },
           },
           diagnostics: {
             regimeSignalIndicators: [],
@@ -196,8 +196,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const regimeIndex = html.indexOf("Revise hiring and roadmap calls now.");
     const callIndex = html.indexOf("Stage approvals and protect runway.");
-    const doNowIndex = html.indexOf(">Action now<");
-    const flipIndex = html.indexOf(">Change course if<");
+    const doNowIndex = html.indexOf(">Do now<");
+    const flipIndex = html.indexOf(">Clears when<");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -241,7 +241,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
             roleAwareTemplates: [],
             executiveOperationalStance: { expand: ["Expand carefully"], avoid: ["Avoid fixed-cost expansion"] },
             revisitDecisions: true,
-            weeklyMovement: { score: 1, direction: "defensive", summary: "Movement" },
+            weeklyMovement: { score: 1, direction: "tightening", summary: "Movement" },
           },
           diagnostics: {
             regimeSignalIndicators: [],

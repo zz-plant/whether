@@ -46,7 +46,7 @@ export const buildCanonicalDecisionCopy = ({
   const doNowLines = [
     weeklyCall?.actionNow,
     homeBriefModel.actionNowShort,
-    ...homeBriefModel.actionStripItems.map((item) => item.actionNow),
+    ...homeBriefModel.actionStripItems.map((item) => item.areaActionNow),
     weeklyCall?.pauseIf,
     homeBriefModel.guardrail,
   ]

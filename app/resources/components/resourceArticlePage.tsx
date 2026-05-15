@@ -7,6 +7,7 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/seo";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
@@ -170,8 +171,8 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                 <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Bounded rule · {decisionAreaLabel(rule.area)}</p>
                   <p className="font-semibold text-slate-100">{rule.recommendation}</p>
-                  <p className="text-xs text-rose-200">Pause: {rule.pauseTrigger}</p>
-                  <p className="text-xs text-emerald-200">Resume: {rule.resumeTrigger}</p>
+                  <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
+                  <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
                 </article>
               ))}
             </div>

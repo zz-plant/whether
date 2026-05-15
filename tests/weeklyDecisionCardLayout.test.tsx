@@ -70,7 +70,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Confidence MED/);
     assert.match(html, />Act with caution</);
     assert.match(html, /Weekly decision strip: current call, action now, pause if, and change course if\./);
-    assert.match(html, /Action now/);
+    assert.match(html, /Do now/);
     assert.match(html, /Boldness budget/);
     assert.match(html, /Hiring market/);
     assert.match(html, /Expansion market/);
@@ -81,8 +81,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /U\.S\. funding backdrop/);
     assert.match(html, />What changed this week</);
     assert.match(html, /Revisit now/);
-    assert.match(html, /Pause if/);
-    assert.match(html, /Change course if/);
+    assert.match(html, /Watch for/);
+    assert.match(html, /Clears when/);
     assert.match(html, /Watch this week/);
     assert.match(html, /Why this lands here/);
     assert.match(html, /What this means now/);
@@ -139,7 +139,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         transitionProbabilities: { Expansion: 15, Mixed: 45, Scarcity: 25, Defensive: 15 },
         decisionRules,
         revisitDecisions: false,
-        weeklyMovement: { score: 0, direction: "neutral", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." },
+        weeklyMovement: { score: 0, direction: "stable", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." },
       },
       diagnostics: {
         regimeSignalIndicators: [
@@ -154,7 +154,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    assert.match(html, /Action now/);
+    assert.match(html, /Do now/);
     assert.match(html, /Using the last clean snapshot because Freshness: Mar 6, 2026 09:12 UTC/);
     assert.match(html, />Act with caution</);
     assert.match(html, /Act with caution/);
@@ -231,7 +231,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           expand: ["Increase product tempo for reversible bets"],
           avoid: ["net-new hiring if tightness > 74"],
         },
-        weeklyMovement: { score: 1.2, direction: "defensive", summary: "summary" },
+        weeklyMovement: { score: 1.2, direction: "tightening", summary: "summary" },
       },
       diagnostics: {
         regimeSignalIndicators: [],
@@ -249,9 +249,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(callCore, /Stage decisions\./);
-    assert.match(callCore, /Action now/);
-    assert.match(callCore, /Pause if/);
-    assert.match(callCore, /Change course if/);
+    assert.match(callCore, /Do now/);
+    assert.match(callCore, /Watch for/);
+    assert.match(callCore, /Clears when/);
     assert.match(callCore, /Revisit now/);
     assert.match(callCore, /Send this brief/);
     assert.match(callCore, /Citation/);

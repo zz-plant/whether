@@ -14,7 +14,7 @@ import type { RegimeKey } from "../regimeEngine";
 
 // ── Indicator-level plain-English translations ──
 
-export type IndicatorPlainEnglish = {
+export type SignalPlainEnglish = {
   /** Human-readable label. e.g., "Cash availability" instead of "Capital tightness" */
   plainLabel: string;
   /** One-line summary of what this indicator captures. */
@@ -31,32 +31,32 @@ export type IndicatorPlainEnglish = {
   operatorPrompt: string;
 };
 
-export const indicatorPlainEnglish: Record<RegimeSignalKey, IndicatorPlainEnglish> = {
+export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
   tightness: {
     plainLabel: "Cash availability",
     whatItMeasures:
-      "How hard or easy it is for U.S. companies to raise and borrow money right now.",
+      "How hard or easy it is for U.S. companies to raise and borrow money.",
     highMeans:
       "Money is tight — conserve cash, extend runway, defer big bets. Fundraising windows are narrow.",
     lowMeans:
       "Money is flowing — you can invest in growth, hire ahead of revenue, and lengthen payback timelines.",
     midMeans:
-      "Money is balanced — stage investments with milestones; don't over-extend but don't freeze either.",
+      "Money is balanced — invest with milestones and keep options open.",
     jargonTerm: "Capital tightness",
     operatorPrompt: "If I needed to raise or borrow money this month, how hard would it be?",
   },
   riskAppetite: {
     plainLabel: "Market risk appetite",
     whatItMeasures:
-      "How willing U.S. investors and buyers are to take risk on new products, hires, and growth bets.",
+      "How willing U.S. investors and buyers are to take risks on new products, hires, and growth bets.",
     highMeans:
       "Investors and markets are bold — launch new products, expand headcount, raise capital confidently.",
     lowMeans:
       "Markets are risk-averse — focus on retention, profitability, and core product. Delay speculative launches.",
     midMeans:
-      "Markets are selectively open — prove traction before scaling; get customer evidence before committing big spend.",
+      "Markets are selectively open — prove traction before scaling; get customer evidence before making large commitments.",
     jargonTerm: "Risk appetite",
-    operatorPrompt: "Would a new product launch or expansion hire get funded or questioned right now?",
+    operatorPrompt: "Would a new product launch or expansion hire get funded or questioned?",
   },
   baseRate: {
     plainLabel: "Fed interest rate",
@@ -77,9 +77,9 @@ export const indicatorPlainEnglish: Record<RegimeSignalKey, IndicatorPlainEnglis
     highMeans:
       "No recession warning — the yield curve is normal. Long-horizon planning is safer.",
     lowMeans:
-      "Recession warning active — the yield curve is inverted or flat. Favor short-payback projects and conserve optionality.",
+      "Recession warning active — the yield curve is inverted or flat. Favor short-payback projects and keep options open.",
     midMeans:
-      "Curve is neutral/flat — don't over-index on this signal alone; combine with cash availability and risk appetite reads.",
+      "Curve is neutral/flat — don't rely on this signal alone; also check cash availability and market risk appetite.",
     jargonTerm: "Yield curve slope",
     operatorPrompt: "If I'm planning a 12+ month project, does this signal support that timeline?",
   },
@@ -108,7 +108,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
     doExamples: [
       "Freeze hiring except for critical roles",
       "Renegotiate vendor contracts",
-      "Focus product on retention and core revenue",
+      "Focus the product on retention and core revenue",
       "Prepare fundraising materials now",
     ],
     avoidExamples: [
@@ -158,7 +158,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
     plainLabel: "Expand",
     stance: "Scale proven bets with milestone-based approval gates.",
     whatItMeans:
-      "Money is flowing and markets are confident. This is the time to invest in growth — but stay disciplined. Scale what's working, don't chase everything.",
+      "Money is flowing and markets are confident. This is the time to invest in growth — with discipline. Scale what's working, don't chase everything.",
     doExamples: [
       "Accelerate hiring for proven product lines",
       "Invest in go-to-market and sales capacity",
@@ -189,7 +189,7 @@ export const plainEnglishScoreDescription = (
   score: number,
 ): string => {
   const band = classifyScoreBand(score);
-  const entry = indicatorPlainEnglish[key];
+  const entry = signalPlainEnglish[key];
   if (band === "high") return entry.highMeans;
   if (band === "low") return entry.lowMeans;
   return entry.midMeans;
@@ -213,9 +213,9 @@ export const buildOperatorContextSummary = (
   const lines = [
     `Your operating environment this week: ${regimeEntry.plainLabel} mode.`,
     "",
-    `Cash availability is ${tightnessBand} (score ${context.tightness}). ${indicatorPlainEnglish.tightness[tightnessBand === "high" ? "highMeans" : tightnessBand === "low" ? "lowMeans" : "midMeans"]}`,
+    `Cash availability is ${tightnessBand} (score ${context.tightness}). ${signalPlainEnglish.tightness[tightnessBand === "high" ? "highMeans" : tightnessBand === "low" ? "lowMeans" : "midMeans"]}`,
     "",
-    `Market risk appetite is ${riskBand} (score ${context.riskAppetite}). ${indicatorPlainEnglish.riskAppetite[riskBand === "high" ? "highMeans" : riskBand === "low" ? "lowMeans" : "midMeans"]}`,
+    `Market risk appetite is ${riskBand} (score ${context.riskAppetite}). ${signalPlainEnglish.riskAppetite[riskBand === "high" ? "highMeans" : riskBand === "low" ? "lowMeans" : "midMeans"]}`,
     "",
     regimeEntry.whatItMeans,
     "",
@@ -270,9 +270,9 @@ export const applyPlainEnglishSubstitutions = (text: string): string => {
 
 // ── "Why this matters" one-liners ──
 
-export const INDICATOR_WHY_MATTERS: Record<RegimeSignalKey, string> = {
+export const SIGNAL_WHY_MATTERS: Record<RegimeSignalKey, string> = {
   tightness: "Cash availability determines whether you conserve or invest.",
   riskAppetite: "Market risk appetite tells you how bold your roadmap can be this week.",
   baseRate: "The Fed rate affects your cost of capital and burn planning.",
-  curveSlope: "The recession gauge warns whether long-horizon bets are safe.",
+  curveSlope: "The recession gauge tells you whether long-horizon bets are safe.",
 };

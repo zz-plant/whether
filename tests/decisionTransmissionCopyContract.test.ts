@@ -63,22 +63,22 @@ describe("decision transmission copy contract", () => {
   it("keeps homepage summary and metadata focused on action, confidence, and flip framing", async () => {
     const metadata = await buildHomeMetadata();
 
-    assert.match(decisionTransmissionSummaryLine, /what to do now/i);
-    assert.match(decisionTransmissionSummaryLine, /what would flip/i);
-    assert.match(decisionTransmissionSummaryLine, /flip the call/i);
-    assert.match(metadata.description ?? "", /what to do now/i);
-    assert.match(metadata.description ?? "", /what would flip/i);
-    assert.match(metadata.description ?? "", /flip the call/i);
+    assert.match(decisionTransmissionSummaryLine, /forecast/i);
+    assert.match(decisionTransmissionSummaryLine, /conditions shift/i);
+    assert.match(decisionTransmissionSummaryLine, /conditions shift/i);
+    assert.match(metadata.description ?? "", /forecast/i);
+    assert.match(metadata.description ?? "", /conditions shift/i);
+    assert.match(metadata.description ?? "", /conditions shift/i);
   });
 
   it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /• Action now:/);
+    assert.match(brief, /• Do now:/);
     assert.match(brief, /Decision transmission check:/);
     assert.match(brief, /• Confidence:/);
     assert.match(brief, /• Change-course trigger:/);
-    assert.match(brief, /• Change course if:/);
+    assert.match(brief, /• Clears when:/);
   });
 
   it("keeps FAQ structured data aligned with the rendered weekly decision FAQ prompts", () => {

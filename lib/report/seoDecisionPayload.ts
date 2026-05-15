@@ -2,7 +2,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeProfile } from "../regimeEngine";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import type { ReportEvidenceItem } from "./reportData";
-import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
+import { buildCompactTrustSummary, buildTrustWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
 import { evaluateSeoQualityGates, type SeoQualitySiblingInput } from "./seoQualityGates";
 
 export type SeoDecisionEvidence = {
@@ -72,7 +72,7 @@ export const buildSeoDecisionPayload = ({
     confidenceLabel: item.confidenceLabel,
   }));
 
-  const failureWarnings = buildFailureModeWarnings({
+  const failureWarnings = buildTrustWarnings({
     confidenceLabel,
     transitionWatch,
     freshnessLabel,

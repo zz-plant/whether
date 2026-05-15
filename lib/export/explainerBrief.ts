@@ -3,7 +3,7 @@ import {
   applyPlainEnglishSubstitutions,
   buildOperatorContextSummary,
   type WeeklyOperatorContext,
-} from "../report/indicatorTranslations";
+} from "../report/signalTranslations";
 
 export const buildExplainerBriefContent = ({
   boardSummary,
@@ -48,10 +48,10 @@ export const buildExplainerBriefContent = ({
     "• Cash availability = how hard it is to raise or borrow money right now.",
     "• Market risk appetite = how willing investors are to take risk on new bets.",
     "• Recession warning gauge = whether the yield curve warns of a slowdown.",
-    `• ${publicDecisionLabels.call} = the standing weekly recommendation.`,
+    `• ${publicDecisionLabels.call} = the weekly forecast for operating conditions.`,
     `• ${publicDecisionLabels.action} = what to do this week.`,
-    `• ${publicDecisionLabels.threshold} = the trip line that pauses or tightens the recommendation.`,
-    `• ${publicDecisionLabels.reversal} = what must improve before loosening again.`,
+    `• ${publicDecisionLabels.threshold} = the condition to watch for that would pause the plan.`,
+    `• ${publicDecisionLabels.reversal} = what must improve before conditions clear.`,
     "",
   );
 
@@ -70,13 +70,13 @@ export const buildExplainerBriefContent = ({
   sections.push("Need definitions?");
   sections.push("Open the glossary at /trust#beginner-glossary to translate any unfamiliar U.S. market terms.");
   sections.push("Or scan this quick reference:");
-  sections.push("• Cash availability (capital tightness) → higher = conserve cash");
-  sections.push("• Market risk appetite → lower = de-risk launches");
-  sections.push("• Recession warning gauge (yield curve slope) → inverted = favor short-payback projects");
-  sections.push("• Fed interest rate (base rate) → higher = borrowing costs more");
+  sections.push("• Capital tightness: a score from 0-100. Higher = cash is harder to access → conserve.");
+  sections.push("• Market risk appetite: a score from 0-100. Lower = investors are more cautious → de-risk.");
+  sections.push("• Recession warning gauge: measures the yield curve. Inverted = favor short-payback bets.");
+  sections.push("• Fed interest rate: the cost of borrowing. Higher = debt is more expensive.");
   sections.push("• Operating environment (regime) → Defend / Conserve / Guarded Expand / Expand");
-  sections.push("• Flip condition → the threshold that changes the recommendation");
-  sections.push("• Guardrail → when to pause current plans");
+  sections.push("• Clears-when condition: the threshold that, once crossed, would change the recommendation.");
+  sections.push("• Watch-for condition: the boundary that pauses or slows current plans.");
 
   return sections.join("\n");
 };

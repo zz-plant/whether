@@ -84,11 +84,11 @@ describe("assembleHomePage streaming contract", () => {
     });
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
-    assert.match(headerOperatorBriefCopy, /Current call:/);
-    assert.match(headerOperatorBriefCopy, /Action now:/);
-    assert.match(headerOperatorBriefCopy, /Pause if:/);
+    assert.match(headerOperatorBriefCopy, /Forecast:/);
+    assert.match(headerOperatorBriefCopy, /Do now:/);
+    assert.match(headerOperatorBriefCopy, /Watch for:/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
-    assert.match(headerOperatorBriefCopy, /Change course if:/);
+    assert.match(headerOperatorBriefCopy, /Clears when:/);
     assert.equal(artifactPayload?.weeklyOperatorBriefText, headerOperatorBriefCopy);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/planning#ops-monthly-action-summary");

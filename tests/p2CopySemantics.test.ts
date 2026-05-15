@@ -36,7 +36,7 @@ describe("P2 beginner copy semantics", () => {
     });
     const shareText = buildShareText(assessment, "GROWTH", "HIRING", "HIRE", output);
 
-    assert.match(shareText, /Posture context: Defensive/);
+    assert.match(shareText, /Posture context: Cloudy/);
     assert.doesNotMatch(shareText, /^Regime:/m);
   });
 
@@ -47,9 +47,9 @@ describe("P2 beginner copy semantics", () => {
     const executiveMemo = buildExecutiveMemo(assessment, "Mar 1, 2026", executiveTemplate);
     const checklist = buildGuardrailChecklist(assessment, executiveTemplate);
 
-    assert.match(strategyBrief, /Posture context: Defensive/);
+    assert.match(strategyBrief, /Posture context: Cloudy/);
     assert.doesNotMatch(strategyBrief, /^Regime:/m);
-    assert.match(executiveMemo, /Posture context: Defensive/);
+    assert.match(executiveMemo, /Posture context: Cloudy/);
     assert.doesNotMatch(executiveMemo, /^Regime:/m);
     assert.match(checklist, /Pause-if Checklist — Defensive/);
   });

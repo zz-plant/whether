@@ -59,7 +59,7 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
     currentCall,
     actionNow:
       options?.modeledDecision?.actionNow
-      ?? actionStripItems?.[0]?.actionNow
+      ?? actionStripItems?.[0]?.areaActionNow
       ?? currentCall,
     operatingStanceLine: currentCall,
     guardrailThreshold: options?.modeledDecision?.guardrailThreshold,
@@ -77,7 +77,7 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     ?? "Hold bounded operating discipline.";
   const actionNow =
     modeled.actionNow
-    ?? topActionStripItems[0]?.actionNow
+    ?? topActionStripItems[0]?.areaActionNow
     ?? currentCall;
   const pauseIf =
     topActionStripItems[0]?.triggerThreshold
@@ -96,7 +96,7 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
     `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
     ...topActionStripItems.slice(1).flatMap((item) => [
-      `• ${item.label}: ${item.actionNow}`,
+      `• ${item.label}: ${item.areaActionNow}`,
       `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
       `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
     ]),
@@ -126,9 +126,9 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
 
   const actionStrip = actionStripItems.slice(1, 3).flatMap((item) => [
     `• ${item.label}`,
-    `  Action now: ${item.actionNow}`,
-    `  Pause if: ${item.triggerThreshold}`,
-    `  Change course if: ${item.reversalCondition}`,
+    `  ${publicDecisionLabels.action}: ${item.areaActionNow}`,
+    `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
+    `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
   ]);
 
   return [
@@ -140,7 +140,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• Regime shift watch: ${options?.transitionWatch ?? "OFF"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
-    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Change course if: ${condition}`),
+    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${publicDecisionLabels.reversal}: ${condition}`),
     "• Re-check owner/cadence: Owner: CEO + Finance lead at the Mon/Thu operating review.",
     ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
     ...actionStrip,

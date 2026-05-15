@@ -10,7 +10,7 @@ export type WeeklyMovement = {
   summary: string;
 };
 
-export type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
+export type TrustWarningItem = { id: string; warning: string; mitigationCheck: string };
 
 // Legacy top-fold section contract kept for DecisionCallHeader tests.
 export type DecisionHeroSectionProps = {
@@ -61,6 +61,6 @@ export type DiagnosticsSectionProps = {
   reportDynamics: ReportDynamics;
   weeklyMovement: WeeklyMovement;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
-  failureModes: FailureModeWarningItem[];
+  failureModes: TrustWarningItem[];
   sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
 };

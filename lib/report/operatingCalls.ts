@@ -20,7 +20,8 @@ import type { DecisionTransmissionBoundedRule } from "./reportData";
 export type ActionStripItem = {
   lever: OperatingLeverKey;
   label: string;
-  actionNow: string;
+  /** Per-area action imperative. Distinct from the top-level actionNowShort which is the overall weekly call. */
+  areaActionNow: string;
   triggerThreshold: string;
   reversalCondition: string;
   currentStateLabel?: "Closed" | "Guarded" | "Staged" | "Open";
@@ -86,7 +87,7 @@ export const buildDecisionTransmissionBoundedRules = ({
   if (Array.isArray(actionStripItems) && actionStripItems.length > 0) {
     return actionStripItems.map((item) =>
       toDecisionTransmissionRule({
-        action: item.actionNow,
+        action: item.areaActionNow,
         triggerThreshold: item.triggerThreshold,
         reversalCondition: item.reversalCondition,
       }),
@@ -261,7 +262,7 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.actionNow,
+      areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.actionNow,
       triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
       currentStateLabel: laneState?.currentStateLabel,

@@ -40,9 +40,9 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
   const hasMeaningfulDelta = Boolean(sinceLastReview?.hasMeaningfulDelta && topDeltaItems.length > 0);
   const freshnessLabel = freshnessLine?.trim() || (fetchedAtLabel ? `Updated ${fetchedAtLabel}` : "Update time unavailable");
   const weeklyMovementLabel = weeklyMovement
-    ? weeklyMovement.direction === "defensive"
+    ? weeklyMovement.direction === "tightening"
       ? "Conditions tightening"
-      : weeklyMovement.direction === "expansionary"
+      : weeklyMovement.direction === "easing"
         ? "Conditions easing"
         : "Conditions stable"
     : "Conditions stable";

@@ -31,7 +31,7 @@ export type TrustExitGate = {
   criteria: TrustExitGateCriterion[];
 };
 
-export type FailureModeWarning = {
+export type TrustWarning = {
   id: "boundary-whipsaw" | "stale-cached" | "anomaly-divergence";
   warning: string;
   mitigationCheck: string;
@@ -233,7 +233,7 @@ const resolveOutageClassification = ({
   return { outageType: "stale-cache", outageSeverity: "blocking" };
 };
 
-export const buildFailureModeWarnings = ({
+export const buildTrustWarnings = ({
   confidenceLabel,
   transitionWatch,
   freshnessLabel,
@@ -249,8 +249,8 @@ export const buildFailureModeWarnings = ({
   provenanceStatusLabel?: string;
   changedSignals: Array<{ delta: number }>;
   anomalySignals: Array<{ reason: string }>;
-}): FailureModeWarning[] => {
-  const warnings: FailureModeWarning[] = [];
+}): TrustWarning[] => {
+  const warnings: TrustWarning[] = [];
   const staleSignal =
     isFallbackSnapshot ||
     isUnavailableFreshness(freshnessLabel) ||
@@ -490,12 +490,12 @@ export const buildTrustStatus = ({
       : "Proceed with normal approvals.";
 
   const action = historicalSelection
-    ? `${historicalAction} Reversal: switch to current data before changing pace.`
+    ? `${historicalAction} Change course if: switch to current data before changing pace.`
     : isFallback
-      ? `${fallbackAction} Reversal: resume normal approvals after one live update.`
+      ? `${fallbackAction} Change course if: resume normal approvals after one live update.`
       : policyRefusalActive
-        ? `Keep posture changes reversible until the policy override clears. Reversal: resume normal approvals once policy signals reconcile.`
-      : `${stableAction} Reversal: return to standard cadence once confidence recovers.`;
+        ? `Keep posture changes reversible until the policy override clears. Change course if: resume normal approvals once policy signals reconcile.`
+      : `${stableAction} Change course if: return to standard cadence once confidence recovers.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

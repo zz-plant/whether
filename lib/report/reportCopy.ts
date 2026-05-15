@@ -59,7 +59,7 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
   { text: "The weekly brief starts from a U.S. market read so teams can make a decision before debating edge cases." },
   { text: "Confidence and trend tell you how reliable this week's read is before you dig into the score details." },
-  { text: "Historical context is available, but the current decision stays primary." },
+  { text: "Historical context is available, but the current decision takes priority." },
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
@@ -73,7 +73,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     value: "tightness",
     term: "Cash availability",
     summary:
-      "How hard or easy it is for U.S. companies to access funding right now. Higher tightness means conserve cash and extend runway.",
+      "How hard or easy it is for U.S. companies to access funding. Higher tightness means conserving cash and extending runway.",
     why: "Why it matters: tighter U.S. capital markets make long-payback projects riskier and fundraising harder.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
@@ -82,7 +82,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     value: "risk-appetite",
     term: "Market risk appetite",
     summary:
-      "How willing U.S. investors and buyers are to take risk on new products, hires, and growth bets.",
+      "How willing U.S. investors and buyers are to take risks on new products, hires, and growth bets.",
     why: "Why it matters: market appetite sets how bold your roadmap and hiring plan can be this week.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
@@ -105,24 +105,24 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "regime",
-    term: "Operating environment (regime)",
-    summary: "Whether identifies 4 environments: Defend, Conserve, Guarded Expand, and Expand. Each maps to a specific set of do/avoid rules.",
-    why: "Why it matters: your operating environment determines the pacing rule for every decision this week.",
+    term: "Current conditions (regime)",
+    summary: "Whether identifies 4 conditions: Freezing, Cloudy, Stormy, and Sunny — each with a specific operating forecast.",
+    why: "Why it matters: current conditions set the operating forecast for every decision this week.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
   {
     value: "flip-condition",
-    term: "Flip condition (change-course trigger)",
-    summary: "The specific threshold that, if crossed, would change this week's recommendation. Always includes a reversal rule: what to do when conditions flip back.",
-    why: "Why it matters: knowing what would change the call prevents overreaction and grounds decisions in data.",
+    term: "Clears-when condition",
+    summary: "The specific threshold that, if crossed, would change this week's forecast. Includes the recovery condition: what to do when conditions clear.",
+    why: "Why it matters: knowing what would shift the forecast prevents overreaction and grounds decisions in data.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
   {
     value: "guardrail",
     term: "Guardrail (pause trigger)",
-    summary: "A boundary condition that tells you when to pause or slow down current plans. Less severe than a full flip.",
+    summary: "A boundary condition that tells you when to pause or slow down current plans. Less severe than a clears-when condition.",
     why: "Why it matters: guardrails let you operate with confidence without constant re-litigation.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
@@ -155,7 +155,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     value: "trend",
     term: "Signal trend",
     summary: "Which direction the signals are moving—improving, deteriorating, stable, or mixed. Trend tells you whether conditions are getting better or worse.",
-    why: "Why it matters: trend adds context beyond a single score. Improving conditions may support staged expansion even in a cautious environment.",
+    why: "Why it matters: trend adds context beyond a single score. Improving conditions support staged expansion even in a cautious environment.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
@@ -192,7 +192,7 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/planning",
     label: "Planning",
-    description: "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
+    description: "Use these diagnostics to set guardrails, prioritize work, and make trade-offs.",
   },
   {
     href: "/trust",
@@ -202,7 +202,7 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/trust#beginner-glossary",
     label: "Trust & glossary",
-    description: "Open trust details and plain-English definitions for teams that need U.S. market term translation.",
+    description: "Open trust details and plain-English definitions of U.S. market terms.",
   },
 ];
 
