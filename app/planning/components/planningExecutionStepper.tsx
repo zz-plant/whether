@@ -41,6 +41,19 @@ export const resolveOperationsExecutionStepId = ({
   return matchingStep?.id ?? firstStepId;
 };
 
+export const resolveOperationsExecutionStepIdFromLocation = ({
+  hash,
+  firstStepId,
+  steps,
+}: {
+  hash: string;
+  firstStepId: string;
+  steps: OperationsExecutionStep[];
+}) => {
+  const hashId = hash.replace(/^#/, "");
+  return hashId ? resolveOperationsExecutionStepId({ hashId, firstStepId, steps }) : firstStepId;
+};
+
 export function OperationsExecutionStepper({
   steps,
 }: {
@@ -55,13 +68,11 @@ export function OperationsExecutionStepper({
     }
 
     const syncFromLocation = () => {
-      const hashId = window.location.hash.replace(/^#/, "");
-      if (!hashId) {
-        setActiveStepId(firstStepId);
-        return;
-      }
-
-      setActiveStepId(resolveOperationsExecutionStepId({ hashId, firstStepId, steps }));
+      setActiveStepId(resolveOperationsExecutionStepIdFromLocation({
+        hash: window.location.hash,
+        firstStepId,
+        steps,
+      }));
     };
 
     syncFromLocation();

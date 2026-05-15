@@ -91,7 +91,7 @@ export default async function SearchPage({
   const activeJob = isSearchEntityJob(normalizedJob) ? normalizedJob : undefined;
 
   if (!query) {
-    permanentRedirect("/resolve#unresolved-question-router");
+    permanentRedirect(buildToolkitLibraryHref());
   }
 
   const matchingResults = searchIndex(query);

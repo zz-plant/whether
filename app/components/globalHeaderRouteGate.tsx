@@ -12,8 +12,9 @@ import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME } from "./globalHeaderShared";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { ThemeToggleButton } from "./themeToggleButton";
+import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 
-const reportHeaderNextStep = (pathname: string) => {
+export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/") {
     return { href: "/evidence", label: "Open evidence" };
   }
@@ -37,6 +38,11 @@ const reportHeaderNextStep = (pathname: string) => {
   return null;
 };
 
+export const resolveReportHeaderUtilityAction = (pathname: string) =>
+  pathname === "/"
+    ? { href: buildToolkitLibraryHref(), label: "Find a tool" }
+    : { href: "/", label: "Weekly brief" };
+
 type GlobalHeaderRouteGateProps = {
   initialPathname?: string;
 };
@@ -53,6 +59,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const isHomeBrief = pathname === "/";
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
   const reportHeaderAction = reportHeaderNextStep(pathname);
+  const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
   const showCollapsedWorkflowPicker = isHomeBrief;
 
   return (
@@ -84,17 +91,17 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   ) : null}
                   {isHomeBrief ? (
                     <Link
-                      href="/search"
+                      href={reportHeaderUtilityAction.href}
                       className="weather-pill hidden min-h-[40px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
                     >
-                      Find a tool
+                      {reportHeaderUtilityAction.label}
                     </Link>
                   ) : (
                     <Link
-                      href="/"
+                      href={reportHeaderUtilityAction.href}
                       className="weather-pill hidden min-h-[40px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
                     >
-                      Weekly brief
+                      {reportHeaderUtilityAction.label}
                     </Link>
                   )}
                   <ThemeToggleButton className="min-h-[42px]" />

@@ -150,6 +150,7 @@ export default async function MethodPage() {
         };
   const sectionLinks = [
     { href: "#trust-snapshot", label: "Snapshot" },
+    { href: "#source-board", label: "Source board" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
@@ -245,6 +246,34 @@ export default async function MethodPage() {
                 ? "Wait for one clean live refresh before approving irreversible moves."
                 : "If freshness or confidence slips, slow approvals and keep decisions reversible."}
             </p>
+          </article>
+        </div>
+      </MethodSection>
+
+      <MethodSection
+        id="source-board"
+        title="Source board"
+        description="The compact source handoff behind the homepage trust board."
+      >
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current source mix</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
+              <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.statusLabel} · {reportData.macroProvenance.timestampLabel}</li>
+              <li><span className="text-slate-400">Decision date:</span> {reportData.recordDateLabel}</li>
+              <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
+            </ul>
+          </article>
+          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Use in the room</p>
+            <p className="text-sm text-slate-200">
+              Use this board when someone asks whether the weekly call is current enough to share or approve against. If either source weakens, keep decisions reversible until the next clean read.
+            </p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Full freshness check</Link>
+              <Link href="#meeting-snippet" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Meeting snippet</Link>
+            </div>
           </article>
         </div>
       </MethodSection>

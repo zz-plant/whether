@@ -5,6 +5,7 @@ import {
   resolveOperationsExecutionStepActionLabel,
   resolveOperationsExecutionStepReturnLabel,
   resolveOperationsExecutionStepId,
+  resolveOperationsExecutionStepIdFromLocation,
 } from "../app/planning/components/planningExecutionStepper";
 
 describe("resolveOperationsExecutionStepId", () => {
@@ -60,6 +61,25 @@ describe("resolveOperationsExecutionStepId", () => {
     assert.equal(
       resolveOperationsExecutionStepId({
         hashId: "ops-operator-requests",
+        firstStepId: "ops-monthly-action-summary",
+        steps,
+      }),
+      "ops-export-briefs",
+    );
+  });
+
+  it("uses the location hash sync so direct share links open the export panel after hydration", () => {
+    assert.equal(
+      resolveOperationsExecutionStepIdFromLocation({
+        hash: "#ops-export-briefs",
+        firstStepId: "ops-monthly-action-summary",
+        steps,
+      }),
+      "ops-export-briefs",
+    );
+    assert.equal(
+      resolveOperationsExecutionStepIdFromLocation({
+        hash: "#ops-operator-requests-panel",
         firstStepId: "ops-monthly-action-summary",
         steps,
       }),

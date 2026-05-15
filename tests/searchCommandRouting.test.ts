@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { resolveSearchCommandHref } from "../app/search/page";
 import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resolve/components/toolkitLibraryPanels";
+import { resolveReportHeaderUtilityAction } from "../app/components/globalHeaderRouteGate";
 import { searchIndex } from "../lib/search/searchIndex";
 
 describe("search command routing", () => {
@@ -14,6 +15,13 @@ describe("search command routing", () => {
   it("routes trust and risk queries into canonical trust anchors", () => {
     assert.equal(resolveSearchCommandHref("confidence", searchIndex("confidence")), "/trust#trust-snapshot");
     assert.equal(resolveSearchCommandHref("failure mode", searchIndex("failure mode")), "/trust#revisit-call");
+  });
+
+  it("keeps the home Find a tool action pointed at the toolkit library", () => {
+    assert.deepEqual(resolveReportHeaderUtilityAction("/"), {
+      href: buildToolkitLibraryHref(),
+      label: "Find a tool",
+    });
   });
 });
 

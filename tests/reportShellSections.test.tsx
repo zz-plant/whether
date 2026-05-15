@@ -48,7 +48,7 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Approval lane/);
     assert.match(html, /Reliability window/);
     assert.match(html, /Source board/);
-    assert.match(html, /\/trust/);
+    assert.match(html, /\/trust#source-board/);
   });
 
   it("prefers canonical treasury source attribution when provenance is present", () => {

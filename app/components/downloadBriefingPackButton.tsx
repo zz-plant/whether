@@ -5,7 +5,55 @@ import { Toast } from "@base-ui/react/toast";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { DocumentIcon, DownloadIcon } from "./uiIcons";
 
-async function generatePdf(text: string): Promise<Uint8Array> {
+const pdfTextReplacements: Array<[RegExp, string]> = [
+  [/[“”]/g, '"'],
+  [/[‘’]/g, "'"],
+  [/—|–/g, "-"],
+  [/→/g, "->"],
+  [/←/g, "<-"],
+  [/≥/g, ">="],
+  [/≤/g, "<="],
+  [/…/g, "..."],
+  [/•/g, "-"],
+  [/\u00a0|\u202f/g, " "],
+];
+
+export function normalizeBriefingPackPdfText(text: string) {
+  const normalized = pdfTextReplacements.reduce(
+    (value, [pattern, replacement]) => value.replace(pattern, replacement),
+    text.normalize("NFKD"),
+  );
+
+  return normalized.replace(/[^\x09\x0a\x0d\x20-\x7e]/g, "");
+}
+
+const wrapPdfLine = (line: string, maxCharacters = 96) => {
+  if (line.length <= maxCharacters) {
+    return [line];
+  }
+
+  const words = line.split(/\s+/);
+  const wrapped: string[] = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const nextLine = currentLine ? `${currentLine} ${word}` : word;
+    if (nextLine.length > maxCharacters && currentLine) {
+      wrapped.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = nextLine;
+    }
+  }
+
+  if (currentLine) {
+    wrapped.push(currentLine);
+  }
+
+  return wrapped.length > 0 ? wrapped : [line];
+};
+
+export async function buildBriefingPackPdfBytes(text: string): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -17,7 +65,7 @@ async function generatePdf(text: string): Promise<Uint8Array> {
   const lineHeight = 13;
   const sectionGap = 8;
 
-  const lines = text.split("\n");
+  const lines = normalizeBriefingPackPdfText(text).split("\n");
   let y = pageHeight - margin;
   let page = doc.addPage([pageWidth, pageHeight]);
 
@@ -32,7 +80,7 @@ async function generatePdf(text: string): Promise<Uint8Array> {
     const f = isHeading ? boldFont : font;
     const size = isHeading ? 12 : isSubheading ? 9 : 8;
 
-    page.drawText(line, {
+    page.drawText(line || " ", {
       x: margin,
       y,
       size,
@@ -43,10 +91,24 @@ async function generatePdf(text: string): Promise<Uint8Array> {
   };
 
   for (const line of lines) {
-    drawLine(line);
+    for (const wrappedLine of wrapPdfLine(line)) {
+      drawLine(wrappedLine);
+    }
   }
 
   return doc.save();
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = "none";
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 export function DownloadBriefingPackButton({
@@ -60,12 +122,7 @@ export function DownloadBriefingPackButton({
 
   const handleDownloadTxt = () => {
     const blob = new Blob([meetingPackText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `whether-briefing-pack-${recordDate}.txt`;
-    anchor.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    downloadBlob(blob, `whether-briefing-pack-${recordDate}.txt`);
     add({
       title: "Download started",
       description: "Briefing pack text is ready.",
@@ -80,15 +137,9 @@ export function DownloadBriefingPackButton({
       type: "success",
     });
     try {
-      const pdfBytes = await generatePdf(meetingPackText);
-      const pdfArray = Array.from(pdfBytes);
-      const blob = new Blob([new Uint8Array(pdfArray)], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `whether-briefing-pack-${recordDate}.pdf`;
-      anchor.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      const pdfBytes = await buildBriefingPackPdfBytes(meetingPackText);
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      downloadBlob(blob, `whether-briefing-pack-${recordDate}.pdf`);
       add({
         title: "PDF ready",
         description: "Briefing pack PDF is downloading.",

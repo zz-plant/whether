@@ -1,7 +1,5 @@
 "use client";
 
-import { Radio } from "@base-ui/react/radio";
-import { RadioGroup } from "@base-ui/react/radio-group";
 import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import type { TreasuryData } from "../../../lib/types";
@@ -117,13 +115,9 @@ export const SignalsModeSwitcherSection = ({
           someone needs to see the proof behind the call.
         </p>
       </div>
-      <RadioGroup
-        value={activeSignalsView}
-        name="signals-view"
+      <div
+        role="radiogroup"
         aria-label="Evidence view mode"
-        onValueChange={(value) => {
-          router.push(buildSignalsViewHref(searchParams, value as SignalsView));
-        }}
         className="grid gap-2 sm:grid-cols-2"
       >
         {([
@@ -140,28 +134,35 @@ export const SignalsModeSwitcherSection = ({
               "Diagnostics, replay, and the checks that would overturn the read.",
           },
         ] as const).map((item) => (
-          <Radio.Root
+          <button
             key={item.id}
-            value={item.id}
+            type="button"
+            role="radio"
+            aria-checked={activeSignalsView === item.id}
+            onClick={() => {
+              router.push(buildSignalsViewHref(searchParams, item.id));
+            }}
             aria-label={item.label}
-            className={({ checked }) =>
+            className={
               `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 text-left outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
-                checked
+                activeSignalsView === item.id
                   ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
                   : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
               }`
             }
           >
             <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80">
-              <Radio.Indicator className="h-2 w-2 rounded-full bg-sky-200" />
+              {activeSignalsView === item.id ? (
+                <span className="h-2 w-2 rounded-full bg-sky-200" aria-hidden="true" />
+              ) : null}
             </span>
             <span className="min-w-0">
               <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">{item.label}</span>
               <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
             </span>
-          </Radio.Root>
+          </button>
         ))}
-      </RadioGroup>
+      </div>
     </section>
   );
 };

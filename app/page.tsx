@@ -186,6 +186,7 @@ export const HomePageReportContent = async ({
         },
       }}
     >
+      <h1 className="sr-only">Weekly Brief</h1>
       <script
         type="application/ld+json"
         id="whether-structured-data"
