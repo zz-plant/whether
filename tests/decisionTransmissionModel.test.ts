@@ -59,7 +59,7 @@ describe("buildDecisionTransmission", () => {
         {
           lever: "hiring-stance",
           label: "Hiring",
-          actionNow: "Hold net-new hiring.",
+          areaActionNow: "Hold net-new hiring.",
           triggerThreshold: " ",
           reversalCondition: "",
         },

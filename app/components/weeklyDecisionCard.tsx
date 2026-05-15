@@ -132,7 +132,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
                 const top = actionStripItems[0];
                 return {
                   label: top.label,
-                  actionNow: top.actionNow,
+                  actionNow: top.areaActionNow,
                   triggerThreshold: top.triggerThreshold,
                   reversalCondition: top.reversalCondition,
                 };

@@ -16,7 +16,7 @@ const resolvePrimarySituationPath = ({
   direction: HomePageDiagnosticsLane["weeklyMovement"]["direction"];
   confidenceLabel: ReturnType<typeof buildWeeklyDecisionCardViewModel>["status"]["confidenceLabel"];
 }) => {
-  if (direction === "defensive") {
+  if (direction === "tightening") {
     return situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0];
   }
 

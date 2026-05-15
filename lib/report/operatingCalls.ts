@@ -47,7 +47,7 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
 const OPERATING_LEVER_FALLBACK = {
-  actionNow: "Hold current posture until rules refresh.",
+  areaActionNow: "Hold current posture until rules refresh.",
   triggerThreshold: "Tighten if confidence and threshold signals worsen.",
   reversalCondition: "Loosen when threshold conditions recover and hold.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
@@ -70,7 +70,7 @@ const toDecisionTransmissionRule = ({
   const missingReversal = !hasText(reversalCondition);
 
   return {
-    action: hasText(action) ? action.trim() : OPERATING_LEVER_FALLBACK.actionNow,
+    action: hasText(action) ? action.trim() : OPERATING_LEVER_FALLBACK.areaActionNow,
     triggerThreshold: missingThreshold ? MANUAL_REVIEW_THRESHOLD_PLACEHOLDER : triggerThreshold.trim(),
     reversalCondition: missingReversal ? MANUAL_REVIEW_REVERSAL_PLACEHOLDER : reversalCondition.trim(),
     manualReviewRequired: missingThreshold || missingReversal,
@@ -106,7 +106,7 @@ export const buildDecisionTransmissionBoundedRules = ({
 
   return [
     toDecisionTransmissionRule({
-      action: OPERATING_LEVER_FALLBACK.actionNow,
+      action: OPERATING_LEVER_FALLBACK.areaActionNow,
       triggerThreshold: undefined,
       reversalCondition: undefined,
     }),
@@ -262,7 +262,7 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
     return {
       lever,
       label: operatingLeverLabel[lever],
-      areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.actionNow,
+      areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.areaActionNow,
       triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
       currentStateLabel: laneState?.currentStateLabel,

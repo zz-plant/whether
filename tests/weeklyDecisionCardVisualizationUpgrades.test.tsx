@@ -116,7 +116,7 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
           {
             lever: "investment-pace",
             label: "Investment pace",
-            actionNow: "Stage discretionary spend.",
+            areaActionNow: "Stage discretionary spend.",
             triggerThreshold: "Tighten if proof slips.",
             reversalCondition: "Reopen after proof recovers.",
             currentStateLabel: "Open",
@@ -127,7 +127,7 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
           {
             lever: "hiring-stance",
             label: "Hiring pace",
-            actionNow: "Keep to backfills.",
+            areaActionNow: "Keep to backfills.",
             triggerThreshold: "Tighten if tightness worsens.",
             reversalCondition: "Reopen after recovery.",
             currentStateLabel: "Guarded",
@@ -138,7 +138,7 @@ describe("WeeklyDecisionCard visualization upgrades", () => {
           {
             lever: "product-priorities",
             label: "Expansion bets",
-            actionNow: "Keep only reversible pilots.",
+            areaActionNow: "Keep only reversible pilots.",
             triggerThreshold: "Tighten if confidence slips.",
             reversalCondition: "Reopen after two improving reads.",
             currentStateLabel: "Staged",

@@ -121,7 +121,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     ?? "Hold bounded operating discipline.";
   const actionNow =
     modeled.actionNow
-    ?? actionStripItems[0]?.actionNow
+    ?? actionStripItems[0]?.areaActionNow
     ?? currentCall;
 
   const actionStrip = actionStripItems.slice(1, 3).flatMap((item) => [

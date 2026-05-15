@@ -25,7 +25,7 @@ export async function GET() {
 
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const decisions = actionItems
-    .map((item) => `- ${item.actionNow} (Threshold: ${item.triggerThreshold} · Reversal: ${item.reversalCondition})`)
+    .map((item) => `- ${item.areaActionNow} (Threshold: ${item.triggerThreshold} · Reversal: ${item.reversalCondition})`)
     .join("\n");
 
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];

@@ -23,7 +23,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={70}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Cloudy",
+          regime: "DEFENSIVE",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -100,7 +100,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={74}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Cloudy",
+          regime: "DEFENSIVE",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -169,7 +169,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         confidencePercent={74}
         confidenceLabel="MED"
         regimeHeader={{
-          regime: "Cloudy",
+          regime: "DEFENSIVE",
           confidence: "Medium (mixed signal reliability)",
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
@@ -238,7 +238,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
             confidenceLabel: "MED",
             confidencePercent: 69,
             signalConfidenceReason: "Boundary distance is moderate.",
-            regimeHeader: { regime: "Cloudy", confidence: "Medium", primaryRisk: "Tightness still elevated." },
+            regimeHeader: { regime: "DEFENSIVE", confidence: "Medium", primaryRisk: "Tightness still elevated." },
             trendLabel: "Mixed",
             confidenceHistory: [
               { recordDate: "2026-01-30", confidencePercent: 62, isMissing: false },
@@ -274,7 +274,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
               pointsToFlip: 6,
               thresholdDirection: "riseAbove",
             },
-            regimeVelocity: { status: "insufficient_history", from: "Cloudy", to: "Cloudy", sampleSize: 0, displayLabel: "Flat" },
+            regimeVelocity: { status: "insufficient_history", from: "Defensive", to: "Defensive", sampleSize: 0, displayLabel: "Flat" },
             whyThisCall: [],
             evidenceItems: [],
           },

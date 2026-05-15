@@ -7,7 +7,7 @@ import type {
   BoundaryDirection,
   FlipRiskMeterState,
   HistoricalTimelineItem,
-  HomeBriefFailureMode,
+  HomeBriefTrustWarning,
   HomeReportData,
   MacroOverlayItem,
   MemoryRailItem,
@@ -280,7 +280,7 @@ export const buildStartRouteDeltaBlock = ({
   evidenceItems: NonNullable<HomeReportData["reportEvidenceItems"]>;
   guardrail: string;
   reversalTrigger: string;
-  failureModes: HomeBriefFailureMode[];
+  failureModes: HomeBriefTrustWarning[];
   trendLabel: string;
   historicalTimeline: HistoricalTimelineItem[];
 }) => {

@@ -365,7 +365,7 @@ export type WeeklyDecisionCardViewModel = {
     regimeVelocity: TransitionVelocityEstimate;
     whyThisCall: WhyThisCallItem[];
     evidenceItems: ReportEvidenceItem[];
-    failureModes?: HomeBriefFailureMode[];
+    failureModes?: HomeBriefTrustWarning[];
   };
   history: {
     memoryRail: MemoryRailItem[];

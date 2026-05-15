@@ -89,7 +89,7 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                 <dl className="grid gap-3 sm:grid-cols-3 text-[11px] leading-5">
                   <div className="border-l-2 border-emerald-400/40 pl-3">
                     <dt className="font-semibold text-emerald-200">{publicDecisionLabels.action}</dt>
-                    <dd className="mt-1 text-slate-100">{item.actionNow}</dd>
+                    <dd className="mt-1 text-slate-100">{item.areaActionNow}</dd>
                   </div>
                   <div className="border-l-2 border-amber-400/40 pl-3">
                     <dt className="font-semibold text-amber-200">{publicDecisionLabels.threshold}</dt>
@@ -130,7 +130,7 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                     <dl className="grid gap-3 sm:grid-cols-3 text-[11px] leading-5">
                       <div className="border-l-2 border-emerald-400/40 pl-3">
                         <dt className="font-semibold text-emerald-200">{publicDecisionLabels.action}</dt>
-                        <dd className="mt-1 text-slate-100">{item.actionNow}</dd>
+                        <dd className="mt-1 text-slate-100">{item.areaActionNow}</dd>
                       </div>
                       <div className="border-l-2 border-amber-400/40 pl-3">
                         <dt className="font-semibold text-amber-200">{publicDecisionLabels.threshold}</dt>

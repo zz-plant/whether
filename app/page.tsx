@@ -101,7 +101,7 @@ export const HomePageReportContent = async ({
       "regime": regime,
       "confidence": confidenceLabel,
       "decisions": actionItems.map((item) => ({
-        "action": item.actionNow,
+        "action": item.areaActionNow,
         "threshold": item.triggerThreshold,
         "reversal": item.reversalCondition,
       })),

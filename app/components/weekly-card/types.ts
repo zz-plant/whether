@@ -6,7 +6,7 @@ import type { ReportDynamics, ReportEvidenceItem } from "../../../lib/report/rep
 
 export type WeeklyMovement = {
   score: number;
-  direction: "defensive" | "expansionary" | "neutral";
+  direction: "tightening" | "easing" | "stable";
   summary: string;
 };
 

@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;
     const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
     const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
-    const doNowItems = actionItems.map((item) => item.actionNow);
+    const doNowItems = actionItems.map((item) => item.areaActionNow);
     const flipTrigger = flipConditionLabels[0] || "Monitor economic indicators";
     const reversalCondition = "Two consecutive weeks of confirming signals";
     const dataFreshness = homepage.reportShell.fetchedAtLabel;
