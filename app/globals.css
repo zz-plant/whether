@@ -683,12 +683,7 @@ body {
   min-width: 0;
 }
 
-@media (min-width: 960px) {
-  .weather-secondary-header-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-    align-items: start;
-  }
-}
+/* 960px breakpoint merged into 1024px block below */
 
 .weather-forecast-card {
   @apply rounded-2xl border bg-slate-950/70 p-3;
@@ -727,12 +722,6 @@ body {
   }
 }
 
-@media (min-width: 900px) {
-  .weather-page-grid-sidebar {
-    grid-template-columns: minmax(0, 1.08fr) minmax(17rem, 0.92fr);
-  }
-}
-
 @media (min-width: 1024px) {
   .weather-hub-hero {
     grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
@@ -745,6 +734,11 @@ body {
 
   .weather-page-grid-sidebar {
     grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+  }
+
+  .weather-secondary-header-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    align-items: start;
   }
 }
 
@@ -967,6 +961,28 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
+  transition: border-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
+              background-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
+}
+
+a .weather-chip:hover,
+button .weather-chip:hover,
+[role="button"] .weather-chip:hover,
+.weather-chip:hover {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.52);
+}
+
+a .weather-chip:active,
+button .weather-chip:active,
+.weather-chip:active {
+  border-color: rgba(148, 163, 184, 0.34);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.weather-chip:focus-visible {
+  outline: 2px solid var(--weather-focus-ring);
+  outline-offset: 2px;
 }
 
 .weather-chip-amber {
@@ -1013,6 +1029,62 @@ body {
 @container brief (max-width: 700px) {
   .weather-brief-secondary-lane {
     display: none;
+  }
+}
+
+@container brief (max-width: 860px) {
+  .weather-brief-call-heading {
+    font-size: 1.15rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.weather-decision-card {
+  padding: var(--weather-card-pad);
+}
+
+/* Decision delta strip — scannable in <5 seconds */
+.weather-decision-delta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem var(--weather-card-pad);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-decision-delta-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(148 163 184 / 0.85);
+}
+
+.weather-decision-delta-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(226 232 240);
+}
+
+/* One-screen guarantee: compact the decision card on shorter viewports */
+@media (max-height: 880px) {
+  .weather-decision-card .weather-section-stage {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .weather-decision-card .weather-section-stage + .weather-section-stage {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 120px;
+  }
+
+  .weather-decision-card dt {
+    font-size: 0.6rem;
+  }
+
+  .weather-decision-card .type-data.font-semibold {
+    font-size: 0.8rem;
   }
 }
 
@@ -1548,7 +1620,7 @@ body {
 }
 
 .type-kicker {
-  @apply text-[0.65rem] font-semibold tracking-[0.08em] text-slate-500;
+  @apply text-[0.65rem] font-semibold tracking-[0.08em] text-slate-400;
 }
 
 .type-data {
@@ -2648,6 +2720,16 @@ body::-webkit-scrollbar-thumb,
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.32);
 }
 
+:root[data-theme="light"] .weather-chip:hover {
+  border-color: rgba(100, 116, 139, 0.7);
+  background: rgba(226, 232, 240, 0.95);
+}
+
+:root[data-theme="light"] .weather-chip:active {
+  border-color: rgba(100, 116, 139, 0.82);
+  background: rgba(203, 213, 225, 0.95);
+}
+
 :root[data-theme="light"] .weather-button {
   border-color: rgba(100, 116, 139, 0.5);
   color: #0f172a;
@@ -2826,4 +2908,24 @@ body::-webkit-scrollbar-thumb,
     0 16px 28px -24px rgba(14, 116, 144, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     inset 0 0 0 1px rgba(56, 189, 248, 0.06);
+}
+
+:root[data-theme="light"] .weather-decision-delta {
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+:root[data-theme="light"] .weather-decision-delta-label {
+  color: #475569;
+}
+
+:root[data-theme="light"] .weather-decision-delta-value {
+  color: #1e293b;
+}
+
+:root[data-display-mode="tv"] .weather-decision-delta-label {
+  font-size: 0.75rem;
+}
+
+:root[data-display-mode="tv"] .weather-decision-delta-value {
+  font-size: 0.95rem;
 }

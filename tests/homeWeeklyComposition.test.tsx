@@ -236,7 +236,7 @@ describe("weekly card and interpretation panel composition", () => {
     const interpretationIndex = html.indexOf("View for this situation");
     const executionIndex = html.indexOf('id="approve-this-weeks-plan"');
     assert.ok(heroIndex > -1);
-    assert.ok(diagnosticsIndex > heroIndex);
+    assert.ok(heroIndex > diagnosticsIndex);
     assert.ok(rulesIndex > -1);
     assert.ok(actionStripIndex > rulesIndex);
     assert.ok(executionIndex > actionStripIndex);

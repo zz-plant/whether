@@ -77,12 +77,31 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     flipPolicyDetails,
   } = buildWeeklyDecisionPresentation({ model, searchParams });
   const stabilityRule = "Wait for two confirming weeks before acting on posture shifts, unless the flip trigger fires at HIGH confidence.";
+  const primaryDriver = driverHighlights[0] ?? null;
+  const changedThisWeekBullet = decisionBullets.find((item) => item.label === "What changed")?.detail ?? "No material weekly delta.";
+  const deltaLeadLine = changedThisWeekBullet.replace(/^(Changed|Updated|Revised):\s*/i, "").trim().split(/\b(?:Do now|Action|Flip):/i)[0]?.trim() || changedThisWeekBullet;
+  const deltaFirstSentence = deltaLeadLine.length > 120 ? `${deltaLeadLine.slice(0, 117)}...` : deltaLeadLine;
+  const postureDirectionChip = (direction: string) =>
+    direction === "tightening" ? "weather-chip-amber" :
+    direction === "opening" ? "weather-chip-emerald" :
+    "weather-chip-slate";
+  const overallDirection = primaryDriver?.postureDirection ?? "flat";
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-decision-card-title">
+    <section className="weather-panel weather-decision-card space-y-4 sm:space-y-5" aria-labelledby="weekly-decision-card-title">
       <h2 id="weekly-decision-card-title" className="sr-only">
         Weekly brief
       </h2>
+      <section className="weather-decision-delta" aria-label="Weekly delta">
+        <span className="weather-chip weather-chip-slate">This week</span>
+        <span className={`weather-chip ${postureDirectionChip(overallDirection)}`}>
+          {overallDirection === "tightening" ? "Tightening" : overallDirection === "opening" ? "Easing" : "Steady"}
+        </span>
+        <span className="weather-decision-delta-value">{deltaFirstSentence}</span>
+        {trajectoryDeltaSummary ? (
+          <span className="weather-decision-delta-label ml-auto hidden sm:inline">{trajectoryDeltaSummary}</span>
+        ) : null}
+      </section>
       <WeeklyDecisionContent
         modePanel={(
           <WeeklyCallModePanel

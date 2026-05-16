@@ -106,11 +106,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const shareSectionIndex = html.indexOf("Send this brief");
 
     assert.ok(deltaIndex > heroIndex);
-    assert.ok(guidanceIndex > deltaIndex);
+    assert.ok(postureIndex > deltaIndex);
+    assert.ok(guidanceIndex > postureIndex);
     assert.ok(actionStripIndex > guidanceIndex);
     assert.ok(shareSectionIndex > actionStripIndex);
-    assert.ok(postureIndex >= heroIndex);
-    assert.ok(postureIndex < deltaIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
@@ -197,7 +196,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.equal((html.match(/Weekly decision strip: current call, action now, pause if, and change course if\./g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.doesNotMatch(html, /Open Signals/);
-    assert.match(html, /weather-panel space-y-4 px-4 py-4/);
+    assert.match(html, /weather-panel weather-decision-card/);
   });
 
   it("keeps the bounded call compact with action, guardrail, and flip visible", () => {

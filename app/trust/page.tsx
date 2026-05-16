@@ -170,6 +170,7 @@ export default async function MethodPage() {
       trustStatusTone={trustStatusTone}
       pageTitle="Forecast confidence"
 
+      currentPath="/trust"
       pageSummary="Check whether this week's forecast is current enough to act on."
       pageSummaryLink={{ href: "#trust-snapshot", label: "Snapshot ↓" }}
       sectionLinks={sectionLinks.slice(0, 3)}

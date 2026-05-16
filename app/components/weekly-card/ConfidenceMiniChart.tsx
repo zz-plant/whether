@@ -30,6 +30,13 @@ const resolveThreshold = (confidencePercent: number) => {
   };
 };
 
+const confidenceTierColors = (percent: number | null) => {
+  if (percent === null) return { dot: "border-slate-200/90 bg-slate-200", card: "rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-3", label: "text-slate-400", value: "text-slate-100" };
+  if (percent >= 75) return { dot: "border-emerald-300/90 bg-emerald-300", card: "rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3", label: "text-emerald-200", value: "text-emerald-50" };
+  if (percent >= 60) return { dot: "border-amber-300/90 bg-amber-300", card: "rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3", label: "text-amber-200", value: "text-amber-50" };
+  return { dot: "border-rose-300/90 bg-rose-300", card: "rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3", label: "text-rose-200", value: "text-rose-50" };
+};
+
 export const ConfidenceMiniChart = ({
   confidenceHistory,
   confidenceTrend,
@@ -105,13 +112,14 @@ export const ConfidenceMiniChart = ({
   const continuitySummary = missingWeeks > 0
     ? `${missingWeeks} gap${missingWeeks === 1 ? "" : "s"} in the 8-week window`
     : "Continuous 8-week read";
+  const tier = confidenceTierColors(currentPercent);
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className={tierOneHeading}>Confidence check</h2>
-          <p className="mt-1 text-[11px] leading-5 text-slate-400">{previousLabel} -&gt; This week -&gt; Threshold</p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-300">{previousLabel} -&gt; This week -&gt; Threshold</p>
           <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>
             {confidenceTrend}
           </p>
@@ -130,9 +138,9 @@ export const ConfidenceMiniChart = ({
             {previousPercent !== null ? `${previousPercent}%` : "n/a"}
           </p>
         </div>
-        <div className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">This week</p>
-          <p className="mt-1 text-lg font-semibold text-sky-50">
+        <div className={tier.card}>
+          <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${tier.label}`}>This week</p>
+          <p className={`mt-1 text-lg font-semibold ${tier.value}`}>
             {currentPercent !== null ? `${currentPercent}%` : "n/a"}
           </p>
         </div>
@@ -163,7 +171,7 @@ export const ConfidenceMiniChart = ({
               />
             ) : null}
             <div
-              className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300/90 bg-amber-300"
+              className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border ${tier.dot}`}
               style={{ left: `${clamp(currentPercent, 0, 100)}%` }}
             />
           </div>

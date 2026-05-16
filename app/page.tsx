@@ -9,7 +9,6 @@ import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
 import { decisionTransmissionSummaryLine } from "../lib/report/decisionTransmissionCopy";
-import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
 import { buildWeeklyTrustCueLine } from "../lib/report/trustStatus";
 import { parseOperatorContextFromCookies } from "../lib/report/operatorContext";
 import { OperatorContextWrapper } from "./components/home/operatorContextWrapper";
@@ -72,18 +71,6 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
-
-  const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
-    assessment: reportData.assessment,
-    treasury: reportData.treasury,
-    date: reportData.weeklyRecordDate,
-    postureWithStageLabel: postureLabel,
-    confidenceLabel,
-    actionStripItems: actionItems,
-    flipConditionLabels,
-    canonicalDecisionCopy: canonicalDecision,
-    weeklyCall: homepage.weeklyCall,
-  });
 
   const trustCue = buildWeeklyTrustCueLine({
     confidenceLabel,
@@ -160,18 +147,6 @@ export const HomePageReportContent = async ({
           ambientMode: "standard",
         },
         actions: {
-          exportCta: {
-            href: "#share-ready-artifact",
-            label: "Copy weekly brief",
-            copyText: headerOperatorBriefCopy,
-            copyTarget: "Weekly brief",
-            telemetryEvent: {
-              pagePath: "/",
-              cluster: "tool",
-              intent: "board",
-              ctaId: "homepage_overview_copy_weekly_brief",
-            },
-          },
           nextStep: {
             href: "/planning",
             description: "Turn this into a weekly plan",

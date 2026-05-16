@@ -189,7 +189,7 @@ export function WeeklyCallModePanel({
                     </span>
                   ) : null}
                 </div>
-                <h2 className={`${tierOneHeadingClassName} mt-3 max-w-4xl text-[1.4rem] font-semibold leading-[1.18] text-slate-50 sm:text-[2.15rem] sm:leading-[1.08]`} style={{ fontFamily: "var(--weather-font-display)", textWrap: "balance" }}>
+                <h2 className={`weather-brief-call-heading ${tierOneHeadingClassName} mt-3 max-w-4xl text-[1.4rem] font-semibold leading-[1.18] text-slate-50 sm:text-[2.15rem] sm:leading-[1.08]`} style={{ fontFamily: "var(--weather-font-display)", textWrap: "balance" }}>
                   {recommendationLine}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs leading-5 text-slate-200" style={{ fontVariantNumeric: "tabular-nums" }}>
