@@ -221,7 +221,7 @@ export function WeeklyCallModePanel({
                   </div>
                 </section>
 
-                <div className="mt-4 flex flex-wrap items-start gap-x-3 gap-y-1.5">
+                <div className="mt-4 flex flex-wrap items-start gap-x-3 gap-y-1.5 max-w-3xl">
                   <p className="text-[12px] leading-5 text-slate-400">
                     <span className="font-medium text-amber-200">Changed this week:</span>{" "}
                     {changedThisWeekDetail}

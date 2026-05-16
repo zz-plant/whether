@@ -233,7 +233,7 @@ export const ReportShell = (props: ReportShellProps) => {
         {enableTvAmbientMode ? <DisplayModeManager /> : null}
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
-        <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
+        <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] px-[var(--weather-shell-pad-inline)] sm:pb-10 sm:pt-5">
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
@@ -250,7 +250,7 @@ export const ReportShell = (props: ReportShellProps) => {
               </aside>
             ) : null}
 
-            <div className={`order-1 min-w-0 space-y-6 lg:space-y-8 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full"}`}>
+            <div className={`order-1 min-w-0 space-y-6 lg:space-y-8 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[72rem]"}`}>
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
