@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 type CliQueryRequest = {
   nextUrl: {
@@ -37,24 +38,25 @@ export const rejectUnsupportedCliQuery = (request: CliQueryRequest, supportedPar
   );
 };
 
+const asOfMatchSchema = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+  .transform((v) => v.split("-").map(Number))
+  .refine(([year]) => year >= 2000, "Year out of range")
+  .transform(([year, month]) => ({ month: String(month), year: String(year) }));
+
 export const parseAsOfSearchParam = (asOf: string | null) => {
   if (!asOf) return {};
-
-  const match = asOf.match(/^(\d{4})-(\d{2})$/);
-  if (!match) return null;
-
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12 || year < 2000) {
-    return null;
-  }
-
-  return {
-    month: String(month),
-    year: String(year),
-  };
+  const result = asOfMatchSchema.safeParse(asOf);
+  if (!result.success) return null;
+  return result.data;
 };
 
+const weeksMatchSchema = z
+  .string()
+  .regex(/^\d+$/)
+  .transform((v) => Number(v))
+  .refine((n) => Number.isInteger(n) && n >= 1, "Weeks must be a positive integer");
 
 export const parseWeeksSearchParam = ({
   weeks,
@@ -73,26 +75,20 @@ export const parseWeeksSearchParam = ({
     };
   }
 
-  if (!/^\d+$/.test(weeks)) {
-    return null;
-  }
+  const result = weeksMatchSchema.safeParse(weeks);
+  if (!result.success) return null;
 
-  const parsed = Number(weeks);
-  if (!Number.isInteger(parsed) || parsed < 1) {
-    return null;
-  }
-
-  if (parsed > maxWeeks) {
+  if (result.data > maxWeeks) {
     return {
-      requestedWeeks: parsed,
+      requestedWeeks: result.data,
       windowWeeks: maxWeeks,
       truncatedToMax: true,
     };
   }
 
   return {
-    requestedWeeks: parsed,
-    windowWeeks: parsed,
+    requestedWeeks: result.data,
+    windowWeeks: result.data,
     truncatedToMax: false,
   };
 };

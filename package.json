@@ -56,12 +56,12 @@
   "packageManager": "bun@1.3.9",
   "dependencies": {
     "@base-ui/react": "1.4.0",
+    "commander": "^14.0.3",
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
     "pdf-lib": "^1.17.1",
     "react": "19.2.5",
     "react-dom": "19.2.5",
-    "simple-icons": "^16.16.0",
     "web-haptics": "^0.0.6",
     "web-vitals": "^5.2.0",
     "zod": "4.3.6"

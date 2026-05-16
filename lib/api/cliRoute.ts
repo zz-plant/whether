@@ -19,7 +19,7 @@ export const parseCliRouteRequest = (
     return NextResponse.json({ error: INVALID_AS_OF_ERROR }, { status: 400 });
   }
 
-  if (!parsedAsOf.year || !parsedAsOf.month) {
+  if (!("year" in parsedAsOf && "month" in parsedAsOf) || !parsedAsOf.year || !parsedAsOf.month) {
     return {};
   }
 

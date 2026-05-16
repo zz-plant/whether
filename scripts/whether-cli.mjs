@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
@@ -55,58 +56,8 @@ const HAS_CUSTOM_LOCAL_API_PORT_CANDIDATES =
   typeof RAW_LOCAL_API_PORT_CANDIDATES === "string" && RAW_LOCAL_API_PORT_CANDIDATES.trim().length > 0;
 const LOCAL_API_PORT_CANDIDATES = parseLocalApiPortCandidates(RAW_LOCAL_API_PORT_CANDIDATES);
 
-const HELP = `Whether CLI — decision terminal for operators
 
-Usage:
-  whether <command> [flags]
-  whether --version
-
-Core Commands:
-  ping          Verify API reachability and auth readiness
-  agent         Pull the canonical agent handoff payload
-  status        Show current operating environment and call (use --verbose for bounded decision detail)
-  call          Show leadership recommendation
-  changes       Show what changed since last refresh
-  regime        Show regime and confidence
-  diagnostics   Show supporting drivers and evidence
-  history       Show historical regimes and calls
-  brief         Generate formatted briefing output
-  explain       Explain the current regime or call
-  scenario      Run what-if analysis
-
-Workflow:
-  export        Export reports and machine-readable outputs
-  share         Share to configured channels
-  watch         Live refresh mode
-
-Setup:
-  install       Bootstrap local CLI configuration for this machine
-  auth          Login and token management
-  config        Manage local configuration
-  doctor        Diagnose CLI or API setup
-  completion    Print shell completion script
-`;
-
-const SUB_HELP = {
-  ping: "Usage: whether ping [--json]",
-  agent:
-    "Usage: whether agent [weekly|monthly|quarterly|yearly] [--json] [--compact|--payload-only|--prompt-only|--skills-only]",
-  call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
-  status:
-    "Usage: whether status [--verbose|--view expanded|--compact] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
-  diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
-  history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
-  brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy] [--json]",
-  export: "Usage: whether export [json|csv|markdown|pdf|briefing] [--output <file>]",
-  share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
-  install:
-    "Usage: whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]\n\nNon-interactive modes:\n  --yes   Skip prompts and accept defaults\n  --ci    CI alias for --yes",
-  auth: "Usage: whether auth [login|logout|status] [--token <token>] [--check] [--json]",
-  config: "Usage: whether config [init|get|set <key> <value>]",
-  company: "Usage: whether company [list|select|status|call|brief] [name]",
-  completion: "Usage: whether completion [--shell <bash|zsh>]",
-};
-
+const SUB_HELP = {};
 const SUPPORTED_AGENT_CADENCES = ["weekly", "monthly", "quarterly", "yearly"];
 
 let cachedVersion = null;
@@ -123,32 +74,6 @@ const readCliVersion = async () => {
   }
 };
 
-const parseArgs = (argv) => {
-  const positionals = [];
-  const flags = {};
-  for (let i = 0; i < argv.length; i += 1) {
-    const token = argv[i];
-    if (!token.startsWith("--")) {
-      positionals.push(token);
-      continue;
-    }
-    const eqIndex = token.indexOf("=");
-    if (eqIndex !== -1) {
-      const key = token.slice(2, eqIndex);
-      flags[key] = token.slice(eqIndex + 1);
-      continue;
-    }
-    const key = token.slice(2);
-    const next = argv[i + 1];
-    if (!next || next.startsWith("--")) {
-      flags[key] = true;
-      continue;
-    }
-    flags[key] = next;
-    i += 1;
-  }
-  return { command: positionals[0] ?? "status", subcommand: positionals[1] ?? null, args: positionals.slice(2), flags };
-};
 
 const parseConfig = (raw) =>
   Object.fromEntries(
@@ -1568,104 +1493,187 @@ const cmdWatch = async (settings, flags) => {
   }
 };
 
-const main = async () => {
-  const parsed = parseArgs(process.argv.slice(2));
-  if (parsed.command === "--help" || parsed.command === "help") {
-    console.log(HELP);
-    return;
-  }
+const run = async () => {
+  const version = await readCliVersion();
+  const program = new Command();
 
-  if (parsed.flags.help && process.argv.slice(2).every((token) => token.startsWith("--"))) {
-    console.log(HELP);
-    return;
-  }
+  program
+    .name("whether")
+    .version(version)
+    .description("Whether CLI — decision terminal for operators")
+    .allowExcessArguments(false)
+    .option("--json", "JSON output")
+    .option("--yaml", "YAML output")
+    .option("--markdown", "Markdown output")
+    .option("--quiet", "Suppress output")
+    .option("--no-color", "Disable color")
+    .option("--no-local-discovery", "Skip local API discovery")
+    .option("--api-base-url <url>", "API base URL")
+    .option("--token <token>", "Auth token")
+    .option("--output <format>", "Output format")
+    .option("--company <name>", "Company context")
+    .option("--stage <stage>", "Company stage")
+    .option("--compact", "Compact output")
+    .option("--payload-only", "Agent payload only")
+    .option("--prompt-only", "Agent prompt only")
+    .option("--skills-only", "Agent skills only")
+    .option("--as-of <date>", "Historical date (YYYY-MM)")
+    .option("--view <mode>", "View mode")
+    .option("--weeks <n>", "Number of weeks")
+    .option("--tightness <n>", "Tightness override")
+    .option("--risk-appetite <n>", "Risk appetite override")
+    .option("--shell <shell>", "Shell for completion")
+    .option("--yes", "Non-interactive install")
+    .option("--ci", "CI mode install")
+    .option("--check", "Auth check")
+    .option("--interval <sec>", "Watch interval (seconds)")
+    .option("--changes-only", "Watch changes only")
+    .option("--copy", "Copy to clipboard")
+    .option("--from <ref>", "Comparison start")
+    .option("--to <ref>", "Comparison end")
+    .option("--metric <key>", "Filter by metric")
+    .option("--plot", "Plot regime history")
+    .option("--cadence <cadence>", "Agent cadence override");
 
-  if (parsed.flags.version) {
-    const settings = await normalizeFlags(parsed.flags);
-    await cmdVersion(settings);
-    return;
-  }
+  const withSettings = (action) => async (...args) => {
+    const opts = args.at(-1);
+    const flags = Object.fromEntries(
+      Object.entries({ ...program.opts(), ...opts }).filter(([, v]) => v !== undefined),
+    );
+    const settings = await normalizeFlags(flags);
+    return action(settings, flags, ...args.slice(0, -1));
+  };
 
-  if (parsed.flags.help && !SUB_HELP[parsed.command]) {
-    console.log(HELP);
-    return;
-  }
+  program
+    .command("ping", { isDefault: false })
+    .description("Verify API reachability and auth readiness")
+    .action(withSettings(async (settings, flags) => cmdPing(settings, flags)));
 
-  const settings = await normalizeFlags(parsed.flags);
+  program
+    .command("status", { isDefault: true })
+    .description("Show current operating environment and call")
+    .action(withSettings(async (settings, flags) => cmdStatus(settings, flags)));
+
+  program
+    .command("agent")
+    .description("Pull the canonical agent handoff payload")
+    .argument("[cadence]", "Cadence (weekly/monthly/quarterly/yearly)")
+    .action(withSettings(async (settings, flags, cadence) => cmdAgent(settings, cadence, flags)));
+
+  program
+    .command("call")
+    .description("Show leadership recommendation")
+    .argument("[subcommand]", "Subcommand (show/copy/diff)")
+    .action(withSettings(async (settings, flags, subcommand) => cmdCall(settings, subcommand ?? "show", flags)));
+
+  program
+    .command("regime")
+    .description("Show regime and confidence")
+    .action(withSettings(async (settings, flags) => cmdRegime(settings, flags)));
+
+  program
+    .command("changes")
+    .description("Show what changed since last refresh")
+    .action(withSettings(async (settings, flags) => cmdChanges(settings, flags)));
+
+  program
+    .command("diagnostics")
+    .description("Show supporting drivers and evidence")
+    .argument("[subcommand]", "Subcommand (summary/drivers/evidence/provenance)")
+    .action(withSettings(async (settings, flags, subcommand) => cmdDiagnostics(settings, subcommand ?? "summary", flags)));
+
+  program
+    .command("history")
+    .description("Show historical regimes and calls")
+    .argument("[subcommand]", "Subcommand (compare)")
+    .action(withSettings(async (settings, flags, subcommand) => cmdHistory(settings, subcommand, flags)));
+
+  program
+    .command("brief")
+    .description("Generate formatted briefing output")
+    .argument("[variant]", "Brief variant (exec/board/staff/investor/slack/email)")
+    .action(withSettings(async (settings, flags, variant) => cmdBrief(settings, variant, flags)));
+
+  program
+    .command("export")
+    .description("Export reports and machine-readable outputs")
+    .argument("[format]", "Export format (json/csv/markdown/pdf/briefing)")
+    .action(withSettings(async (settings, flags, format) => cmdExport(settings, format, flags)));
+
+  program
+    .command("share")
+    .description("Share to configured channels")
+    .argument("[channel]", "Share channel (slack/email/clipboard)")
+    .action(withSettings(async (settings, flags, channel) => cmdShare(settings, channel, flags)));
+
+  program
+    .command("explain")
+    .description("Explain the current regime or call")
+    .argument("[subcommand]", "Subcommand (regime/call/flip/metric)")
+    .action(withSettings(async (settings, flags, subcommand) => cmdExplain(settings, subcommand, flags)));
+
+  program
+    .command("scenario")
+    .description("Run what-if analysis")
+    .action(withSettings(async (settings, flags) => cmdScenario(settings, flags)));
+
+  program
+    .command("company")
+    .description("Manage company contexts")
+    .argument("[subcommand]", "Subcommand (list/select/status/call/brief)")
+    .argument("[name]", "Company name")
+    .action(withSettings(async (settings, flags, subcommand, name) => cmdCompany(settings, subcommand ?? "status", name ? [name] : [], flags)));
+
+  program
+    .command("watch")
+    .description("Live refresh mode")
+    .action(withSettings(async (settings, flags) => cmdWatch(settings, flags)));
+
+  program
+    .command("config")
+    .description("Manage local configuration")
+    .argument("[subcommand]", "Subcommand (init/get/set)")
+    .argument("[key]", "Config key")
+    .argument("[value]", "Config value")
+    .action(withSettings(async (settings, flags, subcommand, key, value) => {
+      const args = [key, value].filter(Boolean);
+      await cmdConfig(settings, subcommand ?? "get", args, flags);
+    }));
+
+  program
+    .command("install")
+    .description("Bootstrap local CLI configuration")
+    .action(withSettings(async (settings, flags) => cmdInstall(settings, flags)));
+
+  program
+    .command("auth")
+    .description("Login and token management")
+    .argument("[subcommand]", "Subcommand (login/logout/status)")
+    .action(withSettings(async (settings, flags, subcommand) => cmdAuth(settings, subcommand ?? "status", flags)));
+
+  program
+    .command("raw")
+    .description("Raw API request")
+    .argument("[endpoint]", "API endpoint path")
+    .action(withSettings(async (settings, _flags, endpoint) => cmdRaw(settings, endpoint)));
+
+  program
+    .command("doctor")
+    .description("Diagnose CLI or API setup")
+    .action(withSettings(async (settings) => cmdDoctor(settings)));
+
+  program
+    .command("completion")
+    .description("Print shell completion script")
+    .action(withSettings(async (settings, flags) => cmdCompletion(settings, flags)));
+
+  program
+    .command("version")
+    .description("Print CLI version")
+    .action(withSettings(async (settings) => cmdVersion(settings)));
 
   try {
-    switch (parsed.command) {
-      case "status":
-        await cmdStatus(settings, parsed.flags);
-        return;
-      case "ping":
-        await cmdPing(settings, parsed.flags);
-        return;
-      case "agent":
-        await cmdAgent(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "call":
-        await cmdCall(settings, parsed.subcommand ?? "show", parsed.flags);
-        return;
-      case "regime":
-        await cmdRegime(settings, parsed.flags);
-        return;
-      case "changes":
-        await cmdChanges(settings, parsed.flags);
-        return;
-      case "diagnostics":
-        await cmdDiagnostics(settings, parsed.subcommand ?? "summary", parsed.flags);
-        return;
-      case "history":
-        await cmdHistory(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "brief":
-        await cmdBrief(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "export":
-        await cmdExport(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "share":
-        await cmdShare(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "explain":
-        await cmdExplain(settings, parsed.subcommand, parsed.flags);
-        return;
-      case "scenario":
-        await cmdScenario(settings, parsed.flags);
-        return;
-      case "company":
-        await cmdCompany(settings, parsed.subcommand, parsed.args, parsed.flags);
-        return;
-      case "watch":
-        await cmdWatch(settings, parsed.flags);
-        return;
-      case "config":
-        await cmdConfig(settings, parsed.subcommand ?? "get", parsed.args, parsed.flags);
-        return;
-      case "install":
-        await cmdInstall(settings, parsed.flags);
-        return;
-      case "auth":
-        await cmdAuth(settings, parsed.subcommand ?? "status", parsed.flags);
-        return;
-      case "raw":
-        await cmdRaw(settings, parsed.subcommand);
-        return;
-      case "doctor":
-        await cmdDoctor(settings);
-        return;
-      case "completion":
-        await cmdCompletion(settings, parsed.flags);
-        return;
-      case "--version":
-      case "version":
-        await cmdVersion(settings);
-        return;
-      default:
-        writeOutput(HELP, settings);
-        process.exit(EXIT.ERROR);
-    }
+    await program.parseAsync(process.argv);
   } catch (error) {
     const knownError = error instanceof Error ? error : new Error(String(error));
     console.error(knownError.message);
@@ -1676,7 +1684,7 @@ const main = async () => {
   }
 };
 
-main().catch((error) => {
+run().catch((error) => {
   const knownError = error instanceof Error ? error : new Error(String(error));
   console.error(knownError.message);
   if (knownError.cause instanceof Error && knownError.cause.message) {
