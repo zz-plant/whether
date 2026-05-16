@@ -139,7 +139,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           </span>
         </div>
         {payload.noindex ? (
-          <p className="rounded-xl border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+          <p className="rounded-md border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
             This page is currently excluded from indexing until freshness and provenance recover. Reasons: {(payload.noindexReasons ?? []).join(", ")}.
           </p>
         ) : null}
@@ -158,7 +158,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <p className="text-sm text-slate-300">{payload.citationMeta}</p>
         <div className="grid gap-3 sm:grid-cols-3">
           {payload.evidence.map((item) => (
-            <article key={item.title} className="rounded-2xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
+            <article key={item.title} className="rounded-lg border border-slate-700/70 bg-slate-950/50 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{item.confidenceLabel}</p>
               <p className="mt-2 text-sm font-semibold text-slate-100">{item.title}</p>
               <p className="mt-2 text-sm text-slate-300">{item.summary}</p>

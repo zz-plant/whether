@@ -46,7 +46,7 @@ export const RegimeSummaryPanel = ({
               </div>
               <p className="mt-3 text-sm text-slate-200">{narrative}</p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                <div className="rounded-md border border-slate-800/80 bg-slate-950/70 p-3">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     Cash availability
                   </p>
@@ -57,7 +57,7 @@ export const RegimeSummaryPanel = ({
                     Threshold {assessment.thresholds.tightnessRegime}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                <div className="rounded-md border border-slate-800/80 bg-slate-950/70 p-3">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     Risk appetite
                   </p>

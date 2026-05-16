@@ -77,7 +77,7 @@ export const MobileActionSheet = ({
             return false;
           }}
         >
-          <div className="weather-mobile-panel weather-mobile-sheet w-full rounded-3xl border border-slate-700/80 p-4 shadow-2xl">
+          <div className="weather-mobile-panel weather-mobile-sheet w-full rounded-lg border border-slate-700/80 p-4 shadow-2xl">
             <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-600/90" aria-hidden="true" />
             <div className="mb-3 flex items-center justify-between gap-3">
               <Drawer.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Drawer.Title>

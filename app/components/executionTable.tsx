@@ -75,7 +75,7 @@ export const ExecutionTable = ({
         </div>
       </div>
       <Tooltip.Provider delay={150} closeDelay={50}>
-        <ScrollArea.Root className="mt-3 overflow-hidden rounded-xl border border-slate-800/80">
+        <ScrollArea.Root className="mt-3 overflow-hidden rounded-md border border-slate-800/80">
           <ScrollArea.Viewport className="max-w-full overscroll-contain">
             <table className="min-w-[720px] border-collapse text-left text-sm text-slate-200">
               <thead>

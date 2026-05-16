@@ -66,7 +66,7 @@ export default function EmbedPlaygroundPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_12rem]">
         {/* Preview area */}
         <div className="space-y-5">
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/50 p-5">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-5">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
               Live preview
             </p>
@@ -97,7 +97,7 @@ export default function EmbedPlaygroundPage() {
         {/* Sidebar — config + code */}
         <div className="space-y-5">
           {/* Configuration */}
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/50 p-4">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
               Configure
             </p>
@@ -161,7 +161,7 @@ export default function EmbedPlaygroundPage() {
           </div>
 
           {/* Embed code */}
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/50 p-4">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
               Embed code
             </p>
@@ -197,7 +197,7 @@ export default function EmbedPlaygroundPage() {
       <div className="mt-14 border-t border-slate-800/40 pt-10">
         <h2 className="mb-5 text-lg font-semibold text-slate-200">How embedding works</h2>
         <div className="grid gap-5 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/40 p-4">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
               1. Configure
             </p>
@@ -206,7 +206,7 @@ export default function EmbedPlaygroundPage() {
               company stage that fits your audience.
             </p>
           </div>
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/40 p-4">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
               2. Copy
             </p>
@@ -215,7 +215,7 @@ export default function EmbedPlaygroundPage() {
               no signup, no ongoing maintenance.
             </p>
           </div>
-          <div className="rounded-xl border border-slate-800/60 bg-slate-950/40 p-4">
+          <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
               3. Publish
             </p>
@@ -228,7 +228,7 @@ export default function EmbedPlaygroundPage() {
       </div>
 
       {/* Attribution note */}
-      <div className="mt-10 rounded-xl border border-slate-800/40 bg-slate-950/30 p-4">
+      <div className="mt-10 rounded-md border border-slate-800/40 bg-slate-950/30 p-4">
         <p className="text-[11px] leading-relaxed text-slate-500">
           <strong className="text-slate-400">Attribution:</strong> The embed block includes
           a small &ldquo;Macro brief by Whether&rdquo; footer with a link back to whether.app.

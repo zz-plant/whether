@@ -65,7 +65,7 @@ export function MockupShell({
 }) {
   return (
     <main id="main-content" tabIndex={-1} className="weather-page-shell weather-page-shell-wide">
-      <section className="weather-panel sticky top-4 z-20 rounded-[1.75rem] border border-slate-700/80 px-4 py-4 shadow-[0_24px_50px_-40px_rgba(2,6,23,0.9)] backdrop-blur-xl">
+      <section className="weather-panel sticky top-4 z-20 rounded-lg border border-slate-700/80 px-4 py-4 shadow-[0_24px_50px_-40px_rgba(2,6,23,0.9)] backdrop-blur-xl">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
@@ -140,9 +140,9 @@ export function MockupShell({
           </Link>
         </div>
 
-        <div className="rounded-[2rem] border border-slate-800/80 bg-slate-950/45 p-3 sm:p-4">
+        <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-3 sm:p-4">
           <div
-            className={`mx-auto flex w-full flex-col ${viewportClassName[viewport]} ${densityClassName[density]} rounded-[1.75rem] border border-slate-800/80 bg-[linear-gradient(180deg,rgba(8,15,29,0.94),rgba(3,8,18,0.98))] shadow-[0_32px_80px_-48px_rgba(2,6,23,0.95)]`}
+            className={`mx-auto flex w-full flex-col ${viewportClassName[viewport]} ${densityClassName[density]} rounded-lg border border-slate-800/80 bg-[linear-gradient(180deg,rgba(8,15,29,0.94),rgba(3,8,18,0.98))] shadow-[0_32px_80px_-48px_rgba(2,6,23,0.95)]`}
           >
             {children}
           </div>

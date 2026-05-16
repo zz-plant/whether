@@ -61,7 +61,7 @@ export const MacroSignalsPanel = ({
             const priority = buildMacroPriorityScore(signal);
 
             return (
-              <div key={signal.id} className="weather-surface rounded-2xl p-4">
+              <div key={signal.id} className="weather-surface rounded-lg p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     {signal.label}

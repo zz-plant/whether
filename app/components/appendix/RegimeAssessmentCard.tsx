@@ -131,7 +131,7 @@ export const RegimeAssessmentCard = ({
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
-                    <Tooltip.Popup className="max-w-[220px] rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl">
+                    <Tooltip.Popup className="max-w-[220px] rounded-lg border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl">
                       {badge.description}
                       <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
                     </Tooltip.Popup>
@@ -205,7 +205,7 @@ export const RegimeAssessmentCard = ({
               <span className="text-slate-500">•</span>
               <span className="break-words">{item}</span>
             </div>
-            <Collapsible.Root className="ml-5 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
+            <Collapsible.Root className="ml-5 rounded-md border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
               <Collapsible.Trigger
                 type="button"
                 className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
@@ -313,7 +313,7 @@ export const RegimeAssessmentCard = ({
         </div>
       </div>
       {hasWarnings ? (
-        <div className="relative mt-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
+        <div className="relative mt-6 rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
           <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
             Data quality flags
           </p>

@@ -29,7 +29,7 @@ const starterViews = [
 export default function MockupsIndexPage() {
   return (
     <main id="main-content" tabIndex={-1} className="weather-page-shell weather-page-shell-wide">
-      <section className="weather-panel rounded-[2.2rem] border border-slate-700/70 px-5 py-8 sm:px-8 sm:py-10">
+      <section className="weather-panel rounded-lg border border-slate-700/70 px-5 py-8 sm:px-8 sm:py-10">
         <div className="space-y-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
             Visual Lab
@@ -51,7 +51,7 @@ export default function MockupsIndexPage() {
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
         <div className="space-y-5">
           {mockups.map((mockup) => (
-            <article key={mockup.href} className="weather-panel rounded-[1.9rem] border border-slate-700/70 px-5 py-5">
+            <article key={mockup.href} className="weather-panel rounded-lg border border-slate-700/70 px-5 py-5">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   {mockup.tags.map((tag) => (
@@ -91,7 +91,7 @@ export default function MockupsIndexPage() {
           ))}
         </div>
 
-        <aside className="weather-panel rounded-[1.9rem] border border-slate-700/70 px-5 py-5">
+        <aside className="weather-panel rounded-lg border border-slate-700/70 px-5 py-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
             Working Rules
           </p>

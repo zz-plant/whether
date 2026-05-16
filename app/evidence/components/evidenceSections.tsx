@@ -144,7 +144,7 @@ export const SignalsModeSwitcherSection = ({
             }}
             aria-label={item.label}
             className={
-              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 text-left outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-left outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
                 activeSignalsView === item.id
                   ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
                   : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
@@ -211,7 +211,7 @@ export const SignalsDecisionSummarySection = ({
         What this means now
       </p>
       <div className="grid gap-3 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             Current outlook
           </p>
@@ -219,7 +219,7 @@ export const SignalsDecisionSummarySection = ({
             {actionNowShort ?? "Hold the current operating posture while thresholds hold."}
           </p>
         </div>
-        <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             Main pressure
           </p>
@@ -228,7 +228,7 @@ export const SignalsDecisionSummarySection = ({
               "Review the scorecard below to confirm the main driver before you change posture."}
           </p>
         </div>
-        <div className="rounded-xl border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             What would change this
           </p>
@@ -308,7 +308,7 @@ export const SignalsDecisionSummarySection = ({
           Use this section to confirm that the weekly brief still fits the evidence. The sections
            below show what changed, why it matters, and what would overturn the outlook.
         </p>
-        <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
+        <dl className="grid gap-3 rounded-md border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
             <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               What to do
@@ -345,7 +345,7 @@ export const SignalsDecisionSummarySection = ({
         <h3 className="text-lg font-semibold text-slate-100">
           What founders should do this week
         </h3>
-        <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-3">
+        <div className="rounded-md border border-emerald-800/60 bg-emerald-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
             Lean in here
           </p>
@@ -355,7 +355,7 @@ export const SignalsDecisionSummarySection = ({
             ))}
           </ul>
         </div>
-        <div className="rounded-xl border border-rose-800/60 bg-rose-950/20 p-3">
+        <div className="rounded-md border border-rose-800/60 bg-rose-950/20 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-200">
             Hold or gate
           </p>
@@ -378,7 +378,7 @@ export const SignalsDecisionSummarySection = ({
           {topDiagnosticCallouts.map((item, index) => (
             <li
               key={item.label}
-              className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3"
+              className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
             >
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
                 Top mover {index + 1}
@@ -450,7 +450,7 @@ export const SignalsCurrentScoresSection = ({
                     </dt>
                     <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.valueLabel}</dd>
                   </dl>
-                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3">
+                  <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
                     <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                       <span>Current vs watch line</span>
                       <span>{card.watchDistanceLabel}</span>
@@ -600,7 +600,7 @@ export const SignalsEvidencePrioritiesSection = ({
         </summary>
         <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
           {additionalPriorityQueue.map((item, index) => (
-            <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
+            <li key={item.label} className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
                 Next check {index + essentialPriorityQueue.length + 1}
               </p>
@@ -697,7 +697,7 @@ export const SignalsAdvancedControlsSection = ({
   searchParams?: Record<string, string | undefined>;
 }) => (
   <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
-    <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+    <div className="grid gap-4 rounded-lg border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="space-y-3">
         <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
           <span>Replay and threshold tools</span>

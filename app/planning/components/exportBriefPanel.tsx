@@ -816,7 +816,7 @@ export const ExportBriefPanel = ({
         </div>
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
-            <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
+            <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
               <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
                 Clipboard blocked
               </p>

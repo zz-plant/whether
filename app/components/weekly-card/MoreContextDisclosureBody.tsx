@@ -68,23 +68,23 @@ export function MoreContextDisclosureBody({
               {evidenceItems.map((item) => (
                 <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
                   <p className="font-semibold text-slate-100">{item.title}</p>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-fluid-xs text-slate-400">
                     Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}
                   </p>
-                  <ul className="space-y-1 text-[11px] text-slate-300">
+                  <ul className="space-y-1 text-fluid-xs text-slate-300">
                     {item.supportingBullets.slice(0, 3).map((bullet) => (
                       <li key={`${item.key}-${bullet}`}>• {bullet}</li>
                     ))}
                   </ul>
-                  <p className="text-[11px] text-slate-300">
+                  <p className="text-fluid-xs text-slate-300">
                     <span className="font-semibold text-slate-200">Confidence:</span>{" "}
                     {item.confidenceLabel}
                   </p>
-                  <p className="text-[11px] text-slate-300">
+                  <p className="text-fluid-xs text-slate-300">
                     <span className="font-semibold text-slate-200">Direction:</span>{" "}
                     {item.directionLabel}
                   </p>
-                  <p className="text-[11px] text-slate-300">
+                  <p className="text-fluid-xs text-slate-300">
                     <span className="font-semibold text-slate-200">Immediate implication:</span>{" "}
                     {item.immediateImplication}
                   </p>
@@ -137,7 +137,7 @@ export function MoreContextDisclosureBody({
                           <li key={`${analog.date}-${analog.similarityScore}`} className={`${compactInset} text-xs text-slate-200`}>
                             <div className="flex items-center justify-between gap-2">
                               <p className="font-semibold text-slate-100">{formatDateUTC(analog.date)}</p>
-                              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+                              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-300">
                                 {Math.round(analog.similarityScore * 100)}% match
                               </span>
                             </div>

@@ -56,7 +56,7 @@ export async function HomeWorkspaceBands({
 
             <Link
               href={workspaceModel.operations.continueHref as Route}
-              className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[0.95rem] px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
+              className="weather-button-primary inline-flex min-h-[48px] items-center justify-center gap-2 rounded-sm px-5 py-2.5 text-sm font-semibold tracking-[0.04em]"
             >
               <CheckIcon className="h-3.5 w-3.5" />
               <span>Open weekly plan</span>

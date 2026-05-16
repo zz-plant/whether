@@ -215,7 +215,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
 
                 return (
                   <figure key={`${section.heading}-embed-${importedEmbed.src}-${index}`} className="space-y-3">
-                    <div className="overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-950/70 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
+                    <div className="overflow-hidden rounded-lg border border-slate-700/80 bg-slate-950/70 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
                       <div className="aspect-video">
                         <iframe
                           src={importedEmbed.src}

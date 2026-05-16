@@ -112,7 +112,7 @@ export const SignalMatrixPanel = ({
       <Collapsible.Root className="mt-4">
         <Collapsible.Trigger
           type="button"
-          className="group flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-700/80 bg-slate-900/45 p-3 text-left text-xs font-medium tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          className="group flex min-h-[48px] w-full items-center justify-between gap-3 rounded-lg border border-slate-700/80 bg-slate-900/45 p-3 text-left text-xs font-medium tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         >
           <span>Decision playbook: matrix positioning and quadrant guidance</span>
           <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600/85 bg-slate-950/65 px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-100">
@@ -293,7 +293,7 @@ export const SignalMatrixPanel = ({
               {quadrants.map((quadrant) => (
                 <div
                   key={quadrant.id}
-                  className={`rounded-xl border p-4 ${quadrant.className} ${
+                  className={`rounded-md border p-4 ${quadrant.className} ${
                     quadrant.id === currentQuadrantId ? "ring-1 ring-slate-100/45" : ""
                   }`}
                 >

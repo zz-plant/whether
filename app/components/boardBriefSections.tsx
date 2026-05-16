@@ -65,7 +65,7 @@ export const WeeklyActionSummaryPanel = ({
               const [actionCue, watchCue] = block.bullets;
 
               return (
-                <section key={block.title} className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-3">
+                <section key={block.title} className="rounded-md border border-slate-700/70 bg-slate-950/40 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-sm font-semibold text-slate-100">{block.title}</h4>
                     <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 1}</span>

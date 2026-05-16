@@ -120,16 +120,16 @@ export function HeroTrustProvenanceBlock({
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex min-h-[28px] items-center rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}
+              className={`inline-flex min-h-[28px] items-center rounded-sm border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}
             >
               {controlHeadline}
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <span className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-500">
               Approval readiness
             </span>
             {outageSeverity ? (
               <span
-                className={`inline-flex min-h-[28px] items-center rounded-[0.7rem] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                className={`inline-flex min-h-[28px] items-center rounded-sm border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${
                   outageSeverity === "critical"
                     ? "border-rose-400/45 bg-rose-500/10 text-rose-100"
                     : outageSeverity === "blocking"
@@ -151,7 +151,7 @@ export function HeroTrustProvenanceBlock({
             <p className="text-xs leading-5 text-slate-500">{decisionImpactWindow}</p>
           ) : null}
         </div>
-        <div className="text-right text-[11px] leading-5 text-slate-400">
+        <div className="text-right text-fluid-xs leading-5 text-slate-400">
           <p>Refreshed {fetchedAtLabel}</p>
           <p>Next {resolvedNextRefreshLabel}</p>
         </div>
@@ -159,7 +159,7 @@ export function HeroTrustProvenanceBlock({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
             Approval lane
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -167,7 +167,7 @@ export function HeroTrustProvenanceBlock({
               {currentApprovalLane?.label ?? (isCompactStableState ? "Allowed now" : "Use caution")}
             </p>
             <span
-              className={`rounded-[0.65rem] border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}
+              className={`rounded-sm border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}
             >
               {trustReadiness.tone === "stable" ? "Clear" : "Watch"}
             </span>
@@ -178,7 +178,7 @@ export function HeroTrustProvenanceBlock({
         </article>
 
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
             Reliability window
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -187,7 +187,7 @@ export function HeroTrustProvenanceBlock({
                 ? `${degradedSourceRows?.length} source${(degradedSourceRows?.length ?? 0) === 1 ? "" : "s"} degraded`
                 : "Core feeds look usable"}
             </p>
-            <span className="text-[10px] uppercase tracking-[0.12em] text-slate-500">
+            <span className="text-fluid-micro uppercase tracking-[0.12em] text-slate-500">
               {outageExitGate
                 ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear`
                 : trustReadiness.tone === "warning"
@@ -210,8 +210,8 @@ export function HeroTrustProvenanceBlock({
         </article>
       </div>
 
-      <details className="weather-auto-chevron weather-transmission-segment rounded-[0.95rem] px-3 py-2">
-          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+      <details className="weather-auto-chevron weather-transmission-segment rounded-sm px-3 py-2">
+          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
             Source board
           </summary>
           <div className="mt-2">
@@ -278,7 +278,7 @@ export function HeroTrustProvenanceBlock({
             ) : null}
           </div>
         </details>
-      <p className="text-[11px] text-slate-400">
+      <p className="text-fluid-xs text-slate-400">
         For formulas and the matching source-board context, see{" "}
         <Link
           href="/trust#source-board"

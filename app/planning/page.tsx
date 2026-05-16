@@ -234,17 +234,17 @@ export default async function OperationsPage({
                     </p>
                   </div>
                   <div className="grid gap-3 md:grid-cols-3">
-                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                    <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Action now</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.actionNow}</p>
                     </article>
-                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                    <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">
                         {weeklyCall.pauseIf}
                       </p>
                     </article>
-                    <article className="rounded-[0.95rem] border border-slate-800/60 bg-slate-950/45 px-3 py-3">
+                    <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">Change course if</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.changeCourseIf}</p>
                     </article>
@@ -256,13 +256,13 @@ export default async function OperationsPage({
                   </p>
                 </section>
 
-                <details className="weather-auto-chevron rounded-[1rem] border border-slate-800/60 bg-slate-950/28 px-4 py-3">
+                <details className="weather-auto-chevron rounded border border-slate-800/60 bg-slate-950/28 px-4 py-3">
                   <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
                     <span className="min-w-0">
                       <span className="block text-[11px] font-medium text-slate-300">Monthly roll-up</span>
                       <span className="mt-1 block text-sm font-semibold text-slate-100">Monthly planning context.</span>
                     </span>
-                    <span className="rounded-[0.65rem] border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                       Optional
                     </span>
                   </summary>
@@ -413,13 +413,13 @@ export default async function OperationsPage({
           <p className="text-sm text-slate-300">Use these warnings to catch weak assumptions before the plan goes out.</p>
         </div>
         {failureModes.length === 0 ? (
-          <div className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-200">
+          <div className="weather-surface rounded-md border px-4 py-4 text-sm text-slate-200">
             No active warning right now. Hold standard guardrails and go deeper only if freshness drops or confidence weakens.
           </div>
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {failureModes.map((warning) => (
-              <article key={warning.id} className="weather-surface rounded-xl border px-4 py-4">
+              <article key={warning.id} className="weather-surface rounded-md border px-4 py-4">
                 <p className="text-sm font-semibold text-slate-100">{warning.warning}</p>
                 <p className="mt-2 text-sm text-slate-300">{warning.mitigationCheck}</p>
               </article>
@@ -456,7 +456,7 @@ export default async function OperationsPage({
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           Board-ready templates
         </summary>
-        <div className="mt-4 space-y-4 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-4">
+        <div className="mt-4 space-y-4 rounded-lg border border-slate-800/80 bg-slate-950/40 px-4 py-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Resources</p>
             <h2 className="text-lg font-semibold text-slate-100">Board-ready templates</h2>
@@ -467,7 +467,7 @@ export default async function OperationsPage({
               <Link
                 key={pillar.slug}
                 href={`/resources/${pillar.slug}` as Route}
-                className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+                className="weather-surface rounded-md border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Governance pillar</p>
                 <p className="mt-2 font-semibold text-slate-100">{pillar.h1}</p>

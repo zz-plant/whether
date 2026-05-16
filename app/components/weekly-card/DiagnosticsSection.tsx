@@ -34,7 +34,7 @@ function RegimeProbabilityStrip({
     <article className="mt-2 border-t border-slate-800/50 pt-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className={`text-xs ${neutralLabel}`}>Possible paths</p>
-        <p className="text-[11px] text-slate-400">Most likely: {leadingState.label} {formatProbabilityPercent(leadingState.value)}</p>
+        <p className="text-fluid-xs text-slate-400">Most likely: {leadingState.label} {formatProbabilityPercent(leadingState.value)}</p>
       </div>
       <div className="mt-2 flex h-3 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
         {orderedStates.map((state) => (
@@ -80,7 +80,7 @@ export function DiagnosticsSection({
   return (
     <>
       <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Decision detail">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Need deeper analysis?</p>
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Need deeper analysis?</p>
         <h2 className={tierTwoHeading}>Why this changed</h2>
         <p className="text-xs leading-5 text-slate-300">Want the backing detail? Expand the sections below to see what changed, what to watch, and why.</p>
         <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">

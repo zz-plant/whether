@@ -124,7 +124,7 @@ export function GuidedTranslationPanels({
               {selectedStakeholder.stageSpecificContent.map((entry) => {
                 const stage = findStageGuide(entry.stageSlug);
                 return (
-                  <li key={entry.stageSlug} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                  <li key={entry.stageSlug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                     <p className="font-semibold text-slate-100">{stage?.title}</p>
                     <p className="mt-1">{entry.guidance}</p>
                     <Link
@@ -138,7 +138,7 @@ export function GuidedTranslationPanels({
               })}
             </ul>
             {selectedStakeholder.promotionAccelerator ? (
-              <div className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+              <div className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   {selectedStakeholder.promotionAccelerator.title}
                 </p>
@@ -186,7 +186,7 @@ export function GuidedTranslationPanels({
               ))}
             </ul>
             {selectedStage.failureMode ? (
-              <p className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
+              <p className="rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
                 <span className="font-semibold">Failure mode:</span> {selectedStage.failureMode}
               </p>
             ) : null}
@@ -196,7 +196,7 @@ export function GuidedTranslationPanels({
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">How each team should read this stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {relatedStakeholderGuides.map((guide) => (
-                <li key={guide.slug} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                <li key={guide.slug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                   <p className="font-semibold text-slate-100">{guide.title}</p>
                   <p className="mt-1">{guide.guidance}</p>
                   <Link

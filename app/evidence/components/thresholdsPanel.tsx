@@ -418,7 +418,7 @@ export const ThresholdsPanel = ({
                   </Popover.Trigger>
                   <Popover.Portal>
                     <Popover.Positioner side="bottom" align="start" sideOffset={12}>
-                      <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
+                      <Popover.Popup className="w-72 rounded-lg border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
                         <Popover.Title className="text-xs font-semibold tracking-[0.14em] text-slate-100">
                           How these thresholds work
                         </Popover.Title>

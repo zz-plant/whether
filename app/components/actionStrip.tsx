@@ -17,7 +17,7 @@ export function ActionStrip({ doItems, dontItems, fenceItems = [] }: ActionStrip
     return (
       <ul className="mt-3 space-y-2 text-sm text-slate-100">
         {items.map((item) => (
-          <li key={item} className="weather-surface flex min-h-[44px] items-start gap-2 rounded-xl px-3 py-2.5">
+          <li key={item} className="weather-surface flex min-h-[44px] items-start gap-2 rounded-md px-3 py-2.5">
             <span aria-hidden="true" className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
             <span aria-hidden="true" className="mt-0.5 shrink-0 text-xs text-slate-300">{icon}</span>
             <span className="leading-relaxed">{item}</span>

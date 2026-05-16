@@ -57,7 +57,7 @@ export function PageFlowNav({
               {items.length} sections
             </span>
           </div>
-          <h2 className={`${compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"} font-semibold text-slate-100`}>{title}</h2>
+          <h2 className={`${compact ? "text-fluid-lg" : "text-fluid-xl"} font-semibold text-slate-100`}>{title}</h2>
           <p className="max-w-3xl text-sm text-slate-300">{description}</p>
         </div>
         {actions ? <div className="flex flex-wrap gap-2.5">{actions}</div> : null}
@@ -71,7 +71,7 @@ export function PageFlowNav({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="group relative block rounded-xl border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="group relative block rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 {index < items.length - 1 ? (
                   <span className={`pointer-events-none absolute left-[1.4rem] top-[3.4rem] h-[calc(100%-2.1rem)] w-px ${tone.rail}`} aria-hidden="true" />

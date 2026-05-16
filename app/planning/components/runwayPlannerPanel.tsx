@@ -75,7 +75,7 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
           How is this calculated?
         </button>
         {showMethodology ? (
-          <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
+          <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
             Runway risk combines runway gap, burn multiple, growth, and the current market setting. The planner turns that pressure plus regime context into practical guidance for approval pace, payback discipline, and how reversible new commitments should be.
           </div>
         ) : null}

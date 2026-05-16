@@ -118,16 +118,16 @@ const TrajectoryMap = ({
     : `Nearest flip: Risk appetite ${postureTrajectory.thresholds.riskAppetite.toFixed(1)}`;
 
   return (
-    <figure className="rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
+    <figure className="rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
       <div className="flex items-center justify-between gap-3">
-        <figcaption className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">
+        <figcaption className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">
           Posture map
         </figcaption>
-        <span className="text-[10px] text-slate-400">
+        <span className="text-fluid-micro text-slate-400">
           {regimeDistance.pointsToFlip.toFixed(1)} pts to nearest flip
         </span>
       </div>
-      <div className="mt-3 relative h-[13rem] rounded-xl border border-slate-800/80 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.08),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.88),rgba(2,6,23,0.98))]">
+      <div className="mt-3 relative h-[13rem] rounded-md border border-slate-800/80 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.08),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.88),rgba(2,6,23,0.98))]">
         <svg
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
@@ -173,7 +173,7 @@ const TrajectoryMap = ({
             Nearest flip
           </text>
         </svg>
-        <div className="pointer-events-none absolute inset-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <div className="pointer-events-none absolute inset-0 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-500">
           <span className="absolute bottom-2 left-3">Cautious</span>
           <span className="absolute bottom-2 right-3">Bold</span>
           <span className="absolute left-2 top-4 -rotate-90 origin-left">Loose</span>
@@ -291,14 +291,14 @@ export const RegimeCommandBar = ({
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_45%)]" aria-hidden="true" />
       <div className="relative grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(18rem,1fr)_minmax(0,0.88fr)] xl:items-stretch">
-        <div className="min-w-0 rounded-2xl border border-slate-700/70 bg-slate-950/72 px-3.5 py-3">
+        <div className="min-w-0 rounded-lg border border-slate-700/70 bg-slate-950/72 px-3.5 py-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex min-h-[30px] items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${regimeStyle.toneClass}`}>
+            <span className={`inline-flex min-h-[30px] items-center rounded-full border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${regimeStyle.toneClass}`}>
               {regimeStyle.label} outlook
             </span>
           </div>
           <div className="mt-3 space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">Current conditions</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-sky-100/85">Current conditions</p>
             <h2 className="max-w-3xl text-sm font-semibold leading-6 tracking-[0.01em] text-slate-50 sm:text-base">
               {call}
             </h2>
@@ -318,9 +318,9 @@ export const RegimeCommandBar = ({
 
         {trajectoryViewProps ? (
           <>
-            <div className="sm:hidden rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
+            <div className="sm:hidden rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
               <details className="weather-auto-chevron">
-                <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-300">
                   Posture map (tap to expand)
                 </summary>
                 <div className="mt-2">
@@ -348,8 +348,8 @@ export const RegimeCommandBar = ({
             </div>
           </>
         ) : (
-          <div className="rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">Weekly direction</p>
+          <div className="rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">Weekly direction</p>
             <p className="mt-2 text-sm text-slate-100">Read the current call as the operating baseline for this cycle.</p>
             <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-300">
               <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">Trend {resolvedTrendLabel}</span>
@@ -358,10 +358,10 @@ export const RegimeCommandBar = ({
           </div>
         )}
 
-        <div className="space-y-3 rounded-2xl border border-slate-700/70 bg-slate-950/78 p-3">
+        <div className="space-y-3 rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
           {postureTrajectory ? (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">Decision runways</p>
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">Decision runways</p>
               <div className="mt-3 space-y-3">
                 <ThresholdRail
                   label="Tightness"
@@ -379,7 +379,7 @@ export const RegimeCommandBar = ({
             </div>
           ) : null}
           <div className="border-t border-slate-800/70 pt-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">Do now</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-emerald-200">Do now</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {doNow.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">
@@ -391,7 +391,7 @@ export const RegimeCommandBar = ({
           </div>
           {trustChecklist?.items.length ? (
             <div className="border-t border-slate-800/70 pt-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-violet-200">
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-violet-200">
                 {trustChecklist.label ?? "Trust check"}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
@@ -405,7 +405,7 @@ export const RegimeCommandBar = ({
             </div>
           ) : null}
           <div className="border-t border-slate-800/70 pt-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-200">Watch next</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-sky-200">Watch next</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {flipConditions.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">

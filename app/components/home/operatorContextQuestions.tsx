@@ -158,7 +158,7 @@ export const OperatorContextBanner = ({
 
   return (
     <div
-      className="weather-panel mx-auto mb-4 max-w-2xl rounded-xl border border-slate-700/60 bg-slate-900/90 p-5 shadow-xl"
+      className="weather-panel mx-auto mb-4 max-w-2xl rounded-md border border-slate-700/60 bg-slate-900/90 p-5 shadow-xl"
       role="region"
       aria-label="Personalize your weekly brief"
       data-weather-first-run-orientation="true"

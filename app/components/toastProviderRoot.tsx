@@ -28,7 +28,7 @@ const ToastList = () => {
           <Toast.Root
             key={toast.id}
             toast={toast}
-            className={`flex w-full flex-col gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl data-[limited]:opacity-0 ${toneClassName}`}
+            className={`flex w-full flex-col gap-2 rounded-lg border border-slate-800/80 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl data-[limited]:opacity-0 ${toneClassName}`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">

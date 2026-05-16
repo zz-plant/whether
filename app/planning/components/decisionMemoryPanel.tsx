@@ -106,13 +106,13 @@ export const DecisionMemoryPanel = () => {
         {statusMessage ? <p className="mt-4 text-sm text-amber-200">{statusMessage}</p> : null}
 
         {!clientId ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
+          <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
               Loading your operator audit trail.
             </p>
           </div>
         ) : entries.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
+          <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
               No saved decisions yet. Save a decision check result to start the history.
             </p>

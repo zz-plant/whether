@@ -38,7 +38,7 @@ export function YearAgoComparator({ comparison }: { comparison: LastYearComparis
       <h3 id="year-ago-comparator" className={tierThreeHeading}>Year-ago comparator</h3>
       <div className="mt-1.5 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <article className={`${compactInset} space-y-2`}>
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-fluid-xs text-slate-400">
             <span>{formatDateUTC(comparison.prior.recordDate)}</span>
             <span>{formatDateUTC(comparison.current.recordDate)}</span>
           </div>

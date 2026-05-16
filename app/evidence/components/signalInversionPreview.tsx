@@ -156,7 +156,7 @@ export function SignalInversionPreview({
           Default view keeps the last 12 monthly spread reads visible so you can see whether inversion pressure is easing or deepening before opening detail mode.
         </p>
       </header>
-      <div className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
+      <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
         <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
           <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="rgba(244,63,94,0.12)" />
           <rect x="0" y="0" width={CHART_WIDTH} height={zeroLineY} fill="rgba(16,185,129,0.08)" />

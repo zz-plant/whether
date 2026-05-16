@@ -152,7 +152,7 @@ export const DataProvenanceStrip = ({
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Positioner side="top" align="center" sideOffset={10}>
-                <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
+                <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
                   <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">Trust snapshot</p>
                   <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-[11px] text-slate-300">
@@ -170,7 +170,7 @@ export const DataProvenanceStrip = ({
             className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
           />
         </div>
-        <div className="grid gap-2 rounded-xl border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
+        <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
           {provenanceRows.map((row) => (
             <p key={row.label} className="space-y-1">
               <span className="block text-[10px] uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
@@ -183,7 +183,7 @@ export const DataProvenanceStrip = ({
   }
 
   return (
-    <div className="weather-surface space-y-2 rounded-2xl border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
+    <div className="weather-surface space-y-2 rounded-lg border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
@@ -206,7 +206,7 @@ export const DataProvenanceStrip = ({
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Positioner side="top" align="center" sideOffset={8}>
-              <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
+              <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
                 <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-[11px] text-slate-300">

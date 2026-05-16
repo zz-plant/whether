@@ -90,7 +90,7 @@ export function PlanningSnippetsPanel({
           });
 
           return (
-            <article key={snippet.id} className="rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4">
+            <article key={snippet.id} className="rounded-lg border border-slate-800/80 bg-slate-950/80 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-semibold text-slate-100">{snippet.label}</h3>

@@ -385,7 +385,7 @@ export const TimeMachinePanel = ({
               </p>
             </div>
             {isDraft ? (
-              <div className="rounded-xl border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
+              <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
                 <p className="type-label text-sky-200">Draft staged</p>
                 <p className="mt-2 text-sm text-slate-200">
                   The URL now points to {selectedLabel}. Load snapshot to apply the replay.

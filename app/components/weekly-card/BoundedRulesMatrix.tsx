@@ -39,7 +39,7 @@ const CorridorScale = () => (
     ].map((item) => (
       <span key={item.label} className="space-y-1">
         <span className={`block h-2 rounded-full ${item.className}`} />
-        <span className="block text-center text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">{item.label}</span>
+        <span className="block text-center text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">{item.label}</span>
       </span>
     ))}
   </div>
@@ -125,13 +125,13 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
               : corridorTone.now.badge;
 
           return (
-            <article key={corridor.key} className="rounded-xl border border-slate-700/70 bg-slate-950/72 p-3">
+            <article key={corridor.key} className="rounded-md border border-slate-700/70 bg-slate-950/72 p-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-slate-100">{corridor.label}</p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-300">{corridor.context}</p>
+                <p className="mt-1 text-fluid-xs leading-5 text-slate-300">{corridor.context}</p>
               </div>
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${laneBadgeClass}`}>
+              <span className={`rounded-full border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${laneBadgeClass}`}>
                 {corridor.laneState?.currentLane === "blocked"
                   ? "Blocked now"
                   : corridor.laneState?.currentLane === "caution"
@@ -141,14 +141,14 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
             </div>
             {corridor.laneState ? (
               <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">
-                <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                <div className="flex items-center justify-between gap-3 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
                   <span>Current status {corridor.laneState.currentStateLabel}</span>
                   <span>{corridor.laneState.tightenDistanceLabel}</span>
                 </div>
                 <div className="relative mt-2 overflow-hidden rounded-full border border-slate-800/70 bg-slate-900/90" aria-hidden="true">
                   <div className="grid h-7 grid-cols-3">
                     {corridorSegmentOrder.map((segment) => (
-                      <span key={segment.key} className={`flex items-center justify-center border-r border-slate-900/70 text-[10px] font-semibold uppercase tracking-[0.08em] ${segment.className}`}>
+                      <span key={segment.key} className={`flex items-center justify-center border-r border-slate-900/70 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${segment.className}`}>
                         {segment.label}
                       </span>
                     ))}
@@ -158,7 +158,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
                     style={{ left: `${corridor.laneState.corridorProgressPercent}%` }}
                   />
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-3 text-[11px] leading-5 text-slate-300">
+                <div className="mt-2 flex items-center justify-between gap-3 text-fluid-xs leading-5 text-slate-300">
                   <p>{corridor.laneState.reopenDistanceLabel}</p>
                   <p className="text-slate-400">Marker shows where this area sits now.</p>
                 </div>
@@ -166,19 +166,19 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [], current
             ) : null}
             <div className="mt-3 grid gap-2 md:grid-cols-3 lg:grid-cols-3">
               <section className={`rounded-lg border px-2.5 py-2 ${corridorTone.now.panel}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-200">Allowed now</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-emerald-200">Allowed now</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">{corridor.now.text}</p>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.now.detail}</p>
+                <p className="mt-2 text-fluid-xs leading-5 text-slate-300">{corridor.now.detail}</p>
               </section>
               <section className={`rounded-lg border px-2.5 py-2 ${corridorTone.caution.panel}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">Caution line</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-amber-200">Caution line</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">{corridor.caution.text}</p>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.caution.detail}</p>
+                <p className="mt-2 text-fluid-xs leading-5 text-slate-300">{corridor.caution.detail}</p>
               </section>
               <section className={`rounded-lg border px-2.5 py-2 ${corridorTone.blocked.panel}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Change course if</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-sky-200">Change course if</p>
                 <p className="mt-1 text-sm font-semibold text-slate-100">{corridor.blocked.text}</p>
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">{corridor.blocked.detail}</p>
+                <p className="mt-2 text-fluid-xs leading-5 text-slate-300">{corridor.blocked.detail}</p>
               </section>
             </div>
             </article>

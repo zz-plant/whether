@@ -36,10 +36,10 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
         const hasPostureShift = previous ? previous.posture !== item.posture : false;
         const shiftLabel = previous ? (hasPostureShift ? "Shifted" : "Held") : "Start";
         const card = (
-          <div className={`rounded-xl border px-3 py-3 ${isCurrent ? "border-sky-400/35 bg-sky-500/10" : "border-slate-700/70 bg-slate-950/65"}`}>
+          <div className={`rounded-md border px-3 py-3 ${isCurrent ? "border-sky-400/35 bg-sky-500/10" : "border-slate-700/70 bg-slate-950/65"}`}>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
-              <span className={`rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
+              <span className={`rounded-full border px-1.5 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
                 isCurrent
                   ? "border-sky-300/50 bg-sky-500/20 text-sky-100"
                   : hasPostureShift
@@ -49,7 +49,7 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
                 {isCurrent ? "Current" : shiftLabel}
               </span>
             </div>
-            <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+            <div className="mt-3 flex items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
               <span
                 className={`h-2.5 w-2.5 rounded-full ${
                   isCurrent
@@ -69,14 +69,14 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
               </span>
             </div>
             <p className="mt-3 text-sm font-semibold text-slate-100">{item.posture}</p>
-            {item.recordDate && item.summary ? <p className="mt-1 text-[11px] leading-5 text-slate-300">{item.recordDate} · {item.summary}</p> : null}
+            {item.recordDate && item.summary ? <p className="mt-1 text-fluid-xs leading-5 text-slate-300">{item.recordDate} · {item.summary}</p> : null}
           </div>
         );
 
         return (
           <li key={`${item.label}-${item.posture}-${index}`}>
             {href ? (
-              <Link href={href} prefetch={false} className="block min-h-[44px] rounded-xl transition hover:bg-slate-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+              <Link href={href} prefetch={false} className="block min-h-[44px] rounded-md transition hover:bg-slate-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                 {card}
               </Link>
             ) : (
@@ -99,7 +99,7 @@ export function HistorySection({ historicalTimeline, title = "Regime history (re
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className={tierOneHeading}>{title}</h2>
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em]">
+          <div className="mt-2 flex flex-wrap gap-1.5 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
             <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-slate-300">{subtitle}</span>
             <span className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-sky-100">
               {currentStreak > 1 ? `${currentStreak} straight in current posture` : "Fresh posture read"}
@@ -110,15 +110,15 @@ export function HistorySection({ historicalTimeline, title = "Regime history (re
           </div>
         </div>
       </div>
-      <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+      <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-3 py-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Drift strip</p>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{driftLabel}</span>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Drift strip</p>
+          <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">{driftLabel}</span>
         </div>
         <div className="mt-2 h-2 rounded-full bg-slate-800/90">
           <div className="h-2 rounded-full bg-gradient-to-r from-emerald-300 via-amber-300 to-rose-300" style={{ width: `${driftPercent}%` }} />
         </div>
-        <p className="mt-2 text-[11px] leading-5 text-slate-400">
+        <p className="mt-2 text-fluid-xs leading-5 text-slate-400">
           {shiftCount === 0
             ? "No recent posture shifts in the current window, which suggests the call is settling."
             : `${shiftCount} recent posture shift${shiftCount > 1 ? "s" : ""} in this window. Higher drift means weaker continuity and less implicit stability.`}

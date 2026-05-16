@@ -22,7 +22,15 @@
   --color-semantic-reversal-border: #fb7185;
   --color-semantic-reversal-bg: #3c1420;
 
-  --color-slate-950: #0a0d14;
+  --color-slate-950: #121212;
+
+  --text-fluid-micro: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
+  --text-fluid-xs: clamp(0.675rem, 0.6rem + 0.3vw, 0.8125rem);
+  --text-fluid-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
+  --text-fluid-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  --text-fluid-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
+  --text-fluid-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
+  --text-fluid-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
 }
 
 /*
@@ -47,16 +55,16 @@
   color-scheme: dark;
   --weather-font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --weather-font-display: "Fraunces", Georgia, serif;
-  --weather-shell-gap: clamp(2rem, 1.5rem + 1.5vw, 3rem);
-  --weather-shell-pad-inline: clamp(1rem, 0.76rem + 1.5vw, 2.5rem);
-  --weather-shell-pad-block: clamp(2.35rem, 1.85rem + 2vw, 3.75rem);
-  --weather-card-pad: clamp(1rem, 0.86rem + 0.6vw, 1.35rem);
+  --weather-shell-gap: clamp(1.75rem, 1rem + 1.75vw, 3rem);
+  --weather-shell-pad-inline: clamp(1rem, 0.6rem + 1.75vw, 2.5rem);
+  --weather-shell-pad-block: clamp(2rem, 1.25rem + 2.5vw, 3.75rem);
+  --weather-card-pad: clamp(0.85rem, 0.7rem + 0.6vw, 1.35rem);
   --weather-interactive-duration: 200ms;
   --weather-interactive-duration-fast: 160ms;
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --weather-focus-ring: rgba(125, 211, 252, 0.88);
   --weather-focus-halo: rgba(14, 165, 233, 0.32);
-  --weather-primary-gradient: linear-gradient(135deg, rgba(36, 99, 235, 0.94), rgba(14, 116, 144, 0.92) 58%, rgba(8, 47, 73, 0.9));
+  --weather-primary-gradient: linear-gradient(135deg, rgba(36, 99, 235, 0.94), rgba(14, 116, 144, 0.92) 58%, rgba(14, 24, 24, 0.9));
   --weather-primary-shadow:
     0 14px 24px -20px rgba(14, 165, 233, 0.26),
     0 6px 14px -12px rgba(59, 130, 246, 0.16),
@@ -72,29 +80,37 @@
     inset 0 0 0 1px rgba(125, 211, 252, 0.08),
     0 12px 22px -18px rgba(2, 6, 23, 0.62),
     0 6px 14px -12px rgba(14, 165, 233, 0.06);
-  --panel-bg: rgba(8, 16, 30, 0.78);
+  --panel-bg: rgba(24, 24, 24, 0.82);
   --panel-border: rgba(148, 163, 184, 0.14);
-  --surface-bg: rgba(9, 16, 29, 0.62);
+  --surface-bg: rgba(30, 30, 30, 0.68);
   --surface-border: rgba(148, 163, 184, 0.12);
-  --weather-radius-panel: 1.15rem;
-  --weather-radius-surface: 1rem;
-  --weather-radius-control: 0.9rem;
-  --weather-radius-chip: 0.72rem;
-  --weather-radius-tight: 0.6rem;
+  --weather-radius-panel: 0.5rem;
+  --weather-radius-surface: 0.375rem;
+  --weather-radius-control: 0.375rem;
+  --weather-radius-chip: 0.25rem;
+  --weather-radius-tight: 0.125rem;
+
+  --weather-font-size-micro: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
+  --weather-font-size-xs: clamp(0.675rem, 0.6rem + 0.3vw, 0.8125rem);
+  --weather-font-size-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
+  --weather-font-size-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  --weather-font-size-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
+  --weather-font-size-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
+  --weather-font-size-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
 
   --color-border-default: rgba(148, 163, 184, 0.14);
   --color-border-subtle: rgba(148, 163, 184, 0.08);
   --color-border-strong: rgba(148, 163, 184, 0.18);
-  --color-bg-nested: rgba(6, 11, 22, 0.40);
-  --color-bg-raised: rgba(8, 15, 28, 0.60);
-  --color-bg-overlay: rgba(8, 15, 28, 0.78);
+  --color-bg-nested: rgba(18, 18, 18, 0.45);
+  --color-bg-raised: rgba(30, 30, 30, 0.65);
+  --color-bg-overlay: rgba(18, 18, 18, 0.82);
   --color-text-decorative: rgb(148 163 184 / 0.90);
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
-  background-color: #0b1120;
+  background-color: #121212;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overflow-x: clip;
@@ -109,8 +125,8 @@ body {
   min-height: 100dvh;
   overflow-x: clip;
   background:
-    radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.10), transparent 60%),
-    linear-gradient(180deg, rgba(4, 10, 20, 1) 0%, rgba(6, 14, 27, 0.99) 34%, rgba(4, 10, 20, 1) 100%);
+    radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(14, 14, 14, 1) 0%, rgba(18, 18, 18, 0.99) 34%, rgba(14, 14, 14, 1) 100%);
 }
 
 ::selection {
@@ -119,10 +135,10 @@ body {
 }
 
 .weather-shell {
-  background-color: #07111f;
+  background-color: #181818;
   background-image:
-    radial-gradient(54rem 20rem at 50% -4%, rgba(56, 189, 248, 0.08), transparent 62%),
-    linear-gradient(180deg, rgba(8, 18, 34, 0.96) 0%, rgba(6, 14, 27, 0.98) 44%, rgba(4, 10, 20, 1) 100%);
+    radial-gradient(54rem 20rem at 50% -4%, rgba(56, 189, 248, 0.06), transparent 62%),
+    linear-gradient(180deg, rgba(24, 24, 24, 0.96) 0%, rgba(20, 20, 20, 0.98) 44%, rgba(14, 14, 14, 1) 100%);
 }
 
 .weather-grid {
@@ -147,11 +163,11 @@ body {
 }
 
 .weather-panel {
-  @apply rounded-2xl border backdrop-blur-sm;
+  @apply rounded-lg border backdrop-blur-sm;
   border-color: var(--color-border-strong);
   background-color: var(--color-bg-overlay);
   background-image:
-    linear-gradient(180deg, rgba(11, 20, 36, 0.94) 0%, rgba(8, 15, 28, 0.96) 58%, rgba(5, 10, 20, 0.98) 100%);
+    linear-gradient(180deg, rgba(24, 24, 24, 0.94) 0%, rgba(20, 20, 20, 0.96) 58%, rgba(14, 14, 14, 0.98) 100%);
   box-shadow:
     0 18px 28px -24px rgba(2, 6, 23, 0.72),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -160,7 +176,7 @@ body {
 
 /* Tier 2: Secondary surfaces — bands, section bodies */
 .weather-surface-secondary {
-  @apply rounded-2xl border backdrop-blur-sm;
+  @apply rounded-lg border backdrop-blur-sm;
   border-color: var(--color-border-default);
   background: var(--color-bg-raised);
   box-shadow: none;
@@ -168,18 +184,18 @@ body {
 
 /* Tier 3: Utility surfaces — chips, stat cards, tags */
 .weather-surface-utility {
-  @apply rounded-xl border;
+  @apply rounded-md border;
   border-color: var(--color-border-subtle);
   background-color: transparent;
   box-shadow: none;
 }
 
 .weather-appbar {
-  @apply rounded-2xl border backdrop-blur-sm;
+  @apply rounded-lg border backdrop-blur-sm;
   border-color: var(--color-border-strong);
-  background-color: rgba(8, 18, 33, 0.72);
+  background-color: rgba(24, 24, 24, 0.78);
   background-image:
-    linear-gradient(180deg, rgba(14, 26, 46, 0.9) 0%, rgba(8, 18, 33, 0.92) 62%, rgba(6, 13, 24, 0.96) 100%);
+    linear-gradient(180deg, rgba(28, 28, 28, 0.9) 0%, rgba(24, 24, 24, 0.92) 62%, rgba(16, 16, 16, 0.96) 100%);
   box-shadow:
     0 14px 22px -20px rgba(2, 6, 23, 0.56),
     0 4px 10px -12px rgba(14, 165, 233, 0.04),
@@ -188,7 +204,7 @@ body {
 }
 
 .weather-panel-static {
-  @apply rounded-[22px] border;
+  @apply rounded-lg border;
   border-color: var(--color-border-default);
   background: var(--color-bg-raised);
 }
@@ -240,7 +256,7 @@ body {
 .weather-hub-shell {
   position: relative;
   isolation: isolate;
-  padding-block: clamp(2rem, 1.4rem + 2.2vw, 3.5rem);
+  padding-block: clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
 }
 
 .weather-hub-shell > * {
@@ -263,11 +279,11 @@ body {
 
 .weather-hub-eyebrow,
 .weather-hub-section-eyebrow {
-  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgb(148 163 184 / 0.90);
+  font-size: var(--weather-font-size-micro);
 }
 
 .weather-hub-title {
@@ -282,10 +298,10 @@ body {
 .weather-hub-hero {
   display: grid;
   gap: 0.9rem;
-  padding: clamp(1.25rem, 1rem + 1.1vw, 2rem);
+  padding: clamp(1rem, 0.75rem + 1.25vw, 2rem);
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 1.5rem;
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
 }
 
@@ -295,7 +311,7 @@ body {
   padding: clamp(1rem, 0.86rem + 0.75vw, 1.6rem);
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 1.5rem;
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
 }
 
@@ -307,7 +323,7 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 1.25rem;
   padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
-  background: rgba(8, 15, 28, 0.50);
+  background: rgba(30, 30, 30, 0.50);
 }
 
 .weather-legal-content :where(h2, h3) {
@@ -322,7 +338,7 @@ body {
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 1.35rem;
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
 }
 
@@ -336,7 +352,7 @@ body {
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  background: rgba(8, 15, 28, 0.50);
+  background: rgba(30, 30, 30, 0.50);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -365,7 +381,7 @@ body {
   align-items: center;
   border-radius: 9999px;
   border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   padding: 0.45rem 0.85rem;
   font-size: 0.72rem;
   font-weight: 700;
@@ -454,11 +470,11 @@ body {
 }
 
 .weather-route-card {
-  @apply rounded-[1.25rem] border px-4 py-4 text-left;
+  @apply rounded-lg border px-4 py-4 text-left;
   touch-action: manipulation;
   padding: 1.05rem;
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
   transition:
     transform 180ms ease,
@@ -480,16 +496,16 @@ body {
 }
 
 .weather-stat-card {
-  @apply rounded-xl border px-3 py-3;
+  @apply rounded-md border px-3 py-3;
   border-color: rgba(148, 163, 184, 0.10);
-  background: rgba(8, 15, 28, 0.40);
+  background: rgba(30, 30, 30, 0.40);
   font-variant-numeric: tabular-nums;
 }
 
 .weather-secondary-header {
   display: grid;
-  gap: clamp(1.05rem, 0.92rem + 0.72vw, 1.55rem);
-  padding: clamp(1.35rem, 1.12rem + 1.05vw, 2rem);
+  gap: clamp(0.9rem, 0.75rem + 0.75vw, 1.5rem);
+  padding: clamp(1.15rem, 0.85rem + 1.25vw, 2rem);
 }
 
 .weather-secondary-header-layout {
@@ -654,9 +670,9 @@ body {
 }
 
 .weather-tile {
-  @apply rounded-2xl border border-slate-700/70 backdrop-blur-xl;
+  @apply rounded-lg border border-slate-700/70 backdrop-blur-xl;
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
 }
 
@@ -686,19 +702,19 @@ body {
 /* 960px breakpoint merged into 1024px block below */
 
 .weather-forecast-card {
-  @apply rounded-2xl border bg-slate-950/70 p-3;
+  @apply rounded-lg border bg-slate-950/70 p-3;
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
   min-height: 7.25rem;
   padding: 0.9rem;
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.50);
+  background: rgba(30, 30, 30, 0.50);
   font-variant-numeric: tabular-nums;
 }
 
 .weather-forecast-icon {
-  @apply inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-900/70 text-base text-slate-100;
+  @apply inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-900/70 text-base text-slate-100;
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.45),
     0 6px 12px -10px rgba(2, 6, 23, 0.7);
@@ -759,21 +775,21 @@ body {
 }
 
 .weather-icon-chip {
-  @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border;
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border;
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
 }
 
 .weather-surface {
-  @apply rounded-2xl border backdrop-blur-sm;
+  @apply rounded-lg border backdrop-blur-sm;
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
   box-shadow: none;
 }
 
 .weather-brief-shell {
   border-color: rgba(125, 211, 252, 0.20);
-  background: rgba(8, 15, 28, 0.65);
+  background: rgba(30, 30, 30, 0.65);
   box-shadow: none;
 }
 
@@ -797,7 +813,7 @@ body {
   align-items: center;
   border-radius: 9999px;
   border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.40);
+  background: rgba(30, 30, 30, 0.40);
   padding: 0.35rem 0.75rem;
   font-size: 0.68rem;
   font-weight: 700;
@@ -826,7 +842,7 @@ body {
   justify-content: center;
   border-radius: 9999px;
   border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.40);
+  background: rgba(30, 30, 30, 0.40);
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -836,7 +852,7 @@ body {
 .weather-sequence-card {
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 1rem;
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
 }
 
 .weather-route-card-proof {
@@ -857,35 +873,35 @@ body {
 
 .weather-ritual-card {
   border-radius: 1.25rem;
-  background: rgba(8, 15, 28, 0.40);
+  background: rgba(30, 30, 30, 0.40);
 }
 
 .weather-transmission-card {
   border: 1px solid rgba(56, 189, 248, 0.18);
   border-radius: 1.1rem;
-  background: rgba(8, 15, 28, 0.60);
+  background: rgba(30, 30, 30, 0.60);
 }
 
 .weather-transmission-segment {
   border-radius: 1rem;
-  background: rgba(4, 8, 16, 0.20);
+  background: rgba(14, 14, 14, 0.20);
 }
 
 .weather-trust-board {
   border-color: rgba(251, 191, 36, 0.16);
-  background: rgba(17, 22, 34, 0.60);
+  background: rgba(26, 26, 26, 0.60);
 }
 
 .weather-trust-lane {
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 1rem;
-  background: rgba(8, 15, 28, 0.45);
+  background: rgba(30, 30, 30, 0.45);
 }
 
 .weather-priority-card {
-  @apply rounded-2xl border;
+  @apply rounded-lg border;
   border-color: rgba(125, 211, 252, 0.22);
-  background: rgba(8, 18, 33, 0.70);
+  background: rgba(24, 24, 24, 0.70);
 }
 
 :where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
@@ -902,7 +918,7 @@ body {
 
 .weather-surface-sky {
   border-color: rgba(56, 189, 248, 0.18);
-  background: rgba(8, 47, 73, 0.15);
+  background: rgba(14, 24, 24, 0.15);
 }
 
 .weather-data-mode {
@@ -950,11 +966,11 @@ body {
 
 .weather-quick-glance {
   border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(8, 15, 28, 0.40);
+  background: rgba(30, 30, 30, 0.40);
 }
 
 .weather-chip {
-  @apply rounded-[0.65rem] border;
+  @apply rounded-sm border;
   padding: 0.2rem 0.6rem;
   font-size: 0.625rem;
   font-weight: 600;
@@ -1146,7 +1162,7 @@ button .weather-chip:active,
   overflow: hidden;
   border: 1px solid rgba(56, 189, 248, 0.20);
   border-radius: 9999px;
-  background: rgba(8, 47, 73, 0.30);
+  background: rgba(14, 24, 24, 0.30);
   padding: 0.32rem;
 }
 
@@ -1154,7 +1170,7 @@ button .weather-chip:active,
   flex: none;
   border-radius: 9999px;
   border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(8, 15, 28, 0.50);
+  background: rgba(30, 30, 30, 0.50);
   color: rgb(186 230 253 / 0.85);
   font-size: 0.6rem;
   font-weight: 500;
@@ -1268,7 +1284,7 @@ button .weather-chip:active,
   font-variant-numeric: tabular-nums;
   border-color: rgba(148, 163, 184, 0.18);
   background-image:
-    linear-gradient(180deg, rgba(16, 29, 49, 0.9), rgba(8, 14, 27, 0.96));
+    linear-gradient(180deg, rgba(28, 28, 28, 0.9), rgba(18, 18, 18, 0.96));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.065),
     inset 0 0 0 1px rgba(125, 211, 252, 0.035),
@@ -1291,7 +1307,7 @@ button .weather-chip:active,
   border-color: rgba(148, 163, 184, 0.18);
   background-image:
     radial-gradient(120% 140% at 0% 0%, rgba(251, 191, 36, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(20, 37, 62, 0.9), rgba(8, 15, 30, 0.94));
+    linear-gradient(180deg, rgba(28, 28, 28, 0.9), rgba(24, 24, 24, 0.94));
   box-shadow:
     inset 0 0 0 1px rgba(125, 211, 252, 0.05),
     0 18px 30px -20px rgba(2, 6, 23, 0.72),
@@ -1347,7 +1363,7 @@ button .weather-chip:active,
   font-variant-numeric: tabular-nums;
   border-color: rgba(148, 163, 184, 0.18);
   background:
-    linear-gradient(180deg, rgba(16, 31, 52, 0.92), rgba(8, 16, 30, 0.97));
+    linear-gradient(180deg, rgba(28, 28, 28, 0.92), rgba(24, 24, 24, 0.97));
   box-shadow:
     inset 0 0 0 1px rgba(125, 211, 252, 0.05),
     0 10px 18px -18px rgba(2, 6, 23, 0.62);
@@ -1557,7 +1573,7 @@ button .weather-chip:active,
   color: rgb(248 250 252);
   background:
     radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.06), transparent 42%),
-    linear-gradient(180deg, rgba(15, 28, 48, 0.92), rgba(8, 16, 31, 0.96));
+    linear-gradient(180deg, rgba(28, 28, 28, 0.92), rgba(24, 24, 24, 0.96));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     inset 0 0 0 1px rgba(125, 211, 252, 0.04),
@@ -1604,28 +1620,41 @@ button .weather-chip:active,
 }
 
 .type-headline {
-  @apply text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl md:text-6xl;
+  @apply font-semibold leading-[1.08] tracking-tight;
+  font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3.75rem);
   font-family: var(--weather-font-display);
   letter-spacing: -0.05em;
 }
 
 .type-section {
-  @apply text-2xl font-semibold leading-snug md:text-3xl;
+  @apply font-semibold leading-snug;
+  font-size: clamp(1.5rem, 1.125rem + 1.5vw, 1.875rem);
   font-family: var(--weather-font-display);
   letter-spacing: -0.04em;
 }
 
 .type-label {
-  @apply text-[0.65rem] font-semibold tracking-[0.08em] leading-none uppercase;
+  @apply font-semibold tracking-[0.08em] leading-none uppercase;
+  font-size: var(--weather-font-size-micro);
 }
 
 .type-kicker {
-  @apply text-[0.65rem] font-semibold tracking-[0.08em] text-slate-400;
+  @apply font-semibold tracking-[0.08em] text-slate-400;
+  font-size: var(--weather-font-size-micro);
 }
 
 .type-data {
-  @apply text-base leading-relaxed;
+  @apply leading-relaxed;
+  font-size: var(--weather-font-size-base);
 }
+
+.text-fluid-micro { font-size: var(--weather-font-size-micro); }
+.text-fluid-xs { font-size: var(--weather-font-size-xs); }
+.text-fluid-sm { font-size: var(--weather-font-size-sm); }
+.text-fluid-base { font-size: var(--weather-font-size-base); }
+.text-fluid-lg { font-size: var(--weather-font-size-lg); }
+.text-fluid-xl { font-size: var(--weather-font-size-xl); }
+.text-fluid-2xl { font-size: var(--weather-font-size-2xl); }
 
 :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   line-height: 1.6;
@@ -1994,8 +2023,8 @@ html {
   --home-band-border: rgba(103, 232, 249, 0.2);
   --home-band-accent: rgb(125 211 252);
   --home-band-accent-soft: rgba(56, 189, 248, 0.16);
-  --home-band-panel-bg: rgba(4, 20, 36, 0.48);
-  --home-band-panel-image: linear-gradient(180deg, rgba(186, 230, 253, 0.05), rgba(8, 47, 73, 0.05) 58%, rgba(2, 6, 23, 0.08) 100%);
+  --home-band-panel-bg: rgba(14, 24, 24, 0.48);
+  --home-band-panel-image: linear-gradient(180deg, rgba(186, 230, 253, 0.05), rgba(14, 24, 24, 0.05) 58%, rgba(2, 6, 23, 0.08) 100%);
   --home-band-panel-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.05), inset 0 0 0 1px rgba(14, 116, 144, 0.1);
   --home-band-kicker: rgb(125 211 252);
 }
@@ -2097,7 +2126,7 @@ html {
 .weather-step-card {
   position: relative;
   overflow: hidden;
-  background: rgba(8, 15, 28, 0.55);
+  background: rgba(30, 30, 30, 0.55);
   transition:
     transform 220ms ease,
     border-color 220ms ease,
@@ -2141,7 +2170,7 @@ html {
 }
 
 .weather-step-summary {
-  background: rgba(8, 15, 28, 0.45);
+  background: rgba(30, 30, 30, 0.45);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -2388,19 +2417,22 @@ body::-webkit-scrollbar-thumb,
   }
 
   .type-headline {
-    @apply text-5xl leading-tight md:text-7xl;
+    font-size: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    line-height: 1.08;
   }
 
   .type-section {
-    @apply text-3xl;
+    font-size: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
   }
 
   .type-label {
-    @apply text-sm tracking-[0.2em];
+    font-size: var(--weather-font-size-sm);
+    letter-spacing: 0.2em;
   }
 
   .type-data {
-    @apply text-lg leading-relaxed;
+    font-size: var(--weather-font-size-lg);
+    line-height: 1.75;
   }
 
   .weather-pill,
@@ -2443,19 +2475,22 @@ body::-webkit-scrollbar-thumb,
 }
 
 :root[data-display-mode="tv"] .type-headline {
-  @apply text-5xl leading-tight md:text-7xl;
+  font-size: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  line-height: 1.08;
 }
 
 :root[data-display-mode="tv"] .type-section {
-  @apply text-3xl;
+  font-size: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
 }
 
 :root[data-display-mode="tv"] .type-label {
-  @apply text-sm tracking-[0.2em];
+  font-size: var(--weather-font-size-sm);
+  letter-spacing: 0.2em;
 }
 
 :root[data-display-mode="tv"] .type-data {
-  @apply text-lg leading-relaxed;
+  font-size: var(--weather-font-size-lg);
+  line-height: 1.75;
 }
 
 :root[data-display-mode="tv"] .weather-pill,

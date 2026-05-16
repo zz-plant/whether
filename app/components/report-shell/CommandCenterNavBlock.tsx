@@ -67,11 +67,11 @@ export function CommandCenterNavBlock({
     decisionBanner?.decision ??
     (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   const headingClassName = heroVariant === "compact"
-    ? "max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-slate-100 sm:text-[2rem]"
+    ? "max-w-3xl font-semibold tracking-[-0.03em] text-slate-100 text-fluid-2xl"
     : "type-headline max-w-3xl text-slate-100";
   const decisionHeadingClassName = heroVariant === "compact"
-    ? "max-w-xl text-[1.45rem] font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 sm:text-[1.6rem]"
-    : "max-w-xl text-[1.7rem] font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50";
+    ? "max-w-xl font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 text-fluid-lg"
+    : "max-w-xl font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50 text-fluid-xl";
   const briefKicker = heroVariant === "compact" ? "Route brief" : "Weekly operating brief";
   const hasUtilityActions = Boolean(secondaryCta || exportCta);
   const introMetaLine = [
@@ -91,8 +91,8 @@ export function CommandCenterNavBlock({
     >
       <div className="space-y-3 sm:space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
-          <div className="rounded-[1rem] border border-slate-800/55 bg-slate-950/40 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <div className="rounded border border-slate-800/55 bg-slate-950/40 p-3">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
               Role
             </p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -103,7 +103,7 @@ export function CommandCenterNavBlock({
                     key={option.key}
                     href={option.href}
                     ariaCurrent={isActive ? "page" : undefined}
-                    className={`inline-flex min-h-[40px] items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    className={`inline-flex min-h-[40px] items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold ${
                       isActive
                         ? "border-sky-300/70 bg-sky-500/12 text-slate-100"
                         : "border-slate-800/60 text-slate-400 hover:border-sky-400/45 hover:text-slate-100"
@@ -120,7 +120,7 @@ export function CommandCenterNavBlock({
         <div className="space-y-3">
           <div className="space-y-2">
             <p className="weather-brief-kicker">{briefKicker}</p>
-            <p className="text-[10px] leading-4 text-slate-500">{introMetaLine}</p>
+            <p className="text-fluid-micro leading-4 text-slate-500">{introMetaLine}</p>
             <h1 className={headingClassName}>{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-[15px]">
               <span>{pageSummary}</span>
@@ -129,12 +129,12 @@ export function CommandCenterNavBlock({
           </div>
 
           {decisionDeltaLine ? (
-            <p className="text-[11px] leading-5 text-slate-400" aria-label="Decision deltas">
+            <p className="text-fluid-xs leading-5 text-slate-400" aria-label="Decision deltas">
               {decisionDeltaLine}
             </p>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-500">
             <span>Updated {fetchedAtLabel}</span>
             <span>{resolvedNextRefreshLabel}</span>
             {nextStep ? <span>Next: {nextStep.description}</span> : null}
@@ -155,7 +155,7 @@ export function CommandCenterNavBlock({
             {secondaryCta ? (
               <InternalAwareLink
                 href={secondaryCta.href}
-                className="inline-flex min-h-[40px] items-center justify-center rounded-[0.9rem] border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[40px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {secondaryCta.label}
               </InternalAwareLink>
@@ -167,7 +167,7 @@ export function CommandCenterNavBlock({
                 copyTarget={exportCta.copyTarget}
                 telemetryEvent={exportCta.telemetryEvent}
                 label={exportCta.label}
-                className="inline-flex min-h-[40px] items-center justify-center rounded-[0.9rem] border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[40px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {exportCta.label}
               </ReportCta>
@@ -176,7 +176,7 @@ export function CommandCenterNavBlock({
         </div>
 
         {roleSwitcher && heroVariant !== "full" ? (
-          <div className="grid gap-2 rounded-[1rem] border border-slate-800/55 bg-slate-950/40 p-3 sm:grid-cols-2">
+          <div className="grid gap-2 rounded border border-slate-800/55 bg-slate-950/40 p-3 sm:grid-cols-2">
             {roleSwitcher.options.map((option) => {
               const isActive = option.key === roleSwitcher.active;
               return (
@@ -184,7 +184,7 @@ export function CommandCenterNavBlock({
                   key={option.key}
                   href={option.href}
                   ariaCurrent={isActive ? "page" : undefined}
-                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                  className={`rounded-md border px-3 py-2 text-sm font-semibold ${
                     isActive
                       ? "border-sky-300/70 bg-sky-500/12 text-slate-100"
                       : "border-slate-800/60 text-slate-400 hover:border-sky-400/45 hover:text-slate-100"
@@ -198,35 +198,35 @@ export function CommandCenterNavBlock({
         ) : null}
 
         {shouldShowMissionSequence ? (
-          <details className="group rounded-[1rem] border border-slate-800/55 bg-slate-950/40 px-4 py-3 sm:px-5 sm:py-4">
+          <details className="group rounded border border-slate-800/55 bg-slate-950/40 px-4 py-3 sm:px-5 sm:py-4">
             <summary className="flex min-h-[40px] cursor-pointer list-none items-center justify-between gap-3 sm:cursor-default sm:list-none">
               <span className="min-w-0">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <span className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   {missionSequenceTitle || "Use this order"}
                 </span>
-                <span className="mt-0.5 block text-[11px] text-slate-500">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
+                <span className="mt-0.5 block text-fluid-xs text-slate-500">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
               </span>
-              <span aria-hidden="true" className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-[11px] text-slate-500 transition group-open:rotate-180 sm:hidden">▾</span>
+              <span aria-hidden="true" className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-fluid-xs text-slate-500 transition group-open:rotate-180 sm:hidden">▾</span>
             </summary>
             <ol className="mt-3 grid gap-2 sm:grid-cols-3">
               {missionSequenceItems.map((item) => (
                 <li key={`${item.phase}-${item.title}`}>
                   <InternalAwareLink
                     href={item.href}
-                    className="block rounded-[0.95rem] border border-slate-800/60 bg-slate-950/30 px-3 py-3 transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/40"
+                    className="block rounded-sm border border-slate-800/60 bg-slate-950/30 px-3 py-3 transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/40"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100/70">
+                        <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-sky-100/70">
                           {item.phase}
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
                       </div>
-                      <span className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                      <span className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
                         {item.cta}
                       </span>
                     </div>
-                    <p className="mt-2 text-[11px] leading-5 text-slate-400">{item.detail}</p>
+                    <p className="mt-2 text-fluid-xs leading-5 text-slate-400">{item.detail}</p>
                   </InternalAwareLink>
                 </li>
               ))}

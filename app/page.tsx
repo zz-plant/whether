@@ -190,7 +190,7 @@ export const HomePageReportContent = async ({
         interpretationSearchParams={homepage.interpretationSearchParams}
         fallbackAlert={homepage.fallbackAlert}
       />
-      <Suspense fallback={<div className="h-24 animate-pulse rounded-xl bg-slate-950/30" />}>
+      <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
         <HomeKeyTermsDisclosure />
       </Suspense>
       <ErrorBoundary label="Workspace bands">

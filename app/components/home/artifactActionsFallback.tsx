@@ -4,7 +4,7 @@ export const ArtifactActionsFallback = () => (
   <div
     aria-busy="true"
     aria-label="Loading share artifacts"
-    className="space-y-3 rounded-xl border border-slate-700/70 bg-slate-950/72 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+    className="space-y-3 rounded-md border border-slate-700/70 bg-slate-950/72 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
   >
     <div className="flex items-center justify-between gap-2">
       <div>

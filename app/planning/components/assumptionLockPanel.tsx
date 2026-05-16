@@ -178,7 +178,7 @@ export const AssumptionLockPanel = () => {
         />
 
         {lockedBanner ? (
-          <div className="mt-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+          <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
             <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
               Locked assumption banner
             </p>

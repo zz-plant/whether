@@ -15,7 +15,7 @@ export const HistoricalBanner = ({
   const backwardHref = previousHref ?? timeMachineHref;
 
   return (
-    <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
+    <div className="mt-6 rounded-lg border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="type-label text-slate-400">Viewing past data</span>
         <div className="flex flex-wrap gap-2">

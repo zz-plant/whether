@@ -215,7 +215,7 @@ export const InsightDatabasePanel = ({
                   </Select.Trigger>
                   <Select.Portal>
                     <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                      <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                      <Select.Popup className="min-w-[220px] rounded-md border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
                         <Select.List className="max-h-64 overflow-y-auto">
                           <Select.Item
                             value="all"
@@ -268,7 +268,7 @@ export const InsightDatabasePanel = ({
                   </Select.Trigger>
                   <Select.Portal>
                     <Select.Positioner side="bottom" align="start" sideOffset={8}>
-                      <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                      <Select.Popup className="min-w-[220px] rounded-md border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
                         <Select.List className="max-h-64 overflow-y-auto">
                           <Select.Item
                             value="all"

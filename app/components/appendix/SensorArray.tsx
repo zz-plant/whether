@@ -101,7 +101,7 @@ export const SensorArray = ({
                   </span>
                 </p>
               </div>
-              <div className="rounded-2xl border border-slate-800/70 bg-slate-950/70 p-4 text-xs text-slate-400">
+              <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 p-4 text-xs text-slate-400">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                   Leading group
                 </p>
@@ -146,7 +146,7 @@ export const SensorArray = ({
           const windowAggregation = getSensorWindowAggregation(sensor, selectedWindow);
 
           return (
-            <div key={sensor.id} className="weather-panel rounded-2xl p-5">
+            <div key={sensor.id} className="weather-panel rounded-lg p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="break-words text-sm text-slate-300">{sensor.label}</p>

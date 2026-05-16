@@ -31,10 +31,10 @@ const resolveThreshold = (confidencePercent: number) => {
 };
 
 const confidenceTierColors = (percent: number | null) => {
-  if (percent === null) return { dot: "border-slate-200/90 bg-slate-200", card: "rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-3", label: "text-slate-400", value: "text-slate-100" };
-  if (percent >= 75) return { dot: "border-emerald-300/90 bg-emerald-300", card: "rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3", label: "text-emerald-200", value: "text-emerald-50" };
-  if (percent >= 60) return { dot: "border-amber-300/90 bg-amber-300", card: "rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3", label: "text-amber-200", value: "text-amber-50" };
-  return { dot: "border-rose-300/90 bg-rose-300", card: "rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3", label: "text-rose-200", value: "text-rose-50" };
+  if (percent === null) return { dot: "border-slate-200/90 bg-slate-200", card: "rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-3", label: "text-slate-400", value: "text-slate-100" };
+  if (percent >= 75) return { dot: "border-emerald-300/90 bg-emerald-300", card: "rounded-md border border-emerald-400/25 bg-emerald-500/8 px-3 py-3", label: "text-emerald-200", value: "text-emerald-50" };
+  if (percent >= 60) return { dot: "border-amber-300/90 bg-amber-300", card: "rounded-md border border-amber-400/25 bg-amber-500/8 px-3 py-3", label: "text-amber-200", value: "text-amber-50" };
+  return { dot: "border-rose-300/90 bg-rose-300", card: "rounded-md border border-rose-400/25 bg-rose-500/8 px-3 py-3", label: "text-rose-200", value: "text-rose-50" };
 };
 
 export const ConfidenceMiniChart = ({
@@ -119,33 +119,33 @@ export const ConfidenceMiniChart = ({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className={tierOneHeading}>Confidence check</h2>
-          <p className="mt-1 text-[11px] leading-5 text-slate-300">{previousLabel} -&gt; This week -&gt; Threshold</p>
-          <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>
+          <p className="mt-1 text-fluid-xs leading-5 text-slate-300">{previousLabel} -&gt; This week -&gt; Threshold</p>
+          <p className={`text-fluid-xs font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>
             {confidenceTrend}
           </p>
         </div>
         {thresholdStatus ? (
-          <div className={`rounded-full border px-3 py-1.5 text-right text-[10px] font-semibold uppercase tracking-[0.12em] ${thresholdStatus.toneClass}`}>
+          <div className={`rounded-full border px-3 py-1.5 text-right text-fluid-micro font-semibold uppercase tracking-[0.12em] ${thresholdStatus.toneClass}`}>
             <span className="block">{thresholdStatus.label}</span>
           </div>
         ) : null}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{previousLabel}</p>
+        <div className="rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-3">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">{previousLabel}</p>
           <p className="mt-1 text-lg font-semibold text-slate-100">
             {previousPercent !== null ? `${previousPercent}%` : "n/a"}
           </p>
         </div>
         <div className={tier.card}>
-          <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${tier.label}`}>This week</p>
+          <p className={`text-fluid-micro font-semibold uppercase tracking-[0.12em] ${tier.label}`}>This week</p>
           <p className={`mt-1 text-lg font-semibold ${tier.value}`}>
             {currentPercent !== null ? `${currentPercent}%` : "n/a"}
           </p>
         </div>
-        <div className="rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Threshold</p>
+        <div className="rounded-md border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-200">Threshold</p>
           <p className="mt-1 text-lg font-semibold text-amber-50">
             {threshold ? `${threshold.value}%` : "n/a"}
           </p>
@@ -153,8 +153,8 @@ export const ConfidenceMiniChart = ({
       </div>
 
       {currentPercent !== null && threshold ? (
-        <div className="rounded-xl border border-slate-800/70 bg-slate-950/55 px-3 py-3">
-          <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+        <div className="rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-3">
+          <div className="flex items-center justify-between text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
             <span>0</span>
             <span>100</span>
           </div>
@@ -175,7 +175,7 @@ export const ConfidenceMiniChart = ({
               style={{ left: `${clamp(currentPercent, 0, 100)}%` }}
             />
           </div>
-          <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+          <div className="mt-3 flex flex-wrap gap-2 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
             {previousPercent !== null ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
                 <span className="h-2.5 w-2.5 rounded-full border border-slate-200/90 bg-slate-950" aria-hidden="true" />
@@ -202,7 +202,7 @@ export const ConfidenceMiniChart = ({
           </div>
           {continuityPoints.length > 0 ? (
             <div className="mt-3 rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2.5">
-              <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+              <div className="flex items-center justify-between gap-3 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
                 <span>Read continuity</span>
                 <span>{continuitySummary}</span>
               </div>

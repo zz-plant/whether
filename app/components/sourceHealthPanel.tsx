@@ -41,7 +41,7 @@ export function SourceHealthPanel({ rows }: { rows: SourceHealthRow[] }) {
           return (
             <div
               key={row.sourceName}
-              className="weather-surface rounded-xl border border-slate-800/80 px-4 py-3"
+              className="weather-surface rounded-md border border-slate-800/80 px-4 py-3"
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>

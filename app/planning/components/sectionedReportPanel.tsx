@@ -33,7 +33,7 @@ export const SectionedReportPanel = ({
         </p>
       ) : null}
     </div>
-    <div className="rounded-[1.1rem] border border-slate-800/55 bg-slate-950/35 p-4 shadow-[0_18px_34px_-28px_rgba(2,6,23,0.75)] sm:p-5">
+    <div className="rounded border border-slate-800/55 bg-slate-950/35 p-4 shadow-[0_18px_34px_-28px_rgba(2,6,23,0.75)] sm:p-5">
       <div className="space-y-6">{children}</div>
     </div>
   </section>

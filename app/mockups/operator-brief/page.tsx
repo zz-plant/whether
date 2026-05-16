@@ -80,7 +80,7 @@ function DecisionCard({
   toneClassName: string;
 }) {
   return (
-    <article className={`rounded-[1.35rem] border p-4 ${toneClassName}`}>
+    <article className={`rounded-md border p-4 ${toneClassName}`}>
       <SectionLabel>{label}</SectionLabel>
       <p className="mt-2 text-sm font-medium leading-6">{value}</p>
     </article>
@@ -104,7 +104,7 @@ export default async function OperatorBriefMockupPage({
       viewport={viewport}
       density={density}
     >
-      <section className="relative overflow-hidden rounded-[2.15rem] border border-cyan-300/20 bg-slate-950/80 px-4 py-5 sm:px-6 sm:py-6">
+      <section className="relative overflow-hidden rounded-lg border border-cyan-300/20 bg-slate-950/80 px-4 py-5 sm:px-6 sm:py-6">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -127,7 +127,7 @@ export default async function OperatorBriefMockupPage({
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)]">
-            <div className="rounded-[1.6rem] border border-slate-700/70 bg-slate-900/72 p-5">
+            <div className="rounded-lg border border-slate-700/70 bg-slate-900/72 p-5">
               <SectionLabel>{publicDecisionLabels.call}</SectionLabel>
               <h1
                 className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]"
@@ -140,13 +140,13 @@ export default async function OperatorBriefMockupPage({
               </p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-4">
+                <div className="rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-4">
                   <SectionLabel>{publicDecisionLabels.action}</SectionLabel>
                   <p className="mt-2 text-base font-semibold text-emerald-50">
                     {weeklyCall.actionNow}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-700/70 bg-slate-950/70 p-4">
+                <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 p-4">
                   <SectionLabel>Shareable line</SectionLabel>
                   <p className="mt-2 text-base font-semibold text-white">
                     {weeklyCall.shareableLine}
@@ -155,7 +155,7 @@ export default async function OperatorBriefMockupPage({
               </div>
             </div>
 
-            <aside className="rounded-[1.6rem] border border-slate-700/70 bg-slate-900/68 p-4">
+            <aside className="rounded-lg border border-slate-700/70 bg-slate-900/68 p-4">
               <SectionLabel>Trust</SectionLabel>
               <p className="mt-2 text-lg font-semibold text-emerald-50">
                 {weeklyCall.readiness}
@@ -168,7 +168,7 @@ export default async function OperatorBriefMockupPage({
                 {backdropItems.map((item) => (
                   <div
                     key={item.label}
-                    className="rounded-2xl border border-slate-700/70 bg-slate-950/65 px-3 py-3"
+                    className="rounded-lg border border-slate-700/70 bg-slate-950/65 px-3 py-3"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                       {item.label}
@@ -201,13 +201,13 @@ export default async function OperatorBriefMockupPage({
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Link
               href="/planning#ops-monthly-action-summary"
-              className="weather-button-primary inline-flex min-h-[46px] items-center justify-center rounded-[1rem] px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
+              className="weather-button-primary inline-flex min-h-[46px] items-center justify-center rounded px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
             >
               Open planning handoff
             </Link>
             <button
               type="button"
-              className="weather-pill inline-flex min-h-[46px] items-center justify-center rounded-[1rem] px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
+              className="weather-pill inline-flex min-h-[46px] items-center justify-center rounded px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
             >
               Copy operator brief
             </button>
@@ -215,7 +215,7 @@ export default async function OperatorBriefMockupPage({
         </div>
       </section>
 
-      <details className="rounded-[1.85rem] border border-slate-700/70 bg-slate-950/60 px-4 py-4 sm:px-5">
+      <details className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-4 py-4 sm:px-5">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3">
           <div>
             <SectionLabel>Why this call</SectionLabel>
@@ -230,7 +230,7 @@ export default async function OperatorBriefMockupPage({
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {proofItems.map((item) => (
-            <div key={item.label} className="rounded-[1.35rem] border border-slate-700/70 bg-slate-950/65 p-4">
+            <div key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/65 p-4">
               <SectionLabel>{item.label}</SectionLabel>
               <p className="mt-2 text-sm leading-6 text-slate-200">{item.value}</p>
             </div>
@@ -238,9 +238,9 @@ export default async function OperatorBriefMockupPage({
         </div>
       </details>
 
-      <section className="rounded-[1.85rem] border border-slate-700/70 bg-slate-950/58 px-4 py-4 sm:px-5">
+      <section className="rounded-lg border border-slate-700/70 bg-slate-950/58 px-4 py-4 sm:px-5">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(16rem,0.9fr)]">
-          <div className="rounded-[1.5rem] border border-cyan-300/20 bg-[linear-gradient(180deg,rgba(14,23,42,0.88),rgba(2,6,23,0.95))] p-5 shadow-[0_24px_60px_-42px_rgba(34,211,238,0.45)]">
+          <div className="rounded-lg border border-cyan-300/20 bg-[linear-gradient(180deg,rgba(14,23,42,0.88),rgba(2,6,23,0.95))] p-5 shadow-[0_24px_60px_-42px_rgba(34,211,238,0.45)]">
             <SectionLabel>Recommended artifact</SectionLabel>
             <h2
               className="mt-3 text-2xl font-semibold text-white"
@@ -259,14 +259,14 @@ export default async function OperatorBriefMockupPage({
           </div>
 
           <div className="space-y-3">
-            <div className="rounded-[1.5rem] border border-slate-700/70 bg-slate-950/65 p-4">
+            <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-4">
               <SectionLabel>Artifact rule</SectionLabel>
               <p className="mt-2 text-sm leading-6 text-slate-200">
                 Keep one routine path visible first. Use the same recommendation and guardrails in every format.
               </p>
             </div>
 
-            <details className="rounded-[1.5rem] border border-slate-700/70 bg-slate-950/65 p-4">
+            <details className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-4">
               <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3">
                 <div>
                   <SectionLabel>More formats</SectionLabel>

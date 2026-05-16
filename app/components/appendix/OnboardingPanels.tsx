@@ -102,7 +102,7 @@ export const FirstTimeGuidePanel = ({
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="weather-surface touch-target inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                className="weather-surface touch-target inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 {link.label}
                 <span aria-hidden="true">→</span>
@@ -147,7 +147,7 @@ export const BeginnerGlossaryPanel = () => (
               <Accordion.Item
                 key={entry.value}
                 value={entry.value}
-                className="rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2"
+                className="rounded-md border border-slate-800/80 bg-slate-950/40 px-3 py-2"
               >
                 <Accordion.Header>
                   <Accordion.Trigger className="group flex min-h-[44px] w-full items-center justify-between gap-3 py-2 text-left touch-manipulation">

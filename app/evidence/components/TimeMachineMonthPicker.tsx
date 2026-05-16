@@ -30,7 +30,7 @@ const yearStepperButtonClass =
   "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600";
 
 const monthOptionBaseClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-xl border px-2 py-2 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation";
+  "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation";
 
 export const TimeMachineMonthPicker = ({
   calendarMonths,
@@ -66,7 +66,7 @@ export const TimeMachineMonthPicker = ({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="start" sideOffset={10}>
-          <Popover.Popup className="weather-panel-static w-72 rounded-[1.6rem] border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-2xl">
+          <Popover.Popup className="weather-panel-static w-72 rounded-lg border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-2xl">
             <div className="flex items-center justify-between gap-2">
               <button
                 type="button"
@@ -121,7 +121,7 @@ export const TimeMachineMonthPicker = ({
                 );
               })}
             </div>
-            <div className="weather-surface mt-3 rounded-xl px-3 py-2">
+            <div className="weather-surface mt-3 rounded-md px-3 py-2">
               <p className="type-label text-slate-500">Available range</p>
               <p className="mt-1 text-[11px] text-slate-300">
                 {coverageMin && coverageMax ? `${coverageMin} → ${coverageMax}` : "No cache loaded yet."}

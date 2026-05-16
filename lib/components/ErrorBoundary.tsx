@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className="rounded-xl border border-rose-400/20 bg-rose-500/8 px-4 py-4 text-center">
+        <div className="rounded-md border border-rose-400/20 bg-rose-500/8 px-4 py-4 text-center">
           <p className="type-kicker text-rose-200">Section error</p>
           <p className="mt-1 text-xs leading-5 text-slate-300">
             {this.props.label ? `${this.props.label} could not render.` : "This section could not render."}

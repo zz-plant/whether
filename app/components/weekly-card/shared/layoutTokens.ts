@@ -1,7 +1,7 @@
 export const sectionSpacing = "space-y-4";
-export const tierOneHeading = "text-sm font-semibold tracking-[0.01em] text-slate-50";
-export const tierTwoHeading = "text-sm font-semibold tracking-[0.01em] text-slate-200";
-export const tierThreeHeading = "text-xs font-medium tracking-normal text-slate-400";
+export const tierOneHeading = "text-fluid-sm font-semibold tracking-[0.01em] text-slate-50";
+export const tierTwoHeading = "text-fluid-sm font-semibold tracking-[0.01em] text-slate-200";
+export const tierThreeHeading = "text-fluid-xs font-medium tracking-normal text-slate-400";
 export const tierOnePanel = "rounded-[1.35rem] border border-sky-300/18 bg-[linear-gradient(160deg,rgba(10,22,40,0.94),rgba(8,17,31,0.96)_58%,rgba(4,10,20,0.98))] p-4 shadow-[0_24px_48px_-34px_rgba(2,6,23,0.95),0_12px_24px_-20px_rgba(56,189,248,0.16),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-5";
 export const tierTwoPanel = "rounded-[1.2rem] border border-slate-700/38 bg-[linear-gradient(180deg,rgba(8,17,31,0.78),rgba(5,11,22,0.9))] p-4 shadow-[0_18px_34px_-30px_rgba(2,6,23,0.78),inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-5";
 export const tierThreePanel = "rounded-xl border border-slate-800/24 bg-[linear-gradient(180deg,rgba(9,17,31,0.46),rgba(4,10,20,0.6))] p-3";

@@ -83,7 +83,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
               <p className="max-w-2xl text-sm leading-relaxed text-slate-100">
                 {historicalContext ? "Selected historical weekly brief is loading." : "Current weekly brief is loading."}
               </p>
-              <div className="rounded-[1.25rem] border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="rounded-md border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                 <div className="flex items-center justify-between gap-3">
                   <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
                     <span className="weather-loading-beacon" />
@@ -104,38 +104,38 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
 
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.9fr)]">
               <section className="grid gap-3 sm:grid-cols-2">
-                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+                <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Posture</p>
                   <Skeleton className="mt-3 h-6 w-28 rounded-full bg-slate-500/40" />
                 </article>
-                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+                <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Do now</p>
                   <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/40" />
                   <Skeleton className="mt-2 h-5 w-8/12 rounded-full bg-slate-500/32" />
                 </article>
-                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+                <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Revisit</p>
                   <Skeleton className="mt-3 h-5 w-24 rounded-full bg-slate-500/36" />
                 </article>
-                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+                <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Watch for</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
-                <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
+                <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Clears when</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
               </section>
-              <section className="space-y-3 rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
+              <section className="space-y-3 rounded-md border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Trust</p>
                   <Skeleton className="h-6 w-24 rounded-full bg-slate-500/35" />
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <Skeleton className="h-16 w-full rounded-xl bg-slate-500/40" />
-                  <Skeleton className="h-16 w-full rounded-xl bg-slate-500/35" />
-                  <Skeleton className="h-16 w-full rounded-xl bg-slate-500/32" />
-                  <Skeleton className="h-16 w-full rounded-xl bg-slate-500/28" />
+                  <Skeleton className="h-16 w-full rounded-md bg-slate-500/40" />
+                  <Skeleton className="h-16 w-full rounded-md bg-slate-500/35" />
+                  <Skeleton className="h-16 w-full rounded-md bg-slate-500/32" />
+                  <Skeleton className="h-16 w-full rounded-md bg-slate-500/28" />
                 </div>
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-10/12 rounded-full bg-slate-500/35" />

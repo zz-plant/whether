@@ -270,7 +270,7 @@ export const ChangeSinceLastReadPanel = ({
               </span>
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Regime shift
                 </p>
@@ -279,7 +279,7 @@ export const ChangeSinceLastReadPanel = ({
                 </p>
                 {previous ? <p className="mt-1 text-xs text-slate-400">Previous posture ghost: <span className="font-semibold text-slate-300">{previous.assessment.regime}</span></p> : null}
               </div>
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Tightness delta
                 </p>
@@ -289,7 +289,7 @@ export const ChangeSinceLastReadPanel = ({
                     : "—"}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Risk appetite delta
                 </p>
@@ -303,7 +303,7 @@ export const ChangeSinceLastReadPanel = ({
                 </p>
                 <DeltaSparkline previous={previous ? previous.assessment.scores.riskAppetite : null} current={assessment.scores.riskAppetite} />
               </div>
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Base rate delta
                 </p>
@@ -313,7 +313,7 @@ export const ChangeSinceLastReadPanel = ({
                     : "—"}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Curve slope delta
                 </p>
@@ -359,7 +359,7 @@ export const ChangeSinceLastReadPanel = ({
               Open Time Machine
             </a>
 
-            <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+            <div className="mt-4 rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Last-year snapshot (nearest cached)
               </p>

@@ -85,7 +85,7 @@ export const MiniSeriesRow = ({
     <article
       tabIndex={0}
       aria-label={rowSummary}
-      className="weather-surface grid gap-4 rounded-xl border border-slate-800/80 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 lg:grid-cols-[1.2fr_2fr_1.4fr]"
+      className="weather-surface grid gap-4 rounded-md border border-slate-800/80 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 lg:grid-cols-[1.2fr_2fr_1.4fr]"
     >
       <div className="space-y-2">
         <h3 className="text-sm font-semibold text-slate-100">{name}</h3>

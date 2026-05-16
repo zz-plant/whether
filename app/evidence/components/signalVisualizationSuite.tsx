@@ -233,7 +233,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         <p className="text-sm text-slate-300">Cleaner one-screen view: 5 panels, minimal framing.</p>
       </header>
 
-      <details className="group rounded-xl border border-slate-800/80 bg-slate-950/30 p-4" open>
+      <details className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-4" open>
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
           <span>Open one-screen terminal</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>

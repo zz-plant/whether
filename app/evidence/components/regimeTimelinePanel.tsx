@@ -135,7 +135,7 @@ export const RegimeTimelinePanel = ({
         />
 
         <div className="mt-6">
-          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-800/70 bg-slate-950/50 p-3 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.04)] sm:p-4">
+          <div className="relative overflow-hidden rounded-lg border border-slate-800/70 bg-slate-950/50 p-3 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.04)] sm:p-4">
             <div className="flex min-h-20 items-stretch">
               {runs.map((run) => {
                 const spanLabel = formatRunSpan(run);

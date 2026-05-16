@@ -14,22 +14,22 @@ export const WeeklyDiagnosticsFallback = () => (
         </span>
       </div>
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-        <div className="rounded-xl border border-slate-800/60 bg-slate-950/62 p-3">
+        <div className="rounded-md border border-slate-800/60 bg-slate-950/62 p-3">
           <div className="flex items-center justify-between gap-2">
             <Skeleton className="h-3.5 w-44 rounded-full bg-slate-500/44" />
             <Skeleton className="h-3 w-20 rounded-full bg-slate-500/32" />
           </div>
           <div className="mt-3 space-y-2">
-            <Skeleton className="h-12 w-full rounded-xl bg-slate-500/38" />
-            <Skeleton className="h-12 w-full rounded-xl bg-slate-500/34" />
-            <Skeleton className="h-12 w-11/12 rounded-xl bg-slate-500/28" />
+            <Skeleton className="h-12 w-full rounded-md bg-slate-500/38" />
+            <Skeleton className="h-12 w-full rounded-md bg-slate-500/34" />
+            <Skeleton className="h-12 w-11/12 rounded-md bg-slate-500/28" />
           </div>
         </div>
-        <div className="rounded-xl border border-slate-800/60 bg-slate-950/62 p-3">
+        <div className="rounded-md border border-slate-800/60 bg-slate-950/62 p-3">
           <Skeleton className="h-3.5 w-32 rounded-full bg-slate-500/44" />
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            <Skeleton className="h-16 w-full rounded-xl bg-slate-500/34" />
-            <Skeleton className="h-16 w-full rounded-xl bg-slate-500/28" />
+            <Skeleton className="h-16 w-full rounded-md bg-slate-500/34" />
+            <Skeleton className="h-16 w-full rounded-md bg-slate-500/28" />
           </div>
         </div>
       </div>
@@ -44,13 +44,13 @@ export const WeeklyDiagnosticsFallback = () => (
         <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pending</span>
       </div>
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <Skeleton className="h-28 w-full rounded-xl bg-slate-500/32" />
-        <Skeleton className="h-28 w-full rounded-xl bg-slate-500/28" />
+        <Skeleton className="h-28 w-full rounded-md bg-slate-500/32" />
+        <Skeleton className="h-28 w-full rounded-md bg-slate-500/28" />
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
-        <Skeleton className="h-40 w-full rounded-xl bg-slate-500/26" />
-        <Skeleton className="h-40 w-full rounded-xl bg-slate-500/22" />
-        <Skeleton className="h-40 w-full rounded-xl bg-slate-500/18" />
+        <Skeleton className="h-40 w-full rounded-md bg-slate-500/26" />
+        <Skeleton className="h-40 w-full rounded-md bg-slate-500/22" />
+        <Skeleton className="h-40 w-full rounded-md bg-slate-500/18" />
       </div>
     </article>
   </section>

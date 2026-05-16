@@ -110,7 +110,7 @@ export const SummaryCard = ({
         </div>
       </div>
       {hasStructuredSections ? (
-        <div className="mt-4 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4">
+        <div className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-slate-400">Structured data</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {visibleStructuredSections.map((section) => (
@@ -131,7 +131,7 @@ export const SummaryCard = ({
       ) : null}
       {hasStructuredSections ? (
         <Accordion.Root defaultValue={[]} className="mt-4">
-          <Accordion.Item value="raw-summary" className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
+          <Accordion.Item value="raw-summary" className="rounded-lg border border-slate-800/80 bg-slate-950/55 px-3 py-2">
             <Accordion.Header>
               <Accordion.Trigger
                 id={rawSummaryTriggerId}
@@ -146,7 +146,7 @@ export const SummaryCard = ({
               <pre
                 tabIndex={0}
                 aria-label="Summary card text"
-                className="mt-2 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
+                className="mt-2 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
               >
                 {summaryCopy}
               </pre>
@@ -157,7 +157,7 @@ export const SummaryCard = ({
         <pre
           tabIndex={0}
           aria-label="Summary card text"
-          className="mt-4 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
+          className="mt-4 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
         >
           {summaryCopy}
         </pre>

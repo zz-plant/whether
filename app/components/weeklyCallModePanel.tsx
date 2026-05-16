@@ -64,7 +64,7 @@ export function WeeklyCallModePanel({
     confidencePercent,
   } = model;
   const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
-  const detailDisclosureBase = "mt-2 rounded-xl bg-slate-950/40 px-3 py-2.5";
+  const detailDisclosureBase = "mt-2 rounded-md bg-slate-950/40 px-3 py-2.5";
   const flipSupport = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== snapshotWatch.trim())
     .slice(0, 2);
@@ -80,7 +80,7 @@ export function WeeklyCallModePanel({
   const trustStatusSummary = trustReason
     ? `Using the last clean snapshot because ${trustReason}`
     : trustStateDetail;
-  const compactMetricCardBase = "rounded-xl bg-slate-950/25 px-3 py-3 tabular-nums";
+  const compactMetricCardBase = "rounded-md bg-slate-950/25 px-3 py-3 tabular-nums";
   const primaryDriver = driverHighlights[0] ?? null;
   const supportingDrivers = primaryDriver ? driverHighlights.slice(1, 3) : driverHighlights.slice(0, 2);
   const featuredRevisitItem = revisitDecisions ? revisitQueue[0] ?? null : null;
@@ -160,7 +160,7 @@ export function WeeklyCallModePanel({
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/35 to-transparent" />
           <div className="relative space-y-4">
             <div className={`weather-brief-container grid gap-4 ${hasSecondaryLane ? "xl:grid-cols-[minmax(0,1.48fr)_minmax(15rem,0.52fr)]" : ""}`}>
-              <article className="weather-stream-reveal rounded-[1rem] px-4 py-4">
+              <article className="weather-stream-reveal rounded px-4 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="weather-chip weather-chip-slate">
@@ -189,7 +189,7 @@ export function WeeklyCallModePanel({
                     </span>
                   ) : null}
                 </div>
-                <h2 className={`weather-brief-call-heading ${tierOneHeadingClassName} mt-3 max-w-4xl text-[1.4rem] font-semibold leading-[1.18] text-slate-50 sm:text-[2.15rem] sm:leading-[1.08]`} style={{ fontFamily: "var(--weather-font-display)", textWrap: "balance" }}>
+                <h2 className={`weather-brief-call-heading ${tierOneHeadingClassName} mt-3 max-w-4xl font-semibold text-slate-50`} style={{ fontSize: "clamp(1.35rem, 1rem + 1.4vw, 2.15rem)", lineHeight: "clamp(1.18, 1.1 + 0.3vw, 1.08)", fontFamily: "var(--weather-font-display)", textWrap: "balance" }}>
                   {recommendationLine}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs leading-5 text-slate-200" style={{ fontVariantNumeric: "tabular-nums" }}>
@@ -206,7 +206,7 @@ export function WeeklyCallModePanel({
                   </p>
                 ) : null}
 
-                <section className="mt-4 rounded-[1rem] px-3 py-2.5">
+                <section className="mt-4 rounded px-3 py-2.5">
                   <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
                     <div className="max-w-2xl">
                       <p className="type-kicker text-slate-300">
@@ -262,7 +262,7 @@ export function WeeklyCallModePanel({
 
               {hasSecondaryLane ? (
                   <aside className="weather-brief-secondary-lane space-y-3 xl:pt-1">
-                    <article className="weather-stream-reveal weather-stream-reveal--medium rounded-[1rem] px-3 py-3 text-slate-100">
+                    <article className="weather-stream-reveal weather-stream-reveal--medium rounded px-3 py-3 text-slate-100">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-[11px] font-medium text-slate-300">Watch this week</p>
                       {revisitQueue.length > 0 ? (
@@ -350,7 +350,7 @@ export function WeeklyCallModePanel({
               ) : null}
             </div>
 
-            <div className="weather-section-stage weather-section-stage--short rounded-[1rem] px-3 py-3" style={{ contentVisibility: "auto" }}>
+            <div className="weather-section-stage weather-section-stage--short rounded px-3 py-3" style={{ contentVisibility: "auto" }}>
               <div className="border-b border-slate-800/50 pb-3">
                 <p className="type-kicker text-slate-400">
                   {PRIMARY_AUDIENCE_LABEL}
@@ -374,7 +374,7 @@ export function WeeklyCallModePanel({
             </div>
 
             {postureSteps.length > 1 || confidenceTrend ? (
-              <div className="weather-section-stage weather-section-stage--medium rounded-[1rem] px-3 py-3" style={{ contentVisibility: "auto" }}>
+              <div className="weather-section-stage weather-section-stage--medium rounded px-3 py-3" style={{ contentVisibility: "auto" }}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="type-kicker text-slate-400">Continuity</p>
                   {trajectoryDeltaSummary ? (
@@ -422,7 +422,7 @@ export function WeeklyCallModePanel({
               {actions ? (
                 actions
               ) : (
-                <p className="rounded-xl bg-slate-950/25 px-3 py-3 text-xs leading-5 text-slate-300">
+                <p className="rounded-md bg-slate-950/25 px-3 py-3 text-xs leading-5 text-slate-300">
                   Share actions are temporarily unavailable. Use the summary above as the copy-ready source.
                 </p>
               )}
@@ -455,7 +455,7 @@ export function WeeklyCallModePanel({
             <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
           </summary>
           <div className="mt-2 grid gap-3 xl:grid-cols-2">
-            <article className="rounded-xl bg-rose-500/8 px-3 py-3">
+            <article className="rounded-md bg-rose-500/8 px-3 py-3">
               <p className="type-kicker text-rose-200">Why this lands here</p>
               <p className="mt-1 type-data text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -465,13 +465,13 @@ export function WeeklyCallModePanel({
               </div>
             </article>
 
-            <article className="rounded-xl bg-slate-950/45 px-3 py-3">
+            <article className="rounded-md bg-slate-950/45 px-3 py-3">
               <p className="type-kicker text-slate-400">Best for</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{selectedModeLabel}</p>
               <p className="mt-1 text-xs leading-5 text-slate-300">{stabilityRule}</p>
             </article>
 
-            <article className="rounded-xl bg-sky-500/8 px-3 py-3">
+            <article className="rounded-md bg-sky-500/8 px-3 py-3">
               <p className="type-kicker text-sky-200">What would change this read</p>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               {flipSupport.length > 0 ? (
@@ -491,7 +491,7 @@ export function WeeklyCallModePanel({
             </article>
 
             {(whyItMattersLine || trustReason || glossaryHref) ? (
-              <article className="rounded-xl bg-slate-950/45 px-3 py-3 xl:col-span-2">
+              <article className="rounded-md bg-slate-950/45 px-3 py-3 xl:col-span-2">
                 <p className="type-kicker text-slate-400">What this means now</p>
                 {whyItMattersLine ? <p className="mt-1 type-data text-slate-200">{whyItMattersLine}</p> : null}
                 {trustReason ? (

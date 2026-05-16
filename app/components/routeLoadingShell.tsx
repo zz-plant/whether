@@ -47,7 +47,7 @@ export function RouteLoadingShell({
       trustStatusTone="stable"
       currentPath={currentPath}
     >
-      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-[1.6rem] px-5 py-5 sm:px-6 sm:py-6">
+      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-lg px-5 py-5 sm:px-6 sm:py-6">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
@@ -59,7 +59,7 @@ export function RouteLoadingShell({
               <p className="max-w-2xl text-sm leading-relaxed text-slate-100">{description}</p>
             </div>
           </div>
-          <div className="rounded-[1.25rem] border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <div className="rounded-md border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             <div className="flex items-center justify-between gap-3">
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
                 <span className="weather-loading-beacon" />
@@ -82,30 +82,30 @@ export function RouteLoadingShell({
             <Skeleton className="h-7 w-36 rounded-full bg-slate-500/30" />
           </div>
           <div className="space-y-2.5">
-            <Skeleton className="h-10 w-full max-w-3xl rounded-2xl bg-slate-500/48" />
+            <Skeleton className="h-10 w-full max-w-3xl rounded-lg bg-slate-500/48" />
             <Skeleton className="h-4 w-11/12 max-w-2xl rounded-full bg-slate-500/36" />
           </div>
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1.22fr)_minmax(18rem,0.78fr)]">
             <section className="grid gap-3 sm:grid-cols-2">
-              <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Summary
                 </p>
                 <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/38" />
               </article>
-              <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Action
                 </p>
                 <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/38" />
               </article>
-              <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Evidence
                 </p>
                 <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/34" />
               </article>
-              <article className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Next step
                 </p>
@@ -113,7 +113,7 @@ export function RouteLoadingShell({
               </article>
             </section>
 
-            <section className="space-y-3 rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
+            <section className="space-y-3 rounded-md border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
                   Trust
@@ -121,10 +121,10 @@ export function RouteLoadingShell({
                 <Skeleton className="h-6 w-24 rounded-full bg-slate-500/32" />
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
-                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/36" />
-                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/30" />
-                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/28" />
-                <Skeleton className="h-16 w-full rounded-xl bg-slate-500/24" />
+                <Skeleton className="h-16 w-full rounded-md bg-slate-500/36" />
+                <Skeleton className="h-16 w-full rounded-md bg-slate-500/30" />
+                <Skeleton className="h-16 w-full rounded-md bg-slate-500/28" />
+                <Skeleton className="h-16 w-full rounded-md bg-slate-500/24" />
               </div>
             </section>
           </div>

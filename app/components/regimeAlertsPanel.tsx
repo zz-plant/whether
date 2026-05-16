@@ -265,7 +265,7 @@ export const RegimeAlertsPanel = () => {
           </div>
         </div>
         {alerts.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
+          <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
               No alert history yet. Open reports again after a new Treasury record lands to log the
               first alert.

@@ -57,7 +57,7 @@ export const RegimeChangeAlertPanel = ({
                 <p className="type-label text-slate-400">Latest alert</p>
                 <p className="mt-3 text-sm text-slate-100">{alert.summary}</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-3">
+                  <div className="rounded-md border border-slate-800/80 bg-slate-950/50 p-3">
                     <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                       Previous record
                     </p>
@@ -70,7 +70,7 @@ export const RegimeChangeAlertPanel = ({
                       Regime: <span className="text-slate-200">{alert.previousRegime}</span>
                     </p>
                   </div>
-                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-3">
+                  <div className="rounded-md border border-slate-800/80 bg-slate-950/50 p-3">
                     <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                       Current record
                     </p>
@@ -120,7 +120,7 @@ export const RegimeChangeAlertPanel = ({
                 </ul>
                 <Link
                   href="/evidence?advanced=1#time-machine"
-                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-md border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Open Time Machine
                 </Link>

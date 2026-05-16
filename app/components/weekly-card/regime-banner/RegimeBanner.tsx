@@ -45,33 +45,33 @@ export function RegimeBanner(props: RegimeBannerProps) {
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
 
   return (
-    <header className={`z-10 rounded-[1rem] border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`z-10 rounded border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
         <div id="weekly-posture-brief-title" className="flex min-w-0 items-start gap-3">
           <span className="weather-icon-chip h-8 w-8 flex-shrink-0 text-slate-50"><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /></span>
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
+            <div className="flex flex-wrap items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-100/85">
               <span>This week</span>
               <span className="text-slate-400">Week of {recordDateLabel}</span>
             </div>
             <p className="mt-1 text-base font-semibold leading-tight text-slate-50 sm:text-lg">{resolvedPostureLabel} · {resolvedStageLabel}</p>
-            <p className="mt-1 text-[11px] leading-5 text-slate-300">{activeWeather}. {flipRiskMeter.detailLabel}</p>
+            <p className="mt-1 text-fluid-xs leading-5 text-slate-300">{activeWeather}. {flipRiskMeter.detailLabel}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:max-w-[24rem]" aria-label="This week metadata">
-          <span className={`inline-flex items-center gap-1.5 rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
             <TrendGlyph trendLabel={trendValue} />
             <span>{trendValue} trend</span>
           </span>
-          <span className="inline-flex rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className="inline-flex rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {Math.round(confidencePercent)}% confidence ({confidenceLabel})
           </span>
-          <span className="inline-flex rounded-[0.7rem] border border-white/10 bg-slate-950/25 px-3 py-1.5 text-[11px] font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className="inline-flex rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {flipRiskValue} to flip
           </span>
         </div>
       </div>
-      <div className="mt-2 text-[11px] leading-5 text-slate-300" aria-label="Trust strip">
+      <div className="mt-2 text-fluid-xs leading-5 text-slate-300" aria-label="Trust strip">
         <span>Flip trigger: {flipRiskMeter.triggerLabel}</span>
         <span className="text-slate-500"> · </span>
         <span className="font-semibold text-slate-100">{trustStrip.freshnessBadge}</span>
@@ -88,7 +88,7 @@ export function RegimeBanner(props: RegimeBannerProps) {
           </>
         ) : null}
         {trustStrip.warningCopy ? (
-          <p className="mt-1 text-[11px] normal-case tracking-normal text-amber-100">{trustStrip.warningCopy}</p>
+          <p className="mt-1 text-fluid-xs normal-case tracking-normal text-amber-100">{trustStrip.warningCopy}</p>
         ) : null}
       </div>
     </header>

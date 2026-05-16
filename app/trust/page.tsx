@@ -213,7 +213,7 @@ export default async function MethodPage() {
       structuredData={breadcrumbStructuredData}
     >
       <MethodSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief.">
-        <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+        <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
           <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
             {trustVerdict.label}
           </p>
@@ -223,13 +223,13 @@ export default async function MethodPage() {
           </p>
         </article>
         <div className="grid gap-3 sm:grid-cols-3">
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
+          <article className="weather-hub-card rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Freshness</p>
             <p className="mt-2 text-sm text-slate-200">Decision date <span className="font-semibold text-slate-100">{reportData.recordDateLabel}</span></p>
             <p className="mt-2 text-sm text-slate-200">Updated <span className="font-semibold text-slate-100">{reportData.fetchedAtLabel}</span></p>
             <p className="mt-2 text-xs text-slate-400">{trustSummary}</p>
           </article>
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
+          <article className="weather-hub-card rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Source coverage</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
               <li>Treasury: <span className="font-semibold text-slate-100">{reportData.treasuryProvenance.statusLabel}</span></li>
@@ -238,7 +238,7 @@ export default async function MethodPage() {
             </ul>
             <p className="mt-3 text-xs text-slate-400">Coverage summary: {sourceCoverage}</p>
           </article>
-          <article className="weather-hub-card rounded-2xl px-4 py-4">
+          <article className="weather-hub-card rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Approval boundary</p>
             <p className="mt-2 text-sm text-slate-200">{trustVerdict.detail}</p>
             <p className="mt-2 text-sm text-slate-300">{reportData.flipThreshold}</p>
@@ -257,7 +257,7 @@ export default async function MethodPage() {
         description="The compact source handoff behind the homepage trust board."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current source mix</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
@@ -266,7 +266,7 @@ export default async function MethodPage() {
               <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
             </ul>
           </article>
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Use in the room</p>
             <p className="text-sm text-slate-200">
               Check whether the weekly call is current enough to share or approve against.
@@ -285,7 +285,7 @@ export default async function MethodPage() {
         description="Where the current recommendation came from and how current it is."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Source coverage</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
@@ -297,7 +297,7 @@ export default async function MethodPage() {
               <a href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Macro source</a>
             </div>
           </article>
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Meeting citation</p>
             <p className="text-sm text-slate-200">{citationLine}</p>
             <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
@@ -319,7 +319,7 @@ export default async function MethodPage() {
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
@@ -328,7 +328,7 @@ export default async function MethodPage() {
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>
             </ul>
           </article>
-          <article className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Escalation rule</p>
             <p className="text-sm text-slate-200">
               If a warning or revisit trigger fires, confirm freshness before moving ahead.
@@ -346,7 +346,7 @@ export default async function MethodPage() {
         title="Formula reference"
         description="How this score is built."
       >
-        <div className="weather-hub-card space-y-3 rounded-2xl px-4 py-4">
+        <div className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
           <p className="text-sm text-slate-200">
             The scoring logic, stop lines, and change triggers behind this week&rsquo;s recommendation.
           </p>
@@ -364,14 +364,14 @@ export default async function MethodPage() {
 
       <MethodSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-hub-card space-y-3 rounded-xl px-4 py-4">
+          <article className="weather-hub-card space-y-3 rounded-md px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>
             {warnings.length === 0 ? (
               <p className="text-sm text-slate-300">No active warning pattern right now. Keep decisions staged and keep the normal change trigger in view.</p>
             ) : (
               <ul className="space-y-3 text-sm text-slate-200">
                 {warnings.map((warning) => (
-                  <li key={warning.id} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                  <li key={warning.id} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                     <p className="font-semibold text-slate-100">{warning.warning}</p>
                     <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
                   </li>
@@ -379,11 +379,11 @@ export default async function MethodPage() {
               </ul>
             )}
           </article>
-          <article className="weather-hub-card rounded-xl px-4 py-4">
+          <article className="weather-hub-card rounded-md px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Revisit checklist</p>
             <ul className="mt-3 space-y-3 text-sm text-slate-200">
               {revisitBullets.map((item) => (
-                <li key={item.label} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
                   <p className="mt-1">{item.detail}</p>
                   <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Related check</Link>
@@ -395,7 +395,7 @@ export default async function MethodPage() {
       </MethodSection>
 
       <MethodSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
-        <pre className="weather-hub-card overflow-x-auto rounded-2xl px-4 py-4 text-xs leading-6 text-slate-200">
+        <pre className="weather-hub-card overflow-x-auto rounded-lg px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>
       </MethodSection>

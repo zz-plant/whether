@@ -163,7 +163,7 @@ export default async function DecidePage({
               </div>
             </summary>
             <div className="mt-4 space-y-4">
-              <div id="direct-answers" className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4">
+              <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
                 <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
                 <div className="mt-3 space-y-2">
@@ -177,7 +177,7 @@ export default async function DecidePage({
               </div>
               <details
                 id="guided-translation"
-                className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-4"
+                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
                 open={hasGuidedTranslationSelection}
               >
                 <summary className="cursor-pointer list-none">

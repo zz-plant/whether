@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const HomeBandGlyph = ({ children, toneClass }: { children: ReactNode; toneClass: string }) => (
-  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl border bg-slate-950/55 ${toneClass}`}>
+  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-md border bg-slate-950/55 ${toneClass}`}>
     {children}
   </span>
 );
@@ -24,7 +24,7 @@ export const HomeBandHeader = ({ step, kicker, title, description, icon, toneCla
           <p className="home-band-kicker">{kicker}</p>
           <HomeBandSignal toneClass={toneClass.split(" ")[0] ?? toneClass} />
         </div>
-        <h2 className="text-lg font-semibold leading-tight text-slate-100 sm:text-[1.1rem]">{title}</h2>
+        <h2 className="font-semibold leading-tight text-slate-100 text-fluid-lg">{title}</h2>
         {description ? <p className="max-w-3xl text-sm leading-relaxed text-slate-300">{description}</p> : null}
       </div>
     </div>
@@ -34,7 +34,7 @@ export const HomeBandHeader = ({ step, kicker, title, description, icon, toneCla
 
 export const CardEyebrow = ({ icon, label, accentClass }: { icon: ReactNode; label: string; accentClass: string }) => (
   <p className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] ${accentClass}`}>
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-[0.7rem] border border-current/20 bg-slate-950/60">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-current/20 bg-slate-950/60">
       {icon}
     </span>
     <span>{label}</span>
