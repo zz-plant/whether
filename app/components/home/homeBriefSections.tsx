@@ -75,7 +75,7 @@ export const HomeKeyTermsDisclosure = () => {
       </summary>
       <div className="mt-3 grid gap-2 pt-3 sm:grid-cols-2">
         {entries.map((entry) => (
-          <div key={entry.value} className="rounded-md border border-slate-800/50 px-3 py-2">
+          <div key={entry.value} className="rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-2">
             <p className="text-xs font-semibold text-slate-100">{entry.term}</p>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-400">{entry.summary}</p>
           </div>
@@ -171,8 +171,8 @@ const InterpretationViewPills = ({
           href={buildViewHref(view, searchParams) as Route}
           className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors ${
             activeView === view
-              ? "border border-sky-300/70 bg-sky-400/10 text-sky-100"
-              : "border border-slate-700/40 text-slate-400 hover:border-slate-500/60 hover:text-slate-200"
+              ? "border border-sky-300/60 bg-sky-400/10 text-sky-100"
+              : "border border-white/[0.08] text-slate-400 hover:border-white/[0.14] hover:text-slate-200"
           }`}
           aria-current={activeView === view ? "page" : undefined}
         >

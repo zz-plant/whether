@@ -266,7 +266,7 @@ export const ReportShell = (props: ReportShellProps) => {
                   return (
                     <div
                       key={sectionKey}
-                      className={index === 0 ? "" : "border-t border-slate-800/70 pt-8 lg:pt-10"}
+                      className={index === 0 ? "" : "border-t border-white/[0.04] pt-8 lg:pt-10"}
                     >
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
@@ -279,7 +279,7 @@ export const ReportShell = (props: ReportShellProps) => {
                 })}
               </div>
 
-              <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
+              <footer className="mt-12 border-t border-white/[0.04] pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INTERNAL_USE_LABEL}</p>
               </footer>
             </div>

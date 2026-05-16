@@ -24,7 +24,7 @@ export async function HomeWorkspaceBands({
       >
       <summary className="sm:hidden text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">
         <span>Workspace tools</span>
-        <span className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-[10px] text-slate-500 sm:hidden" aria-hidden="true">▾</span>
+        <span className="rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] text-slate-500 sm:hidden" aria-hidden="true">▾</span>
       </summary>
       <div className="space-y-4">
         <div className="weather-panel-header">
