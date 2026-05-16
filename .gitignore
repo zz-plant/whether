@@ -7,6 +7,9 @@ out
 .vercel
 .env.local
 .DS_Store
+# macOS Finder duplicate files (creates "filename 2.ext")
+* 2.*
+* 3.*
 artifacts/ui
 artifacts/seo-payloads
 artifacts/seo-refresh

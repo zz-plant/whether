@@ -4,6 +4,16 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+
+// Commander.js converts --kebab-flags to camelCase keys.
+// This normalizes them back so the rest of the code can always read kebab-case.
+const toKebabFlags = (obj) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
+      value,
+    ]),
+  );
 import { Command } from "commander";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 
@@ -136,21 +146,18 @@ const normalizeFlags = async (flags) => {
   const envToken = process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? null;
   const envApiBaseUrl = process.env.WHETHER_API_URL ?? null;
   const configApiBaseUrl = config.api_base_url ?? null;
-  const getFlag = (key) => {
-    const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-    return flags[key] ?? flags[camel] ?? undefined;
-  };
+  // Flags are already normalized to kebab-case by toKebabFlags in withSettings
 
   const apiBaseUrl =
-    typeof getFlag("api-base-url") === "string"
-      ? getFlag("api-base-url")
+    typeof flags["api-base-url"] === "string"
+      ? flags["api-base-url"]
       : envApiBaseUrl
         ? envApiBaseUrl
         : configApiBaseUrl
           ? configApiBaseUrl
           : DEFAULT_API_BASE_URL;
   const apiBaseUrlSource =
-    typeof getFlag("api-base-url") === "string"
+    typeof flags["api-base-url"] === "string"
       ? "flag"
       : envApiBaseUrl
         ? "env"
@@ -161,11 +168,11 @@ const normalizeFlags = async (flags) => {
     config,
     output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.format ?? config.output ?? "text",
     quiet: Boolean(flags.quiet),
-    noColor: Boolean(getFlag("no-color")),
+    noColor: Boolean(flags["no-color"]),
     apiBaseUrl,
     apiBaseUrlSource,
     allowLocalApiDiscovery:
-      !getFlag("no-local-discovery") &&
+      !flags["no-local-discovery"] &&
       (apiBaseUrlSource === "default" || (apiBaseUrlSource === "config" && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(apiBaseUrl))),
     resolvedApiBaseUrl: null,
     autodiscoveredApiBaseUrl: false,
@@ -943,13 +950,8 @@ Skills:
 ${compact.skills.map((skill) => `- ${skill.id}: ${skill.purpose}`).join("\n") || "- none"}`;
 };
 
-const getFlagValue = (flags, key) => {
-  const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-  return flags[key] ?? flags[camel] ?? undefined;
-};
-
 const selectAgentOutput = (body, flags, settings) => {
-  if (getFlagValue(flags, "prompt-only")) {
+  if (flags["prompt-only"]) {
     return settings.output === "text"
       ? body.agentHandoff?.prompt ?? ""
       : {
@@ -961,13 +963,13 @@ const selectAgentOutput = (body, flags, settings) => {
         };
   }
 
-  if (getFlagValue(flags, "payload-only")) {
+  if (flags["payload-only"]) {
     return settings.output === "text"
       ? JSON.stringify(body.agentHandoff?.payload ?? {}, null, 2)
       : (body.agentHandoff?.payload ?? {});
   }
 
-  if (getFlagValue(flags, "skills-only")) {
+  if (flags["skills-only"]) {
     const skills = body.agentHandoff?.payload?.skills ?? body.skills ?? [];
     return settings.output === "text"
       ? skills.map((skill) => `${skill.id}: ${skill.purpose}`).join("\n")
@@ -1003,7 +1005,7 @@ const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", 
   };
   const params = new URLSearchParams();
   for (const flag of allowedFlags) {
-    const value = getFlagValue(flags, flag);
+    const value = flags[flag];
     if (value === undefined || value === null || value === "") continue;
     params.set(keyMap[flag] ?? flag, String(value));
   }
@@ -1548,8 +1550,10 @@ const run = async () => {
 
   const withSettings = (action) => async (...args) => {
     const opts = args.at(-1);
-    const flags = Object.fromEntries(
-      Object.entries({ ...program.opts(), ...opts }).filter(([, v]) => v !== undefined),
+    const flags = toKebabFlags(
+      Object.fromEntries(
+        Object.entries({ ...program.opts(), ...opts }).filter(([, v]) => v !== undefined),
+      ),
     );
     const settings = await normalizeFlags(flags);
     return action(settings, flags, ...args.slice(0, -1));

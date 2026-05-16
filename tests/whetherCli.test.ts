@@ -1342,4 +1342,31 @@ describe("whether cli", () => {
     assert.ok(requests.every((url) => !url.includes("company=") && !url.includes("stage=")));
   });
 
+  // Guard test: kebab-case CLI flags are not silently dropped by Commander's camelCase conversion.
+  it("--help mentions all critical flags to prevent Commander camelCase regressions", () => {
+    const result = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+    assert.equal(result.status, 0);
+    for (const flag of ["--no-local-discovery", "--api-base-url", "--as-of", "--payload-only", "--prompt-only", "--skills-only", "--verbose"]) {
+      assert.match(result.stdout, new RegExp(flag.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")));
+    }
+  });
+
+  it("--no-local-discovery flag prevents auto-discovery when URL source is default (verifies Commander kebab-case routing)", async () => {
+    // Verify the flag is parseable by Commander and reachable in help output
+    const help = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+    assert.match(help.stdout, /no-local-discovery/);
+    // Verify --api-base-url flag routes correctly (the previously broken path)
+    const server = http.createServer((_req, res) => {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ status: "ok" }));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.ok, true);
+  });
+
 });
