@@ -25,6 +25,8 @@ const resolveServerPort = (server: http.Server) => {
   return address.port;
 };
 
+const CLI_TIMEOUT_MS = 10_000;
+
 const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
   new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
     const child = spawn(NODE_BIN, [CLI_PATH, ...args], {
@@ -34,6 +36,13 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
 
     let stdout = "";
     let stderr = "";
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      child.kill("SIGTERM");
+      resolve({ status: null, stdout, stderr });
+    }, CLI_TIMEOUT_MS);
 
     child.stdout.on("data", (chunk: Buffer) => {
       stdout += String(chunk);
@@ -41,8 +50,16 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
     child.stderr.on("data", (chunk: Buffer) => {
       stderr += String(chunk);
     });
-    child.on("error", reject);
+    child.on("error", (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(err);
+    });
     child.on("close", (status: number | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
       resolve({ status, stdout, stderr });
     });
   });
@@ -50,12 +67,12 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
 const runCliWithRetries = async (
   args: string[],
   options: { env?: NodeJS.ProcessEnv } = {},
-  attempts = 5,
+  attempts = 3,
 ) => {
   let lastResult: { status: number | null; stdout: string; stderr: string } | null = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     lastResult = await runCli(args, options);
-    if (lastResult.status === 0) return lastResult;
+    if (lastResult?.status === 0) return lastResult;
     await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
   }
   return lastResult ?? { status: null, stdout: "", stderr: "no result" };
@@ -208,7 +225,7 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address() as { port: number };
-    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
@@ -236,8 +253,8 @@ describe("whether cli", () => {
     });
 
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const port = resolveServerPort(server);
-    const result = await runCli(["brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["brief", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);

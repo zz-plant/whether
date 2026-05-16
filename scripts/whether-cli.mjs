@@ -136,16 +136,21 @@ const normalizeFlags = async (flags) => {
   const envToken = process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? null;
   const envApiBaseUrl = process.env.WHETHER_API_URL ?? null;
   const configApiBaseUrl = config.api_base_url ?? null;
+  const getFlag = (key) => {
+    const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    return flags[key] ?? flags[camel] ?? undefined;
+  };
+
   const apiBaseUrl =
-    typeof flags["api-base-url"] === "string"
-      ? flags["api-base-url"]
+    typeof getFlag("api-base-url") === "string"
+      ? getFlag("api-base-url")
       : envApiBaseUrl
         ? envApiBaseUrl
         : configApiBaseUrl
           ? configApiBaseUrl
           : DEFAULT_API_BASE_URL;
   const apiBaseUrlSource =
-    typeof flags["api-base-url"] === "string"
+    typeof getFlag("api-base-url") === "string"
       ? "flag"
       : envApiBaseUrl
         ? "env"
@@ -156,11 +161,11 @@ const normalizeFlags = async (flags) => {
     config,
     output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.format ?? config.output ?? "text",
     quiet: Boolean(flags.quiet),
-    noColor: Boolean(flags["no-color"]),
+    noColor: Boolean(getFlag("no-color")),
     apiBaseUrl,
     apiBaseUrlSource,
     allowLocalApiDiscovery:
-      !flags["no-local-discovery"] &&
+      !getFlag("no-local-discovery") &&
       (apiBaseUrlSource === "default" || (apiBaseUrlSource === "config" && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(apiBaseUrl))),
     resolvedApiBaseUrl: null,
     autodiscoveredApiBaseUrl: false,
@@ -938,8 +943,13 @@ Skills:
 ${compact.skills.map((skill) => `- ${skill.id}: ${skill.purpose}`).join("\n") || "- none"}`;
 };
 
+const getFlagValue = (flags, key) => {
+  const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  return flags[key] ?? flags[camel] ?? undefined;
+};
+
 const selectAgentOutput = (body, flags, settings) => {
-  if (flags["prompt-only"]) {
+  if (getFlagValue(flags, "prompt-only")) {
     return settings.output === "text"
       ? body.agentHandoff?.prompt ?? ""
       : {
@@ -951,13 +961,13 @@ const selectAgentOutput = (body, flags, settings) => {
         };
   }
 
-  if (flags["payload-only"]) {
+  if (getFlagValue(flags, "payload-only")) {
     return settings.output === "text"
       ? JSON.stringify(body.agentHandoff?.payload ?? {}, null, 2)
       : (body.agentHandoff?.payload ?? {});
   }
 
-  if (flags["skills-only"]) {
+  if (getFlagValue(flags, "skills-only")) {
     const skills = body.agentHandoff?.payload?.skills ?? body.skills ?? [];
     return settings.output === "text"
       ? skills.map((skill) => `${skill.id}: ${skill.purpose}`).join("\n")
@@ -993,7 +1003,7 @@ const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", 
   };
   const params = new URLSearchParams();
   for (const flag of allowedFlags) {
-    const value = flags[flag];
+    const value = getFlagValue(flags, flag);
     if (value === undefined || value === null || value === "") continue;
     params.set(keyMap[flag] ?? flag, String(value));
   }
@@ -1518,6 +1528,7 @@ const run = async () => {
     .option("--prompt-only", "Agent prompt only")
     .option("--skills-only", "Agent skills only")
     .option("--as-of <date>", "Historical date (YYYY-MM)")
+    .option("--verbose", "Expanded view (alias for --view expanded)")
     .option("--view <mode>", "View mode")
     .option("--weeks <n>", "Number of weeks")
     .option("--tightness <n>", "Tightness override")
