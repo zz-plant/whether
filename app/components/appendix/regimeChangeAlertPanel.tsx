@@ -120,7 +120,7 @@ export const RegimeChangeAlertPanel = ({
                 </ul>
                 <Link
                   href="/evidence?advanced=1#time-machine"
-                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-md border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-md border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Open Time Machine
                 </Link>

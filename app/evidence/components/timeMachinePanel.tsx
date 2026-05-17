@@ -336,7 +336,7 @@ export const TimeMachinePanel = ({
               type="submit"
               disabled={isPending}
               aria-busy={isPending}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400 touch-manipulation"
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />

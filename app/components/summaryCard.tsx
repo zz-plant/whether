@@ -89,20 +89,20 @@ export const SummaryCard = ({
             onClick={handleCopy}
             disabled={isCopying}
             aria-busy={isCopying}
-            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
           >
             {isCopying ? "Copying" : copied ? "Copied" : "Copy summary"}
           </Button>
           <a
             href={apiHref}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100"
           >
             View {cadenceLabel} API
           </a>
           {companionHref ? (
             <a
               href={companionHref}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100"
             >
               API companion guide
             </a>
@@ -136,7 +136,7 @@ export const SummaryCard = ({
               <Accordion.Trigger
                 id={rawSummaryTriggerId}
                 aria-controls={rawSummaryPanelId}
-                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-fluid-xs font-semibold tracking-[0.12em] text-slate-200 touch-manipulation"
+                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-fluid-xs font-semibold tracking-[0.12em] text-slate-200"
               >
                 <span>Raw summary text</span>
                 <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>

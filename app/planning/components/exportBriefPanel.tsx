@@ -347,7 +347,7 @@ export const ExportBriefPanel = ({
               <Button
                 type="button"
                 onClick={handlePrint}
-                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
+                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white"
               >
                 <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Print / PDF</span>
               </Button>
@@ -397,7 +397,7 @@ export const ExportBriefPanel = ({
               onClick={handlePrint}
               data-premium-intent="export_brief"
               data-premium-cta="export_pdf"
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white"
             >
               <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Print / PDF</span>
             </Button>
@@ -565,7 +565,7 @@ export const ExportBriefPanel = ({
                     `whether-weekly-operator-brief-${weeklyOperatorDate}.txt`
                   )
                 }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                 Download leadership team brief
               </Button>
@@ -577,13 +577,13 @@ export const ExportBriefPanel = ({
                     `whether-weekly-operator-slack-blocks-${weeklyOperatorDate}.json`
                   )
                 }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                 Download Slack format
               </Button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 Open email draft
               </a>
@@ -609,7 +609,7 @@ export const ExportBriefPanel = ({
                   `whether-slide-bullets-${treasury.record_date}.txt`
                 )
               }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
             >
               Download bullets
             </Button>
@@ -638,7 +638,7 @@ export const ExportBriefPanel = ({
                   `whether-headlines-${treasury.record_date}.txt`
                 )
               }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
             >
               Download key lines
             </Button>
@@ -654,7 +654,7 @@ export const ExportBriefPanel = ({
               readOnly
               value={constraintHeadlines}
               rows={6}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
             />
           </div>
         </div>
@@ -681,7 +681,7 @@ export const ExportBriefPanel = ({
                     `whether-agent-payload-${treasury.record_date}.json`
                   )
                 }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 Download JSON
               </Button>
@@ -699,7 +699,7 @@ export const ExportBriefPanel = ({
                     `whether-agent-prompt-${treasury.record_date}.txt`
                   )
                 }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 Download prompt
               </Button>
@@ -716,7 +716,7 @@ export const ExportBriefPanel = ({
               readOnly
               value={agentPayload}
               rows={10}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
             />
           </div>
         </div>
@@ -750,7 +750,7 @@ export const ExportBriefPanel = ({
                       `whether-jira-note-${treasury.record_date}.md`
                     )
                   }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Download <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" />
                 </Button>
@@ -778,7 +778,7 @@ export const ExportBriefPanel = ({
                       `whether-confluence-note-${treasury.record_date}.txt`
                     )
                   }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Download <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" />
                 </Button>
@@ -806,7 +806,7 @@ export const ExportBriefPanel = ({
                       `whether-linear-note-${treasury.record_date}.md`
                     )
                   }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Download <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" />
                 </Button>
@@ -827,7 +827,7 @@ export const ExportBriefPanel = ({
                 readOnly
               value={briefing}
                 rows={8}
-                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
+                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
               />
             </div>
           ) : null}

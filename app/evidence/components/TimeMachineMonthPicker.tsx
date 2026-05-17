@@ -30,7 +30,7 @@ const yearStepperButtonClass =
   "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600";
 
 const monthOptionBaseClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-fluid-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation";
+  "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-fluid-xs font-semibold tracking-[0.12em] transition-colors";
 
 export const TimeMachineMonthPicker = ({
   calendarMonths,
@@ -59,7 +59,7 @@ export const TimeMachineMonthPicker = ({
         type="button"
         aria-invalid={isInvalid}
         aria-describedby={isInvalid ? errorId : undefined}
-        className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+        className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70"
       >
         <span>{selectedLabel}</span>
         <span className="text-xs text-slate-400">Pick month</span>

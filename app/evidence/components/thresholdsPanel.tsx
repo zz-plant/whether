@@ -280,7 +280,7 @@ export const ThresholdsPanel = ({
                   onClick={() => handlePresetApply(preset.thresholds)}
                   disabled={isPending}
                   aria-busy={isPending}
-                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
                 >
                   <span className="text-slate-100">{preset.label}</span>
                   <span className="text-fluid-xs font-medium tracking-[0.08em] text-slate-400">
@@ -294,7 +294,7 @@ export const ThresholdsPanel = ({
           <Collapsible.Root>
             <Collapsible.Trigger
               type="button"
-              className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
             >
               Edit exact numbers
               <span className="text-fluid-micro text-slate-500">Show / hide</span>
@@ -401,7 +401,7 @@ export const ThresholdsPanel = ({
             <Collapsible.Root>
               <Collapsible.Trigger
                 type="button"
-                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
+                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
               >
                 How this works
               </Collapsible.Trigger>
@@ -409,7 +409,7 @@ export const ThresholdsPanel = ({
                 <Popover.Root>
                   <Popover.Trigger
                     type="button"
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                   >
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[9px] text-slate-400">
                       ?
@@ -436,7 +436,7 @@ export const ThresholdsPanel = ({
                             <span>Higher numbers delay changes until signals are extreme.</span>
                           </li>
                         </ul>
-                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100">
                           Close
                         </Popover.Close>
                         <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
@@ -452,7 +452,7 @@ export const ThresholdsPanel = ({
             <Collapsible.Root defaultOpen>
               <Collapsible.Trigger
                 type="button"
-                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
+                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
               >
                 Audit trail (recent overrides)
               </Collapsible.Trigger>

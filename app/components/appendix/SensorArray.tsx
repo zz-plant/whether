@@ -129,7 +129,7 @@ export const SensorArray = ({
               <Toggle
                 key={window.id}
                 value={window.id}
-                className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/15 data-[pressed]:text-slate-100 touch-manipulation"
+                className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/15 data-[pressed]:text-slate-100"
               >
                 {window.label}
               </Toggle>

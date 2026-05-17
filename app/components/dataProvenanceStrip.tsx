@@ -167,7 +167,7 @@ export const DataProvenanceStrip = ({
           <ManualRefreshButton
             label="Refresh"
             title="Request a fresh snapshot for this provenance context."
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
           />
         </div>
         <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
@@ -220,7 +220,7 @@ export const DataProvenanceStrip = ({
         <ManualRefreshButton
           label="Refresh"
           title="Request a fresh snapshot for this provenance context."
-          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
         />
       </div>
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">

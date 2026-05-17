@@ -339,7 +339,7 @@ export const InsightDatabasePanel = ({
                   <Toggle
                     key={tag}
                     value={tag}
-                    className="min-h-[44px] rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/20 data-[pressed]:text-sky-100 hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
+                    className="min-h-[44px] rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/20 data-[pressed]:text-sky-100 hover:border-slate-500/80 hover:text-slate-100"
                   >
                     {tag}
                   </Toggle>
@@ -394,7 +394,7 @@ export const InsightDatabasePanel = ({
                         onClick={() => toggleTag(tag)}
                         aria-pressed={selectedTags.includes(tag)}
                         aria-label={`Filter by ${tag}`}
-                        className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                        className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors ${
                           selectedTags.includes(tag)
                             ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
                             : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"

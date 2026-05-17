@@ -49,7 +49,7 @@ export function ManualRefreshButton({
       disabled={isRefreshing}
       aria-busy={isRefreshing}
       title={title}
-      className={className ?? "weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"}
+      className={className ?? "weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"}
     >
       {isRefreshing ? refreshingLabel : wasRefreshed ? successLabel : label}
     </Button>

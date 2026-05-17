@@ -138,7 +138,7 @@ export const PlaybookPanel = ({
                     <a
                       key={link.href}
                       href={link.href}
-                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                     >
                       {link.label}
                     </a>
@@ -153,7 +153,7 @@ export const PlaybookPanel = ({
               <Collapsible.Root defaultOpen>
                 <Collapsible.Trigger
                   type="button"
-                  className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
+                  className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
                 >
                   Leadership signals (phrases to use or avoid)
                 </Collapsible.Trigger>

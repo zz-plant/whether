@@ -49,7 +49,7 @@ export const AdvancedThresholdsSection = ({
         <Collapsible.Root defaultOpen={defaultOpen}>
           <Collapsible.Trigger
             type="button"
-            className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100 touch-manipulation"
+            className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
           >
             Open advanced threshold controls
             <span className="text-fluid-micro text-slate-500">Show / hide</span>

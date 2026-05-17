@@ -208,7 +208,7 @@ export const RegimeAssessmentCard = ({
             <Collapsible.Root className="ml-5 rounded-md border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
               <Collapsible.Trigger
                 type="button"
-                className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
                 Because
                 <span className="text-slate-500">(show drivers)</span>
@@ -224,7 +224,7 @@ export const RegimeAssessmentCard = ({
                       <span className="break-words">{driver.label}</span>
                       <a
                         href={driver.href}
-                        className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                       >
                         {driver.linkLabel}
                       </a>

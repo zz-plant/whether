@@ -5,13 +5,13 @@ type ActionLinkVariant = "primary" | "pill" | "ghost" | "inline";
 
 const actionLinkVariantClasses: Record<ActionLinkVariant, string> = {
   primary:
-    "weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation",
+    "weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
   pill:
-    "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation",
+    "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300",
   ghost:
-    "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation",
+    "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
   inline:
-    "inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-300 transition-colors hover:text-sky-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation",
+    "inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-300 transition-colors hover:text-sky-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300",
 };
 
 const joinClasses = (...values: Array<string | undefined>) => values.filter(Boolean).join(" ");

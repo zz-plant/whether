@@ -1,0 +1,450 @@
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(48rem 24rem at 50% -10%, rgba(56, 189, 248, 0.08), transparent 58%),
+    linear-gradient(180deg, #f7fbff 0%, #eef4fb 58%, #f8fbff 100%);
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .weather-shell {
+  background-color: #f3f6fb;
+  background-image:
+    radial-gradient(920px 540px at 50% -12%, rgba(56, 189, 248, 0.10), transparent 65%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 60%, #f8fbff 100%);
+}
+
+:root[data-theme="light"] .weather-panel,
+:root[data-theme="light"] .weather-surface,
+:root[data-theme="light"] .weather-appbar,
+:root[data-theme="light"] .weather-brand-mark,
+:root[data-theme="light"] .weather-pill,
+:root[data-theme="light"] .weather-input,
+:root[data-theme="light"] .weather-button {
+  color: #0f172a;
+  border-color: rgba(100, 116, 139, 0.45);
+  background-color: rgba(255, 255, 255, 0.9);
+  background-image: none;
+}
+
+:root[data-theme="light"] .text-slate-100,
+:root[data-theme="light"] .text-slate-50,
+:root[data-theme="light"] .text-slate-200,
+:root[data-theme="light"] .text-slate-300,
+:root[data-theme="light"] .text-slate-400 {
+  color: #1e293b !important;
+}
+
+:root[data-theme="light"] .text-slate-500,
+:root[data-theme="light"] .text-slate-600 {
+  color: #334155 !important;
+}
+
+:root[data-theme="light"] .text-sky-100,
+:root[data-theme="light"] .text-sky-200 {
+  color: #075985 !important;
+}
+
+:root[data-theme="light"] .text-emerald-100,
+:root[data-theme="light"] .text-emerald-200 {
+  color: #065f46 !important;
+}
+
+:root[data-theme="light"] .text-amber-100,
+:root[data-theme="light"] .text-amber-200 {
+  color: #92400e !important;
+}
+
+:root[data-theme="light"] .text-violet-100,
+:root[data-theme="light"] .text-violet-200 {
+  color: #5b21b6 !important;
+}
+
+:root[data-theme="light"] .text-rose-200 {
+  color: #9f1239 !important;
+}
+
+:root[data-theme="light"] .weather-data-mode-dynamic {
+  border-color: rgba(16, 185, 129, 0.55);
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #065f46;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+
+:root[data-theme="light"] .weather-data-mode-static {
+  border-color: rgba(71, 85, 105, 0.4);
+  background-color: rgba(226, 232, 240, 0.8);
+  color: #1e293b;
+}
+
+
+/* Surface background overrides — maps dark slate backgrounds to light off-white.
+   These use the existing --color-bg-* and --surface-* CSS vars so new components
+   that use those vars automatically get the correct light-theme color.
+   Individual component overrides below handle classes that hardcode slate values. */
+:root[data-theme="light"] {
+  --color-bg-nested: rgba(248, 250, 252, 0.96);
+  --color-bg-raised: rgba(248, 250, 252, 0.92);
+  --color-bg-overlay: rgba(255, 255, 255, 0.95);
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --surface-bg: rgba(248, 250, 252, 0.90);
+  --color-text-decorative: rgb(71 85 105 / 1.0);
+}
+
+:root[data-theme="light"] .weather-chip {
+  border-color: rgba(148, 163, 184, 0.58);
+  background: rgba(241, 245, 249, 0.95);
+  color: #1e293b;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.32);
+}
+
+:root[data-theme="light"] .weather-chip:hover {
+  border-color: rgba(100, 116, 139, 0.7);
+  background: rgba(226, 232, 240, 0.95);
+}
+
+:root[data-theme="light"] .weather-chip:active {
+  border-color: rgba(100, 116, 139, 0.82);
+  background: rgba(203, 213, 225, 0.95);
+}
+
+:root[data-theme="light"] .weather-button {
+  border-color: rgba(100, 116, 139, 0.5);
+  color: #0f172a;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 14px 24px -20px rgba(15, 23, 42, 0.28);
+}
+
+:root[data-theme="light"] .weather-brand-mark {
+  color: #0f172a;
+  background:
+    radial-gradient(140% 140% at 0% 0%, rgba(251, 191, 36, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
+}
+
+:root[data-theme="light"] .weather-button-primary {
+  border-color: rgba(14, 116, 144, 0.45);
+  color: #0b2538;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.82), rgba(56, 189, 248, 0.62));
+  box-shadow:
+    0 14px 24px -18px rgba(14, 116, 144, 0.36),
+    inset 0 0 0 1px rgba(224, 242, 254, 0.58);
+}
+
+
+:root[data-theme="light"] .weather-cta-secondary {
+  border-color: rgba(100, 116, 139, 0.5);
+  color: #0f172a;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 14px 24px -20px rgba(15, 23, 42, 0.28);
+}
+
+:root[data-theme="light"] .weather-cta-primary {
+  border-color: rgba(14, 116, 144, 0.45);
+  color: #0b2538;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.82), rgba(56, 189, 248, 0.62));
+  box-shadow:
+    0 14px 24px -18px rgba(14, 116, 144, 0.36),
+    inset 0 0 0 1px rgba(224, 242, 254, 0.58);
+}
+
+:root[data-theme="light"] .weather-cta-export {
+  border-color: rgba(14, 116, 144, 0.4);
+  color: #075985;
+  background: linear-gradient(180deg, rgba(224, 242, 254, 0.96), rgba(186, 230, 253, 0.68));
+  box-shadow:
+    inset 0 0 0 1px rgba(186, 230, 253, 0.65),
+    0 14px 24px -20px rgba(14, 116, 144, 0.28);
+}
+
+
+:root[data-theme="light"] .weather-climate-backdrop-shade {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(226, 232, 240, 0.32) 62%, rgba(241, 245, 249, 0.88) 100%);
+}
+
+:root[data-theme="light"] [class*="text-emerald-100/"],
+:root[data-theme="light"] [class*="text-emerald-200/"],
+:root[data-theme="light"] [class*="text-amber-100/"],
+:root[data-theme="light"] [class*="text-amber-200/"],
+:root[data-theme="light"] [class*="text-slate-100/"],
+:root[data-theme="light"] [class*="text-slate-200/"],
+:root[data-theme="light"] [class*="text-slate-300/"] {
+  opacity: 1;
+}
+
+:root[data-theme="light"] .weather-shell,
+:root[data-theme="light"] .weather-panel,
+:root[data-theme="light"] .weather-surface,
+:root[data-theme="light"] .weather-appbar,
+:root[data-theme="light"] .weather-pill,
+:root[data-theme="light"] .weather-tab,
+:root[data-theme="light"] .weather-mobile-nav,
+:root[data-theme="light"] .weather-mobile-panel {
+  box-shadow: 0 14px 30px -24px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(148, 163, 184, 0.2);
+}
+
+:root[data-theme="light"] .home-band::before {
+  opacity: 0.65;
+}
+
+:root[data-theme="light"] .home-band-card,
+:root[data-theme="light"] .home-band .weather-step-card {
+  background-color: rgba(255, 255, 255, 0.84) !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.92)) !important;
+  box-shadow:
+    0 12px 26px -24px rgba(15, 23, 42, 0.24),
+    inset 0 0 0 1px color-mix(in srgb, var(--home-band-border) 72%, rgba(148, 163, 184, 0.3)) !important;
+}
+
+:root[data-theme="light"] .home-band-list-item {
+  background-color: rgba(248, 250, 252, 0.96) !important;
+}
+
+:root[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] [class*="text-sky-100/"],
+:root[data-theme="light"] [class*="text-sky-200/"] {
+  color: #075985 !important;
+  opacity: 1;
+}
+
+:root[data-theme="light"] .weather-panel-static,
+:root[data-theme="light"] .weather-route-card,
+:root[data-theme="light"] .weather-stat-card,
+:root[data-theme="light"] .weather-tile,
+:root[data-theme="light"] .weather-step-summary,
+:root[data-theme="light"] .weather-hub-hero,
+:root[data-theme="light"] .weather-hub-section,
+:root[data-theme="light"] .weather-hub-card,
+:root[data-theme="light"] .weather-hub-link-card {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 20px -16px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme="light"] .weather-priority-card {
+  border-color: rgba(56, 189, 248, 0.24);
+  background: rgba(240, 249, 255, 0.90);
+  box-shadow: 0 10px 20px -16px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme="light"] .weather-hub-backdrop,
+:root[data-theme="light"] .weather-secondary-shell-backdrop {
+  background:
+    radial-gradient(38rem 18rem at 8% 2%, rgba(56, 189, 248, 0.06), transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.60) 0%, rgba(226, 232, 240, 0.12) 100%);
+  filter: none;
+}
+
+:root[data-theme="light"] .weather-hub-title,
+:root[data-theme="light"] .weather-secondary-title,
+:root[data-theme="light"] .weather-secondary-section-title {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .weather-secondary-description {
+  color: #334155;
+}
+
+:root[data-theme="light"] .weather-hub-chip {
+  border-color: rgba(14, 116, 144, 0.24);
+  background: rgba(241, 245, 249, 0.96);
+  color: #0f172a;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.16);
+}
+
+:root[data-theme="light"] .weather-hub-chip:hover {
+  border-color: rgba(14, 116, 144, 0.38);
+  color: #075985;
+  box-shadow: 0 12px 22px -18px rgba(14, 116, 144, 0.18);
+}
+
+:root[data-theme="light"] .weather-hub-chip-active {
+  border-color: rgba(14, 116, 144, 0.4);
+  background: rgba(224, 242, 254, 0.94);
+  color: #075985;
+}
+
+:root[data-theme="light"] .weather-tag-slate {
+  border-color: rgba(148, 163, 184, 0.34);
+  background: rgba(226, 232, 240, 0.82);
+  color: #334155;
+}
+
+:root[data-theme="light"] .weather-hub-link-card:hover,
+:root[data-theme="light"] .weather-route-card:hover,
+:root[data-theme="light"] .weather-step-summary:hover,
+:root[data-theme="light"] .weather-step-summary:focus-within {
+  border-color: rgba(56, 189, 248, 0.34);
+  box-shadow:
+    0 16px 28px -24px rgba(14, 116, 144, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 0 0 1px rgba(56, 189, 248, 0.06);
+}
+
+:root[data-theme="light"] .weather-decision-delta {
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+:root[data-theme="light"] .weather-decision-delta-label {
+  color: #475569;
+}
+
+:root[data-theme="light"] .weather-decision-delta-value {
+  color: #1e293b;
+}
+
+:root[data-display-mode="tv"] .weather-decision-delta-label {
+  font-size: 0.75rem;
+}
+
+:root[data-display-mode="tv"] .weather-decision-delta-value {
+  font-size: 0.95rem;
+}
+
+/* Light theme scrollbar */
+:root[data-theme="light"] html,
+:root[data-theme="light"] body,
+:root[data-theme="light"] .weather-mobile-nav,
+:root[data-theme="light"] .weather-mobile-panel {
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(226, 232, 240, 0.4);
+}
+
+:root[data-theme="light"] html::-webkit-scrollbar-track,
+:root[data-theme="light"] body::-webkit-scrollbar-track,
+:root[data-theme="light"] .weather-mobile-nav::-webkit-scrollbar-track,
+:root[data-theme="light"] .weather-mobile-panel::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.5);
+}
+
+:root[data-theme="light"] html::-webkit-scrollbar-thumb,
+:root[data-theme="light"] body::-webkit-scrollbar-thumb,
+:root[data-theme="light"] .weather-mobile-nav::-webkit-scrollbar-thumb,
+
+  .cadence-item {
+    gap: 0.75rem;
+  }
+
+  .cadence-item .cadence-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1280px) and (pointer: coarse), (min-width: 1920px) {
+  html {
+    font-size: 18px;
+  }
+
+  .type-headline {
+    font-size: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    line-height: 1.08;
+  }
+
+  .type-section {
+    font-size: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+  }
+
+  .type-label {
+    font-size: var(--weather-font-size-sm);
+    letter-spacing: 0.2em;
+  }
+
+  .type-data {
+    font-size: var(--weather-font-size-lg);
+    line-height: 1.75;
+  }
+
+  .weather-pill,
+  .weather-button,
+  .weather-button-primary,
+  .weather-tab {
+    min-height: 56px;
+  }
+
+  .weather-mobile-nav,
+  .weather-mobile-panel {
+    font-size: 1.05rem;
+  }
+
+
+  .tv-rail-safe {
+    padding-right: max(calc(env(safe-area-inset-right) + 22rem), 32vw);
+  }
+
+  .tv-action-rail {
+    position: fixed;
+    right: calc(env(safe-area-inset-right) + 1rem);
+    top: calc(env(safe-area-inset-top) + 6rem);
+    z-index: 35;
+    width: min(22rem, 30vw);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 1rem;
+    background: rgba(2, 6, 23, 0.92);
+    padding: 0.85rem;
+    backdrop-filter: blur(14px);
+    box-shadow:
+      0 20px 40px -24px rgba(2, 6, 23, 0.9),
+      0 8px 20px -16px rgba(56, 189, 248, 0.28);
+    display: block;
+  }
+}
+
+:root[data-display-mode="tv"] {
+  font-size: 18px;
+}
+
+:root[data-display-mode="tv"] .type-headline {
+  font-size: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  line-height: 1.08;
+}
+
+:root[data-display-mode="tv"] .type-section {
+  font-size: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+}
+
+:root[data-display-mode="tv"] .type-label {
+  font-size: var(--weather-font-size-sm);
+  letter-spacing: 0.2em;
+}
+
+:root[data-display-mode="tv"] .type-data {
+  font-size: var(--weather-font-size-lg);
+  line-height: 1.75;
+}
+
+:root[data-display-mode="tv"] .weather-pill,
+:root[data-display-mode="tv"] .weather-button,
+:root[data-display-mode="tv"] .weather-button-primary,
+:root[data-display-mode="tv"] .weather-cta,
+:root[data-display-mode="tv"] .weather-tab {
+  min-height: 56px;
+}
+
+:root[data-display-mode="tv"] .weather-mobile-nav,
+:root[data-display-mode="tv"] .weather-mobile-panel {
+  font-size: 1.05rem;
+}
+
+:root[data-display-mode="tv"] .tv-rail-safe {
+  padding-right: max(calc(env(safe-area-inset-right) + 22rem), 32vw);
+}
+
+:root[data-display-mode="tv"] .tv-action-rail {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 1rem);
+  top: calc(env(safe-area-inset-top) + 6rem);
+  z-index: 35;
+  width: min(22rem, 30vw);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.92);
+  padding: 0.85rem;

@@ -6,7 +6,7 @@ import type { DiagnosticsSectionProps } from "./types";
 
 const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
   <Accordion.Header>
-    <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none touch-manipulation`}>
+    <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none`}>
       <span>{label}</span>
       <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-data-[panel-open]:rotate-180">▾</span>
     </Accordion.Trigger>

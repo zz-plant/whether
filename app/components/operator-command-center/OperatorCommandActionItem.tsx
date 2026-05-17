@@ -81,7 +81,7 @@ export const OperatorCommandActionItem = ({
     className:
       variant === "popup"
         ? "flex min-h-[44px] cursor-pointer items-center justify-between gap-3 rounded-md border border-slate-800/70 px-3 py-2 text-left text-slate-200 outline-none transition-colors data-[highlighted]:border-sky-400/70 data-[highlighted]:text-slate-100"
-        : "weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation",
+        : "weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300",
     title: action.description,
   });
 };

@@ -203,7 +203,7 @@ export const CanonicalTrustModule = ({
         <Collapsible.Root className="mt-1 border-t border-slate-700/70 pt-3 text-slate-200">
           <Collapsible.Trigger
             type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-left text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-left text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
           >
             <span>Data source details</span>
             <span className="sr-only group-data-[panel-open]:hidden">Collapsed</span>

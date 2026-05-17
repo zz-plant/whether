@@ -27,7 +27,7 @@ export const SummaryDeltaPanel = ({
         </div>
         <Link
           href="/api/summary-delta"
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
         >
           View delta API
         </Link>

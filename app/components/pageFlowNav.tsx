@@ -71,7 +71,7 @@ export function PageFlowNav({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="group relative block rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="group relative block rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3 text-slate-100 transition-colors hover:border-sky-400/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
                 {index < items.length - 1 ? (
                   <span className={`pointer-events-none absolute left-[1.4rem] top-[3.4rem] h-[calc(100%-2.1rem)] w-px ${tone.rail}`} aria-hidden="true" />

@@ -250,7 +250,7 @@ export const ChangeSinceLastReadPanel = ({
                 {topImpactItems.map((item) => (
                   <span
                     key={item.label}
-                    className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
+                    className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
                   >
                     {item.label}: {item.tone.label}
                   </span>
@@ -354,7 +354,7 @@ export const ChangeSinceLastReadPanel = ({
             </p>
             <a
               href={timeMachineLink}
-              className="weather-button-primary mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
+              className="weather-button-primary mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-300/80 hover:text-white"
             >
               Open Time Machine
             </a>
@@ -521,7 +521,7 @@ export const ReturningVisitorDeltaStrip = ({
           <li key={item.label}>
             <a
               href={item.href}
-              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
+              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
             >
               {item.label} · {item.tone.label}
             </a>

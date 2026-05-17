@@ -97,7 +97,7 @@ export function WeeklyDigestDownload() {
       type="button"
       onClick={handleDownload}
       disabled={loading}
-      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
     >
       <DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />
       {loading ? "Loading digest…" : "Download weekly digest"}

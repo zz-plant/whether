@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+@import 'tailwindcss';
+
+@theme {
+  --color-semantic-tightening-fg: #fca5a5;
+  --color-semantic-tightening-border: #f87171;
+  --color-semantic-tightening-bg: #3f1a1a;
+
+  --color-semantic-easing-fg: #86efac;
+  --color-semantic-easing-border: #4ade80;
+  --color-semantic-easing-bg: #123023;
+
+  --color-semantic-unchanged-fg: #cbd5e1;
+  --color-semantic-unchanged-border: #64748b;
+  --color-semantic-unchanged-bg: #162133;
+
+  --color-semantic-caution-fg: #fcd34d;
+  --color-semantic-caution-border: #f59e0b;
+  --color-semantic-caution-bg: #3b2d0b;
+
+  --color-semantic-reversal-fg: #fda4af;
+  --color-semantic-reversal-border: #fb7185;
+  --color-semantic-reversal-bg: #3c1420;
+
+  --color-slate-950: #121212;
+
+  --text-fluid-micro: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
+  --text-fluid-xs: clamp(0.675rem, 0.6rem + 0.3vw, 0.8125rem);
+  --text-fluid-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
+  --text-fluid-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  --text-fluid-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
+  --text-fluid-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
+  --text-fluid-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+:root {
+  color-scheme: dark;
+  --weather-font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --weather-font-display: "Fraunces", Georgia, serif;
+  --weather-font-size-micro: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
+  --weather-font-size-xs: clamp(0.675rem, 0.6rem + 0.3vw, 0.8125rem);
+  --weather-font-size-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
+  --weather-font-size-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  --weather-font-size-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
+  --weather-font-size-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
+  --weather-font-size-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
+  --weather-shell-gap: clamp(1rem, 0.85rem + 1.5vw, 2.5rem);
+  --weather-shell-pad-inline: clamp(0.65rem, 0.5rem + 1.5vw, 2rem);
+  --weather-shell-pad-block: clamp(1rem, 1rem + 2vw, 3rem);
+  --weather-card-pad: clamp(0.75rem, 0.65rem + 0.5vw, 1.2rem);
+  --weather-interactive-duration: 220ms;
+  --weather-interactive-duration-fast: 160ms;
+  --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --weather-focus-ring: rgba(125, 211, 252, 0.88);
+  --weather-focus-halo: rgba(14, 165, 233, 0.32);
+  --weather-primary-gradient: linear-gradient(135deg, rgba(36, 99, 235, 0.94), rgba(14, 116, 144, 0.92) 58%, rgba(14, 24, 24, 0.9));
+  --weather-primary-shadow:
+    0 14px 24px -20px rgba(14, 165, 233, 0.26),
+    0 6px 14px -12px rgba(59, 130, 246, 0.16),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
+  --weather-primary-shadow-hover:
+    0 18px 30px -20px rgba(14, 165, 233, 0.34),
+    0 8px 16px -12px rgba(59, 130, 246, 0.22),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
+  --weather-secondary-shadow:
+    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 10px 18px -18px rgba(2, 6, 23, 0.54);
+  --weather-secondary-shadow-hover:
+    inset 0 0 0 1px rgba(125, 211, 252, 0.08),
+    0 14px 24px -18px rgba(2, 6, 23, 0.68),
+    0 6px 14px -12px rgba(14, 165, 233, 0.08);
+  --panel-bg: rgba(24, 24, 24, 0.82);
+  --panel-border: rgba(148, 163, 184, 0.10);
+  --surface-bg: rgba(32, 32, 32, 0.72);
+  --surface-border: rgba(148, 163, 184, 0.09);
+  --color-bg-nested: rgba(18, 18, 18, 0.45);
+  --color-bg-raised: rgba(32, 32, 32, 0.70);
+  --color-bg-overlay: rgba(18, 18, 18, 0.82);
+  --color-text-decorative: rgb(148 163 184 / 1.0);
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  background-color: #121212;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
+  scrollbar-gutter: stable both-edges;
+  scroll-padding-top: calc(env(safe-area-inset-top) + 5rem);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
+}
+
+body {
+  background: #121212;
+  color: #f1f5f9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  isolation: isolate;
+  font-family: var(--weather-font-sans);
+  min-height: 100dvh;
+  overflow-x: clip;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  background:
+    radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.07), transparent 60%),
+    linear-gradient(180deg, rgba(10, 10, 10, 1) 0%, rgba(14, 14, 14, 1) 50%, rgba(10, 10, 10, 1) 100%);
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: rgb(240 249 255);
+}

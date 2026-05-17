@@ -115,7 +115,7 @@ export const DisplayModeToggle = () => {
       onClick={() => updateMode(isTv ? "auto" : "tv")}
       aria-pressed={isTv}
       aria-label={isTv ? "Switch to auto display mode" : "Switch to TV display mode"}
-      className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+      className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       suppressHydrationWarning
     >
       {isTv ? "Use auto display mode" : "Force TV display mode"}

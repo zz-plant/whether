@@ -113,7 +113,7 @@ export function OperationsExecutionStepper({
                   aria-controls={step.id}
                   data-active={isActive ? "true" : "false"}
                   data-reviewed={index < activeIndex ? "true" : "false"}
-                  className={`weather-surface weather-step-card flex min-h-[112px] w-full flex-col gap-2 rounded border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 hover:-translate-y-0.5 ${cardTone}`}
+                  className={`weather-surface weather-step-card flex min-h-[112px] w-full flex-col gap-2 rounded border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 hover:-translate-y-0.5 ${cardTone}`}
                 >
                   <span className="inline-flex items-center justify-between gap-2 text-fluid-xs font-semibold uppercase tracking-[0.2em]">
                     <span className="inline-flex items-center gap-2">
@@ -214,7 +214,7 @@ export function OperationsExecutionStepper({
               </div>
               <a
                 href={stepHref}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
                 Open step
               </a>

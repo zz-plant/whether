@@ -565,7 +565,7 @@ export const SignalsEvidencePrioritiesSection = ({
             key={focus}
             href={buildSignalsFocusHref(searchParams, focus)}
             aria-current={isActive ? "page" : undefined}
-            className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+            className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
               isActive
                 ? "border-sky-300/80 text-slate-100"
                 : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"

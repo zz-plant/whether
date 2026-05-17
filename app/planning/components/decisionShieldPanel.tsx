@@ -361,7 +361,7 @@ export const DecisionShieldPanel = ({
               onClick={handleSaveToDecisionMemory}
               disabled={isSavingMemory || !clientId}
               aria-busy={isSavingMemory}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isSavingMemory ? "Saving" : !clientId ? "Preparing memory" : "Save to memory"}
             </button>
@@ -397,7 +397,7 @@ export const DecisionShieldPanel = ({
                 value={shareText}
                 rows={8}
                 aria-label="Copy-ready Decision Shield verdict"
-                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
+                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
               />
             </div>
           ) : null}
@@ -417,7 +417,7 @@ export const DecisionShieldPanel = ({
               onValueChange={(value) => setField("lifecycle", value)}
               options={lifecycleSelectOptions}
               placeholder="Select lifecycle"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
             />
             <LabeledSelectField
               label="Category"
@@ -425,7 +425,7 @@ export const DecisionShieldPanel = ({
               onValueChange={(value) => setField("category", value)}
               options={categorySelectOptions}
               placeholder="Select category"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
             />
             <LabeledSelectField
               label="Action"
@@ -433,7 +433,7 @@ export const DecisionShieldPanel = ({
               onValueChange={(value) => setField("action", value)}
               options={actionSelectOptions}
               placeholder="Select action"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
             />
           </Fieldset.Root>
 
@@ -464,12 +464,12 @@ export const DecisionShieldPanel = ({
                     aria-describedby={[presetError ? "preset-error" : null, presetHintId]
                       .filter(Boolean)
                       .join(" ")}
-                    className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                    className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
                   />
                 </Field.Root>
                 <button
                   type="submit"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Save preset
                 </button>
@@ -505,14 +505,14 @@ export const DecisionShieldPanel = ({
                       <button
                         type="button"
                         onClick={() => handlePresetApply(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                       >
                         Apply
                       </button>
                       <button
                         type="button"
                         onClick={() => handlePresetDelete(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
                       >
                         Remove
                       </button>
