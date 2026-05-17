@@ -31,6 +31,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [stage, setStage] = useState<CompanyStage | null>(null);
   const [sensitivity, setSensitivity] = useState<RateSensitivity | null>(null);
   const [displayMode, setDisplayMode] = useState<string>("auto");
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     setStage((localStorage.getItem(STAGE_KEY) as CompanyStage | null));
@@ -55,6 +56,26 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     localStorage.setItem(DISPLAY_KEY, value);
     document.documentElement.dataset.displayMode = value;
   }, []);
+
+  const showSaved = useCallback(() => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }, []);
+
+  const saveStageWithFeedback = useCallback((value: CompanyStage) => {
+    saveStage(value);
+    showSaved();
+  }, [saveStage, showSaved]);
+
+  const saveSensitivityWithFeedback = useCallback((value: RateSensitivity) => {
+    saveSensitivity(value);
+    showSaved();
+  }, [saveSensitivity, showSaved]);
+
+  const saveDisplayModeWithFeedback = useCallback((value: string) => {
+    saveDisplayMode(value);
+    showSaved();
+  }, [saveDisplayMode, showSaved]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-end sm:items-start">
@@ -96,7 +117,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     name="company-stage"
                     value={s.value}
                     checked={stage === s.value}
-                    onChange={() => saveStage(s.value)}
+                    onChange={() => saveStageWithFeedback(s.value)}
                     className="accent-sky-400"
                   />
                   {s.label}
@@ -125,7 +146,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     name="rate-sensitivity"
                     value={s.value}
                     checked={sensitivity === s.value}
-                    onChange={() => saveSensitivity(s.value)}
+                    onChange={() => saveSensitivityWithFeedback(s.value)}
                     className="accent-sky-400"
                   />
                   {s.label}
@@ -144,7 +165,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 <button
                   key={mode.value}
                   type="button"
-                  onClick={() => saveDisplayMode(mode.value)}
+                  onClick={() => saveDisplayModeWithFeedback(mode.value)}
                   className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
                     displayMode === mode.value
                       ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
@@ -158,9 +179,16 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </fieldset>
         </div>
 
-        <p className="mt-4 text-fluid-micro text-slate-500">
-          Changes apply on next brief refresh.
-        </p>
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-fluid-micro text-slate-500">
+            Changes apply on next brief refresh.
+          </p>
+          {saved ? (
+            <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-200">
+              Saved
+            </span>
+          ) : null}
+        </div>
       </aside>
     </div>
   );

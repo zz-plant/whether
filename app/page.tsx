@@ -20,6 +20,7 @@ import {
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 import { HomeDeltaStrip } from "./components/home/deltaStrip";
+import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -175,6 +176,22 @@ export const HomePageReportContent = async ({
       />
       <OperatorContextWrapper />
       <BriefConfigureStrip />
+      <PageDeltaSummary
+        regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
+        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+        tightnessDelta={
+          homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals
+            .find((s) => s.key === "tightness")?.delta ?? 0
+        }
+        riskAppetiteDelta={
+          homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals
+            .find((s) => s.key === "riskAppetite")?.delta ?? 0
+        }
+        actionShort={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
+        postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
+        recordDate={homepage.reportShell.recordDateLabel}
+      />
       <FirstVisitBanner />
       <HomeDeltaStrip
         tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
@@ -183,13 +200,15 @@ export const HomePageReportContent = async ({
       />
       <HomeRoutePrefetch />
       <ErrorBoundary label="Weekly decision card">
-        <HomeWhatChangedSection
-          weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
-          leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
-          fallbackActive={homepage.fallbackActive}
-          searchParams={resolvedSearchParams}
-          initialArtifactMode={initialArtifactMode}
-        />
+        <div data-share-section="decision">
+          <HomeWhatChangedSection
+            weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
+            leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
+            fallbackActive={homepage.fallbackActive}
+            searchParams={resolvedSearchParams}
+            initialArtifactMode={initialArtifactMode}
+          />
+        </div>
       </ErrorBoundary>
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}

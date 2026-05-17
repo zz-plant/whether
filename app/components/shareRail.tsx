@@ -113,15 +113,26 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 {status === "copied" ? "Copied!" : "Slack format"}
               </button>
             </div>
-            <div className="mt-3">
+            <div className="mt-3 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => {
                   copyToClipboard(window.location.href, "link");
                 }}
-                className="weather-button w-full px-3 py-2 text-xs font-semibold"
+                className="weather-button px-3 py-2 text-xs font-semibold"
               >
-                {status === "copied" ? "Link copied!" : "Copy page link"}
+                {status === "copied" ? "Link copied!" : "Page link"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const decisionSection = document.querySelector('[data-share-section="decision"]');
+                  const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
+                  copyToClipboard(text, "section");
+                }}
+                className="weather-button px-3 py-2 text-xs font-semibold"
+              >
+                {status === "copied" ? "Copied!" : "Decision card"}
               </button>
             </div>
           </div>
