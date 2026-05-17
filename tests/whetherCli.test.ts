@@ -1361,7 +1361,9 @@ describe("whether cli", () => {
       res.end(JSON.stringify({ status: "ok" }));
     });
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
+    const addr = server.address();
+    if (!addr || typeof addr === 'string') throw new Error('Expected AddressInfo from server');
+    const { port } = addr;
     const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
     await new Promise<void>((resolve) => server.close(() => resolve()));
     assert.equal(result.status, 0);
