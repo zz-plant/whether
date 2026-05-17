@@ -249,7 +249,7 @@ export function GlobalHeaderNavRail({
       <nav aria-label="Primary routes">
         <ul
           ref={railRef}
-          className="flex gap-1.5 overflow-x-auto pb-1 sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
+          className="weather-nav-rail flex gap-1.5 overflow-x-auto pb-1 sm:scroll-smooth sm:pr-3 sm:[-ms-overflow-style:none] sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden"
         >
           {navigationLinks.map((link) => (
             <CompactNavigationLink key={link.href} link={link} onIntent={onIntent} />
@@ -293,7 +293,7 @@ export function GlobalHeaderNavRail({
       <ul
         id="global-header-nav-list"
         ref={railRef}
-        className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto scroll-smooth pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
+        className={`${isMenuOpen ? "flex" : "hidden"} weather-nav-rail gap-2 overflow-x-auto scroll-smooth pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
       >
         {navigationLinks.map((link, index) => (
           <NavigationLinkCard

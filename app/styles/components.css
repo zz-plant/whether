@@ -212,6 +212,12 @@
   background: rgba(30, 30, 30, 0.40);
 }
 
+/* Nav scroll fade — subtle right-edge gradient hinting at more items on small screens */
+.weather-nav-rail {
+  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
+}
+
 /* Chip base — normalizes sizing across all chip-like elements */
 :where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-brief-meta-chip, .weather-nav-card-index, .weather-data-mode) {
   border-radius: 9999px;

@@ -57,7 +57,7 @@
   --weather-shell-gap: clamp(1rem, 0.85rem + 1.5vw, 2.5rem);
   --weather-shell-pad-inline: clamp(0.65rem, 0.5rem + 1.5vw, 2rem);
   --weather-shell-pad-block: clamp(1rem, 1rem + 2vw, 3rem);
-  --weather-card-pad: clamp(0.75rem, 0.65rem + 0.5vw, 1.2rem);
+  --weather-card-pad: clamp(0.5rem, 0.6rem + 0.4vw, 1.2rem);
   --weather-interactive-duration: 220ms;
   --weather-interactive-duration-fast: 160ms;
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);

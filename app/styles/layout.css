@@ -891,3 +891,15 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Tiny screen / short viewport — compact header and tighter spacing */
+@media (max-height: 700px) {
+  :root {
+    --weather-shell-pad-block: clamp(0.75rem, 0.75rem + 0.5vw, 1.5rem);
+    --weather-shell-gap: clamp(0.5rem, 0.5rem + 1vw, 1.5rem);
+  }
+
+  .weather-page-shell {
+    padding-block: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  }
+}
