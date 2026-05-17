@@ -296,7 +296,7 @@
 }
 
 .weather-hub-stat {
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  border: 1px solid var(--border-default);
   border-radius: 1.15rem;
   padding: 0.95rem 1rem;
   background: rgba(15, 23, 42, 0.46);

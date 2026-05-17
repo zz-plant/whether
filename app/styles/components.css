@@ -103,7 +103,7 @@
 }
 
 .weather-route-card-utility {
-  border-color: rgba(148, 163, 184, 0.14);
+  border-color: var(--border-default);
 }
 
 .weather-ritual-card {
@@ -175,7 +175,7 @@
 }
 
 .weather-data-mode-static {
-  border-color: rgba(148, 163, 184, 0.28);
+  border-color: var(--border-strong);
   background-color: rgba(30, 41, 59, 0.30);
   color: rgb(226 232 240);
 }
@@ -208,7 +208,7 @@
 }
 
 .weather-quick-glance {
-  border-color: rgba(148, 163, 184, 0.14);
+  border-color: var(--border-default);
   background: rgba(30, 30, 30, 0.40);
 }
 
@@ -228,7 +228,7 @@ a .weather-chip:hover,
 button .weather-chip:hover,
 [role="button"] .weather-chip:hover,
 .weather-chip:hover {
-  border-color: rgba(148, 163, 184, 0.28);
+  border-color: var(--border-strong);
   background: rgba(15, 23, 42, 0.52);
 }
 
@@ -793,7 +793,7 @@ button .weather-chip:active,
   z-index: 50;
   transform: translateY(-200%);
   border-radius: var(--weather-radius-control);
-  border: 1px solid rgba(148, 163, 184, 0.5);
+  border: 1px solid var(--border-strong);
   background: rgba(15, 23, 42, 0.95);
   padding: 0.6rem 1.2rem;
   font-size: 0.75rem;
@@ -1191,7 +1191,7 @@ html {
 }
 
 .weather-step-panel {
-  animation: weather-panel-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: weather-panel-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .weather-step-summary {
