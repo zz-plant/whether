@@ -191,6 +191,8 @@ export const HomePageReportContent = async ({
         actionShort={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
         postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
         recordDate={homepage.reportShell.recordDateLabel}
+        companyStage={operatorContext.companyStage}
+        rateSensitivity={operatorContext.rateSensitivity}
       />
       <FirstVisitBanner />
       <HomeDeltaStrip

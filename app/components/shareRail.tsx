@@ -15,7 +15,7 @@ const presetLabels: Record<SharePreset, string> = {
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
-  const { copyToClipboard, status } = useClipboardCopy();
+  const { copyToClipboard, status, copiedTarget } = useClipboardCopy();
 
   const buildShareText = useCallback(() => {
     const context = includeContext
@@ -49,7 +49,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-start justify-end sm:items-start">
       <div className="fixed inset-0 bg-black/40" onClick={onClose} />
       <aside
-        className="relative z-10 mt-14 mr-2 w-[22rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
+        className="weather-slide-panel relative z-10 mt-14 mr-2 w-[22rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
         role="dialog"
         aria-label="Share brief"
       >
@@ -103,14 +103,25 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 onClick={handleCopy}
                 className="weather-button flex-1 px-3 py-2 text-xs font-semibold"
               >
-                {status === "copied" ? "Copied!" : "Plain text"}
+                {copiedTarget === "plain" ? "Copied!" : "Plain text"}
               </button>
               <button
                 type="button"
                 onClick={copySlackText}
                 className="weather-button flex-1 px-3 py-2 text-xs font-semibold"
               >
-                {status === "copied" ? "Copied!" : "Slack format"}
+                {copiedTarget === "slack" ? "Copied!" : "Slack format"}
+              </button>
+            </div>
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  copyToClipboard(window.location.href, "link");
+                }}
+                className="weather-button w-full px-3 py-2 text-xs font-semibold"
+              >
+                {copiedTarget === "link" ? "Link copied!" : "Copy page link"}
               </button>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -132,7 +143,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 }}
                 className="weather-button px-3 py-2 text-xs font-semibold"
               >
-                {status === "copied" ? "Copied!" : "Decision card"}
+                {copiedTarget === "section" ? "Copied!" : "Decision card"}
               </button>
             </div>
           </div>

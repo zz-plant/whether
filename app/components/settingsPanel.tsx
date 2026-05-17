@@ -81,7 +81,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-start justify-end sm:items-start">
       <div className="fixed inset-0 bg-black/40" onClick={onClose} />
       <aside
-        className="relative z-10 mt-14 mr-2 w-[20rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
+        className="weather-slide-panel relative z-10 mt-14 mr-2 w-[20rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
         role="dialog"
         aria-label="Settings"
       >

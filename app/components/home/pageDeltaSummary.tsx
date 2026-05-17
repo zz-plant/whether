@@ -7,6 +7,14 @@ const REGIME_LABELS: Record<string, string> = {
   EXPANSION: "expansionary conditions",
 };
 
+const STAGE_LABELS: Record<string, string> = {
+  "pre-seed": "Pre-seed",
+  seed: "Seed",
+  "series-a": "Series A",
+  "series-b-plus": "Series B+",
+  public: "Public",
+};
+
 export function PageDeltaSummary({
   regimeKey,
   tightness,
@@ -16,6 +24,8 @@ export function PageDeltaSummary({
   actionShort,
   postureLabel,
   recordDate,
+  companyStage,
+  rateSensitivity,
 }: {
   regimeKey?: string;
   tightness: number;
@@ -25,6 +35,8 @@ export function PageDeltaSummary({
   actionShort?: string;
   postureLabel?: string;
   recordDate?: string;
+  companyStage?: string | null;
+  rateSensitivity?: string | null;
 }) {
   const regimeLabel = regimeKey ? REGIME_LABELS[regimeKey] ?? regimeKey.toLowerCase() : "unknown";
 
@@ -46,6 +58,11 @@ export function PageDeltaSummary({
         <span className="text-slate-300">
           {actionShort ?? postureLabel}
         </span>
+        {companyStage ? (
+          <span className="rounded-full bg-slate-800/50 px-2 py-0.5 text-fluid-micro font-medium text-slate-400">
+            {STAGE_LABELS[companyStage] ?? companyStage}{rateSensitivity ? ` · ${rateSensitivity}` : ""}
+          </span>
+        ) : null}
       </div>
     </div>
   );
