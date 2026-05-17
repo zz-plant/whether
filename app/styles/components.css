@@ -212,6 +212,16 @@
   background: rgba(30, 30, 30, 0.40);
 }
 
+/* Chip base — normalizes sizing across all chip-like elements */
+:where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-brief-meta-chip, .weather-nav-card-index, .weather-data-mode) {
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
 .weather-chip {
   @apply rounded-sm border;
   padding: 0.2rem 0.6rem;
@@ -993,11 +1003,17 @@ html {
 
 .weather-skeleton__shimmer {
   position: absolute;
-  inset: -30% -12%;
+  inset: -40% -20%;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(191, 219, 254, 0.06) 50%, transparent 100%);
-  animation: weather-pulse 1.5s ease-in-out infinite;
-  will-change: opacity;
+    linear-gradient(90deg, transparent 0%, rgba(191, 219, 254, 0.08) 25%, rgba(191, 219, 254, 0.14) 37%, rgba(191, 219, 254, 0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: weather-shimmer 1.8s ease-in-out infinite;
+  will-change: background-position;
+}
+
+@keyframes weather-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .weather-loading-beacon {
@@ -1005,7 +1021,7 @@ html {
   height: 0.55rem;
   width: 0.55rem;
   border-radius: 9999px;
-  background: rgba(34, 211, 238, 0.70);
+  background: rgba(45, 212, 191, 0.70);
   animation: weather-pulse 1.4s ease-in-out infinite;
 }
 
@@ -1023,7 +1039,7 @@ html {
   inset: 1px;
   border-radius: inherit;
   transform-origin: left center;
-  background: linear-gradient(90deg, rgba(34, 211, 238, 0.6), rgba(125, 211, 252, 0.8) 100%);
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0.6), rgba(45, 212, 191, 0.85) 100%);
   animation: weather-pulse 1.5s ease-in-out infinite;
 }
 
