@@ -107,7 +107,7 @@ function CompactNavigationLink({
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
         title={link.description}
-        className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-3 py-2 text-[13px] font-medium tracking-[0.01em] no-underline touch-manipulation transition-colors ${
+        className={`inline-flex min-h-[32px] items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium tracking-[0.01em] no-underline touch-manipulation transition-colors ${
           link.isActive
             ? "border-slate-700/80 bg-slate-900/80 text-slate-50"
             : "border-transparent text-slate-400 hover:border-slate-800 hover:bg-slate-950/60 hover:text-slate-100"

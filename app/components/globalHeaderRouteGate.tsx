@@ -77,15 +77,15 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
   return (
     <header
-      className={`mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+      className={`mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_8px_20px_-16px_rgba(2,6,23,0.72)]"}`}
     >
-      <div className="weather-appbar weather-topbar px-4 py-3 sm:px-5 sm:py-3">
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="weather-appbar weather-topbar px-3 py-2.5 sm:px-4 sm:py-2.5">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
-              <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <Link href="/" className={GLOBAL_HEADER_BRAND_LINK_CLASSNAME}>
                   Whether
                 </Link>
@@ -101,7 +101,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   {reportHeaderAction ? (
                     <Link
                       href={reportHeaderAction.href}
-                      className="weather-button-primary inline-flex min-h-[42px] items-center justify-center rounded-full px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+                      className="weather-button-primary inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] text-slate-100"
                     >
                       {reportHeaderAction.label}
                     </Link>
@@ -109,19 +109,19 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   {isHomeBrief ? (
                     <Link
                       href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[40px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
+                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
                     >
                       {reportHeaderUtilityAction.label}
                     </Link>
                   ) : (
                     <Link
                       href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[40px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
+                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
                     >
                       {reportHeaderUtilityAction.label}
                     </Link>
                   )}
-                  <ThemeToggleButton className="min-h-[42px]" />
+                  <ThemeToggleButton className="min-h-[36px]" />
                 </>
               ) : (
                 <>
@@ -133,16 +133,16 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
 
           {/* Unified compact workflow nav — one system for all routes */}
-          <details className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-3 py-2 md:hidden">
-            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <details className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-1.5 md:hidden">
+            <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               Browse workflow
             </summary>
-            <div className="mt-3">
+            <div className="mt-2">
               <GlobalHeaderNavClient pathname={pathname} variant="compact" />
             </div>
           </details>
 
-          <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-2 md:block">
+          <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-1.5 md:block">
             <GlobalHeaderNavClient pathname={pathname} variant="compact" />
           </nav>
         </div>

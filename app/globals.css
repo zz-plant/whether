@@ -55,10 +55,10 @@
   color-scheme: dark;
   --weather-font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --weather-font-display: "Fraunces", Georgia, serif;
-  --weather-shell-gap: clamp(1.25rem, 1rem + 1.75vw, 3rem);
-  --weather-shell-pad-inline: clamp(0.75rem, 0.6rem + 1.75vw, 2.5rem);
-  --weather-shell-pad-block: clamp(1.25rem, 1.25rem + 2.5vw, 3.75rem);
-  --weather-card-pad: clamp(0.85rem, 0.7rem + 0.6vw, 1.35rem);
+  --weather-shell-gap: clamp(1rem, 0.85rem + 1.5vw, 2.5rem);
+  --weather-shell-pad-inline: clamp(0.65rem, 0.5rem + 1.5vw, 2rem);
+  --weather-shell-pad-block: clamp(1rem, 1rem + 2vw, 3rem);
+  --weather-card-pad: clamp(0.75rem, 0.65rem + 0.5vw, 1.2rem);
   --weather-interactive-duration: 220ms;
   --weather-interactive-duration-fast: 160ms;
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -1577,11 +1577,11 @@ button .weather-chip:active,
 
 .weather-brand-mark {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 36px;
   align-items: center;
   border-radius: var(--weather-radius-control);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  padding: 0.68rem 1rem;
+  padding: 0.45rem 0.8rem;
   font-family: var(--weather-font-display);
   font-size: 0.94rem;
   font-weight: 600;
@@ -1678,7 +1678,7 @@ button .weather-chip:active,
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
-  scroll-margin-top: 96px;
+  scroll-margin-top: 72px;
   text-wrap: balance;
 }
 
@@ -1709,8 +1709,8 @@ summary {
 }
 
 html {
-  scroll-padding-top: calc(env(safe-area-inset-top) + 6.5rem);
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 8.5rem);
+  scroll-padding-top: calc(env(safe-area-inset-top) + 5rem);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 
 @keyframes weather-stream-reveal {

@@ -233,13 +233,13 @@ export const ReportShell = (props: ReportShellProps) => {
         {enableTvAmbientMode ? <DisplayModeManager /> : null}
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
-        <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] px-[var(--weather-shell-pad-inline)] sm:pb-10 sm:pt-5">
+        <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+8rem)] pt-[calc(env(safe-area-inset-top)+0.5rem)] px-[var(--weather-shell-pad-inline)] sm:pb-8 sm:pt-4">
           {resolvedHistoricalBanner}
-          {extendedCommandBar ? <div className="mt-4"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
+          {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-3 grid min-w-0 gap-4 xl:gap-5 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
+          <div className={`mt-2 grid min-w-0 gap-4 xl:gap-5 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
             {hasSidebar ? (
-              <aside className="order-2 hidden space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:block xl:sticky xl:top-28 xl:self-start">
+              <aside className="order-2 hidden space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:block xl:sticky xl:top-24 xl:self-start">
                 {resolvedSectionLinks.length ? (
                   <ReportSectionNavigation
                     sectionLinks={resolvedSectionLinks}
@@ -250,14 +250,14 @@ export const ReportShell = (props: ReportShellProps) => {
               </aside>
             ) : null}
 
-            <div className={`order-1 min-w-0 space-y-6 lg:space-y-8 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+            <div className={`order-1 min-w-0 space-y-5 lg:space-y-6 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[72rem]"}`}>
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
               {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
 
-              <div className="space-y-8 lg:space-y-10">
+              <div className="space-y-6 lg:space-y-8">
                 {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
@@ -266,7 +266,7 @@ export const ReportShell = (props: ReportShellProps) => {
                   return (
                     <div
                       key={sectionKey}
-                      className={index === 0 ? "" : "border-t border-white/[0.04] pt-8 lg:pt-10"}
+                      className={index === 0 ? "" : "border-t border-white/[0.04] pt-6 lg:pt-8"}
                     >
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
@@ -279,7 +279,7 @@ export const ReportShell = (props: ReportShellProps) => {
                 })}
               </div>
 
-              <footer className="mt-12 border-t border-white/[0.04] pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
+              <footer className="mt-8 border-t border-white/[0.04] pt-4 text-[11px] font-semibold tracking-[0.18em] text-slate-400">
                 <p>{INTERNAL_USE_LABEL}</p>
               </footer>
             </div>
