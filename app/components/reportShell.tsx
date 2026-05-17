@@ -7,6 +7,7 @@
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
+import { SwipeableSection } from "./swipeableSection";
 import { DisplayModeToggle } from "./displayModeToggle";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import {
@@ -251,27 +252,28 @@ export const ReportShell = (props: ReportShellProps) => {
 
               {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
 
-              <div className="space-y-6 lg:space-y-8">
-                {contentSections.map((section, index) => {
+              <SwipeableSection
+                sections={contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
                       ? section.key
                       : `section-${index}`;
-                  return (
-                    <div
-                      key={sectionKey}
-                      className={index === 0 ? "" : "border-t border-white/[0.04] pt-6 lg:pt-8"}
-                    >
-                      {section}
-                      {renderTrustAfterFirstSection && index === 0 ? (
-                        <div className="mt-4">
-                          <InlineTrustBlock {...trustBlockProps} />
-                        </div>
-                      ) : null}
-                    </div>
-                  );
+                  return {
+                    key: sectionKey,
+                    content: (
+                      <>
+                        {section}
+                        {renderTrustAfterFirstSection && index === 0 ? (
+                          <div className="mt-4">
+                            <InlineTrustBlock {...trustBlockProps} />
+                          </div>
+                        ) : null}
+                      </>
+                    ),
+                  };
                 })}
-              </div>
+                className="space-y-6 lg:space-y-8"
+              />
 
               <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
                 <p>{INTERNAL_USE_LABEL}</p>

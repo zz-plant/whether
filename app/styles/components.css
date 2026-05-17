@@ -17,6 +17,7 @@
   background: var(--bg-surface);
   box-shadow:
     0 8px 16px -12px var(--shadow-mid);
+  container-type: inline-size;
 }
 
 .weather-brief-shell {

@@ -104,6 +104,7 @@
   --accent-strong: rgba(56, 189, 248, 0.62);
   --white-overlay-faint: rgba(255, 255, 255, 0.04);
   --white-overlay-subtle: rgba(255, 255, 255, 0.03);
+  --display-shape: rectangular;
   --accent-glow-faint: rgba(125, 211, 252, 0.05);
   --accent-border-soft: rgba(56, 189, 248, 0.16);
   --bg-nested: rgba(15, 23, 42, 0.28);
