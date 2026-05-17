@@ -377,7 +377,7 @@ button .weather-chip:active,
   width: 0.45rem;
   border-radius: 9999px;
   background: rgb(45 212 191);
-  animation: weather-pulse 3s ease-in-out infinite;
+  animation: weather-pulse 1.5s ease-in-out infinite;
 }
 
 .weather-command-bar {
@@ -704,12 +704,9 @@ button .weather-chip:active,
 .weather-icon-chip:focus-visible,
 .weather-route-card:focus-visible,
 .weather-hub-link-card:focus-visible {
-  outline: 3px solid rgba(165, 243, 252, 0.98);
-  outline-offset: 3px;
-  box-shadow:
-    0 0 0 6px rgba(8, 145, 178, 0.42),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.5),
-    0 14px 26px -18px rgba(2, 6, 23, 0.85);
+  outline: 2px solid var(--weather-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--weather-focus-halo);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -973,6 +970,19 @@ html {
   transition-duration: 50ms;
 }
 
+/* Touch press feedback — brief opacity dip simulates press */
+@media (hover: none) and (pointer: coarse) {
+  .weather-hub-link-card:active,
+  .weather-route-card:active,
+  .weather-command-bar__card:active,
+  .weather-step-card:active,
+  .weather-delta-card:active,
+  .weather-motion-card:active {
+    opacity: 0.7;
+    transition: opacity 60ms ease;
+  }
+}
+
 .weather-skeleton {
   position: relative;
   overflow: hidden;
@@ -986,7 +996,7 @@ html {
   inset: -30% -12%;
   background:
     linear-gradient(90deg, transparent 0%, rgba(191, 219, 254, 0.06) 50%, transparent 100%);
-  animation: weather-pulse 2.6s ease-in-out infinite;
+  animation: weather-pulse 1.5s ease-in-out infinite;
   will-change: opacity;
 }
 
@@ -1014,7 +1024,7 @@ html {
   border-radius: inherit;
   transform-origin: left center;
   background: linear-gradient(90deg, rgba(34, 211, 238, 0.6), rgba(125, 211, 252, 0.8) 100%);
-  animation: weather-pulse 2.4s ease-in-out infinite;
+  animation: weather-pulse 1.5s ease-in-out infinite;
 }
 
 .weather-loading-stage-rail {
@@ -1228,9 +1238,9 @@ select:focus-visible,
 textarea:focus-visible,
 input:focus-visible,
 summary:focus-visible {
-  outline: 3px solid rgba(56, 189, 248, 0.9);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 5px rgba(14, 116, 144, 0.38);
+  outline: 2px solid var(--weather-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--weather-focus-halo);
 }
 
 :where(.weather-panel a, .weather-surface a) {

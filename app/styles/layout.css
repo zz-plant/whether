@@ -1,5 +1,6 @@
 .weather-shell {
   background-color: #181818;
+  animation: weather-shell-fade-in 300ms ease-out;
   background-image:
     radial-gradient(54rem 20rem at 50% -4%, rgba(56, 189, 248, 0.05), transparent 62%),
     linear-gradient(180deg, rgba(20, 20, 20, 0.98) 0%, rgba(16, 16, 16, 0.99) 50%, rgba(12, 12, 12, 1) 100%);
@@ -884,4 +885,9 @@
     top: 0.9rem;
     z-index: 8;
   }
+}
+
+@keyframes weather-shell-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

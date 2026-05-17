@@ -81,6 +81,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const [showSettings, setShowSettings] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showTimeMachine, setShowTimeMachine] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
   return (
     <header
       className={`mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
@@ -166,14 +167,24 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
 
           {/* Unified compact workflow nav — one system for all routes */}
-          <details className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-1.5 md:hidden">
-            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <div className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-1.5 md:hidden">
+            <button
+              type="button"
+              onClick={() => setShowMobileNav((v) => !v)}
+              className="flex w-full items-center justify-between gap-2 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300"
+              aria-expanded={showMobileNav}
+            >
               Browse workflow
-            </summary>
-            <div className="mt-2">
+              <span className={`transition-transform duration-200 ${showMobileNav ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            <div
+              className={`overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                showMobileNav ? "mt-2 max-h-96 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
               <GlobalHeaderNavClient pathname={pathname} variant="compact" />
             </div>
-          </details>
+          </div>
 
           <nav aria-label="Global navigation" className="hidden border-t border-slate-800/65 pt-1.5 md:block">
             <GlobalHeaderNavClient pathname={pathname} variant="compact" />

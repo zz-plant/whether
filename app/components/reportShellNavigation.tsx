@@ -39,7 +39,7 @@ export const ReportSectionNavigation = ({
           <li key={section.href}>
             <a
               href={section.href}
-              className="weather-pill inline-flex min-h-[42px] w-full items-center justify-between rounded-sm px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between rounded-sm px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               <span>{resolveCompactSectionLabel(section)}</span>
               <span className="text-fluid-micro text-slate-400">{index + 1}</span>

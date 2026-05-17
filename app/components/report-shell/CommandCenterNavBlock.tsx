@@ -103,7 +103,7 @@ export function CommandCenterNavBlock({
                     key={option.key}
                     href={option.href}
                     ariaCurrent={isActive ? "page" : undefined}
-                    className={`inline-flex min-h-[40px] items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold ${
+                    className={`inline-flex min-h-[44px] items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold ${
                       isActive
                         ? "border-sky-300/70 bg-sky-500/12 text-slate-100"
                         : "border-slate-800/60 text-slate-400 hover:border-sky-400/45 hover:text-slate-100"
@@ -155,7 +155,7 @@ export function CommandCenterNavBlock({
             {secondaryCta ? (
               <InternalAwareLink
                 href={secondaryCta.href}
-                className="inline-flex min-h-[40px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {secondaryCta.label}
               </InternalAwareLink>
@@ -167,7 +167,7 @@ export function CommandCenterNavBlock({
                 copyTarget={exportCta.copyTarget}
                 telemetryEvent={exportCta.telemetryEvent}
                 label={exportCta.label}
-                className="inline-flex min-h-[40px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {exportCta.label}
               </ReportCta>
@@ -199,7 +199,7 @@ export function CommandCenterNavBlock({
 
         {shouldShowMissionSequence ? (
           <details className="group rounded border border-slate-800/55 bg-slate-950/40 px-4 py-3 sm:px-5 sm:py-4">
-            <summary className="flex min-h-[40px] cursor-pointer list-none items-center justify-between gap-3 sm:cursor-default sm:list-none">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 sm:cursor-default sm:list-none">
               <span className="min-w-0">
                 <span className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   {missionSequenceTitle || "Use this order"}

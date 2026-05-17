@@ -48,7 +48,7 @@
   --weather-font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --weather-font-display: "Fraunces", Georgia, serif;
   --weather-font-size-micro: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
-  --weather-font-size-xs: clamp(0.675rem, 0.6rem + 0.3vw, 0.8125rem);
+  --weather-font-size-xs: clamp(0.625rem, 0.55rem + 0.3vw, 0.75rem);
   --weather-font-size-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
   --weather-font-size-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
   --weather-font-size-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
