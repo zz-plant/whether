@@ -84,7 +84,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const [showMobileNav, setShowMobileNav] = useState(false);
   return (
     <header
-      className={`mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_8px_20px_-16px_rgba(2,6,23,0.72)]"}`}
     >
