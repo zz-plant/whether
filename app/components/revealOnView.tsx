@@ -16,7 +16,6 @@ export function RevealOnView({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -24,39 +23,30 @@ export function RevealOnView({
         if (entry?.isIntersecting) {
           setVisible(true);
           observer.disconnect();
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-            timeoutId = null;
-          }
         }
       },
       {
         threshold: 0.01,
-        rootMargin: "420px 0px",
+        rootMargin: "240px 0px",
       },
     );
-
-    timeoutId = setTimeout(() => {
-      setVisible(true);
-      observer.disconnect();
-    }, 1800);
 
     observer.observe(node);
 
     return () => {
       observer.disconnect();
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
     };
   }, []);
 
   return (
     <div
       ref={ref}
-      className={`transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
-        visible || placeholder ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-      } ${className}`}
+      className={`
+        transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+        motion-reduce:transition-none
+        ${visible || placeholder ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}
+        ${className}
+      `}
     >
       {visible ? children : placeholder ?? null}
     </div>

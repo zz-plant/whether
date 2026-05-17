@@ -55,9 +55,9 @@
   color-scheme: dark;
   --weather-font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --weather-font-display: "Fraunces", Georgia, serif;
-  --weather-shell-gap: clamp(1.75rem, 1rem + 1.75vw, 3rem);
-  --weather-shell-pad-inline: clamp(1rem, 0.6rem + 1.75vw, 2.5rem);
-  --weather-shell-pad-block: clamp(2rem, 1.25rem + 2.5vw, 3.75rem);
+  --weather-shell-gap: clamp(1.25rem, 1rem + 1.75vw, 3rem);
+  --weather-shell-pad-inline: clamp(0.75rem, 0.6rem + 1.75vw, 2.5rem);
+  --weather-shell-pad-block: clamp(1.25rem, 1.25rem + 2.5vw, 3.75rem);
   --weather-card-pad: clamp(0.85rem, 0.7rem + 0.6vw, 1.35rem);
   --weather-interactive-duration: 220ms;
   --weather-interactive-duration-fast: 160ms;
@@ -107,6 +107,8 @@ body {
   font-family: var(--weather-font-sans);
   min-height: 100dvh;
   overflow-x: clip;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
   background:
     radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.07), transparent 60%),
     linear-gradient(180deg, rgba(10, 10, 10, 1) 0%, rgba(14, 14, 14, 1) 50%, rgba(10, 10, 10, 1) 100%);

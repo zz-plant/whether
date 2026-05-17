@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useScrollDirection } from "./useScrollDirection";
 import {
   isReportShellRoute,
   normalizePathname,
@@ -50,10 +51,24 @@ type GlobalHeaderRouteGateProps = {
 export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRouteGateProps) {
   const currentPathname = normalizePathname(usePathname() ?? initialPathname);
   const [pathname, setPathname] = useState(() => normalizePathname(initialPathname));
+  const { direction, isPastThreshold } = useScrollDirection();
+  const [hidden, setHidden] = useState(false);
+  const [atTop, setAtTop] = useState(true);
 
   useEffect(() => {
     setPathname(currentPathname);
   }, [currentPathname]);
+
+  /* Hide header on scroll down past threshold, reveal on scroll up */
+  useEffect(() => {
+    if (!isPastThreshold) {
+      setHidden(false);
+      setAtTop(true);
+      return;
+    }
+    setAtTop(false);
+    setHidden(direction === "down");
+  }, [direction, isPastThreshold]);
 
   const isReportRoute = isReportShellRoute(pathname);
   const isHomeBrief = pathname === "/";
@@ -61,7 +76,11 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const reportHeaderAction = reportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
   return (
-    <header className="mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3">
+    <header
+      className={`mx-auto sticky top-0 z-50 w-full max-w-[88rem] px-4 pt-2 sm:px-6 sm:pt-2.5 lg:px-8 lg:pt-3 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      } ${atTop ? "" : "shadow-[0_8px_20px_-16px_rgba(2,6,23,0.72)]"}`}
+    >
       <div className="weather-appbar weather-topbar px-4 py-3 sm:px-5 sm:py-3">
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
