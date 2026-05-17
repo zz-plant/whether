@@ -72,7 +72,7 @@ export function CommandCenterNavBlock({
   const decisionHeadingClassName = heroVariant === "compact"
     ? "max-w-xl font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 text-fluid-lg"
     : "max-w-xl font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50 text-fluid-xl";
-  const briefKicker = heroVariant === "compact" ? "Route brief" : "Weekly operating brief";
+  const briefKicker = heroVariant === "compact" ? "Weekly brief" : "Weekly operating brief";
   const hasUtilityActions = Boolean(secondaryCta || exportCta);
   const introMetaLine = [
     statusLabel,

@@ -20,13 +20,22 @@ const sensitivities: { value: RateSensitivity; label: string }[] = [
   { value: "low", label: "Low (capital-light)" },
 ];
 
+const DISPLAY_KEY = "whether-display-mode";
+
+const displayModes = [
+  { value: "auto", label: "Auto" },
+  { value: "tv", label: "TV / Kiosk" },
+] as const;
+
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [stage, setStage] = useState<CompanyStage | null>(null);
   const [sensitivity, setSensitivity] = useState<RateSensitivity | null>(null);
+  const [displayMode, setDisplayMode] = useState<string>("auto");
 
   useEffect(() => {
     setStage((localStorage.getItem(STAGE_KEY) as CompanyStage | null));
     setSensitivity((localStorage.getItem(SENSITIVITY_KEY) as RateSensitivity | null));
+    setDisplayMode(localStorage.getItem(DISPLAY_KEY) ?? "auto");
   }, []);
 
   const saveStage = useCallback((value: CompanyStage) => {
@@ -39,6 +48,12 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     setSensitivity(value);
     localStorage.setItem(SENSITIVITY_KEY, value);
     document.cookie = `${SENSITIVITY_KEY}=${value};path=/;max-age=31536000`;
+  }, []);
+
+  const saveDisplayMode = useCallback((value: string) => {
+    setDisplayMode(value);
+    localStorage.setItem(DISPLAY_KEY, value);
+    document.documentElement.dataset.displayMode = value;
   }, []);
 
   return (
@@ -115,6 +130,29 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   />
                   {s.label}
                 </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Display mode</legend>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              Larger text and buttons for screens across the room.
+            </p>
+            <div className="mt-2 flex gap-2">
+              {displayModes.map((mode) => (
+                <button
+                  key={mode.value}
+                  type="button"
+                  onClick={() => saveDisplayMode(mode.value)}
+                  className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
+                    displayMode === mode.value
+                      ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
+                      : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"
+                  }`}
+                >
+                  {mode.label}
+                </button>
               ))}
             </div>
           </fieldset>
