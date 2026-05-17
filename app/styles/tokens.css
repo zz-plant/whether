@@ -87,6 +87,27 @@
   --color-bg-raised: rgba(32, 32, 32, 0.70);
   --color-bg-overlay: rgba(18, 18, 18, 0.82);
   --color-text-decorative: rgb(148 163 184 / 1.0);
+
+  /* Surface & border color tokens — consolidated from repeated rgba values across components */
+  --border-default: rgba(148, 163, 184, 0.10);
+  --border-strong: rgba(148, 163, 184, 0.18);
+  --border-subtle: rgba(148, 163, 184, 0.16);
+  --border-faint: rgba(148, 163, 184, 0.08);
+  --bg-surface: rgba(34, 34, 34, 0.68);
+  --bg-surface-muted: rgba(34, 34, 34, 0.50);
+  --bg-surface-raised: rgba(34, 34, 34, 0.60);
+  --shadow-mid: rgba(2, 6, 23, 0.48);
+  --shadow-heavy: rgba(2, 6, 23, 0.60);
+  --shadow-light: rgba(2, 6, 23, 0.40);
+  --accent-glow: rgba(56, 189, 248, 0.06);
+  --accent-border: rgba(56, 189, 248, 0.28);
+  --accent-strong: rgba(56, 189, 248, 0.62);
+  --white-overlay-faint: rgba(255, 255, 255, 0.04);
+  --white-overlay-subtle: rgba(255, 255, 255, 0.03);
+  --accent-glow-faint: rgba(125, 211, 252, 0.05);
+  --accent-border-soft: rgba(56, 189, 248, 0.16);
+  --bg-nested: rgba(15, 23, 42, 0.28);
+  --bg-nested-light: rgba(15, 23, 42, 0.12);
 }
 
 html {

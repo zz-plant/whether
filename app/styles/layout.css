@@ -1,14 +1,3 @@
-  -webkit-overflow-scrolling: touch;
-  background:
-    radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.07), transparent 60%),
-    linear-gradient(180deg, rgba(10, 10, 10, 1) 0%, rgba(14, 14, 14, 1) 50%, rgba(10, 10, 10, 1) 100%);
-}
-
-::selection {
-  background: rgba(56, 189, 248, 0.35);
-  color: rgb(240 249 255);
-}
-
 .weather-shell {
   background-color: #181818;
   background-image:
@@ -174,24 +163,24 @@
   display: grid;
   gap: 0.9rem;
   padding: clamp(1rem, 0.75rem + 1.25vw, 2rem);
-  border: 1px solid rgba(148, 163, 184, 0.10);
+  border: 1px solid var(--border-default);
   border-radius: 1.5rem;
-  background: rgba(34, 34, 34, 0.68);
+  background: var(--bg-surface);
   box-shadow:
-    0 12px 24px -18px rgba(2, 6, 23, 0.60),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 12px 24px -18px var(--shadow-heavy),
+    inset 0 1px 0 var(--white-overlay-faint);
 }
 
 .weather-hub-section {
   display: grid;
   gap: 1rem;
   padding: clamp(1rem, 0.86rem + 0.75vw, 1.6rem);
-  border: 1px solid rgba(148, 163, 184, 0.10);
+  border: 1px solid var(--border-default);
   border-radius: 1.5rem;
-  background: rgba(34, 34, 34, 0.68);
+  background: var(--bg-surface);
   box-shadow:
-    0 12px 24px -18px rgba(2, 6, 23, 0.60),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 12px 24px -18px var(--shadow-heavy),
+    inset 0 1px 0 var(--white-overlay-faint);
 }
 
 .weather-hub-card {
@@ -200,12 +189,12 @@
   min-width: 0;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.10);
+  border: 1px solid var(--border-default);
   border-radius: 1.35rem;
-  background: rgba(34, 34, 34, 0.68);
+  background: var(--bg-surface);
   box-shadow:
-    0 12px 24px -18px rgba(2, 6, 23, 0.60),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 12px 24px -18px var(--shadow-heavy),
+    inset 0 1px 0 var(--white-overlay-faint);
 }
 
 .weather-hub-sidecar {
@@ -213,13 +202,13 @@
 }
 
 .weather-legal-content :where(section:not(:first-of-type)) {
-  border: 1px solid rgba(148, 163, 184, 0.10);
+  border: 1px solid var(--border-default);
   border-radius: 1.25rem;
   padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
   background: rgba(34, 34, 34, 0.55);
   box-shadow:
-    0 8px 16px -12px rgba(2, 6, 23, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 8px 16px -12px var(--shadow-mid),
+    inset 0 1px 0 var(--white-overlay-subtle);
 }
 
 .weather-legal-content :where(h2, h3) {
@@ -231,14 +220,14 @@
   align-content: start;
   gap: 0.45rem;
   min-height: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.10);
+  border: 1px solid var(--border-default);
   border-radius: 1.25rem;
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  background: rgba(34, 34, 34, 0.60);
+  background: var(--bg-surface-raised);
   box-shadow:
-    0 8px 16px -12px rgba(2, 6, 23, 0.48);
+    0 8px 16px -12px var(--shadow-mid);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -251,7 +240,7 @@
   border-color: rgba(56, 189, 248, 0.42);
   box-shadow:
     0 24px 36px -24px rgba(15, 23, 42, 0.85),
-    0 0 18px rgba(56, 189, 248, 0.06);
+    0 0 18px var(--accent-glow);
 }
 
 .weather-hub-link-card:focus-visible {
@@ -267,7 +256,7 @@
   min-height: 2.5rem;
   align-items: center;
   border-radius: 9999px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--border-strong);
   background: rgba(30, 30, 30, 0.60);
   padding: 0.45rem 0.85rem;
   font-size: 0.72rem;
@@ -360,10 +349,10 @@
   @apply rounded-lg border px-4 py-4 text-left;
   touch-action: manipulation;
   padding: 1.05rem;
-  border-color: rgba(148, 163, 184, 0.10);
-  background: rgba(34, 34, 34, 0.68);
+  border-color: var(--border-default);
+  background: var(--bg-surface);
   box-shadow:
-    0 8px 16px -12px rgba(2, 6, 23, 0.48);
+    0 8px 16px -12px var(--shadow-mid);
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
     border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -376,7 +365,7 @@
   border-color: rgba(56, 189, 248, 0.38);
   box-shadow:
     0 20px 32px -22px rgba(2, 6, 23, 0.85),
-    0 0 18px rgba(56, 189, 248, 0.06);
+    0 0 18px var(--accent-glow);
 }
 
 .weather-route-card:focus-visible {
@@ -386,10 +375,10 @@
 
 .weather-stat-card {
   @apply rounded-md border px-3 py-3;
-  border-color: rgba(148, 163, 184, 0.08);
-  background: rgba(34, 34, 34, 0.50);
+  border-color: var(--border-faint);
+  background: var(--bg-surface-muted);
   box-shadow:
-    0 4px 8px -8px rgba(2, 6, 23, 0.40);
+    0 4px 8px -8px var(--shadow-light);
   font-variant-numeric: tabular-nums;
 }
 
@@ -555,17 +544,17 @@
 }
 
 .weather-tag-slate {
-  border-color: rgba(148, 163, 184, 0.18);
+  border-color: var(--border-strong);
   background: rgba(15, 23, 42, 0.30);
   color: rgb(203 213 225);
 }
 
 .weather-tile {
   @apply rounded-lg border border-white/[0.08] backdrop-blur-xl;
-  background: rgba(34, 34, 34, 0.68);
+  background: var(--bg-surface);
   box-shadow:
-    0 8px 16px -12px rgba(2, 6, 23, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 8px 16px -12px var(--shadow-mid),
+    inset 0 1px 0 var(--white-overlay-subtle);
 }
 
 .weather-bento-grid {
@@ -600,14 +589,14 @@
   align-items: flex-start;
   min-height: 7.25rem;
   padding: 0.9rem;
-  border-color: rgba(148, 163, 184, 0.10);
-  background: rgba(34, 34, 34, 0.60);
+  border-color: var(--border-default);
+  background: var(--bg-surface-raised);
   font-variant-numeric: tabular-nums;
 }
 
 .weather-forecast-icon {
   @apply inline-flex h-11 w-11 items-center justify-center rounded-lg border text-base;
-  border-color: rgba(148, 163, 184, 0.10);
+  border-color: var(--border-default);
   background: rgba(24, 24, 24, 0.75);
   color: rgb(248 250 252);
   box-shadow:
@@ -673,12 +662,12 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  --home-band-border: rgba(148, 163, 184, 0.16);
+  --home-band-border: var(--border-subtle);
   --home-band-accent: rgb(148 163 184);
-  --home-band-accent-soft: rgba(148, 163, 184, 0.16);
+  --home-band-accent-soft: var(--border-subtle);
   --home-band-panel-bg: rgba(7, 13, 24, 0.48);
   --home-band-panel-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(15, 23, 42, 0.06) 100%);
-  --home-band-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 0 0 1px rgba(15, 23, 42, 0.16);
+  --home-band-panel-shadow: inset 0 1px 0 var(--white-overlay-subtle), inset 0 0 0 1px rgba(15, 23, 42, 0.16);
   --home-band-list-bg: rgba(2, 6, 23, 0.28);
   --home-band-list-border: rgba(71, 85, 105, 0.32);
   --home-band-kicker: rgb(148 163 184);
@@ -796,7 +785,7 @@
 .home-band--flow {
   --home-band-border: rgba(103, 232, 249, 0.2);
   --home-band-accent: rgb(125 211 252);
-  --home-band-accent-soft: rgba(56, 189, 248, 0.16);
+  --home-band-accent-soft: var(--accent-border-soft);
   --home-band-panel-bg: rgba(14, 24, 24, 0.48);
   --home-band-panel-image: linear-gradient(180deg, rgba(186, 230, 253, 0.05), rgba(14, 24, 24, 0.05) 58%, rgba(2, 6, 23, 0.08) 100%);
   --home-band-panel-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.05), inset 0 0 0 1px rgba(14, 116, 144, 0.1);
@@ -886,3 +875,13 @@
     inset: auto 0 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--home-band-border), transparent);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .home-band-shell--nav {
+    position: sticky;
+    top: 0.9rem;
+    z-index: 8;
+  }
+}

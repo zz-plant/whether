@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
-import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
+import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";

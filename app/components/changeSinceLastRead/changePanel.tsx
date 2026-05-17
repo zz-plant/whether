@@ -1,0 +1,310 @@
+/**
+ * Panel for summarizing changes since the last report view.
+ * Persists a lightweight snapshot in localStorage for delta comparisons.
+ */
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import type { LastYearComparison } from "../../../lib/report/reportData";
+import { buildRegimeChangeReasons } from "../../../lib/regimeEngine";
+import { formatDateLabel, formatDelta, formatOptionalDelta } from "../../../lib/report/signalFormatting";
+import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
+import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "../regimeAlertsStorage";
+import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelection";
+import { DeltaSparkline } from "./DeltaSparkline";
+import {
+  getImpactTone,
+  hasAssessmentChanged,
+  readStoredSnapshot,
+  writeStoredSnapshot,
+  type LastReadSnapshot,
+} from "./storage";
+
+export const ChangeSinceLastReadPanel = ({
+  assessment,
+  lastYearComparison,
+  recordDate,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  lastYearComparison: LastYearComparison | null;
+  recordDate: string;
+  provenance: DataProvenance;
+}) => {
+  const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
+
+  useEffect(() => {
+    const storedSnapshot = readStoredSnapshot();
+    if (storedSnapshot) {
+      setPrevious(storedSnapshot);
+    }
+
+    const loggedAt = new Date().toISOString();
+
+    if (storedSnapshot && hasAssessmentChanged(storedSnapshot, assessment, recordDate)) {
+      const reasons = buildRegimeChangeReasons(storedSnapshot.assessment, assessment);
+      const alertEntry: RegimeAlertLogEntry = {
+        id:
+          typeof crypto?.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `${recordDate}-${loggedAt}`,
+        loggedAt,
+        previous: {
+          recordDate: storedSnapshot.recordDate,
+          assessment: storedSnapshot.assessment,
+        },
+        current: {
+          recordDate,
+          assessment,
+        },
+        reasons,
+      };
+
+      try {
+        const storedAlerts = window.localStorage.getItem(regimeAlertsStorageKey);
+        const parsedAlerts = storedAlerts
+          ? (JSON.parse(storedAlerts) as RegimeAlertLogEntry[])
+          : [];
+        const alerts = Array.isArray(parsedAlerts) ? parsedAlerts : [];
+        const latest = alerts[0];
+        const isDuplicate =
+          latest &&
+          latest.current.recordDate === alertEntry.current.recordDate &&
+          latest.previous.recordDate === alertEntry.previous.recordDate &&
+          latest.current.assessment.regime === alertEntry.current.assessment.regime &&
+          latest.previous.assessment.regime === alertEntry.previous.assessment.regime;
+
+        if (!isDuplicate) {
+          const nextAlerts = [alertEntry, ...alerts].slice(0, 20);
+          window.localStorage.setItem(regimeAlertsStorageKey, JSON.stringify(nextAlerts));
+
+          void fetch("/api/regime-alerts", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              previousRecordDate: storedSnapshot.recordDate,
+              currentRecordDate: recordDate,
+              previousAssessment: storedSnapshot.assessment,
+              currentAssessment: assessment,
+              reasons,
+              sourceUrls: Array.from(
+                new Set(
+                  [
+                    ...storedSnapshot.assessment.inputs.map((input) => input.sourceUrl),
+                    ...assessment.inputs.map((input) => input.sourceUrl),
+                  ].filter(Boolean),
+                ),
+              ),
+              timeMachineHref: `/evidence?advanced=1#time-machine`,
+            }),
+          }).catch(() => {
+            // Ignore network failures and keep local alerting as fallback.
+          });
+        }
+      } catch {
+        // Ignore storage errors to keep console clean.
+      }
+    }
+
+    writeStoredSnapshot({ assessment, recordDate });
+  }, [assessment, recordDate]);
+
+  const timeMachineLink = useMemo(() => {
+    if (!previous) {
+      return "/evidence?advanced=1#time-machine";
+    }
+    const date = new Date(previous.recordDate);
+    if (Number.isNaN(date.valueOf())) {
+      return "/evidence?advanced=1#time-machine";
+    }
+    const month = date.getUTCMonth() + 1;
+    const year = date.getUTCFullYear();
+    return buildTimeMachineHref("/evidence?advanced=1#time-machine", { month, year });
+  }, [previous]);
+
+  const hasChange =
+    previous &&
+    hasAssessmentChanged(previous, assessment, recordDate);
+
+  const impactItems = previous
+    ? [
+        {
+          label: "Tightness",
+          delta: Math.abs(assessment.scores.tightness - previous.assessment.scores.tightness),
+          href: "#weekly-action-summary",
+        },
+        {
+          label: "Risk appetite",
+          delta: Math.abs(
+            assessment.scores.riskAppetite - previous.assessment.scores.riskAppetite,
+          ),
+          href: "#executive-snapshot",
+        },
+        {
+          label: "Base rate",
+          delta: Math.abs(assessment.scores.baseRate - previous.assessment.scores.baseRate),
+          href: "#signal-matrix",
+        },
+      ]
+        .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
+        .sort((left, right) => right.delta - left.delta)
+    : [];
+  const topImpactItems = impactItems.slice(0, 2);
+
+  return (
+    <section
+      id="change-since-last-read"
+      aria-labelledby="change-since-last-read-title"
+      className="mt-10"
+    >
+      <div className="weather-panel p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-label text-slate-400">What changed since last read</p>
+            <h3 id="change-since-last-read-title" className="type-section text-slate-100">
+              Delta snapshot
+            </h3>
+            <p className="mt-2 type-data text-slate-300">
+              Since your last review, these are the highest-impact deltas and where to act first.
+            </p>
+            {previous ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {topImpactItems.map((item) => (
+                  <span
+                    key={item.label}
+                    className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
+                  >
+                    {item.label}: {item.tone.label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <DataProvenanceStrip provenance={provenance} />
+        </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Delta signals</p>
+            <p className="mt-2 text-sm text-slate-200">
+              Previous read:{" "}
+              <span className="mono text-slate-100">
+                {previous ? formatDateLabel(previous.recordDate) : "—"}
+              </span>
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Regime shift
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {previous ? `${previous.assessment.regime} → ${assessment.regime}` : "—"}
+                </p>
+                {previous ? <p className="mt-1 text-xs text-slate-400">Previous posture ghost: <span className="font-semibold text-slate-300">{previous.assessment.regime}</span></p> : null}
+              </div>
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Tightness delta
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {previous
+                    ? formatDelta(previous.assessment.scores.tightness, assessment.scores.tightness)
+                    : "—"}
+                </p>
+              </div>
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Risk appetite delta
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {previous
+                    ? formatDelta(
+                        previous.assessment.scores.riskAppetite,
+                        assessment.scores.riskAppetite
+                      )
+                    : "—"}
+                </p>
+                <DeltaSparkline previous={previous ? previous.assessment.scores.riskAppetite : null} current={assessment.scores.riskAppetite} />
+              </div>
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Base rate delta
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {previous
+                    ? formatDelta(previous.assessment.scores.baseRate, assessment.scores.baseRate, "%")
+                    : "—"}
+                </p>
+              </div>
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Curve slope delta
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {previous
+                    ? formatOptionalDelta(
+                        previous.assessment.scores.curveSlope,
+                        assessment.scores.curveSlope,
+                        "%"
+                      )
+                    : "—"}
+                </p>
+                <DeltaSparkline previous={previous ? previous.assessment.scores.curveSlope : null} current={assessment.scores.curveSlope} />
+              </div>
+            </div>
+            <p className="mt-4 text-xs text-slate-400">
+              {previous
+                ? `Last read logged ${formatDateLabel(previous.readAt)}.`
+                : "No previous read captured yet. Open the report again to view a delta snapshot."}
+            </p>
+            {hasChange ? (
+              <p className="mt-4 text-xs text-emerald-200">
+                Changes detected since your last read.
+              </p>
+            ) : (
+              <p className="mt-4 text-xs text-slate-500">
+                No detected deltas yet. Keep checking as new Treasury data arrives.
+              </p>
+            )}
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Replay the last view
+            </p>
+            <p className="mt-3 text-sm text-slate-200">
+              Use Time Machine to replay the exact month from your previous read and share the
+              delta in leadership syncs.
+            </p>
+            <a
+              href={timeMachineLink}
+              className="weather-button-primary mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-300/80 hover:text-white"
+            >
+              Open Time Machine
+            </a>
+
+            <div className="mt-4 rounded-md border border-slate-800/80 bg-slate-950/60 p-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Last-year snapshot (nearest cached)
+              </p>
+              {lastYearComparison ? (
+                <>
+                  <p className="mt-2 text-sm text-slate-200">
+                    {formatDateLabel(lastYearComparison.prior.recordDate)}: {lastYearComparison.prior.regime}
+                    {" "}→ now: {lastYearComparison.current.regime}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Tightness {formatDelta(lastYearComparison.prior.tightness, lastYearComparison.current.tightness)} · Risk appetite {formatDelta(lastYearComparison.prior.riskAppetite, lastYearComparison.current.riskAppetite)}
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 text-xs text-slate-500">
+                  Historical match unavailable for this week in the Time Machine cache.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
