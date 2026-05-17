@@ -111,7 +111,7 @@ export const SummaryCard = ({
       </div>
       {hasStructuredSections ? (
         <div className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-slate-400">Structured data</p>
+          <p className="text-fluid-xs font-semibold tracking-[0.12em] text-slate-400">Structured data</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {visibleStructuredSections.map((section) => (
               <div key={section.title}>
@@ -136,7 +136,7 @@ export const SummaryCard = ({
               <Accordion.Trigger
                 id={rawSummaryTriggerId}
                 aria-controls={rawSummaryPanelId}
-                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation"
+                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-fluid-xs font-semibold tracking-[0.12em] text-slate-200 touch-manipulation"
               >
                 <span>Raw summary text</span>
                 <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>

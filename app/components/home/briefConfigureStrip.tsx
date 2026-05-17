@@ -52,16 +52,16 @@ export function BriefConfigureStrip() {
     <div className="weather-surface-secondary mx-auto mb-4 max-w-3xl px-4 py-3 text-sm text-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
             Configure your brief
           </p>
-          <p className="mt-1 text-[11px] leading-5 text-slate-400">
+          <p className="mt-1 text-fluid-xs leading-5 text-slate-400">
             Tailor this brief to your situation &mdash; adjusts which decisions are highlighted and how they&apos;re framed.
           </p>
           {visible ? (
             <div className="mt-2 flex flex-wrap items-end gap-2">
               <div className="min-w-0 flex-1">
-                <label htmlFor="brief-ticker" className="block text-[11px] font-medium text-slate-400">
+                <label htmlFor="brief-ticker" className="block text-fluid-xs font-medium text-slate-400">
                   Company ticker (optional)
                 </label>
                 <input
@@ -74,7 +74,7 @@ export function BriefConfigureStrip() {
                 />
               </div>
               <div>
-                <label htmlFor="brief-stage" className="block text-[11px] font-medium text-slate-400">
+                <label htmlFor="brief-stage" className="block text-fluid-xs font-medium text-slate-400">
                   Company stage
                 </label>
                 <select
@@ -103,7 +103,7 @@ export function BriefConfigureStrip() {
         {visible ? (
           <button
             onClick={dismiss}
-            className="flex-shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-300 hover:bg-sky-400/10 hover:text-sky-100 transition-colors"
+            className="flex-shrink-0 rounded-full px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.08em] text-sky-300 hover:bg-sky-400/10 hover:text-sky-100 transition-colors"
             aria-label="Apply configuration"
           >
             Apply

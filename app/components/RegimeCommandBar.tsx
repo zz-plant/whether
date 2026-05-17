@@ -190,7 +190,7 @@ const TrajectoryMap = ({
           ))}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-300">
+      <div className="mt-3 flex flex-wrap gap-2 text-fluid-xs text-slate-300">
         <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Trend {trendLabel}
         </span>
@@ -236,7 +236,7 @@ const ThresholdRail = ({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between gap-3 text-[11px] text-slate-300">
+      <div className="flex items-center justify-between gap-3 text-fluid-xs text-slate-300">
         <span className="font-semibold text-slate-100">{label}</span>
         <span className="tabular-nums">{current.toFixed(1)} vs {threshold.toFixed(1)}</span>
       </div>
@@ -303,7 +303,7 @@ export const RegimeCommandBar = ({
               {call}
             </h2>
             <p className="text-sm text-slate-300">{resolvedPostureLabel}</p>
-            <div className="flex flex-wrap gap-2 text-[11px] text-slate-300">
+            <div className="flex flex-wrap gap-2 text-fluid-xs text-slate-300">
               {regimeDistance ? (
                 <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
                   {regimeDistance.dimensionLabel} {regimeDistance.pointsToFlip.toFixed(1)} pts from flip
@@ -351,7 +351,7 @@ export const RegimeCommandBar = ({
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
             <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">Weekly direction</p>
             <p className="mt-2 text-sm text-slate-100">Read the current call as the operating baseline for this cycle.</p>
-            <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-300">
+            <div className="mt-3 flex flex-wrap gap-2 text-fluid-xs text-slate-300">
               <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">Trend {resolvedTrendLabel}</span>
               <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">{regimeStyle.label}</span>
             </div>

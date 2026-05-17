@@ -315,7 +315,7 @@ export const RegimeAlertsPanel = () => {
                   {entry.timeMachineHref ? (
                     <a
                       href={entry.timeMachineHref}
-                      className="mt-3 inline-flex text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200 hover:text-sky-100"
+                      className="mt-3 inline-flex text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200 hover:text-sky-100"
                     >
                       View regime history →
                     </a>

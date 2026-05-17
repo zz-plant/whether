@@ -51,7 +51,7 @@ export default function EmbedPlaygroundPage() {
     <main className="mx-auto min-h-screen max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-400">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-400">
           Whether — Embed
         </p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-100 sm:text-3xl">
@@ -67,7 +67,7 @@ export default function EmbedPlaygroundPage() {
         {/* Preview area */}
         <div className="space-y-5">
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-5">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
               Live preview
             </p>
             <div
@@ -98,7 +98,7 @@ export default function EmbedPlaygroundPage() {
         <div className="space-y-5">
           {/* Configuration */}
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
               Configure
             </p>
 
@@ -106,7 +106,7 @@ export default function EmbedPlaygroundPage() {
               <div>
                 <label
                   htmlFor="embed-ticker"
-                  className="block text-[11px] font-medium text-slate-400"
+                  className="block text-fluid-xs font-medium text-slate-400"
                 >
                   Ticker
                 </label>
@@ -126,7 +126,7 @@ export default function EmbedPlaygroundPage() {
                   <button
                     key={t}
                     onClick={() => setTicker(t)}
-                    className={`rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                    className={`rounded-md px-2 py-0.5 text-fluid-micro font-medium transition-colors ${
                       ticker === t
                         ? "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/40"
                         : "bg-slate-800/60 text-slate-400 hover:bg-slate-700/60 hover:text-slate-300"
@@ -140,7 +140,7 @@ export default function EmbedPlaygroundPage() {
               <div>
                 <label
                   htmlFor="embed-stage"
-                  className="block text-[11px] font-medium text-slate-400"
+                  className="block text-fluid-xs font-medium text-slate-400"
                 >
                   Company stage
                 </label>
@@ -162,12 +162,12 @@ export default function EmbedPlaygroundPage() {
 
           {/* Embed code */}
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
               Embed code
             </p>
 
             <div className="relative">
-              <pre className="overflow-x-auto rounded-lg border border-slate-700/60 bg-slate-900/80 p-3 text-[11px] leading-relaxed text-slate-300">
+              <pre className="overflow-x-auto rounded-lg border border-slate-700/60 bg-slate-900/80 p-3 text-fluid-xs leading-relaxed text-slate-300">
                 <code>{embedCode}</code>
               </pre>
             </div>
@@ -175,7 +175,7 @@ export default function EmbedPlaygroundPage() {
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={handleCopy}
-                className={`flex-1 rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] transition-all ${
+                className={`flex-1 rounded-lg px-3 py-2 text-fluid-xs font-semibold uppercase tracking-[0.08em] transition-all ${
                   copied
                     ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
                     : "bg-sky-500/20 text-sky-300 hover:bg-sky-400/30 hover:text-sky-200 ring-1 ring-sky-500/30 hover:ring-sky-400/50"
@@ -185,7 +185,7 @@ export default function EmbedPlaygroundPage() {
               </button>
             </div>
 
-            <p className="mt-3 text-[10px] leading-relaxed text-slate-500">
+            <p className="mt-3 text-fluid-micro leading-relaxed text-slate-500">
               Paste this into any HTML newsletter or webpage. The brief renders live and
               auto-updates weekly. No API key needed.
             </p>
@@ -198,7 +198,7 @@ export default function EmbedPlaygroundPage() {
         <h2 className="mb-5 text-lg font-semibold text-slate-200">How embedding works</h2>
         <div className="grid gap-5 sm:grid-cols-3">
           <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.08em] text-sky-400">
               1. Configure
             </p>
             <p className="mt-2 text-xs leading-relaxed text-slate-400">
@@ -207,7 +207,7 @@ export default function EmbedPlaygroundPage() {
             </p>
           </div>
           <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.08em] text-sky-400">
               2. Copy
             </p>
             <p className="mt-2 text-xs leading-relaxed text-slate-400">
@@ -216,7 +216,7 @@ export default function EmbedPlaygroundPage() {
             </p>
           </div>
           <div className="rounded-md border border-slate-800/60 bg-slate-950/40 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-sky-400">
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.08em] text-sky-400">
               3. Publish
             </p>
             <p className="mt-2 text-xs leading-relaxed text-slate-400">
@@ -229,7 +229,7 @@ export default function EmbedPlaygroundPage() {
 
       {/* Attribution note */}
       <div className="mt-10 rounded-md border border-slate-800/40 bg-slate-950/30 p-4">
-        <p className="text-[11px] leading-relaxed text-slate-500">
+        <p className="text-fluid-xs leading-relaxed text-slate-500">
           <strong className="text-slate-400">Attribution:</strong> The embed block includes
           a small &ldquo;Macro brief by Whether&rdquo; footer with a link back to whether.app.
           This attribution is required for free embed usage.

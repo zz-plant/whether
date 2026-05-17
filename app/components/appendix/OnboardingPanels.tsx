@@ -158,7 +158,7 @@ export const BeginnerGlossaryPanel = () => (
                       <span className="mt-1 block text-xs text-slate-400">
                         {entry.summary}
                       </span>
-                      <span className="mt-1 block text-[11px] uppercase tracking-[0.14em] text-slate-500">Select to expand or collapse</span>
+                      <span className="mt-1 block text-fluid-xs uppercase tracking-[0.14em] text-slate-500">Select to expand or collapse</span>
                     </span>
                     <span className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180" aria-hidden="true">
                       <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">

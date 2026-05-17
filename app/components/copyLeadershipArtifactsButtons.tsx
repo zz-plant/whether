@@ -202,8 +202,8 @@ export function CopyLeadershipArtifactsButtons({
       <article className="weather-transmission-card px-3 py-3 sm:px-4 sm:py-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Send this brief</p>
-            <p className="mt-1 max-w-xl text-[11px] leading-5 text-slate-300">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">Send this brief</p>
+            <p className="mt-1 max-w-xl text-fluid-xs leading-5 text-slate-300">
               {PRIMARY_AUDIENCE_SHARE_GUIDANCE}
             </p>
           </div>
@@ -234,7 +234,7 @@ export function CopyLeadershipArtifactsButtons({
                 }`}
               >
                 <span>{artifactModeLabels[mode]}</span>
-                <span className="mt-1 text-[10px] font-normal tracking-normal text-slate-400">
+                <span className="mt-1 text-fluid-micro font-normal tracking-normal text-slate-400">
                   {mode === "explainer"
                     ? "Jargon-free version for team members who don't follow macro."
                     : "Standard brief with decision terms for your leadership team."
@@ -269,7 +269,7 @@ export function CopyLeadershipArtifactsButtons({
           </ActionButton>
         </div>
 
-        <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400" role="status" aria-live="polite">
+        <p className="mt-2 px-1 text-fluid-xs leading-5 text-slate-400" role="status" aria-live="polite">
           {shareState === "shared"
             ? `${activeModeLabel} shared with its link.`
             : shareState === "copied"
@@ -281,7 +281,7 @@ export function CopyLeadershipArtifactsButtons({
         </p>
 
         <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
-          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+          <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
             More copy formats
           </summary>
 
@@ -315,17 +315,17 @@ export function CopyLeadershipArtifactsButtons({
 
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Need a fuller package?</p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">Need a fuller package?</p>
+                <p className="mt-1 text-fluid-xs leading-5 text-slate-400">
                   Board and approval-ready formats live in Planning.
                 </p>
               </div>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
                 More formats
               </span>
             </div>
             {fallbackActive ? (
-              <p className="text-[10px] leading-5 text-amber-200">
+              <p className="text-fluid-micro leading-5 text-amber-200">
                 Cached snapshot active: confirm the details in Planning before sharing externally.
               </p>
             ) : null}

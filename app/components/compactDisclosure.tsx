@@ -106,7 +106,7 @@ export function CompactDisclosure({
         <span className="min-w-0 flex-1">
           <span className="block">{summary}</span>
           {preview ? (
-            <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-slate-400">
+            <span className="mt-1 block text-fluid-xs font-normal normal-case tracking-normal text-slate-400">
               {preview}
             </span>
           ) : null}

@@ -27,7 +27,7 @@ export const ReportSectionNavigation = ({
     <nav aria-label="Section index" className={className}>
       <div className="weather-panel-static space-y-3 rounded px-3 py-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
             On this page
           </p>
           <span className="weather-tag weather-tag-slate">
@@ -42,13 +42,13 @@ export const ReportSectionNavigation = ({
               className="weather-pill inline-flex min-h-[42px] w-full items-center justify-between rounded-sm px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               <span>{resolveCompactSectionLabel(section)}</span>
-              <span className="text-[10px] text-slate-400">{index + 1}</span>
+              <span className="text-fluid-micro text-slate-400">{index + 1}</span>
             </a>
           </li>
         ))}
         </ol>
         {hiddenSectionCount > 0 ? (
-          <p className="px-1 text-[11px] text-slate-400">
+          <p className="px-1 text-fluid-xs text-slate-400">
             {hiddenSectionCount} more section{hiddenSectionCount === 1 ? "" : "s"} below.
           </p>
         ) : null}

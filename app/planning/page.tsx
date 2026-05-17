@@ -194,7 +194,7 @@ export default async function OperationsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
-      <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-[11px] leading-5 text-slate-400">
+      <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400">
         This page turns the weekly call from the{" "}
         <Link href="/" className="font-semibold text-sky-200 hover:text-sky-100">homepage brief</Link>{" "}
         into a plan with guardrails, finance direction, and share-ready formats.
@@ -235,17 +235,17 @@ export default async function OperationsPage({
                   </div>
                   <div className="grid gap-3 md:grid-cols-3">
                     <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Action now</p>
+                      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Action now</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.actionNow}</p>
                     </article>
                     <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
+                      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Pause if</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">
                         {weeklyCall.pauseIf}
                       </p>
                     </article>
                     <article className="rounded-sm border border-slate-800/60 bg-slate-950/45 px-3 py-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-200">Change course if</p>
+                      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Change course if</p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">{weeklyCall.changeCourseIf}</p>
                     </article>
                   </div>
@@ -259,10 +259,10 @@ export default async function OperationsPage({
                 <details className="weather-auto-chevron rounded border border-slate-800/60 bg-slate-950/28 px-4 py-3">
                   <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
                     <span className="min-w-0">
-                      <span className="block text-[11px] font-medium text-slate-300">Monthly roll-up</span>
+                      <span className="block text-fluid-xs font-medium text-slate-300">Monthly roll-up</span>
                       <span className="mt-1 block text-sm font-semibold text-slate-100">Monthly planning context.</span>
                     </span>
-                    <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
                       Optional
                     </span>
                   </summary>
@@ -469,7 +469,7 @@ export default async function OperationsPage({
                 href={`/resources/${pillar.slug}` as Route}
                 className="weather-surface rounded-md border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Governance pillar</p>
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Governance pillar</p>
                 <p className="mt-2 font-semibold text-slate-100">{pillar.h1}</p>
                 <p className="mt-2 text-sm text-slate-300">{pillar.description}</p>
               </Link>

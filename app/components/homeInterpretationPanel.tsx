@@ -61,7 +61,7 @@ const CueCard = ({
   body: string;
 }) => (
   <article className={`weather-surface rounded-lg border px-3 py-3 text-sm text-slate-200 ${toneClass}`}>
-    <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em]">
+    <p className="inline-flex items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-current/20 bg-slate-950/55">
         {icon}
       </span>
@@ -91,7 +91,7 @@ export const HomeInterpretationPanel = ({
           <p className="text-xs text-slate-300">{layer.summary}</p>
           <p className="text-xs text-slate-400">Same decision, framed for your context.</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
           <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
           <span>Filtered view</span>
         </div>
@@ -109,7 +109,7 @@ export const HomeInterpretationPanel = ({
             aria-current={layer.view === view ? "page" : undefined}
           >
             <span>{interpretationLabels[view]}</span>
-            <span className="rounded-full border border-slate-600/70 px-1.5 py-0.5 text-[10px] text-slate-300">{index + 1}</span>
+            <span className="rounded-full border border-slate-600/70 px-1.5 py-0.5 text-fluid-micro text-slate-300">{index + 1}</span>
           </Link>
         ))}
       </nav>

@@ -117,7 +117,7 @@ export const CadenceChecklist = ({
               className={`cadence-item weather-surface flex h-full flex-col gap-3 p-4 ${done ? "border-emerald-400/50 bg-emerald-500/10" : ""}`}
             >
               <div className="flex items-center gap-2">
-                <span aria-hidden="true" className="cadence-step-index inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold">
+                <span aria-hidden="true" className="cadence-step-index inline-flex h-6 w-6 items-center justify-center rounded-full text-fluid-xs font-semibold">
                   {done ? "✓" : index + 1}
                 </span>
                 <p className="text-sm font-semibold text-slate-100">{item.label}</p>

@@ -31,7 +31,7 @@ export function FirstVisitBanner() {
         </div>
         <button
           onClick={dismiss}
-          className="flex-shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors"
+          className="flex-shrink-0 rounded-full px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.08em] text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors"
           aria-label="Dismiss"
         >
           Got it

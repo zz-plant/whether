@@ -50,22 +50,22 @@ export function RouteLoadingShell({
       <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-lg px-5 py-5 sm:px-6 sm:py-6">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]">
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
+            <div className="flex flex-wrap items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.12em]">
               <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
             </div>
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{pageTitle}</p>
+              <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{pageTitle}</p>
               <p className="max-w-2xl text-sm leading-relaxed text-slate-100">{description}</p>
             </div>
           </div>
           <div className="rounded-md border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             <div className="flex items-center justify-between gap-3">
-              <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+              <p className="inline-flex items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-cyan-100">
                 <span className="weather-loading-beacon" />
                 Loading
               </p>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Live refresh</span>
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Live refresh</span>
             </div>
             <div className="weather-loading-progress mt-3" aria-hidden="true" />
             <p className="mt-3 text-sm leading-relaxed text-slate-300">
@@ -88,25 +88,25 @@ export function RouteLoadingShell({
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1.22fr)_minmax(18rem,0.78fr)]">
             <section className="grid gap-3 sm:grid-cols-2">
               <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Summary
                 </p>
                 <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/38" />
               </article>
               <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Action
                 </p>
                 <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/38" />
               </article>
               <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Evidence
                 </p>
                 <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/34" />
               </article>
               <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   Next step
                 </p>
                 <Skeleton className="mt-3 h-5 w-8/12 rounded-full bg-slate-500/30" />
@@ -115,7 +115,7 @@ export function RouteLoadingShell({
 
             <section className="space-y-3 rounded-md border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
                   Trust
                 </p>
                 <Skeleton className="h-6 w-24 rounded-full bg-slate-500/32" />

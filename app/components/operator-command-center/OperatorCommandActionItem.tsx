@@ -57,7 +57,7 @@ export const OperatorCommandActionItem = ({
       </span>
       <span className="inline-flex items-center gap-2">
         {variant === "popup" ? (
-          <span className="hidden text-[11px] text-slate-400 sm:inline">{action.description}</span>
+          <span className="hidden text-fluid-xs text-slate-400 sm:inline">{action.description}</span>
         ) : (
           <span className="flex flex-wrap justify-end gap-1">
             {(action.tags ?? [action.group]).map((tag) => (

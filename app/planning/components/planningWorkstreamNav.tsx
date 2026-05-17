@@ -51,11 +51,11 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
                 <div className="flex w-full flex-wrap items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-2">
                     <span className="text-slate-300" aria-hidden="true">{workstreamIconByLabel[link.label]}</span>
-                    <span className={`text-[11px] uppercase tracking-[0.22em] ${labelTone}`}>
+                    <span className={`text-fluid-xs uppercase tracking-[0.22em] ${labelTone}`}>
                       {link.label}
                     </span>
                   </span>
-                  <span className="rounded-full border border-slate-700/70 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-300">
+                  <span className="rounded-full border border-slate-700/70 px-2 py-1 text-fluid-micro uppercase tracking-[0.16em] text-slate-300">
                     {statusLabel}
                   </span>
                 </div>

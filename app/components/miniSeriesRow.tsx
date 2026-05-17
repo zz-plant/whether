@@ -94,7 +94,7 @@ export const MiniSeriesRow = ({
       </div>
 
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">5Y trend</p>
+        <p className="mb-2 text-fluid-xs font-semibold uppercase tracking-[0.16em] text-slate-500">5Y trend</p>
         {parsed ? (
           <svg viewBox={`0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`} className="h-16 w-full" aria-hidden="true" preserveAspectRatio="none">
             <path d={parsed.path} fill="none" stroke={lineColor} strokeWidth="1.8" vectorEffect="non-scaling-stroke" />

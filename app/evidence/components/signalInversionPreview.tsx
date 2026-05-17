@@ -197,7 +197,7 @@ export function SignalInversionPreview({
             </>
           ) : null}
         </svg>
-        <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+        <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
           <span>{latest?.label}</span>
@@ -207,7 +207,7 @@ export function SignalInversionPreview({
           <span>2Y−3M {formatBp(latest?.spread2Y3M ?? null)}</span>
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.1em]">
+        <div className="mt-3 flex flex-wrap gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
           <span className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
             10Y-2Y inverted {monthsInverted10Y2Y} mo
           </span>

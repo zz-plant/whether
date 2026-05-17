@@ -184,7 +184,7 @@ export function WeeklyCallModePanel({
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   {showModeChip ? (
-                    <span className="text-[11px] font-medium text-slate-500">
+                    <span className="text-fluid-xs font-medium text-slate-500">
                       {selectedModeLabel}
                     </span>
                   ) : null}
@@ -201,7 +201,7 @@ export function WeeklyCallModePanel({
                 </div>
 
                 {shouldShowReadinessCallout ? (
-                  <p className="mt-3 rounded-lg bg-slate-950/40 px-3 py-2 text-[12px] leading-5 text-slate-300">
+                  <p className="mt-3 rounded-lg bg-slate-950/40 px-3 py-2 text-fluid-micro leading-5 text-slate-300">
                     {trustStatusSummary}
                   </p>
                 ) : null}
@@ -222,7 +222,7 @@ export function WeeklyCallModePanel({
                 </section>
 
                 <div className="mt-4 flex flex-wrap items-start gap-x-3 gap-y-1.5 max-w-3xl">
-                  <p className="text-[12px] leading-5 text-slate-400">
+                  <p className="text-fluid-micro leading-5 text-slate-400">
                     <span className="font-medium text-amber-200">Changed this week:</span>{" "}
                     {changedThisWeekDetail}
                   </p>
@@ -264,7 +264,7 @@ export function WeeklyCallModePanel({
                   <aside className="weather-brief-secondary-lane space-y-3 xl:pt-1">
                     <article className="weather-stream-reveal weather-stream-reveal--medium rounded px-3 py-3 text-slate-100">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-[11px] font-medium text-slate-300">Watch this week</p>
+                      <p className="text-fluid-xs font-medium text-slate-300">Watch this week</p>
                       {revisitQueue.length > 0 ? (
                         <span className="weather-chip weather-chip-slate">
                           {revisitQueue.length} decisions
@@ -293,22 +293,22 @@ export function WeeklyCallModePanel({
                         <article className="rounded-lg bg-slate-950/40 px-3 py-3">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="text-[11px] font-medium text-slate-300">Start with</p>
+                              <p className="text-fluid-xs font-medium text-slate-300">Start with</p>
                               <p className="mt-1 text-sm font-semibold text-slate-100">{featuredRevisitItem.label}</p>
                             </div>
                             <span className="weather-chip weather-chip-emerald">
                               Revisit now
                             </span>
                           </div>
-                          <p className="mt-3 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.action}</p>
+                          <p className="mt-3 text-fluid-xs leading-5 text-slate-200">{featuredRevisitItem.action}</p>
                           <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                             <div>
-                              <dt className="text-[11px] font-medium text-slate-400">Why it matters</dt>
-                              <dd className="mt-1 text-[11px] leading-5 text-slate-400">{featuredRevisitItem.reason}</dd>
+                              <dt className="text-fluid-xs font-medium text-slate-400">Why it matters</dt>
+                              <dd className="mt-1 text-fluid-xs leading-5 text-slate-400">{featuredRevisitItem.reason}</dd>
                             </div>
                             <div>
-                              <dt className="text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
-                              <dd className="mt-1 text-[11px] leading-5 text-slate-200">{featuredRevisitItem.flipCondition}.</dd>
+                              <dt className="text-fluid-xs font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
+                              <dd className="mt-1 text-fluid-xs leading-5 text-slate-200">{featuredRevisitItem.flipCondition}.</dd>
                             </div>
                           </dl>
                         </article>
@@ -317,7 +317,7 @@ export function WeeklyCallModePanel({
 
                     {deferredRevisitItems.length > 0 ? (
                       <details className="weather-auto-chevron mt-3 rounded-lg bg-slate-950/35 px-3 py-2.5">
-                        <summary className="cursor-pointer list-none text-[11px] font-medium text-slate-300">
+                        <summary className="cursor-pointer list-none text-fluid-xs font-medium text-slate-300">
                           More to revisit
                         </summary>
                         <div className="mt-3 divide-y divide-slate-800/70">
@@ -329,15 +329,15 @@ export function WeeklyCallModePanel({
                                   Revisit now
                                 </span>
                               </div>
-                              <p className="mt-2 text-[11px] leading-5 text-slate-200">{item.action}</p>
+                              <p className="mt-2 text-fluid-xs leading-5 text-slate-200">{item.action}</p>
                               <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                                 <div>
-                                  <dt className="text-[11px] font-medium text-slate-400">Why it matters</dt>
-                                  <dd className="mt-1 text-[11px] leading-5 text-slate-400">{item.reason}</dd>
+                                  <dt className="text-fluid-xs font-medium text-slate-400">Why it matters</dt>
+                                  <dd className="mt-1 text-fluid-xs leading-5 text-slate-400">{item.reason}</dd>
                                 </div>
                                 <div>
-                                  <dt className="text-[11px] font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
-                                  <dd className="mt-1 text-[11px] leading-5 text-slate-200">{item.flipCondition}.</dd>
+                                  <dt className="text-fluid-xs font-medium text-slate-300">{publicDecisionLabels.reversal}</dt>
+                                  <dd className="mt-1 text-fluid-xs leading-5 text-slate-200">{item.flipCondition}.</dd>
                                 </div>
                               </dl>
                             </article>
@@ -355,10 +355,10 @@ export function WeeklyCallModePanel({
                 <p className="type-kicker text-slate-400">
                   {PRIMARY_AUDIENCE_LABEL}
                 </p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-300">
+                <p className="mt-1 text-fluid-xs leading-5 text-slate-300">
                   {PRIMARY_AUDIENCE_SUMMARY}
                 </p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                <p className="mt-1 text-fluid-xs leading-5 text-slate-400">
                   {PRIMARY_AUDIENCE_ACTION}
                 </p>
               </div>
@@ -367,7 +367,7 @@ export function WeeklyCallModePanel({
                 <div key={card.label} className={card.className}>
                   <dt className="type-kicker text-slate-400">{card.label}</dt>
                   <dd className="mt-1 type-data font-semibold text-slate-50">{card.value}</dd>
-                  <dd className="mt-1 text-[10px] leading-4 text-slate-400">{card.detail}</dd>
+                  <dd className="mt-1 text-fluid-micro leading-4 text-slate-400">{card.detail}</dd>
                 </div>
               ))}
               </dl>
@@ -393,7 +393,7 @@ export function WeeklyCallModePanel({
                         <article className={`min-w-[8rem] rounded-lg px-2.5 py-2 ${step.isCurrent ? "bg-sky-500/8" : "bg-slate-950/35"}`}>
                           <p className="type-kicker text-slate-300">{step.label}</p>
                           <p className={`mt-1 type-data font-semibold ${step.isCurrent ? "text-sky-50" : "text-slate-50"}`}>{step.posture}</p>
-                          <p className="mt-1 text-[10px] leading-4 text-slate-300">{step.detail}</p>
+                          <p className="mt-1 text-fluid-micro leading-4 text-slate-300">{step.detail}</p>
                         </article>
                         {index < postureSteps.length - 1 ? (
                           <span className="text-xs font-semibold text-slate-500" aria-hidden="true">→</span>
@@ -428,7 +428,7 @@ export function WeeklyCallModePanel({
               )}
 
               <details className="weather-auto-chevron rounded-lg bg-slate-950/35 px-3 py-2.5">
-                <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
                   Citation
                 </summary>
                 <div className="mt-3">
@@ -445,10 +445,10 @@ export function WeeklyCallModePanel({
         </article>
 
         <details className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}>
-          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
             <span className="min-w-0 flex-1">
               <span className="block">Why this lands here</span>
-              <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-slate-400">
+              <span className="mt-1 block text-fluid-xs font-normal normal-case tracking-normal text-slate-400">
                 {guardrailPolicyDetails.summary}
               </span>
             </span>
@@ -495,12 +495,12 @@ export function WeeklyCallModePanel({
                 <p className="type-kicker text-slate-400">What this means now</p>
                 {whyItMattersLine ? <p className="mt-1 type-data text-slate-200">{whyItMattersLine}</p> : null}
                 {trustReason ? (
-                  <p className="mt-2 text-[11px] leading-5 text-slate-400">
+                  <p className="mt-2 text-fluid-xs leading-5 text-slate-400">
                     Using the last verified weekly read because {trustReason}
                   </p>
                 ) : null}
                 {glossaryHref ? (
-                  <p className="mt-2 text-[11px] leading-5 text-slate-300">
+                  <p className="mt-2 text-fluid-xs leading-5 text-slate-300">
                     Need definitions?{" "}
                     <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
                       Open the glossary

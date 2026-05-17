@@ -128,7 +128,7 @@ export const RegimeTimelinePanel = ({
           titleId="regime-timeline-title"
           description="Timeline emphasizes continuity while keeping month-level navigation."
           aside={
-            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold tracking-[0.1em] text-slate-100">
+            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-100">
               Current: {currentLabel}
             </span>
           }
@@ -152,10 +152,10 @@ export const RegimeTimelinePanel = ({
                       aria-hidden="true"
                     />
                     <div className="relative z-10 w-full bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent px-2 pb-2 pt-8 sm:px-3">
-                      <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-100 sm:text-xs">
+                      <p className="truncate text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-100 sm:text-xs">
                         {runLabel}
                       </p>
-                      <p className="hidden text-[10px] text-slate-200/90 sm:block">{spanLabel}</p>
+                      <p className="hidden text-fluid-micro text-slate-200/90 sm:block">{spanLabel}</p>
                     </div>
                   </div>
                 );

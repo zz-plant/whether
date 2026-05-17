@@ -133,7 +133,7 @@ export const DataProvenanceStrip = ({
     return (
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
         <p className="text-xs text-slate-300">{derivationLine}</p>
-        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+        <div className="flex flex-wrap items-center gap-2 text-fluid-xs">
           <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
             <span aria-hidden="true">{dataModeIcon}</span>
             <span>{dataMode.label}</span>
@@ -155,7 +155,7 @@ export const DataProvenanceStrip = ({
                 <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
                   <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">Trust snapshot</p>
                   <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
-                <div className="mt-2 space-y-1 text-[11px] text-slate-300">
+                <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
                   <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
                     <p><span className="text-slate-500">Decision as-of:</span> {provenance.recordDateLabel}</p>
                     <p><span className="text-slate-500">Data refreshed:</span> {provenance.timestampLabel}</p>
@@ -173,7 +173,7 @@ export const DataProvenanceStrip = ({
         <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
           {provenanceRows.map((row) => (
             <p key={row.label} className="space-y-1">
-              <span className="block text-[10px] uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
+              <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
               <span className="block tracking-normal normal-case">{row.value}</span>
             </p>
           ))}
@@ -209,7 +209,7 @@ export const DataProvenanceStrip = ({
               <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
                 <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
-                <div className="mt-2 space-y-1 text-[11px] text-slate-300">
+                <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
                   <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
                   <p><span className="text-slate-500">Data age:</span> {provenance.ageLabel}</p>
                 </div>
@@ -226,7 +226,7 @@ export const DataProvenanceStrip = ({
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (
           <p key={row.label} className="space-y-1">
-            <span className="block text-[10px] uppercase tracking-[0.12em] text-slate-500">{row.label}</span>
+            <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-500">{row.label}</span>
             <span className="block tracking-normal normal-case">{row.value}</span>
           </p>
         ))}

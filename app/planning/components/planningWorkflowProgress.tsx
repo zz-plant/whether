@@ -56,10 +56,10 @@ export const OperationsWorkflowProgress = () => {
                 aria-current={index === 0 ? "step" : undefined}
                 className={`weather-surface flex min-h-[100px] flex-col gap-2 rounded-md border p-3 ${cardTone}`}
               >
-                <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
+                <span className="inline-flex items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.2em]">
                   <span className="inline-flex items-center gap-2">
                     <span
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] ${
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-fluid-micro ${
                         index === 0
                           ? "border-sky-300/80 bg-sky-500/35 text-sky-50"
                           : "border-slate-600/80 text-slate-300"
@@ -83,7 +83,7 @@ export const OperationsWorkflowProgress = () => {
       </ol>
 
       <div className="weather-surface space-y-2 rounded-md border border-slate-800/80 px-3 py-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Implementation handoff</p>
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Implementation handoff</p>
         <p className="text-xs text-slate-300">
           For tools and automation owners once the weekly plan is approved.
         </p>

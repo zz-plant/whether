@@ -54,7 +54,7 @@ const ToastList = () => {
             {toast.actionProps ? (
               <Toast.Action
                 {...toast.actionProps}
-                className={`inline-flex min-h-[32px] items-center justify-center rounded-full border border-slate-700/70 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 ${
+                className={`inline-flex min-h-[32px] items-center justify-center rounded-full border border-slate-700/70 px-3 text-fluid-micro font-semibold uppercase tracking-[0.18em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 ${
                   toast.actionProps.className ?? ""
                 }`}
               />

@@ -10,7 +10,7 @@ export const ArtifactActionsFallback = () => (
       <div>
         <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading share actions</span>
       </div>
-      <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
+      <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-cyan-100">
         <span className="weather-loading-beacon" />
         Loading
       </span>

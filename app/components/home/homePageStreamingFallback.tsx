@@ -64,16 +64,16 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                 className="h-9 w-auto"
                 priority
               />
-              <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
+              <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-sky-100">
                 Weekly brief loading
               </span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-200">
                 {contextLabel}
               </span>
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
+              <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
               <p className="max-w-2xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
                 This week&apos;s recommendation and decision rules are loading.
               </p>
@@ -85,11 +85,11 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
               </p>
               <div className="rounded-md border border-slate-700/75 bg-slate-950/72 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+                  <p className="inline-flex items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-cyan-100">
                     <span className="weather-loading-beacon" />
                     Loading
                   </p>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Weekly sync</span>
+                  <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Weekly sync</span>
                 </div>
                 <div className="weather-loading-progress mt-3" aria-hidden="true" />
                 <p className="mt-3 text-sm leading-relaxed text-slate-300">
@@ -105,30 +105,30 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.9fr)]">
               <section className="grid gap-3 sm:grid-cols-2">
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Posture</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Posture</p>
                   <Skeleton className="mt-3 h-6 w-28 rounded-full bg-slate-500/40" />
                 </article>
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Do now</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Do now</p>
                   <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/40" />
                   <Skeleton className="mt-2 h-5 w-8/12 rounded-full bg-slate-500/32" />
                 </article>
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Revisit</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Revisit</p>
                   <Skeleton className="mt-3 h-5 w-24 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Watch for</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Watch for</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Clears when</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Clears when</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
               </section>
               <section className="space-y-3 rounded-md border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Trust</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Trust</p>
                   <Skeleton className="h-6 w-24 rounded-full bg-slate-500/35" />
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">

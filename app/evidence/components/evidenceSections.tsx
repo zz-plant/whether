@@ -157,7 +157,7 @@ export const SignalsModeSwitcherSection = ({
               ) : null}
             </span>
             <span className="min-w-0">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">{item.label}</span>
+              <span className="text-fluid-xs font-semibold uppercase tracking-[0.14em]">{item.label}</span>
               <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
             </span>
           </button>
@@ -212,7 +212,7 @@ export const SignalsDecisionSummarySection = ({
       </p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             Current outlook
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
@@ -220,7 +220,7 @@ export const SignalsDecisionSummarySection = ({
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             Main pressure
           </p>
           <p className="mt-2 text-sm text-slate-200">
@@ -229,19 +229,19 @@ export const SignalsDecisionSummarySection = ({
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             What would change this
           </p>
           {showMicroDecisionRows ? (
             <div className="mt-2 space-y-2 text-sm text-slate-200">
               <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-200">
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-amber-200">
                   Wrong if
                 </p>
                 <p className="mt-1">{triggerCondition}</p>
               </div>
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-sky-200">
                   Safe again when
                 </p>
                 <p className="mt-1">{reversalCondition}</p>
@@ -269,25 +269,25 @@ export const SignalsDecisionSummarySection = ({
     </article>
     <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
           Current environment
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
       </div>
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
           Confidence
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
       </div>
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
           Decision as-of
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
       </div>
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
           Freshness
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{freshnessSummaryLabel}</p>
@@ -310,7 +310,7 @@ export const SignalsDecisionSummarySection = ({
         </p>
         <dl className="grid gap-3 rounded-md border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
           <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
               What to do
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
@@ -318,7 +318,7 @@ export const SignalsDecisionSummarySection = ({
             </dd>
           </div>
           <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
               If this is wrong
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
@@ -326,7 +326,7 @@ export const SignalsDecisionSummarySection = ({
             </dd>
           </div>
           <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
               Check again
             </dt>
             <dd className="mt-1 text-xs text-slate-100">
@@ -346,7 +346,7 @@ export const SignalsDecisionSummarySection = ({
           What founders should do this week
         </h3>
         <div className="rounded-md border border-emerald-800/60 bg-emerald-950/20 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">
             Lean in here
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
@@ -356,7 +356,7 @@ export const SignalsDecisionSummarySection = ({
           </ul>
         </div>
         <div className="rounded-md border border-rose-800/60 bg-rose-950/20 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-200">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-rose-200">
             Hold or gate
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
@@ -451,7 +451,7 @@ export const SignalsCurrentScoresSection = ({
                     <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.valueLabel}</dd>
                   </dl>
                   <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
-                    <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    <div className="flex items-center justify-between gap-3 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                       <span>Current vs watch line</span>
                       <span>{card.watchDistanceLabel}</span>
                     </div>
@@ -479,12 +479,12 @@ export const SignalsCurrentScoresSection = ({
                             style={{ left: `${meterState.currentPercent}%` }}
                           />
                         </div>
-                        <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+                        <div className="mt-1 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
                           <span>{meterState.leftLabel}</span>
                           <span>Watch line</span>
                           <span>{meterState.rightLabel}</span>
                         </div>
-                        <p className="mt-2 text-[11px] text-slate-400">
+                        <p className="mt-2 text-fluid-xs text-slate-400">
                           Watch line: <span className="text-slate-200">{card.thresholdLabel}</span>
                         </p>
                       </>

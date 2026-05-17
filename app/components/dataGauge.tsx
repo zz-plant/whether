@@ -88,7 +88,7 @@ export const DataGauge = ({
             </div>
 
             <div className="text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-300 transition-colors">
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-300 transition-colors">
                     {label}
                 </p>
             </div>

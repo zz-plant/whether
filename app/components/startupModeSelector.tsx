@@ -41,7 +41,7 @@ export function StartupModeSelector({
   return (
     <>
       <fieldset className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2">
-        <legend className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+        <legend className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-300">
           Company mode
         </legend>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -73,13 +73,13 @@ export function StartupModeSelector({
 
       <div className="grid gap-2.5 sm:grid-cols-2">
         <div className="rounded-lg border border-emerald-500/35 bg-emerald-500/5 px-3 py-3 space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
           <ul className="space-y-1 text-xs text-emerald-100">
             {activeContent.doNowBullets.map((bullet) => <li key={`do-${bullet}`}>• {bullet}</li>)}
           </ul>
         </div>
         <div className="rounded-lg border border-rose-500/35 bg-rose-500/5 px-3 py-3 space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
           <ul className="space-y-1 text-xs text-rose-100">
             {activeContent.avoidBullets.map((bullet) => <li key={`avoid-${bullet}`}>• {bullet}</li>)}
           </ul>
@@ -87,7 +87,7 @@ export function StartupModeSelector({
       </div>
 
       <div className="rounded-lg border border-sky-500/35 bg-sky-500/5 px-3 py-3 space-y-1.5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
         <ul className="space-y-1 text-xs text-sky-100">
           {activeContent.watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
         </ul>

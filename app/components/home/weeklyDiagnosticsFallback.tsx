@@ -8,7 +8,7 @@ export const WeeklyDiagnosticsFallback = () => (
           <p className="home-band-kicker">Evidence + trust</p>
           <h2 className="text-xl font-semibold text-slate-100">Preparing compact evidence and trust handoff.</h2>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
+        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-cyan-100">
           <span className="weather-loading-beacon" />
           Updating
         </span>
@@ -41,7 +41,7 @@ export const WeeklyDiagnosticsFallback = () => (
           <p className="home-band-kicker">Planning</p>
           <h2 className="text-xl font-semibold text-slate-100">Preparing the planning handoff.</h2>
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pending</span>
+        <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Pending</span>
       </div>
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <Skeleton className="h-28 w-full rounded-md bg-slate-500/32" />

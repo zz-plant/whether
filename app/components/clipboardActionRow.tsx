@@ -64,7 +64,7 @@ export function ClipboardActionRow({
         onClick={onClick}
         disabled={isDisabled}
         aria-busy={isCopying}
-        className={`${BUTTON_VARIANT_CLASS[buttonVariant]} ${BUTTON_BASE_CLASS} ${compact ? "min-h-[40px] px-3 py-1 text-[11px]" : "min-h-[44px]"} ${buttonClassName ?? ""}`.trim()}
+        className={`${BUTTON_VARIANT_CLASS[buttonVariant]} ${BUTTON_BASE_CLASS} ${compact ? "min-h-[40px] px-3 py-1 text-fluid-xs" : "min-h-[44px]"} ${buttonClassName ?? ""}`.trim()}
       >
         {buttonIcon ? <span className="mr-1.5 inline-flex items-center">{buttonIcon}</span> : null}
         {buttonLabel}

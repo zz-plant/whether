@@ -46,25 +46,25 @@ export function SourceHealthPanel({ rows }: { rows: SourceHealthRow[] }) {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="text-sm font-semibold text-slate-100">{row.sourceName}</p>
-                  <p className="mt-0.5 text-[11px] text-slate-400">{row.cadenceLabel}</p>
+                  <p className="mt-0.5 text-fluid-xs text-slate-400">{row.cadenceLabel}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${modeStyle}`}>
+                  <span className={`rounded-full border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${modeStyle}`}>
                     {modeLabel}
                   </span>
-                  <span className={`rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${freshnessStyle}`}>
+                  <span className={`rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${freshnessStyle}`}>
                     {freshnessLabel}
                   </span>
-                  <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
                     {formatSla(row.freshnessSlaHours)}
                   </span>
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-fluid-xs text-slate-500">
                 <span>Last fetch: {formatLastFetch(row.lastSuccessfulFetchAt)}</span>
               </div>
               {row.activeFallbackReason ? (
-                <p className="mt-2 text-[11px] leading-5 text-amber-300/90">
+                <p className="mt-2 text-fluid-xs leading-5 text-amber-300/90">
                   {row.activeFallbackReason}
                 </p>
               ) : null}

@@ -43,15 +43,15 @@ export const WeeklyActionSummaryPanel = ({
 
         <div className="grid gap-2 md:grid-cols-3">
           <article className="weather-surface rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Action now</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-violet-100">Action now</p>
             <p className="mt-1 text-sm text-slate-100">{actionGuidance}</p>
           </article>
           <article className="weather-surface rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Pause if</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-100">Pause if</p>
             <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
           </article>
           <article className="weather-surface rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Change course if</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-sky-100">Change course if</p>
             <p className="mt-1 text-sm text-slate-100">{flipCondition}</p>
           </article>
         </div>
@@ -68,11 +68,11 @@ export const WeeklyActionSummaryPanel = ({
                 <section key={block.title} className="rounded-md border border-slate-700/70 bg-slate-950/40 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-sm font-semibold text-slate-100">{block.title}</h4>
-                    <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 1}</span>
+                    <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 1}</span>
                   </div>
-                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Action</p>
+                  <p className="mt-2 text-fluid-micro font-semibold uppercase tracking-[0.1em] text-emerald-200">Action</p>
                   <p className="mt-1 text-sm text-slate-200">{actionCue}</p>
-                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-200">Watch</p>
+                  <p className="mt-2 text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-200">Watch</p>
                   <p className="mt-1 text-xs text-slate-300">{watchCue}</p>
                 </section>
               );
@@ -168,11 +168,11 @@ export const ExecutiveSnapshotPanel = ({
 
             <div className="mt-3 grid gap-2 md:grid-cols-3">
               <article className="rounded-md border border-violet-500/45 bg-violet-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Current call</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-violet-100">Current call</p>
                 <p className="mt-1 text-xs font-semibold text-slate-100">{weeklyLockCommitment.currentCall}</p>
               </article>
               <article className="rounded-md border border-sky-500/45 bg-sky-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Change-course signals</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-sky-100">Change-course signals</p>
                 <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-slate-100">
                   {weeklyLockCommitment.flipConditions.map((condition) => (
                     <li key={condition}>{condition}</li>
@@ -180,12 +180,12 @@ export const ExecutiveSnapshotPanel = ({
                 </ul>
               </article>
               <article className="rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Owner cadence</p>
+                <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-100">Owner cadence</p>
                 <p className="mt-1 text-xs text-slate-100">{weeklyLockCommitment.ownerCadence}</p>
               </article>
             </div>
             {weeklyLockCommitment.trustMarkers.length > 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+              <div className="mt-2 flex flex-wrap gap-2 text-fluid-xs">
                 {weeklyLockCommitment.trustMarkers.map((marker) => (
                   <span key={marker} className="rounded-full border border-amber-400/45 bg-amber-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.1em] text-amber-100">
                     {marker}

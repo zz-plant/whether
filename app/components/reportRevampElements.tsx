@@ -34,7 +34,7 @@ export const StageRail = ({
               aria-current={item.status === "current" ? "step" : undefined}
               className={`weather-route-card inline-flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] ${tone}`}
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-fluid-micro">
                 {index + 1}
               </span>
               <span>{item.label}</span>

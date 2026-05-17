@@ -66,7 +66,7 @@ export const MacroSignalsPanel = ({
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     {signal.label}
                   </p>
-                  <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-sky-100">
+                  <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-1 text-fluid-micro font-semibold tracking-[0.14em] text-sky-100">
                     Priority #{index + 1}
                   </span>
                 </div>

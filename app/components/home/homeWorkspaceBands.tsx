@@ -22,14 +22,14 @@ export async function HomeWorkspaceBands({
         aria-labelledby="approve-this-weeks-plan-title"
         open={true}
       >
-      <summary className="sm:hidden text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+      <summary className="sm:hidden text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">
         <span>Workspace tools</span>
-        <span className="rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] text-slate-500 sm:hidden" aria-hidden="true">▾</span>
+        <span className="rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-fluid-micro text-slate-500 sm:hidden" aria-hidden="true">▾</span>
       </summary>
       <div className="space-y-4">
         <div className="weather-panel-header">
           <div className="weather-panel-header-copy">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Next step</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Next step</p>
             <h2 id="approve-this-weeks-plan-title" className="weather-panel-header-title text-lg font-semibold text-slate-100">
               Turn this read into this week&apos;s plan
             </h2>
@@ -42,7 +42,7 @@ export async function HomeWorkspaceBands({
         <article className="weather-ritual-card px-4 py-4">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="max-w-3xl space-y-2">
-                <div className="flex items-center gap-2 text-[11px] font-medium text-sky-200">
+                <div className="flex items-center gap-2 text-fluid-xs font-medium text-sky-200">
                   <CheckIcon className="h-3.5 w-3.5" />
                   <span>Main planning path</span>
                 </div>
@@ -65,13 +65,13 @@ export async function HomeWorkspaceBands({
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Pause first</p>
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Pause first</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryGuardrail?.label ?? "Hold the current baseline"}
               </p>
             </div>
             <div className="weather-transmission-segment px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Send next</p>
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Send next</p>
               <p className="mt-1 text-sm font-semibold text-slate-100">
                 {primaryExportAction?.label ?? "Open share brief"}
               </p>

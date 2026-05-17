@@ -155,7 +155,7 @@ const ribbonTone = (value: number | null) => {
 const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
   <header className="space-y-1">
     <p className="text-xs font-semibold tracking-[0.14em] text-slate-300">{title}</p>
-    <p className="text-[11px] text-slate-500">{subtitle}</p>
+    <p className="text-fluid-xs text-slate-500">{subtitle}</p>
   </header>
 );
 
@@ -289,13 +289,13 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" className="fill-teal-200 text-[5px] uppercase tracking-[0.12em]">2Y</text> : null}
               {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" className="fill-indigo-200 text-[5px] uppercase tracking-[0.12em]">10Y</text> : null}
             </svg>
-            <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+            <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
             </div>
             <p className="text-xs text-slate-300">1M {formatPercent(latest?.oneMonth ?? null)} · 3M {formatPercent(latest?.threeMonth ?? null)} · 2Y {formatPercent(latest?.twoYear ?? null)} · 10Y {formatPercent(latest?.tenYear ?? null)}</p>
-            {hasRateGaps ? <p className="text-[11px] text-slate-500">Breaks indicate missing readings.</p> : null}
+            {hasRateGaps ? <p className="text-fluid-xs text-slate-500">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
@@ -333,7 +333,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 </text>
               ) : null}
             </svg>
-            <p className="text-[11px] text-slate-500">Older months fade back; the path shows direction, not just position.</p>
+            <p className="text-fluid-xs text-slate-500">Older months fade back; the path shows direction, not just position.</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">
@@ -353,13 +353,13 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" className="fill-emerald-200 text-[5px] uppercase tracking-[0.12em]">10Y-2Y</text> : null}
               {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" className="fill-amber-200 text-[5px] uppercase tracking-[0.12em]">2Y-3M</text> : null}
             </svg>
-            <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-slate-500">
+            <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
             </div>
             <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
-            {hasSpreadGaps ? <p className="text-[11px] text-slate-500">Breaks indicate missing spread reads.</p> : null}
+            {hasSpreadGaps ? <p className="text-fluid-xs text-slate-500">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">

@@ -122,7 +122,7 @@ export function CommandCenterNavBlock({
             <p className="weather-brief-kicker">{briefKicker}</p>
             <p className="text-fluid-micro leading-4 text-slate-500">{introMetaLine}</p>
             <h1 className={headingClassName}>{pageTitle}</h1>
-            <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-[15px]">
+            <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
               <span>{pageSummary}</span>
               {summaryLink}
             </p>

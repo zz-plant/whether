@@ -301,7 +301,7 @@ export const SignalMatrixPanel = ({
                     <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
                     {quadrant.id === currentQuadrantId ? (
                       <span
-                        className={`rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.12em] ${quadrant.chipClassName}`}
+                        className={`rounded-full border px-2 py-1 text-fluid-micro font-semibold tracking-[0.12em] ${quadrant.chipClassName}`}
                       >
                         Current
                       </span>

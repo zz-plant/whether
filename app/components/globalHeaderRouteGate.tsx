@@ -101,7 +101,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   {reportHeaderAction ? (
                     <Link
                       href={reportHeaderAction.href}
-                      className="weather-button-primary inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] text-slate-100"
+                      className="weather-button-primary inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100"
                     >
                       {reportHeaderAction.label}
                     </Link>
@@ -109,14 +109,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   {isHomeBrief ? (
                     <Link
                       href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
+                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
                     >
                       {reportHeaderUtilityAction.label}
                     </Link>
                   ) : (
                     <Link
                       href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
+                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
                     >
                       {reportHeaderUtilityAction.label}
                     </Link>
@@ -134,7 +134,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
           {/* Unified compact workflow nav — one system for all routes */}
           <details className="rounded-lg border border-slate-800/70 bg-slate-950/45 px-2.5 py-1.5 md:hidden">
-            <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
               Browse workflow
             </summary>
             <div className="mt-2">

@@ -133,7 +133,7 @@ export const CanonicalTrustModule = ({
     >
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`inline-flex min-h-[24px] items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.14em] ${config.badgeClassName}`}
+          className={`inline-flex min-h-[24px] items-center gap-1 rounded-full border px-2 py-1 text-fluid-xs font-semibold tracking-[0.14em] ${config.badgeClassName}`}
         >
           {config.icon}
           {config.label}
@@ -144,7 +144,7 @@ export const CanonicalTrustModule = ({
       </div>
       <p className="text-sm font-semibold text-slate-100">{label}</p>
       {outageSeverity ? (
-        <p className={`inline-flex w-fit items-center rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${severityToneClass}`}>
+        <p className={`inline-flex w-fit items-center rounded-full border px-2 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${severityToneClass}`}>
           {outageSeverity} outage · {outageTypeLabel}
         </p>
       ) : null}
@@ -154,13 +154,13 @@ export const CanonicalTrustModule = ({
       {decisionImpactWindow ? <p className="text-xs leading-relaxed text-slate-200">{decisionImpactWindow}</p> : null}
       {!compact ? (
         <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Decision rule</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Decision rule</p>
           <p className="text-xs leading-relaxed text-slate-100/90 whitespace-pre-line">{action.replace(" Reversal:", "\nReversal:")}</p>
         </div>
       ) : null}
       {approvalBuckets && approvalBuckets.length > 0 ? (
         <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Outage approvals</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Outage approvals</p>
           <ul className="space-y-1 text-xs text-slate-100/90">
             {approvalBuckets.map((bucket) => (
               <li key={bucket.label}><span className="font-semibold text-slate-100">{bucket.label}:</span> {bucket.detail}</li>
@@ -170,7 +170,7 @@ export const CanonicalTrustModule = ({
       ) : null}
       {recoveryPlan ? (
         <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2 text-xs text-slate-100/90">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Recovery runbook</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Recovery runbook</p>
           <p><span className="font-semibold text-slate-100">Owner:</span> {recoveryPlan.owner}</p>
           <p><span className="font-semibold text-slate-100">Next checkpoint:</span> {recoveryPlan.nextCheckpoint}</p>
           <p><span className="font-semibold text-slate-100">Exit condition:</span> {recoveryPlan.exitCondition}</p>
@@ -178,7 +178,7 @@ export const CanonicalTrustModule = ({
       ) : null}
       {outageExitGate ? (
         <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2 text-xs text-slate-100/90">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Outage exit gate</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Outage exit gate</p>
           <p className="font-semibold text-slate-100">{outageExitGate.label}</p>
           <p>
             {outageExitGate.summary}
@@ -188,7 +188,7 @@ export const CanonicalTrustModule = ({
       ) : null}
       {degradedSourceRows && degradedSourceRows.length > 0 ? (
         <div className="space-y-1 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Degraded sources this refresh</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100">Degraded sources this refresh</p>
           <ul className="space-y-1">
             {degradedSourceRows.slice(0, 3).map((row) => (
               <li key={row.sourceName} className="flex flex-wrap items-center justify-between gap-2">

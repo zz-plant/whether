@@ -21,7 +21,7 @@ export const ForecastChip = ({
   className,
 }: ForecastChipData) => (
   <span
-    className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${forecastChipToneClass[tone]} ${className ?? ""}`}
+    className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${forecastChipToneClass[tone]} ${className ?? ""}`}
   >
     {label}
   </span>
@@ -59,7 +59,7 @@ export const ForecastConditionsHeader = ({
         </div>
       ) : null}
       <div className="space-y-1">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">{eyebrow}</p>
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-sky-100/85">{eyebrow}</p>
         <h2 className="text-lg font-semibold tracking-[0.01em] text-slate-50 sm:text-xl">{headline}</h2>
         <p className="text-xs leading-5 text-slate-300">{description}</p>
       </div>
@@ -83,7 +83,7 @@ export const ForecastStatsGrid = ({
   <div className={`grid gap-2 sm:grid-cols-3 ${className ?? ""}`}>
     {stats.map((stat) => (
       <div key={stat.label} className="weather-stat-card">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{stat.label}</p>
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">{stat.label}</p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{stat.value}</p>
       </div>
     ))}
@@ -179,7 +179,7 @@ const ForecastStripCard = ({
 }: ForecastStripCardData) => (
   <article className={`weather-forecast-card ${forecastCardToneClass[tone]}`}>
     <div className="space-y-2">
-      <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${forecastCardLabelToneClass[tone]}`}>{label}</p>
+      <p className={`text-fluid-micro font-semibold uppercase tracking-[0.12em] ${forecastCardLabelToneClass[tone]}`}>{label}</p>
       <p className={`text-sm font-semibold leading-relaxed ${forecastCardHeadlineToneClass[tone]}`}>{headline}</p>
     </div>
 

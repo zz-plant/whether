@@ -406,7 +406,7 @@ export const ExportBriefPanel = ({
 
         {hasOverride ? (
           <div className="mt-4 rounded-lg border border-amber-300/30 bg-amber-500/10 p-4 text-xs leading-5 text-amber-100">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
             <p className="mt-2">{overrideLine}</p>
           </div>
         ) : null}
@@ -435,7 +435,7 @@ export const ExportBriefPanel = ({
               <WeeklyDigestDownload />
             </div>
             {fallbackActive ? (
-              <p className="text-[10px] leading-5 text-amber-200">
+              <p className="text-fluid-micro leading-5 text-amber-200">
                 Cached snapshot active: confirm irreversible sharing actions before circulating this package.
               </p>
             ) : null}
@@ -465,7 +465,7 @@ export const ExportBriefPanel = ({
               />
             </div>
             {fallbackActive ? (
-              <p className="text-[10px] leading-5 text-amber-200">
+              <p className="text-fluid-micro leading-5 text-amber-200">
                 Cached snapshot active: confirm irreversible sharing actions before circulating this package.
               </p>
             ) : null}
@@ -482,7 +482,7 @@ export const ExportBriefPanel = ({
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Reason</span>
+                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Reason</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideReason}
@@ -490,7 +490,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Local indicator</span>
+                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Local indicator</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideIndicator}
@@ -498,7 +498,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Owner</span>
+                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Owner</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideOwner}
@@ -506,7 +506,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100/80">Change course if</span>
+                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Change course if</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideReversal}
@@ -514,7 +514,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
             </div>
-            <p className="text-[11px] leading-5 text-amber-100/80">
+            <p className="text-fluid-xs leading-5 text-amber-100/80">
               When active, the exception is appended to the leadership team brief, plain-English brief, board note, meeting pack, one-screen summary, and board summary exports.
             </p>
           </div>

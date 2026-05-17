@@ -259,7 +259,7 @@ export const ThresholdsPanel = ({
           titleId="thresholds-title"
           description="These values decide when the environment label changes. They stay in the URL so shared links match."
           aside={
-            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold tracking-[0.1em] text-slate-200">
+            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-200">
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
               {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
             </span>
@@ -283,7 +283,7 @@ export const ThresholdsPanel = ({
                   className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
                 >
                   <span className="text-slate-100">{preset.label}</span>
-                  <span className="text-[11px] font-medium tracking-[0.08em] text-slate-400">
+                  <span className="text-fluid-xs font-medium tracking-[0.08em] text-slate-400">
                     {preset.detail}
                   </span>
                 </button>
@@ -297,7 +297,7 @@ export const ThresholdsPanel = ({
               className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100 touch-manipulation"
             >
               Edit exact numbers
-              <span className="text-[10px] text-slate-500">Show / hide</span>
+              <span className="text-fluid-micro text-slate-500">Show / hide</span>
             </Collapsible.Trigger>
             <Collapsible.Panel className="pt-4">
               <Form onFormSubmit={handleSubmit} className="grid gap-4">
@@ -409,7 +409,7 @@ export const ThresholdsPanel = ({
                 <Popover.Root>
                   <Popover.Trigger
                     type="button"
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                   >
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[9px] text-slate-400">
                       ?
@@ -436,7 +436,7 @@ export const ThresholdsPanel = ({
                             <span>Higher numbers delay changes until signals are extreme.</span>
                           </li>
                         </ul>
-                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
                           Close
                         </Popover.Close>
                         <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />

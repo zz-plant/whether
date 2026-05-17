@@ -115,10 +115,10 @@ export function OperationsExecutionStepper({
                   data-reviewed={index < activeIndex ? "true" : "false"}
                   className={`weather-surface weather-step-card flex min-h-[112px] w-full flex-col gap-2 rounded border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 hover:-translate-y-0.5 ${cardTone}`}
                 >
-                  <span className="inline-flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
+                  <span className="inline-flex items-center justify-between gap-2 text-fluid-xs font-semibold uppercase tracking-[0.2em]">
                     <span className="inline-flex items-center gap-2">
                       <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] ${
+                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-fluid-micro ${
                           isActive
                             ? "border-sky-300/80 bg-sky-500/35 text-sky-50 shadow-[0_0_0_1px_rgba(125,211,252,0.12)]"
                             : "border-slate-600/80 bg-slate-950/75 text-slate-300"
@@ -128,14 +128,14 @@ export function OperationsExecutionStepper({
                       </span>
                       {step.label}
                     </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.18em] text-slate-300">
                       {resolveOperationsExecutionStepActionLabel(isActive)}
                     </span>
                   </span>
                   <span className="text-sm font-semibold tracking-[0.01em] text-slate-100">{step.title}</span>
                   <span className="text-xs text-slate-300">{stepStateLabel(index, activeIndex)}</span>
-                  {step.owner ? <span className="text-[11px] text-slate-300">Owner: {step.owner}</span> : null}
-                  {step.approvalStatus ? <span className="text-[11px] text-slate-300">{step.approvalStatus}</span> : null}
+                  {step.owner ? <span className="text-fluid-xs text-slate-300">Owner: {step.owner}</span> : null}
+                  {step.approvalStatus ? <span className="text-fluid-xs text-slate-300">{step.approvalStatus}</span> : null}
                 </a>
               </li>
             );
@@ -159,29 +159,29 @@ export function OperationsExecutionStepper({
                     <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {step.owner ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                           Owner: {step.owner}
                         </span>
                       ) : null}
                       {step.approvalStatus ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                           {step.approvalStatus}
                         </span>
                       ) : null}
                       {step.changeSignal ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                           Check again if: {step.changeSignal}
                         </span>
                       ) : null}
                       <a
                         href="#planning-stepper"
-                        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                       >
                         {resolveOperationsExecutionStepReturnLabel()}
                       </a>
                     </div>
                   </div>
-                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100 shadow-[0_10px_20px_-18px_rgba(14,165,233,0.55)]">
+                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100 shadow-[0_10px_20px_-18px_rgba(14,165,233,0.55)]">
                     Current
                   </span>
                 </div>
@@ -201,13 +201,13 @@ export function OperationsExecutionStepper({
                 <h3 className="text-base font-semibold tracking-[-0.01em] text-slate-100">{step.title}</h3>
                 <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.summary}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                     Owner: {step.owner}
                   </span>
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                     {step.approvalStatus}
                   </span>
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold text-slate-100">
+                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
                     Check again if: {step.changeSignal}
                   </span>
                 </div>

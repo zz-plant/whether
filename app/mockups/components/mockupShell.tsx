@@ -68,7 +68,7 @@ export function MockupShell({
       <section className="weather-panel sticky top-4 z-20 rounded-lg border border-slate-700/80 px-4 py-4 shadow-[0_24px_50px_-40px_rgba(2,6,23,0.9)] backdrop-blur-xl">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
               Visual Lab
             </p>
             <div className="space-y-1">
@@ -84,7 +84,7 @@ export function MockupShell({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
                 Viewport
               </p>
               <div className="flex flex-wrap gap-2">
@@ -106,7 +106,7 @@ export function MockupShell({
             </div>
 
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
                 Density
               </p>
               <div className="flex flex-wrap gap-2">

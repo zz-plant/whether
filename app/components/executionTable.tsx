@@ -20,7 +20,7 @@ const HeaderTooltip = ({ label, detail }: { label: string; detail: string }) => 
     <Tooltip.Trigger className="underline decoration-dotted underline-offset-4">{label}</Tooltip.Trigger>
     <Tooltip.Portal>
       <Tooltip.Positioner side="top" sideOffset={8}>
-        <Tooltip.Popup className="max-w-[220px] rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] normal-case tracking-normal text-slate-200 shadow-lg">
+        <Tooltip.Popup className="max-w-[220px] rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-fluid-xs normal-case tracking-normal text-slate-200 shadow-lg">
           {detail}
         </Tooltip.Popup>
       </Tooltip.Positioner>

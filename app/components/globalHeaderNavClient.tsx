@@ -74,7 +74,7 @@ function NavigationLinkCard({
         }`}
       >
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/90">
+          <span className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-300/90">
             {presentation.eyebrow}
           </span>
           <span className="weather-nav-card-index" aria-hidden="true">
@@ -84,7 +84,7 @@ function NavigationLinkCard({
         <span className="mt-1 font-[family:var(--weather-font-display)] text-sm font-semibold tracking-[-0.02em] sm:text-[1.02rem]">
           {link.label}
         </span>
-        <span className="text-[11px] font-medium leading-relaxed text-slate-200/90">
+        <span className="text-fluid-xs font-medium leading-relaxed text-slate-200/90">
           {presentation.prompt}
         </span>
       </Link>
@@ -107,7 +107,7 @@ function CompactNavigationLink({
         onMouseEnter={() => onIntent(link.href)}
         onFocus={() => onIntent(link.href)}
         title={link.description}
-        className={`inline-flex min-h-[32px] items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium tracking-[0.01em] no-underline touch-manipulation transition-colors ${
+        className={`inline-flex min-h-[32px] items-center gap-1.5 rounded-full border px-2.5 py-1 text-fluid-micro font-medium tracking-[0.01em] no-underline touch-manipulation transition-colors ${
           link.isActive
             ? "border-slate-700/80 bg-slate-900/80 text-slate-50"
             : "border-transparent text-slate-400 hover:border-slate-800 hover:bg-slate-950/60 hover:text-slate-100"
@@ -274,13 +274,13 @@ export function GlobalHeaderNavRail({
       </div>
       <div className="mb-2 flex items-start justify-between gap-3 sm:hidden">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
             Navigation
           </p>
-          <p className="truncate text-[13px] font-medium text-slate-200">
+          <p className="truncate text-fluid-sm font-medium text-slate-200">
             {activeRouteLabel}
           </p>
-          <p className="pt-1 text-[11px] leading-relaxed text-slate-400">
+          <p className="pt-1 text-fluid-xs leading-relaxed text-slate-400">
             {hasScrollableOverflow
               ? isMenuOpen
                 ? `${activeLink?.label ?? "Weekly Brief"} is active. Swipe or use the arrows to move between the main pages.`
