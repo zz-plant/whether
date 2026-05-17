@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
+import { CloseIcon } from "./uiIcons";
 
 const STAGE_KEY = "whether-company-stage";
 const SENSITIVITY_KEY = "whether-rate-sensitivity";
@@ -92,7 +93,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
             aria-label="Close settings"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 

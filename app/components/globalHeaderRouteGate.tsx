@@ -16,6 +16,7 @@ import { ThemeToggleButton } from "./themeToggleButton";
 import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 import { SettingsPanel } from "./settingsPanel";
 import { ShareRail } from "./shareRail";
+import { SettingsIcon, ChevronDownIcon } from "./uiIcons";
 import { TimeMachineDatePicker } from "./timeMachineDatePicker";
 
 export const reportHeaderNextStep = (pathname: string) => {
@@ -150,7 +151,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     className="weather-button inline-flex min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm"
                     aria-label="Settings"
                   >
-                    ⚙
+                    <SettingsIcon />
                   </button>
                   <ThemeToggleButton className="min-h-[36px]" />
                 </>
@@ -175,7 +176,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
               aria-expanded={showMobileNav}
             >
               Browse workflow
-              <span className={`transition-transform duration-200 ${showMobileNav ? "rotate-180" : ""}`}>▾</span>
+              <ChevronDownIcon className={`h-3.5 w-3.5 transition-transform duration-200 ${showMobileNav ? "rotate-180" : ""}`} />
             </button>
             <div
               className={`overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { CloseIcon } from "./uiIcons";
 
 type CoverageMap = Record<number, number[]>; // year -> months[]
 
@@ -69,7 +70,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
             aria-label="Close"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 

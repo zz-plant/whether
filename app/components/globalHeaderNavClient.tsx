@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "./uiIcons";
 import {
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
@@ -230,7 +231,7 @@ export function GlobalHeaderNavRail({
         disabled={!canScrollPrev}
         onClick={() => scrollRail(-1)}
       >
-        ←
+        <ChevronLeftIcon />
       </button>
       <button
         type="button"
@@ -239,7 +240,7 @@ export function GlobalHeaderNavRail({
         disabled={!canScrollNext}
         onClick={() => scrollRail(1)}
       >
-        →
+        <ChevronRightIcon />
       </button>
     </div>
   );

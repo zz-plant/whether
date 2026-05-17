@@ -12,6 +12,10 @@ import Shield from "lucide-react/dist/esm/icons/shield.js";
 import Target from "lucide-react/dist/esm/icons/target.js";
 import TrendingUp from "lucide-react/dist/esm/icons/trending-up.js";
 import Waypoints from "lucide-react/dist/esm/icons/waypoints.js";
+import XClose from "lucide-react/dist/esm/icons/x.js";
+import Settings from "lucide-react/dist/esm/icons/settings.js";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left.js";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right.js";
 import Zap from "lucide-react/dist/esm/icons/zap.js";
 import type { SVGProps } from "react";
 
@@ -72,6 +76,22 @@ export const HistoryIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props
 
 export const AuditIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <ScanSearch className={className} {...baseProps} {...props} />
+);
+
+export const CloseIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <XClose className={className} {...baseProps} {...props} />
+);
+
+export const SettingsIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <Settings className={className} {...baseProps} {...props} />
+);
+
+export const ChevronLeftIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <ChevronLeft className={className} {...baseProps} {...props} />
+);
+
+export const ChevronRightIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <ChevronRight className={className} {...baseProps} {...props} />
 );
 
 export const TrendUpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (

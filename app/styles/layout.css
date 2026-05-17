@@ -36,7 +36,7 @@
   box-shadow:
     0 20px 32px -22px rgba(2, 6, 23, 0.78),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  animation: weather-fade-in 400ms ease-out;
+  animation: weather-fade-in 250ms ease-out;
   container-type: inline-size;
 }
 

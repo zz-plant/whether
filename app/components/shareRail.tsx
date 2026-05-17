@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { CloseIcon } from "./uiIcons";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -60,7 +61,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
             aria-label="Close share panel"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 
