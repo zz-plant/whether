@@ -19,6 +19,7 @@ import {
   HomeKeyTermsDisclosure,
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
+import { HomeDeltaStrip } from "./components/home/deltaStrip";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -175,6 +176,11 @@ export const HomePageReportContent = async ({
       <OperatorContextWrapper />
       <BriefConfigureStrip />
       <FirstVisitBanner />
+      <HomeDeltaStrip
+        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+        recordDate={homepage.reportShell.recordDateLabel}
+      />
       <HomeRoutePrefetch />
       <ErrorBoundary label="Weekly decision card">
         <HomeWhatChangedSection
