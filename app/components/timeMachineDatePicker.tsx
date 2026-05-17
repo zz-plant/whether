@@ -56,7 +56,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-start justify-end sm:items-start">
       <div className="fixed inset-0 bg-black/40" onClick={onClose} />
       <aside
-        className="weather-slide-panel relative z-10 mt-14 mr-2 w-[18rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
+        className="weather-slide-panel relative z-10 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[18rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
         role="dialog"
         aria-label="Time machine"
       >
@@ -66,7 +66,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
           </h2>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
             aria-label="Close"
           >
             ✕

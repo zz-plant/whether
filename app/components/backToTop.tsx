@@ -33,7 +33,7 @@ export function BackToTop({ threshold = SCROLL_THRESHOLD }: { threshold?: number
     <button
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-6 right-6 z-40 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/70 bg-slate-950/90 text-sm font-semibold text-slate-200 shadow-lg backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-sky-500/40 hover:text-sky-100 focus-visible:outline-2 focus-visible:outline-sky-400 sm:bottom-8 sm:right-8"
+      className="fixed bottom-6 right-6 z-40 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/70 bg-slate-950/90 text-sm font-semibold text-slate-200 shadow-lg backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-sky-500/40 hover:text-sky-100 focus-visible:outline-2 focus-visible:outline-sky-400 sm:bottom-8 sm:right-8" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
       aria-label="Back to top"
     >
       <svg
