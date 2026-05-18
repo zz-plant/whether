@@ -7,7 +7,6 @@
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
-import { SwipeableSection } from "./swipeableSection";
 import { DisplayModeToggle } from "./displayModeToggle";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import {
@@ -252,28 +251,24 @@ export const ReportShell = (props: ReportShellProps) => {
 
               {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
 
-              <SwipeableSection
-                sections={contentSections.map((section, index) => {
+              <div className="divide-y divide-white/[0.04]">
+                {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
                       ? section.key
                       : `section-${index}`;
-                  return {
-                    key: sectionKey,
-                    content: (
-                      <>
-                        {section}
-                        {renderTrustAfterFirstSection && index === 0 ? (
-                          <div className="mt-4">
-                            <InlineTrustBlock {...trustBlockProps} />
-                          </div>
-                        ) : null}
-                      </>
-                    ),
-                  };
+                  return (
+                    <div key={sectionKey} className={index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}>
+                      {section}
+                      {renderTrustAfterFirstSection && index === 0 ? (
+                        <div className="mt-4">
+                          <InlineTrustBlock {...trustBlockProps} />
+                        </div>
+                      ) : null}
+                    </div>
+                  );
                 })}
-                className="space-y-6 lg:space-y-8"
-              />
+              </div>
 
               <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
                 <p>{INTERNAL_USE_LABEL}</p>
