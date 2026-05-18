@@ -9,10 +9,10 @@ type RegimeExplainerProps = {
 };
 
 const REGIME_DESCRIPTIONS: Record<string, string> = {
-  SCARCITY: "Cash and credit are tight. Market risk appetite is low. Prioritize cash preservation.",
-  DEFENSIVE: "Cash and credit are tight, but market risk appetite is still healthy. Gate new commitments to short-payback work.",
-  VOLATILE: "Cash and credit are available, but market risk appetite is low. Proceed with caution — conditions can shift quickly.",
-  EXPANSION: "Cash and credit are available and market risk appetite is high. Scale proven bets with milestone-based gates.",
+  SCARCITY: "Credit is tight and investors are cautious. Focus on cash preservation and delay non-essential spend.",
+  DEFENSIVE: "Credit is tight but investors are still willing to fund growth. Gate new commitments to short-payback work.",
+  VOLATILE: "Credit is available but investors are cautious. Favor reversible decisions — conditions can shift quickly.",
+  EXPANSION: "Credit is available and investors are optimistic. Scale proven bets with milestone-based approval gates.",
 };
 
 export function RegimeExplainer({

@@ -21,7 +21,13 @@ import {
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 import { DecisionTracker } from "./components/home/decisionTracker";
+import { RitualComplete } from "./components/home/ritualComplete";
+import { InlineSubscribe } from "./components/home/inlineSubscribe";
+import { HowItWorks } from "./components/home/howItWorks";
+import { StartupActivity } from "./components/home/startupActivity";
+import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator";
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
+import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
@@ -240,6 +246,20 @@ export const HomePageReportContent = async ({
           </div>
         </ErrorBoundary>
 
+        <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
+        <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
+
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
+          <div>
+            <p className="text-fluid-micro text-slate-500">
+              Next brief: Monday &middot; <a href="/share" className="underline decoration-slate-600 hover:decoration-sky-400">Share with your team</a>
+            </p>
+            <StartupActivity />
+            <SaaSMultiplesIndicator />
+          </div>
+          <InlineSubscribe />
+        </div>
+
         <PageDeltaSummary
         regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
         tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
@@ -262,6 +282,7 @@ export const HomePageReportContent = async ({
       </div>
 
       <HomeRoutePrefetch />
+      <HowItWorks />
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}
         interpretationSearchParams={homepage.interpretationSearchParams}

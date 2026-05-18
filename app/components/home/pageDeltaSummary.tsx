@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { RegimeCompass } from "../regimeCompass";
 import { RegimeExplainer } from "./regimeExplainer";
+import { RegimeContextBlock } from "./regimeContextBlock";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -19,8 +21,8 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const SCORE_TOOLTIPS = {
-  tightness: "Tightness measures how constrained cash and credit conditions are. Higher = tighter = harder to raise or spend.",
-  risk: "Risk appetite measures market willingness to fund growth. Higher = easier to raise capital or take risk.",
+  tightness: "Credit conditions measure how constrained cash and credit are. Higher = tighter = harder to raise or spend. Scale: 0 (easiest) to 100 (tightest).",
+  risk: "Investor sentiment measures market willingness to fund growth. Higher = easier to raise capital. Scale: 0 (most cautious) to 100 (most optimistic).",
 };
 
 export function PageDeltaSummary({
@@ -63,6 +65,17 @@ export function PageDeltaSummary({
   const regimeLabel = regimeKey ? REGIME_LABELS[regimeKey] ?? regimeKey.toLowerCase() : "unknown";
   const hasDelta = tightnessDelta !== 0 || riskAppetiteDelta !== 0;
   const directionWord = directionLabel ?? (tightnessDelta > 0 ? "tightening" : riskAppetiteDelta > 0 ? "easing" : "stable");
+  const [showFull, setShowFull] = useState(false);
+
+  useEffect(() => {
+    const vc = Number(localStorage.getItem("whether_visit_count") ?? "0");
+    if (vc >= 2) setShowFull(true);
+    else {
+      /* Show the full view after a short delay so returning users see it immediately */
+      const timer = setTimeout(() => setShowFull(true), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   return (
     <div className="mb-3 rounded-lg border border-slate-800/60 bg-slate-950/50 px-4 py-3 text-xs sm:px-5 sm:text-sm">
@@ -90,7 +103,7 @@ export function PageDeltaSummary({
           </p>
           <div className="mt-2 flex gap-4 text-sm">
             <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Tightness</span>
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Credit conditions</span>
               <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.tightness}>
                 {tightness}
                 {tightnessDelta !== 0 ? (
@@ -101,7 +114,7 @@ export function PageDeltaSummary({
               </p>
             </div>
             <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Risk</span>
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Investor sentiment</span>
               <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.risk}>
                 {riskAppetite}
                 {riskAppetiteDelta !== 0 ? (
@@ -133,8 +146,18 @@ export function PageDeltaSummary({
             </span>
           ) : null}
         </div>
+        {!showFull ? (
+          <div className="flex flex-col justify-center">
+            <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
+              Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
+            </p>
+          </div>
+        ) : (
         <div className="flex flex-col">
-          <RegimeCompass
+          <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
+          Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
+        </p>
+        <RegimeCompass
             tightness={tightness}
             riskAppetite={riskAppetite}
             prevTightness={tightness - tightnessDelta}
@@ -147,6 +170,13 @@ export function PageDeltaSummary({
             riskAppetite={riskAppetite}
             tightnessThreshold={tightnessThreshold ?? 70}
             riskAppetiteThreshold={riskAppetiteThreshold ?? 50}
+          />
+          <RegimeContextBlock
+            regimeKey={regimeKey}
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            tightnessDelta={tightnessDelta}
+            riskAppetiteDelta={riskAppetiteDelta}
           />
           {regimeKey ? (
             <div className="mt-3 pt-3 border-t border-slate-700/50">
@@ -177,6 +207,7 @@ export function PageDeltaSummary({
             </div>
           ) : null}
         </div>
+        )}
       </div>
     </div>
   );

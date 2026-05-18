@@ -10,7 +10,7 @@ const interpretationLabels: Record<InterpretationView, string> = {
   sector: "Sector",
   company: "Company",
   financial: "Financial",
-  forecast: "Call",
+  forecast: "Stance",
 };
 
 const pickCue = (bullets: string[], prefix: "Action:" | "Pause if:" | "Clears when:") => {
