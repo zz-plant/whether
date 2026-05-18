@@ -18,22 +18,43 @@ export type EmailDeliveryAdapter = {
 };
 
 /**
- * Cloudflare Email Service adapter stub.
- * Replace the implementation with Cloudflare bindings when deployed.
+ * Cloudflare Email Service adapter.
+ * Uses the EMAIL binding available at globalThis in the Workers runtime.
+ * Falls back to a console stub when the binding is unavailable (local dev).
  */
 export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
+  const emailBinding = (globalThis as { EMAIL?: { send: (msg: {
+    to: string;
+    from: { email: string; name: string };
+    subject: string;
+    html: string;
+    text: string;
+  }) => Promise<unknown> } }).EMAIL;
+
+  if (!emailBinding) {
+    console.warn("[EMAIL] No EMAIL binding found — using stub. Add send_email binding to wrangler.toml.");
+    return {
+      send: async ({ to, subject }) => {
+        console.log(`[EMAIL STUB] To: ${to.email} | Subject: ${subject}`);
+        return { ok: true };
+      },
+    };
+  }
+
   return {
     send: async ({ to, subject, html, text }) => {
-      // Cloudflare Email Worker integration point:
-      // await sendEmail({
-      //   to: to.email,
-      //   from: "brief@whether.app",
-      //   subject,
-      //   html,
-      //   text,
-      // });
-      console.log(`[EMAIL STUB] To: ${to.email} (${to.name ?? "no name"}) | Subject: ${subject}`);
-      return { ok: true };
+      try {
+        await emailBinding.send({
+          to: to.email,
+          from: { email: "brief@whether.work", name: "Whether Brief" },
+          subject,
+          html,
+          text,
+        });
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, error: error instanceof Error ? error.message : String(error) };
+      }
     },
   };
 };
