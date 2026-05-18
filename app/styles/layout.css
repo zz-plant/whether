@@ -69,9 +69,9 @@
 
 .weather-page-shell {
   @apply mx-auto flex w-full flex-col;
-  gap: var(--weather-shell-gap);
-  padding-inline: var(--weather-shell-pad-inline);
-  padding-block: var(--weather-shell-pad-block);
+  gap: clamp(1rem, 0.85rem + 1.5vw, 2.5rem);
+  padding-inline: clamp(0.65rem, 0.5rem + 1.5vw, 2rem);
+  padding-block: clamp(1rem, 1rem + 2vw, 3rem);
 }
 
 .weather-secondary-shell {
@@ -141,11 +141,11 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgb(148 163 184 / 1.0);
-  font-size: var(--weather-font-size-micro);
+  font-size: var(--fs-micro);
 }
 
 .weather-hub-title {
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   font-size: clamp(2.3rem, 1.8rem + 2.1vw, 4.35rem);
   line-height: 0.98;
   letter-spacing: -0.035em;
@@ -223,10 +223,10 @@
   box-shadow:
     0 8px 16px -12px var(--shadow-mid);
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    background-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out);
 }
 
 .weather-hub-link-card:hover {
@@ -348,10 +348,10 @@
   box-shadow:
     0 8px 16px -12px var(--shadow-mid);
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    background-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out);
 }
 
 .weather-route-card:hover {
@@ -401,7 +401,7 @@
 }
 
 .weather-secondary-title {
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
   line-height: 0.98;
   letter-spacing: -0.05em;
@@ -439,7 +439,7 @@
 }
 
 .weather-secondary-section-title {
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -752,9 +752,9 @@
   text-decoration: none;
   cursor: pointer;
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out);
 }
 
 .home-band-link-card:hover {
@@ -887,11 +887,6 @@
 
 /* Tiny screen / short viewport — compact header and tighter spacing */
 @media (max-height: 700px) {
-  :root {
-    --weather-shell-pad-block: clamp(0.75rem, 0.75rem + 0.5vw, 1.5rem);
-    --weather-shell-gap: clamp(0.5rem, 0.5rem + 1vw, 1.5rem);
-  }
-
   .weather-page-shell {
     padding-block: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
   }

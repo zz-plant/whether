@@ -24,6 +24,7 @@ import { DecisionTracker } from "./components/home/decisionTracker";
 import { RitualComplete } from "./components/home/ritualComplete";
 import { InlineSubscribe } from "./components/home/inlineSubscribe";
 import { HowItWorks } from "./components/home/howItWorks";
+import { DiscoverabilityStrip } from "./components/home/discoverabilityStrip";
 import { StartupActivity } from "./components/home/startupActivity";
 import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator";
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
@@ -281,6 +282,7 @@ export const HomePageReportContent = async ({
       />
       </div>
 
+      <DiscoverabilityStrip />
       <HomeRoutePrefetch />
       <HowItWorks />
       <HomeRevisitFlipSection

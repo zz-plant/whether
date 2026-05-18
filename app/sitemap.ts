@@ -108,6 +108,17 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/embed", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
+    { path: "/this-week", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.85 },
+    { path: "/current-regime", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
+    { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
+    { path: "/threshold", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
+    { path: "/template", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
+    { path: "/regime-changes", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.72 },
+    { path: "/archive", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.68 },
+    { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+    { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
+    { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
+    { path: "/feed.xml", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 },
   ];
 
   const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages

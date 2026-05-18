@@ -19,11 +19,10 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
-  --accent-blue: #0284c7;
-  --accent-teal: #0d9488;
-  --semantic-tighten: #dc2626;
-  --semantic-ease: #059669;
-  --semantic-caution: #d97706;
+  --accent-action: #0284c7;
+  --accent-success: #0d9488;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
 }
 
 :root[data-theme="light"] body {
@@ -69,7 +68,7 @@
 
 :root[data-theme="light"] a.weather-chip:hover,
 :root[data-theme="light"] button.weather-chip:hover {
-  border-color: var(--accent-blue);
+  border-color: var(--accent-action);
   background: var(--bg-raised);
 }
 
@@ -116,8 +115,8 @@
 }
 
 :root[data-theme="light"] .weather-hub-chip:hover {
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
+  border-color: var(--accent-action);
+  color: var(--accent-action);
 }
 
 :root[data-theme="light"] .weather-secondary-header {
@@ -152,15 +151,15 @@
 }
 
 :root[data-theme="light"] .weather-live-hero {
-  border-color: var(--accent-blue);
+  border-color: var(--accent-action);
 }
 
 :root[data-theme="light"] .weather-live-dot {
-  background: var(--accent-teal);
+  background: var(--accent-success);
 }
 
 :root[data-theme="light"] .weather-data-mode-dynamic {
-  border-color: var(--accent-emerald);
+  border-color: var(--accent-success);
   background: rgba(16, 185, 129, 0.08);
   color: var(--semantic-ease);
 }
@@ -199,8 +198,4 @@
 /* TV mode — larger spacing */
 :root[data-display-mode="tv"] {
   font-size: 18px;
-  --weather-shell-gap: clamp(1.5rem, 1rem + 2vw, 4rem);
-  --weather-shell-pad-inline: clamp(1rem, 0.8rem + 2vw, 3rem);
-  --weather-shell-pad-block: clamp(1.5rem, 1.25rem + 2.5vw, 4rem);
-  --weather-card-pad: clamp(1rem, 0.85rem + 0.8vw, 1.75rem);
 }

@@ -236,8 +236,8 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
-  transition: border-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-              background-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
+  transition: border-color var(--transition-fast) var(--ease-out),
+              background-color var(--transition-fast) var(--ease-out);
 }
 
 a .weather-chip:hover,
@@ -256,7 +256,7 @@ button .weather-chip:active,
 }
 
 .weather-chip:focus-visible {
-  outline: 2px solid var(--weather-focus-ring);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
 }
 
@@ -315,7 +315,7 @@ button .weather-chip:active,
 }
 
 .weather-decision-card {
-  padding: var(--weather-card-pad);
+  padding: var(--space-md);
 }
 
 /* Decision delta strip — scannable in <5 seconds */
@@ -324,7 +324,7 @@ button .weather-chip:active,
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem var(--weather-card-pad);
+  padding: 0.5rem var(--space-md);
   border-bottom: 1px solid var(--border-faint);
   font-variant-numeric: tabular-nums;
 }
@@ -402,9 +402,9 @@ button .weather-chip:active,
 .weather-command-bar__card {
   height: 100%;
   transition:
-    transform var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
+    transform var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out);
 }
 
 .weather-command-bar__card:hover,
@@ -450,9 +450,9 @@ button .weather-chip:active,
 
 .weather-live-chip {
   transition:
-    transform var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
+    transform var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    background-color var(--transition-fast) var(--ease-out);
 }
 
 
@@ -460,8 +460,8 @@ button .weather-chip:active,
 
 .weather-motion-card {
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out);
 }
 
 .weather-signal-cell {
@@ -543,7 +543,7 @@ button .weather-chip:active,
 .weather-pill {
   @apply border border-slate-700/70 bg-slate-950/75;
   min-height: 46px;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   padding-inline: 1rem;
   font-variant-numeric: tabular-nums;
   border-color: var(--border-strong);
@@ -558,14 +558,14 @@ button .weather-chip:active,
 
 .weather-pill-muted {
   @apply border border-slate-700/75 bg-slate-900/65 text-slate-200;
-  border-radius: var(--weather-radius-chip);
+  border-radius: var(--radius-full);
   background-image: linear-gradient(120deg, rgba(99, 102, 241, 0.08), rgba(15, 23, 42, 0.24));
 }
 
 .weather-tab {
   @apply border border-slate-700/70 bg-slate-950/75 backdrop-blur-sm;
   min-height: 46px;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   padding-inline: 0.95rem;
   font-variant-numeric: tabular-nums;
   border-color: var(--border-strong);
@@ -577,17 +577,17 @@ button .weather-chip:active,
     0 18px 30px -20px rgba(2, 6, 23, 0.72),
     0 6px 14px -12px rgba(245, 158, 11, 0.12);
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out),
+    background-color var(--transition-base) var(--ease-out);
 }
 
 .weather-input {
   @apply border border-slate-800/70 bg-slate-950/70 text-slate-100;
   min-height: 44px;
-  border-radius: var(--weather-radius-surface);
+  border-radius: var(--radius-lg);
   font-size: 16px;
   font-variant-numeric: tabular-nums;
   border-color: var(--border-strong);
@@ -602,7 +602,7 @@ button .weather-chip:active,
   @apply w-full px-3 py-2 text-sm;
   min-height: 44px;
   font-size: 16px;
-  border-radius: var(--weather-radius-surface);
+  border-radius: var(--radius-lg);
   border-width: 1px;
   color: rgb(241 245 249);
   border-color: var(--border-strong);
@@ -622,7 +622,7 @@ button .weather-chip:active,
 
 .weather-button {
   @apply border border-slate-700/75 text-slate-200;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   border-color: var(--border-strong);
@@ -633,40 +633,40 @@ button .weather-chip:active,
     0 10px 18px -18px rgba(2, 6, 23, 0.62);
   text-decoration: none;
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out),
+    background-color var(--transition-base) var(--ease-out);
 }
 
 .weather-button-primary {
   @apply border border-sky-400/60 text-slate-100;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   background: var(--cta-gradient);
   box-shadow: var(--cta-shadow);
   text-decoration: none;
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-position var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out),
+    background-position var(--transition-base) var(--ease-out);
 }
 
 .weather-cta {
   @apply inline-flex items-center justify-center border text-xs font-semibold leading-tight tracking-[0.12em] no-underline;
   min-height: 46px;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   padding: 0.55rem 1.05rem;
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    background-color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out),
+    background-color var(--transition-base) var(--ease-out);
 }
 
 :where(a.weather-pill, a.weather-button, a.weather-button-primary, a.weather-cta, a.weather-hub-link-card, a.weather-hub-chip) {
@@ -684,7 +684,7 @@ button .weather-chip:active,
   border-color: rgba(156, 204, 255, 0.42);
   color: rgb(241 245 249);
   background: linear-gradient(180deg, rgba(9, 53, 99, 0.76), rgba(8, 34, 72, 0.8));
-  box-shadow: var(--weather-secondary-shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 .weather-cta-export {
@@ -706,10 +706,10 @@ button .weather-chip:active,
 .weather-icon-chip,
 .weather-surface {
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out);
 }
 
 .weather-tab:focus-visible,
@@ -720,9 +720,9 @@ button .weather-chip:active,
 .weather-icon-chip:focus-visible,
 .weather-route-card:focus-visible,
 .weather-hub-link-card:focus-visible {
-  outline: 2px solid var(--weather-focus-ring);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--weather-focus-halo);
+  box-shadow: 0 0 0 4px var(--accent-info);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -769,7 +769,7 @@ button .weather-chip:active,
 
   .weather-cta-secondary:hover {
     border-color: rgba(129, 140, 248, 0.42);
-    box-shadow: var(--weather-secondary-shadow-hover);
+    box-shadow: var(--shadow-md);
   }
 
   .weather-cta-export:hover {
@@ -805,7 +805,7 @@ button .weather-chip:active,
   top: 1rem;
   z-index: 50;
   transform: translateY(-200%);
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-strong);
   background: rgba(15, 23, 42, 0.95);
   padding: 0.6rem 1.2rem;
@@ -823,10 +823,10 @@ button .weather-chip:active,
   display: inline-flex;
   min-height: 36px;
   align-items: center;
-  border-radius: var(--weather-radius-control);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   padding: 0.45rem 0.8rem;
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   font-size: 0.94rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -840,10 +840,10 @@ button .weather-chip:active,
     inset 0 0 0 1px rgba(125, 211, 252, 0.04),
     0 14px 24px -24px rgba(2, 6, 23, 0.68);
   transition:
-    transform var(--weather-interactive-duration) var(--weather-interactive-ease),
-    border-color var(--weather-interactive-duration) var(--weather-interactive-ease),
-    box-shadow var(--weather-interactive-duration) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration) var(--weather-interactive-ease);
+    transform var(--transition-base) var(--ease-out),
+    border-color var(--transition-base) var(--ease-out),
+    box-shadow var(--transition-base) var(--ease-out),
+    color var(--transition-base) var(--ease-out);
 }
 
 .weather-brand-mark:hover {
@@ -883,39 +883,39 @@ button .weather-chip:active,
 .type-headline {
   @apply font-semibold leading-[1.08] tracking-tight;
   font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3.75rem);
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   letter-spacing: -0.05em;
 }
 
 .type-section {
   @apply font-semibold leading-snug;
   font-size: clamp(1.5rem, 1.125rem + 1.5vw, 1.875rem);
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
   letter-spacing: -0.04em;
 }
 
 .type-label {
   @apply font-semibold tracking-[0.08em] leading-none uppercase;
-  font-size: var(--weather-font-size-micro);
+  font-size: var(--fs-micro);
 }
 
 .type-kicker {
   @apply font-semibold tracking-[0.08em] text-slate-400;
-  font-size: var(--weather-font-size-micro);
+  font-size: var(--fs-micro);
 }
 
 .type-data {
   @apply leading-relaxed;
-  font-size: var(--weather-font-size-base);
+  font-size: var(--fs-base);
 }
 
-.text-fluid-micro { font-size: var(--weather-font-size-micro); }
-.text-fluid-xs { font-size: var(--weather-font-size-xs); }
-.text-fluid-sm { font-size: var(--weather-font-size-sm); }
-.text-fluid-base { font-size: var(--weather-font-size-base); }
-.text-fluid-lg { font-size: var(--weather-font-size-lg); }
-.text-fluid-xl { font-size: var(--weather-font-size-xl); }
-.text-fluid-2xl { font-size: var(--weather-font-size-2xl); }
+.text-fluid-micro { font-size: var(--fs-micro); }
+.text-fluid-xs { font-size: var(--fs-micro); }
+.text-fluid-sm { font-size: var(--fs-sm); }
+.text-fluid-base { font-size: var(--fs-base); }
+.text-fluid-lg { font-size: var(--fs-lg); }
+.text-fluid-xl { font-size: var(--fs-xl); }
+.text-fluid-2xl { font-size: var(--fs-2xl); }
 
 :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   line-height: 1.7;
@@ -927,7 +927,7 @@ button .weather-chip:active,
 }
 
 :where(h1, h2) {
-  font-family: var(--weather-font-display);
+  font-family: var(--font-display);
 }
 
 img,
@@ -937,7 +937,7 @@ svg {
 }
 
 a:focus-visible {
-  outline: 2px solid var(--weather-focus-ring);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -1249,8 +1249,8 @@ html {
 
 .weather-disclosure-trigger-indicator {
   transition:
-    transform var(--weather-interactive-duration-fast) var(--weather-interactive-ease),
-    color var(--weather-interactive-duration-fast) var(--weather-interactive-ease);
+    transform var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out);
 }
 
 
@@ -1260,9 +1260,9 @@ select:focus-visible,
 textarea:focus-visible,
 input:focus-visible,
 summary:focus-visible {
-  outline: 2px solid var(--weather-focus-ring);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--weather-focus-halo);
+  box-shadow: 0 0 0 4px var(--accent-info);
 }
 
 :where(.weather-panel a, .weather-surface a) {
@@ -1390,7 +1390,7 @@ body::-webkit-scrollbar-thumb:hover,
 
 .weather-mobile-nav {
   @apply border border-white/[0.08] bg-slate-950/90 backdrop-blur-2xl;
-  border-radius: var(--weather-radius-panel);
+  border-radius: var(--radius-xl);
   box-shadow:
     0 -20px 40px -28px rgba(2, 6, 23, 0.92),
     0 -8px 18px -14px var(--accent-border-soft);
@@ -1400,7 +1400,7 @@ body::-webkit-scrollbar-thumb:hover,
 
 .weather-mobile-panel {
   @apply border border-white/[0.08] bg-slate-950/95 backdrop-blur-2xl;
-  border-radius: var(--weather-radius-panel);
+  border-radius: var(--radius-xl);
   box-shadow:
     0 22px 44px -32px rgba(2, 6, 23, 0.88),
     0 10px 22px -18px rgba(56, 189, 248, 0.18);

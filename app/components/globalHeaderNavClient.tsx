@@ -99,19 +99,42 @@ function SecondaryNavLinks() {
   const [showMore, setShowMore] = useState(false);
   const secondaryLinks = [
     { href: "/share" as Route, label: "Share" },
-    { href: "/toolkits" as Route, label: "Toolkits" },
-    { href: "/answers" as Route, label: "Answers" },
+    { href: "/this-week" as Route, label: "This Week" },
+    { href: "/comps" as Route, label: "Multiples" },
+    { href: "/history" as Route, label: "History" },
+    { href: "/regime-changes" as Route, label: "Changes" },
+  ];
+  const secondaryLinks2 = [
+    { href: "/archive" as Route, label: "Archive" },
+    { href: "/api-docs" as Route, label: "API" },
   ];
   const moreLinks = [
-    { href: "/history" as Route, label: "History" },
+    { href: "/threshold" as Route, label: "Decision Framework" },
+    { href: "/template" as Route, label: "Decision Template" },
+    { href: "/feed.xml" as Route, label: "RSS Feed" },
     { href: "/resources" as Route, label: "Resources" },
-    { href: "/guides" as Route, label: "Guides" },
     { href: "/settings" as Route, label: "Settings" },
   ];
 
   return (
     <nav aria-label="More pages" className="flex items-center gap-1">
       {secondaryLinks.map((link) => {
+        const isActive = pathname.startsWith(link.href);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`rounded-full px-2.5 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors ${
+              isActive
+                ? "bg-slate-800/70 text-slate-200"
+                : "text-slate-500 hover:text-slate-300"
+            }`}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+      {secondaryLinks2.map((link) => {
         const isActive = pathname.startsWith(link.href);
         return (
           <Link
@@ -209,10 +232,13 @@ function MobileNavSheet({
           })}
         </nav>
         <div className="mt-4 border-t border-slate-800/60 pt-3">
+          <Link href="/this-week" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">This Week</Link>
           <Link href="/share" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Share</Link>
-          <Link href="/toolkits" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Toolkits</Link>
+          <Link href="/comps" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Multiples</Link>
           <Link href="/history" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">History</Link>
-          <Link href="/answers" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Answers</Link>
+          <Link href="/threshold" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Framework</Link>
+          <Link href="/comps" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">SaaS Multiples</Link>
+          <Link href="/threshold" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Decision Framework</Link>
         </div>
       </div>
     </div>

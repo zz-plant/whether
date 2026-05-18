@@ -3,22 +3,17 @@
 import { useEffect, useState } from "react";
 
 const COMPLETE_KEY = "whether_reviewed";
-const NOTE_KEY = "whether_decision_note";
 
 export function RitualComplete({ recordDate }: { recordDate?: string }) {
   const [reviewed, setReviewed] = useState(false);
   const [streak, setStreak] = useState(0);
-  const [note, setNote] = useState("");
-  const [saving, setSaving] = useState(false);
-
   useEffect(() => {
     if (!recordDate) return;
     try {
       const stored = localStorage.getItem(COMPLETE_KEY);
       if (stored) {
-        const data = JSON.parse(stored) as Record<string, { reviewed: boolean; note: string }>;
+        const data = JSON.parse(stored) as Record<string, { reviewed: boolean }>;
         if (data[recordDate]?.reviewed) setReviewed(true);
-        if (data[recordDate]?.note) setNote(data[recordDate].note);
       }
       /* Calculate streak */
       const allKeys = Object.keys(JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}")).sort().reverse();
@@ -31,26 +26,15 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
     } catch { /* ignore */ }
   }, [recordDate]);
 
-  const save = (reviewedStatus: boolean, noteText: string) => {
-    if (!recordDate) return;
-    try {
-      const stored = JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}");
-      stored[recordDate] = { reviewed: reviewedStatus, note: noteText };
-      localStorage.setItem(COMPLETE_KEY, JSON.stringify(stored));
-      localStorage.setItem(NOTE_KEY, noteText);
-    } catch { /* ignore */ }
-  };
-
   const handleReview = () => {
     const next = !reviewed;
     setReviewed(next);
-    save(next, note);
-  };
-
-  const handleNoteSave = () => {
-    setSaving(true);
-    save(reviewed, note);
-    setTimeout(() => setSaving(false), 1000);
+    if (!recordDate) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}");
+      stored[recordDate] = { reviewed: next };
+      localStorage.setItem(COMPLETE_KEY, JSON.stringify(stored));
+    } catch { /* ignore */ }
   };
 
   if (!recordDate) return null;
@@ -79,22 +63,6 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
         ) : null}
       </div>
 
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="This week I decided to..."
-          className="weather-input flex-1 min-h-[44px] rounded-md px-3 py-2 text-xs"
-        />
-        <button
-          type="button"
-          onClick={handleNoteSave}
-          className="weather-button min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold"
-        >
-          {saving ? "Saved" : "Save"}
-        </button>
-      </div>
     </div>
   );
 }
