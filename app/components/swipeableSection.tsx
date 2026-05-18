@@ -13,19 +13,40 @@ type SwipeableSectionProps = {
   className?: string;
 };
 
-const SWIPE_THRESHOLD = 60;
+const SWIPE_THRESHOLD = 50;
+
+function getIsMobile() {
+  try {
+    return window.matchMedia("(max-width: 639px)").matches;
+  } catch {
+    return false;
+  }
+}
 
 export function SwipeableSection({ sections, className = "" }: SwipeableSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const touchStart = useRef<number | null>(null);
+  const touchMoved = useRef(false);
 
   useEffect(() => {
-    setIsMobile(window.matchMedia("(max-width: 639px)").matches);
+    setIsMobile(getIsMobile());
+    const handler = () => setIsMobile(getIsMobile());
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStart.current = e.touches[0].clientX;
+    touchMoved.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchStart.current === null) return;
+    const delta = e.touches[0].clientX - touchStart.current;
+    if (Math.abs(delta) > 20) {
+      touchMoved.current = true;
+    }
   }, []);
 
   const handleTouchEnd = useCallback(
@@ -50,9 +71,9 @@ export function SwipeableSection({ sections, className = "" }: SwipeableSectionP
   if (!isMobile) {
     return (
       <div className={className}>
-        {sections.map((section, index) => (
-          <div key={section.key} className={index === 0 ? "" : "border-t border-white/[0.04] pt-6 lg:pt-8"}>
-            {section.content}
+        {sections.map((s, index) => (
+          <div key={s.key} className={index === 0 ? "" : "border-t border-white/[0.04] pt-6 lg:pt-8"}>
+            {s.content}
           </div>
         ))}
       </div>
@@ -60,13 +81,18 @@ export function SwipeableSection({ sections, className = "" }: SwipeableSectionP
   }
 
   return (
-    <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className={className}>
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={className}
+    >
       <div key={sections[activeIndex].key} className="transition-opacity duration-200">
         {sections[activeIndex].content}
       </div>
 
       {sections.length > 1 ? (
-        <div className="mt-5 flex justify-center gap-2" role="tablist" aria-label="Section navigation">
+        <div className="mt-4 flex justify-center gap-2" role="tablist" aria-label="Section navigation">
           {sections.map((section, index) => (
             <button
               key={section.key}
