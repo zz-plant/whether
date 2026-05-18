@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
@@ -47,22 +48,15 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   }, [copyToClipboard, buildShareText]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-end sm:items-start">
-      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-      <aside
-        className="weather-slide-panel relative z-10 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[22rem] rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl sm:mr-4"
-        role="dialog"
-        aria-label="Share brief"
-      >
+    <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
+        <Dialog.Popup className="weather-slide-panel fixed z-50 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[22rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Share brief">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Share</h2>
-          <button
-            onClick={onClose}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-            aria-label="Close share panel"
-          >
+          <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">
             <CloseIcon />
-          </button>
+          </Dialog.Close>
         </div>
 
         <div className="mt-4 space-y-3">
@@ -149,7 +143,8 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         </div>
-      </aside>
-    </div>
+      </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

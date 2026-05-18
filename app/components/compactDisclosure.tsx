@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type ComponentProps } from "react";
 import { useSearchParams } from "next/navigation";
+import { Collapsible } from "@base-ui/react/collapsible";
 
 type CompactDisclosureProps = {
   summary: string;
@@ -24,7 +25,6 @@ export const resolveDisclosureInitialOpen = (
   if (!queryKey) {
     return defaultOpen;
   }
-
   return searchParams?.get(queryKey) === queryValue;
 };
 
@@ -36,13 +36,11 @@ export const buildDisclosureHref = (
   queryValue = "1",
 ) => {
   const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
-
   if (nextOpen) {
     nextParams.set(queryKey, queryValue);
   } else {
     nextParams.delete(queryKey);
   }
-
   const nextQuery = nextParams.toString();
   return nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname;
 };
@@ -67,42 +65,29 @@ export function CompactDisclosure({
   }, [initialOpen]);
 
   useEffect(() => {
-    if (!queryKey) {
-      return undefined;
-    }
-
+    if (!queryKey) return undefined;
     const handlePopState = () => {
       setOpen(resolveDisclosureInitialOpen(new URLSearchParams(window.location.search), queryKey, queryValue, defaultOpen));
     };
-
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [defaultOpen, queryKey, queryValue]);
 
   return (
-    <details
-      id={id}
+    <Collapsible.Root
       open={open}
-      onToggle={(event) => {
-        const nextOpen = event.currentTarget.open;
+      onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
-
-        if (!queryKey) {
-          return;
-        }
-
+        if (!queryKey) return;
         const nextHref = buildDisclosureHref(window.location.pathname, new URLSearchParams(window.location.search), queryKey, nextOpen, queryValue);
         const currentHref = `${window.location.pathname}${window.location.search}`;
-
-        if (nextHref === currentHref) {
-          return;
-        }
-
+        if (nextHref === currentHref) return;
         window.history.pushState({}, "", `${nextHref}${window.location.hash}`);
       }}
+      id={id}
       className={className}
     >
-      <summary className={`${summaryClassName} cursor-pointer list-none`}>
+      <Collapsible.Trigger className={`${summaryClassName} flex w-full cursor-pointer items-center justify-between gap-3 text-left`}>
         <span className="min-w-0 flex-1">
           <span className="block">{summary}</span>
           {preview ? (
@@ -111,9 +96,11 @@ export function CompactDisclosure({
             </span>
           ) : null}
         </span>
-        <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-      </summary>
-      {children}
-    </details>
+        <span aria-hidden="true" className={`text-sm transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
+      </Collapsible.Trigger>
+      <Collapsible.Panel className="data-[ending-style]:fade-out data-[starting-style]:fade-out mt-3 transition-[height] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-[ending-style]:animate-out data-[starting-style]:animate-in">
+        {children}
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 }
