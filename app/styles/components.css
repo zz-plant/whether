@@ -1308,7 +1308,7 @@ summary:focus-visible {
   display: none;
 }
 
-:where(details.weather-auto-chevron > summary) {
+:where(.weather-auto-chevron > [role="button"]) {
   display: flex;
   min-height: 44px;
   align-items: center;
@@ -1318,7 +1318,7 @@ summary:focus-visible {
   text-decoration: none;
 }
 
-:where(details.weather-auto-chevron > summary)::after {
+:where(.weather-auto-chevron > [role="button"])::after {
   content: "▾";
   color: rgb(148 163 184);
   font-size: 0.95rem;
@@ -1326,11 +1326,11 @@ summary:focus-visible {
   transition: transform 0.2s ease;
 }
 
-:where(details.weather-auto-chevron[open] > summary)::after {
+:where(.weather-auto-chevron[data-panel-open] > [role="button"])::after {
   transform: rotate(180deg);
 }
 
-:where(details.weather-auto-chevron[open] > summary) {
+:where(.weather-auto-chevron[data-panel-open] > [role="button"]) {
   margin-bottom: 0.9rem;
 }
 

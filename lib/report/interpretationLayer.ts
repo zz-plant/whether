@@ -43,7 +43,7 @@ const compactClause = (value: string, max = 96) => {
   return `${normalized.slice(0, max - 1).trimEnd()}…`;
 };
 
-const boundedLine = (label: "Action" | "Pause if" | "Clears when", value: string) =>
+const boundedLine = (label: "Action" | "Trigger" | "Reverse", value: string) =>
   `${label}: ${compactClause(value)}`;
 
 const boundedTriplet = ({
@@ -57,8 +57,8 @@ const boundedTriplet = ({
 }) =>
   [
     boundedLine("Action", action),
-    boundedLine("Pause if", trigger),
-    boundedLine("Clears when", reverse),
+    boundedLine("Trigger", trigger),
+    boundedLine("Reverse", reverse),
   ].join(" | ");
 
 type FinancialViewInput = {
@@ -131,8 +131,8 @@ export const buildInterpretationLayer = ({
 }): InterpretationLayer => {
   const canonicalBullets = [
     boundedLine("Action", homeBriefModel.decisionShiftSummary),
-    boundedLine("Pause if", homeBriefModel.guardrail),
-    boundedLine("Clears when", homeBriefModel.reversalTrigger),
+    boundedLine("Trigger", homeBriefModel.guardrail),
+    boundedLine("Reverse", homeBriefModel.reversalTrigger),
   ];
 
   if (view === "sector") {
@@ -147,8 +147,8 @@ export const buildInterpretationLayer = ({
         "Translate the weekly call through sector demand context without rewriting the base posture.",
       bullets: [
         boundedLine("Action", sectorShift),
-        boundedLine("Pause if", homeBriefModel.guardrail),
-        boundedLine("Clears when", homeBriefModel.reversalTrigger),
+        boundedLine("Trigger", homeBriefModel.guardrail),
+        boundedLine("Reverse", homeBriefModel.reversalTrigger),
       ],
     };
   }
@@ -207,11 +207,11 @@ export const buildInterpretationLayer = ({
           `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; set pace to match the current window.`,
         ),
         boundedLine(
-          "Pause if",
+          "Trigger",
           `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
         ),
         boundedLine(
-          "Clears when",
+          "Reverse",
           `Use burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%) to move faster or slower.`,
         ),
       ],
@@ -246,10 +246,10 @@ export const buildInterpretationLayer = ({
       bullets: [
         boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
         boundedLine(
-          "Pause if",
+          "Trigger",
           `${forecast.boundaryPressure.distance} points to boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
         ),
-        boundedLine("Clears when", momentumCopy[forecast.boundaryPressure.momentum]),
+        boundedLine("Reverse", momentumCopy[forecast.boundaryPressure.momentum]),
       ],
     };
   }

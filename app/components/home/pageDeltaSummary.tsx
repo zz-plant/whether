@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RegimeCompass } from "../regimeCompass";
 import { RegimeExplainer } from "./regimeExplainer";
 import { RegimeContextBlock } from "./regimeContextBlock";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -66,16 +67,11 @@ export function PageDeltaSummary({
   const hasDelta = tightnessDelta !== 0 || riskAppetiteDelta !== 0;
   const directionWord = directionLabel ?? (tightnessDelta > 0 ? "tightening" : riskAppetiteDelta > 0 ? "easing" : "stable");
   const [showFull, setShowFull] = useState(false);
+  const [visitCount] = useLocalStorageState<number>("whether_visit_count", 0);
 
   useEffect(() => {
-    const vc = Number(localStorage.getItem("whether_visit_count") ?? "0");
-    if (vc >= 2) setShowFull(true);
-    else {
-      /* Show the full view after a short delay so returning users see it immediately */
-      const timer = setTimeout(() => setShowFull(true), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    if (visitCount >= 2) setShowFull(true);
+  }, [visitCount]);
 
   return (
     <div className="mb-3 rounded-lg border border-slate-800/60 bg-slate-950/50 px-4 py-3 text-xs sm:px-5 sm:text-sm">
@@ -103,7 +99,10 @@ export function PageDeltaSummary({
           </p>
           <div className="mt-2 flex gap-4 text-sm">
             <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Credit conditions</span>
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
+                Credit conditions
+                <span className="text-slate-600 font-normal lowercase ml-1 tracking-normal">(higher = tighter)</span>
+              </span>
               <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.tightness}>
                 {tightness}
                 {tightnessDelta !== 0 ? (
@@ -114,7 +113,10 @@ export function PageDeltaSummary({
               </p>
             </div>
             <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">Investor sentiment</span>
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
+                Investor sentiment
+                <span className="text-slate-600 font-normal lowercase ml-1 tracking-normal">(higher = easier to raise)</span>
+              </span>
               <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.risk}>
                 {riskAppetite}
                 {riskAppetiteDelta !== 0 ? (
@@ -151,6 +153,12 @@ export function PageDeltaSummary({
             <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
               Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
             </p>
+            <button
+              onClick={() => setShowFull(true)}
+              className="mt-2 self-start inline-flex items-center gap-1 rounded-full border border-slate-700/60 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/30 hover:text-sky-200 transition-colors"
+            >
+              Show analysis →
+            </button>
           </div>
         ) : (
         <div className="flex flex-col">
@@ -206,6 +214,12 @@ export function PageDeltaSummary({
               </div>
             </div>
           ) : null}
+          <button
+            onClick={() => setShowFull(false)}
+            className="mt-3 self-start inline-flex items-center gap-1 rounded-full border border-slate-700/60 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/30 hover:text-sky-200 transition-colors"
+          >
+            Show less
+          </button>
         </div>
         )}
       </div>

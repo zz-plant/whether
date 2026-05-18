@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const CONFIG_DISMISS_KEY = "whether.config.dismissed";
 const TICKER_KEY = "whether.config.ticker";
@@ -15,35 +15,18 @@ const STAGE_OPTIONS = [
 ] as const;
 
 export function BriefConfigureStrip() {
-  const [visible, setVisible] = useState(false);
-  const [ticker, setTicker] = useState("");
-  const [stage, setStage] = useState("");
+  const [dismissed, setDismissed] = useLocalStorageState<string>(CONFIG_DISMISS_KEY, "");
+  const [ticker, setTicker] = useLocalStorageState<string>(TICKER_KEY, "");
+  const [stage, setStage] = useLocalStorageState<string>(STAGE_KEY, "");
 
-  useEffect(() => {
-    const dismissed = localStorage.getItem(CONFIG_DISMISS_KEY);
-    const savedTicker = localStorage.getItem(TICKER_KEY) ?? "";
-    const savedStage = localStorage.getItem(STAGE_KEY) ?? "";
-    setTicker(savedTicker);
-    setStage(savedStage);
-    if (!dismissed) {
-      setVisible(true);
-    }
-  }, []);
+  const visible = !dismissed;
 
-  const dismiss = () => {
-    localStorage.setItem(CONFIG_DISMISS_KEY, "1");
-    if (ticker.trim()) localStorage.setItem(TICKER_KEY, ticker.trim());
-    if (stage) localStorage.setItem(STAGE_KEY, stage);
-    setVisible(false);
-  };
+  const dismiss = () => setDismissed("1");
 
   const clearConfig = () => {
-    localStorage.removeItem(TICKER_KEY);
-    localStorage.removeItem(STAGE_KEY);
-    localStorage.removeItem(CONFIG_DISMISS_KEY);
     setTicker("");
     setStage("");
-    setVisible(true);
+    setDismissed("");
   };
 
   if (!visible && !ticker && !stage) return null;

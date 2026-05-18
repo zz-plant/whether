@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
 import { ChevronDownIcon } from "../../components/uiIcons";
 import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
@@ -165,6 +166,7 @@ const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; cl
 
 export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
   const [cadence, setCadence] = useState<Cadence>("monthly");
+  const [terminalOpen, setTerminalOpen] = useState(true);
   const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
   const latest = points.at(-1) ?? null;
   const midPoint = points[Math.floor((points.length - 1) / 2)] ?? latest;
@@ -233,11 +235,13 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         <p className="text-sm text-slate-300">Cleaner one-screen view: 5 panels, minimal framing.</p>
       </header>
 
-      <details className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-4" open>
-        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
+      <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-4">
+        <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
           <span>Open one-screen terminal</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
-        </summary>
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
+        </Collapsible.Trigger>
+
+        <Collapsible.Panel>
 
         <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
           YCURVE | Last: {treasury.record_date} | Live/Cache: {treasury.isLive ? "Live" : "Cache"}
@@ -377,7 +381,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </ul>
           </FlatPanel>
         </div>
-      </details>
+        </Collapsible.Panel>
+      </Collapsible.Root>
     </section>
   );
 };

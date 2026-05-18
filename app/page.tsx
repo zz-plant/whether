@@ -33,7 +33,7 @@ import { CadenceSelector } from "./components/cadenceSelector";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
-export const revalidate = 900;
+export const revalidate = 300;
 export const runtime = "edge";
 
 export const generateMetadata = async ({
@@ -168,12 +168,12 @@ export const HomePageReportContent = async ({
           outageExitGate: homepage.reportShell.outageExitGate,
           degradedSourceRows: homepage.reportShell.degradedSourceRows,
           showOfflineBadge: homepage.reportShell.showOfflineBadge,
-          inlineTrustPlacement: "before-content",
+          inlineTrustPlacement: "hidden",
           provenance: homepage.reportShell.provenance,
         },
         chrome: {
-          sidebarVariant: "hidden",
-          hideHeroChrome: false,
+          sidebarVariant: "full",
+          hideHeroChrome: true,
           heroVariant: "compact",
           ambientMode: "standard",
         },
@@ -185,7 +185,7 @@ export const HomePageReportContent = async ({
         },
         payloads: {
           structuredData: homepage.reportShell.structuredData,
-          commandBar: homepage.reportShell.commandBar,
+          commandBar: undefined,
           historicalBanner: homepage.reportShell.historicalBanner ? (
             <HistoricalBanner
               banner={homepage.reportShell.historicalBanner.banner}
@@ -203,10 +203,6 @@ export const HomePageReportContent = async ({
         id="whether-structured-data"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
       />
-      <OperatorContextWrapper />
-      <div className="flex items-center justify-between gap-3 mb-1">
-        <CadenceSelector />
-      </div>
       {cadenceData && activeCadence !== "weekly" ? (
         <div className="mb-3 rounded-lg border border-sky-500/20 bg-sky-500/8 px-4 py-3">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">
@@ -223,17 +219,6 @@ export const HomePageReportContent = async ({
           </div>
         </div>
       ) : null}
-      <BriefConfigureStrip />
-      <FirstVisitBanner />
-
-      <DecisionTracker
-        action={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort}
-        regime={homepage.weeklyDecisionCardModel.status.regimeKey}
-        recordDate={homepage.reportShell.recordDateLabel}
-        confidence={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-      />
-
-      {/* Decision card + scores — visible together without scrolling */}
       <div className="-mt-4 space-y-3">
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
@@ -247,19 +232,20 @@ export const HomePageReportContent = async ({
           </div>
         </ErrorBoundary>
 
-        <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
-        <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
-
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
-          <div>
-            <p className="text-fluid-micro text-slate-500">
-              Next brief: Monday &middot; <a href="/share" className="underline decoration-slate-600 hover:decoration-sky-400">Share with your team</a>
-            </p>
-            <StartupActivity />
-            <SaaSMultiplesIndicator />
-          </div>
-          <InlineSubscribe />
+        <div className="flex items-center justify-between gap-3">
+          <CadenceSelector />
         </div>
+        <DecisionTracker
+          action={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort}
+          regime={homepage.weeklyDecisionCardModel.status.regimeKey}
+          recordDate={homepage.reportShell.recordDateLabel}
+          confidence={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+        />
+        <OperatorContextWrapper />
+        <FirstVisitBanner />
+        <BriefConfigureStrip />
+
+        <HowItWorks />
 
         <PageDeltaSummary
         regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
@@ -280,11 +266,24 @@ export const HomePageReportContent = async ({
         directionLabel={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel}
         regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
       />
+
+        <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
+        <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
+
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
+          <div>
+            <p className="text-fluid-micro text-slate-500">
+              Next brief: Monday &middot; <a href="/share" className="underline decoration-slate-600 hover:decoration-sky-400">Share with your team</a>
+            </p>
+            <StartupActivity />
+            <SaaSMultiplesIndicator />
+          </div>
+          <InlineSubscribe />
+        </div>
       </div>
 
       <DiscoverabilityStrip />
       <HomeRoutePrefetch />
-      <HowItWorks />
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}
         interpretationSearchParams={homepage.interpretationSearchParams}

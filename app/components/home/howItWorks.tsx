@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 export function HowItWorks() {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [visitCount] = useLocalStorageState<number>("whether_visit_count", 0);
 
   useEffect(() => {
-    try {
-      const vc = Number(localStorage.getItem("whether_visit_count") ?? "0");
-      if (vc <= 1) setIsFirstVisit(true);
-    } catch { /* ignore */ }
-  }, []);
+    if (visitCount <= 1) setIsFirstVisit(true);
+  }, [visitCount]);
 
   return (
     <div className={`weather-surface px-5 py-4 space-y-3 ${isFirstVisit ? "border-sky-500/30" : ""}`}>

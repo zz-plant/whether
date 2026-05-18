@@ -1,40 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const COMPLETE_KEY = "whether_reviewed";
 
 export function RitualComplete({ recordDate }: { recordDate?: string }) {
-  const [reviewed, setReviewed] = useState(false);
-  const [streak, setStreak] = useState(0);
-  useEffect(() => {
-    if (!recordDate) return;
-    try {
-      const stored = localStorage.getItem(COMPLETE_KEY);
-      if (stored) {
-        const data = JSON.parse(stored) as Record<string, { reviewed: boolean }>;
-        if (data[recordDate]?.reviewed) setReviewed(true);
-      }
-      /* Calculate streak */
-      const allKeys = Object.keys(JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}")).sort().reverse();
-      let count = 0;
-      for (const key of allKeys) {
-        if (JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}")[key]?.reviewed) count++;
-        else break;
-      }
-      setStreak(count);
-    } catch { /* ignore */ }
-  }, [recordDate]);
+  const [data, setData] = useLocalStorageState<Record<string, { reviewed: boolean }>>(COMPLETE_KEY, {});
+
+  const reviewed = recordDate ? data[recordDate]?.reviewed ?? false : false;
+
+  const streak = useMemo(() => {
+    const keys = Object.keys(data).sort().reverse();
+    let count = 0;
+    for (const key of keys) {
+      if (data[key]?.reviewed) count++;
+      else break;
+    }
+    return count;
+  }, [data]);
 
   const handleReview = () => {
-    const next = !reviewed;
-    setReviewed(next);
     if (!recordDate) return;
-    try {
-      const stored = JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? "{}");
-      stored[recordDate] = { reviewed: next };
-      localStorage.setItem(COMPLETE_KEY, JSON.stringify(stored));
-    } catch { /* ignore */ }
+    setData((prev) => ({
+      ...prev,
+      [recordDate]: { reviewed: !reviewed },
+    }));
   };
 
   if (!recordDate) return null;

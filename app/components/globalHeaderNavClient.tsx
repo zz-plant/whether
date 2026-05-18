@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Tooltip } from "@base-ui/react/tooltip";
 import {
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
@@ -28,12 +29,16 @@ const STEP_HINTS = [
 
 function StepTooltip({ children, hint }: { children: React.ReactNode; hint: string }) {
   return (
-    <span className="group/tip relative">
-      {children}
-      <span className="pointer-events-none absolute -bottom-6 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-fluid-micro text-slate-200 opacity-0 shadow-lg transition-opacity duration-150 group-hover/tip:opacity-100">
-        {hint}
-      </span>
-    </span>
+    <Tooltip.Root>
+      <Tooltip.Trigger className="cursor-default">{children}</Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Positioner sideOffset={6}>
+          <Tooltip.Popup className="z-30 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-fluid-micro text-slate-200 shadow-lg">
+            {hint}
+          </Tooltip.Popup>
+        </Tooltip.Positioner>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   );
 }
 
@@ -98,43 +103,25 @@ function SecondaryNavLinks() {
   const pathname = usePathname() ?? "/";
   const [showMore, setShowMore] = useState(false);
   const secondaryLinks = [
-    { href: "/share" as Route, label: "Share" },
     { href: "/this-week" as Route, label: "This Week" },
+    { href: "/current-regime" as Route, label: "Regime" },
+    { href: "/learn" as Route, label: "Learn" },
     { href: "/comps" as Route, label: "Multiples" },
-    { href: "/history" as Route, label: "History" },
     { href: "/regime-changes" as Route, label: "Changes" },
-  ];
-  const secondaryLinks2 = [
     { href: "/archive" as Route, label: "Archive" },
     { href: "/api-docs" as Route, label: "API" },
   ];
   const moreLinks = [
     { href: "/threshold" as Route, label: "Decision Framework" },
     { href: "/template" as Route, label: "Decision Template" },
-    { href: "/feed.xml" as Route, label: "RSS Feed" },
     { href: "/resources" as Route, label: "Resources" },
-    { href: "/settings" as Route, label: "Settings" },
+    { href: "/feed.xml" as Route, label: "RSS Feed" },
+    { href: "/about" as Route, label: "About" },
   ];
 
   return (
     <nav aria-label="More pages" className="flex items-center gap-1">
       {secondaryLinks.map((link) => {
-        const isActive = pathname.startsWith(link.href);
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`rounded-full px-2.5 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors ${
-              isActive
-                ? "bg-slate-800/70 text-slate-200"
-                : "text-slate-500 hover:text-slate-300"
-            }`}
-          >
-            {link.label}
-          </Link>
-        );
-      })}
-      {secondaryLinks2.map((link) => {
         const isActive = pathname.startsWith(link.href);
         return (
           <Link
@@ -161,7 +148,7 @@ function SecondaryNavLinks() {
         {showMore ? (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setShowMore(false)} />
-            <div className="absolute right-0 top-full z-20 mt-1 w-36 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
+            <div className="absolute right-0 top-full z-20 mt-1 w-40 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
               {moreLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -233,12 +220,15 @@ function MobileNavSheet({
         </nav>
         <div className="mt-4 border-t border-slate-800/60 pt-3">
           <Link href="/this-week" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">This Week</Link>
-          <Link href="/share" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Share</Link>
-          <Link href="/comps" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Multiples</Link>
-          <Link href="/history" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">History</Link>
-          <Link href="/threshold" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Framework</Link>
+          <Link href="/current-regime" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Current Regime</Link>
+          <Link href="/learn" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">How it Works</Link>
           <Link href="/comps" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">SaaS Multiples</Link>
+          <Link href="/regime-changes" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Regime Changes</Link>
+          <Link href="/archive" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Archive</Link>
           <Link href="/threshold" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Decision Framework</Link>
+          <Link href="/template" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Decision Template</Link>
+          <Link href="/api-docs" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">API &amp; Agents</Link>
+          <Link href="/about" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">About</Link>
         </div>
       </div>
     </div>
@@ -280,7 +270,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         {activeRouteLabel}
       </button>
 
-      <nav aria-label="Workflow" className="hidden md:block">
+      <nav aria-label="Workflow" className="hidden md:block lg:hidden">
         <ul className="flex items-center">
           {navigationLinks.map((link, index) => (
             <WorkflowStep
@@ -296,7 +286,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         </ul>
       </nav>
 
-      <div className="hidden md:block">
+      <div className="hidden md:block lg:hidden">
         <SecondaryNavLinks />
       </div>
 

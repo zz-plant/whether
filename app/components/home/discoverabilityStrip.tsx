@@ -3,12 +3,12 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/current-regime", label: "Current Regime", desc: "Full page" },
-  { href: "/comps", label: "SaaS Multiples", desc: "Live valuation data" },
-  { href: "/regime-changes", label: "Regime Changes", desc: "Historical transitions" },
   { href: "/threshold", label: "Decision Framework", desc: "How bounded decisions work" },
   { href: "/template", label: "Decision Template", desc: "Printable one-pager" },
-  { href: "/api-docs", label: "API & Agents", desc: "Tools for developers and AI" },
+  { href: "/resources", label: "Resources", desc: "Guides and references" },
+  { href: "/about", label: "About", desc: "What Whether is and who it's for" },
+  { href: "/search", label: "Search", desc: "Find signals and posts" },
+  { href: "/feed.xml", label: "RSS Feed", desc: "Subscribe in your feed reader" },
 ];
 
 export function DiscoverabilityStrip() {

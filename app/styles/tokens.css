@@ -28,7 +28,7 @@
 
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--border-default);
   }
 }
 
@@ -65,10 +65,14 @@
   --bg-body: #0a0a0a;
   --bg-panel: #1a1a1a;
   --bg-surface: #141414;
+  --bg-surface-muted: rgba(20, 20, 20, 0.6);
   --bg-raised: #222222;
   --bg-nested: #111111;
+  --bg-nested-light: rgba(255, 255, 255, 0.025);
 
   /* Borders */
+  --border-faint: rgba(255, 255, 255, 0.035);
+  --border-subtle: rgba(255, 255, 255, 0.045);
   --border-default: rgba(255, 255, 255, 0.06);
   --border-strong: rgba(255, 255, 255, 0.10);
 
@@ -78,9 +82,12 @@
   --text-muted: #64748b;
 
   /* Shadows */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-mid: 0 8px 16px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-heavy: 0 12px 24px rgba(0, 0, 0, 0.65);
 
   /* Accent colors — reserved by function */
   --accent-action: #38bdf8;
@@ -88,6 +95,15 @@
   --accent-success: #34d399;
   --accent-warning: #fbbf24;
   --accent-danger: #f87171;
+  --accent-strong: rgba(56, 189, 248, 0.5);
+  --accent-border: rgba(56, 189, 248, 0.35);
+  --accent-border-soft: rgba(56, 189, 248, 0.15);
+  --accent-glow: rgba(56, 189, 248, 0.06);
+  --accent-glow-faint: rgba(56, 189, 248, 0.03);
+
+  /* Overlay highlights */
+  --white-overlay-subtle: rgba(255, 255, 255, 0.02);
+  --white-overlay-faint: rgba(255, 255, 255, 0.01);
 
   /* CTA button */
   --cta-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(14, 116, 144, 0.85));

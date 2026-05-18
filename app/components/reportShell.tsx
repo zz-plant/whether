@@ -9,10 +9,8 @@ import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
 import { DisplayModeToggle } from "./displayModeToggle";
 import type { DataProvenance } from "./dataProvenanceStrip";
-import {
-  ReportSectionNavigation,
-  type ReportSectionLink,
-} from "./reportShellNavigation";
+import { type ReportSectionLink } from "./reportShellNavigation";
+import { AppSidebar } from "./AppSidebar";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import { ReportCta } from "./reportCta";
@@ -173,7 +171,8 @@ export const ReportShell = (props: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
-  const hasSidebar = resolvedSidebarVariant === "full" && resolvedSectionLinks.length > 0;
+  const hasSidebar = resolvedSidebarVariant === "full";
+  const sidebarEnabled = hasSidebar;
   const missionSequenceLabels = ["Now", "Next", "Later"];
   const missionSequenceTitle = resolvedActionSequence?.title ?? "Plan";
   const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
@@ -196,7 +195,6 @@ export const ReportShell = (props: ReportShellProps) => {
     degradedSourceRows: resolvedDegradedSourceRows,
     trustStatusDetail: resolvedTrustStatusDetail,
   });
-  const maxSectionNavItemsDesktop = 4;
   const controlHeadline = trustReadiness.headline;
   const trustStatusDetailForDisplay = resolvedTrustStatusDetail;
   const trustStatusActionForDisplay = resolvedTrustStatusAction;
@@ -231,20 +229,14 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-2 grid min-w-0 gap-4 xl:gap-5 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
-            {hasSidebar ? (
-              <aside className="order-2 hidden space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:block xl:sticky xl:top-24 xl:self-start">
-                {resolvedSectionLinks.length ? (
-                  <ReportSectionNavigation
-                    sectionLinks={resolvedSectionLinks}
-                    className="hidden xl:block"
-                    maxItems={maxSectionNavItemsDesktop}
-                  />
-                ) : null}
+          <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6" : ""}`}>
+            {sidebarEnabled ? (
+              <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] lg:overflow-y-auto">
+                <AppSidebar />
               </aside>
             ) : null}
 
-            <div className={`order-1 min-w-0 space-y-5 lg:space-y-6 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+            <div className={`order-1 min-w-0 space-y-5 lg:space-y-6 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />

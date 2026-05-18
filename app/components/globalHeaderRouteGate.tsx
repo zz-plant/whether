@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Settings } from "lucide-react";
 import { useScrollDirection } from "./useScrollDirection";
 import {
   isReportShellRoute,
@@ -16,7 +17,7 @@ import { ThemeToggleButton } from "./themeToggleButton";
 import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 import { SettingsPanel } from "./settingsPanel";
 import { ShareRail } from "./shareRail";
-import { SettingsIcon, HistoryIcon } from "./uiIcons";
+import { HistoryIcon } from "./uiIcons";
 
 export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/") {
@@ -87,7 +88,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_8px_20px_-16px_rgba(2,6,23,0.72)]"}`}
     >
-      <div className="weather-appbar weather-topbar px-3 py-2.5 sm:px-4 sm:py-2.5">
+      <div className="weather-appbar weather-topbar px-3 py-2 sm:px-4">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
@@ -101,13 +102,13 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
               </div>
             </div>
 
-            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-2 sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
               {isReportRoute ? (
                 <>
                   {reportHeaderAction ? (
                     <Link
                       href={reportHeaderAction.href}
-                      className="weather-button-primary inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100"
+                      className="weather-button-primary inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
                     >
                       {reportHeaderAction.label}
                     </Link>
@@ -130,25 +131,26 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   <button
                     type="button"
                     onClick={() => setShowShare(true)}
-                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
+                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
                     aria-label="Share brief"
                   >
                     Share
                   </button>
                   <Link
                     href="/history"
-                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] no-underline"
+                    className="weather-button hidden min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] no-underline sm:inline-flex"
                     aria-label="Historical trends"
                   >
-                    History
+                    <HistoryIcon />
+                    <span className="ml-1.5">History</span>
                   </Link>
                   <button
                     type="button"
                     onClick={() => setShowSettings(true)}
-                    className="weather-button inline-flex min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm"
+                    className="weather-button hidden min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm text-slate-200 sm:inline-flex"
                     aria-label="Settings"
                   >
-                    <SettingsIcon />
+                    <Settings aria-hidden="true" className="text-slate-100" size={18} strokeWidth={2.4} />
                   </button>
                   <ThemeToggleButton className="min-h-[36px]" />
                 </>
@@ -164,7 +166,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
 
           {/* Navigation — workflow stepper on desktop, sheet on mobile */}
-          <div className="flex items-center justify-between gap-2 border-t border-slate-800/65 pt-2">
+          <div className="flex items-center justify-between gap-2 border-t border-slate-800/65 pt-2 lg:hidden">
             <GlobalHeaderNavClient pathname={pathname} />
           </div>
         </div>

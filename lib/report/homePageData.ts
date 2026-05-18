@@ -12,7 +12,7 @@ type HomePageDataDependencies = {
 
 type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
 
-const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 900;
+const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 300;
 
 const defaultDependencies: HomePageDataDependencies = {
   loadReportDataSafe,

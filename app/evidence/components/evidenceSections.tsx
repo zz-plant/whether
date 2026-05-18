@@ -2,6 +2,7 @@
 
 import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
+import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
@@ -591,13 +592,14 @@ export const SignalsEvidencePrioritiesSection = ({
       ))}
     </ol>
     {additionalPriorityQueue.length ? (
-      <details className="weather-surface group p-4">
-        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
+      <Collapsible.Root className="weather-surface group p-4">
+        <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
           <span>Show the rest</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180">
             ⌄
           </span>
-        </summary>
+        </Collapsible.Trigger>
+        <Collapsible.Panel>
         <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
           {additionalPriorityQueue.map((item, index) => (
             <li key={item.label} className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4">
@@ -612,7 +614,8 @@ export const SignalsEvidencePrioritiesSection = ({
             </li>
           ))}
         </ol>
-      </details>
+        </Collapsible.Panel>
+      </Collapsible.Root>
     ) : null}
   </section>
 );

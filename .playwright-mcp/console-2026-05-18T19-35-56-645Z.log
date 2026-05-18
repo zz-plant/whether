@@ -1,0 +1,13 @@
+[    1722ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at qi (https://whether.work/assets/framework-Ble6BdLS.js:8:31210)
+    at Xi (https://whether.work/assets/framework-Ble6BdLS.js:8:32550)
+    at Hc (https://whether.work/assets/framework-Ble6BdLS.js:8:85635)
+    at Fu (https://whether.work/assets/framework-Ble6BdLS.js:8:116310)
+    at Mu (https://whether.work/assets/framework-Ble6BdLS.js:8:115583)
+    at ju (https://whether.work/assets/framework-Ble6BdLS.js:8:115495)
+    at Au (https://whether.work/assets/framework-Ble6BdLS.js:8:115357)
+    at gu (https://whether.work/assets/framework-Ble6BdLS.js:8:110957)
+    at cd (https://whether.work/assets/framework-Ble6BdLS.js:8:122809)
+    at MessagePort.ie (https://whether.work/assets/framework-Ble6BdLS.js:1:9094)
+[    2011ms] [ERROR] Access to fetch at 'https://layoffs.fyi/feed/' from origin 'https://whether.work' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://whether.work/:0
+[    2011ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://layoffs.fyi/feed/:0
