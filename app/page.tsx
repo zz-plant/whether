@@ -193,6 +193,9 @@ export const HomePageReportContent = async ({
         recordDate={homepage.reportShell.recordDateLabel}
         companyStage={operatorContext.companyStage}
         rateSensitivity={operatorContext.rateSensitivity}
+        confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+        freshnessLabel={homepage.reportShell.fetchedAtLabel}
+        sourceLabel={homepage.reportShell.treasurySource}
       />
       <FirstVisitBanner />
       <HomeDeltaStrip

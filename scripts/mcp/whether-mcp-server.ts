@@ -6,8 +6,8 @@ import {
   pullRecentSiteInfo,
   supportedAgentCadences,
   type AgentCadence,
-} from "../../lib/agentInterface";
-import { agentSkills } from "../../lib/agentSkills";
+} from "../../lib/agentInterface.js";
+import { agentSkills } from "../../lib/agentSkills.js";
 
 const cadenceSchema = z.enum(supportedAgentCadences);
 const defaultCadence: AgentCadence = "weekly";
@@ -17,72 +17,78 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-const registerTool = server.tool.bind(server) as any;
-
-registerTool(
-  "get_agent_brief",
-  "Fetch a cadence-specific Whether summary with structured agent handoff payload and prompt.",
-  {
+server.registerTool("get_agent_brief", {
+  description: "Fetch a cadence-specific Whether summary with structured agent handoff payload and prompt.",
+  inputSchema: {
     cadence: cadenceSchema.optional(),
   },
-  async ({ cadence }: { cadence?: AgentCadence }) => {
+}, async ({ cadence }: { cadence?: AgentCadence }) => {
+  try {
     const resolvedCadence = cadence ?? defaultCadence;
     const response = await buildAgentInterfaceResponse(resolvedCadence);
-
     return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(response, null, 2),
-        },
-      ],
+      content: [{ type: "text" as const, text: JSON.stringify(response, null, 2) }],
+    };
+  } catch (error) {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify({
+        error: "Failed to fetch agent brief",
+        message: error instanceof Error ? error.message : String(error),
+        cadence: cadence ?? "weekly",
+      }, null, 2) }],
+      isError: true,
     };
   }
-);
+});
 
-registerTool(
-  "list_agent_skills",
-  "List Whether agent skills expected by the agent handoff payload.",
-  {},
-  async () => ({
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify({ skills: agentSkills }, null, 2),
-      },
-    ],
-  })
-);
+server.registerTool("list_agent_skills", {
+  description: "List Whether agent skills expected by the agent handoff payload.",
+  inputSchema: {},
+}, async () => {
+  try {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify({ skills: agentSkills }, null, 2) }],
+    };
+  } catch (error) {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify({
+        error: "Failed to list skills",
+        message: error instanceof Error ? error.message : String(error),
+      }, null, 2) }],
+      isError: true,
+    };
+  }
+});
 
-registerTool(
-  "pull_recent_site_info",
-  "Pull the latest Whether site agent brief from /api/agent so downstream agents can use fresh site context.",
-  {
+server.registerTool("pull_recent_site_info", {
+  description: "Pull the latest Whether site agent brief from /api/agent so downstream agents can use fresh site context.",
+  inputSchema: {
     cadence: cadenceSchema.optional(),
     siteUrl: z.string().optional(),
   },
-  async ({
-    cadence,
-    siteUrl,
-  }: {
-    cadence?: AgentCadence;
-    siteUrl?: string;
-  }) => {
+}, async ({ cadence, siteUrl }: { cadence?: AgentCadence; siteUrl?: string }) => {
+  try {
     const recentInfo = await pullRecentSiteInfo({
       cadence: cadence ?? defaultCadence,
       siteBaseUrl: siteUrl,
     });
-
     return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(recentInfo, null, 2),
-        },
-      ],
+      content: [{ type: "text" as const, text: JSON.stringify(recentInfo, null, 2) }],
+    };
+  } catch (error) {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify({
+        error: "Failed to pull site info",
+        message: error instanceof Error ? error.message : String(error),
+        cadence: cadence ?? "weekly",
+      }, null, 2) }],
+      isError: true,
     };
   }
-);
+});
 
+/* Start stdio transport for local MCP integration (e.g., Claude Desktop, AI IDEs).
+   For remote/HTTP access, use the /api/agent endpoint directly or expose the MCP server
+   via the app router with the StreamableHTTP transport. */
 const transport = new StdioServerTransport();
 await server.connect(transport);

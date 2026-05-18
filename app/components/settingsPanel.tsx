@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
+import { subscribeEmail, unsubscribeEmail } from "../../lib/email/emailDelivery";
 import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
 
@@ -33,6 +34,10 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [stage, setStage] = useState<CompanyStage | null>(null);
   const [sensitivity, setSensitivity] = useState<RateSensitivity | null>(null);
   const [displayMode, setDisplayMode] = useState<string>("auto");
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscribeMsg, setSubscribeMsg] = useState("");
+  const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -171,8 +176,60 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   </button>
                 ))}
               </div>
-            </fieldset>
-          </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Weekly delivery</legend>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              Get the weekly brief delivered to your inbox.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                className="weather-input min-h-[44px] flex-1 rounded-md px-3 py-2 text-xs"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!email || !email.includes("@")) {
+                    setSubscribeMsg("Enter a valid email.");
+                    return;
+                  }
+                  subscribeEmail({ email, name: "" });
+                  setSubscribed(true);
+                  setSubscribeMsg("Subscribed! Check your inbox.");
+                  setSaved(false);
+                  setTimeout(() => setSubscribeMsg(""), 3000);
+                }}
+                className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold"
+              >
+                {subscribed ? "Subscribed" : "Subscribe"}
+              </button>
+            </div>
+            {subscribeMsg ? (
+              <p className="mt-1 text-fluid-micro text-emerald-200">{subscribeMsg}</p>
+            ) : null}
+          </fieldset>
+
+          <fieldset>
+            <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Alerts</legend>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              Get notified when the regime changes.
+            </p>
+            <label className="mt-2 flex items-center gap-2 text-sm text-slate-300">
+              <input
+                type="checkbox"
+                checked={alertsEnabled}
+                onChange={() => setAlertsEnabled(!alertsEnabled)}
+                className="accent-sky-400"
+              />
+              Regime change alerts
+            </label>
+          </fieldset>
+        </div>
 
           <div className="mt-4 flex items-center justify-between">
             <p className="text-fluid-micro text-slate-500">Changes apply on next brief refresh.</p>
