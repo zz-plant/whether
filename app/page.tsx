@@ -196,6 +196,8 @@ export const HomePageReportContent = async ({
         confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
         freshnessLabel={homepage.reportShell.fetchedAtLabel}
         sourceLabel={homepage.reportShell.treasurySource}
+        tightnessThreshold={reportData.assessment?.thresholds?.tightnessRegime ?? 70}
+        riskAppetiteThreshold={reportData.assessment?.thresholds?.riskAppetiteRegime ?? 50}
       />
       <FirstVisitBanner />
       <HomeDeltaStrip

@@ -1,6 +1,7 @@
 "use client";
 
 import { RegimeCompass } from "../regimeCompass";
+import { RegimeExplainer } from "./regimeExplainer";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -36,6 +37,8 @@ export function PageDeltaSummary({
   confidenceLabel,
   freshnessLabel,
   sourceLabel,
+  tightnessThreshold = 70,
+  riskAppetiteThreshold = 50,
 }: {
   regimeKey?: string;
   tightness: number;
@@ -50,6 +53,8 @@ export function PageDeltaSummary({
   confidenceLabel?: string;
   freshnessLabel?: string;
   sourceLabel?: string;
+  tightnessThreshold?: number;
+  riskAppetiteThreshold?: number;
 }) {
   const regimeLabel = regimeKey ? REGIME_LABELS[regimeKey] ?? regimeKey.toLowerCase() : "unknown";
 
@@ -109,13 +114,22 @@ export function PageDeltaSummary({
             </span>
           ) : null}
         </div>
-        <RegimeCompass
-          tightness={tightness}
-          riskAppetite={riskAppetite}
-          prevTightness={tightness - tightnessDelta}
-          prevRiskAppetite={riskAppetite - riskAppetiteDelta}
-          regimeKey={regimeKey}
-        />
+        <div className="flex flex-col">
+          <RegimeCompass
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            prevTightness={tightness - tightnessDelta}
+            prevRiskAppetite={riskAppetite - riskAppetiteDelta}
+            regimeKey={regimeKey}
+          />
+          <RegimeExplainer
+            regimeKey={regimeKey}
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            tightnessThreshold={tightnessThreshold ?? 70}
+            riskAppetiteThreshold={riskAppetiteThreshold ?? 50}
+          />
+        </div>
       </div>
     </div>
   );

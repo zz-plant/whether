@@ -193,12 +193,12 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               />
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (!email || !email.includes("@")) {
                     setSubscribeMsg("Enter a valid email.");
                     return;
                   }
-                  subscribeEmail({ email, name: "" });
+                  await subscribeEmail({ email, name: "" });
                   setSubscribed(true);
                   setSubscribeMsg("Subscribed! Check your inbox.");
                   setSaved(false);

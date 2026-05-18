@@ -82,34 +82,53 @@ export const sendWeeklyBriefEmail = async (
   return adapter.send({ to: recipient, subject, html, text });
 };
 
-/**
- * In-memory subscription store for prototype.
- * Replace with KV or database in production.
- */
-let subscriptions: Array<EmailRecipient & { active: boolean }> = [];
+const SUBSCRIPTIONS_KV_KEY = "email:subscriptions";
 
-export const subscribeEmail = (recipient: EmailRecipient): { ok: true } => {
-  const existing = subscriptions.findIndex((s) => s.email === recipient.email);
+type StoredSubscriber = EmailRecipient & { active: boolean; subscribedAt?: string };
+
+const getKv = () => (globalThis as { WHETHER_DURABLE_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string): Promise<void> } }).WHETHER_DURABLE_KV;
+
+const readSubscriptions = async (): Promise<StoredSubscriber[]> => {
+  try {
+    const kv = getKv();
+    if (!kv) return [];
+    const raw = await kv.get(SUBSCRIPTIONS_KV_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+};
+
+const writeSubscriptions = async (subs: StoredSubscriber[]): Promise<void> => {
+  try {
+    const kv = getKv();
+    if (kv) await kv.put(SUBSCRIPTIONS_KV_KEY, JSON.stringify(subs));
+  } catch { /* KV write failure is non-fatal for subscription */ }
+};
+
+export const subscribeEmail = async (recipient: EmailRecipient): Promise<{ ok: true }> => {
+  const subs = await readSubscriptions();
+  const existing = subs.findIndex((s) => s.email === recipient.email);
   if (existing >= 0) {
-    subscriptions[existing] = { ...subscriptions[existing], ...recipient, active: true };
+    subs[existing] = { ...subs[existing], ...recipient, active: true };
   } else {
-    subscriptions.push({ ...recipient, active: true });
+    subs.push({ ...recipient, active: true, subscribedAt: new Date().toISOString() });
   }
+  await writeSubscriptions(subs);
   return { ok: true };
 };
 
-export const unsubscribeEmail = (email: string): { ok: true } => {
-  const existing = subscriptions.find((s) => s.email === email);
-  if (existing) {
-    existing.active = false;
-  }
+export const unsubscribeEmail = async (email: string): Promise<{ ok: true }> => {
+  const subs = await readSubscriptions();
+  const existing = subs.find((s) => s.email === email);
+  if (existing) existing.active = false;
+  await writeSubscriptions(subs);
   return { ok: true };
 };
 
-export const getActiveSubscriptions = (): Array<EmailRecipient> => {
-  return subscriptions.filter((s) => s.active);
+export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
+  const subs = await readSubscriptions();
+  return subs.filter((s) => s.active).map(({ active: _, subscribedAt: __, ...rest }) => rest);
 };
 
-export const clearSubscriptions = (): void => {
-  subscriptions = [];
+export const clearSubscriptions = async (): Promise<void> => {
+  await writeSubscriptions([]);
 };

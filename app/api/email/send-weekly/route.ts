@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const subscriptions = getActiveSubscriptions();
+    const subscriptions = await getActiveSubscriptions();
     if (subscriptions.length === 0) {
       return NextResponse.json({ ok: true, sent: 0, message: "No active subscriptions." });
     }
@@ -60,7 +60,24 @@ export async function POST(request: Request) {
     const sent = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
     const errors = results.filter((r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok)).length;
 
-    return NextResponse.json({ ok: true, sent, errors, total: subscriptions.length });
+    /* Also post to Slack if a webhook is configured */
+    const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+    let slackOk = false;
+    if (slackWebhook) {
+      try {
+        const regime = String((brief as any).summary?.regime ?? "");
+        const actionNow = String((brief as any).summary?.action ?? "");
+        const blocks = [
+          { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief` } },
+          { type: "section", text: { type: "mrkdwn", text: `*Regime:* ${regime}\n*Action:* ${actionNow}` } },
+          { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View full brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+        ];
+        await fetch(slackWebhook, { method: "POST", body: JSON.stringify({ blocks }) });
+        slackOk = true;
+      } catch { /* Slack post failure is non-fatal */ }
+    }
+
+    return NextResponse.json({ ok: true, sent, errors, total: subscriptions.length, slackPosted: slackOk });
   } catch (error) {
     return NextResponse.json({
       ok: false,
