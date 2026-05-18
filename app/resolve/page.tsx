@@ -8,7 +8,6 @@ import {
   situationUseCaseDefinitions,
   useCaseRoles,
 } from "../../lib/decisionDomainCatalog";
-import { HubSection } from "../components/hubPageShell";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
@@ -134,15 +133,12 @@ export default async function DecidePage({
       structuredData={breadcrumbStructuredData}
       >
         <OperatorWorkflowRouteTracker />
-      <HubSection
-        id="unresolved-question-router"
-        title="What still needs help?"
-        description="Start with the best next step."
-        className="scroll-mt-28"
-      >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <article className="weather-hub-card space-y-4 border-sky-400/30 bg-sky-500/10">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{recommendedPath.kicker}</p>
+      <section id="unresolved-question-router" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What still needs help?</p>
+        <p className="text-sm text-slate-300">Start with the best next step.</p>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <article className="weather-surface space-y-4 px-4 py-4">
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{recommendedPath.kicker}</p>
             <div className="space-y-2">
               <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
@@ -153,7 +149,7 @@ export default async function DecidePage({
           </article>
 
           <details
-            className="weather-hub-card weather-auto-chevron scroll-mt-28 px-4 py-4"
+            className="weather-surface weather-auto-chevron scroll-mt-28 px-4 py-4"
             open={hasGuidedTranslationSelection}
           >
             <summary className="cursor-pointer list-none">
@@ -168,7 +164,7 @@ export default async function DecidePage({
                 <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
                 <div className="mt-3 space-y-2">
                   {recommendedAnswerPages.map((page) => (
-                    <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-hub-link-card block space-y-1">
+                    <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-surface block space-y-1">
                       <p className="text-sm font-semibold text-slate-100">{page.title}</p>
                       <p className="text-xs text-slate-300">{page.shortAnswer}</p>
                     </Link>
@@ -189,7 +185,7 @@ export default async function DecidePage({
                     <Link
                       key={guide.slug}
                       href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
-                      className="weather-hub-link-card space-y-1"
+                      className="weather-surface space-y-1"
                     >
                       <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
                       <p className="text-xs text-slate-300">{guide.tagline}</p>
@@ -199,7 +195,7 @@ export default async function DecidePage({
                     <Link
                       key={stage.slug}
                       href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
-                      className="weather-hub-link-card space-y-1"
+                      className="weather-surface space-y-1"
                     >
                       <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
                       <p className="text-xs text-slate-300">{stage.primaryValue}</p>
@@ -211,7 +207,7 @@ export default async function DecidePage({
           </details>
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
-      </HubSection>
+      </section>
 
       <details id="decide-secondary-paths" className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
         <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
@@ -224,7 +220,7 @@ export default async function DecidePage({
               <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More team help</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
-                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-hub-chip">
+                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
                     {role.title}
                   </Link>
                 ))}
@@ -234,7 +230,7 @@ export default async function DecidePage({
               <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More situation help</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
-                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-hub-chip">
+                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">
                     {situation.title}
                   </Link>
                 ))}
