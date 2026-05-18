@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
 import type { Route } from "../../lib/navigation/routeType";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
@@ -22,6 +23,7 @@ export function ReportCta({
   children,
 }: ReportCtaProps) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
+  const router = useRouter();
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;
   const isCopied = status === "copied";
@@ -50,7 +52,7 @@ export function ReportCta({
     trackActivation();
     const copied = await copyToClipboard(copyText, resolvedCopyTarget);
     if (!copied) {
-      window.location.assign(href);
+      router.push(href as Route);
     }
   };
 

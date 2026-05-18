@@ -27,7 +27,7 @@ export function CadenceSelector() {
             if (c.key === "weekly") params.delete("cadence");
             else params.set("cadence", c.key);
             const qs = params.toString();
-            router.push(qs ? `/?${qs}` : "/");
+            router.replace(qs ? `/?${qs}` : "/", { scroll: false });
           }}
           className={`rounded-full px-3 py-1 text-fluid-micro font-semibold transition-colors ${
             current === c.key

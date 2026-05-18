@@ -287,10 +287,11 @@ export const loadReportDataUncachedInternal = async ({
   const regimeSeries = deps.getTimeMachineRegimeSeries(deps.DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = deps.getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const timeMachineSnapshots = deps.getTimeMachineSnapshots();
-  const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
+  const [treasuryResult, liveTreasuryResult, macroResult, snapshotResult] = await Promise.allSettled([
     treasuryPromise,
     liveTreasuryPromise ?? Promise.resolve(null),
     canonicalInputs ? Promise.resolve(canonicalInputs.macroSeries) : deps.loadMacroSeries(liveFetcher),
+    loadRegimeMachineSnapshot(),
   ]);
 
   if (treasuryResult.status === "rejected") {
@@ -322,7 +323,7 @@ export const loadReportDataUncachedInternal = async ({
   const fetchedAtLabel = deps.formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = deps.formatAgeHours(treasury.fetched_at, now);
   const sensors = deps.buildSensorReadings(treasury);
-  const previousMachineSnapshot = await loadRegimeMachineSnapshot();
+  const previousMachineSnapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
   const assessment = deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot);
   const assessmentSnapshot = assessment.regimeTransition?.snapshot;
   if (assessmentSnapshot) {
