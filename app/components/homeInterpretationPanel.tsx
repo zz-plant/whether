@@ -10,10 +10,10 @@ const interpretationLabels: Record<InterpretationView, string> = {
   sector: "Sector",
   company: "Company",
   financial: "Financial",
-  forecast: "Forecast",
+  forecast: "Call",
 };
 
-const pickCue = (bullets: string[], prefix: "Action:" | "Trigger:" | "Reverse:") => {
+const pickCue = (bullets: string[], prefix: "Action:" | "Pause if:" | "Clears when:") => {
   const line = bullets.find((bullet) => bullet.includes(prefix));
   if (!line) {
     return null;
@@ -79,8 +79,8 @@ export const HomeInterpretationPanel = ({
   searchParams?: Record<string, string | undefined>;
 }) => {
   const actionCue = pickCue(layer.bullets, "Action:");
-  const triggerCue = pickCue(layer.bullets, "Trigger:");
-  const reverseCue = pickCue(layer.bullets, "Reverse:");
+  const triggerCue = pickCue(layer.bullets, "Pause if:");
+  const reverseCue = pickCue(layer.bullets, "Clears when:");
 
   return (
     <section id="interpretation-layer" className="weather-surface-secondary space-y-4 px-5 py-5" aria-label="View for this situation">
