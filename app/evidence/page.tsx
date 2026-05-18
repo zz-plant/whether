@@ -6,6 +6,7 @@ import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/vi
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
+import { DomainContextSection } from "./components/domainContextSection";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import {
   SignalsAdvancedControlsSection,
@@ -121,6 +122,8 @@ export default async function SignalsPage({
         activeSignalsView={model.activeSignalsView}
         searchParams={resolvedSearchParams}
       />
+
+      <DomainContextSection regime={model.assessment.regime} />
 
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trends</p>

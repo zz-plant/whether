@@ -16,8 +16,7 @@ import { ThemeToggleButton } from "./themeToggleButton";
 import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 import { SettingsPanel } from "./settingsPanel";
 import { ShareRail } from "./shareRail";
-import { TimeMachineDatePicker } from "./timeMachineDatePicker";
-import { SettingsIcon } from "./uiIcons";
+import { SettingsIcon, HistoryIcon } from "./uiIcons";
 
 export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/") {
@@ -81,7 +80,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
   const [showSettings, setShowSettings] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [showTimeMachine, setShowTimeMachine] = useState(false);
+
   return (
     <header
       className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
@@ -136,14 +135,13 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   >
                     Share
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowTimeMachine(true)}
-                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
-                    aria-label="Historical view"
+                  <Link
+                    href="/history"
+                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] no-underline"
+                    aria-label="Historical trends"
                   >
                     History
-                  </button>
+                  </Link>
                   <button
                     type="button"
                     onClick={() => setShowSettings(true)}
@@ -160,7 +158,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   <ThemeToggleButton />
                 </>
               )}
-              {showTimeMachine ? <TimeMachineDatePicker onClose={() => setShowTimeMachine(false)} /> : null}
               {showSettings ? <SettingsPanel onClose={() => setShowSettings(false)} /> : null}
               {showShare ? <ShareRail onClose={() => setShowShare(false)} /> : null}
             </div>

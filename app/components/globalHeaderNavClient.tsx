@@ -15,13 +15,15 @@ type GlobalHeaderNavClientProps = {
 };
 
 const FIRST_VISIT_NAV_KEY = "whether_nav_hints_dismissed";
-const STEP_LABELS = ["Read", "Evidence", "Plan", "Resolve", "Trust"];
+const STEP_LABELS = ["Decide", "Evidence", "Plan", "Resolve", "Trust", "History"];
+const STEP_ORDER = ["/", "/evidence", "/planning", "/resolve", "/trust", "/history"];
 const STEP_HINTS = [
-  "This week's brief and decision",
+  "This week's decision and brief",
   "Proof and thresholds behind the brief",
-  "Turn the call into approvals",
+  "Turn the brief into approvals",
   "Close one open question",
   "Freshness, confidence, and sources",
+  "Trends over time",
 ];
 
 function StepTooltip({ children, hint }: { children: React.ReactNode; hint: string }) {
@@ -94,9 +96,17 @@ function WorkflowStep({
 
 function SecondaryNavLinks() {
   const pathname = usePathname() ?? "/";
+  const [showMore, setShowMore] = useState(false);
   const secondaryLinks = [
+    { href: "/share" as Route, label: "Share" },
     { href: "/toolkits" as Route, label: "Toolkits" },
-    { href: "/learn" as Route, label: "Learn" },
+    { href: "/answers" as Route, label: "Answers" },
+  ];
+  const moreLinks = [
+    { href: "/history" as Route, label: "History" },
+    { href: "/resources" as Route, label: "Resources" },
+    { href: "/guides" as Route, label: "Guides" },
+    { href: "/settings" as Route, label: "Settings" },
   ];
 
   return (
@@ -117,6 +127,32 @@ function SecondaryNavLinks() {
           </Link>
         );
       })}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setShowMore(!showMore)}
+          className="rounded-full px-2.5 py-1.5 text-fluid-xs font-medium text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          More ▾
+        </button>
+        {showMore ? (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setShowMore(false)} />
+            <div className="absolute right-0 top-full z-20 mt-1 w-36 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
+              {moreLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setShowMore(false)}
+                  className="block rounded-md px-3 py-2 text-fluid-xs font-medium text-slate-300 no-underline hover:bg-slate-800/60"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </>
+        ) : null}
+      </div>
     </nav>
   );
 }
@@ -173,20 +209,10 @@ function MobileNavSheet({
           })}
         </nav>
         <div className="mt-4 border-t border-slate-800/60 pt-3">
-          <Link
-            href="/toolkits"
-            onClick={onClose}
-            className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50"
-          >
-            Toolkits
-          </Link>
-          <Link
-            href="/learn"
-            onClick={onClose}
-            className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50"
-          >
-            Learn
-          </Link>
+          <Link href="/share" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Share</Link>
+          <Link href="/toolkits" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Toolkits</Link>
+          <Link href="/history" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">History</Link>
+          <Link href="/answers" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Answers</Link>
         </div>
       </div>
     </div>

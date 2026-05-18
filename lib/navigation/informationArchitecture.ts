@@ -6,7 +6,8 @@ export type NavigationLayerKey =
   | "planning"
   | "resolve"
   | "toolkits"
-  | "trust";
+  | "trust"
+  | "history";
 
 export type NavigationLayer = {
   key: NavigationLayerKey;
@@ -74,6 +75,16 @@ export const navigationLayers: NavigationLayer[] = [
     navLabel: "Trust",
     description: "Check freshness, confidence, source coverage, and what would change the brief.",
     boundary: "Use this when you want to sanity-check the brief before a big decision.",
+    group: "reference",
+    tier: "primary",
+  },
+  {
+    key: "history",
+    href: "/history",
+    label: "History",
+    navLabel: "History",
+    description: "See how tightness and risk appetite have changed over time.",
+    boundary: "Use this to spot regime transitions and compare current conditions to past periods.",
     group: "reference",
     tier: "primary",
   },

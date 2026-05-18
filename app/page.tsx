@@ -20,7 +20,7 @@ import {
   HomeKeyTermsDisclosure,
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
-import { HomeDeltaStrip } from "./components/home/deltaStrip";
+import { DecisionTracker } from "./components/home/decisionTracker";
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
@@ -83,6 +83,18 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
+
+  /* Stage-specific action text — makes personalization visible */
+  const stageActionOverrides: Record<string, string> = {
+    "pre-seed": "Preserve runway · Gate small bets",
+    seed: "Extend runway · Staged critical hires only",
+    "series-a": "Gate team growth · Protect unit economics",
+    "series-b-plus": "Scale proven channels · Milestone-check new bets",
+    public: "Manage shareholder expectations · Optimize free cash flow",
+  };
+  const stageAction = operatorContext.companyStage && stageActionOverrides[operatorContext.companyStage]
+    ? stageActionOverrides[operatorContext.companyStage]
+    : null;
 
   const trustCue = buildWeeklyTrustCueLine({
     confidenceLabel,
@@ -207,27 +219,34 @@ export const HomePageReportContent = async ({
       <BriefConfigureStrip />
       <FirstVisitBanner />
 
-      {/* Decision card — the primary output, shown first */}
-      <ErrorBoundary label="Weekly decision card">
-        <div data-share-section="decision">
-          <HomeWhatChangedSection
-            weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
-            leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
-            fallbackActive={homepage.fallbackActive}
-            searchParams={resolvedSearchParams}
-            initialArtifactMode={initialArtifactMode}
-          />
-        </div>
-      </ErrorBoundary>
+      <DecisionTracker
+        action={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort}
+        regime={homepage.weeklyDecisionCardModel.status.regimeKey}
+        recordDate={homepage.reportShell.recordDateLabel}
+        confidence={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+      />
 
-      {/* Scores and data — supporting evidence, below the decision */}
-      <PageDeltaSummary
+      {/* Decision card + scores — visible together without scrolling */}
+      <div className="-mt-4 space-y-3">
+        <ErrorBoundary label="Weekly decision card">
+          <div data-share-section="decision">
+            <HomeWhatChangedSection
+              weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
+              leadershipArtifactPayloadPromise={homepage.leadershipArtifactPayloadPromise}
+              fallbackActive={homepage.fallbackActive}
+              searchParams={resolvedSearchParams}
+              initialArtifactMode={initialArtifactMode}
+            />
+          </div>
+        </ErrorBoundary>
+
+        <PageDeltaSummary
         regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
         tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
         riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
         tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
         riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
-        actionShort={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
+        actionShort={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
         postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
         recordDate={homepage.reportShell.recordDateLabel}
         companyStage={operatorContext.companyStage}
@@ -237,7 +256,10 @@ export const HomePageReportContent = async ({
         sourceLabel={homepage.reportShell.treasurySource}
         tightnessThreshold={reportData.assessment?.thresholds?.tightnessRegime ?? 70}
         riskAppetiteThreshold={reportData.assessment?.thresholds?.riskAppetiteRegime ?? 50}
+        directionLabel={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel}
+        regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
       />
+      </div>
 
       <HomeRoutePrefetch />
       <HomeRevisitFlipSection

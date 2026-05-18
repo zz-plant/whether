@@ -49,6 +49,7 @@ export const resolveGlobalHeaderTagline = (pathname: string) => {
     planning: "Approve or hold hiring, spend, roadmap, and what to share.",
     resolve: "Close one open question.",
     trust: "Check freshness, confidence, and sources.",
+    history: "See trends and historical snapshots.",
     toolkits: "Use a tool or template for a specific task.",
   };
 

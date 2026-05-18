@@ -39,6 +39,8 @@ export function PageDeltaSummary({
   sourceLabel,
   tightnessThreshold = 70,
   riskAppetiteThreshold = 50,
+  directionLabel,
+  regimeDistance,
 }: {
   regimeKey?: string;
   tightness: number;
@@ -55,14 +57,31 @@ export function PageDeltaSummary({
   sourceLabel?: string;
   tightnessThreshold?: number;
   riskAppetiteThreshold?: number;
+  directionLabel?: string;
+  regimeDistance?: { dimensionLabel: string; pointsToFlip: number; currentValue: number; thresholdValue: number };
 }) {
   const regimeLabel = regimeKey ? REGIME_LABELS[regimeKey] ?? regimeKey.toLowerCase() : "unknown";
+  const hasDelta = tightnessDelta !== 0 || riskAppetiteDelta !== 0;
+  const directionWord = directionLabel ?? (tightnessDelta > 0 ? "tightening" : riskAppetiteDelta > 0 ? "easing" : "stable");
 
   return (
     <div className="mb-3 rounded-lg border border-slate-800/60 bg-slate-950/50 px-4 py-3 text-xs sm:px-5 sm:text-sm">
-      <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
-        This week
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
+          This week
+        </p>
+        {hasDelta ? (
+          <span className={`text-fluid-micro font-semibold uppercase tracking-[0.1em] ${
+            directionWord === "tightening" ? "text-amber-200" :
+            directionWord === "easing" ? "text-emerald-200" :
+            "text-slate-400"
+          }`}>
+            {directionWord === "tightening" ? `Closer to ${regimeKey === "DEFENSIVE" ? "SCARCITY" : "tightening"}↑` :
+             directionWord === "easing" ? `Easing toward ${regimeKey === "SCARCITY" ? "DEFENSIVE" : "expansion"}↓` :
+             "Stable"}
+          </span>
+        ) : null}
+      </div>
       <div className="flex flex-wrap items-stretch gap-4">
         <div className="flex flex-col justify-center min-w-0">
           <p className="text-fluid-xs font-semibold text-slate-300">
@@ -129,6 +148,34 @@ export function PageDeltaSummary({
             tightnessThreshold={tightnessThreshold ?? 70}
             riskAppetiteThreshold={riskAppetiteThreshold ?? 50}
           />
+          {regimeKey ? (
+            <div className="mt-3 pt-3 border-t border-slate-700/50">
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Fundraising conditions</p>
+              <p className="mt-1 text-xs text-slate-300">
+                {regimeKey === "SCARCITY" ? "Investors are risk-off. Extend runway and delay fundraising. Lead with breakeven path." :
+                 regimeKey === "DEFENSIVE" ? "Expect longer diligence. Lead with unit economics. Investors prioritizing profitability over growth." :
+                 regimeKey === "VOLATILE" ? "Capital is available but cautious. Have multiple term sheets before committing. Favor milestone-based raises." :
+                 regimeKey === "EXPANSION" ? "Investor appetite is strong. Lead with growth metrics. Raise while conditions are favorable." :
+                 "Market conditions are mixed. Lead with your strongest metric."}
+              </p>
+            </div>
+          ) : null}
+          {regimeDistance ? (
+            <div className="mt-3 space-y-1">
+              <p className="text-fluid-micro font-semibold text-slate-400">
+                <span className="text-amber-200 font-bold">{regimeDistance.pointsToFlip.toFixed(1)} pts</span> from {regimeDistance.dimensionLabel} flip
+              </p>
+              <div className="h-1.5 w-full rounded-full bg-slate-800/60 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-[width] duration-500"
+                  style={{
+                    width: `${Math.min(Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue) / 2, 100)}%`,
+                    background: `linear-gradient(90deg, rgba(251,191,36,0.5), rgba(251,191,36,0.85))`,
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
