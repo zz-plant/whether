@@ -98,7 +98,7 @@ export default async function DecidePage({
       trustStatusDetail="Pick the narrowest path that answers the question."
       trustStatusAction="Return to Planning after the question is answered."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
-      pageTitle="Choose the right help"
+      pageTitle="Resolve"
       currentPath="/resolve"
       pageSummary="Resolve one open question without reopening the whole weekly brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}

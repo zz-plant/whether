@@ -116,7 +116,7 @@ describe("buildTrustStatus trust tones", () => {
       confidenceLabel: "HIGH",
       freshnessState: {
         updatedAtLabel: "2026-03-01T00:00:00Z",
-        stalenessLabel: "stale",
+        freshnessStatus: "stale",
         mode: "live",
         timestamp: "2026-03-01T00:00:00.000Z",
         ageHours: 18,
@@ -133,7 +133,7 @@ describe("buildTrustStatus trust tones", () => {
       confidenceLabel: "HIGH",
       freshnessState: {
         updatedAtLabel: "2026-03-01T00:00:00Z",
-        stalenessLabel: "fresh",
+        freshnessStatus: "fresh",
         mode: "live",
         timestamp: "2026-03-01T00:00:00.000Z",
         ageHours: 1,

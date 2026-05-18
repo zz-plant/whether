@@ -15,7 +15,7 @@ import {
  * operator context (company stage + rate sensitivity) for personalization.
  */
 
-export const operatingLeverOrder = [
+export const businessAreaOrder = [
   "hiring-stance",
   "investment-pace",
   "sales-posture",
@@ -23,9 +23,9 @@ export const operatingLeverOrder = [
   "risk-tolerance",
 ] as const;
 
-export type OperatingLeverKey = (typeof operatingLeverOrder)[number];
+export type BusinessAreaKey = (typeof businessAreaOrder)[number];
 
-export const operatingLeverLabel: Record<OperatingLeverKey, string> = {
+export const businessAreaLabel: Record<BusinessAreaKey, string> = {
   "hiring-stance": "Hiring stance",
   "investment-pace": "Investment pace",
   "sales-posture": "Fundraising posture",

@@ -48,7 +48,7 @@ it("derives operating levers from canonical bounded rules with assessment contex
 });
 
 
-it("keeps operating levers in canonical operatingLeverOrder", () => {
+it("keeps operating levers in canonical businessAreaOrder", () => {
   const guidance = getPlaybookGuidance("DEFENSIVE", {
     thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
     scores: { tightness: 74, riskAppetite: 46 },

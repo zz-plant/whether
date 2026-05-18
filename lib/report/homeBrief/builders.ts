@@ -351,7 +351,7 @@ export const buildHomeBriefModelInternal = (
     confidenceLabel,
     freshnessState: {
       updatedAtLabel: fetchedAtLabel ?? "Unavailable",
-      stalenessLabel: Boolean(treasury?.fallback_at || treasury?.fallback_reason)
+      freshnessStatus: Boolean(treasury?.fallback_at || treasury?.fallback_reason)
         ? "stale"
         : treasury?.fetched_at
           ? "fresh"

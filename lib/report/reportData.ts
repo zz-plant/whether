@@ -133,7 +133,7 @@ export type DecisionTransmission = {
   flipConditions: string[];
   freshness: {
     timestamp: string;
-    stalenessLabel: DecisionTransmissionStalenessLabel;
+    freshnessStatus: DecisionTransmissionStalenessLabel;
   };
   confidence: DecisionTransmissionConfidenceLabel;
   provenance: Array<{

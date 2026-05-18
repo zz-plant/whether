@@ -403,7 +403,7 @@ const resolveStalenessLabel = ({
   timestamp?: string | null;
   now: Date;
   staleAfterHours: number;
-}): DecisionTransmission["freshness"]["stalenessLabel"] => {
+}): DecisionTransmission["freshness"]["freshnessStatus"] => {
   if (!timestamp) return "unknown";
   const parsed = Date.parse(timestamp);
   if (Number.isNaN(parsed)) return "unknown";
@@ -458,7 +458,7 @@ export const buildDecisionTransmission = (
         : [homeBriefModel.reversalTrigger],
     freshness: {
       timestamp: data.treasury?.fetched_at ?? data.fetchedAtLabel ?? "timestamp-unavailable",
-      stalenessLabel: resolveStalenessLabel({
+      freshnessStatus: resolveStalenessLabel({
         timestamp: data.treasury?.fetched_at,
         now,
         staleAfterHours,

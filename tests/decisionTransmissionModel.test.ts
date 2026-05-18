@@ -38,7 +38,7 @@ describe("buildDecisionTransmission", () => {
     assert.ok(transmission.boundedRules.length > 0);
     assert.equal(transmission.boundedRules.some((rule) => rule.manualReviewRequired), false);
     assert.ok(transmission.flipConditions.length > 0);
-    assert.equal(transmission.freshness.stalenessLabel, "fresh");
+    assert.equal(transmission.freshness.freshnessStatus, "fresh");
     assert.match(transmission.confidence, /high|medium|low|unknown/);
     assert.equal(transmission.provenance[0]?.isFallback, false);
   });
@@ -78,6 +78,6 @@ describe("buildDecisionTransmission", () => {
       treasury: { fetched_at: "2026-03-25T00:00:00.000Z" },
     }, { now: new Date("2026-04-02T00:00:00.000Z"), staleAfterHours: 24 });
 
-    assert.equal(transmission.freshness.stalenessLabel, "stale");
+    assert.equal(transmission.freshness.freshnessStatus, "stale");
   });
 });

@@ -33,7 +33,7 @@ export const pageLinkIcons: Record<string, ReactNode> = {
       />
     </svg>
   ),
-  operations: (
+  planning: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <rect
         x="4.75"
@@ -55,7 +55,7 @@ export const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="16.5" cy="12" r="1.6" fill="currentColor" />
     </svg>
   ),
-  decide: (
+  resolve: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 5.5h16v13H4z"
@@ -123,7 +123,7 @@ export const pageLinkIcons: Record<string, ReactNode> = {
       />
     </svg>
   ),
-  method: (
+  trust: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
@@ -141,4 +141,4 @@ export const pageLinkIcons: Record<string, ReactNode> = {
   ),
 };
 
-export const defaultPageLinkIcon = pageLinkIcons.method;
+export const defaultPageLinkIcon = pageLinkIcons.trust;

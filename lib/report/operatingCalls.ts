@@ -5,8 +5,8 @@ import {
   type BoundedDecisionRule,
   type DecisionArea,
 } from "./boundedDecisionRules";
-import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
-import { operatingLeverToDecisionArea } from "./operatingLeverMap";
+import { businessAreaLabel, businessAreaOrder, type BusinessAreaKey } from "./decisionKnobs";
+import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import type { DecisionTransmissionBoundedRule } from "./reportData";
 
 /**
@@ -18,7 +18,7 @@ import type { DecisionTransmissionBoundedRule } from "./reportData";
  */
 
 export type ActionStripItem = {
-  lever: OperatingLeverKey;
+  lever: BusinessAreaKey;
   label: string;
   /** Per-area action imperative. Distinct from the top-level actionNowShort which is the overall weekly call. */
   areaActionNow: string;
@@ -254,14 +254,14 @@ export const resolveDecisionLaneState = ({
 };
 
 export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: CurrentScores): ActionStripItem[] =>
-  operatingLeverOrder.map((lever, index) => {
+  businessAreaOrder.map((lever, index) => {
     const area = operatingLeverToDecisionArea[lever];
     const rule = findRule(rules, area);
     const laneState = resolveDecisionLaneState({ rule, scores });
 
     return {
       lever,
-      label: operatingLeverLabel[lever],
+      label: businessAreaLabel[lever],
       areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.areaActionNow,
       triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,

@@ -45,7 +45,7 @@ export type DecisionReadinessState = {
 
 export type SourceFreshnessState = Pick<
   CompactFreshnessMeta,
-  "updatedAtLabel" | "stalenessLabel" | "mode" | "timestamp" | "ageHours"
+  "updatedAtLabel" | "freshnessStatus" | "mode" | "timestamp" | "ageHours"
 >;
 
 const FALLBACK_FRESHNESS_LABEL = "Unavailable";
@@ -69,10 +69,10 @@ const resolveFreshnessState = ({
   isFallbackSnapshot: boolean;
   isHistoricalSelection?: boolean;
 }): SourceFreshnessState => {
-  if (freshnessState?.updatedAtLabel && freshnessState.stalenessLabel && freshnessState.mode) {
+  if (freshnessState?.updatedAtLabel && freshnessState.freshnessStatus && freshnessState.mode) {
     return {
       updatedAtLabel: normalizeFreshnessLabel(freshnessState.updatedAtLabel),
-      stalenessLabel: freshnessState.stalenessLabel,
+      freshnessStatus: freshnessState.freshnessStatus,
       mode: freshnessState.mode,
       timestamp: freshnessState.timestamp ?? null,
       ageHours: typeof freshnessState.ageHours === "number" ? freshnessState.ageHours : null,
@@ -82,7 +82,7 @@ const resolveFreshnessState = ({
   const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel ?? FALLBACK_FRESHNESS_LABEL);
   return {
     updatedAtLabel: normalizedFreshness,
-    stalenessLabel: isUnavailableFreshness(normalizedFreshness)
+    freshnessStatus: isUnavailableFreshness(normalizedFreshness)
       ? "unknown"
       : isFallbackSnapshot
         ? "stale"
@@ -380,7 +380,7 @@ export const buildDecisionReadinessState = ({
   });
   const normalizedFreshness = resolvedFreshness.updatedAtLabel;
   const freshnessWeak =
-    resolvedFreshness.stalenessLabel === "stale" || resolvedFreshness.stalenessLabel === "unknown";
+    resolvedFreshness.freshnessStatus === "stale" || resolvedFreshness.freshnessStatus === "unknown";
 
   if (isHistoricalSelection) {
     return {
@@ -468,7 +468,7 @@ export const buildTrustStatus = ({
     isFallbackSnapshot: isFallback,
     isHistoricalSelection: historicalSelection,
   });
-  const freshnessUnavailable = resolvedFreshness.stalenessLabel === "unknown";
+  const freshnessUnavailable = resolvedFreshness.freshnessStatus === "unknown";
   const historicalMacroCoverageDetail = historicalSelection && historicalMacroCoverageLabel
     ? ` Macro coverage: ${historicalMacroCoverageLabel}.`
     : "";

@@ -61,20 +61,19 @@ describe("navigation information architecture", () => {
   });
 
   it("keeps canonical route transitions for Decide and Method", () => {
-    const decideLayer = navigationLayers.find((layer) => layer.key === "decide");
-    const methodLayer = navigationLayers.find((layer) => layer.key === "method");
-
-    assert.equal(decideLayer?.href, "/resolve");
-    assert.equal(methodLayer?.href, "/trust");
-    assert.equal(decideLayer?.href.startsWith("#"), false);
-    assert.equal(methodLayer?.href.startsWith("#"), false);
+    const resolveLayer = navigationLayers.find((layer) => layer.key === "resolve");
+    const trustLayer = navigationLayers.find((layer) => layer.key === "trust");
+    assert.equal(resolveLayer?.href, "/resolve");
+    assert.equal(trustLayer?.href, "/trust");
+    assert.equal(resolveLayer?.href.startsWith("#"), false);
+    assert.equal(trustLayer?.href.startsWith("#"), false);
   });
 
   it("demotes Toolkits into a supporting surface with an explicit parent", () => {
     assert.equal(primaryNavigationLayers.length, 5);
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.key),
-      ["weekly-brief", "signals", "operations", "decide", "method"],
+      ["weekly-brief", "signals", "planning", "resolve", "trust"],
     );
 
     assert.deepEqual(
@@ -83,7 +82,7 @@ describe("navigation information architecture", () => {
         parentKey: layer.parentKey,
       })),
       [
-        { key: "toolkits", parentKey: "decide" },
+        { key: "toolkits", parentKey: "resolve" },
       ],
     );
   });

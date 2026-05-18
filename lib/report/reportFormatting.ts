@@ -25,7 +25,7 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 };
 
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Cash availability",
+  tightness: "Tightness",
   riskAppetite: "Market risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
@@ -223,7 +223,7 @@ export type CompactFreshnessMeta = {
   updatedAtLabel: string;
   confidenceCue: string;
   maxAge: "fresh" | "stale";
-  stalenessLabel: "fresh" | "stale" | "unknown";
+  freshnessStatus: "fresh" | "stale" | "unknown";
   mode: "live" | "cached" | "historical";
   timestamp: string | null;
   ageHours: number | null;
@@ -263,7 +263,7 @@ export const buildCompactFreshnessMeta = ({
   const staleByDate = normalizedUpdatedAt === "Unavailable" || ageHours === null;
   const staleByAge = ageHours !== null && ageHours > staleAfterHours;
   const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate || staleByAge ? "stale" : "fresh";
-  const stalenessLabel: "fresh" | "stale" | "unknown" = staleByDate
+  const freshnessStatus: "fresh" | "stale" | "unknown" = staleByDate
     ? "unknown"
     : staleByAge || isFallbackSnapshot
       ? "stale"
@@ -289,7 +289,7 @@ export const buildCompactFreshnessMeta = ({
     updatedAtLabel: normalizedUpdatedAt,
     confidenceCue,
     maxAge,
-    stalenessLabel,
+    freshnessStatus,
     mode,
     timestamp: hasParseableTimestamp ? new Date(timestamp).toISOString() : null,
     ageHours,

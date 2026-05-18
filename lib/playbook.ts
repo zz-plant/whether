@@ -4,13 +4,13 @@
  */
 import { insightDatabase } from "../data/recommendations";
 import type { RegimeKey } from "./regimeEngine";
-import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./report/decisionKnobs";
+import { businessAreaLabel, businessAreaOrder, type BusinessAreaKey } from "./report/decisionKnobs";
 import { buildCanonicalBoundedDecisionRules } from "./report/boundedDecisionRules";
 import { buildActionStripItems } from "./report/operatingCalls";
 import { formatDecisionAction, formatDecisionReversal, formatDecisionThreshold } from "./report/reportFormatting";
 
 type PlaybookOperatingLever = {
-  lever: OperatingLeverKey;
+  lever: BusinessAreaKey;
   label: string;
   actionNow: string;
   triggerThreshold: string;
@@ -72,12 +72,12 @@ const buildPlaybookOperatingLevers = ({
   const actionStripItems = buildActionStripItems(canonicalRules);
   const actionStripByLever = new Map(actionStripItems.map((item) => [item.lever, item]));
 
-  return operatingLeverOrder.map((lever) => {
+  return businessAreaOrder.map((lever) => {
     const stripItem = actionStripByLever.get(lever);
 
     return {
       lever,
-      label: operatingLeverLabel[lever],
+      label: businessAreaLabel[lever],
       actionNow: stripItem?.areaActionNow ?? CANONICAL_RULE_FALLBACK.actionNow,
       triggerThreshold: stripItem?.triggerThreshold ?? CANONICAL_RULE_FALLBACK.triggerThreshold,
       reversalCondition: stripItem?.reversalCondition ?? CANONICAL_RULE_FALLBACK.reversalCondition,

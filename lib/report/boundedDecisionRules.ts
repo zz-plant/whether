@@ -15,8 +15,11 @@ export type BoundedDecisionRule = {
   doNow: string[];
   avoidNow: string[];
   scope: string;
+  /** Maps to UI label "Threshold" — the condition that triggers a pause */
   pauseTrigger: string;
+  /** Maps to UI label "Reversal" — the condition that clears the pause */
   resumeTrigger: string;
+  /** Additional conditions that would flip the regime/decision */
   flipConditions: Array<{
     metric: "tightness" | "riskAppetite";
     operator: ">" | ">=" | "<" | "<=";

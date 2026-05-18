@@ -3,10 +3,10 @@ import type { Route } from "./routeType";
 export type NavigationLayerKey =
   | "weekly-brief"
   | "signals"
-  | "operations"
-  | "decide"
+  | "planning"
+  | "resolve"
   | "toolkits"
-  | "method";
+  | "trust";
 
 export type NavigationLayer = {
   key: NavigationLayerKey;
@@ -48,19 +48,19 @@ export const navigationLayers: NavigationLayer[] = [
     tier: "primary",
   },
   {
-    key: "operations",
+    key: "planning",
     href: "/planning",
-    label: "Planning",
+    label: "Plan",
     navLabel: "Plan",
-    description: "Turn this week's read into decisions on hiring, spend, roadmap, and what to share.",
-    boundary: "Use this when you are ready to turn the call into approvals.",
+    description: "Turn this week's brief into decisions on hiring, spend, roadmap, and what to share.",
+    boundary: "Use this when you are ready to turn the brief into approvals.",
     group: "workflow",
     tier: "primary",
   },
   {
-    key: "decide",
+    key: "resolve",
     href: "/resolve",
-    label: "Decision Tools",
+    label: "Resolve",
     navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",
     boundary: "Use this page when the brief is clear but one question still needs an answer.",
@@ -68,12 +68,12 @@ export const navigationLayers: NavigationLayer[] = [
     tier: "primary",
   },
   {
-    key: "method",
+    key: "trust",
     href: "/trust",
     label: "Trust",
-    navLabel: "Verify",
-    description: "Check freshness, confidence, source coverage, and what would change the call.",
-    boundary: "Use this when you want to sanity-check the call before a big decision.",
+    navLabel: "Trust",
+    description: "Check freshness, confidence, source coverage, and what would change the brief.",
+    boundary: "Use this when you want to sanity-check the brief before a big decision.",
     group: "reference",
     tier: "primary",
   },
@@ -86,7 +86,7 @@ export const navigationLayers: NavigationLayer[] = [
     boundary: "Use these after you've narrowed the question in Decision Tools.",
     group: "workflow",
     tier: "supporting",
-    parentKey: "decide",
+    parentKey: "resolve",
   },
 ] as const;
 

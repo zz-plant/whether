@@ -15,10 +15,10 @@ type GlobalHeaderNavClientProps = {
 };
 
 const FIRST_VISIT_NAV_KEY = "whether_nav_hints_dismissed";
-const STEP_LABELS = ["Read", "Evidence", "Plan", "Decide", "Verify"];
+const STEP_LABELS = ["Read", "Evidence", "Plan", "Resolve", "Trust"];
 const STEP_HINTS = [
-  "This week's call and decision",
-  "Proof and thresholds behind the call",
+  "This week's brief and decision",
+  "Proof and thresholds behind the brief",
   "Turn the call into approvals",
   "Close one open question",
   "Freshness, confidence, and sources",
