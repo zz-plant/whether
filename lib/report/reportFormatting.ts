@@ -11,10 +11,10 @@ export type DecisionPhraseTriplet = {
 };
 
 export const publicDecisionLabels = {
-  call: "Stance",
+  call: "Posture",
   action: "Do now",
   threshold: "Pause if",
-  reversal: "Clears when",
+  reversal: "Re-open when",
   evidence: "Evidence",
 } as const;
 
@@ -25,10 +25,10 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 };
 
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Tightness",
-  riskAppetite: "Market risk appetite",
+  tightness: "Credit conditions",
+  riskAppetite: "Investor sentiment",
   baseRate: "Fed interest rate",
-  curveSlope: "Recession warning gauge",
+  curveSlope: "Recession gauge",
 };
 
 export const buildRegimeAlert = (

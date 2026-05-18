@@ -17,7 +17,7 @@ export function CadenceSelector() {
   if (pathname !== "/") return null;
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5">
+    <div className="flex items-center gap-1 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5" role="group" aria-label="Cadence">
       {CADENCES.map((c) => (
         <button
           key={c.key}
@@ -29,6 +29,7 @@ export function CadenceSelector() {
             const qs = params.toString();
             router.replace(qs ? `/?${qs}` : "/", { scroll: false });
           }}
+          aria-pressed={current === c.key}
           className={`rounded-full px-3 py-1 text-fluid-micro font-semibold transition-colors ${
             current === c.key
               ? "bg-sky-500/14 text-sky-100"

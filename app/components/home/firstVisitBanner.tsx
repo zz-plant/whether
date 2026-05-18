@@ -36,9 +36,8 @@ export function FirstVisitBanner() {
                 This is your weekly operating brief.
               </p>
               <p className="text-sm leading-relaxed text-sky-200/80">
-                Whether translates U.S. macro signals into a weekly decision:{" "}
-                <strong className="text-sky-100">what to do, what to watch, when conditions shift.</strong>
-                {" "}The card above is this week&apos;s call. Below it you&apos;ll find the evidence, thresholds, and context behind it.
+                U.S. macro signals → one weekly decision:{" "}
+                <strong className="text-sky-100">what to do, what to watch, when to flip.</strong>
               </p>
             </>
           ) : (
@@ -47,8 +46,7 @@ export function FirstVisitBanner() {
                 Welcome back — the brief has updated.
               </p>
               <p className="text-sm leading-relaxed text-slate-300">
-                The <strong>decision card</strong> above shows what to do, what to watch for, and when conditions shift.
-                Dig into <strong>Evidence</strong> to see what moved.
+                The <strong>decision card</strong> above is this week&apos;s call. Head to <strong>Evidence</strong> to see what changed.
               </p>
             </>
           )}

@@ -157,7 +157,7 @@ export function PageDeltaSummary({
               onClick={() => setShowFull(true)}
               className="mt-2 self-start inline-flex items-center gap-1 rounded-full border border-slate-700/60 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/30 hover:text-sky-200 transition-colors"
             >
-              Show analysis →
+              Show compass &amp; analysis →
             </button>
           </div>
         ) : (

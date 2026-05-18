@@ -5,6 +5,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "@base-ui/react/tooltip";
+import { Menu } from "@base-ui/react/menu";
 import {
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
@@ -101,7 +102,6 @@ function WorkflowStep({
 
 function SecondaryNavLinks() {
   const pathname = usePathname() ?? "/";
-  const [showMore, setShowMore] = useState(false);
   const secondaryLinks = [
     { href: "/this-week" as Route, label: "This Week" },
     { href: "/current-regime" as Route, label: "Regime" },
@@ -137,32 +137,28 @@ function SecondaryNavLinks() {
           </Link>
         );
       })}
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setShowMore(!showMore)}
-          className="rounded-full px-2.5 py-1.5 text-fluid-xs font-medium text-slate-500 hover:text-slate-300 transition-colors"
-        >
+      <Menu.Root>
+        <Menu.Trigger className="rounded-full px-2.5 py-1.5 text-fluid-xs font-medium text-slate-500 hover:text-slate-300 transition-colors cursor-pointer">
           More ▾
-        </button>
-        {showMore ? (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setShowMore(false)} />
-            <div className="absolute right-0 top-full z-20 mt-1 w-40 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
+        </Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner sideOffset={4} align="end">
+            <Menu.Popup className="z-20 w-40 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
               {moreLinks.map((link) => (
-                <Link
+                <Menu.Item
                   key={link.href}
-                  href={link.href}
-                  onClick={() => setShowMore(false)}
-                  className="block rounded-md px-3 py-2 text-fluid-xs font-medium text-slate-300 no-underline hover:bg-slate-800/60"
-                >
-                  {link.label}
-                </Link>
+                  className="w-full rounded-md px-3 py-2 text-left text-fluid-xs font-medium text-slate-300 no-underline hover:bg-slate-800/60 cursor-pointer"
+                  render={
+                    <Link href={link.href} className="block">
+                      {link.label}
+                    </Link>
+                  }
+                />
               ))}
-            </div>
-          </>
-        ) : null}
-      </div>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
     </nav>
   );
 }

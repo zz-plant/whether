@@ -30,7 +30,6 @@ import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CadenceSelector } from "./components/cadenceSelector";
-import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
 export const revalidate = 300;
@@ -243,7 +242,6 @@ export const HomePageReportContent = async ({
         />
         <OperatorContextWrapper />
         <FirstVisitBanner />
-        <BriefConfigureStrip />
 
         <HowItWorks />
 
@@ -270,6 +268,12 @@ export const HomePageReportContent = async ({
         <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
         <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
 
+        <HomeRevisitFlipSection
+          interpretationLayer={homepage.interpretationLayer}
+          interpretationSearchParams={homepage.interpretationSearchParams}
+          fallbackAlert={homepage.fallbackAlert}
+        />
+
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
           <div>
             <p className="text-fluid-micro text-slate-500">
@@ -284,11 +288,6 @@ export const HomePageReportContent = async ({
 
       <DiscoverabilityStrip />
       <HomeRoutePrefetch />
-      <HomeRevisitFlipSection
-        interpretationLayer={homepage.interpretationLayer}
-        interpretationSearchParams={homepage.interpretationSearchParams}
-        fallbackAlert={homepage.fallbackAlert}
-      />
       <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
         <HomeKeyTermsDisclosure />
       </Suspense>

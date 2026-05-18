@@ -122,7 +122,7 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
                 <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:col-span-2">
-                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Clears when</p>
+                  <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Re-open when</p>
                   <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/36" />
                 </article>
               </section>

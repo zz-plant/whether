@@ -54,10 +54,7 @@ export function WeeklyDecisionContent({
         <details className="group rounded border border-slate-800/80 bg-slate-950/35 px-4 py-3 sm:px-5 sm:py-4">
           <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
             <span className="min-w-0">
-              <span className="block text-slate-100">Decision details</span>
-              <span className="mt-1 block text-fluid-xs font-normal normal-case tracking-normal text-slate-400">
-                Rules by area and what would change the call
-              </span>
+              <span className="block text-slate-100">Operating rules</span>
             </span>
             <span aria-hidden="true" className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-fluid-xs text-slate-400 transition group-open:rotate-180">
               ▾
