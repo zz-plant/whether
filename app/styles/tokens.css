@@ -63,58 +63,55 @@
   --weather-interactive-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --weather-focus-ring: rgba(125, 211, 252, 0.88);
   --weather-focus-halo: rgba(14, 165, 233, 0.32);
-  --weather-primary-gradient: linear-gradient(135deg, rgba(36, 99, 235, 0.94), rgba(14, 116, 144, 0.92) 58%, rgba(14, 24, 24, 0.9));
-  --weather-primary-shadow:
-    0 14px 24px -20px rgba(14, 165, 233, 0.26),
-    0 6px 14px -12px rgba(59, 130, 246, 0.16),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
-  --weather-primary-shadow-hover:
-    0 18px 30px -20px rgba(14, 165, 233, 0.34),
-    0 8px 16px -12px rgba(59, 130, 246, 0.22),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.22);
-  --weather-secondary-shadow:
-    inset 0 0 0 1px rgba(125, 211, 252, 0.05),
-    0 10px 18px -18px rgba(2, 6, 23, 0.54);
-  --weather-secondary-shadow-hover:
-    inset 0 0 0 1px rgba(125, 211, 252, 0.08),
-    0 14px 24px -18px rgba(2, 6, 23, 0.68),
-    0 6px 14px -12px rgba(14, 165, 233, 0.08);
-  --panel-bg: rgba(42, 42, 42, 0.95);
-  --panel-border: rgba(148, 163, 184, 0.14);
-  --surface-bg: rgba(18, 18, 18, 0.48);
-  --surface-border: rgba(148, 163, 184, 0.07);
-  --color-bg-nested: rgba(18, 18, 18, 0.55);
-  --color-bg-raised: rgba(34, 34, 34, 0.78);
-  --color-bg-overlay: rgba(12, 12, 12, 0.88);
-  --color-text-decorative: rgb(148 163 184 / 1.0);
 
-  /* Surface & border color tokens — consolidated from repeated rgba values across components */
-  --border-default: rgba(148, 163, 184, 0.10);
-  --border-strong: rgba(148, 163, 184, 0.18);
-  --border-subtle: rgba(148, 163, 184, 0.16);
-  --border-faint: rgba(148, 163, 184, 0.08);
-  --bg-surface: rgba(34, 34, 34, 0.68);
-  --bg-surface-muted: rgba(34, 34, 34, 0.50);
-  --bg-surface-raised: rgba(34, 34, 34, 0.60);
-  --shadow-mid: rgba(2, 6, 23, 0.48);
-  --shadow-heavy: rgba(2, 6, 23, 0.60);
-  --shadow-light: rgba(2, 6, 23, 0.40);
-  --accent-glow: rgba(56, 189, 248, 0.06);
-  --accent-border: rgba(56, 189, 248, 0.28);
-  --accent-strong: rgba(56, 189, 248, 0.62);
-  --white-overlay-faint: rgba(255, 255, 255, 0.04);
-  --white-overlay-subtle: rgba(255, 255, 255, 0.03);
-  --display-shape: rectangular;
-  --accent-glow-faint: rgba(125, 211, 252, 0.05);
-  --accent-border-soft: rgba(56, 189, 248, 0.16);
-  --bg-nested: rgba(15, 23, 42, 0.28);
-  --bg-nested-light: rgba(15, 23, 42, 0.12);
+  /* Surfaces — flat, no gradient overlays */
+  --bg-body: #0a0a0a;
+  --bg-panel: #1a1a1a;
+  --bg-surface: #141414;
+  --bg-raised: #222222;
+  --bg-nested: #111111;
+  --bg-overlay: #0a0a0a;
+
+  /* Borders */
+  --border-default: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+
+  /* Accent colors — blue reserved for CTAs, teal for live, amber for warnings */
+  --accent-blue: #38bdf8;
+  --accent-teal: #2dd4bf;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-emerald: #10b981;
+
+  /* CTA button */
+  --cta-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(14, 116, 144, 0.85));
+  --cta-shadow: 0 8px 20px -12px rgba(56, 189, 248, 0.3);
+  --cta-shadow-hover: 0 12px 28px -12px rgba(56, 189, 248, 0.45);
+
+  /* Semantic colors */
+  --semantic-tighten: #f87171;
+  --semantic-ease: #34d399;
+  --semantic-caution: #fbbf24;
+  --semantic-reversal: #fb7185;
+  --semantic-unchanged: #94a3b8;
+
+  /* Text */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-decorative: rgba(148, 163, 184, 0.6);
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
-  background-color: #121212;
+  background-color: var(--bg-body);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overflow-x: clip;
@@ -124,8 +121,9 @@ html {
 }
 
 body {
-  background: #121212;
-  color: #f1f5f9;
+  background: var(--bg-body);
+  background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(56, 189, 248, 0.04), transparent 60%);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
@@ -135,9 +133,6 @@ body {
   overflow-x: clip;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  background:
-    radial-gradient(72rem 36rem at 50% -8%, rgba(56, 189, 248, 0.07), transparent 60%),
-    linear-gradient(180deg, rgba(10, 10, 10, 1) 0%, rgba(14, 14, 14, 1) 50%, rgba(10, 10, 10, 1) 100%);
 }
 
 ::selection {

@@ -12,11 +12,10 @@
 }
 
 .weather-surface {
-  @apply rounded-lg border backdrop-blur-sm;
+  @apply rounded-lg border;
   border-color: var(--border-default);
   background: var(--bg-surface);
-  box-shadow:
-    0 8px 16px -12px var(--shadow-mid);
+  box-shadow: var(--shadow-sm);
   container-type: inline-size;
 }
 
@@ -646,8 +645,8 @@ button .weather-chip:active,
   border-radius: var(--weather-radius-control);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  background: var(--weather-primary-gradient);
-  box-shadow: var(--weather-primary-shadow);
+  background: var(--cta-gradient);
+  box-shadow: var(--cta-shadow);
   text-decoration: none;
   transition:
     transform var(--weather-interactive-duration) var(--weather-interactive-ease),
@@ -677,8 +676,8 @@ button .weather-chip:active,
 .weather-cta-primary {
   border-color: rgba(56, 189, 248, 0.72);
   color: rgb(241 245 249);
-  background: var(--weather-primary-gradient);
-  box-shadow: var(--weather-primary-shadow);
+  background: var(--cta-gradient);
+  box-shadow: var(--cta-shadow);
 }
 
 .weather-cta-secondary {
@@ -754,7 +753,7 @@ button .weather-chip:active,
   .weather-button-primary:hover {
     transform: translateY(-2px);
     border-color: rgba(125, 211, 252, 0.9);
-    box-shadow: var(--weather-primary-shadow-hover);
+    box-shadow: var(--cta-shadow-hover);
   }
 
   .weather-cta-primary:hover,
@@ -765,7 +764,7 @@ button .weather-chip:active,
 
   .weather-cta-primary:hover {
     border-color: rgba(125, 211, 252, 0.9);
-    box-shadow: var(--weather-primary-shadow-hover);
+    box-shadow: var(--cta-shadow-hover);
   }
 
   .weather-cta-secondary:hover {

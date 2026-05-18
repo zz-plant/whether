@@ -5,6 +5,7 @@ import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
+import { buildAgentInterfaceResponse, supportedAgentCadences, isAgentCadence } from "../lib/agentInterface";
 import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
@@ -21,6 +22,7 @@ import {
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 import { HomeDeltaStrip } from "./components/home/deltaStrip";
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
+import { CadenceSelector } from "./components/cadenceSelector";
 import { BriefConfigureStrip } from "./components/home/briefConfigureStrip";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -59,10 +61,18 @@ export const HomePageReportContent = async ({
   const cookieHeader = cookieStore.toString();
   const operatorContext = parseOperatorContextFromCookies(cookieHeader);
 
+  const activeCadence = resolvedSearchParams?.cadence && isAgentCadence(resolvedSearchParams.cadence)
+    ? resolvedSearchParams.cadence
+    : "weekly";
+
   const homepage = await assembleHomePage({
     searchParams: resolvedSearchParams,
     operatorContext,
   });
+
+  const cadenceData = activeCadence !== "weekly"
+    ? await buildAgentInterfaceResponse(activeCadence).catch(() => null)
+    : null;
   const initialArtifactMode = isArtifactMode(resolvedSearchParams?.artifactMode)
     ? resolvedSearchParams.artifactMode
     : undefined;
@@ -175,37 +185,29 @@ export const HomePageReportContent = async ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
       />
       <OperatorContextWrapper />
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <CadenceSelector />
+      </div>
+      {cadenceData && activeCadence !== "weekly" ? (
+        <div className="mb-3 rounded-lg border border-sky-500/20 bg-sky-500/8 px-4 py-3">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">
+            {activeCadence === "monthly" ? "Monthly" : activeCadence === "quarterly" ? "Quarterly" : "Yearly"} summary
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-200">
+            {cadenceData && typeof cadenceData === "object" ? (
+              <>
+                {(cadenceData as any).summary?.regime ? <span>Regime: <strong>{(cadenceData as any).summary.regime}</strong></span> : null}
+                {(cadenceData as any).summary?.action ? <span>Action: <strong>{(cadenceData as any).summary.action}</strong></span> : null}
+                {(cadenceData as any).recordDateLabel ? <span className="text-slate-500">As of {(cadenceData as any).recordDateLabel}</span> : null}
+              </>
+            ) : <span>Viewing the {activeCadence} brief.</span>}
+          </div>
+        </div>
+      ) : null}
       <BriefConfigureStrip />
-      <PageDeltaSummary
-        regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
-        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
-        tightnessDelta={
-          homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals
-            .find((s) => s.key === "tightness")?.delta ?? 0
-        }
-        riskAppetiteDelta={
-          homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals
-            .find((s) => s.key === "riskAppetite")?.delta ?? 0
-        }
-        actionShort={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
-        postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
-        recordDate={homepage.reportShell.recordDateLabel}
-        companyStage={operatorContext.companyStage}
-        rateSensitivity={operatorContext.rateSensitivity}
-        confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-        freshnessLabel={homepage.reportShell.fetchedAtLabel}
-        sourceLabel={homepage.reportShell.treasurySource}
-        tightnessThreshold={reportData.assessment?.thresholds?.tightnessRegime ?? 70}
-        riskAppetiteThreshold={reportData.assessment?.thresholds?.riskAppetiteRegime ?? 50}
-      />
       <FirstVisitBanner />
-      <HomeDeltaStrip
-        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
-        recordDate={homepage.reportShell.recordDateLabel}
-      />
-      <HomeRoutePrefetch />
+
+      {/* Decision card — the primary output, shown first */}
       <ErrorBoundary label="Weekly decision card">
         <div data-share-section="decision">
           <HomeWhatChangedSection
@@ -217,6 +219,27 @@ export const HomePageReportContent = async ({
           />
         </div>
       </ErrorBoundary>
+
+      {/* Scores and data — supporting evidence, below the decision */}
+      <PageDeltaSummary
+        regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
+        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+        tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
+        riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
+        actionShort={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
+        postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
+        recordDate={homepage.reportShell.recordDateLabel}
+        companyStage={operatorContext.companyStage}
+        rateSensitivity={operatorContext.rateSensitivity}
+        confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+        freshnessLabel={homepage.reportShell.fetchedAtLabel}
+        sourceLabel={homepage.reportShell.treasurySource}
+        tightnessThreshold={reportData.assessment?.thresholds?.tightnessRegime ?? 70}
+        riskAppetiteThreshold={reportData.assessment?.thresholds?.riskAppetiteRegime ?? 50}
+      />
+
+      <HomeRoutePrefetch />
       <HomeRevisitFlipSection
         interpretationLayer={homepage.interpretationLayer}
         interpretationSearchParams={homepage.interpretationSearchParams}

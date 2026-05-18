@@ -32,11 +32,14 @@ type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroug
 export default {
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     const secret = env.WHETHER_CRON_SECRET;
-    const url = "https://whether.work/api/email/send-weekly";
-    await fetch(url, {
-      method: "POST",
-      headers: secret ? { Authorization: `Bearer ${secret}` } : {},
-    });
+    const headers: Record<string, string> = {};
+    if (secret) headers["Authorization"] = `Bearer ${secret}`;
+
+    /* Send weekly brief to email subscribers */
+    await fetch("https://whether.work/api/email/send-weekly", { method: "POST", headers });
+
+    /* Check if regime changed and alert if so */
+    await fetch("https://whether.work/api/check-regime-change", { method: "POST", headers });
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {

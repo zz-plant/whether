@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
-import { subscribeEmail, unsubscribeEmail } from "../../lib/email/emailDelivery";
+import { subscribeEmail } from "../../lib/email/emailDelivery";
+
 import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
 

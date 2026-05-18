@@ -4,8 +4,6 @@
  * via a minimal adapter interface. Currently stubs the delivery path.
  */
 
-import { buildWeeklyBriefEmailHtml, buildWeeklyBriefEmailText, type WeeklyBriefEmailProps } from "./weeklyBriefEmail";
-
 export type EmailRecipient = {
   email: string;
   name?: string;
@@ -59,28 +57,7 @@ export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
   };
 };
 
-/**
- * Build and send a weekly brief email for a given recipient.
- */
-export const sendWeeklyBriefEmail = async (
-  adapter: EmailDeliveryAdapter,
-  recipient: EmailRecipient,
-  briefProps: Omit<WeeklyBriefEmailProps, "briefUrl" | "tickerLabel"> & { tickerLabel?: string },
-): Promise<{ ok: true } | { ok: false; error: string }> => {
-  const briefUrl = `https://whether.app/${recipient.tickerConfig ? `?ticker=${recipient.tickerConfig}` : ""}`;
 
-  const props: WeeklyBriefEmailProps = {
-    ...briefProps,
-    briefUrl,
-    tickerLabel: recipient.tickerConfig ?? briefProps.tickerLabel,
-  };
-
-  const subject = `Whether Brief — ${props.regimeLabel}`;
-  const html = buildWeeklyBriefEmailHtml(props);
-  const text = buildWeeklyBriefEmailText(props);
-
-  return adapter.send({ to: recipient, subject, html, text });
-};
 
 const SUBSCRIPTIONS_KV_KEY = "email:subscriptions";
 

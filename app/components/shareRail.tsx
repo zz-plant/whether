@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
+import { CalendarButton } from "./calendarButton";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -91,6 +92,17 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
           </label>
 
           <div className="border-t border-slate-800/60 pt-3">
+            <div className="mb-3">
+              <CalendarButton
+                title="Whether Weekly Brief"
+                description="Review the weekly operating brief from Whether."
+                date={(() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                  return d.toISOString().split("T")[0];
+                })()}
+              />
+            </div>
             <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Copy as</p>
             <div className="mt-2 flex gap-2">
               <button

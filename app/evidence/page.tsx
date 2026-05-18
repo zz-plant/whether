@@ -5,6 +5,7 @@ import { HistoricalBanner } from "../components/historicalBanner";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
+import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import {
   SignalsAdvancedControlsSection,
@@ -121,7 +122,13 @@ export default async function SignalsPage({
         searchParams={resolvedSearchParams}
       />
 
-      <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
+      <div className="weather-panel space-y-4 px-5 py-5">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trends</p>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <HistoricalTrendChart metric="tightness" label="Tightness" color="#f87171" />
+          <HistoricalTrendChart metric="riskAppetite" label="Risk appetite" color="#34d399" />
+        </div>
+      </div>
 
       {model.activeSignalsView === "implication" ? (
         <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />
