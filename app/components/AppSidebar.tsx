@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
+import { FileText, BarChart3, ClipboardList, Search, Shield, TrendingUp } from "lucide-react";
 
 const WORKFLOW_STEPS = [
-  { href: "/" as Route, label: "Brief", desc: "This week's call", icon: "📋" },
-  { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds", icon: "📊" },
-  { href: "/planning" as Route, label: "Plan", desc: "Create your plan", icon: "📐" },
-  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question", icon: "🔍" },
-  { href: "/trust" as Route, label: "Trust", desc: "Methodology", icon: "🛡" },
-  { href: "/history" as Route, label: "History", desc: "Trends over time", icon: "📈" },
+  { href: "/" as Route, label: "Brief", desc: "This week's call", Icon: FileText },
+  { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds", Icon: BarChart3 },
+  { href: "/planning" as Route, label: "Plan", desc: "Create your plan", Icon: ClipboardList },
+  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question", Icon: Search },
+  { href: "/trust" as Route, label: "Trust", desc: "Methodology", Icon: Shield },
+  { href: "/history" as Route, label: "History", desc: "Trends over time", Icon: TrendingUp },
 ] as const;
 
 const SECONDARY_LINKS = [
@@ -27,14 +28,14 @@ function NavItem({
   href,
   label,
   desc,
-  icon,
+  Icon,
   isActive,
   onClick,
 }: {
   href: string;
   label: string;
   desc?: string;
-  icon?: string;
+  Icon?: React.ComponentType<{ className?: string }>;
   isActive: boolean;
   onClick?: () => void;
 }) {
@@ -50,7 +51,7 @@ function NavItem({
           : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
       }`}
     >
-      {icon ? <span className="text-base flex-shrink-0">{icon}</span> : null}
+      {Icon ? <Icon className="h-4 w-4 flex-shrink-0" /> : null}
       <div className="flex flex-col min-w-0">
         <span className="font-medium">{label}</span>
       {desc ? (
@@ -90,7 +91,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               href={step.href}
               label={step.label}
               desc={step.desc}
-              icon={step.icon}
+              Icon={step.Icon}
               isActive={isActive}
               onClick={onClose}
             />
