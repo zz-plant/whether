@@ -76,7 +76,7 @@ html[data-theme-variant="sepia"] {
   --accent-danger: #dc2626;
   --text-primary: #f0e6d3;
   --text-secondary: #a09080;
-  --text-muted: #706050;
+  --text-muted: #8a7a6a;
   --border-default: rgba(180,130,60,0.06);
   --border-strong: rgba(180,130,60,0.10);
   --cta-gradient: linear-gradient(135deg, rgba(212,160,48,0.9), rgba(146,100,20,0.85));
@@ -206,9 +206,9 @@ html[data-theme-variant="neon"] {
 html[data-theme-variant="mono"] {
   --accent-action: #94a3b8;
   --accent-info: #64748b;
-  --accent-success: #94a3b8;
-  --accent-warning: #94a3b8;
-  --accent-danger: #94a3b8;
+  --accent-success: #86a890;
+  --accent-warning: #b8a070;
+  --accent-danger: #b89090;
   --accent-strong: rgba(148,163,184,0.5);
   --accent-glow: rgba(148,163,184,0.04);
   --accent-glow-faint: rgba(148,163,184,0.02);
