@@ -28,7 +28,7 @@ export function KeyboardShortcuts() {
   }, []);
 
   return (
-    <p className="text-center text-fluid-micro text-slate-700 py-2">
+    <p className="hidden sm:block text-center text-fluid-micro text-slate-700 py-2">
       Press <kbd className="rounded border border-slate-700 px-1 text-slate-600">E</kbd> Evidence <kbd className="rounded border border-slate-700 px-1 text-slate-600">P</kbd> Plan <kbd className="rounded border border-slate-700 px-1 text-slate-600">H</kbd> History <kbd className="rounded border border-slate-700 px-1 text-slate-600">/</kbd> Search
     </p>
   );
