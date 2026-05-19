@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { GlobalHeader } from "./components/globalHeader";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
+import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { BackToTop } from "./components/backToTop";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { siteUrl } from "../lib/siteUrl";
@@ -155,6 +156,7 @@ export default function RootLayout({
             Skip to content
           </a>
           <GlobalHeader />
+          <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
         <BackToTop />
