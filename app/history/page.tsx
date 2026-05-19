@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReportShell } from "../components/reportShell";
+import { PageMasthead } from "../components/PageMasthead";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
@@ -64,6 +65,7 @@ export default function HistoryPage() {
         chrome: { sidebarVariant: "full" },
       }}
     >
+      <PageMasthead page="History" summary="Tightness and risk appetite over time. Select a period to see past conditions." />
       <section className="weather-panel space-y-5 px-5 py-5">
         <h1 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h1>
         <p className="text-sm text-slate-300">

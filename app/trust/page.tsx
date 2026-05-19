@@ -4,6 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { SourceHealthPanel } from "../components/sourceHealthPanel";
 import { ReportShell } from "../components/reportShell";
+import { PageMasthead } from "../components/PageMasthead";
 import {
   PRIMARY_AUDIENCE_ACTION,
   PRIMARY_AUDIENCE_SUMMARY,
@@ -39,6 +40,7 @@ export default async function MethodPage() {
 
   return (
     <ReportShell {...reportShellProps}>
+      <PageMasthead page="Trust" summary="Freshness, source coverage, and how heavily to lean on this week's brief." />
       <MethodSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief.">
         <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
           <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>

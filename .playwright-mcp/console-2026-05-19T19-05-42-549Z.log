@@ -1,0 +1,19 @@
+[   16116ms] [WARNING] Cache API not supported, falling back to memory cache @ http://romm-pi.local:8282/assets/index-C3VQmLN3.js:110
+[   23069ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://romm-pi.local:8282/api/tasks:0
+[   23077ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://romm-pi.local:8282/api/users/me:0
+[   23390ms] [ERROR] Error fetching tasks:  AxiosError: Request failed with status code 403
+    at MA (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:68:1091)
+    at XMLHttpRequest.y (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:68:5953)
+    at so.request (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:70:2094)
+    at async Proxy.fetchTasks (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:113:56514)
+    at async Promise.all (index 3)
+    at async wY (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:113:57108)
+    at async SY (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:113:57241) @ http://romm-pi.local:8282/assets/index-C3VQmLN3.js:112
+[   23713ms] [ERROR] Error fetching current user:  AxiosError: Request failed with status code 403
+    at MA (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:68:1091)
+    at XMLHttpRequest.y (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:68:5953)
+    at so.request (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:70:2094)
+    at async Proxy.fetchCurrentUser (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:111:27387)
+    at async Promise.all (index 1)
+    at async wY (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:113:57108)
+    at async SY (http://romm-pi.local:8282/assets/index-C3VQmLN3.js:113:57241) @ http://romm-pi.local:8282/assets/index-C3VQmLN3.js:110

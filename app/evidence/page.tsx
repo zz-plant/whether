@@ -17,6 +17,7 @@ import {
   SignalsModeSwitcherSection,
   SignalsNeedMoreProofSection,
 } from "./components/evidenceSections";
+import { PageMasthead } from "../components/PageMasthead";
 
 export { buildDiagnosticsExpansionHref } from "./evidenceQueryState";
 
@@ -101,13 +102,11 @@ export default async function SignalsPage({
       }
     >
       <OperatorWorkflowRouteTracker />
-      <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 mb-4">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">What this page shows</p>
-        <p className="text-xs text-slate-300 leading-relaxed">
-          {model.decisionDeltaLabel ? `This week's call: ${model.decisionDeltaLabel}. ` : ""}
-          The evidence below shows what changed, how close we are to watch lines, and what would flip the call.
-        </p>
-      </div>
+      <PageMasthead
+        page="Evidence"
+        summary={model.decisionDeltaLabel ? `${model.decisionDeltaLabel}. Evidence below shows what changed, how close we are to watch lines, and what would flip the call.` : "What changed, why, and what would flip the weekly call."}
+        recordDate={model.recordDateLabel}
+      />
       <SignalsDecisionSummarySection
         decisionDeltaLabel={model.decisionDeltaLabel}
         triggerCondition={model.triggerCondition}
