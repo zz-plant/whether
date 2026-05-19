@@ -131,6 +131,16 @@ html[data-theme-variant="paper"] {
   --font-display: "Fraunces", Georgia, serif;
   background-image: radial-gradient(48rem 24rem at 50% -10%, rgba(139,69,19,0.04), transparent 58%);
 }
+html[data-theme-variant="paper"] .regime-compass-text { fill: rgba(71,85,105,0.7); }
+html[data-theme-variant="paper"] .regime-compass-grid { stroke: rgba(0,0,0,0.1); }
+html[data-theme-variant="paper"] .regime-compass-dot { stroke: #fff; }
+html[data-theme-variant="paper"] .weather-input,
+html[data-theme-variant="paper"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme-variant="paper"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme-variant="paper"] .weather-button-primary { color: #4a2800; }
+html[data-theme-variant="paper"] .bg-slate-950\/40 { background: rgba(0,0,0,0.04) !important; }
+html[data-theme-variant="paper"] .bg-slate-950 { background: var(--bg-body) !important; }
+html[data-theme-variant="paper"] .bg-slate-800\/50 { background: rgba(0,0,0,0.06) !important; }
 
 /* 7. Minimal Light — cool white, clean */
 html[data-theme-variant="minimal"] {
@@ -172,6 +182,16 @@ html[data-theme-variant="minimal"] {
   --white-overlay-faint: rgba(0,0,0,0.005);
   background-image: radial-gradient(48rem 24rem at 50% -10%, rgba(37,99,235,0.04), transparent 58%);
 }
+html[data-theme-variant="minimal"] .regime-compass-text { fill: rgba(71,85,105,0.7); }
+html[data-theme-variant="minimal"] .regime-compass-grid { stroke: rgba(0,0,0,0.1); }
+html[data-theme-variant="minimal"] .regime-compass-dot { stroke: #fff; }
+html[data-theme-variant="minimal"] .weather-input,
+html[data-theme-variant="minimal"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme-variant="minimal"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme-variant="minimal"] .weather-button-primary { color: #0a1628; }
+html[data-theme-variant="minimal"] .bg-slate-950\/40 { background: rgba(0,0,0,0.03) !important; }
+html[data-theme-variant="minimal"] .bg-slate-950 { background: var(--bg-body) !important; }
+html[data-theme-variant="minimal"] .bg-slate-800\/50 { background: rgba(0,0,0,0.05) !important; }
 
 /* 8. Neon — high contrast, vibrant */
 html[data-theme-variant="neon"] {
