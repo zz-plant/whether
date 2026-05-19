@@ -141,6 +141,10 @@ html[data-theme-variant="paper"] .weather-button-primary { color: #4a2800; }
 html[data-theme-variant="paper"] .bg-slate-950\/40 { background: rgba(0,0,0,0.04) !important; }
 html[data-theme-variant="paper"] .bg-slate-950 { background: var(--bg-body) !important; }
 html[data-theme-variant="paper"] .bg-slate-800\/50 { background: rgba(0,0,0,0.06) !important; }
+html[data-theme-variant="paper"] .text-amber-200,
+html[data-theme-variant="paper"] .text-amber-200\/80 { color: #b45309 !important; }
+html[data-theme-variant="paper"] .text-emerald-200 { color: #047857 !important; }
+html[data-theme-variant="paper"] .text-sky-200 { color: #0369a1 !important; }
 
 /* 7. Minimal Light — cool white, clean */
 html[data-theme-variant="minimal"] {
@@ -192,6 +196,10 @@ html[data-theme-variant="minimal"] .weather-button-primary { color: #0a1628; }
 html[data-theme-variant="minimal"] .bg-slate-950\/40 { background: rgba(0,0,0,0.03) !important; }
 html[data-theme-variant="minimal"] .bg-slate-950 { background: var(--bg-body) !important; }
 html[data-theme-variant="minimal"] .bg-slate-800\/50 { background: rgba(0,0,0,0.05) !important; }
+html[data-theme-variant="minimal"] .text-amber-200,
+html[data-theme-variant="minimal"] .text-amber-200\/80 { color: #b45309 !important; }
+html[data-theme-variant="minimal"] .text-emerald-200 { color: #047857 !important; }
+html[data-theme-variant="minimal"] .text-sky-200 { color: #0369a1 !important; }
 
 /* 8. Neon — high contrast, vibrant */
 html[data-theme-variant="neon"] {
