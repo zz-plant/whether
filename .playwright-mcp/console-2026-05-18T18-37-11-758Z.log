@@ -1,4 +1,0 @@
-[    1545ms] [ERROR] Access to fetch at 'https://layoffs.fyi/feed/' from origin 'https://whether.work' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://whether.work/:0
-[    1545ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://layoffs.fyi/feed/:0
-[    6116ms] [ERROR] Access to fetch at 'https://layoffs.fyi/feed/' from origin 'https://whether.work' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://whether.work/:0
-[    6116ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://layoffs.fyi/feed/:0

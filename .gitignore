@@ -20,3 +20,6 @@ artifacts/agent
 .env
 .env.*
 !.env.example
+
+# Playwright MCP artifacts
+.playwright-mcp/
