@@ -23,6 +23,7 @@
   @apply rounded-lg border px-4 py-3;
   border-color: var(--border-strong);
   background: color-mix(in srgb, var(--bg-body) 40%, transparent);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
 
 .weather-brief-shell {
