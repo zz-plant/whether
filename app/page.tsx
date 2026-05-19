@@ -296,7 +296,7 @@ export const HomePageReportContent = async ({
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
               <span className="text-slate-500">Stage</span>
               {operatorContext.companyStage ? (
-                <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
+                <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
                   {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
                    operatorContext.companyStage === "seed" ? "Seed" :
                    operatorContext.companyStage === "series-a" ? "Series A" :
@@ -304,19 +304,19 @@ export const HomePageReportContent = async ({
                    operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
                 </span>
               ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
                   Select your stage
                 </a>
               )}
               <span className="text-slate-600">·</span>
               <span className="text-slate-500">Rate</span>
               {operatorContext.rateSensitivity ? (
-                <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
+                <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
                   {operatorContext.rateSensitivity === "high" ? "High" :
                    operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
                 </span>
               ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
                   Set sensitivity
                 </a>
               )}

@@ -128,7 +128,7 @@ type WeeklyLockCommitmentContext = {
 const weeklyCallByRegime: Record<RegimeKey, string> = {
   SCARCITY: "Freeze discretionary spend; protect cash-critical execution.",
   DEFENSIVE: "Gate net-new commitments to short-payback work only.",
-  VOLATILE: "Approve only reversible bets with explicit checkpoint exits.",
+  VOLATILE: "Make only reversible moves with clear exit criteria.",
   EXPANSION: "Scale proven bets, but keep milestone-based approval gates.",
 };
 

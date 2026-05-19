@@ -514,10 +514,10 @@ export const buildHomeBriefModelInternal = (
 
   const netConstraintSummary =
     severityDelta > 0
-      ? `${displayRegime.label}. Changed: constraints tightened. Do now: ${conciseActionNow ?? "slow non-core approvals and keep irreversible spend frozen"}. Flip: ${conciseFlipThreshold}`
+      ? `${displayRegime.label}. Changing: pressure rising. Do now: ${conciseActionNow ?? "slow new commitments"}. Shift: ${conciseFlipThreshold}`
       : severityDelta < 0
-        ? `${displayRegime.label}. Changed: constraints eased. Do now: ${conciseActionNow ?? "release selective hires and experiments that stay reversible"}. Flip: ${conciseFlipThreshold}`
-        : `${displayRegime.label}. Changed: constraints held near prior week. Do now: ${conciseActionNow ?? "keep execution measured and irreversible bets capped"}. Flip: ${conciseFlipThreshold}`;
+        ? `${displayRegime.label}. Changing: pressure eased. Do now: ${conciseActionNow ?? "speed up on what's working"}. Shift: ${conciseFlipThreshold}`
+      : `${displayRegime.label}. Changing: conditions held. Do now: ${conciseActionNow ?? "stay the course"}. Shift: ${conciseFlipThreshold}`;
 
   return {
     postureLabel: displayRegime.label,

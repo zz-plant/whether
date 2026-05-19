@@ -134,10 +134,10 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     "product-tempo": {
       area: "product-tempo",
       recommendation: isExpansion
-        ? "Increase product tempo for reversible bets tied to activation/retention milestones."
-        : "Protect core roadmap; slow long-payback roadmap expansions.",
+        ? "Speed up product work tied to activation and retention goals."
+        : "Protect your roadmap. Slow long-payback expansions.",
       doNow: isExpansion
-        ? ["Increase tempo on reversible bets tied to activation and retention milestones."]
+        ? ["Speed up on product bets tied to activation and retention goals."]
         : ["Protect core roadmap tempo and prioritize near-term customer value slices."],
       avoidNow: isExpansion
         ? ["Avoid irreversible scope expansion before milestone evidence confirms traction."]

@@ -18,12 +18,9 @@ export const buildActionNowShort = ({
     return "Tighten approvals now; keep new spend reversible.";
   }
   if (directionLabel === "improving") {
-    return "Release selective bets now, but keep payback discipline.";
+    return "Move forward on proven bets. Require a clear success metric for each.";
   }
-  if (directionLabel === "mixed") {
-    return "Hold approval pace and gate decisions with explicit stop triggers.";
-  }
-  return "Hold last week's operating cadence; avoid irreversible commitments.";
+  return "Hold current pace. Gate new commitments behind measurable milestones.";
 };
 
 export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {

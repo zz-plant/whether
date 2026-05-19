@@ -27,15 +27,15 @@ export const buildDecisionShiftSummary = ({
   reversalTrigger: string;
 }) => {
   if (changeCount === 0 || directionLabel === "stable") {
-    return `No material shift this week. Do now: keep approval pace and focus on commitments with clear payback windows. Clears when: ${reversalTrigger}`;
+    return `No significant change this week. Keep your current plan. Re-open when: ${reversalTrigger}`;
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return `Pressure eased compared to last week. Do now: speed approvals for reversible bets and keep payback discipline. Clears when: ${reversalTrigger}`;
+    return `Conditions improved. Move faster on what's working. Re-open when: ${reversalTrigger}`;
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return `Pressure rose compared to last week. Do now: slow approvals, narrow experiments, and tighten payback windows. Clears when: ${reversalTrigger}`;
+    return `Conditions tightened. Slow new commitments and focus on what's already in motion. Re-open when: ${reversalTrigger}`;
   }
-  return `Signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with clear stop triggers. Clears when: ${reversalTrigger}`;
+  return `Mixed signals this week. Hold steady and keep new moves reversible. Re-open when: ${reversalTrigger}`;
 };
 
 export const buildWeeklyMovementMetric = ({
@@ -66,7 +66,7 @@ export const buildWeeklyMovementMetric = ({
     return {
       score,
       direction: "tightening" as const,
-      summary: `Pressure increased by +${score.toFixed(1)} this week; tighten approvals until conditions reverse.`,
+      summary: `Pressure increased by +${score.toFixed(1)} this week. Slow new commitments until conditions stabilize.`,
     };
   }
 
@@ -74,14 +74,14 @@ export const buildWeeklyMovementMetric = ({
     return {
       score,
       direction: "easing" as const,
-      summary: `Pressure eased by ${score.toFixed(1)} this week; approve only reversible bets while watching for reversal triggers.`,
+      summary: `Pressure eased by ${score.toFixed(1)} this week. Move faster on what's already working.`,
     };
   }
 
   return {
     score,
     direction: "stable" as const,
-    summary: "Pressure is flat this week; keep the current call and guardrails in force.",
+    summary: "Conditions held steady this week. Keep your current plan in place.",
   };
 };
 

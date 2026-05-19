@@ -33,7 +33,7 @@ export function TimeTravelTrigger() {
               key={jump.label}
               type="button"
               onClick={() => router.push(`/?month=${month}&year=${year}`)}
-              className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-fluid-micro font-medium text-amber-200/80 hover:border-amber-400/50 hover:text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-400 transition-colors"
+              className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-2 min-h-[44px] text-fluid-micro font-medium text-amber-200/80 hover:border-amber-400/50 hover:text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-400 transition-colors inline-flex items-center"
             >
               {jump.label}
             </button>
