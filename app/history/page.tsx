@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PageShell } from "../components/pageShell";
+import { ReportShell } from "../components/reportShell";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
@@ -56,7 +56,14 @@ export default function HistoryPage() {
   }, [router]);
 
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <ReportShell
+      model={{
+        status: { statusLabel: "Historical", recordDateLabel: "", fetchedAtLabel: "", treasurySource: "https://fred.stlouisfed.org" },
+        page: { pageTitle: "History", pageSummary: "Tightness and risk appetite over time.", sectionLinks: [], currentPath: "/history" },
+        trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
+        chrome: { sidebarVariant: "full" },
+      }}
+    >
       <section className="weather-panel space-y-5 px-5 py-5">
         <h1 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h1>
         <p className="text-sm text-slate-300">
@@ -169,6 +176,6 @@ export default function HistoryPage() {
           ) : null}
         </section>
       ) : null}
-    </PageShell>
+    </ReportShell>
   );
 }
