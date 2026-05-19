@@ -62,6 +62,7 @@ export const HomePageReportContent = async ({
   searchParams?: HomePageSearchParams | Promise<HomePageSearchParams>;
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const isScreenshot = resolvedSearchParams?.screenshot === "1";
 
   // Read operator context from cookies for personalization
   const cookieStore = await cookies();
@@ -249,7 +250,12 @@ export const HomePageReportContent = async ({
           </div>
         </div>
       ) : null}
-      <div className="-mt-4 space-y-3">
+      <div className="-mt-4 space-y-3" data-screenshot={isScreenshot ? "true" : undefined}>
+        {isScreenshot ? (
+          <div className="text-center text-fluid-micro text-slate-500">
+            Whether Brief — {homepage.reportShell.recordDateLabel} · {homepage.reportShell.fetchedAtLabel}
+          </div>
+        ) : null}
         <GuidedSetup />
 
         <ErrorBoundary label="Weekly decision card">

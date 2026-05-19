@@ -166,3 +166,15 @@ html, body {
 html:has([data-historical="true"]) {
   background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(212, 160, 48, 0.03), transparent 60%);
 }
+
+/* Screenshot mode — hide chrome, compact view */
+[data-screenshot="true"] .screenshot-hide,
+[data-screenshot="true"] aside,
+[data-screenshot="true"] header,
+[data-screenshot="true"] nav,
+[data-screenshot="true"] .weather-card[class*="bg-slate-950/20"],
+[data-screenshot="true"] .DiscoverabilityStrip,
+[data-screenshot="true"] [class*="HomeKeyTerms"],
+[data-screenshot="true"] [class*="HomeDecision"] { display: none !important; }
+[data-screenshot="true"] .lg\:grid { display: block !important; }
+[data-screenshot="true"] .lg\:grid-cols-\[14rem_minmax\(0\2c 1fr\)\] { grid-template-columns: 1fr !important; }
