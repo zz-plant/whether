@@ -145,6 +145,10 @@ html[data-theme-variant="paper"] .text-amber-200,
 html[data-theme-variant="paper"] .text-amber-200\/80 { color: #b45309 !important; }
 html[data-theme-variant="paper"] .text-emerald-200 { color: #047857 !important; }
 html[data-theme-variant="paper"] .text-sky-200 { color: #0369a1 !important; }
+html[data-theme-variant="paper"] .text-amber-200\/70,
+html[data-theme-variant="paper"] .text-amber-200\/80 { color: #92400e !important; }
+html[data-theme-variant="paper"] .text-sky-200\/80 { color: #075985 !important; }
+html[data-theme-variant="paper"] .text-sky-100\/85 { color: #0c4a6e !important; }
 
 /* 7. Minimal Light — cool white, clean */
 html[data-theme-variant="minimal"] {
