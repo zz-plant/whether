@@ -183,3 +183,7 @@ html[data-screenshot="true"] .lg\:grid { display: block !important; }
 html[data-screenshot="true"] .lg\:grid-cols-\[14rem_minmax\(0\2c 1fr\)\] { grid-template-columns: 1fr !important; }
 html[data-screenshot="true"] .max-w-\[72rem\] { max-width: 100% !important; }
 html[data-screenshot="true"] { font-size: 16px; }
+html[data-screenshot="true"] body {
+  border: 1px solid rgba(56,189,248,0.12);
+  min-height: 100dvh;
+}

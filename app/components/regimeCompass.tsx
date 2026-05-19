@@ -80,11 +80,11 @@ export function RegimeCompass({
       {/* Border */}
       <rect x={M} y={M} width={W} height={H} fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth="1" rx="2" />
 
-      {/* Trajectory arrow */}
+      {/* Trajectory arrow — shows movement from last week */}
       {hasPrev && (prevX !== currentX || prevY !== currentY) ? (
         <>
-          <line x1={prevX} y1={prevY} x2={currentX} y2={currentY} stroke="rgba(125,211,252,0.5)" strokeWidth="1.5" />
-          <circle cx={prevX} cy={prevY} r="3.5" fill="none" stroke="rgba(125,211,252,0.4)" strokeWidth="1.5" />
+          <line x1={prevX} y1={prevY} x2={currentX} y2={currentY} stroke="rgba(125,211,252,0.6)" strokeWidth="2" />
+          <circle cx={prevX} cy={prevY} r="4" fill="rgba(125,211,252,0.2)" stroke="rgba(125,211,252,0.5)" strokeWidth="1.5" />
         </>
       ) : null}
 
