@@ -49,12 +49,22 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
           </span>
           {reviewed ? "Reviewed" : "Mark as reviewed"}
         </button>
-        {streak > 1 ? (
+        {streak >= 4 ? (
+          <span className="rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-fluid-micro font-medium text-amber-200">
+            {streak}-week streak 🔥
+          </span>
+        ) : streak > 1 ? (
           <span className="text-fluid-micro text-slate-500">
-            {streak}-week streak {streak >= 4 ? "🔥" : ""}
+            {streak}-week streak
           </span>
         ) : null}
       </div>
+
+      {reviewed ? (
+        <Link href="/share" className="inline-flex items-center gap-1 text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors no-underline">
+          Share this brief with your team →
+        </Link>
+      ) : null}
 
       {totalReviews >= 4 ? (
         <div className="flex items-center gap-2 text-fluid-micro text-slate-500">

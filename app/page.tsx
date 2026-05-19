@@ -278,7 +278,7 @@ export const HomePageReportContent = async ({
         )}
 
         {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={true}>
+          <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={!operatorContext.companyStage}>
             <CadenceSelector />
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
               <span className="text-slate-500">Stage</span>
@@ -348,7 +348,7 @@ export const HomePageReportContent = async ({
         </Suspense>
 
         {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_act_open" label="Take action" defaultOpen={true}>
+          <CollapsibleGroup storageKey="whether_act_open" label="Take action" forceOpen={true}>
             <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
           </CollapsibleGroup>
         ) : null}

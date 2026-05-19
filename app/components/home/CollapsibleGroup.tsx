@@ -7,11 +7,13 @@ export function CollapsibleGroup({
   storageKey,
   label,
   defaultOpen = true,
+  forceOpen = false,
   children,
 }: {
   storageKey: string;
   label: string;
   defaultOpen?: boolean;
+  forceOpen?: boolean;
   children: ReactNode;
 }) {
   const [stored, setStored] = useLocalStorageState<string>(storageKey, defaultOpen ? "1" : "0");
@@ -19,15 +21,15 @@ export function CollapsibleGroup({
 
   useEffect(() => { setMobile(window.innerWidth < 1024); }, []);
 
-  const open = mobile ? stored === "1" : stored !== "0";
+  const open = forceOpen ? true : mobile ? stored === "1" : stored !== "0";
   const toggle = () => setStored(open ? "0" : "1");
 
   return (
     <div className={`weather-card space-y-3 ${open ? "" : "bg-slate-950/20"}`}>
       <button
         type="button"
-        onClick={toggle}
-        className="flex w-full items-center justify-between gap-2 text-left"
+        onClick={forceOpen ? undefined : toggle}
+        className={`flex w-full items-center justify-between gap-2 text-left ${forceOpen ? "cursor-default" : ""}`}
       >
         <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
           {label}

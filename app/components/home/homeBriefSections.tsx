@@ -43,7 +43,11 @@ const LeadershipArtifactActions = async ({
 
   return (
     <StreamedSectionReveal delay="medium">
-      <div className="space-y-4">
+      <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
+        <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
+          Share &amp; export
+        </summary>
+        <div className="mt-3 space-y-4">
         <DownloadBriefingPackButton
           meetingPackText={artifactPayload.meetingPackText}
           recordDate={recordDateLabel ?? "weekly"}
@@ -58,7 +62,8 @@ const LeadershipArtifactActions = async ({
           initialArtifactMode={initialArtifactMode}
           moreFormatsHref="/planning#ops-export-briefs"
         />
-      </div>
+        </div>
+      </details>
     </StreamedSectionReveal>
   );
 };

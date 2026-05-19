@@ -153,6 +153,10 @@ export function PageDeltaSummary({
               ) : null}
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}
+              <span className="text-slate-600">·</span>
+              <a href="/history" className="text-fluid-micro text-slate-500 hover:text-sky-200 no-underline transition-colors" title="See how these scores have changed over time">
+                ▁▂▃▄▅▆ See trend →
+              </a>
             </div>
           ) : null}
           {companyStage ? (
