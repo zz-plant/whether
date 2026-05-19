@@ -1,5 +1,7 @@
 import { RegimeCompass } from "../regimeCompass";
 
+const REGIME_LABELS: Record<string, string> = { SCARCITY: "Scarcity", DEFENSIVE: "Defensive", VOLATILE: "Volatile", EXPANSION: "Expansion" };
+
 type BriefHeroProps = {
   regime: string;
   postureLabel: string;
@@ -39,11 +41,7 @@ export function BriefHero({
 
       <div className="space-y-1">
         <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
-          {regime === "EXPANSION" ? "Expansion" :
-           regime === "SCARCITY" ? "Scarcity" :
-           regime === "DEFENSIVE" ? "Defensive" :
-           regime === "VOLATILE" ? "Volatile" : regime}
-          {" · "}{postureLabel}
+          {REGIME_LABELS[regime] ?? regime}{" · "}{postureLabel}
         </p>
       </div>
 
