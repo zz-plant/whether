@@ -74,7 +74,7 @@ export function PageDeltaSummary({
   }, [visitCount]);
 
   return (
-    <div className="mb-3 rounded-lg border border-slate-800/60 bg-slate-950/50 px-4 py-3 text-xs sm:px-5 sm:text-sm">
+    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 text-xs">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
           This week
@@ -130,13 +130,17 @@ export function PageDeltaSummary({
           {confidenceLabel || freshnessLabel ? (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-500">
               {confidenceLabel ? (
-                <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${
+                <a
+                  href="/learn/failure-modes"
+                  className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] no-underline hover:underline ${
                   confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
                   confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
                   "text-rose-200 bg-rose-500/10"
-                }`}>
+                }`}
+                title="When is this wrong?"
+                >
                   {confidenceLabel}
-                </span>
+                </a>
               ) : null}
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}

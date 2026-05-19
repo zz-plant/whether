@@ -165,10 +165,7 @@ export const OperatorContextBanner = ({
     >
       {step === "stage" ? (
         <>
-          <h2 className="mb-1 text-base font-semibold text-slate-100">
-            Tailor your weekly brief
-          </h2>
-          <p className="mb-4 text-sm text-slate-400">
+          <p className="mb-4 text-sm text-slate-300">
             What stage is your company?
           </p>
           <div className="flex flex-wrap gap-2">

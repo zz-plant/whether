@@ -146,3 +146,23 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
 }
+
+/* Historical / time-travel mode — subtle sepia tint */
+[data-historical="true"] {
+  --bg-body: #0e0b07;
+  --bg-panel: #1c1812;
+  --bg-surface: #181410;
+  --bg-raised: #241e17;
+  --bg-nested: #13100c;
+  --border-default: rgba(180, 130, 60, 0.06);
+  --border-strong: rgba(180, 130, 60, 0.10);
+  --text-primary: #f0e6d3;
+  --text-secondary: #a09080;
+  --text-muted: #706050;
+  --accent-action: #d4a030;
+  --accent-glow: rgba(212, 160, 48, 0.04);
+}
+
+html:has([data-historical="true"]) {
+  background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(212, 160, 48, 0.03), transparent 60%);
+}

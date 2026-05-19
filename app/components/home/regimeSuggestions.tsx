@@ -26,7 +26,7 @@ export function RegimeSuggestions({ regimeKey }: { regimeKey?: string }) {
   const suggestions = REGIME_SUGGESTIONS[regimeKey];
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/45 px-4 py-3">
+    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
       <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-2">Suggested next steps</p>
       <div className="flex flex-wrap gap-2">
         {suggestions.map((s) => (

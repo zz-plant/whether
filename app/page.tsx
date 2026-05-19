@@ -20,15 +20,16 @@ import {
   HomeKeyTermsDisclosure,
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
-import { DecisionTracker } from "./components/home/decisionTracker";
 import { RitualComplete } from "./components/home/ritualComplete";
-import { InlineSubscribe } from "./components/home/inlineSubscribe";
+import { StayInTheLoop } from "./components/home/StayInTheLoop";
 import { HowItWorks } from "./components/home/howItWorks";
 import { DiscoverabilityStrip } from "./components/home/discoverabilityStrip";
 import { StartupActivity } from "./components/home/startupActivity";
 import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator";
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { RegimeSuggestions } from "./components/home/regimeSuggestions";
+import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
+import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -89,6 +90,7 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
+  const isHistorical = Boolean(reportData.historicalSelection);
 
   /* Stage-specific action text — makes personalization visible */
   const stageActionOverrides: Record<string, string> = {
@@ -231,16 +233,56 @@ export const HomePageReportContent = async ({
           </div>
         </ErrorBoundary>
 
-        <div className="flex items-center justify-between gap-3">
+        {isHistorical ? (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/8 px-4 py-3 flex items-center justify-between gap-3">
+            <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-200">
+              Historical snapshot — {reportData.recordDateLabel}
+            </span>
+            <a href="/" className="rounded-full border border-amber-400/40 px-3 py-1 text-fluid-micro font-medium text-amber-200 hover:bg-amber-500/10 transition-colors no-underline">
+              ← Back to present
+            </a>
+          </div>
+        ) : (
+          <TimeTravelTrigger />
+        )}
+
+        {!isHistorical ? (
+          <div className="rounded-lg border border-slate-700/60 bg-slate-950/25 px-4 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
+            <span className="text-slate-500">Tuned for</span>
+            {operatorContext.companyStage ? (
+              <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
+                {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
+                 operatorContext.companyStage === "seed" ? "Seed" :
+                 operatorContext.companyStage === "series-a" ? "Series A" :
+                 operatorContext.companyStage === "series-b-plus" ? "Series B+" :
+                 operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
+              </span>
+            ) : (
+              <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                Set your stage
+              </a>
+            )}
+            <span className="text-slate-600">·</span>
+            <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Sector</a>
+            <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Company</a>
+            <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Financial</a>
+            <span className="text-slate-600">|</span>
+            <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Default</a>
+          </div>
+        ) : null}
+
+        {!isHistorical ? (
+          <CollapsibleGroup storageKey="whether_tailor_open" label="Tailor this brief" defaultOpen={true}>
           <CadenceSelector />
-        </div>
-        <DecisionTracker
-          action={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort}
-          regime={homepage.weeklyDecisionCardModel.status.regimeKey}
-          recordDate={homepage.reportShell.recordDateLabel}
-          confidence={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-        />
-        <OperatorContextWrapper />
+          <OperatorContextWrapper />
+          <HomeRevisitFlipSection
+            interpretationLayer={homepage.interpretationLayer}
+            interpretationSearchParams={homepage.interpretationSearchParams}
+            fallbackAlert={homepage.fallbackAlert}
+          />
+        </CollapsibleGroup>
+        ) : null}
+
         <FirstVisitBanner />
 
         <HowItWorks />
@@ -265,25 +307,19 @@ export const HomePageReportContent = async ({
         regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
       />
 
-        <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
+        {!isHistorical ? (
+          <CollapsibleGroup storageKey="whether_act_open" label="Act on this brief" defaultOpen={true}>
+            <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
+          </CollapsibleGroup>
+        ) : null}
+
         <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
 
-        <HomeRevisitFlipSection
-          interpretationLayer={homepage.interpretationLayer}
-          interpretationSearchParams={homepage.interpretationSearchParams}
-          fallbackAlert={homepage.fallbackAlert}
-        />
-
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
-          <div>
-            <p className="text-fluid-micro text-slate-500">
-              Next brief: Monday &middot; <a href="/share" className="underline decoration-slate-600 hover:decoration-sky-400">Share with your team</a>
-            </p>
-            <StartupActivity />
-            <SaaSMultiplesIndicator />
-          </div>
-          <InlineSubscribe />
-        </div>
+        {!isHistorical ? (
+          <StayInTheLoop />
+        ) : null}
+        <StartupActivity />
+        <SaaSMultiplesIndicator />
       </div>
 
       <DiscoverabilityStrip />

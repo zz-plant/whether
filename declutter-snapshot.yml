@@ -1,0 +1,304 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e8]:
+        - link "Whether" [ref=e9] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e10]: Weekly Brief
+      - generic [ref=e11]:
+        - link "Open evidence" [ref=e12] [cursor=pointer]:
+          - /url: /evidence
+        - link "Find a tool" [ref=e13] [cursor=pointer]:
+          - /url: /resolve#toolkit-library
+        - button "Share brief" [ref=e14]: Share
+        - link "Historical trends" [ref=e15] [cursor=pointer]:
+          - /url: /history
+          - img [ref=e16]
+          - generic [ref=e20]: History
+        - button "Settings" [ref=e21]:
+          - img [ref=e22]
+        - button "Switch to light mode" [ref=e25]:
+          - img [ref=e26]
+  - main [ref=e180]:
+    - generic [ref=e182]:
+      - complementary [ref=e183]:
+        - complementary [ref=e184]:
+          - link "Whether" [ref=e185] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e186]: Whether
+          - navigation "Workflow" [ref=e187]:
+            - link "Decide This week's call" [ref=e188] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e189]: Decide
+              - generic [ref=e190]: This week's call
+            - link "Evidence Proof and thresholds" [ref=e191] [cursor=pointer]:
+              - /url: /evidence
+              - generic [ref=e192]: Evidence
+              - generic [ref=e193]: Proof and thresholds
+            - link "Plan Turn into approvals" [ref=e194] [cursor=pointer]:
+              - /url: /planning
+              - generic [ref=e195]: Plan
+              - generic [ref=e196]: Turn into approvals
+            - link "Resolve Close one question" [ref=e197] [cursor=pointer]:
+              - /url: /resolve
+              - generic [ref=e198]: Resolve
+              - generic [ref=e199]: Close one question
+            - link "Trust Sources and confidence" [ref=e200] [cursor=pointer]:
+              - /url: /trust
+              - generic [ref=e201]: Trust
+              - generic [ref=e202]: Sources and confidence
+            - link "History Trends over time" [ref=e203] [cursor=pointer]:
+              - /url: /history
+              - generic [ref=e204]: History
+              - generic [ref=e205]: Trends over time
+          - navigation "More pages" [ref=e207]:
+            - link "This Week" [ref=e208] [cursor=pointer]:
+              - /url: /this-week
+              - generic [ref=e209]: This Week
+            - link "Multiples" [ref=e210] [cursor=pointer]:
+              - /url: /comps
+              - generic [ref=e211]: Multiples
+            - link "Regime" [ref=e212] [cursor=pointer]:
+              - /url: /current-regime
+              - generic [ref=e213]: Regime
+            - link "Changes" [ref=e214] [cursor=pointer]:
+              - /url: /regime-changes
+              - generic [ref=e215]: Changes
+            - link "Archive" [ref=e216] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e217]: Archive
+            - link "API" [ref=e218] [cursor=pointer]:
+              - /url: /api-docs
+              - generic [ref=e219]: API
+            - link "Learn" [ref=e220] [cursor=pointer]:
+              - /url: /learn
+              - generic [ref=e221]: Learn
+          - button "Switch to light mode" [ref=e223]:
+            - img [ref=e224]
+            - generic [ref=e230]: Light
+      - generic [ref=e231]:
+        - generic [ref=e232]:
+          - heading "Weekly Brief" [level=1] [ref=e234]
+          - generic [ref=e237]:
+            - generic [ref=e238]:
+              - region "Weekly brief" [ref=e239]:
+                - heading "Weekly brief" [level=2] [ref=e240]
+                - region "Weekly delta" [ref=e241]:
+                  - generic [ref=e242]: This week
+                  - generic [ref=e243]: Easing
+                  - generic [ref=e244]: Pressure eased compared to last week.
+                  - generic [ref=e245]: Tightness unchanged · Risk appetite unchanged
+                - generic [ref=e246]:
+                  - region "Weekly decision order" [ref=e247]:
+                    - article "Weekly brief" [ref=e248]:
+                      - article [ref=e249]:
+                        - generic [ref=e250]
+                  - region "Hiring stance" [ref=e471]:
+                    - paragraph [ref=e472]: Hiring stance
+                    - generic [ref=e473]:
+                      - generic [ref=e474]:
+                        - term [ref=e475]: Action
+                        - definition [ref=e476]: Prioritize revenue-linked and reliability roles with staged approvals
+                      - generic [ref=e477]:
+                        - term [ref=e478]: Threshold
+                        - definition [ref=e479]: net-new hiring if cash availability tightens above 76 or market risk appetite falls below 44
+                      - generic [ref=e480]:
+                        - term [ref=e481]: Reversal
+                        - definition [ref=e482]: staged approvals when cash availability eases below 66 and market risk appetite is above 54
+                  - group [ref=e483]:
+                    - generic "Operating rules" [ref=e484] [cursor=pointer]:
+                      - generic [ref=e486]: Operating rules
+                      - generic [ref=e487]: ▾
+              - generic [ref=e488]:
+                - group "Company mode" [ref=e489]:
+                  - generic [ref=e490]: Company mode
+                  - generic [ref=e491]:
+                    - generic [ref=e492] [cursor=pointer]:
+                      - radio "Seed" [ref=e493]
+                      - generic [ref=e494]: Seed
+                    - generic [ref=e495] [cursor=pointer]:
+                      - radio "Series A" [checked] [ref=e496]
+                      - generic [ref=e497]: Series A
+                    - generic [ref=e498] [cursor=pointer]:
+                      - radio "Series B" [ref=e499]
+                      - generic [ref=e500]: Series B
+                    - generic [ref=e501] [cursor=pointer]:
+                      - radio "Growth" [ref=e502]
+                      - generic [ref=e503]: Growth
+                    - generic [ref=e504] [cursor=pointer]:
+                      - radio "Public" [ref=e505]
+                      - generic [ref=e506]: Public
+                    - generic [ref=e507] [cursor=pointer]:
+                      - radio "Bootstrapped" [ref=e508]
+                      - generic [ref=e509]: Bootstrapped
+                  - paragraph [ref=e510]: "Balance growth tempo with repeatability proof. Threshold emphasis: Emphasize payback windows and repeatable pipeline conversion."
+                - generic [ref=e511]:
+                  - generic [ref=e512]:
+                    - paragraph [ref=e513]: DO NOW
+                    - list [ref=e514]:
+                      - listitem [ref=e515]: • Scale GTM and product bets only where activation and retention targets are tracking.
+                  - generic [ref=e516]:
+                    - paragraph [ref=e517]: AVOID
+                    - list [ref=e518]:
+                      - listitem [ref=e519]: • Avoid parallel expansion programs that obscure payback accountability.
+                - generic [ref=e520]:
+                  - paragraph [ref=e521]: WATCH
+                  - list [ref=e522]:
+                    - listitem [ref=e523]: "• Payback trigger: revisit plan if market risk appetite gap moves inside 10.0 points."
+                  - paragraph [ref=e524]: "Reversal discipline: Reverse to aggressive expansion only after trigger clears and conversion quality remains stable for two weekly reviews."
+            - generic [ref=e525]:
+              - paragraph [ref=e526]: Tailor this brief
+              - group "Cadence" [ref=e527]:
+                - button "Weekly" [pressed] [ref=e528]
+                - button "Monthly" [ref=e529]
+                - button "Quarterly" [ref=e530]
+              - region "Personalize your weekly brief" [ref=e531]:
+                - heading "Tailor your weekly brief" [level=2] [ref=e532]
+                - paragraph [ref=e533]: What stage is your company?
+                - generic [ref=e534]:
+                  - button "Pre-seed" [ref=e535]
+                  - button "Seed" [ref=e536]
+                  - button "Series A" [ref=e537]
+                  - button "Series B+" [ref=e538]
+                  - button "Public" [ref=e539]
+                - button "Skip — show generic brief" [ref=e541]
+              - generic [ref=e542]:
+                - paragraph [ref=e543]: View as
+                - navigation "Interpretation view" [ref=e544]:
+                  - link "Default" [ref=e545] [cursor=pointer]:
+                    - /url: /
+                  - link "Sector" [ref=e546] [cursor=pointer]:
+                    - /url: /?view=sector
+                  - link "Company" [ref=e547] [cursor=pointer]:
+                    - /url: /?view=company
+                  - link "Financial" [ref=e548] [cursor=pointer]:
+                    - /url: /?view=financial
+                  - link "Stance" [ref=e549] [cursor=pointer]:
+                    - /url: /?view=forecast
+            - generic [ref=e551]:
+              - generic [ref=e552]:
+                - paragraph [ref=e553]: This is your weekly operating brief.
+                - paragraph [ref=e554]:
+                  - text: "U.S. macro signals → one weekly decision:"
+                  - strong [ref=e555]: what to do, what to watch, when to flip.
+                - generic [ref=e556]:
+                  - link "How it works" [ref=e557] [cursor=pointer]:
+                    - /url: /learn
+                  - link "See the evidence" [ref=e558] [cursor=pointer]:
+                    - /url: /evidence
+              - button "Dismiss" [ref=e559]: Got it
+            - generic [ref=e560]:
+              - paragraph [ref=e561]: New to Whether? Here's how it works
+              - paragraph [ref=e562]: "Whether tracks four macro signals — Treasury yields, credit spreads, inflation, and employment — and maps them to a 2D score (tightness × risk appetite) that determines the current regime. Each regime produces a bounded decision: an action, a threshold that would pause it, and a condition that would reverse it. The brief updates weekly and is delivered to your inbox every Monday."
+              - link "Read the full methodology →" [ref=e563] [cursor=pointer]:
+                - /url: /trust
+            - generic [ref=e564]:
+              - paragraph [ref=e566]: This week
+              - generic [ref=e567]:
+                - generic [ref=e568]:
+                  - paragraph [ref=e569]:
+                    - text: Expansionary conditions
+                    - generic [ref=e570]: · Release selective bets now, but keep payback discipline.
+                  - generic [ref=e571]:
+                    - generic [ref=e572]:
+                      - generic [ref=e573]: Credit conditions(higher = tighter)
+                      - paragraph [ref=e574]: "0"
+                    - generic [ref=e575]:
+                      - generic [ref=e576]: Investor sentiment(higher = easier to raise)
+                      - paragraph [ref=e577]: "60"
+                  - generic [ref=e578]:
+                    - generic [ref=e579]: MED
+                    - generic [ref=e580]: Data May 18, 2026, 10:06 PM UTC
+                    - generic [ref=e581]: · https://fred.stlouisfed.org
+                - generic [ref=e582]:
+                  - paragraph [ref=e583]: Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
+                  - button "Show compass & analysis →" [ref=e584]
+            - generic [ref=e585]:
+              - paragraph [ref=e586]: Act on this brief
+              - generic [ref=e587]:
+                - paragraph [ref=e588]: Suggested next steps
+                - generic [ref=e589]:
+                  - link "Scale proven bets — Investor appetite is strong — raise if needed." [ref=e590] [cursor=pointer]:
+                    - /url: /planning
+                    - text: Scale proven bets
+                    - generic [ref=e591]: — Investor appetite is strong — raise if needed.
+                  - link "Explore toolkits — More time available — review growth frameworks." [ref=e592] [cursor=pointer]:
+                    - /url: /toolkits
+                    - text: Explore toolkits
+                    - generic [ref=e593]: — More time available — review growth frameworks.
+                  - link "Share the brief — Good time to align the team on the expansion call." [ref=e594] [cursor=pointer]:
+                    - /url: /share
+                    - text: Share the brief
+                    - generic [ref=e595]: — Good time to align the team on the expansion call.
+              - button "○ Mark as reviewed" [ref=e598]:
+                - generic [ref=e599]: ○
+                - text: Mark as reviewed
+            - generic [ref=e600]:
+              - paragraph [ref=e602]:
+                - text: "Next brief: Monday ·"
+                - link "Share with your team" [ref=e603] [cursor=pointer]:
+                  - /url: /share
+              - generic [ref=e604]:
+                - textbox "you@company.com" [ref=e605]
+                - button "Subscribe" [ref=e606]
+          - generic [ref=e608]:
+            - paragraph [ref=e609]: Explore
+            - generic [ref=e610]:
+              - link "Decision Framework— How bounded decisions work" [ref=e611] [cursor=pointer]:
+                - /url: /threshold
+                - text: Decision Framework
+                - generic [ref=e612]: — How bounded decisions work
+              - link "Decision Template— Printable one-pager" [ref=e613] [cursor=pointer]:
+                - /url: /template
+                - text: Decision Template
+                - generic [ref=e614]: — Printable one-pager
+              - link "Resources— Guides and references" [ref=e615] [cursor=pointer]:
+                - /url: /resources
+                - text: Resources
+                - generic [ref=e616]: — Guides and references
+              - link "About— What Whether is and who it's for" [ref=e617] [cursor=pointer]:
+                - /url: /about
+                - text: About
+                - generic [ref=e618]: — What Whether is and who it's for
+              - link "Search— Find signals and posts" [ref=e619] [cursor=pointer]:
+                - /url: /search
+                - text: Search
+                - generic [ref=e620]: — Find signals and posts
+              - link "RSS Feed— Subscribe in your feed reader" [ref=e621] [cursor=pointer]:
+                - /url: /feed.xml
+                - text: RSS Feed
+                - generic [ref=e622]: — Subscribe in your feed reader
+          - group [ref=e625]:
+            - generic "Key terms" [ref=e626] [cursor=pointer]
+          - group "Turn this read into this week's plan" [ref=e630]:
+            - generic "Workspace tools" [ref=e631] [cursor=pointer]:
+              - generic [ref=e632]: Workspace tools
+            - generic [ref=e633]:
+              - generic [ref=e635]:
+                - paragraph [ref=e636]: Next step
+                - heading "Turn this read into this week's plan" [level=2] [ref=e637]
+                - paragraph [ref=e638]: Open Planning to turn the weekly call into approvals and share-ready decisions.
+              - article [ref=e639]:
+                - generic [ref=e640]:
+                  - generic [ref=e641]:
+                    - generic [ref=e642]:
+                      - img [ref=e643]
+                      - generic [ref=e645]: Main planning path
+                    - paragraph [ref=e646]: Release selective bets now, but keep payback discipline.
+                    - paragraph [ref=e647]: Revisit last week's approvals before you add fixed cost or sequence new bets.
+                  - link "Open weekly plan" [ref=e648] [cursor=pointer]:
+                    - /url: /planning#ops-monthly-action-summary
+                    - img [ref=e649]
+                    - generic [ref=e651]: Open weekly plan
+                - generic [ref=e652]:
+                  - generic [ref=e653]:
+                    - paragraph [ref=e654]: Pause first
+                    - paragraph [ref=e655]: Hiring stance
+                  - generic [ref=e656]:
+                    - paragraph [ref=e657]: Send next
+                    - paragraph [ref=e658]: Open share brief
+        - paragraph [ref=e660]: Internal use only
+  - generic:
+    - region "Notifications"
