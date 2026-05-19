@@ -4,6 +4,7 @@ import Script from "next/script";
 import { GlobalHeader } from "./components/globalHeader";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
+import { ThemeCycler } from "./components/ThemeCycler";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { BackToTop } from "./components/backToTop";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
@@ -162,6 +163,7 @@ export default function RootLayout({
         </ToastProviderRoot>
         <BackToTop />
         <KeyboardShortcuts />
+        <ThemeCycler />
       </body>
     </html>
   );
