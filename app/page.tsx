@@ -30,6 +30,7 @@ import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
 import { GuidedSetup } from "./components/home/GuidedSetup";
 import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
+import { BriefHero } from "./components/home/BriefHero";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -251,12 +252,18 @@ export const HomePageReportContent = async ({
         </div>
       ) : null}
       <div className="-mt-4 space-y-3" data-screenshot={isScreenshot ? "true" : undefined}>
-        {isScreenshot ? (
-          <div className="text-center text-fluid-micro text-slate-500">
-            Whether Brief — {homepage.reportShell.recordDateLabel} · {homepage.reportShell.fetchedAtLabel}
-          </div>
-        ) : null}
-        <GuidedSetup />
+        <BriefHero
+          regime={regime}
+          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
+          decision={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+          tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
+          riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
+          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+          recordDate={homepage.reportShell.recordDateLabel}
+          fetchedAt={homepage.reportShell.fetchedAtLabel}
+        />
 
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
