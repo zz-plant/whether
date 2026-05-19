@@ -104,6 +104,9 @@ export function BriefHero({
           {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
         </div>
         <p className="text-slate-600">Data: FRED · Treasury · Yahoo Finance</p>
+        <a href="/share" className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-1.5 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/20 transition-colors no-underline mt-1">
+          Share this brief →
+        </a>
       </div>
     </div>
   );

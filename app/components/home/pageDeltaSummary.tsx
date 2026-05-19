@@ -164,6 +164,29 @@ export function PageDeltaSummary({
               {STAGE_LABELS[companyStage] ?? companyStage}{rateSensitivity ? ` · ${rateSensitivity}` : ""}
             </span>
           ) : null}
+          {regimeDistance ? (
+            <p className="text-fluid-micro text-amber-200/70 leading-relaxed mt-1">
+              {regimeDistance.pointsToFlip.toFixed(0)} pts from shifting to{" "}
+              {regimeDistance.dimensionLabel === "Risk appetite"
+                ? regimeKey === "EXPANSION" ? "Volatile — make only reversible moves"
+                : regimeKey === "DEFENSIVE" ? "Scarcity — preserve cash"
+                : regimeKey === "VOLATILE" ? regimeDistance.currentValue > regimeDistance.thresholdValue ? "Expansion — scale proven bets" : "Scarcity — preserve cash"
+                : regimeKey === "SCARCITY" ? "Volatile — stay reversible"
+                : "a different regime"
+                : regimeKey === "DEFENSIVE" ? "Expansion — move faster on what's working"
+                : regimeKey === "EXPANSION" ? "Defensive — protect what's working"
+                : "a different regime"}
+            </p>
+          ) : null}
+          {companyStage ? (
+            <p className="text-fluid-micro text-slate-500 mt-1">
+              {companyStage === "pre-seed" ? "Pre-seed companies in this regime typically extend runway and gate small experiments."
+               : companyStage === "seed" ? "Seed-stage companies in this regime typically focus on repeatable pipeline and staged hires."
+               : companyStage === "series-a" ? "Series A companies in this regime typically gate team growth and protect unit economics."
+               : companyStage === "series-b-plus" ? "Growth-stage companies in this regime typically scale proven channels with milestone checks."
+               : "Public companies in this regime typically manage expectations and optimize free cash flow."}
+            </p>
+          ) : null}
         </div>
         {!showFull ? (
           <div className="flex flex-col justify-center">
