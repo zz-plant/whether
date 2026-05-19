@@ -26,7 +26,7 @@ export function BriefHero({
   fetchedAt,
 }: BriefHeroProps) {
   return (
-    <div className="text-center space-y-6 py-8">
+    <div className="text-center space-y-4 sm:space-y-6 py-4 sm:py-8">
       <div className="space-y-1">
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
           Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
@@ -48,7 +48,7 @@ export function BriefHero({
       </div>
 
       <div className="flex justify-center">
-        <div className="w-full max-w-[20rem]">
+        <div className="w-full max-w-[16rem] sm:max-w-[20rem]">
           <RegimeCompass
             tightness={tightness}
             riskAppetite={riskAppetite}
@@ -60,7 +60,7 @@ export function BriefHero({
       </div>
 
       {/* Scores — card-based with visual weight */}
-      <div className="flex justify-center gap-4 pt-2">
+      <div className="flex flex-wrap justify-center gap-4 pt-2">
         <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-6 py-3 text-center min-w-[8rem]">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">Credit conditions</p>
           <p className="text-2xl font-bold tabular-nums text-slate-100">
