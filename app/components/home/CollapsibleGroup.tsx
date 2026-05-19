@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 export function CollapsibleGroup({
   storageKey,
@@ -14,25 +14,13 @@ export function CollapsibleGroup({
   defaultOpen?: boolean;
   children: ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [stored, setStored] = useLocalStorageState<string>(storageKey, defaultOpen ? "1" : "0");
+  const open = stored !== "0";
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored === "0") setOpen(false);
-    } catch {}
-  }, [storageKey]);
-
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    try {
-      localStorage.setItem(storageKey, next ? "1" : "0");
-    } catch {}
-  };
+  const toggle = () => setStored(open ? "0" : "1");
 
   return (
-    <div className={`rounded-lg border border-slate-700/60 px-4 py-3 space-y-3 ${open ? "bg-slate-950/40" : "bg-slate-950/20"}`}>
+    <div className={`weather-card space-y-3 ${open ? "" : "bg-slate-950/20"}`}>
       <button
         type="button"
         onClick={toggle}

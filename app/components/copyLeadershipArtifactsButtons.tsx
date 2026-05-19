@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ButtonHTMLAttributes } from "react";
+import { Collapsible } from "@base-ui/react/collapsible";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
@@ -280,10 +281,11 @@ export function CopyLeadershipArtifactsButtons({
           }
         </p>
 
-        <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
-          <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <Collapsible.Root className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
+          <Collapsible.Trigger className="flex w-full cursor-pointer list-none items-center text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
             More copy formats
-          </summary>
+          </Collapsible.Trigger>
+          <Collapsible.Panel>
 
           <div className="mt-3 space-y-3">
             <div className="grid gap-2 sm:grid-cols-2">
@@ -338,7 +340,8 @@ export function CopyLeadershipArtifactsButtons({
               </Link>
             </div>
           </div>
-        </details>
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </article>
     </div>
   );

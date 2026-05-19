@@ -22,7 +22,7 @@ export function StayInTheLoop() {
   };
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 space-y-2">
+    <div className="weather-card space-y-2">
       <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Stay in the loop</p>
 
       <div className="grid gap-2 sm:grid-cols-2">
@@ -62,6 +62,7 @@ export function StayInTheLoop() {
 
         <button
           type="button"
+          onClick={() => window.open("/settings", "_blank")}
           className="flex items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-amber-200 transition-colors"
         >
           <span className="text-slate-300">⚡</span>
@@ -70,10 +71,14 @@ export function StayInTheLoop() {
 
         <button
           type="button"
+          onClick={() => {
+            document.documentElement.dataset.displayMode = "tv";
+            localStorage.setItem("whether-display-mode", "tv");
+          }}
           className="flex items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
         >
-          <span className="text-slate-300">📅</span>
-          + Calendar — Monday morning reminder
+          <span className="text-slate-300">📺</span>
+          + TV mode — always-on office display
         </button>
       </div>
 
@@ -95,9 +100,12 @@ export function StayInTheLoop() {
       ) : null}
 
       <p className="text-fluid-micro text-slate-600">
-        <a href="/api-docs" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">
-          Slack API · Embed · RSS →
-        </a>
+        <a href="/api-docs" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">Slack API</a>
+        {" · "}
+        <a href="/embed" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">Embed</a>
+        {" · "}
+        <a href="/feed.xml" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">RSS</a>
+        {" →"}
       </p>
     </div>
   );

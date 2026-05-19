@@ -21,7 +21,7 @@ export function TimeTravelTrigger() {
   const router = useRouter();
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
+    <div className="weather-card">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
           View past brief

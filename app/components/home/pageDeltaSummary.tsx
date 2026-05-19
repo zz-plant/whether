@@ -74,7 +74,7 @@ export function PageDeltaSummary({
   }, [visitCount]);
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 text-xs">
+    <div className="weather-card text-xs">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
           This week

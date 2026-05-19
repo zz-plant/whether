@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const LINKS = [
   { href: "/threshold", label: "Decision Framework", desc: "How bounded decisions work" },
@@ -15,27 +15,13 @@ const LINKS = [
 const STORAGE_KEY = "whether_explore_open";
 
 export function DiscoverabilityStrip() {
-  const [open, setOpen] = useState(false);
+  const [stored, setStored] = useLocalStorageState<string>(STORAGE_KEY, "1");
+  const open = stored !== "0";
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      setOpen(stored !== "0");
-    } catch {
-      setOpen(true);
-    }
-  }, []);
-
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
-    } catch {}
-  };
+  const toggle = () => setStored(open ? "0" : "1");
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3">
+    <div className="weather-card">
       <button
         type="button"
         onClick={toggle}

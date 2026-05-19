@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { Dialog } from "@base-ui/react/dialog";
+import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
 import { CalendarButton } from "./calendarButton";
 
@@ -82,12 +83,13 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
           </fieldset>
 
           <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+            <Switch.Root
               checked={includeContext}
-              onChange={() => setIncludeContext((v) => !v)}
-              className="accent-sky-400"
-            />
+              onCheckedChange={setIncludeContext}
+              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
+            >
+              <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
+            </Switch.Root>
             Include context for non-users
           </label>
 

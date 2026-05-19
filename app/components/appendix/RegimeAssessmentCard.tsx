@@ -2,6 +2,7 @@
 
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Tooltip } from "@base-ui/react/tooltip";
+import { Meter } from "@base-ui/react/meter";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
 import { RegimeBadgeIcon } from "../regimeIcons";
@@ -26,11 +27,6 @@ export const RegimeAssessmentCard = ({
   const constraintCount = assessment.constraints.length;
   const tightnessScore = clampToRange(assessment.scores.tightness, 0, 100);
   const riskScore = clampToRange(assessment.scores.riskAppetite, 0, 100);
-  const progressId = `regime-progress-${assessment.regime.toLowerCase()}`;
-  const tightnessGradientId = `${progressId}-tightness-gradient`;
-  const riskGradientId = `${progressId}-risk-gradient`;
-  const tightnessMaskId = `${progressId}-tightness-mask`;
-  const riskMaskId = `${progressId}-risk-mask`;
   const baseRateThreshold = assessment.thresholds.baseRateTightness;
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
@@ -244,34 +240,23 @@ export const RegimeAssessmentCard = ({
               {assessment.scores.tightness}/100
             </span>
           </div>
-          <meter
-            className="sr-only"
+          <Meter.Root
+            value={tightnessScore}
             min={0}
             max={100}
-            value={tightnessScore}
             aria-label="Cash availability tightness score"
-          />
-          <svg
-            viewBox="0 0 100 8"
-            className="h-2 w-full"
-            aria-hidden="true"
-            focusable="false"
-            preserveAspectRatio="none"
+            className="space-y-1"
           >
-            <defs>
-              <linearGradient id={tightnessGradientId} x1="0" y1="0" x2="100" y2="0">
-                <stop offset="0%" stopColor="#fb7185" />
-                <stop offset="100%" stopColor="#f43f5e" />
-              </linearGradient>
-              <mask id={tightnessMaskId} maskUnits="userSpaceOnUse">
-                <rect width="100" height="8" rx="4" fill="#fff" />
-              </mask>
-            </defs>
-            <g mask={`url(#${tightnessMaskId})`}>
-              <rect width="100" height="8" fill="#1e293b" />
-              <rect width={tightnessScore} height="8" fill={`url(#${tightnessGradientId})`} />
-            </g>
-          </svg>
+            <Meter.Track className="block h-2 w-full overflow-hidden rounded-full bg-slate-800">
+              <Meter.Indicator
+                className="block h-full rounded-full transition-[width] duration-500"
+                style={{
+                  width: `${tightnessScore}%`,
+                  background: "linear-gradient(90deg, #fb7185, #f43f5e)",
+                }}
+              />
+            </Meter.Track>
+          </Meter.Root>
           <p>{assessment.tightnessExplanation}</p>
         </div>
         <div className="space-y-3">
@@ -281,34 +266,23 @@ export const RegimeAssessmentCard = ({
               {assessment.scores.riskAppetite}/100
             </span>
           </div>
-          <meter
-            className="sr-only"
+          <Meter.Root
+            value={riskScore}
             min={0}
             max={100}
-            value={riskScore}
             aria-label="Market risk appetite score"
-          />
-          <svg
-            viewBox="0 0 100 8"
-            className="h-2 w-full"
-            aria-hidden="true"
-            focusable="false"
-            preserveAspectRatio="none"
+            className="space-y-1"
           >
-            <defs>
-              <linearGradient id={riskGradientId} x1="0" y1="0" x2="100" y2="0">
-                <stop offset="0%" stopColor="#fbbf24" />
-                <stop offset="100%" stopColor="#f59e0b" />
-              </linearGradient>
-              <mask id={riskMaskId} maskUnits="userSpaceOnUse">
-                <rect width="100" height="8" rx="4" fill="#fff" />
-              </mask>
-            </defs>
-            <g mask={`url(#${riskMaskId})`}>
-              <rect width="100" height="8" fill="#1e293b" />
-              <rect width={riskScore} height="8" fill={`url(#${riskGradientId})`} />
-            </g>
-          </svg>
+            <Meter.Track className="block h-2 w-full overflow-hidden rounded-full bg-slate-800">
+              <Meter.Indicator
+                className="block h-full rounded-full transition-[width] duration-500"
+                style={{
+                  width: `${riskScore}%`,
+                  background: "linear-gradient(90deg, #fbbf24, #f59e0b)",
+                }}
+              />
+            </Meter.Track>
+          </Meter.Root>
           <p>{assessment.riskAppetiteExplanation}</p>
         </div>
       </div>

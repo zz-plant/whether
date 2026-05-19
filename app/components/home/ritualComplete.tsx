@@ -33,7 +33,7 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
   if (!recordDate) return null;
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 space-y-2">
+    <div className="weather-card space-y-2">
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"

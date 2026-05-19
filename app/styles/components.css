@@ -19,6 +19,12 @@
   container-type: inline-size;
 }
 
+.weather-card {
+  @apply rounded-lg border px-4 py-3;
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--bg-body) 40%, transparent);
+}
+
 .weather-brief-shell {
   border-color: rgba(125, 211, 252, 0.18);
   background: rgba(34, 34, 34, 0.70);

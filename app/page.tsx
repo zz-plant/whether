@@ -296,6 +296,18 @@ export const HomePageReportContent = async ({
                 </a>
               )}
               <span className="text-slate-600">·</span>
+              <span className="text-slate-500">Rate</span>
+              {operatorContext.rateSensitivity ? (
+                <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
+                  {operatorContext.rateSensitivity === "high" ? "High" :
+                   operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
+                </span>
+              ) : (
+                <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                  Set sensitivity
+                </a>
+              )}
+              <span className="text-slate-600">·</span>
               <span className="text-slate-500">View</span>
               <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Default</a>
               <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Sector</a>
@@ -338,6 +350,17 @@ export const HomePageReportContent = async ({
         ) : null}
 
         <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
+
+        {!isHistorical ? (
+          <div className="flex items-center gap-2 text-fluid-micro">
+            <a href="/planning" className="rounded-full border border-slate-700/70 px-3 py-1.5 font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+              Open planning →
+            </a>
+            <a href="/share" className="rounded-full border border-slate-700/70 px-3 py-1.5 font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+              Share brief →
+            </a>
+          </div>
+        ) : null}
 
         {!isHistorical ? (
           <StayInTheLoop />

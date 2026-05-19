@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Toolbar } from "@base-ui/react/toolbar";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -17,7 +18,7 @@ export function CadenceSelector() {
   if (pathname !== "/") return null;
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5" role="group" aria-label="Cadence">
+    <Toolbar.Root aria-label="Cadence" className="flex items-center gap-1 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5">
       {CADENCES.map((c) => (
         <button
           key={c.key}
@@ -39,6 +40,6 @@ export function CadenceSelector() {
           {c.label}
         </button>
       ))}
-    </div>
+    </Toolbar.Root>
   );
 }

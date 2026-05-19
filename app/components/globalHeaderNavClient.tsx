@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "@base-ui/react/tooltip";
 import { Menu } from "@base-ui/react/menu";
+import { Drawer } from "@base-ui/react/drawer";
 import {
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
@@ -163,70 +164,43 @@ function SecondaryNavLinks() {
   );
 }
 
-function MobileNavSheet({
+function MobileNavContent({
   navigationLinks,
-  activeRouteLabel,
   onClose,
 }: {
   navigationLinks: GlobalHeaderNavigationLink[];
-  activeRouteLabel: string;
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:hidden">
-      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative z-10 w-full rounded-t-2xl border border-slate-800/70 bg-slate-950/95 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-2xl">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-700" />
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-          Workflow
-        </p>
-        <nav className="mt-3 space-y-1" aria-label="Primary routes">
-          {navigationLinks.map((link, index) => {
-            const stepNumber = index + 1;
-            const stepLabel = STEP_LABELS[index] ?? link.label;
-            const hint = STEP_HINTS[index] ?? link.description;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={link.isActive ? "page" : undefined}
-                onClick={onClose}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-colors ${
-                  link.isActive
-                    ? "bg-sky-500/12 text-sky-100"
-                    : "text-slate-300 hover:bg-slate-800/50"
-                }`}
-              >
-                <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                    link.isActive
-                      ? "bg-sky-400 text-slate-950"
-                      : "bg-slate-800 text-slate-400"
-                  }`}
-                >
-                  {stepNumber}
-                </span>
-                <div className="flex flex-col">
-                  <span>{stepLabel}</span>
-                  <span className="text-fluid-xs font-normal text-slate-500">{hint}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-4 border-t border-slate-800/60 pt-3">
-          <Link href="/this-week" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">This Week</Link>
-          <Link href="/current-regime" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Current Regime</Link>
-          <Link href="/learn" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">How it Works</Link>
-          <Link href="/comps" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">SaaS Multiples</Link>
-          <Link href="/regime-changes" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Regime Changes</Link>
-          <Link href="/archive" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Archive</Link>
-          <Link href="/threshold" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Decision Framework</Link>
-          <Link href="/template" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">Decision Template</Link>
-          <Link href="/api-docs" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">API &amp; Agents</Link>
-          <Link href="/about" onClick={onClose} className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 no-underline hover:bg-slate-800/50">About</Link>
-        </div>
-      </div>
+    <div className="w-full px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
+      <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-700" />
+      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Workflow</p>
+      <nav className="mt-3 space-y-1" aria-label="Primary routes">
+        {navigationLinks.map((link, index) => {
+          const stepNumber = index + 1;
+          const stepLabel = STEP_LABELS[index] ?? link.label;
+          const hint = STEP_HINTS[index] ?? link.description;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={link.isActive ? "page" : undefined}
+              onClick={onClose}
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-colors ${
+                link.isActive ? "bg-sky-500/12 text-sky-100" : "text-slate-300 hover:bg-slate-800/50"
+              }`}
+            >
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                link.isActive ? "bg-sky-400 text-slate-950" : "bg-slate-800 text-slate-400"
+              }`}>{stepNumber}</span>
+              <div className="flex flex-col">
+                <span>{stepLabel}</span>
+                <span className="text-fluid-xs font-normal text-slate-500">{hint}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
@@ -286,13 +260,14 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         <SecondaryNavLinks />
       </div>
 
-      {showMobile ? (
-        <MobileNavSheet
-          navigationLinks={navigationLinks}
-          activeRouteLabel={activeRouteLabel}
-          onClose={() => setShowMobile(false)}
-        />
-      ) : null}
+      <Drawer.Root open={showMobile} onOpenChange={setShowMobile}>
+        <Drawer.Portal>
+          <Drawer.Backdrop className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          <Drawer.Popup className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-2xl sm:hidden">
+            <MobileNavContent navigationLinks={navigationLinks} onClose={() => setShowMobile(false)} />
+          </Drawer.Popup>
+        </Drawer.Portal>
+      </Drawer.Root>
     </>
   );
 }

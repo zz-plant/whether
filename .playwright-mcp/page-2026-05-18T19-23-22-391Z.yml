@@ -1,0 +1,138 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e8]:
+          - link "Whether" [ref=e9] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e10]: Weekly Brief
+        - generic [ref=e11]:
+          - link "Open evidence" [ref=e12] [cursor=pointer]:
+            - /url: /evidence
+          - link "Find a tool" [ref=e13] [cursor=pointer]:
+            - /url: /resolve#toolkit-library
+          - button "Share brief" [ref=e14]: Share
+          - link "Historical trends" [ref=e15] [cursor=pointer]:
+            - /url: /history
+            - text: History
+          - button "Settings" [ref=e16]:
+            - img [ref=e17]
+          - button "Switch to light mode" [ref=e20]: Light
+      - generic [ref=e21]:
+        - navigation "Workflow" [ref=e22]:
+          - list [ref=e23]:
+            - listitem [ref=e24]:
+              - link "1 Decide" [ref=e25] [cursor=pointer]:
+                - /url: /
+                - generic [ref=e26]: "1"
+                - generic [ref=e27]: Decide
+            - listitem [ref=e29]:
+              - link "2 Evidence" [ref=e30] [cursor=pointer]:
+                - /url: /evidence
+                - generic [ref=e31]: "2"
+                - generic [ref=e32]: Evidence
+            - listitem [ref=e34]:
+              - link "3 Plan" [ref=e35] [cursor=pointer]:
+                - /url: /planning
+                - generic [ref=e36]: "3"
+                - generic [ref=e37]: Plan
+            - listitem [ref=e39]:
+              - link "4 Resolve" [ref=e40] [cursor=pointer]:
+                - /url: /resolve
+                - generic [ref=e41]: "4"
+                - generic [ref=e42]: Resolve
+            - listitem [ref=e44]:
+              - link "5 Trust" [ref=e45] [cursor=pointer]:
+                - /url: /trust
+                - generic [ref=e46]: "5"
+                - generic [ref=e47]: Trust
+            - listitem [ref=e49]:
+              - link "6 History" [ref=e50] [cursor=pointer]:
+                - /url: /history
+                - generic [ref=e51]: "6"
+                - generic [ref=e52]: History
+        - navigation "More pages" [ref=e54]:
+          - link "This Week" [ref=e55] [cursor=pointer]:
+            - /url: /this-week
+          - link "Regime" [ref=e56] [cursor=pointer]:
+            - /url: /current-regime
+          - link "Learn" [ref=e57] [cursor=pointer]:
+            - /url: /learn
+          - link "Multiples" [ref=e58] [cursor=pointer]:
+            - /url: /comps
+          - link "Changes" [ref=e59] [cursor=pointer]:
+            - /url: /regime-changes
+          - link "Archive" [ref=e60] [cursor=pointer]:
+            - /url: /archive
+          - link "API" [ref=e61] [cursor=pointer]:
+            - /url: /api-docs
+          - button "More ▾" [ref=e63]
+  - region "Loading weekly operating posture" [ref=e64]:
+    - article [ref=e66]:
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - img "Whether — Weekly Operating Posture (Loading)" [ref=e69]
+          - generic [ref=e70]: Weekly brief loading
+          - generic [ref=e71]: Current weekly brief
+        - generic [ref=e72]:
+          - paragraph [ref=e73]: Current conditions
+          - paragraph [ref=e74]: This week's recommendation and decision rules are loading.
+        - generic [ref=e75]:
+          - paragraph [ref=e76]: Current weekly brief is loading.
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - paragraph [ref=e79]: Loading
+              - generic [ref=e81]: Weekly sync
+            - paragraph [ref=e83]: The weekly recommendation is being rebuilt before the plan and trust sections stream in.
+        - region "Brief sequence" [ref=e84]:
+          - paragraph [ref=e85]: Brief sequence
+          - list [ref=e86]:
+            - listitem [ref=e87]:
+              - generic [ref=e88]:
+                - generic [ref=e89]:
+                  - paragraph [ref=e90]: Signal sync
+                  - paragraph [ref=e91]: Refreshing this week’s macro inputs and confidence checks.
+                - generic [ref=e92]: Now
+            - listitem [ref=e93]:
+              - generic [ref=e94]:
+                - generic [ref=e95]:
+                  - paragraph [ref=e96]: Weekly call
+                  - paragraph [ref=e97]: Rebuilding the bounded decision contract for the top fold.
+                - generic [ref=e98]: Next
+            - listitem [ref=e99]:
+              - generic [ref=e100]:
+                - generic [ref=e101]:
+                  - paragraph [ref=e102]: Plan handoff
+                  - paragraph [ref=e103]: Staging the planning and evidence lanes underneath the brief.
+                - generic [ref=e104]: Then
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - article [ref=e107]:
+              - paragraph [ref=e108]: Posture
+            - article [ref=e111]:
+              - paragraph [ref=e112]: Do now
+            - article [ref=e117]:
+              - paragraph [ref=e118]: Revisit
+            - article [ref=e121]:
+              - paragraph [ref=e122]: Watch for
+            - article [ref=e125]:
+              - paragraph [ref=e126]: Clears when
+          - paragraph [ref=e131]: Trust
+    - region "Workspace updates pending" [ref=e148]:
+      - article [ref=e149]:
+        - generic [ref=e150]:
+          - generic [ref=e151]:
+            - paragraph [ref=e152]: Evidence + trust
+            - heading "Preparing compact evidence and trust handoff." [level=2] [ref=e153]
+          - generic [ref=e154]: Updating
+      - article [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e180]:
+            - paragraph [ref=e181]: Planning
+            - heading "Preparing the planning handoff." [level=2] [ref=e182]
+          - generic [ref=e183]: Pending
+  - generic:
+    - region "Notifications"
+  - text: ▾ ▾ ▾ ▾

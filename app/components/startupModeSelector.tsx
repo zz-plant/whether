@@ -1,6 +1,7 @@
 "use client";
-import { useId } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import { RadioGroup } from "@base-ui/react/radio-group";
+import { Radio } from "@base-ui/react/radio";
 
 type ModeOption = { mode: StartupVariantMode; label: string };
 
@@ -33,43 +34,36 @@ export function StartupModeSelector({
   contentByMode: Partial<Record<StartupVariantMode, StartupModeContent>>;
   onModeChange?: (mode: StartupVariantMode) => void;
 }) {
-  const radioGroupName = `startup-mode-${useId()}`;
   const firstAvailableMode = options.find((option) => contentByMode[option.mode])?.mode;
   const effectiveMode = contentByMode[selectedMode] ? selectedMode : firstAvailableMode;
   const activeContent = (effectiveMode && contentByMode[effectiveMode]) || emptyModeContent;
 
   return (
     <>
-      <fieldset className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2">
-        <legend className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-300">
+      <RadioGroup
+        value={effectiveMode}
+        onValueChange={(value) => onModeChange?.(value as StartupVariantMode)}
+        aria-labelledby="company-mode-label"
+        className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2"
+      >
+        <div id="company-mode-label" className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-300">
           Company mode
-        </legend>
+        </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {options.map((option) => (
-            <label
+            <Radio.Root
               key={option.mode}
-              className={`relative inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition ${
-                effectiveMode === option.mode
-                  ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                  : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
-              }`}
+              value={option.mode}
+              className={`relative inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition data-[checked]:border-sky-400/70 data-[checked]:bg-sky-500/20 data-[checked]:text-sky-100 border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80`}
             >
-              <input
-                type="radio"
-                name={radioGroupName}
-                value={option.mode}
-                checked={effectiveMode === option.mode}
-                onChange={() => onModeChange?.(option.mode)}
-                className="peer sr-only"
-              />
-              <span className="rounded-full peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-300">
-                {option.label}
-              </span>
-            </label>
+              <Radio.Indicator className="mr-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-slate-500 data-[checked]:border-sky-400 data-[checked]:bg-sky-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-950 hidden data-[checked]:block" />
+              </Radio.Indicator>
+              {option.label}
+            </Radio.Root>
           ))}
         </div>
-        <p className="text-xs text-slate-300">{activeContent.description} Threshold emphasis: {activeContent.thresholdEmphasis}</p>
-      </fieldset>
+      </RadioGroup>
 
       <div className="grid gap-2.5 sm:grid-cols-2">
         <div className="rounded-lg border border-emerald-500/35 bg-emerald-500/5 px-3 py-3 space-y-1.5">
