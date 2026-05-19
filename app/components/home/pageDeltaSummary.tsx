@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RegimeCompass } from "../regimeCompass";
 import { RegimeExplainer } from "./regimeExplainer";
 import { RegimeContextBlock } from "./regimeContextBlock";
-import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -66,12 +65,7 @@ export function PageDeltaSummary({
   const regimeLabel = regimeKey ? REGIME_LABELS[regimeKey] ?? regimeKey.toLowerCase() : "unknown";
   const hasDelta = tightnessDelta !== 0 || riskAppetiteDelta !== 0;
   const directionWord = directionLabel ?? (tightnessDelta > 0 ? "tightening" : riskAppetiteDelta > 0 ? "easing" : "stable");
-  const [showFull, setShowFull] = useState(false);
-  const [visitCount] = useLocalStorageState<number>("whether_visit_count", 0);
-
-  useEffect(() => {
-    if (visitCount >= 2) setShowFull(true);
-  }, [visitCount]);
+  const [showFull, setShowFull] = useState(true);
 
   return (
     <div className="weather-card text-xs">
@@ -220,7 +214,7 @@ export function PageDeltaSummary({
           {regimeDistance ? (
             <div className="mt-3 space-y-1">
               <p className="text-fluid-micro font-semibold text-slate-400">
-                <span className="text-amber-200 font-bold">{regimeDistance.pointsToFlip.toFixed(1)} pts</span> from {regimeDistance.dimensionLabel} flip
+                <span className="text-amber-200 font-bold">{regimeDistance.pointsToFlip.toFixed(1)} pts</span> from {regimeDistance.dimensionLabel} shift
               </p>
               <div className="h-1.5 w-full rounded-full bg-slate-800/60 overflow-hidden">
                 <div

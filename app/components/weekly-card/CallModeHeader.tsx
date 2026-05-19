@@ -75,7 +75,7 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs leading-5 text-slate-200" style={{ fontVariantNumeric: "tabular-nums" }}>
           <span className="font-semibold text-slate-50">{weeklyLeadershipSummary.shorthandLine}</span>
           <span aria-hidden="true" className="text-slate-600">·</span>
-          <span>Boldness budget {weeklyLeadershipSummary.boldnessScore}/100</span>
+          <span>Posture score {weeklyLeadershipSummary.boldnessScore}/100</span>
           <span aria-hidden="true" className="text-slate-600">·</span>
           <span>{Math.round(confidencePercent)}% confidence</span>
         </div>

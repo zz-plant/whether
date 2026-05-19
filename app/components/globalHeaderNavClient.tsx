@@ -105,9 +105,9 @@ function SecondaryNavLinks() {
   const pathname = usePathname() ?? "/";
   const secondaryLinks = [
     { href: "/this-week" as Route, label: "This Week" },
-    { href: "/current-regime" as Route, label: "Regime" },
+    { href: "/current-regime" as Route, label: "Conditions" },
     { href: "/learn" as Route, label: "Learn" },
-    { href: "/comps" as Route, label: "Multiples" },
+    { href: "/comps" as Route, label: "Valuations" },
     { href: "/regime-changes" as Route, label: "Changes" },
     { href: "/archive" as Route, label: "Archive" },
     { href: "/api-docs" as Route, label: "API" },

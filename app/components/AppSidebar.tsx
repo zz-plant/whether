@@ -5,18 +5,18 @@ import { usePathname } from "next/navigation";
 import type { Route } from "next";
 
 const WORKFLOW_STEPS = [
-  { href: "/" as Route, label: "Decide", desc: "This week's call" },
-  { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds" },
-  { href: "/planning" as Route, label: "Plan", desc: "Create your plan" },
-  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question" },
-  { href: "/trust" as Route, label: "Trust", desc: "Methodology" },
-  { href: "/history" as Route, label: "History", desc: "Trends over time" },
+  { href: "/" as Route, label: "Brief", desc: "This week's call", icon: "📋" },
+  { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds", icon: "📊" },
+  { href: "/planning" as Route, label: "Plan", desc: "Create your plan", icon: "📐" },
+  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question", icon: "🔍" },
+  { href: "/trust" as Route, label: "Trust", desc: "Methodology", icon: "🛡" },
+  { href: "/history" as Route, label: "History", desc: "Trends over time", icon: "📈" },
 ] as const;
 
 const SECONDARY_LINKS = [
   { href: "/this-week" as Route, label: "This Week" },
-  { href: "/comps" as Route, label: "Multiples" },
-  { href: "/current-regime" as Route, label: "Regime" },
+  { href: "/comps" as Route, label: "Valuations" },
+  { href: "/current-regime" as Route, label: "Conditions" },
   { href: "/regime-changes" as Route, label: "Changes" },
   { href: "/archive" as Route, label: "Archive" },
   { href: "/api-docs" as Route, label: "API" },
@@ -27,12 +27,14 @@ function NavItem({
   href,
   label,
   desc,
+  icon,
   isActive,
   onClick,
 }: {
   href: string;
   label: string;
   desc?: string;
+  icon?: string;
   isActive: boolean;
   onClick?: () => void;
 }) {
@@ -42,18 +44,21 @@ function NavItem({
       prefetch
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
-      className={`group flex flex-col rounded-lg px-3 py-2 text-sm no-underline transition-colors ${
+      className={`group flex items-center gap-2 rounded-lg px-3 py-2 text-sm no-underline transition-colors ${
         isActive
           ? "bg-sky-500/10 text-sky-100"
           : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
       }`}
     >
-      <span className="font-medium">{label}</span>
+      {icon ? <span className="text-base flex-shrink-0">{icon}</span> : null}
+      <div className="flex flex-col min-w-0">
+        <span className="font-medium">{label}</span>
       {desc ? (
         <span className="text-fluid-micro text-slate-500 group-hover:text-slate-400">
           {desc}
         </span>
       ) : null}
+      </div>
     </Link>
   );
 }
@@ -85,6 +90,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               href={step.href}
               label={step.label}
               desc={step.desc}
+              icon={step.icon}
               isActive={isActive}
               onClick={onClose}
             />

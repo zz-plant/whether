@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 export function CollapsibleGroup({
@@ -15,8 +15,11 @@ export function CollapsibleGroup({
   children: ReactNode;
 }) {
   const [stored, setStored] = useLocalStorageState<string>(storageKey, defaultOpen ? "1" : "0");
-  const open = stored !== "0";
+  const [mobile, setMobile] = useState(false);
 
+  useEffect(() => { setMobile(window.innerWidth < 1024); }, []);
+
+  const open = mobile ? stored === "1" : stored !== "0";
   const toggle = () => setStored(open ? "0" : "1");
 
   return (

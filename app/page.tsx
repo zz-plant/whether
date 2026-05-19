@@ -309,11 +309,11 @@ export const HomePageReportContent = async ({
               )}
               <span className="text-slate-600">·</span>
               <span className="text-slate-500">View</span>
-              <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Default</a>
-              <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Sector</a>
-              <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Company</a>
-              <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Financial</a>
-              <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Posture</a>
+              <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</a>
+              <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</a>
+              <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</a>
+              <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</a>
+              <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</a>
             </div>
             <OperatorContextWrapper />
           </CollapsibleGroup>
@@ -343,6 +343,10 @@ export const HomePageReportContent = async ({
         regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
       />
 
+        <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
+          <HomeKeyTermsDisclosure />
+        </Suspense>
+
         {!isHistorical ? (
           <CollapsibleGroup storageKey="whether_act_open" label="Take action" defaultOpen={true}>
             <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
@@ -371,9 +375,6 @@ export const HomePageReportContent = async ({
 
       <DiscoverabilityStrip />
       <HomeRoutePrefetch />
-      <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
-        <HomeKeyTermsDisclosure />
-      </Suspense>
       <ErrorBoundary label="Workspace bands">
         <HomeDecisionSection workspaceModelPromise={homepage.workspaceModelPromise} />
       </ErrorBoundary>

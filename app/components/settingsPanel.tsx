@@ -99,6 +99,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="mt-4 space-y-4">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 pb-2">Personalization</p>
             <fieldset>
               <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Company stage</legend>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -157,6 +158,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               </div>
             </fieldset>
 
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 pb-2 mt-4">Display &amp; notifications</p>
             <fieldset>
               <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Display mode</legend>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">

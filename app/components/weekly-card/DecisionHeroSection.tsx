@@ -67,7 +67,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
             <span className="weather-decision-chip rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200" data-priority={hasMeaningfulDelta ? "true" : undefined}>{weeklyMovementLabel}</span>
           </div>
           <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Operating stance</p>
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Decision posture</p>
             <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-slate-50 sm:text-[2.15rem]">
               {operatingStanceLine}
             </h1>
