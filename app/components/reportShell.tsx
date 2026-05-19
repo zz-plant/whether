@@ -229,7 +229,7 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6" : ""}`}>
+          <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
             {sidebarEnabled ? (
               <aside className="hidden md:block md:sticky md:top-4 md:self-start md:h-[calc(100vh-2rem)] md:overflow-y-auto">
                 <AppSidebar />
@@ -250,7 +250,7 @@ export const ReportShell = (props: ReportShellProps) => {
                       ? section.key
                       : `section-${index}`;
                   return (
-                    <div key={sectionKey} className={index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}>
+                    <div key={sectionKey} className={index === 0 ? "pb-4 lg:pb-6" : "py-4 lg:py-6"}>
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
                         <div className="mt-4">

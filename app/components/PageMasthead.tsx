@@ -6,7 +6,7 @@ type PageMastheadProps = {
 
 export function PageMasthead({ page, summary, recordDate }: PageMastheadProps) {
   return (
-    <div className="text-center space-y-3 py-6">
+    <div className="text-center space-y-3 py-4">
       <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-500">
         Whether · {page}{recordDate ? ` · ${recordDate}` : ""}
       </p>
