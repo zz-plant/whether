@@ -27,14 +27,26 @@ export function BriefHero({
 }: BriefHeroProps) {
   return (
     <div className="text-center space-y-6 py-8">
-      {/* Publication masthead */}
       <div className="space-y-1">
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
           Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
         </p>
       </div>
 
-      {/* Hero compass — large and centered */}
+      <h2 className="text-fluid-xl font-semibold text-slate-100 leading-snug max-w-2xl mx-auto font-display">
+        {decision}
+      </h2>
+
+      <div className="space-y-1">
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
+          {regime === "EXPANSION" ? "Expansion" :
+           regime === "SCARCITY" ? "Scarcity" :
+           regime === "DEFENSIVE" ? "Defensive" :
+           regime === "VOLATILE" ? "Volatile" : regime}
+          {" · "}{postureLabel}
+        </p>
+      </div>
+
       <div className="flex justify-center">
         <div className="w-full max-w-[20rem]">
           <RegimeCompass
@@ -46,22 +58,6 @@ export function BriefHero({
           />
         </div>
       </div>
-
-      {/* Regime label + posture */}
-      <div className="space-y-1">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
-          {regime === "EXPANSION" ? "Expansion" :
-           regime === "SCARCITY" ? "Scarcity" :
-           regime === "DEFENSIVE" ? "Defensive" :
-           regime === "VOLATILE" ? "Volatile" : regime}
-          {" · "}{postureLabel}
-        </p>
-      </div>
-
-      {/* Decision headline */}
-      <h2 className="text-fluid-xl font-semibold text-slate-100 leading-snug max-w-2xl mx-auto font-display">
-        {decision}
-      </h2>
 
       {/* Scores — card-based with visual weight */}
       <div className="flex justify-center gap-4 pt-2">

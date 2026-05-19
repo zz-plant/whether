@@ -168,7 +168,7 @@ export function PageDeltaSummary({
         {!showFull ? (
           <div className="flex flex-col justify-center">
             <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
-              Based on public data. Your situation may vary.
+              <a href="/learn/failure-modes" className="text-slate-600 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
             </p>
             <button
               onClick={() => setShowFull(true)}
@@ -180,7 +180,7 @@ export function PageDeltaSummary({
         ) : (
         <div className="flex flex-col">
           <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
-          Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
+          <a href="/learn/failure-modes" className="text-slate-600 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
         </p>
         <RegimeCompass
             tightness={tightness}

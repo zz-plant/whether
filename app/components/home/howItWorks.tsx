@@ -27,7 +27,7 @@ export function HowItWorks() {
         </Collapsible.Trigger>
         <Collapsible.Panel className="space-y-2">
           <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-            Whether tracks four macro signals — Treasury yields, credit spreads, inflation, and employment — and maps them to a 2D score (credit conditions × investor sentiment) that determines the current conditions. Each regime produces a bounded decision: an action, a threshold that would pause it, and a condition that would reverse it. The brief updates weekly and is delivered to your inbox every Monday.
+            Your weekly operating call — what to do, what would pause it, and what would reverse it — based on U.S. credit conditions and investor sentiment. When credit tightens, preserve cash. When investors pull back, extend runway. When conditions ease, move faster on what's working.
           </p>
           <a href="/trust" className="inline-flex text-fluid-micro font-semibold text-sky-200 hover:text-sky-100 no-underline">
             Read the full methodology →
