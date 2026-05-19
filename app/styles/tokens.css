@@ -106,7 +106,7 @@
   --white-overlay-faint: rgba(255, 255, 255, 0.01);
 
   /* CTA button */
-  --cta-gradient: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(14, 116, 144, 0.85));
+  --cta-gradient: rgba(56, 189, 248, 0.85);
   --cta-shadow: 0 8px 20px -12px rgba(56, 189, 248, 0.3);
   --cta-shadow-hover: 0 12px 28px -12px rgba(56, 189, 248, 0.45);
 

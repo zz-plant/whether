@@ -187,13 +187,13 @@
 :root[data-theme="light"] .weather-button-primary {
   color: #0b2538;
   border-color: rgba(56, 189, 248, 0.45);
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.82), rgba(56, 189, 248, 0.62));
+  background: rgba(2, 132, 199, 0.85);
 }
 
 :root[data-theme="light"] .weather-cta-primary {
   color: #0b2538;
   border-color: rgba(56, 189, 248, 0.45);
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.82), rgba(56, 189, 248, 0.62));
+  background: rgba(2, 132, 199, 0.85);
 }
 
 :root[data-theme="light"] .weather-brand-mark {
