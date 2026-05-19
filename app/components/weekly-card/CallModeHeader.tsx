@@ -144,7 +144,7 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
           <aside className="weather-brief-secondary-lane space-y-3 xl:pt-1">
             <article className="weather-stream-reveal weather-stream-reveal--medium rounded px-3 py-3 text-slate-100">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-fluid-xs font-medium text-slate-300">Watch this week</p>
+              <p className="text-fluid-xs font-medium text-slate-300">Revisit this week</p>
               {revisitQueue.length > 0 ? (
                 <span className="weather-chip weather-chip-slate">
                   {revisitQueue.length} decisions

@@ -15,7 +15,6 @@ import { parseOperatorContextFromCookies } from "../lib/report/operatorContext";
 import { OperatorContextWrapper } from "./components/home/operatorContextWrapper";
 import {
   HomeDecisionSection,
-  HomeRevisitFlipSection,
   HomeWhatChangedSection,
   HomeKeyTermsDisclosure,
 } from "./components/home/homeBriefSections";
@@ -29,6 +28,7 @@ import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
+import { GuidedSetup } from "./components/home/GuidedSetup";
 import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
@@ -112,10 +112,12 @@ export const HomePageReportContent = async ({
 
   const structuredDecisionData = {
     "@context": "https://schema.org",
-    "@type": "Report",
+    "@type": ["Article", "Report"],
+    "headline": `Whether Weekly Brief — ${reportData.weeklyRecordDate}`,
     "name": `Whether Weekly Brief — ${reportData.weeklyRecordDate}`,
     "about": "US Macro Operating Posture for Startup and Product Leaders",
     "datePublished": reportData.weeklyRecordDate,
+    "dateModified": homepage.reportShell.fetchedAtLabel,
     "result": {
       "posture": postureLabel,
       "regime": regime,
@@ -138,6 +140,25 @@ export const HomePageReportContent = async ({
       "briefMdUrl": "/brief.md",
       "agentApiUrl": "/api/agent?cadence=weekly",
     },
+  };
+
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Weekly Brief",
+      "item": "https://whether.work",
+    }],
+  };
+
+  const scoresDataset = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "Whether Weekly Scores",
+    "description": `Credit conditions: ${homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}, Investor sentiment: ${homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}. Regime: ${regime}. Confidence: ${confidenceLabel}.`,
+    "dateModified": homepage.reportShell.fetchedAtLabel,
   };
 
   return (
@@ -204,6 +225,14 @@ export const HomePageReportContent = async ({
         id="whether-structured-data"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDecisionData) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(scoresDataset) }}
+      />
       {cadenceData && activeCadence !== "weekly" ? (
         <div className="mb-3 rounded-lg border border-sky-500/20 bg-sky-500/8 px-4 py-3">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">
@@ -221,6 +250,8 @@ export const HomePageReportContent = async ({
         </div>
       ) : null}
       <div className="-mt-4 space-y-3">
+        <GuidedSetup />
+
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
             <HomeWhatChangedSection
@@ -247,40 +278,33 @@ export const HomePageReportContent = async ({
         )}
 
         {!isHistorical ? (
-          <div className="rounded-lg border border-slate-700/60 bg-slate-950/25 px-4 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
-            <span className="text-slate-500">Tuned for</span>
-            {operatorContext.companyStage ? (
-              <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
-                {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
-                 operatorContext.companyStage === "seed" ? "Seed" :
-                 operatorContext.companyStage === "series-a" ? "Series A" :
-                 operatorContext.companyStage === "series-b-plus" ? "Series B+" :
-                 operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
-              </span>
-            ) : (
-              <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-                Set your stage
-              </a>
-            )}
-            <span className="text-slate-600">·</span>
-            <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Sector</a>
-            <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Company</a>
-            <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Financial</a>
-            <span className="text-slate-600">|</span>
-            <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Default</a>
-          </div>
-        ) : null}
-
-        {!isHistorical ? (
           <CollapsibleGroup storageKey="whether_tailor_open" label="Tailor this brief" defaultOpen={true}>
-          <CadenceSelector />
-          <OperatorContextWrapper />
-          <HomeRevisitFlipSection
-            interpretationLayer={homepage.interpretationLayer}
-            interpretationSearchParams={homepage.interpretationSearchParams}
-            fallbackAlert={homepage.fallbackAlert}
-          />
-        </CollapsibleGroup>
+            <CadenceSelector />
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
+              <span className="text-slate-500">Stage</span>
+              {operatorContext.companyStage ? (
+                <span className="rounded-full bg-slate-800/50 px-2 py-0.5 font-medium text-slate-300">
+                  {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
+                   operatorContext.companyStage === "seed" ? "Seed" :
+                   operatorContext.companyStage === "series-a" ? "Series A" :
+                   operatorContext.companyStage === "series-b-plus" ? "Series B+" :
+                   operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
+                </span>
+              ) : (
+                <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                  Set your stage
+                </a>
+              )}
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-500">View</span>
+              <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Default</a>
+              <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Sector</a>
+              <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Company</a>
+              <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Financial</a>
+              <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`}>Posture</a>
+            </div>
+            <OperatorContextWrapper />
+          </CollapsibleGroup>
         ) : null}
 
         <FirstVisitBanner />

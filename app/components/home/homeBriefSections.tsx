@@ -135,7 +135,7 @@ const interpretationLabels: Record<InterpretationView, string> = {
   sector: "Sector",
   company: "Company",
   financial: "Financial",
-  forecast: "Stance",
+  forecast: "Posture",
 };
 
 const buildViewHref = (

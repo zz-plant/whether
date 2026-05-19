@@ -162,7 +162,7 @@ export function DownloadBriefingPackButton({
         className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white"
       >
         <DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />
-        Download briefing pack (.txt)
+        Download .txt
       </Button>
       <Button
         type="button"
@@ -170,7 +170,7 @@ export function DownloadBriefingPackButton({
         className="weather-button inline-flex min-h-[44px] items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
       >
         <DocumentIcon className="h-3.5 w-3.5" aria-hidden="true" />
-        Download PDF
+        PDF
       </Button>
     </div>
   );

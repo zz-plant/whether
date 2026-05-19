@@ -60,7 +60,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       {postureSteps.length > 1 || confidenceTrend ? (
         <div className="weather-section-stage weather-section-stage--medium rounded px-3 py-3" style={{ contentVisibility: "auto" }}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="type-kicker text-slate-400">Continuity</p>
+            <p className="type-kicker text-slate-400">Confidence timeline</p>
             {trajectoryDeltaSummary ? (
               <p className="type-kicker text-slate-300">{trajectoryDeltaSummary}</p>
             ) : null}

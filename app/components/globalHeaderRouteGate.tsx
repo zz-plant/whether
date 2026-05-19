@@ -21,7 +21,7 @@ import { HistoryIcon } from "./uiIcons";
 
 export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/evidence", label: "Open evidence" };
+    return { href: "/evidence", label: "Evidence" };
   }
 
   if (pathname.startsWith("/evidence")) {
@@ -45,7 +45,7 @@ export const reportHeaderNextStep = (pathname: string) => {
 
 export const resolveReportHeaderUtilityAction = (pathname: string) =>
   pathname === "/"
-    ? { href: buildToolkitLibraryHref(), label: "Find a tool" }
+    ? { href: buildToolkitLibraryHref(), label: "Toolkits" }
     : { href: "/", label: "Weekly brief" };
 
 type GlobalHeaderRouteGateProps = {
@@ -139,7 +139,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   <Link
                     href="/history"
                     className="weather-button hidden min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] no-underline sm:inline-flex"
-                    aria-label="Historical trends"
+                    aria-label="History"
                   >
                     <HistoryIcon />
                     <span className="ml-1.5">History</span>

@@ -37,7 +37,7 @@ export function MoreContextDisclosureBody({
     <div className="space-y-2.5">
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>More context and continuity</span>
+          <span>Confidence &amp; context</span>
           <span
             aria-hidden="true"
             className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180"

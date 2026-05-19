@@ -10,13 +10,14 @@ const VISIT_COUNT_KEY = "whether_visit_count";
 export function FirstVisitBanner() {
   const [dismissed, setDismissed] = useLocalStorageState<boolean>(FIRST_VISIT_KEY, false);
   const [visitCount, setVisitCount] = useLocalStorageState<number>(VISIT_COUNT_KEY, 0);
+  const [setupDone] = useLocalStorageState<boolean>("whether_setup_done", false);
 
   useEffect(() => {
     if (visitCount === 0) setVisitCount(1);
     else if (visitCount === 1) setVisitCount(2);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const visible = !dismissed && visitCount <= 2;
+  const visible = !dismissed && visitCount <= 2 && !setupDone;
 
   if (!visible) return null;
 

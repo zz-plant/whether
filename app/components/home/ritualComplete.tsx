@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const COMPLETE_KEY = "whether_reviewed";
@@ -10,14 +11,15 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
 
   const reviewed = recordDate ? data[recordDate]?.reviewed ?? false : false;
 
-  const streak = useMemo(() => {
+  const { streak, totalReviews } = useMemo(() => {
+    const values = Object.values(data);
     const keys = Object.keys(data).sort().reverse();
-    let count = 0;
+    let s = 0;
     for (const key of keys) {
-      if (data[key]?.reviewed) count++;
+      if (data[key]?.reviewed) s++;
       else break;
     }
-    return count;
+    return { streak: s, totalReviews: values.filter((v) => v.reviewed).length };
   }, [data]);
 
   const handleReview = () => {
@@ -31,7 +33,7 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
   if (!recordDate) return null;
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 space-y-3">
+    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 py-3 space-y-2">
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
@@ -49,11 +51,20 @@ export function RitualComplete({ recordDate }: { recordDate?: string }) {
         </button>
         {streak > 1 ? (
           <span className="text-fluid-micro text-slate-500">
-            {streak}-week streak
+            {streak}-week streak {streak >= 4 ? "🔥" : ""}
           </span>
         ) : null}
       </div>
 
+      {totalReviews >= 4 ? (
+        <div className="flex items-center gap-2 text-fluid-micro text-slate-500">
+          <span>{totalReviews} briefs reviewed</span>
+          <span className="text-slate-700">·</span>
+          <Link href="/history" className="text-sky-400 hover:text-sky-300 no-underline">
+            See your history →
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

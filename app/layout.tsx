@@ -135,6 +135,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
+        <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
+        <link rel="alternate" hrefLang="x-default" href={siteUrl} />
         {/* Agent discovery: machine-readable alternates for browser-based AI agents */}
         <link rel="alternate" type="text/markdown" href={BRIEF_MD_URL} title="Whether Weekly Brief (Markdown)" />
         <link rel="alternate" type="application/json" href={AGENT_API_URL} title="Whether Weekly Brief (JSON)" />

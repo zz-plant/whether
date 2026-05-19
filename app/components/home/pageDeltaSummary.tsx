@@ -109,7 +109,14 @@ export function PageDeltaSummary({
                   <span className={tightnessDelta > 0 ? "text-amber-200 ml-1" : "text-emerald-200 ml-1"}>
                     {tightnessDelta > 0 ? "↑" : "↓"}{Math.abs(tightnessDelta)}
                   </span>
-                ) : null}
+                ) : (
+                  <span className="text-slate-600 ml-1 text-fluid-micro font-normal">—</span>
+                )}
+              </p>
+              <p className="text-fluid-micro text-slate-600">
+                {tightnessDelta !== 0
+                  ? `vs last week: ${tightnessDelta > 0 ? "+" : ""}${tightnessDelta}`
+                  : "unchanged from last week"}
               </p>
             </div>
             <div className="group/tip relative">
@@ -123,24 +130,32 @@ export function PageDeltaSummary({
                   <span className={riskAppetiteDelta > 0 ? "text-emerald-200 ml-1" : "text-amber-200 ml-1"}>
                     {riskAppetiteDelta > 0 ? "↑" : "↓"}{Math.abs(riskAppetiteDelta)}
                   </span>
-                ) : null}
+                ) : (
+                  <span className="text-slate-600 ml-1 text-fluid-micro font-normal">—</span>
+                )}
+              </p>
+              <p className="text-fluid-micro text-slate-600">
+                {riskAppetiteDelta !== 0
+                  ? `vs last week: ${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta}`
+                  : "unchanged from last week"}
               </p>
             </div>
           </div>
           {confidenceLabel || freshnessLabel ? (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-500">
               {confidenceLabel ? (
-                <a
-                  href="/learn/failure-modes"
-                  className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] no-underline hover:underline ${
+                <button
+                  type="button"
+                  onClick={() => setShowFull(true)}
+                  className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:ring-1 hover:ring-white/20 ${
                   confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
                   confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
                   "text-rose-200 bg-rose-500/10"
                 }`}
-                title="When is this wrong?"
+                  title="Tap to see when we're wrong"
                 >
                   {confidenceLabel}
-                </a>
+                </button>
               ) : null}
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}
@@ -192,7 +207,7 @@ export function PageDeltaSummary({
           />
           {regimeKey ? (
             <div className="mt-3 pt-3 border-t border-slate-700/50">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Fundraising conditions</p>
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">What this means for fundraising</p>
               <p className="mt-1 text-xs text-slate-300">
                 {regimeKey === "SCARCITY" ? "Investors are risk-off. Extend runway and delay fundraising. Lead with breakeven path." :
                  regimeKey === "DEFENSIVE" ? "Expect longer diligence. Lead with unit economics. Investors prioritizing profitability over growth." :
