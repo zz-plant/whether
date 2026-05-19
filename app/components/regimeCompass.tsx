@@ -89,8 +89,9 @@ export function RegimeCompass({
       ) : null}
 
       {/* Current position */}
-      <circle cx={currentX} cy={currentY} r="5" fill="rgba(56,189,248,0.9)" stroke="#0a0a0a" strokeWidth="1.5" />
-      <circle cx={currentX} cy={currentY} r="8" fill="rgba(56,189,248,0.15)" stroke="none" />
+      <circle cx={currentX} cy={currentY} r="6" fill="rgba(56,189,248,0.95)" stroke="#0a0a0a" strokeWidth="2" />
+      <circle cx={currentX} cy={currentY} r="12" fill="rgba(56,189,248,0.12)" stroke="none" />
+      <circle cx={currentX} cy={currentY} r="20" fill="rgba(56,189,248,0.04)" stroke="none" />
 
       {/* Axis labels */}
       <text x={M + W / 2} y={M + H + 16} textAnchor="middle" fill="rgba(148,163,184,0.6)" fontSize="9" fontWeight="500" fontFamily="IBM Plex Sans, sans-serif">

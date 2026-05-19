@@ -63,9 +63,9 @@ export function BriefHero({
         {decision}
       </h2>
 
-      {/* Scores — large numbers */}
-      <div className="flex justify-center gap-8 pt-2">
-        <div className="text-center">
+      {/* Scores — card-based with visual weight */}
+      <div className="flex justify-center gap-4 pt-2">
+        <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-6 py-3 text-center min-w-[8rem]">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">Credit conditions</p>
           <p className="text-2xl font-bold tabular-nums text-slate-100">
             {tightness}
@@ -73,10 +73,12 @@ export function BriefHero({
               <span className={`text-lg ml-1 ${tightnessDelta > 0 ? "text-amber-200" : "text-emerald-200"}`}>
                 {tightnessDelta > 0 ? "↑" : "↓"}{Math.abs(tightnessDelta)}
               </span>
-            ) : null}
+            ) : (
+              <span className="text-lg ml-1 text-slate-600">—</span>
+            )}
           </p>
         </div>
-        <div className="text-center">
+        <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-6 py-3 text-center min-w-[8rem]">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">Investor sentiment</p>
           <p className="text-2xl font-bold tabular-nums text-slate-100">
             {riskAppetite}
@@ -84,23 +86,28 @@ export function BriefHero({
               <span className={`text-lg ml-1 ${riskAppetiteDelta > 0 ? "text-emerald-200" : "text-amber-200"}`}>
                 {riskAppetiteDelta > 0 ? "↑" : "↓"}{Math.abs(riskAppetiteDelta)}
               </span>
-            ) : null}
+            ) : (
+              <span className="text-lg ml-1 text-slate-600">—</span>
+            )}
           </p>
         </div>
       </div>
 
-      {/* Confidence + freshness */}
-      <div className="flex justify-center gap-3 text-fluid-micro text-slate-500">
-        {confidenceLabel ? (
-          <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${
-            confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
-            confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
-            "text-rose-200 bg-rose-500/10"
-          }`}>
-            {confidenceLabel}
-          </span>
-        ) : null}
-        {fetchedAt ? <span>Data {fetchedAt}</span> : null}
+      {/* Confidence + source attribution */}
+      <div className="flex flex-col items-center gap-2 text-fluid-micro text-slate-500">
+        <div className="flex justify-center gap-3">
+          {confidenceLabel ? (
+            <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${
+              confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
+              confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
+              "text-rose-200 bg-rose-500/10"
+            }`}>
+              {confidenceLabel}
+            </span>
+          ) : null}
+          {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
+        </div>
+        <p className="text-slate-600">Data: FRED · Treasury · Yahoo Finance</p>
       </div>
     </div>
   );
