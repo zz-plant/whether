@@ -188,7 +188,9 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               Get the weekly brief delivered to your inbox.
             </p>
             <div className="mt-2 flex gap-2">
+              <label htmlFor="settings-email" className="sr-only">Email address</label>
               <input
+                id="settings-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
