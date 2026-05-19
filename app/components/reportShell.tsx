@@ -229,9 +229,9 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6" : ""}`}>
+          <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6" : ""}`}>
             {sidebarEnabled ? (
-              <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] lg:overflow-y-auto">
+              <aside className="hidden md:block md:sticky md:top-4 md:self-start md:h-[calc(100vh-2rem)] md:overflow-y-auto">
                 <AppSidebar />
               </aside>
             ) : null}
