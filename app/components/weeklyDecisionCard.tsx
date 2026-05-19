@@ -92,7 +92,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       <h2 id="weekly-decision-card-title" className="sr-only">
         Weekly brief
       </h2>
-      <section className="weather-decision-delta" aria-label="Weekly delta">
+      <section className="weather-decision-delta" aria-label="What changed">
         <span className="weather-chip weather-chip-slate">This week</span>
         <span className={`weather-chip ${postureDirectionChip(overallDirection)}`}>
           {overallDirection === "tightening" ? "Tightening" : overallDirection === "opening" ? "Easing" : "Steady"}

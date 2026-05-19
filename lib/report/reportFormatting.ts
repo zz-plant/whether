@@ -28,7 +28,7 @@ export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
   tightness: "Credit conditions",
   riskAppetite: "Investor sentiment",
   baseRate: "Fed interest rate",
-  curveSlope: "Recession gauge",
+  curveSlope: "Recession risk",
 };
 
 export const buildRegimeAlert = (

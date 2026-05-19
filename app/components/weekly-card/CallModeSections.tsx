@@ -129,7 +129,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       <details className={`group ${detailDisclosureBase} weather-auto-chevron mt-3`}>
         <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
           <span className="min-w-0 flex-1">
-            <span className="block">Why this lands here</span>
+            <span className="block">Why this call</span>
             <span className="mt-1 block text-fluid-xs font-normal normal-case tracking-normal text-slate-400">
               {guardrailPolicyDetails.summary}
             </span>
@@ -138,7 +138,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
         </summary>
         <div className="mt-2 grid gap-3 xl:grid-cols-2">
           <article className="rounded-md bg-rose-500/8 px-3 py-3">
-            <p className="type-kicker text-rose-200">Why this lands here</p>
+            <p className="type-kicker text-rose-200">Why this call</p>
             <p className="mt-1 type-data text-slate-200">{guardrailPolicyDetails.summary}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {guardrailPolicyDetails.chips.map((chip) => (

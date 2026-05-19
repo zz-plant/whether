@@ -35,7 +35,7 @@ export async function GET() {
         <p><strong>Confidence:</strong> ${confidence}</p>
         <p><strong>Record date:</strong> ${recordDate}</p>
         <p><a href="${link}">View full brief →</a></p>
-        <p style="font-size:0.85rem;color:#64748b;">Guidance based on aggregate macro signals. Use your judgment.</p>
+        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>
       ]]></content:encoded>
     </item>
   </channel>

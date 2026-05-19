@@ -40,7 +40,7 @@ export default function SharePage() {
                   ``,
                   `Full brief: https://whether.work`,
                   ``,
-                  `Guidance based on aggregate macro signals. Use judgment — conditions vary by company, industry, and stage.`,
+                  `Based on public data. Your situation may vary.`,
                 ].join("\n"));
               }}
             >Copy board brief</button>

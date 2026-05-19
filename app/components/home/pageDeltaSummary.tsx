@@ -170,7 +170,7 @@ export function PageDeltaSummary({
         {!showFull ? (
           <div className="flex flex-col justify-center">
             <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
-              Guidance based on aggregate macro signals. Use your judgment — conditions vary by company, industry, and stage.
+              Based on public data. Your situation may vary.
             </p>
             <button
               onClick={() => setShowFull(true)}

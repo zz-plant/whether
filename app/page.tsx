@@ -278,7 +278,7 @@ export const HomePageReportContent = async ({
         )}
 
         {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_tailor_open" label="Tailor this brief" defaultOpen={true}>
+          <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={true}>
             <CadenceSelector />
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
               <span className="text-slate-500">Stage</span>
@@ -292,7 +292,7 @@ export const HomePageReportContent = async ({
                 </span>
               ) : (
                 <a href="/settings" className="rounded-full border border-slate-700/70 px-2 py-0.5 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-                  Set your stage
+                  Select your stage
                 </a>
               )}
               <span className="text-slate-600">·</span>
@@ -344,7 +344,7 @@ export const HomePageReportContent = async ({
       />
 
         {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_act_open" label="Act on this brief" defaultOpen={true}>
+          <CollapsibleGroup storageKey="whether_act_open" label="Take action" defaultOpen={true}>
             <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
           </CollapsibleGroup>
         ) : null}

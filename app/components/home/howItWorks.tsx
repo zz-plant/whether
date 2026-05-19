@@ -20,7 +20,7 @@ export function HowItWorks() {
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <div className={`rounded-lg border px-4 py-3 space-y-2 ${open ? (isFirstVisit ? "border-sky-500/30 bg-sky-950/20" : "border-slate-700/60 bg-slate-950/30") : "border-slate-700/60 bg-slate-950/30"}`}>
         <Collapsible.Trigger className="flex w-full items-center justify-between gap-2 text-left">
-          <span className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <span className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">
             {isFirstVisit ? "New to Whether? Here's how it works" : open ? "How it works" : "How it works ▸"}
           </span>
           <span className="text-fluid-micro text-slate-500 transition-transform data-[panel-open]:rotate-180">▾</span>

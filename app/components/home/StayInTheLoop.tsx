@@ -32,7 +32,9 @@ export function StayInTheLoop() {
             <span className="text-fluid-micro text-emerald-200">Weekly email ✓</span>
           ) : (
             <div className="flex items-center gap-1.5">
+              <label htmlFor="stay-loop-email" className="sr-only">Email address</label>
               <input
+                id="stay-loop-email"
                 type="email"
                 placeholder="you@company.com"
                 value={email}

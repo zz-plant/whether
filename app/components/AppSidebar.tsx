@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
-import { ThemeToggleButton } from "./themeToggleButton";
 
 const WORKFLOW_STEPS = [
   { href: "/" as Route, label: "Decide", desc: "This week's call" },
   { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds" },
-  { href: "/planning" as Route, label: "Plan", desc: "Turn into approvals" },
-  { href: "/resolve" as Route, label: "Resolve", desc: "Close one question" },
-  { href: "/trust" as Route, label: "Trust", desc: "Sources and confidence" },
+  { href: "/planning" as Route, label: "Plan", desc: "Create your plan" },
+  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question" },
+  { href: "/trust" as Route, label: "Trust", desc: "Methodology" },
   { href: "/history" as Route, label: "History", desc: "Trends over time" },
 ] as const;
 
@@ -109,10 +108,6 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           );
         })}
       </nav>
-
-      <div className="mt-auto border-t border-slate-800/60 pt-3">
-        <ThemeToggleButton showLabel className="w-full justify-start rounded-lg px-3 py-2 text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200" />
-      </div>
     </>
   );
 }

@@ -79,7 +79,7 @@ export function GuidedSetup({ onComplete }: { onComplete?: () => void }) {
               onClick={() => setStage(s.key)}
               className={`rounded-lg border px-4 py-3 text-left transition-colors ${
                 stage === s.key
-                  ? "border-sky-400/60 bg-sky-500/10 text-sky-100"
+                  ? "border-sky-400/60 bg-sky-500/14 text-sky-100"
                   : "border-slate-700/60 bg-slate-950/40 text-slate-300 hover:border-sky-500/40"
               }`}
             >
@@ -97,7 +97,7 @@ export function GuidedSetup({ onComplete }: { onComplete?: () => void }) {
               onClick={() => setSensitivity(s.key)}
               className={`rounded-lg border px-4 py-3 text-left transition-colors ${
                 sensitivity === s.key
-                  ? "border-sky-400/60 bg-sky-500/10 text-sky-100"
+                  ? "border-sky-400/60 bg-sky-500/14 text-sky-100"
                   : "border-slate-700/60 bg-slate-950/40 text-slate-300 hover:border-sky-500/40"
               }`}
             >

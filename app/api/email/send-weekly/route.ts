@@ -91,7 +91,7 @@ export async function POST(request: Request) {
           `<div style="margin-top:24px;">`,
           `<a href="${briefUrl}" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,116,144,0.85));color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
           `</div>`,
-          `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Guidance based on aggregate macro signals. Use your judgment.</p>`,
+          `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
           `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
           `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
           `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,

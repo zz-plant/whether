@@ -23,7 +23,7 @@ export function TimeTravelTrigger() {
   return (
     <div className="weather-card">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
+        <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-200/70">
           View past brief
         </span>
         {QUICK_JUMPS.map((jump) => {
@@ -33,7 +33,7 @@ export function TimeTravelTrigger() {
               key={jump.label}
               type="button"
               onClick={() => router.push(`/?month=${month}&year=${year}`)}
-              className="rounded-full border border-slate-700/70 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors"
+              className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-fluid-micro font-medium text-amber-200/80 hover:border-amber-400/50 hover:text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-400 transition-colors"
             >
               {jump.label}
             </button>

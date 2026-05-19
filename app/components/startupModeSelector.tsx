@@ -85,7 +85,7 @@ export function StartupModeSelector({
         <ul className="space-y-1 text-xs text-sky-100">
           {activeContent.watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
         </ul>
-        <p className="text-xs text-sky-100/90">Reversal discipline: {activeContent.reversalTriggerDiscipline}</p>
+        <p className="text-xs text-sky-100/90">When to reverse: {activeContent.reversalTriggerDiscipline}</p>
       </div>
     </>
   );
