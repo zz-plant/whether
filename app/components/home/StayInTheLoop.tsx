@@ -6,6 +6,7 @@ export function StayInTheLoop() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [showSlack, setShowSlack] = useState(false);
+  const [alertsOn, setAlertsOn] = useState(false);
 
   const handleSubscribe = async () => {
     if (!email.includes("@")) return;
@@ -17,7 +18,26 @@ export function StayInTheLoop() {
       });
       setSubscribed(true);
     } catch {
-      // silently fail — non-critical
+      // non-critical
+    }
+  };
+
+  const toggleAlerts = async () => {
+    if (!alertsOn && !email.includes("@")) {
+      // Need email to enable alerts
+      const input = document.getElementById("stay-loop-email") as HTMLInputElement;
+      input?.focus();
+      return;
+    }
+    try {
+      await fetch("/api/alert-preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: email, preferences: { email: !alertsOn, slack: false, webhook: false } }),
+      });
+      setAlertsOn(!alertsOn);
+    } catch {
+      // non-critical
     }
   };
 
@@ -64,11 +84,11 @@ export function StayInTheLoop() {
 
         <button
           type="button"
-          onClick={() => window.open("/settings", "_blank")}
-          className="flex items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-amber-200 transition-colors"
+          onClick={toggleAlerts}
+          className={`flex items-center gap-2 text-left text-fluid-micro transition-colors ${alertsOn ? "text-amber-200" : "text-slate-500 hover:text-amber-200"}`}
         >
           <span className="text-slate-300">⚡</span>
-          + Regime alerts — notified when conditions shift
+          {alertsOn ? "Regime alerts on ✓" : "+ Regime alerts — notified when conditions shift"}
         </button>
 
         <button
@@ -102,12 +122,11 @@ export function StayInTheLoop() {
       ) : null}
 
       <p className="text-fluid-micro text-slate-600">
-        <a href="/api-docs" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">Slack API</a>
+        <a href="/api-docs" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">API</a>
         {" · "}
-        <a href="/embed" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">Embed</a>
+        <a href="/embed" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">Embed on your site</a>
         {" · "}
         <a href="/feed.xml" className="hover:text-sky-400 underline decoration-slate-700 hover:decoration-sky-400">RSS</a>
-        {" →"}
       </p>
     </div>
   );

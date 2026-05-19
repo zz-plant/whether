@@ -60,16 +60,16 @@ export function RegimeCompass({
       <rect x={thresholdX} y={M} width={W - (thresholdX - M)} height={thresholdY - M} fill="rgba(251,191,36,0.08)" rx="0" />
 
       {/* Quadrant labels */}
-      <text x={M + 6} y={M + 14} fill="rgba(148,163,184,0.5)" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
+      <text x={M + 6} y={M + 14} className="regime-compass-text" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
         Expansion
       </text>
-      <text x={thresholdX + 6} y={M + 14} fill="rgba(148,163,184,0.5)" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
+      <text x={thresholdX + 6} y={M + 14} className="regime-compass-text" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
         Defensive
       </text>
-      <text x={M + 6} y={thresholdY + 14} fill="rgba(148,163,184,0.5)" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
+      <text x={M + 6} y={thresholdY + 14} className="regime-compass-text" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
         Volatile
       </text>
-      <text x={thresholdX + 6} y={thresholdY + 14} fill="rgba(148,163,184,0.5)" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
+      <text x={thresholdX + 6} y={thresholdY + 14} className="regime-compass-text" fontSize="10" fontWeight="600" fontFamily="IBM Plex Sans, sans-serif">
         Scarcity
       </text>
 
@@ -78,7 +78,7 @@ export function RegimeCompass({
       <line x1={M} y1={thresholdY} x2={M + W} y2={thresholdY} stroke="rgba(148,163,184,0.25)" strokeWidth="1" strokeDasharray="4 3" />
 
       {/* Border */}
-      <rect x={M} y={M} width={W} height={H} fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth="1" rx="2" />
+      <rect x={M} y={M} width={W} height={H} fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth="1" rx="2" className="regime-compass-grid" />
 
       {/* Trajectory arrow — shows movement from last week */}
       {hasPrev && (prevX !== currentX || prevY !== currentY) ? (
@@ -89,15 +89,15 @@ export function RegimeCompass({
       ) : null}
 
       {/* Current position */}
-      <circle cx={currentX} cy={currentY} r="6" fill="rgba(56,189,248,0.95)" stroke="#0a0a0a" strokeWidth="2" />
+      <circle cx={currentX} cy={currentY} r="6" fill="rgba(56,189,248,0.95)" stroke="#0a0a0a" strokeWidth="2" className="regime-compass-dot" />
       <circle cx={currentX} cy={currentY} r="12" fill="rgba(56,189,248,0.12)" stroke="none" />
       <circle cx={currentX} cy={currentY} r="20" fill="rgba(56,189,248,0.04)" stroke="none" />
 
       {/* Axis labels */}
-      <text x={M + W / 2} y={M + H + 16} textAnchor="middle" fill="rgba(148,163,184,0.6)" fontSize="9" fontWeight="500" fontFamily="IBM Plex Sans, sans-serif">
+      <text x={M + W / 2} y={M + H + 16} textAnchor="middle" className="regime-compass-text" fontSize="9" fontWeight="500" fontFamily="IBM Plex Sans, sans-serif">
         Tightness →
       </text>
-      <text x={M - 8} y={M + H / 2} textAnchor="middle" fill="rgba(148,163,184,0.6)" fontSize="9" fontWeight="500" fontFamily="IBM Plex Sans, sans-serif" transform={`rotate(-90, ${M - 8}, ${M + H / 2})`}>
+      <text x={M - 8} y={M + H / 2} textAnchor="middle" className="regime-compass-text" fontSize="9" fontWeight="500" fontFamily="IBM Plex Sans, sans-serif" transform={`rotate(-90, ${M - 8}, ${M + H / 2})`}>
         Risk appetite ↑
       </text>
 

@@ -167,6 +167,11 @@ html:has([data-historical="true"]) {
   background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(212, 160, 48, 0.03), transparent 60%);
 }
 
+/* Compass text — dark mode default, light mode override in theme-light.css */
+.regime-compass-text { fill: rgba(148,163,184,0.5); }
+.regime-compass-grid { stroke: rgba(148,163,184,0.15); }
+.regime-compass-dot { stroke: #0a0a0a; }
+
 /* Screenshot mode — clean, self-contained view for sharing */
 html[data-screenshot="true"] body > header,
 html[data-screenshot="true"] aside,

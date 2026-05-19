@@ -326,3 +326,8 @@
 :root[data-display-mode="tv"] {
   font-size: 18px;
 }
+
+/* Light mode — compass text and graphics */
+:root[data-theme="light"] .regime-compass-text { fill: rgba(71,85,105,0.7); }
+:root[data-theme="light"] .regime-compass-grid { stroke: rgba(0,0,0,0.1); }
+:root[data-theme="light"] .regime-compass-dot { stroke: #fff; }
