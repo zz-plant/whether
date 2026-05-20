@@ -6,14 +6,16 @@ export function SaaSMultiplesIndicator() {
   const [data, setData] = useState<{ medianEv: number; growth: number; count: number } | null>(null);
 
   useEffect(() => {
+    let active = true;
     fetch("/api/comps")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((r) => {
-        if (r.medianEvToRevenue) {
+        if (active && r.medianEvToRevenue) {
           setData({ medianEv: r.medianEvToRevenue, growth: r.medianRevenueGrowth ?? 0, count: r.companyCount });
         }
       })
-      .catch(() => {});
+      .catch(() => { /* fetch failed — indicator stays hidden */ });
+    return () => { active = false; };
   }, []);
 
   if (!data) return null;

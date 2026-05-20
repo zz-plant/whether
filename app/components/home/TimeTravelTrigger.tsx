@@ -1,13 +1,17 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-const QUICK_JUMPS = [
-  { label: "Last week", month: new Date().getMonth(), year: new Date().getFullYear() },
-  { label: "Last month", month: new Date().getMonth() - 1, year: new Date().getFullYear() },
-  { label: "3 months ago", month: new Date().getMonth() - 3, year: new Date().getFullYear() },
-  { label: "1 year ago", month: new Date().getMonth(), year: new Date().getFullYear() - 1 },
-];
+function computeQuickJumps() {
+  const now = new Date();
+  return [
+    { label: "Last week", month: now.getMonth(), year: now.getFullYear() },
+    { label: "Last month", month: now.getMonth() - 1, year: now.getFullYear() },
+    { label: "3 months ago", month: now.getMonth() - 3, year: now.getFullYear() },
+    { label: "1 year ago", month: now.getMonth(), year: now.getFullYear() - 1 },
+  ];
+}
 
 function normalizeMonth(m: number, y: number): { month: number; year: number } {
   let month = m;
@@ -19,6 +23,7 @@ function normalizeMonth(m: number, y: number): { month: number; year: number } {
 
 export function TimeTravelTrigger() {
   const router = useRouter();
+  const quickJumps = useMemo(() => computeQuickJumps(), []);
 
   return (
     <div className="weather-card">
@@ -26,7 +31,7 @@ export function TimeTravelTrigger() {
         <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-200/70">
           View past brief
         </span>
-        {QUICK_JUMPS.map((jump) => {
+        {quickJumps.map((jump) => {
           const { month, year } = normalizeMonth(jump.month, jump.year);
           return (
             <button

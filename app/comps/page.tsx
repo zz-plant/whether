@@ -14,13 +14,15 @@ type CompsData = {
 export default function CompsPage() {
   const [data, setData] = useState<CompsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    let active = true;
     fetch("/api/comps")
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d) => { if (active) { setData(d); setLoading(false); } })
+      .catch(() => { if (active) { setError(true); setLoading(false); } });
+    return () => { active = false; };
   }, []);
 
   return (
