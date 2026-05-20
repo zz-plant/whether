@@ -56,7 +56,7 @@ export function ConfidenceBadge({
   if (variant === "link") {
     return (
       <Link
-        href="/learn/failure-modes"
+        href="/trust#revisit-call"
         className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:text-sky-200 no-underline ${pillClass} ${className}`}
         title="When we get this wrong"
       >

@@ -173,7 +173,7 @@ export function PageDeltaSummary({
         ) : (
         <div className="flex flex-col">
           <p className="text-fluid-micro text-slate-400 italic leading-relaxed">
-          <a href="/learn/failure-modes" className="text-slate-400 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
+          <a href="/trust#revisit-call" className="text-slate-400 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
         </p>
         <RegimeCompass
             tightness={tightness}

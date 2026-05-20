@@ -53,7 +53,7 @@ export function FirstVisitBanner() {
           )}
           <div className="mt-2 flex flex-wrap gap-2">
             <Link
-              href="/learn"
+              href="/trust"
               className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 px-3 py-1 text-fluid-xs font-semibold text-sky-200 no-underline hover:bg-sky-500/10"
             >
               How it works

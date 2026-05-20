@@ -15,7 +15,7 @@ const REGIME_SUGGESTIONS: Record<string, { cta: string; href: string; reason: st
   ],
   EXPANSION: [
     { cta: "Scale proven bets", href: "/planning", reason: "Investor appetite is strong — raise if needed." },
-    { cta: "Explore toolkits", href: "/toolkits", reason: "More time available — review growth frameworks." },
+    { cta: "Explore toolkits", href: "/resolve", reason: "More time available — review growth frameworks." },
     { cta: "Share the brief", href: "/share", reason: "Good time to align the team on the expansion call." },
   ],
 };

@@ -39,7 +39,7 @@ export default function ArchivePage() {
                 </thead>
                 <tbody>
                   {byYear[year].slice().reverse().map((entry, i) => (
-                    <tr key={i} className="border-b border-slate-800/40">
+                    <tr key={entry.recordDate} className="border-b border-slate-800/40">
                       <td className="py-2 pr-4 text-slate-400 whitespace-nowrap">{entry.recordDate}</td>
                       <td className="py-2 pr-4">
                         <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-fluid-micro ${

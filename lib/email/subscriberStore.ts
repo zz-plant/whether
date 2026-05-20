@@ -59,7 +59,7 @@ class KvSubscriberStore implements SubscriberStore {
         active: true,
         subscribedAt: existing.subscribedAt || new Date().toISOString(),
       };
-      await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => {});
+      await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
       this.fallback.saveToMemory(updated);
       return updated;
     }
@@ -73,8 +73,8 @@ class KvSubscriberStore implements SubscriberStore {
       active: true,
     };
 
-    await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(subscriber)).catch(() => {});
-    await this.kv.put(TOKEN_PREFIX + token, normalized).catch(() => {});
+    await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(subscriber)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    await this.kv.put(TOKEN_PREFIX + token, normalized).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     this.fallback.saveToMemory(subscriber);
 
     return subscriber;
@@ -89,7 +89,7 @@ class KvSubscriberStore implements SubscriberStore {
 
     const sub: Subscriber = JSON.parse(raw);
     sub.active = false;
-    await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => {});
+    await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     this.fallback.saveToMemory(sub);
     return true;
   }
@@ -103,7 +103,7 @@ class KvSubscriberStore implements SubscriberStore {
 
     const sub: Subscriber = JSON.parse(raw);
     sub.verified = true;
-    await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => {});
+    await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     this.fallback.saveToMemory(sub);
     return true;
   }

@@ -13,7 +13,7 @@ export function OperatorContextWrapper() {
   useEffect(() => {
     try {
       setSetupDone(!!localStorage.getItem("whether_setup_done"));
-    } catch {}
+    } catch { /* localStorage unavailable — use defaults */ }
     setReady(true);
   }, []);
 

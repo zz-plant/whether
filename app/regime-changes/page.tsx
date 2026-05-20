@@ -70,7 +70,7 @@ export default function RegimeChangesPage() {
               </thead>
               <tbody>
                 {transitions.slice().reverse().map((t, i) => (
-                  <tr key={i} className="border-b border-slate-800/40">
+                  <tr key={t.date} className="border-b border-slate-800/40">
                     <td className="py-2 pr-3 text-slate-400 whitespace-nowrap">{t.date}</td>
                     <td className="py-2 pr-3">
                       <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-fluid-micro ${

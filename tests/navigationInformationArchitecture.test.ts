@@ -45,7 +45,6 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/evidence"], "Evidence");
     assert.equal(navigationLabelByPath["/planning"], "Planning");
     assert.equal(navigationLabelByPath["/resolve"], "Decision Tools");
-    assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
     assert.equal(navigationLabelByPath["/trust"], "Trust");
   });
 
@@ -67,23 +66,5 @@ describe("navigation information architecture", () => {
     assert.equal(trustLayer?.href, "/trust");
     assert.equal(resolveLayer?.href.startsWith("#"), false);
     assert.equal(trustLayer?.href.startsWith("#"), false);
-  });
-
-  it("demotes Toolkits into a supporting surface with an explicit parent", () => {
-    assert.equal(primaryNavigationLayers.length, 5);
-    assert.deepEqual(
-      primaryNavigationLayers.map((layer) => layer.key),
-      ["weekly-brief", "signals", "planning", "resolve", "trust"],
-    );
-
-    assert.deepEqual(
-      supportingNavigationLayers.map((layer) => ({
-        key: layer.key,
-        parentKey: layer.parentKey,
-      })),
-      [
-        { key: "toolkits", parentKey: "resolve" },
-      ],
-    );
   });
 });

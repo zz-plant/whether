@@ -29,7 +29,7 @@ export function GuidedSetup({ onComplete }: { onComplete?: () => void }) {
   useEffect(() => {
     try {
       if (localStorage.getItem(DISMISS_KEY)) setDone(true);
-    } catch {}
+    } catch { /* localStorage unavailable — show guided setup */ }
   }, []);
 
   const saveAndNext = () => {

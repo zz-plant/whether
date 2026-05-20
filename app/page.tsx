@@ -242,11 +242,16 @@ export const HomePageReportContent = async ({
           </p>
           <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-200">
             {cadenceData && typeof cadenceData === "object" ? (
-              <>
-                {(cadenceData as any).summary?.regime ? <span>Regime: <strong>{(cadenceData as any).summary.regime}</strong></span> : null}
-                {(cadenceData as any).summary?.action ? <span>Action: <strong>{(cadenceData as any).summary.action}</strong></span> : null}
-                {(cadenceData as any).recordDateLabel ? <span className="text-slate-500">As of {(cadenceData as any).recordDateLabel}</span> : null}
-              </>
+              (() => {
+                const c = cadenceData as { summary?: { regime?: string; action?: string }; recordDateLabel?: string };
+                return (
+                  <>
+                    {c.summary?.regime ? <span>Regime: <strong>{c.summary.regime}</strong></span> : null}
+                    {c.summary?.action ? <span>Action: <strong>{c.summary.action}</strong></span> : null}
+                    {c.recordDateLabel ? <span className="text-slate-500">As of {c.recordDateLabel}</span> : null}
+                  </>
+                );
+              })()
             ) : <span>Viewing the {activeCadence} brief.</span>}
           </div>
         </div>

@@ -22,6 +22,7 @@ interface Env {
     }): Promise<unknown>;
   };
   WHETHER_CRON_SECRET?: string;
+  SITE_URL?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,13 +37,14 @@ export default {
     if (secret) headers["Authorization"] = `Bearer ${secret}`;
 
     /* Send weekly brief to email subscribers */
-    await fetch("https://whether.work/api/email/send-weekly", { method: "POST", headers });
+    const site = env.SITE_URL || "https://whether.work";
+    await fetch(`${site}/api/email/send-weekly`, { method: "POST", headers });
 
     /* Check if regime changed and alert if so */
-    await fetch("https://whether.work/api/check-regime-change", { method: "POST", headers });
+    await fetch(`${site}/api/check-regime-change`, { method: "POST", headers });
 
     /* Evaluate alert conditions and deliver to subscribers */
-    await fetch("https://whether.work/api/alert-deliveries", { method: "POST", headers });
+    await fetch(`${site}/api/alert-deliveries`, { method: "POST", headers });
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {
