@@ -5,7 +5,6 @@ export type NavigationLayerKey =
   | "signals"
   | "planning"
   | "resolve"
-  | "toolkits"
   | "trust"
   | "history";
 
@@ -88,17 +87,6 @@ export const navigationLayers: NavigationLayer[] = [
     group: "reference",
     tier: "primary",
   },
-  {
-    key: "toolkits",
-    href: "/toolkits",
-    label: "Toolkits",
-    navLabel: "Use a tool",
-    description: "Templates and tools for working through a specific decision.",
-    boundary: "Use these after you've narrowed the question in Decision Tools.",
-    group: "workflow",
-    tier: "supporting",
-    parentKey: "resolve",
-  },
 ] as const;
 
 export const primaryNavigationLayers = navigationLayers.filter((layer) => layer.tier === "primary");
@@ -114,7 +102,6 @@ export const resolvePrimaryNavigationSurfaceCue = (href: Route) => {
   if (href === "/evidence") return "Evidence";
   if (href === "/planning") return "Plan";
   if (href === "/resolve") return "Resolve";
-  if (href === "/toolkits") return "Toolkits";
   return null;
 };
 
