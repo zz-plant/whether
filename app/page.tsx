@@ -291,45 +291,51 @@ export const HomePageReportContent = async ({
         )}
 
         {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={!operatorContext.companyStage}>
-            <CadenceSelector />
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
-              <span className="text-slate-500">Stage</span>
-              {operatorContext.companyStage ? (
-                <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
-                  {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
-                   operatorContext.companyStage === "seed" ? "Seed" :
-                   operatorContext.companyStage === "series-a" ? "Series A" :
-                   operatorContext.companyStage === "series-b-plus" ? "Series B+" :
-                   operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
-                </span>
-              ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-                  Select your stage
-                </a>
-              )}
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-500">Rate</span>
-              {operatorContext.rateSensitivity ? (
-                <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
-                  {operatorContext.rateSensitivity === "high" ? "High" :
-                   operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
-                </span>
-              ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-                  Set sensitivity
-                </a>
-              )}
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-500">View</span>
-              <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</a>
-              <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</a>
-              <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</a>
-              <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</a>
-              <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</a>
+          <>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400 justify-between">
+              <CadenceSelector />
+              <div className="flex items-center gap-x-2">
+                <span className="text-slate-500">View</span>
+                <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</a>
+                <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</a>
+                <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</a>
+                <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</a>
+                <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-500 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</a>
+              </div>
             </div>
-            <OperatorContextWrapper />
-          </CollapsibleGroup>
+
+            <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={!operatorContext.companyStage}>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
+                <span className="text-slate-500">Stage</span>
+                {operatorContext.companyStage ? (
+                  <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
+                    {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
+                     operatorContext.companyStage === "seed" ? "Seed" :
+                     operatorContext.companyStage === "series-a" ? "Series A" :
+                     operatorContext.companyStage === "series-b-plus" ? "Series B+" :
+                     operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
+                  </span>
+                ) : (
+                  <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                    Select your stage
+                  </a>
+                )}
+                <span className="text-slate-600">·</span>
+                <span className="text-slate-500">Rate</span>
+                {operatorContext.rateSensitivity ? (
+                  <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
+                    {operatorContext.rateSensitivity === "high" ? "High" :
+                     operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
+                  </span>
+                ) : (
+                  <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-500 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                    Set sensitivity
+                  </a>
+                )}
+              </div>
+              <OperatorContextWrapper />
+            </CollapsibleGroup>
+          </>
         ) : null}
 
         <FirstVisitBanner />
