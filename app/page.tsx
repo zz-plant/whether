@@ -340,8 +340,6 @@ export const HomePageReportContent = async ({
 
         <FirstVisitBanner />
 
-        <HowItWorks />
-
         <PageDeltaSummary
         regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
         tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
@@ -361,6 +359,8 @@ export const HomePageReportContent = async ({
         directionLabel={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel}
         regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
       />
+
+        <HowItWorks />
 
         <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
           <HomeKeyTermsDisclosure />
