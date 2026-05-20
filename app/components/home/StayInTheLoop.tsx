@@ -4,21 +4,30 @@ import { useState } from "react";
 
 export function StayInTheLoop() {
   const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeState, setSubscribeState] = useState<"idle" | "sent" | "error">("idle");
   const [showSlack, setShowSlack] = useState(false);
   const [alertsOn, setAlertsOn] = useState(false);
 
   const handleSubscribe = async () => {
     if (!email.includes("@")) return;
+    setSubscribing(true);
+    setSubscribeState("idle");
     try {
-      await fetch("/api/email/send-weekly", {
+      const res = await fetch("/api/email/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, action: "subscribe" }),
+        body: JSON.stringify({ email }),
       });
-      setSubscribed(true);
+      if (res.ok) {
+        setSubscribeState("sent");
+      } else {
+        setSubscribeState("error");
+      }
     } catch {
-      // non-critical
+      setSubscribeState("error");
+    } finally {
+      setSubscribing(false);
     }
   };
 
@@ -48,8 +57,10 @@ export function StayInTheLoop() {
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="flex items-center gap-2">
           <span className="text-fluid-micro text-slate-300">✉</span>
-          {subscribed ? (
-            <span className="text-fluid-micro text-emerald-200">Weekly email ✓</span>
+          {subscribeState === "sent" ? (
+            <span className="text-fluid-micro text-emerald-200">Weekly email ✓ — check your inbox</span>
+          ) : subscribeState === "error" ? (
+            <span className="text-fluid-micro text-amber-200">Try again?</span>
           ) : (
             <div className="flex items-center gap-1.5">
               <label htmlFor="stay-loop-email" className="sr-only">Email address</label>
@@ -65,9 +76,10 @@ export function StayInTheLoop() {
               <button
                 type="button"
                 onClick={handleSubscribe}
-                className="rounded-md bg-sky-500/15 border border-sky-400/30 px-2 py-1 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors"
+                disabled={subscribing}
+                className="rounded-md bg-sky-500/15 border border-sky-400/30 px-2 py-1 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors disabled:opacity-50"
               >
-                Subscribe
+                {subscribing ? "Sending..." : "Subscribe"}
               </button>
             </div>
           )}

@@ -1,0 +1,174 @@
+import type { Metadata } from "next";
+import { loadMarketState, type MarketState } from "../../lib/marketStateModel";
+import {
+  buildMarketMetadata,
+  buildMarketFallbackMetadata,
+} from "../../lib/seo/marketMetadata";
+
+export const runtime = "edge";
+export const revalidate = 3600;
+
+const REGIME_LABELS: Record<string, string> = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Volatile",
+  EXPANSION: "Expansion",
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const state = await loadMarketState();
+  if (!state) return buildMarketFallbackMetadata();
+  return buildMarketMetadata(state);
+}
+
+export default async function StatePage() {
+  const state = await loadMarketState();
+
+  if (!state) {
+    return <ErrorView />;
+  }
+
+  return <MarketStateView state={state} />;
+}
+
+function ErrorView() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
+      <div className="max-w-md space-y-6 text-center">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
+          WHETHER
+        </p>
+        <h1 className="text-fluid-lg font-semibold text-slate-100 font-display">
+          Unable to load market data.
+        </h1>
+        <p className="text-fluid-sm text-slate-400">
+          Check back soon. We refresh this page hourly with the latest U.S.
+          Treasury signals.
+        </p>
+        <a
+          href="/"
+          className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
+        >
+          View the weekly brief →
+        </a>
+      </div>
+    </main>
+  );
+}
+
+function MarketStateView({ state }: { state: MarketState }) {
+  const regimeDisplay = REGIME_LABELS[state.regime] ?? state.regime;
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
+      <div className="w-full max-w-2xl space-y-6 text-center">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
+          WHETHER
+        </p>
+
+        <h1 className="text-fluid-xl font-semibold text-slate-100 leading-snug font-display">
+          {state.decision}
+        </h1>
+
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
+          {regimeDisplay}
+          {" · "}
+          {state.posture}
+        </p>
+
+        <div className="flex flex-wrap justify-center gap-4 pt-2">
+          <ScoreCard
+            label="Credit conditions"
+            value={state.tightness}
+            delta={state.tightnessDelta}
+          />
+          <ScoreCard
+            label="Investor sentiment"
+            value={state.riskAppetite}
+            delta={state.riskAppetiteDelta}
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
+          <ConfidenceBadge label={state.confidenceLabel} />
+          <span>Record {state.recordDate}</span>
+          <span className="text-slate-600">·</span>
+          <span>Refreshed {state.fetchedAt}</span>
+        </div>
+
+        <p className="text-fluid-micro text-slate-600">
+          Data: FRED · Treasury · Yahoo Finance
+        </p>
+
+        <div className="pt-4">
+          <a
+            href="/"
+            className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-6 py-3 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
+          >
+            Get the full weekly brief →
+          </a>
+        </div>
+
+        <p className="text-fluid-micro text-slate-600 max-w-md mx-auto leading-relaxed pt-4">
+          Weekly operating brief for startup and product leaders. Based on U.S.
+          Treasury data. No signup required.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+function ScoreCard({
+  label,
+  value,
+  delta,
+}: {
+  label: string;
+  value: number;
+  delta: number;
+}) {
+  const deltaColor =
+    delta > 0
+      ? label === "Credit conditions"
+        ? "text-amber-200"
+        : "text-emerald-200"
+      : delta < 0
+        ? label === "Credit conditions"
+          ? "text-emerald-200"
+          : "text-amber-200"
+        : "text-slate-600";
+
+  const arrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "—";
+
+  return (
+    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-5 py-3 text-center min-w-[9rem]">
+      <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
+        {label}
+      </p>
+      <p className="text-2xl font-bold tabular-nums text-slate-100">
+        {value}
+        <span className={`text-lg ml-1 ${deltaColor}`}>
+          {arrow}
+          {delta !== 0 ? Math.abs(delta) : ""}
+        </span>
+      </p>
+    </div>
+  );
+}
+
+function ConfidenceBadge({ label }: { label: string }) {
+  const badgeClasses =
+    label === "HIGH"
+      ? "text-emerald-200 bg-emerald-500/10"
+      : label === "MED"
+        ? "text-amber-200 bg-amber-500/10"
+        : "text-rose-200 bg-rose-500/10";
+
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${badgeClasses}`}
+    >
+      {label}
+    </span>
+  );
+}

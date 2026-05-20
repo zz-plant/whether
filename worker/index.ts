@@ -40,6 +40,9 @@ export default {
 
     /* Check if regime changed and alert if so */
     await fetch("https://whether.work/api/check-regime-change", { method: "POST", headers });
+
+    /* Evaluate alert conditions and deliver to subscribers */
+    await fetch("https://whether.work/api/alert-deliveries", { method: "POST", headers });
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {

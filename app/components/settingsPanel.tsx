@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
-import { subscribeEmail } from "../../lib/email/emailDelivery";
+import { getSubscriberStore } from "../../lib/email/subscriberStore";
 
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
@@ -204,9 +204,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     setSubscribeMsg("Enter a valid email.");
                     return;
                   }
-                  await subscribeEmail({ email, name: "" });
-                  setSubscribed(true);
-                  setSubscribeMsg("Subscribed! Check your inbox.");
+                  try {
+                    await getSubscriberStore().subscribe(email);
+                    setSubscribed(true);
+                    setSubscribeMsg("Subscribed! Check your inbox.");
+                  } catch {
+                    setSubscribeMsg("Something went wrong.");
+                  }
                   setSaved(false);
                   setTimeout(() => setSubscribeMsg(""), 3000);
                 }}

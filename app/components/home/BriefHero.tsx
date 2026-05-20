@@ -1,4 +1,5 @@
 import { RegimeCompass } from "../regimeCompass";
+import { ExportImageButton } from "../exportImageButton";
 
 const REGIME_LABELS: Record<string, string> = { SCARCITY: "Scarcity", DEFENSIVE: "Defensive", VOLATILE: "Volatile", EXPANSION: "Expansion" };
 
@@ -100,6 +101,13 @@ export function BriefHero({
             </span>
           ) : null}
           {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
+          <ExportImageButton
+            decision={decision}
+            regime={regime}
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            confidenceLabel={confidenceLabel}
+          />
         </div>
         <p className="text-slate-600">Data: FRED · Treasury · Yahoo Finance</p>
       </div>

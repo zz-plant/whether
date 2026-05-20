@@ -1,7 +1,7 @@
 /**
  * Email delivery interface for weekly brief emails.
  * Designed to work with Cloudflare Email Service or any SMTP provider
- * via a minimal adapter interface. Currently stubs the delivery path.
+ * via a minimal adapter interface.
  */
 
 export type EmailRecipient = {
@@ -15,11 +15,6 @@ export type EmailDeliveryAdapter = {
   send: (params: { to: EmailRecipient; subject: string; html: string; text: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
-/**
- * Cloudflare Email Service adapter.
- * Uses the EMAIL binding available at globalThis in the Workers runtime.
- * Falls back to a console stub when the binding is unavailable (local dev).
- */
 export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
   const emailBinding = (globalThis as { EMAIL?: { send: (msg: {
     to: string;
@@ -57,55 +52,14 @@ export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
   };
 };
 
-
-
-const SUBSCRIPTIONS_KV_KEY = "email:subscriptions";
-
-type StoredSubscriber = EmailRecipient & { active: boolean; subscribedAt?: string };
-
-const getKv = () => (globalThis as { WHETHER_DURABLE_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string): Promise<void> } }).WHETHER_DURABLE_KV;
-
-const readSubscriptions = async (): Promise<StoredSubscriber[]> => {
-  try {
-    const kv = getKv();
-    if (!kv) return [];
-    const raw = await kv.get(SUBSCRIPTIONS_KV_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-};
-
-const writeSubscriptions = async (subs: StoredSubscriber[]): Promise<void> => {
-  try {
-    const kv = getKv();
-    if (kv) await kv.put(SUBSCRIPTIONS_KV_KEY, JSON.stringify(subs));
-  } catch { /* KV write failure is non-fatal for subscription */ }
-};
-
-export const subscribeEmail = async (recipient: EmailRecipient): Promise<{ ok: true }> => {
-  const subs = await readSubscriptions();
-  const existing = subs.findIndex((s) => s.email === recipient.email);
-  if (existing >= 0) {
-    subs[existing] = { ...subs[existing], ...recipient, active: true };
-  } else {
-    subs.push({ ...recipient, active: true, subscribedAt: new Date().toISOString() });
-  }
-  await writeSubscriptions(subs);
-  return { ok: true };
-};
-
-export const unsubscribeEmail = async (email: string): Promise<{ ok: true }> => {
-  const subs = await readSubscriptions();
-  const existing = subs.find((s) => s.email === email);
-  if (existing) existing.active = false;
-  await writeSubscriptions(subs);
-  return { ok: true };
-};
+import { getSubscriberStore, resetSubscriberStore } from "./subscriberStore";
 
 export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
-  const subs = await readSubscriptions();
-  return subs.filter((s) => s.active).map(({ active: _, subscribedAt: __, ...rest }) => rest);
+  const store = getSubscriberStore();
+  const emails = await store.getActiveSubscriptions();
+  return emails.map((email) => ({ email }));
 };
 
 export const clearSubscriptions = async (): Promise<void> => {
-  await writeSubscriptions([]);
+  resetSubscriberStore();
 };

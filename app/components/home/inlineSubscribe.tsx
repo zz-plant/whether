@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { subscribeEmail } from "../../../lib/email/emailDelivery";
+import { getSubscriberStore } from "../../../lib/email/subscriberStore";
 
 export function InlineSubscribe() {
   const [email, setEmail] = useState("");
@@ -20,8 +20,12 @@ export function InlineSubscribe() {
         type="button"
         onClick={async () => {
           if (!email || !email.includes("@")) { setMsg("Enter a valid email."); return; }
-          await subscribeEmail({ email, name: "" });
-          setMsg("Subscribed!");
+          try {
+            await getSubscriberStore().subscribe(email);
+            setMsg("Subscribed!");
+          } catch {
+            setMsg("Try again.");
+          }
           setTimeout(() => setMsg(""), 3000);
         }}
         className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold"

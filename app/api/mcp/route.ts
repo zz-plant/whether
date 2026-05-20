@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildAgentInterfaceResponse } from "../../../lib/agentInterface";
 import { getRegimeContext, getRegimeProjection } from "../../../lib/report/regimeContext";
-import { subscribeEmail } from "../../../lib/email/emailDelivery";
+import { getSubscriberStore } from "../../../lib/email/subscriberStore";
 import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
 import { fetchSaaSValuations } from "../../../lib/saasMultiples";
 
@@ -117,8 +117,8 @@ export async function POST(request: Request) {
       if (!email || !email.includes("@")) {
         return NextResponse.json({ error: "Invalid email" }, { status: 400 });
       }
-      await subscribeEmail({ email, name: email.split("@")[0] });
-      return NextResponse.json({ ok: true, subscribed: true, email, message: "You'll receive the weekly brief every Monday." });
+      await getSubscriberStore().subscribe(email);
+      return NextResponse.json({ ok: true, subscribed: true, email, message: "Check your email to confirm." });
     }
 
     return NextResponse.json({ error: `Unknown tool: ${tool}`, available: ["subscribe"] }, { status: 400 });
