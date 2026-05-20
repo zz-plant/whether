@@ -117,7 +117,6 @@ export const SignalsModeSwitcherSection = ({
         </p>
       </div>
       <div
-        role="radiogroup"
         aria-label="Evidence view mode"
         className="grid gap-2 sm:grid-cols-2"
       >
@@ -138,8 +137,7 @@ export const SignalsModeSwitcherSection = ({
           <button
             key={item.id}
             type="button"
-            role="radio"
-            aria-checked={activeSignalsView === item.id}
+            aria-pressed={activeSignalsView === item.id}
             onClick={() => {
               router.push(buildSignalsViewHref(searchParams, item.id));
             }}

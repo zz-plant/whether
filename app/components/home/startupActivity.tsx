@@ -5,12 +5,16 @@ import type { StartupActivitySignals } from "../../../lib/startupActivity";
 
 export function StartupActivity() {
   const [signals, setSignals] = useState<StartupActivitySignals | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    import("../../../lib/startupActivity").then((mod) => {
-      mod.getStartupActivitySignals().then(setSignals);
-    });
+    import("../../../lib/startupActivity")
+      .then((mod) => mod.getStartupActivitySignals())
+      .then((s) => setSignals(s))
+      .catch(() => setError(true));
   }, []);
+
+  if (error) return null;
 
   if (!signals) return null;
 

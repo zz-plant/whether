@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export function SaaSMultiplesIndicator() {
   const [data, setData] = useState<{ medianEv: number; growth: number; count: number } | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -14,10 +15,11 @@ export function SaaSMultiplesIndicator() {
           setData({ medianEv: r.medianEvToRevenue, growth: r.medianRevenueGrowth ?? 0, count: r.companyCount });
         }
       })
-      .catch(() => { /* fetch failed — indicator stays hidden */ });
+      .catch(() => { if (active) setFailed(true); });
     return () => { active = false; };
   }, []);
 
+  if (failed) return null;
   if (!data) return null;
 
   return (

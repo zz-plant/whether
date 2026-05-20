@@ -24,6 +24,7 @@ type WeeklyDigestPayload = {
 
 export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
   const [payload, setPayload] = useState<WeeklyDigestPayload | null>(null);
+  const [failed, setFailed] = useState(false);
   const signsToWatch = buildSignsToWatch(assessment);
   const alertCount = payload?.alertCount ?? payload?.deprecated?.alertCount ?? 0;
   const deliveryCount = payload?.deliveryCount ?? payload?.deprecated?.deliveryCount ?? 0;
@@ -40,9 +41,7 @@ export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment
           setPayload(data);
         }
       })
-      .catch(() => {
-        // no-op
-      });
+      .catch(() => { if (active) setFailed(true); });
 
     return () => {
       active = false;
@@ -61,7 +60,7 @@ export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment
         </p>
 
         <div className="mt-6 weather-surface p-4">
-          <p className="text-sm text-slate-100">{payload?.digest.summary ?? "Loading digest…"}</p>
+          <p className="text-sm text-slate-100">{failed ? "Digest temporarily unavailable" : payload?.digest.summary ?? "Loading digest…"}</p>
           <ul className="mt-3 space-y-2 text-sm text-slate-300">
             {(payload?.digest.bullets ?? []).map((bullet) => (
               <li key={bullet} className="flex gap-2">

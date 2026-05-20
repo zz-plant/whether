@@ -144,7 +144,6 @@ export const SummaryCard = ({
             </Accordion.Header>
             <Accordion.Panel id={rawSummaryPanelId} aria-labelledby={rawSummaryTriggerId}>
               <pre
-                tabIndex={0}
                 aria-label="Summary card text"
                 className="mt-2 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
               >

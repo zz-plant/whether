@@ -5,7 +5,7 @@ import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
-import { buildAgentInterfaceResponse, supportedAgentCadences, isAgentCadence } from "../lib/agentInterface";
+import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
 import { isArtifactMode } from "../lib/shareArtifacts";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { HomeRoutePrefetch } from "./components/homeRoutePrefetch";
@@ -28,7 +28,6 @@ import { SaaSMultiplesIndicator } from "./components/home/saasMultiplesIndicator
 import { PageDeltaSummary } from "./components/home/pageDeltaSummary";
 import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
-import { GuidedSetup } from "./components/home/GuidedSetup";
 import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { BriefHero } from "./components/home/BriefHero";
 import { VerificationBlock } from "./components/home/verificationBlock";
