@@ -10,6 +10,7 @@ import { LiveDataFallbackAlert } from "../liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../operatorWorkflowRouteTracker";
 import type { ArtifactPayload, HomePageAssembly, HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import type { ArtifactMode } from "../../../lib/literacyAssist";
+import { Details } from "../details";
 import { CopyLeadershipArtifactsButtons } from "../copyLeadershipArtifactsButtons";
 import { DownloadBriefingPackButton } from "../downloadBriefingPackButton";
 import { interpretationViews } from "../../../lib/report/interpretationLayer";
@@ -43,11 +44,11 @@ const LeadershipArtifactActions = async ({
 
   return (
     <StreamedSectionReveal delay="medium">
-      <details className="weather-auto-chevron weather-transmission-segment mt-3 px-3 py-3">
-        <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
-          Share &amp; export
-        </summary>
-        <div className="mt-3 space-y-4">
+      <Details
+        variant="auto-chevron"
+        className="weather-transmission-segment mt-3 px-3 py-3"
+        summary={<span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Share &amp; export</span>}
+      >
         <DownloadBriefingPackButton
           meetingPackText={artifactPayload.meetingPackText}
           recordDate={recordDateLabel ?? "weekly"}
@@ -62,8 +63,7 @@ const LeadershipArtifactActions = async ({
           initialArtifactMode={initialArtifactMode}
           moreFormatsHref="/planning#ops-export-briefs"
         />
-        </div>
-      </details>
+      </Details>
     </StreamedSectionReveal>
   );
 };
@@ -74,11 +74,12 @@ export const HomeKeyTermsDisclosure = () => {
   const entries = BEGINNER_GLOSSARY_ENTRIES.filter((entry) => HOMEPAGE_GLOSSARY_VALUES.includes(entry.value));
 
   return (
-    <details className="weather-surface-secondary group mx-0 mb-4 px-4 py-3">
-      <summary className="cursor-pointer list-none text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-200">
-        Key terms
-      </summary>
-      <div className="mt-3 grid gap-2 pt-3 sm:grid-cols-2">
+    <Details
+      variant="surface-secondary"
+      className="group mx-0 mb-4"
+      summary={<span className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-200">Key terms</span>}
+    >
+      <div className="grid gap-2 sm:grid-cols-2">
         {entries.map((entry) => (
           <div key={entry.value} className="rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-2">
             <p className="text-xs font-semibold text-slate-100">{entry.term}</p>
@@ -86,7 +87,7 @@ export const HomeKeyTermsDisclosure = () => {
           </div>
         ))}
       </div>
-    </details>
+    </Details>
   );
 };
 

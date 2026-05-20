@@ -126,7 +126,7 @@ function SecondaryNavLinks() {
         const isActive = pathname.startsWith(link.href);
         return (
           <Link
-            key={link.href}
+            key={`${link.href}-${link.label}`}
             href={link.href}
             className={`rounded-full px-2.5 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors ${
               isActive
@@ -147,7 +147,7 @@ function SecondaryNavLinks() {
             <Menu.Popup className="z-20 w-40 rounded-lg border border-slate-700/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-xl">
               {moreLinks.map((link) => (
                 <Menu.Item
-                  key={link.href}
+                  key={`${link.href}-${link.label}`}
                   className="w-full rounded-md px-3 py-2 text-left text-fluid-xs font-medium text-slate-300 no-underline hover:bg-slate-800/60 cursor-pointer"
                   render={
                     <Link href={link.href} className="block">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { loadMarketState, type MarketState } from "../../lib/marketStateModel";
 import { ConfidenceBadge } from "../components/ConfidenceBadge";
 import { ScoreCard } from "../components/ScoreCard";
@@ -47,12 +48,12 @@ function ErrorView() {
           Check back soon. We refresh this page hourly with the latest U.S.
           Treasury signals.
         </p>
-        <a
+        <Link
           href="/"
           className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
         >
           View the weekly brief →
-        </a>
+        </Link>
       </div>
     </main>
   );
@@ -103,12 +104,12 @@ function MarketStateView({ state }: { state: MarketState }) {
         </p>
 
         <div className="pt-4">
-          <a
+          <Link
             href="/"
             className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-6 py-3 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
           >
             Get the full weekly brief →
-          </a>
+          </Link>
         </div>
 
         <p className="text-fluid-micro text-slate-600 max-w-md mx-auto leading-relaxed pt-4">

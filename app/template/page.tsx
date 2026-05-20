@@ -105,7 +105,7 @@ export default function TemplatePage() {
           <div className="grid gap-3 sm:grid-cols-2">
             <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
-              <p className="text-xs text-slate-300">See this week's posture and decisions</p>
+              <p className="text-xs text-slate-300">See this week&apos;s posture and decisions</p>
             </Link>
             <Link href="/threshold" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">The framework</p>

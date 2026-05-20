@@ -105,7 +105,7 @@ export function ToolkitLibraryPanels({
         </div>
       ) : (
         <div className="rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
-          {routedShortlist.map((toolkit) => toolkit.title).join(", ")}.
+          {routedShortlist.map((toolkit) => toolkit.title.replace(/ Toolkit$/, "")).join(", ")}.
         </div>
       )}
 

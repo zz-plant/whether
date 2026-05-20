@@ -1,70 +1,114 @@
-"use client";
-
+import type { Metadata } from "next";
+import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { ShareCopyControls } from "./shareCopyControls";
+import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
+import {
+  buildWeeklyOperatorBriefPayload,
+  buildWeeklyOperatorBriefPlainText,
+} from "../../lib/export/weeklyOperatorBrief";
+import { loadReportData } from "../../lib/report/reportData";
 
-export default function SharePage() {
+export const runtime = "edge";
+export const revalidate = 300;
+
+export const metadata: Metadata = {
+  title: "Share the Current Weekly Brief | Whether",
+  description: "Copy the current Whether weekly operating brief for Slack, email, calendar agendas, and meeting notes.",
+};
+
+const buildCurrentShareArtifact = async () => {
+  const { assessment, treasury, sensors, macroSeries } = await loadReportData();
+  const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(
+    buildWeeklyOperatorBriefPayload({ assessment, treasury }),
+  );
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
+  const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries);
+  const citation = buildCallCitation(assessment, treasury);
+  const meetingPack = [
+    "WEEKLY BRIEF",
+    weeklyOperatorBrief,
+    "",
+    "SLACK BRIEF",
+    slackBrief,
+    "",
+    "BOARD SUMMARY",
+    boardBrief,
+    "",
+    "CITATION",
+    citation,
+  ].join("\n");
+
+  return {
+    recordDate: treasury.record_date,
+    trustLine: `Source: ${treasury.source}`,
+    slackBrief: weeklyOperatorBrief,
+    emailBrief: [
+      "Whether weekly operating brief",
+      "",
+      weeklyOperatorBrief,
+      "",
+      "Citation",
+      citation,
+      "",
+      "Full brief: https://whether.work",
+    ].join("\n"),
+    meetingPack,
+    calendarDetails: [
+      "Review the current Whether weekly operating brief.",
+      "",
+      weeklyOperatorBrief,
+      "",
+      "Full brief: https://whether.work",
+    ].join("\n"),
+  };
+};
+
+export default async function SharePage() {
+  const artifact = await buildCurrentShareArtifact();
+
   return (
     <PageShell backdropVariant="default" showFooter>
       <section className="weather-panel space-y-5 px-5 py-5">
-        <h1 className="text-fluid-xl font-semibold text-slate-100">Share this brief</h1>
-        <p className="text-sm text-slate-300">
-          Copy the brief in the format that fits your meeting or channel.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <article className="weather-surface space-y-3 px-4 py-4">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-sky-200">Plain text</h2>
-            <p className="text-xs text-slate-300">For email, messaging, or docs.</p>
-            <button type="button" className="weather-button px-4 py-2 text-xs font-semibold"
-              onClick={() => { navigator.clipboard.writeText("Whether Weekly Brief\nMacro signals → operating posture.\nhttps://whether.work"); }}
-            >Copy text</button>
-          </article>
-          <article className="weather-surface space-y-3 px-4 py-4">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-emerald-200">Slack format</h2>
-            <p className="text-xs text-slate-300">Formatted for Slack channels.</p>
-            <button type="button" className="weather-button px-4 py-2 text-xs font-semibold"
-              onClick={() => { navigator.clipboard.writeText("*Whether Weekly Brief*\nMacro signals → operating posture.\nhttps://whether.work"); }}
-            >Copy Slack</button>
-          </article>
-          <article className="weather-surface space-y-3 px-4 py-4">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-amber-200">Board brief</h2>
-            <p className="text-xs text-slate-300">One-page summary for board packets.</p>
-            <button type="button" className="weather-button px-4 py-2 text-xs font-semibold"
-              onClick={() => {
-                const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-                navigator.clipboard.writeText([
-                  `Whether Operating Brief — ${date}`,
-                  ``,
-                  `Current regime and operating posture for the period.`,
-                  ``,
-                  `Action, threshold, and reversal conditions are based on Treasury yields, credit spreads, inflation, and employment data.`,
-                  ``,
-                  `Full brief: https://whether.work`,
-                  ``,
-                  `Based on public data. Your situation may vary.`,
-                ].join("\n"));
-              }}
-            >Copy board brief</button>
-          </article>
-          <article className="weather-surface space-y-3 px-4 py-4">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-violet-200">Calendar event</h2>
-            <p className="text-xs text-slate-300">Add a weekly brief review to your calendar.</p>
-            <button type="button" className="weather-button px-4 py-2 text-xs font-semibold"
-              onClick={() => {
-                const d = new Date(); d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
-                const ds = d.toISOString().split("T")[0];
-                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Whether Weekly Brief Review")}&dates=${ds}T140000/${ds}T143000&details=${encodeURIComponent("Review the weekly operating brief.\n\nhttps://whether.work")}`, "_blank");
-              }}
-            >Add to Calendar</button>
-          </article>
+        <div className="max-w-3xl space-y-3">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">
+            Current weekly artifact
+          </p>
+          <h1 className="text-fluid-xl font-semibold text-slate-100">Share this week&apos;s operating brief</h1>
+          <p className="text-sm leading-relaxed text-slate-300">
+            Copy the live weekly call, bounded action, pause line, and change-course condition into Slack, email, calendar agendas, or meeting notes.
+          </p>
+          <p className="text-fluid-xs text-slate-500">{artifact.trustLine}</p>
         </div>
+
+        <ShareCopyControls
+          recordDate={artifact.recordDate}
+          slackBrief={artifact.slackBrief}
+          emailBrief={artifact.emailBrief}
+          meetingPack={artifact.meetingPack}
+          calendarDetails={artifact.calendarDetails}
+        />
       </section>
 
       <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">About Whether</h2>
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Whether tracks public macro signals and translates them into a weekly operating posture for startup and product leaders. The brief goes out every Monday — delivered to your inbox and your team&apos;s Slack.
-        </p>
-        <p className="text-fluid-xs text-slate-500 italic">Guidance based on aggregate macro signals. Use your judgment.</p>
+        <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What sharing produces</h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold text-sky-200">Slack</p>
+            <p className="text-xs leading-relaxed text-slate-300">A compact weekly operator brief with posture, action, pause condition, reversal condition, and why the call could be wrong.</p>
+          </div>
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold text-emerald-200">Email</p>
+            <p className="text-xs leading-relaxed text-slate-300">The same current brief plus citation lines, ready for leadership updates or follow-up notes.</p>
+          </div>
+          <div className="weather-surface space-y-2 px-4 py-4">
+            <p className="text-xs font-semibold text-amber-200">Meeting pack</p>
+            <p className="text-xs leading-relaxed text-slate-300">Board note, call snapshot, weekly brief, board summary, and citation in one pasteable artifact.</p>
+          </div>
+        </div>
+        <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">
+          Return to weekly brief
+        </Link>
       </section>
     </PageShell>
   );

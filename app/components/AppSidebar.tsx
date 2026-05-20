@@ -15,7 +15,7 @@ const WORKFLOW_STEPS = [
 ] as const;
 
 const SECONDARY_LINKS = [
-  { href: "/" as Route, label: "This Week" },
+  { href: "/history" as Route, label: "History" },
   { href: "/comps" as Route, label: "Valuations" },
   { href: "/" as Route, label: "Conditions" },
   { href: "/regime-changes" as Route, label: "Changes" },
@@ -106,7 +106,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           const isActive = pathname.startsWith(link.href);
           return (
             <NavItem
-              key={link.href}
+              key={`${link.href}-${link.label}`}
               href={link.href}
               label={link.label}
               isActive={isActive}

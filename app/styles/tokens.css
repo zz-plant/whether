@@ -2,7 +2,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-slate-950: #121212;
+  --color-slate-950: #101114;
   --text-fluid-micro: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
   --text-fluid-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
   --text-fluid-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
@@ -62,32 +62,32 @@
   --radius-full: 9999px;
 
   /* Surfaces */
-  --bg-body: #000000;
-  --bg-panel: #0d0d0d;
-  --bg-surface: #0a0a0a;
-  --bg-surface-muted: rgba(10, 10, 10, 0.6);
-  --bg-raised: #141414;
-  --bg-nested: #080808;
-  --bg-nested-light: rgba(255, 255, 255, 0.025);
+  --bg-body: #08090b;
+  --bg-panel: #111316;
+  --bg-surface: #15171b;
+  --bg-surface-muted: rgba(18, 20, 24, 0.76);
+  --bg-raised: #1a1d22;
+  --bg-nested: #0d0f12;
+  --bg-nested-light: rgba(255, 255, 255, 0.035);
 
   /* Borders */
-  --border-faint: rgba(255, 255, 255, 0.035);
-  --border-subtle: rgba(255, 255, 255, 0.045);
-  --border-default: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.10);
+  --border-faint: rgba(226, 232, 240, 0.045);
+  --border-subtle: rgba(226, 232, 240, 0.065);
+  --border-default: rgba(226, 232, 240, 0.085);
+  --border-strong: rgba(226, 232, 240, 0.14);
 
   /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #f4f7fb;
+  --text-secondary: #aab7c8;
+  --text-muted: #748196;
 
   /* Shadows */
-  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-mid: 0 8px 16px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-heavy: 0 12px 24px rgba(0, 0, 0, 0.65);
+  --shadow-light: 0 8px 18px rgba(0, 0, 0, 0.18);
+  --shadow-sm: 0 12px 28px rgba(0, 0, 0, 0.22);
+  --shadow-mid: 0 18px 44px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 20px 52px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 26px 72px rgba(0, 0, 0, 0.42);
+  --shadow-heavy: 0 32px 84px rgba(0, 0, 0, 0.52);
 
   /* Accent colors — reserved by function */
   --accent-action: #38bdf8;
@@ -106,9 +106,9 @@
   --white-overlay-faint: rgba(255, 255, 255, 0.01);
 
   /* CTA button */
-  --cta-gradient: rgba(56, 189, 248, 0.85);
-  --cta-shadow: 0 8px 20px -12px rgba(56, 189, 248, 0.3);
-  --cta-shadow-hover: 0 12px 28px -12px rgba(56, 189, 248, 0.45);
+  --cta-gradient: linear-gradient(180deg, rgba(71, 204, 234, 0.94), rgba(32, 139, 196, 0.96));
+  --cta-shadow: 0 16px 34px -22px rgba(56, 189, 248, 0.55);
+  --cta-shadow-hover: 0 22px 44px -24px rgba(56, 189, 248, 0.68);
 
   /* Interactive */
   --transition-fast: 200ms ease;
@@ -120,7 +120,9 @@ html {
   scroll-behavior: smooth;
   color-scheme: dark;
   background: var(--bg-body);
-  background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(56, 189, 248, 0.04), transparent 60%);
+  background-image:
+    linear-gradient(180deg, rgba(28, 31, 38, 0.72), rgba(8, 9, 11, 0) 18rem),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.035), rgba(251, 191, 36, 0.018) 48%, rgba(96, 165, 250, 0.03));
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
   scrollbar-gutter: stable both-edges;
@@ -134,6 +136,7 @@ body {
   overflow-x: clip;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {

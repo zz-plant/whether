@@ -60,6 +60,10 @@ export const canonicalSurfaceRedirectPairs = [
   ["/planning/data", "/planning"],
   ["/planning/cli", "/planning"],
   ["/planning/integrations", "/planning"],
+  // Retrofit redirects (links that soft-404)
+  ["/settings", "/"],
+  ["/decision-tools", "/resolve"],
+  ["/toolkits", "/"],
 ];
 
 export const redirectEntries = [

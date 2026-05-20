@@ -1,5 +1,8 @@
 .weather-shell {
   background-color: var(--bg-body);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 22rem),
+    linear-gradient(90deg, rgba(52, 211, 153, 0.018), rgba(56, 189, 248, 0.014), rgba(251, 191, 36, 0.012));
   animation: weather-shell-fade-in 300ms ease-out;
 }
 
@@ -26,9 +29,13 @@
 
 .weather-panel {
   @apply rounded-lg border;
-  border-color: var(--border-strong);
-  background-color: var(--bg-panel);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    var(--bg-panel);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
   container-type: inline-size;
 }
 
@@ -36,8 +43,12 @@
 .weather-surface-secondary {
   @apply rounded-lg border backdrop-blur-sm;
   border-color: var(--color-border-default);
-  background: var(--bg-raised);
-  box-shadow: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
+    var(--bg-raised);
+  box-shadow:
+    0 10px 22px -20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 /* Tier 3: Utility surfaces — chips, stat cards, tags */
@@ -51,14 +62,14 @@
 .weather-appbar {
   @apply rounded-lg border backdrop-blur-sm;
   border-color: var(--color-border-default);
-  background-color: rgba(26, 26, 26, 0.82);
+  background-color: rgba(24, 27, 32, 0.86);
   background-image:
-    linear-gradient(180deg, rgba(30, 30, 30, 0.92) 0%, rgba(24, 24, 24, 0.94) 62%, rgba(18, 18, 18, 0.96) 100%);
+    linear-gradient(180deg, rgba(34, 38, 45, 0.94) 0%, rgba(22, 25, 30, 0.96) 62%, rgba(14, 16, 20, 0.98) 100%);
   box-shadow:
-    0 14px 22px -20px rgba(2, 6, 23, 0.56),
-    0 4px 10px -12px rgba(14, 165, 233, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    inset 0 0 0 1px rgba(125, 211, 252, 0.03);
+    0 18px 34px -24px rgba(0, 0, 0, 0.62),
+    0 8px 20px -18px rgba(45, 212, 191, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.085),
+    inset 0 0 0 1px rgba(125, 211, 252, 0.04);
 }
 
 .weather-panel-static {
@@ -148,7 +159,7 @@
   font-family: var(--font-display);
   font-size: clamp(2.3rem, 1.8rem + 2.1vw, 4.35rem);
   line-height: 0.98;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
   color: white;
   text-wrap: balance;
 }
@@ -158,7 +169,7 @@
   gap: 0.9rem;
   padding: clamp(1rem, 0.75rem + 1.25vw, 2rem);
   border: 1px solid var(--border-default);
-  border-radius: 1.5rem;
+  border-radius: var(--radius-lg);
   background: var(--bg-surface);
   box-shadow:
     0 12px 24px -18px var(--shadow-heavy),
@@ -170,7 +181,7 @@
   gap: 1rem;
   padding: clamp(1rem, 0.86rem + 0.75vw, 1.6rem);
   border: 1px solid var(--border-default);
-  border-radius: 1.5rem;
+  border-radius: var(--radius-lg);
   background: var(--bg-surface);
   box-shadow:
     0 12px 24px -18px var(--shadow-heavy),
@@ -184,7 +195,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-default);
-  border-radius: 1.35rem;
+  border-radius: var(--radius-lg);
   background: var(--bg-surface);
   box-shadow:
     0 12px 24px -18px var(--shadow-heavy),
@@ -215,7 +226,7 @@
   gap: 0.45rem;
   min-height: 100%;
   border: 1px solid var(--border-default);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-lg);
   padding: 1rem;
   text-decoration: none;
   color: inherit;
@@ -404,7 +415,7 @@
   font-family: var(--font-display);
   font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
   line-height: 0.98;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
   color: white;
   text-wrap: balance;
 }
@@ -442,7 +453,7 @@
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   color: rgb(248 250 252);
 }
 

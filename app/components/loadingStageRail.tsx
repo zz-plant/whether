@@ -6,11 +6,11 @@ type LoadingStageItem = {
   state?: LoadingStageState;
 };
 
-const stageStateLabel: Record<LoadingStageState, string> = {
-  active: "Now",
-  next: "Next",
-  queued: "Then",
-};
+  const stageStateLabel: Record<LoadingStageState, string> = {
+    active: "Loading",
+    next: "Pending",
+    queued: "Queued",
+  };
 
 export function LoadingStageRail({
   title = "Load sequence",

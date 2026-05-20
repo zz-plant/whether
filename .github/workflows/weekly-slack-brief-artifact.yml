@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   generate-brief:
@@ -26,36 +25,24 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Generate weekly Slack brief artifact
-        run: bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt
+        run: bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt
 
       - name: Generate latest weekly Slack brief markdown
-        run: bunx tsx scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown
+        run: bun scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown
 
-      - name: Open pull request with latest weekly brief
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: automation/weekly-slack-brief
-          delete-branch: true
-          title: "chore: refresh latest weekly Slack brief"
-          commit-message: "chore: refresh latest weekly Slack brief"
-          body: |
-            ## Summary
-            - Regenerates `docs/briefs/latest-weekly-slack-brief.md` from the latest weekly report data.
-            - Keeps the downloadable artifact workflow intact for operational handoff.
+      - name: Commit latest weekly Slack brief markdown
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet -- docs/briefs/latest-weekly-slack-brief.md; then
+            echo "Latest weekly Slack brief markdown is already current."
+            exit 0
+          fi
 
-            ## Why this matters
-            - Makes the weekly brief linkable and reviewable directly in-repo.
-
-            ## Validation
-            - Generated via `scripts/generateWeeklySlackBrief.ts` in this workflow.
-
-            ## Risks / follow-ups
-            - If report data schema changes, this automation may require script updates.
-          labels: |
-            automation
-            briefs
-          add-paths: |
-            docs/briefs/latest-weekly-slack-brief.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/briefs/latest-weekly-slack-brief.md
+          git commit -m "chore: refresh latest weekly Slack brief"
+          git push
 
       - name: Upload weekly Slack brief artifact
         uses: actions/upload-artifact@v4

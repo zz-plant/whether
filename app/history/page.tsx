@@ -14,6 +14,8 @@ export default function HistoryPage() {
   const searchParams = useSearchParams();
   const { history } = useDecisionHistory();
 
+  useEffect(() => { document.title = "Historical trends — Whether"; }, []);
+
   const urlMonth = Number(searchParams?.get("month")) || 0;
   const urlYear = Number(searchParams?.get("year")) || 0;
 
@@ -74,18 +76,16 @@ export default function HistoryPage() {
         {years.length > 0 ? (
           <div className="space-y-3">
             <div className="flex flex-wrap gap-1.5">
-              {years.map((year) => (
-                <button
-                  key={year}
-                  type="button"
-                  onClick={() => { setSelectedYear(year); setSelectedMonth(0); }}
-                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                    selectedYear === year
-                      ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
-                      : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"
-                  }`}
-                >{year}</button>
-              ))}
+              <select
+                value={selectedYear}
+                onChange={(e) => { setSelectedYear(Number(e.target.value)); setSelectedMonth(0); }}
+                className="rounded-md border border-slate-800/60 bg-slate-950/80 px-3 py-1.5 text-xs font-medium text-slate-200 focus:border-sky-400/60 focus:outline-none"
+                aria-label="Select year"
+              >
+                {years.map((year) => (
+                  <option key={year} value={year} className="bg-slate-950">{year}</option>
+                ))}
+              </select>
             </div>
             {months.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">

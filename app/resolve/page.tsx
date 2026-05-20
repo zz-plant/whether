@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Details } from "../components/details";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -173,10 +174,10 @@ export default async function DecidePage({
               </div>
               <details
                 id="guided-translation"
-                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
+                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4 [&>summary]:cursor-pointer [&>summary]:list-none"
                 open={hasGuidedTranslationSelection}
               >
-                <summary className="cursor-pointer list-none">
+                <summary className="select-none">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
                   <p className="mt-2 text-sm text-slate-200">For role-specific or company-stage views.</p>
                 </summary>
@@ -209,11 +210,9 @@ export default async function DecidePage({
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </section>
 
-      <details id="decide-secondary-paths" className="weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-6 py-6">
-        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
-          Browse more options
-        </summary>
-        <div className="mt-4 space-y-6">
+      <Details id="decide-secondary-paths" variant="auto-chevron" className="weather-panel px-6 py-6"
+        summary={<span className="text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">Browse more options</span>}
+      >
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
@@ -237,8 +236,7 @@ export default async function DecidePage({
               </div>
             </div>
           </section>
-        </div>
-      </details>
+      </Details>
     </ReportShell>
   );
 }

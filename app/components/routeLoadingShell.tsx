@@ -14,21 +14,21 @@ export function RouteLoadingShell({
   pageTitle?: string;
 }) {
   const loadingStages = [
-    {
-      label: "Signal sync",
-      hint: "Refreshing the latest macro inputs and freshness checks.",
-      state: "active" as const,
-    },
-    {
-      label: "Decision pass",
-      hint: `Rebuilding the ${pageTitle.toLowerCase()} summary and action cues.`,
-      state: "next" as const,
-    },
-    {
-      label: "Page handoff",
-      hint: "Locking the route shell before the live brief streams in.",
-      state: "queued" as const,
-    },
+  {
+    label: "Refreshing data",
+    hint: "Checking the latest macro inputs and freshness.",
+    state: "active" as const,
+  },
+  {
+    label: "Building summary",
+    hint: `Assembling the ${pageTitle.toLowerCase()} view.`,
+    state: "next" as const,
+  },
+  {
+    label: "Finalizing",
+    hint: "Preparing the page for your review.",
+    state: "queued" as const,
+  },
   ];
 
   return (

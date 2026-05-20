@@ -95,6 +95,10 @@ export default async function MethodPage() {
               <li><span className="text-slate-400">Decision date:</span> {reportData.recordDateLabel}</li>
               <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
             </ul>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <a href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Treasury source</a>
+              <a href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Macro source</a>
+            </div>
           </article>
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Use in the room</p>
@@ -114,19 +118,7 @@ export default async function MethodPage() {
         title="Sources and freshness"
         description="Where the current recommendation came from and how current it is."
       >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Source coverage</p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
-              <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.statusLabel} · {reportData.macroProvenance.timestampLabel}</li>
-              <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
-            </ul>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <a href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Treasury source</a>
-              <a href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Macro source</a>
-            </div>
-          </article>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Meeting citation</p>
             <p className="text-sm text-slate-200">{citationLine}</p>
@@ -216,7 +208,7 @@ export default async function MethodPage() {
                 <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
                   <p className="mt-1">{item.detail}</p>
-                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Related check</Link>
+                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Check {item.label === "Trigger" ? "confidence limits" : item.label === "Impact" ? "snapshot" : "sources"} →</Link>
                 </li>
               ))}
             </ul>
@@ -232,19 +224,7 @@ export default async function MethodPage() {
 
       <BeginnerGlossaryPanel />
 
-      <MethodSection id="about-creator" title="About the creator" description="">
-        <div className="weather-surface rounded-lg px-5 py-5 space-y-3">
-          <p className="text-sm text-slate-200 leading-relaxed">
-            Whether was built by <a href="https://kanav.net" className="text-sky-200 underline decoration-sky-600">Kanav Jain</a>, a product operator who has spent over a decade building decision infrastructure for high-stakes environments — clinical workflows at Doximity and Transcarent, physician financial guidance at Andwise, and contested claims at NextConsensus.
-          </p>
-          <p className="text-sm text-slate-200 leading-relaxed">
-            The bounded decision format used here (action, threshold, reversal) was developed across these contexts. The macro signals are the input. The decision framework is the output — and the framework is what has been tested across regulated markets, clinical review windows, and fiduciary-grade financial guidance.
-          </p>
-          <p className="text-sm text-slate-200 leading-relaxed">
-            Kanav holds an MBA in Finance and Tech from NYU Stern, a BS in Biomedical Engineering from Georgia Tech, and passed the Series 65 Uniform Investment Adviser Law Examination. His research on accountable systems is published under <a href="https://ethotechnics.org" className="text-sky-200 underline decoration-sky-600">Ethotechnics</a> and <a href="https://thecrumplezone.substack.com" className="text-sky-200 underline decoration-sky-600">The Crumple Zone</a>.
-          </p>
-        </div>
-      </MethodSection>
+
     </ReportShell>
   );
 }

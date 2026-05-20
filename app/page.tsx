@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { HistoricalBanner } from "./components/historicalBanner";
@@ -293,9 +294,9 @@ export const HomePageReportContent = async ({
             <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-amber-200">
               Historical snapshot — {reportData.recordDateLabel}
             </span>
-            <a href="/" className="rounded-full border border-amber-400/40 px-3 py-1 text-fluid-micro font-medium text-amber-200 hover:bg-amber-500/10 transition-colors no-underline">
+            <Link href="/" className="rounded-full border border-amber-400/40 px-3 py-1 text-fluid-micro font-medium text-amber-200 hover:bg-amber-500/10 transition-colors no-underline">
               ← Back to present
-            </a>
+            </Link>
           </div>
         ) : (
           <TimeTravelTrigger />
@@ -307,11 +308,11 @@ export const HomePageReportContent = async ({
               <CadenceSelector />
               <div className="flex items-center gap-x-2">
                 <span className="text-slate-400">View</span>
-                <a href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</a>
-                <a href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</a>
-                <a href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</a>
-                <a href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</a>
-                <a href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</a>
+                <Link href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</Link>
+                <Link href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</Link>
+                <Link href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</Link>
+                <Link href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</Link>
+                <Link href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</Link>
               </div>
             </div>
 
@@ -387,12 +388,12 @@ export const HomePageReportContent = async ({
 
         {!isHistorical ? (
           <div className="flex items-center gap-3 text-fluid-micro">
-            <a href="/planning" className="rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-2 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline">
+            <Link href="/planning" className="rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-2 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline">
               Turn this into a plan →
-            </a>
-            <a href="/share" className="text-slate-400 hover:text-sky-200 transition-colors no-underline">
+            </Link>
+            <Link href="/share" className="text-slate-400 hover:text-sky-200 transition-colors no-underline">
               Or share this brief
-            </a>
+            </Link>
           </div>
         ) : null}
 

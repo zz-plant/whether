@@ -67,11 +67,11 @@ export function CommandCenterNavBlock({
     decisionBanner?.decision ??
     (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   const headingClassName = heroVariant === "compact"
-    ? "max-w-3xl font-semibold tracking-[-0.03em] text-slate-100 text-fluid-2xl"
+    ? "max-w-3xl font-semibold text-slate-100 text-fluid-2xl"
     : "type-headline max-w-3xl text-slate-100";
   const decisionHeadingClassName = heroVariant === "compact"
-    ? "max-w-xl font-semibold leading-[1.15] tracking-[-0.03em] text-slate-50 text-fluid-lg"
-    : "max-w-xl font-semibold leading-[1.12] tracking-[-0.035em] text-slate-50 text-fluid-xl";
+    ? "max-w-xl font-semibold leading-[1.15] text-slate-50 text-fluid-lg"
+    : "max-w-xl font-semibold leading-[1.12] text-slate-50 text-fluid-xl";
   const briefKicker = heroVariant === "compact" ? "Weekly brief" : "Weekly operating brief";
   const hasUtilityActions = Boolean(secondaryCta || exportCta);
   const introMetaLine = [

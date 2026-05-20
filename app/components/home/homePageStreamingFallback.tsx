@@ -32,20 +32,20 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
   const contextLabel = historicalContext ?? "Current weekly brief";
   const loadingStages = [
     {
-      label: "Signal sync",
+      label: "Refreshing data",
       hint: historicalContext
         ? "Loading the requested historical inputs and frozen trust context."
-        : "Refreshing this week’s macro inputs and confidence checks.",
+        : "Checking this week’s macro inputs and confidence.",
       state: "active" as const,
     },
     {
-      label: "Weekly call",
-      hint: "Rebuilding the bounded decision contract for the top fold.",
+      label: "Building brief",
+      hint: "Assembling the weekly decision summary.",
       state: "next" as const,
     },
     {
-      label: "Plan handoff",
-      hint: "Staging the planning and evidence lanes underneath the brief.",
+      label: "Finalizing",
+      hint: "Preparing planning and evidence sections.",
       state: "queued" as const,
     },
   ];

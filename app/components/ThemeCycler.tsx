@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 const THEMES = [
-  { key: "", label: "OLED Dark" },
+  { key: "", label: "Dark" },
   { key: "slate", label: "Slate" },
   { key: "midnight", label: "Midnight" },
   { key: "forest", label: "Forest" },

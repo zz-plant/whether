@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
 
 export const metadata: Metadata = {
-  title: "Whether API — Agent Interface and MCP Tools",
+  title: "API & Agent Tools",
   description: "Programmatic access to the weekly brief, regime data, SaaS multiples, and decision framework. Tools for AI agents and developers.",
   robots: { index: true, follow: true },
 };
@@ -49,17 +49,17 @@ export default function ApiDocsPage() {
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /brief.md</p>
               <p className="text-xs text-slate-300">The current brief in Markdown format. Instant, structured, cacheable.</p>
-              <a href="/brief.md" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View →</a>
+              <a href="/brief.md" aria-label="View Markdown brief" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View brief.md →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /llms.txt</p>
               <p className="text-xs text-slate-300">Agent discovery document. Linked from &lt;link rel=&quot;llm&quot;&gt; in the page head.</p>
-              <a href="/llms.txt" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View →</a>
+              <a href="/llms.txt" aria-label="View LLMs discovery document" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View llms.txt →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /feed.xml</p>
               <p className="text-xs text-slate-300">RSS feed for the weekly brief. Subscribe in any RSS reader.</p>
-              <a href="/feed.xml" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View →</a>
+              <a href="/feed.xml" aria-label="View RSS feed" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View feed.xml →</a>
             </div>
           </div>
         </section>
