@@ -183,12 +183,9 @@ export function PageDeltaSummary({
         </div>
         {!showFull ? (
           <div className="flex flex-col justify-center">
-          <p className="text-fluid-micro text-slate-400 italic leading-relaxed">
-              <a href="/learn/failure-modes" className="text-slate-600 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
-            </p>
             <button
               onClick={() => setShowFull(true)}
-              className="mt-2 self-start inline-flex items-center gap-1 rounded-full border border-slate-700/60 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/30 hover:text-sky-200 transition-colors"
+              className="self-start inline-flex items-center gap-1 rounded-full border border-slate-700/60 px-3 py-1 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/30 hover:text-sky-200 transition-colors"
             >
               Show compass &amp; analysis →
             </button>

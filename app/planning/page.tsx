@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
-import { PageMasthead } from "../components/PageMasthead";
 import {
   buildPlanningPageModel,
   type PlanningSearchParams,
@@ -28,7 +27,6 @@ export default async function OperationsPage({
   const { reportShellModel, children } = await buildPlanningPageModel(searchParams);
   return (
     <ReportShell model={reportShellModel}>
-      <PageMasthead page="Planning" summary="Turn the weekly call into this week's approvals, guardrails, and share-ready plan." />
       {children}
     </ReportShell>
   );

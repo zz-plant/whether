@@ -375,12 +375,12 @@ export const HomePageReportContent = async ({
         <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
 
         {!isHistorical ? (
-          <div className="flex items-center gap-2 text-fluid-micro">
-            <a href="/planning" className="rounded-full border border-slate-700/70 px-3 py-1.5 font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-              Open planning →
+          <div className="flex items-center gap-3 text-fluid-micro">
+            <a href="/planning" className="rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-2 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline">
+              Turn this into a plan →
             </a>
-            <a href="/share" className="rounded-full border border-slate-700/70 px-3 py-1.5 font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-              Share brief →
+            <a href="/share" className="text-slate-400 hover:text-sky-200 transition-colors no-underline">
+              Or share this brief
             </a>
           </div>
         ) : null}
