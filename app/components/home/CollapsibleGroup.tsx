@@ -34,7 +34,7 @@ export function CollapsibleGroup({
         className={`flex w-full items-center justify-between gap-2 text-left ${forceOpen ? "cursor-default" : ""}`}
       >
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 flex-shrink-0">
+          <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 flex-shrink-0">
             {label}
           </span>
           {!open && summary ? (

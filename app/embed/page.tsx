@@ -67,7 +67,7 @@ export default function EmbedPlaygroundPage() {
         {/* Preview area */}
         <div className="space-y-5">
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-5">
-            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
               Live preview
             </p>
             <div
@@ -98,7 +98,7 @@ export default function EmbedPlaygroundPage() {
         <div className="space-y-5">
           {/* Configuration */}
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
-            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
               Configure
             </p>
 
@@ -162,7 +162,7 @@ export default function EmbedPlaygroundPage() {
 
           {/* Embed code */}
           <div className="rounded-md border border-slate-800/60 bg-slate-950/50 p-4">
-            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="mb-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
               Embed code
             </p>
 
@@ -185,7 +185,7 @@ export default function EmbedPlaygroundPage() {
               </button>
             </div>
 
-            <p className="mt-3 text-fluid-micro leading-relaxed text-slate-500">
+            <p className="mt-3 text-fluid-micro leading-relaxed text-slate-400">
               Paste this into any HTML newsletter or webpage. The brief renders live and
               auto-updates weekly. No API key needed.
             </p>
@@ -229,7 +229,7 @@ export default function EmbedPlaygroundPage() {
 
       {/* Attribution note */}
       <div className="mt-10 rounded-md border border-slate-800/40 bg-slate-950/30 p-4">
-        <p className="text-fluid-xs leading-relaxed text-slate-500">
+        <p className="text-fluid-xs leading-relaxed text-slate-400">
           <strong className="text-slate-400">Attribution:</strong> The embed block includes
           a small &ldquo;Macro brief by Whether&rdquo; footer with a link back to whether.app.
           This attribution is required for free embed usage.

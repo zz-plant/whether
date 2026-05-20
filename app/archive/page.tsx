@@ -31,7 +31,7 @@ export default function ArchivePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-slate-700/60 text-left text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
+                  <tr className="border-b border-slate-700/60 text-left text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
                     <th className="pb-2 pr-4">Date</th>
                     <th className="pb-2 pr-4">Regime</th>
                     <th className="pb-2">Summary</th>

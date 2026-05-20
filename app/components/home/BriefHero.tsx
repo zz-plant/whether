@@ -30,7 +30,7 @@ export function BriefHero({
   return (
     <div className="text-center space-y-4 sm:space-y-6 py-4 sm:py-8">
       <div className="space-y-1">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-500">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-400">
           Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
         </p>
       </div>
@@ -60,7 +60,7 @@ export function BriefHero({
       {/* Scores — card-based with visual weight */}
       <div className="flex flex-wrap justify-center gap-4 pt-2">
         <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">Credit conditions</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">Credit conditions</p>
           <p className="text-2xl font-bold tabular-nums text-slate-100">
             {tightness}
             {tightnessDelta !== 0 ? (
@@ -73,7 +73,7 @@ export function BriefHero({
           </p>
         </div>
         <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1">Investor sentiment</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">Investor sentiment</p>
           <p className="text-2xl font-bold tabular-nums text-slate-100">
             {riskAppetite}
             {riskAppetiteDelta !== 0 ? (
@@ -88,7 +88,7 @@ export function BriefHero({
       </div>
 
       {/* Confidence + source attribution */}
-      <div className="flex flex-col items-center gap-2 text-fluid-micro text-slate-500">
+      <div className="flex flex-col items-center gap-2 text-fluid-micro text-slate-400">
         <div className="flex justify-center gap-3">
           {confidenceLabel ? (
             <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${

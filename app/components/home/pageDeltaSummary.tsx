@@ -136,7 +136,7 @@ export function PageDeltaSummary({
             </div>
           </div>
           {freshnessLabel || sourceLabel ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-500">
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-400">
               <a href="/learn/failure-modes" className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:text-sky-200 no-underline ${
                   confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
                   confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
@@ -147,7 +147,7 @@ export function PageDeltaSummary({
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}
               <span className="text-slate-600">·</span>
-              <a href="/history" className="text-fluid-micro text-slate-500 hover:text-sky-200 no-underline transition-colors" title="See how these scores have changed over time">
+              <a href="/history" className="text-fluid-micro text-slate-400 hover:text-sky-200 no-underline transition-colors" title="See how these scores have changed over time">
                 ▁▂▃▄▅▆ See trend →
               </a>
             </div>
@@ -172,7 +172,7 @@ export function PageDeltaSummary({
             </p>
           ) : null}
           {companyStage ? (
-            <p className="text-fluid-micro text-slate-500 mt-1">
+            <p className="text-fluid-micro text-slate-400 mt-1">
               {companyStage === "pre-seed" ? "Pre-seed companies in this regime typically extend runway and gate small experiments."
                : companyStage === "seed" ? "Seed-stage companies in this regime typically focus on repeatable pipeline and staged hires."
                : companyStage === "series-a" ? "Series A companies in this regime typically gate team growth and protect unit economics."
@@ -183,7 +183,7 @@ export function PageDeltaSummary({
         </div>
         {!showFull ? (
           <div className="flex flex-col justify-center">
-            <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
+          <p className="text-fluid-micro text-slate-400 italic leading-relaxed">
               <a href="/learn/failure-modes" className="text-slate-600 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
             </p>
             <button
@@ -195,8 +195,8 @@ export function PageDeltaSummary({
           </div>
         ) : (
         <div className="flex flex-col">
-          <p className="text-fluid-micro text-slate-500 italic leading-relaxed">
-          <a href="/learn/failure-modes" className="text-slate-600 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
+          <p className="text-fluid-micro text-slate-400 italic leading-relaxed">
+          <a href="/learn/failure-modes" className="text-slate-400 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 transition-colors">When we get this wrong →</a>
         </p>
         <RegimeCompass
             tightness={tightness}
@@ -221,7 +221,7 @@ export function PageDeltaSummary({
           />
           {regimeKey ? (
             <div className="mt-3 pt-3 border-t border-slate-700/50">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">What this means for fundraising</p>
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">What this means for fundraising</p>
               <p className="mt-1 text-xs text-slate-300">
                 {regimeKey === "SCARCITY" ? "Investors are risk-off. Extend runway and delay fundraising. Lead with breakeven path." :
                  regimeKey === "DEFENSIVE" ? "Expect longer diligence. Lead with unit economics. Investors prioritizing profitability over growth." :
@@ -238,9 +238,9 @@ export function PageDeltaSummary({
               </p>
               <div className="h-1.5 w-full rounded-full bg-slate-800/60 overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-[width] duration-500"
+                  className="h-full rounded-full origin-left transition-transform duration-500"
                   style={{
-                    width: `${Math.min(Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue) / 2, 100)}%`,
+                    transform: `scaleX(${Math.min(Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue) / 200, 1)})`,
                     background: `linear-gradient(90deg, rgba(251,191,36,0.5), rgba(251,191,36,0.85))`,
                   }}
                 />

@@ -14,7 +14,7 @@ export const ClimateBackdrop = ({ regime }: { regime: string }) => {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       <div
-        className="absolute inset-0 transition-opacity duration-800"
+        className="absolute inset-0 transition-opacity duration-500"
         style={{
           backgroundImage: `radial-gradient(1200px 800px at 50% -10%, ${color}, transparent 70%)`,
         }}

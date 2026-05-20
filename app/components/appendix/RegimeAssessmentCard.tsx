@@ -249,9 +249,10 @@ export const RegimeAssessmentCard = ({
           >
             <Meter.Track className="block h-2 w-full overflow-hidden rounded-full bg-slate-800">
               <Meter.Indicator
-                className="block h-full rounded-full transition-[width] duration-500"
+                className="block h-full rounded-full transition-transform duration-500 origin-left"
                 style={{
-                  width: `${tightnessScore}%`,
+                  width: "100%",
+                  transform: `scaleX(${tightnessScore / 100})`,
                   background: "linear-gradient(90deg, #fb7185, #f43f5e)",
                 }}
               />
@@ -275,9 +276,10 @@ export const RegimeAssessmentCard = ({
           >
             <Meter.Track className="block h-2 w-full overflow-hidden rounded-full bg-slate-800">
               <Meter.Indicator
-                className="block h-full rounded-full transition-[width] duration-500"
+                className="block h-full rounded-full transition-transform duration-500 origin-left"
                 style={{
-                  width: `${riskScore}%`,
+                  width: "100%",
+                  transform: `scaleX(${riskScore / 100})`,
                   background: "linear-gradient(90deg, #fbbf24, #f59e0b)",
                 }}
               />
