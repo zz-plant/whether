@@ -135,22 +135,15 @@ export function PageDeltaSummary({
               </p>
             </div>
           </div>
-          {confidenceLabel || freshnessLabel ? (
+          {freshnessLabel || sourceLabel ? (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-500">
-              {confidenceLabel ? (
-                <button
-                  type="button"
-                  onClick={() => setShowFull(true)}
-                  className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:ring-1 hover:ring-white/20 ${
+              <a href="/learn/failure-modes" className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:text-sky-200 no-underline ${
                   confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
                   confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
                   "text-rose-200 bg-rose-500/10"
-                }`}
-                  title="Tap to see when we're wrong"
-                >
-                  {confidenceLabel}
-                </button>
-              ) : null}
+                }`} title="When we get this wrong">
+                {confidenceLabel ?? "??"}
+              </a>
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}
               <span className="text-slate-600">·</span>

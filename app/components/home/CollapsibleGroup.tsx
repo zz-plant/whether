@@ -8,12 +8,14 @@ export function CollapsibleGroup({
   label,
   defaultOpen = true,
   forceOpen = false,
+  summary,
   children,
 }: {
   storageKey: string;
   label: string;
   defaultOpen?: boolean;
   forceOpen?: boolean;
+  summary?: string;
   children: ReactNode;
 }) {
   const [stored, setStored] = useLocalStorageState<string>(storageKey, defaultOpen ? "1" : "0");
@@ -31,12 +33,19 @@ export function CollapsibleGroup({
         onClick={forceOpen ? undefined : toggle}
         className={`flex w-full items-center justify-between gap-2 text-left ${forceOpen ? "cursor-default" : ""}`}
       >
-        <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
-          {label}
-        </span>
-        <span className={`text-fluid-micro text-slate-500 transition-transform ${open ? "rotate-180" : ""}`}>
-          ▾
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 flex-shrink-0">
+            {label}
+          </span>
+          {!open && summary ? (
+            <span className="text-fluid-micro text-slate-600 truncate">— {summary}</span>
+          ) : null}
+        </div>
+        {!forceOpen ? (
+          <span className={`text-fluid-micro text-slate-500 transition-transform flex-shrink-0 ${open ? "rotate-180" : ""}`}>
+            ▾
+          </span>
+        ) : null}
       </button>
       {open ? children : null}
     </div>

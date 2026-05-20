@@ -101,17 +101,32 @@ export default function TemplatePage() {
         </p>
 
         <div className="border-t border-slate-700/50 pt-6 space-y-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
+          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next</h2>
           <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
+              <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
+              <p className="text-xs text-slate-300">See this week's posture and decisions</p>
+            </Link>
             <Link href="/threshold" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">The framework</p>
               <p className="text-xs text-slate-300">Why bounded decisions work</p>
             </Link>
+          </div>
+        </div>
+        <div className="border-t border-slate-700/50 pt-6 space-y-3">
+          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
             <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">Current brief</p>
               <p className="text-xs text-slate-300">See a live bounded decision in practice</p>
             </Link>
           </div>
+        </div>
+
+        <div className="border-t border-slate-700/50 pt-6">
+          <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+            ← Back to weekly brief
+          </Link>
         </div>
       </article>
     </PageShell>

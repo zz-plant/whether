@@ -66,6 +66,20 @@ export default function ThresholdPage() {
         </section>
 
         <section className="space-y-4">
+          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
+              <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
+              <p className="text-xs text-slate-300">See this week's posture and decisions</p>
+            </Link>
+            <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
+              <p className="text-xs font-semibold text-sky-200">Current regime</p>
+              <p className="text-xs text-slate-300">See the current macro regime and bounded decision</p>
+            </Link>
+          </div>
+        </section>
+
+        <section className="space-y-4">
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
@@ -78,6 +92,12 @@ export default function ThresholdPage() {
             </Link>
           </div>
         </section>
+
+        <div className="border-t border-slate-700/50 pt-6">
+          <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+            ← Back to weekly brief
+          </Link>
+        </div>
       </article>
     </PageShell>
   );

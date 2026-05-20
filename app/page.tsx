@@ -304,7 +304,7 @@ export const HomePageReportContent = async ({
               </div>
             </div>
 
-            <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={!operatorContext.companyStage}>
+            <CollapsibleGroup storageKey="whether_tailor_open" label="Customize" defaultOpen={!operatorContext.companyStage} summary={operatorContext.companyStage ? `${operatorContext.companyStage === "pre-seed" ? "Pre-seed" : operatorContext.companyStage === "seed" ? "Seed" : operatorContext.companyStage === "series-a" ? "Series A" : operatorContext.companyStage === "series-b-plus" ? "Series B+" : operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}${operatorContext.rateSensitivity ? ` · ${operatorContext.rateSensitivity === "high" ? "High" : operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"} sensitivity` : ""}` : undefined}>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
                 <span className="text-slate-500">Stage</span>
                 {operatorContext.companyStage ? (
