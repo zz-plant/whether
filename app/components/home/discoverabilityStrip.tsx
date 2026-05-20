@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
@@ -17,15 +16,6 @@ const STORAGE_KEY = "whether_explore_open";
 
 export function DiscoverabilityStrip() {
   const [stored, setStored] = useLocalStorageState<string>(STORAGE_KEY, "1");
-  const [visitCount] = useLocalStorageState<number>("whether_visit_count", 0);
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    if (!initialized && visitCount >= 3 && stored === "1") {
-      setStored("0");
-    }
-    setInitialized(true);
-  }, [visitCount, stored, initialized, setStored]);
 
   const open = stored !== "0";
 
