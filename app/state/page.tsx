@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { loadMarketState, type MarketState } from "../../lib/marketStateModel";
+import { ConfidenceBadge } from "../components/ConfidenceBadge";
 import {
   buildMarketMetadata,
   buildMarketFallbackMetadata,
@@ -153,22 +154,5 @@ function ScoreCard({
         </span>
       </p>
     </div>
-  );
-}
-
-function ConfidenceBadge({ label }: { label: string }) {
-  const badgeClasses =
-    label === "HIGH"
-      ? "text-emerald-200 bg-emerald-500/10"
-      : label === "MED"
-        ? "text-amber-200 bg-amber-500/10"
-        : "text-rose-200 bg-rose-500/10";
-
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${badgeClasses}`}
-    >
-      {label}
-    </span>
   );
 }

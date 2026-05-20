@@ -1,4 +1,5 @@
 import { RegimeCompass } from "../regimeCompass";
+import { ConfidenceBadge } from "../ConfidenceBadge";
 import { ExportImageButton } from "../exportImageButton";
 
 const REGIME_LABELS: Record<string, string> = { SCARCITY: "Scarcity", DEFENSIVE: "Defensive", VOLATILE: "Volatile", EXPANSION: "Expansion" };
@@ -91,15 +92,7 @@ export function BriefHero({
       {/* Confidence + source attribution */}
       <div className="flex flex-col items-center gap-2 text-fluid-micro text-slate-400">
         <div className="flex justify-center gap-3">
-          {confidenceLabel ? (
-            <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] ${
-              confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
-              confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
-              "text-rose-200 bg-rose-500/10"
-            }`}>
-              {confidenceLabel}
-            </span>
-          ) : null}
+          {confidenceLabel ? <ConfidenceBadge label={confidenceLabel} /> : null}
           {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
           <ExportImageButton
             decision={decision}

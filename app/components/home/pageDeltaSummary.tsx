@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RegimeCompass } from "../regimeCompass";
 import { RegimeExplainer } from "./regimeExplainer";
 import { RegimeContextBlock } from "./regimeContextBlock";
+import { ConfidenceBadge } from "../ConfidenceBadge";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -137,13 +138,7 @@ export function PageDeltaSummary({
           </div>
           {freshnessLabel || sourceLabel ? (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-400">
-              <a href="/learn/failure-modes" className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:text-sky-200 no-underline ${
-                  confidenceLabel === "HIGH" ? "text-emerald-200 bg-emerald-500/10" :
-                  confidenceLabel === "MED" ? "text-amber-200 bg-amber-500/10" :
-                  "text-rose-200 bg-rose-500/10"
-                }`} title="When we get this wrong">
-                {confidenceLabel ?? "??"}
-              </a>
+              {confidenceLabel ? <ConfidenceBadge label={confidenceLabel} variant="link" /> : null}
               {freshnessLabel ? <span>Data {freshnessLabel}</span> : null}
               {sourceLabel ? <span className="text-slate-600">· {sourceLabel}</span> : null}
               <span className="text-slate-600">·</span>
