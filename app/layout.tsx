@@ -6,7 +6,6 @@ import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { ThemeCycler } from "./components/ThemeCycler";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
-import { BackToTop } from "./components/backToTop";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
@@ -161,7 +160,6 @@ export default function RootLayout({
           <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
-        <BackToTop />
         <KeyboardShortcuts />
         <ThemeCycler />
       </body>

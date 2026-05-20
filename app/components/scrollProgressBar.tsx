@@ -48,7 +48,7 @@ export function ScrollProgressBar() {
       aria-label="Page scroll progress"
     >
       <div
-        className="h-full rounded-full bg-gradient-to-r from-sky-500/70 to-cyan-400/80 transition-[width] duration-150 ease-out will-change-[width]"
+        className="h-full rounded-full bg-sky-500/70 transition-[width] duration-150 ease-out"
         style={{ width: `${progress * 100}%` }}
       />
     </div>

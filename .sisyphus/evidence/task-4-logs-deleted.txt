@@ -1,0 +1,16 @@
+Task 4: Clean up Playwright console logs and gitignore .playwright-mcp/
+====================================================================
+Date: 2026-05-19T18:20:00Z
+Commit: 91c4f43
+
+Actions taken:
+1. Deleted 51 console-*.log files from .playwright-mcp/ (168 KB freed)
+2. Untracked all .playwright-mcp/ artifacts from git (git rm --cached -r)
+3. Appended '.playwright-mcp/' to .gitignore
+
+Verification:
+- ls .playwright-mcp/*.log: 0 files (empty, exit code 1 as expected)
+- grep playwright-mcp .gitignore: matches '.playwright-mcp/'
+- git status --porcelain after commit: clean
+- Commit: 91c4f43 "chore(whether-app): gitignore playwright-mcp logs and artifacts"
+  - 103 files changed (3 insertions in .gitignore, 15730 deletions of tracked artifacts)
