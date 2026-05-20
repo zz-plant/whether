@@ -70,8 +70,8 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "trust",
     href: "/trust",
-    label: "Trust",
-    navLabel: "Trust",
+    label: "Readiness",
+    navLabel: "Readiness",
     description: "Check freshness, confidence, source coverage, and what would change the brief.",
     boundary: "Use this when you want to sanity-check the brief before a big decision.",
     group: "reference",

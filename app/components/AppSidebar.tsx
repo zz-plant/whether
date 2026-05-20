@@ -10,7 +10,7 @@ const WORKFLOW_STEPS = [
   { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds", Icon: BarChart3 },
   { href: "/planning" as Route, label: "Plan", desc: "Create your plan", Icon: ClipboardList },
   { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question", Icon: Search },
-  { href: "/trust" as Route, label: "Trust", desc: "Methodology", Icon: Shield },
+  { href: "/trust" as Route, label: "Readiness", desc: "Methodology", Icon: Shield },
   { href: "/history" as Route, label: "History", desc: "Trends over time", Icon: TrendingUp },
 ] as const;
 

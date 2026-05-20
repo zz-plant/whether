@@ -15,9 +15,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Trust — freshness, confidence, and sources",
+  title: "Readiness — freshness, confidence, and sources",
   description:
-    "Check whether this week's U.S.-market brief is current, dependable, and backed by sources.",
+    "Whether is decision-support software, not an authority. Check source freshness, confidence, and methodology before acting on irreversible decisions.",
   path: "/trust",
   imageAlt: "Whether trust hub",
 });
@@ -39,12 +39,15 @@ export default async function MethodPage() {
 
   return (
     <ReportShell {...reportShellProps}>
-      <MethodSection id="trust-snapshot" title="Trust snapshot" description="Freshness, source coverage, and how heavily to lean on this week's U.S.-market brief.">
+      <MethodSection id="trust-snapshot" title="Readiness snapshot" description="How current the data is, how reliable the signal, and whether this week's read is suitable as a planning prompt or needs deeper verification.">
         <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
           <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
             {trustVerdict.label}
           </p>
           <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
+          <p className="text-xs leading-5 text-slate-400 mt-2">
+            Whether is decision-support software, not an authority. Use this read as a planning prompt — not as the sole basis for irreversible hiring, fundraising, budget, or investment decisions. Verify the source data and combine it with company-specific metrics before acting.
+          </p>
           <p className="text-xs leading-5 text-slate-400">
             {PRIMARY_AUDIENCE_SUMMARY} {PRIMARY_AUDIENCE_ACTION}
           </p>

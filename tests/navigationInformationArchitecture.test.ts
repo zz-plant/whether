@@ -45,7 +45,7 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/evidence"], "Evidence");
     assert.equal(navigationLabelByPath["/planning"], "Planning");
     assert.equal(navigationLabelByPath["/resolve"], "Decision Tools");
-    assert.equal(navigationLabelByPath["/trust"], "Trust");
+    assert.equal(navigationLabelByPath["/trust"], "Readiness");
   });
 
   it("exposes primary surface progress cues and route cues for navigation copy", () => {

@@ -31,6 +31,7 @@ import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
 import { GuidedSetup } from "./components/home/GuidedSetup";
 import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { BriefHero } from "./components/home/BriefHero";
+import { VerificationBlock } from "./components/home/verificationBlock";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
@@ -268,6 +269,12 @@ export const HomePageReportContent = async ({
           confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
+        />
+
+        <VerificationBlock
+          recordDate={homepage.reportShell.recordDateLabel}
+          fetchedAt={homepage.reportShell.fetchedAtLabel}
+          sourceLabel={homepage.reportShell.treasurySource}
         />
 
         <ErrorBoundary label="Weekly decision card">

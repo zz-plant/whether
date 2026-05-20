@@ -138,7 +138,7 @@ export const decideScrollPlan: ScrollPlan = {
 };
 
 export const methodScrollPlan: ScrollPlan = {
-  eyebrow: "Trust",
+  eyebrow: "Readiness",
   title: "Freshness, confidence, and reversal conditions",
   description:
     "Current status first, then reversal conditions and glossary support if needed.",

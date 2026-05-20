@@ -18,7 +18,7 @@ type GlobalHeaderNavClientProps = {
 };
 
 const FIRST_VISIT_NAV_KEY = "whether_nav_hints_dismissed";
-const STEP_LABELS = ["Decide", "Evidence", "Plan", "Resolve", "Trust", "History"];
+const STEP_LABELS = ["Decide", "Evidence", "Plan", "Resolve", "Readiness", "History"];
 const STEP_ORDER = ["/", "/evidence", "/planning", "/resolve", "/trust", "/history"];
 const STEP_HINTS = [
   "This week's decision and brief",

@@ -28,9 +28,9 @@ export type HighlightBullet = { text: string };
 
 export const PRIMARY_AUDIENCE_LABEL = "U.S. market starting point";
 export const PRIMARY_AUDIENCE_SUMMARY =
-  "This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
+  "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 export const PRIMARY_AUDIENCE_ACTION =
-  "Before you commit, pressure-test that read against your own demand, retention, and cash signals.";
+  "Before you commit, pressure-test that read against your own demand, retention, and cash signals. Do not use this as the sole basis for irreversible hiring, fundraising, budget, or investment decisions.";
 export const PRIMARY_AUDIENCE_SHARE_GUIDANCE =
   "Start with the leadership team brief. Switch to the plain-English brief when the audience needs less shorthand.";
 
@@ -196,12 +196,12 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   },
   {
     href: "/trust",
-    label: "Trust",
+    label: "Readiness",
     description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
     href: "/trust#beginner-glossary",
-    label: "Trust & glossary",
+    label: "Readiness & glossary",
     description: "Open trust details and plain-English definitions of U.S. market terms.",
   },
 ];
@@ -219,7 +219,7 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   },
   {
     href: "/trust#beginner-glossary",
-    label: "Trust & glossary",
+    label: "Readiness & glossary",
     description: "Review trust status, confidence limits, and the plain-English U.S. market glossary in one place.",
   },
 ];
