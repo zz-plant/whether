@@ -6,15 +6,15 @@ import {
   buildMarketFallbackMetadata,
 } from "../../lib/seo/marketMetadata";
 
-export const runtime = "edge";
-export const revalidate = 3600;
-
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
   VOLATILE: "Volatile",
   EXPANSION: "Expansion",
 };
+
+export const runtime = "edge";
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const state = await loadMarketState();
