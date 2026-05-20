@@ -15,13 +15,13 @@ const WORKFLOW_STEPS = [
 ] as const;
 
 const SECONDARY_LINKS = [
-  { href: "/this-week" as Route, label: "This Week" },
+  { href: "/" as Route, label: "This Week" },
   { href: "/comps" as Route, label: "Valuations" },
-  { href: "/current-regime" as Route, label: "Conditions" },
+  { href: "/" as Route, label: "Conditions" },
   { href: "/regime-changes" as Route, label: "Changes" },
   { href: "/archive" as Route, label: "Archive" },
   { href: "/api-docs" as Route, label: "API" },
-  { href: "/learn" as Route, label: "Learn" },
+  { href: "/trust" as Route, label: "Learn" },
 ] as const;
 
 function NavItem({

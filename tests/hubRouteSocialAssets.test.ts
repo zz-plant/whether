@@ -3,7 +3,6 @@ import { describe, it } from "bun:test";
 import type { Metadata } from "next";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
 import { metadata as decideMetadata } from "../app/resolve/page";
-import { metadata as guidesMetadata } from "../app/guides/page";
 import { metadata as operationsMetadata } from "../app/planning/page";
 import { metadata as signalsMetadata } from "../app/evidence/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";
@@ -44,7 +43,6 @@ describe("hub route social assets", () => {
       { metadata: signalsMetadata, imagePath: "/social/evidence.svg" },
       { metadata: operationsMetadata, imagePath: "/social/planning.svg" },
       { metadata: decideMetadata, imagePath: "/social/resolve.svg" },
-      { metadata: guidesMetadata, imagePath: "/social/guides.svg" },
     ];
 
     for (const asset of expectedAssets) {

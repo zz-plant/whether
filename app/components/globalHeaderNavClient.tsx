@@ -104,9 +104,9 @@ function WorkflowStep({
 function SecondaryNavLinks() {
   const pathname = usePathname() ?? "/";
   const secondaryLinks = [
-    { href: "/this-week" as Route, label: "This Week" },
-    { href: "/current-regime" as Route, label: "Conditions" },
-    { href: "/learn" as Route, label: "Learn" },
+    { href: "/" as Route, label: "This Week" },
+    { href: "/" as Route, label: "Conditions" },
+    { href: "/trust" as Route, label: "Learn" },
     { href: "/comps" as Route, label: "Valuations" },
     { href: "/regime-changes" as Route, label: "Changes" },
     { href: "/archive" as Route, label: "Archive" },
@@ -115,9 +115,9 @@ function SecondaryNavLinks() {
   const moreLinks = [
     { href: "/threshold" as Route, label: "Decision Framework" },
     { href: "/template" as Route, label: "Decision Template" },
-    { href: "/resources" as Route, label: "Resources" },
+    { href: "/planning#ops-export-briefs" as Route, label: "Resources" },
     { href: "/feed.xml" as Route, label: "RSS Feed" },
-    { href: "/about" as Route, label: "About" },
+    { href: "/trust" as Route, label: "About" },
   ];
 
   return (

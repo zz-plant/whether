@@ -160,6 +160,12 @@ export default function RootLayout({
           <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
+        <footer className="border-t border-slate-800/60 px-4 py-4 text-center">
+          <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
+            <a href="/acceptable-use-policy" className="hover:text-slate-300 transition-colors no-underline">Acceptable Use</a>
+            <a href="/terms-of-service" className="hover:text-slate-300 transition-colors no-underline">Terms of Service</a>
+          </nav>
+        </footer>
         <KeyboardShortcuts />
         <ThemeCycler />
       </body>

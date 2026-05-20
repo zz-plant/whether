@@ -316,19 +316,19 @@ export const HomePageReportContent = async ({
                      operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
                   </span>
                 ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+                <a href="/trust" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
                   Select your stage
                 </a>
-                )}
-                <span className="text-slate-600">·</span>
-                <span className="text-slate-400">Rate</span>
-                {operatorContext.rateSensitivity ? (
-                  <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
-                    {operatorContext.rateSensitivity === "high" ? "High" :
-                     operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
-                  </span>
-                ) : (
-                <a href="/settings" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+              )}
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-400">Rate</span>
+              {operatorContext.rateSensitivity ? (
+                <span className="rounded-full bg-slate-800/50 px-3 py-1 font-medium text-slate-300">
+                  {operatorContext.rateSensitivity === "high" ? "High" :
+                   operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"}
+                </span>
+              ) : (
+                <a href="/trust" className="rounded-full border border-slate-700/70 px-3 py-1 text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
                   Set sensitivity
                 </a>
                 )}

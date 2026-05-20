@@ -6,8 +6,8 @@ import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 const LINKS = [
   { href: "/threshold", label: "Decision Framework", desc: "How bounded decisions work" },
   { href: "/template", label: "Decision Template", desc: "Printable one-pager" },
-  { href: "/resources", label: "Resources", desc: "Guides and references" },
-  { href: "/about", label: "About", desc: "What Whether is and who it's for" },
+  { href: "/planning", label: "Resources", desc: "Guides and references" },
+  { href: "/trust", label: "About", desc: "What Whether is and who it's for" },
   { href: "/search", label: "Search", desc: "Find signals and posts" },
   { href: "/feed.xml", label: "RSS Feed", desc: "Subscribe in your feed reader" },
 ];
