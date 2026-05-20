@@ -79,7 +79,7 @@ export default function HistoryPage() {
               <select
                 value={selectedYear}
                 onChange={(e) => { setSelectedYear(Number(e.target.value)); setSelectedMonth(0); }}
-                className="rounded-md border border-slate-800/60 bg-slate-950/80 px-3 py-1.5 text-xs font-medium text-slate-200 focus:border-sky-400/60 focus:outline-none"
+                className="min-h-[44px] rounded-md border border-slate-800/60 bg-slate-950/80 px-3 py-2 text-xs font-medium text-slate-200 focus:border-sky-400/60 focus:outline-none"
                 aria-label="Select year"
               >
                 {years.map((year) => (
@@ -94,7 +94,7 @@ export default function HistoryPage() {
                     key={month}
                     type="button"
                     onClick={() => navigateTo(selectedYear, month)}
-                    className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    className={`min-h-[44px] rounded-md px-3 py-2 text-xs font-medium transition-colors ${
                       selectedYear === urlYear && month === urlMonth
                         ? "bg-sky-500/18 text-sky-100 border border-sky-400/40"
                         : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"

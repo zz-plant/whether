@@ -25,19 +25,19 @@ export const reportHeaderNextStep = (pathname: string) => {
   }
 
   if (pathname.startsWith("/evidence")) {
-    return { href: "/planning", label: "Open planning" };
+    return { href: "/planning", label: "Planning" };
   }
 
   if (pathname.startsWith("/planning")) {
-    return { href: "/resolve", label: "Resolve questions" };
+    return { href: "/resolve", label: "Resolve" };
   }
 
   if (pathname.startsWith("/resolve")) {
-    return { href: "/trust", label: "Verify call" };
+    return { href: "/trust", label: "Readiness" };
   }
 
   if (pathname.startsWith("/trust")) {
-    return { href: "/", label: "Back to brief" };
+    return { href: "/", label: "Brief" };
   }
 
   return null;
@@ -46,7 +46,15 @@ export const reportHeaderNextStep = (pathname: string) => {
 export const resolveReportHeaderUtilityAction = (pathname: string) =>
   pathname === "/"
     ? { href: buildToolkitLibraryHref(), label: "Toolkits" }
-    : { href: "/", label: "Weekly brief" };
+    : pathname.startsWith("/evidence")
+      ? { href: "/evidence", label: "Evidence" }
+      : pathname.startsWith("/planning")
+        ? { href: "/planning", label: "Plan" }
+        : pathname.startsWith("/resolve")
+          ? { href: "/resolve", label: "Resolve" }
+          : pathname.startsWith("/trust")
+            ? { href: "/trust", label: "Readiness" }
+            : { href: "/", label: "Home" };
 
 type GlobalHeaderRouteGateProps = {
   initialPathname?: string;

@@ -23,3 +23,6 @@ artifacts/agent
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# vinext (Next.js plugin)
+.vinext/

@@ -231,7 +231,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <button
         type="button"
         onClick={() => setShowMobile(true)}
-        className="flex items-center gap-2 rounded-full border border-slate-800/60 px-3 py-1.5 text-fluid-xs font-semibold text-slate-300 md:hidden"
+        className="flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/60 px-3 py-1.5 text-fluid-xs font-semibold text-slate-300 md:hidden"
         aria-label="Open navigation"
       >
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-400/20 text-[10px] font-bold text-sky-100">
@@ -263,7 +263,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <Drawer.Root open={showMobile} onOpenChange={setShowMobile}>
         <Drawer.Portal>
           <Drawer.Backdrop className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-          <Drawer.Popup className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-2xl sm:hidden">
+          <Drawer.Popup className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-2xl md:hidden">
             <MobileNavContent navigationLinks={navigationLinks} onClose={() => setShowMobile(false)} />
           </Drawer.Popup>
         </Drawer.Portal>

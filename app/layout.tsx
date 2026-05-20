@@ -9,6 +9,10 @@ import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -135,7 +139,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -160,10 +164,15 @@ export default function RootLayout({
           <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
-        <footer className="border-t border-slate-800/60 px-4 py-4 text-center">
+        <footer className="border-t border-slate-800/60 px-4 py-6 text-center">
           <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
             <a href="/acceptable-use-policy" className="hover:text-slate-300 transition-colors no-underline">Acceptable Use</a>
             <a href="/terms-of-service" className="hover:text-slate-300 transition-colors no-underline">Terms of Service</a>
+            <span className="text-slate-600">·</span>
+            <span>Built by <a href="https://kanav.net" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">Kanav Jain</a></span>
+            <a href="https://thecrumplezone.substack.com" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">The Crumple Zone</a>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-600">© 2026 Whether</span>
           </nav>
         </footer>
         <KeyboardShortcuts />

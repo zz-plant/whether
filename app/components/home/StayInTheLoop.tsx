@@ -77,7 +77,7 @@ export function StayInTheLoop() {
                 type="button"
                 onClick={handleSubscribe}
                 disabled={subscribing}
-                className="rounded-md bg-sky-500/15 border border-sky-400/30 px-2 py-1 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors disabled:opacity-50"
+                className="min-h-[44px] rounded-md bg-sky-500/15 border border-sky-400/30 px-3 py-2 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors disabled:opacity-50"
               >
                 {subscribing ? "Sending..." : "Subscribe"}
               </button>
@@ -88,7 +88,7 @@ export function StayInTheLoop() {
         <button
           type="button"
           onClick={() => setShowSlack(!showSlack)}
-          className="flex items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
+          className="flex min-h-[44px] items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
         >
           <span className="text-slate-300">#</span>
           {showSlack ? "Slack — enter webhook URL above" : "+ Slack — post briefs to your team"}
@@ -97,7 +97,7 @@ export function StayInTheLoop() {
         <button
           type="button"
           onClick={toggleAlerts}
-          className={`flex items-center gap-2 text-left text-fluid-micro transition-colors ${alertsOn ? "text-amber-200" : "text-slate-500 hover:text-amber-200"}`}
+          className={`flex min-h-[44px] items-center gap-2 text-left text-fluid-micro transition-colors ${alertsOn ? "text-amber-200" : "text-slate-500 hover:text-amber-200"}`}
         >
           <span className="text-slate-300">⚡</span>
           {alertsOn ? "Regime alerts on ✓" : "+ Regime alerts — notified when conditions shift"}
@@ -109,7 +109,7 @@ export function StayInTheLoop() {
             document.documentElement.dataset.displayMode = "tv";
             localStorage.setItem("whether-display-mode", "tv");
           }}
-          className="flex items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
+          className="flex min-h-[44px] items-center gap-2 text-left text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
         >
           <span className="text-slate-300">📺</span>
           + TV mode — always-on office display
@@ -126,7 +126,7 @@ export function StayInTheLoop() {
           />
           <button
             type="button"
-            className="rounded-md bg-sky-500/15 border border-sky-400/30 px-2 py-1 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors"
+            className="min-h-[44px] rounded-md bg-sky-500/15 border border-sky-400/30 px-3 py-2 text-fluid-micro font-medium text-sky-200 hover:bg-sky-500/25 transition-colors"
           >
             Connect
           </button>
