@@ -5,6 +5,7 @@ import { RegimeCompass } from "../regimeCompass";
 import { RegimeExplainer } from "./regimeExplainer";
 import { RegimeContextBlock } from "./regimeContextBlock";
 import { ConfidenceBadge } from "../ConfidenceBadge";
+import { ScoreCard } from "../ScoreCard";
 
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "tightening cycle",
@@ -93,48 +94,32 @@ export function PageDeltaSummary({
             <span className="text-slate-500 font-normal ml-2">· {actionShort ?? postureLabel}</span>
           </p>
           <div className="mt-2 flex gap-4 text-sm">
-            <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
-                Credit conditions
-                <span className="text-slate-600 font-normal lowercase ml-1 tracking-normal">(higher = tighter)</span>
-              </span>
-              <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.tightness}>
-                {tightness}
-                {tightnessDelta !== 0 ? (
-                  <span className={tightnessDelta > 0 ? "text-amber-200 ml-1" : "text-emerald-200 ml-1"}>
-                    {tightnessDelta > 0 ? "↑" : "↓"}{Math.abs(tightnessDelta)}
-                  </span>
-                ) : (
-                  <span className="text-slate-600 ml-1 text-fluid-micro font-normal">—</span>
-                )}
-              </p>
+            <ScoreCard
+              label="Credit conditions"
+              value={tightness}
+              delta={tightnessDelta}
+              variant="compact"
+              tooltip={SCORE_TOOLTIPS.tightness}
+            >
               <p className="text-fluid-micro text-slate-600">
                 {tightnessDelta !== 0
                   ? `vs last week: ${tightnessDelta > 0 ? "+" : ""}${tightnessDelta}`
                   : "unchanged from last week"}
               </p>
-            </div>
-            <div className="group/tip relative">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
-                Investor sentiment
-                <span className="text-slate-600 font-normal lowercase ml-1 tracking-normal">(higher = easier to raise)</span>
-              </span>
-              <p className="font-semibold tabular-nums text-slate-100" title={SCORE_TOOLTIPS.risk}>
-                {riskAppetite}
-                {riskAppetiteDelta !== 0 ? (
-                  <span className={riskAppetiteDelta > 0 ? "text-emerald-200 ml-1" : "text-amber-200 ml-1"}>
-                    {riskAppetiteDelta > 0 ? "↑" : "↓"}{Math.abs(riskAppetiteDelta)}
-                  </span>
-                ) : (
-                  <span className="text-slate-600 ml-1 text-fluid-micro font-normal">—</span>
-                )}
-              </p>
+            </ScoreCard>
+            <ScoreCard
+              label="Investor sentiment"
+              value={riskAppetite}
+              delta={riskAppetiteDelta}
+              variant="compact"
+              tooltip={SCORE_TOOLTIPS.risk}
+            >
               <p className="text-fluid-micro text-slate-600">
                 {riskAppetiteDelta !== 0
                   ? `vs last week: ${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta}`
                   : "unchanged from last week"}
               </p>
-            </div>
+            </ScoreCard>
           </div>
           {freshnessLabel || sourceLabel ? (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-fluid-micro text-slate-400">

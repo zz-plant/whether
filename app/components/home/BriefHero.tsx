@@ -1,6 +1,7 @@
 import { RegimeCompass } from "../regimeCompass";
 import { ConfidenceBadge } from "../ConfidenceBadge";
 import { ExportImageButton } from "../exportImageButton";
+import { ScoreCard } from "../ScoreCard";
 
 const REGIME_LABELS: Record<string, string> = { SCARCITY: "Scarcity", DEFENSIVE: "Defensive", VOLATILE: "Volatile", EXPANSION: "Expansion" };
 
@@ -61,32 +62,8 @@ export function BriefHero({
 
       {/* Scores — card-based with visual weight */}
       <div className="flex flex-wrap justify-center gap-4 pt-2">
-        <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">Credit conditions</p>
-          <p className="text-2xl font-bold tabular-nums text-slate-100">
-            {tightness}
-            {tightnessDelta !== 0 ? (
-              <span className={`text-lg ml-1 ${tightnessDelta > 0 ? "text-amber-200" : "text-emerald-200"}`}>
-                {tightnessDelta > 0 ? "↑" : "↓"}{Math.abs(tightnessDelta)}
-              </span>
-            ) : (
-              <span className="text-lg ml-1 text-slate-600">—</span>
-            )}
-          </p>
-        </div>
-        <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">Investor sentiment</p>
-          <p className="text-2xl font-bold tabular-nums text-slate-100">
-            {riskAppetite}
-            {riskAppetiteDelta !== 0 ? (
-              <span className={`text-lg ml-1 ${riskAppetiteDelta > 0 ? "text-emerald-200" : "text-amber-200"}`}>
-                {riskAppetiteDelta > 0 ? "↑" : "↓"}{Math.abs(riskAppetiteDelta)}
-              </span>
-            ) : (
-              <span className="text-lg ml-1 text-slate-600">—</span>
-            )}
-          </p>
-        </div>
+        <ScoreCard label="Credit conditions" value={tightness} delta={tightnessDelta} variant="large" />
+        <ScoreCard label="Investor sentiment" value={riskAppetite} delta={riskAppetiteDelta} variant="large" />
       </div>
 
       {/* Confidence + source attribution */}

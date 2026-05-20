@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { loadMarketState, type MarketState } from "../../lib/marketStateModel";
 import { ConfidenceBadge } from "../components/ConfidenceBadge";
+import { ScoreCard } from "../components/ScoreCard";
 import {
   buildMarketMetadata,
   buildMarketFallbackMetadata,
@@ -116,43 +117,5 @@ function MarketStateView({ state }: { state: MarketState }) {
         </p>
       </div>
     </main>
-  );
-}
-
-function ScoreCard({
-  label,
-  value,
-  delta,
-}: {
-  label: string;
-  value: number;
-  delta: number;
-}) {
-  const deltaColor =
-    delta > 0
-      ? label === "Credit conditions"
-        ? "text-amber-200"
-        : "text-emerald-200"
-      : delta < 0
-        ? label === "Credit conditions"
-          ? "text-emerald-200"
-          : "text-amber-200"
-        : "text-slate-600";
-
-  const arrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "—";
-
-  return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-5 py-3 text-center min-w-[9rem]">
-      <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
-        {label}
-      </p>
-      <p className="text-2xl font-bold tabular-nums text-slate-100">
-        {value}
-        <span className={`text-lg ml-1 ${deltaColor}`}>
-          {arrow}
-          {delta !== 0 ? Math.abs(delta) : ""}
-        </span>
-      </p>
-    </div>
   );
 }
