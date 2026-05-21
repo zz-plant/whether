@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
+import { Search, Settings } from "lucide-react";
 import { useScrollDirection } from "./useScrollDirection";
 import {
   isReportShellRoute,
@@ -151,6 +151,13 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   >
                     <HistoryIcon />
                     <span className="ml-1.5">History</span>
+                  </Link>
+                  <Link
+                    href="/resolve"
+                    className="weather-button hidden min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm text-slate-200 sm:inline-flex"
+                    aria-label="Search"
+                  >
+                    <Search aria-hidden="true" className="text-slate-100" size={18} strokeWidth={2.4} />
                   </Link>
                   <button
                     type="button"

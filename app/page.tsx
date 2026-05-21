@@ -258,6 +258,9 @@ export const HomePageReportContent = async ({
         </div>
       ) : null}
       <div className="-mt-4 space-y-3" data-screenshot={isScreenshot ? "true" : undefined}>
+        <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+          Macro conditions translated into weekly operating decisions for leadership teams. No econ degree required.
+        </p>
         <BriefHero
           regime={regime}
           postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
