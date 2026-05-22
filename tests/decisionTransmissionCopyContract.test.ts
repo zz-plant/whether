@@ -78,7 +78,7 @@ describe("decision transmission copy contract", () => {
     assert.match(brief, /Decision transmission check:/);
     assert.match(brief, /• Confidence:/);
     assert.match(brief, /• Change-course trigger:/);
-    assert.match(brief, /• Clears when:/);
+    assert.match(brief, /• Re-open when:/);
   });
 
   it("keeps FAQ structured data aligned with the rendered weekly decision FAQ prompts", () => {

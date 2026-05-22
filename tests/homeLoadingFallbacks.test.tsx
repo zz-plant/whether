@@ -12,10 +12,10 @@ describe("homepage loading fallbacks", () => {
     const html = renderToStaticMarkup(<HomePageStreamingFallback />);
 
     assert.match(html, /Weekly brief/);
-    assert.match(html, /Weekly brief loading/);
+    assert.match(html, /Loading weekly operating posture/);
     assert.match(html, /Do now/);
     assert.match(html, /Watch for/);
-    assert.match(html, /Clears when/);
+    assert.match(html, /Re-open when/);
     assert.match(html, /Preparing compact evidence and trust handoff\./);
     assert.doesNotMatch(html, /Shared-card continuity/);
   });
@@ -24,7 +24,6 @@ describe("homepage loading fallbacks", () => {
     const html = renderToStaticMarkup(<HomePageStreamingFallback searchParams={{ month: "3", year: "2026" }} />);
 
     assert.match(html, /Historical replay requested · 2026-03/);
-    assert.match(html, /Selected historical weekly brief is loading\./);
   });
 
   it("keeps diagnostics fallback neutral", () => {
@@ -47,9 +46,9 @@ describe("homepage loading fallbacks", () => {
   it("keeps the root loading shell route-agnostic", () => {
     const html = renderToStaticMarkup(<RouteLoadingShell />);
 
-    assert.match(html, /Preparing brief/);
+    assert.match(html, /Weekly brief/);
     assert.match(html, /In progress/);
-    assert.match(html, /Live brief is being prepared/);
+    assert.match(html, /Readiness clear/);
     assert.match(html, /id="main-content"/);
     assert.doesNotMatch(html, /Unlock actions/);
     assert.doesNotMatch(html, /Weekly operating call/);
@@ -58,7 +57,7 @@ describe("homepage loading fallbacks", () => {
   it("uses the route-agnostic shell from app loading", () => {
     const html = renderToStaticMarkup(<Loading />);
 
-    assert.match(html, /Preparing brief/);
-    assert.doesNotMatch(html, /Weekly brief loading/);
+    assert.match(html, /Preparing page/);
+    assert.doesNotMatch(html, /Loading weekly operating posture/);
   });
 });

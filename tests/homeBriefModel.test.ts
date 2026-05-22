@@ -92,7 +92,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
-    assert.equal(model.regimeSignalIndicators[0]?.label, "Cash availability");
+    assert.equal(model.regimeSignalIndicators[0]?.label, "Credit conditions");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
@@ -133,9 +133,8 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /No material shift this week\./);
-    assert.match(model.decisionShiftSummary, /Do now:/);
-    assert.match(model.decisionShiftSummary, /Clears when:/);
+    assert.match(model.decisionShiftSummary, /No significant change/);
+    assert.match(model.decisionShiftSummary, /Re-open when:/);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
@@ -178,7 +177,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     const momentumReason = model.whyThisCall.find((reason) => reason.key === "momentum" || reason.label === "Momentum" || reason.label === "What moved this week")?.detail ?? "";
-    assert.match(momentumReason, /Market risk appetite improving this week; improving overall\./);
+    assert.match(momentumReason, /Investor sentiment improving this week; improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 

@@ -20,7 +20,7 @@ describe("search command routing", () => {
   it("keeps the home Find a tool action pointed at the toolkit library", () => {
     assert.deepEqual(resolveReportHeaderUtilityAction("/"), {
       href: buildToolkitLibraryHref(),
-      label: "Find a tool",
+      label: "Toolkits",
     });
   });
 });

@@ -10,8 +10,7 @@ import { decisionTransmissionSearchDescription } from "./decisionTransmissionCop
 export type { HomePageSearchParams };
 
 const HOME_TITLE = "Weekly Macro Brief for Leadership Teams";
-const HOME_DESCRIPTION =
-  "Macro context for weekly operating decisions. Whether helps leadership teams pressure-test hiring, fundraising, spending, and expansion against current public macro signals.";
+const HOME_DESCRIPTION = decisionTransmissionSearchDescription;
 
 const buildImageParams = (searchParams: HomePageSearchParams | undefined) => {
   const params: Record<string, string> = { template: "report" };

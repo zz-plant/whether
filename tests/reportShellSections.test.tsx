@@ -1,6 +1,26 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+
+const mockAny: any = mock;
+
+mockAny.module("next/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({
+    push: () => {},
+    replace: () => {},
+    prefetch: () => {},
+  }),
+}));
+
+mockAny.module("next/link", () => ({
+  __esModule: true,
+  default: ({ children, href, ...props }: any) => {
+    return <a href={href} {...props}>{children}</a>;
+  },
+}));
+
 import {
   CommandCenterNavBlock,
   HeroTrustProvenanceBlock,

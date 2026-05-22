@@ -43,18 +43,18 @@ describe("navigation information architecture", () => {
 
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
     assert.equal(navigationLabelByPath["/evidence"], "Evidence");
-    assert.equal(navigationLabelByPath["/planning"], "Planning");
-    assert.equal(navigationLabelByPath["/resolve"], "Decision Tools");
+    assert.equal(navigationLabelByPath["/planning"], "Plan");
+    assert.equal(navigationLabelByPath["/resolve"], "Resolve");
     assert.equal(navigationLabelByPath["/trust"], "Readiness");
   });
 
   it("exposes primary surface progress cues and route cues for navigation copy", () => {
-    assert.equal(primaryNavigationSurfaceCount, 5);
+    assert.equal(primaryNavigationSurfaceCount, 6);
     assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/evidence"), "Open evidence");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/planning"), "Open planning");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/resolve"), "Open decision tools");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/trust"), "Check trust");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/evidence"), "Evidence");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/planning"), "Plan");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/resolve"), "Resolve");
+    assert.equal(resolvePrimaryNavigationSurfaceCue("/trust"), null);
     assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
     assert.equal(resolveNavigationRouteCue("/evidence"), "/evidence");
   });

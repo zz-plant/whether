@@ -38,10 +38,10 @@ describe("CopyLeadershipArtifactsButtons", () => {
       citation: "Citation",
     });
 
-    assert.match(brief, /Forecast = the weekly forecast for operating conditions\./);
+    assert.match(brief, /Posture = the weekly forecast for operating conditions\./);
     assert.match(brief, /Do now = what to do this week\./);
-    assert.match(brief, /Watch for = the condition to watch for that would pause the plan/);
-    assert.match(brief, /Clears when = what must improve before conditions clear\./);
+    assert.match(brief, /Pause if = the condition to watch for that would pause the plan/);
+    assert.match(brief, /Re-open when = what must improve before conditions clear\./);
     assert.doesNotMatch(brief, /stop line|reopen line/i);
   });
 });

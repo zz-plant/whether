@@ -60,11 +60,11 @@ describe("weekly operator brief export adapters", () => {
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Posture:/);
-    assert.match(text, /Forecast:/);
+    assert.match(text, /Posture:/); // replaces Forecast
     assert.match(text, /Do now:/);
-    assert.match(text, /Watch for:/);
+    assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
-    assert.match(text, /Clears when:/);
+    assert.match(text, /Re-open when:/); // replaces Clears when
     assert.equal(cardText, text);
   });
 

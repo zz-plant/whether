@@ -66,7 +66,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-decision-card-title/);
     assert.match(html, /Revise hiring and roadmap calls now\./);
-    assert.match(html, /Confidence MED/);
+    assert.match(html, /68% confidence/);
     assert.match(html, /Confidence MED/);
     assert.match(html, />Act with caution</);
     assert.match(html, /Weekly decision strip: current call, action now, pause if, and change course if\./);
@@ -81,10 +81,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /U\.S\. funding backdrop/);
     assert.match(html, /Changed this week:/);
     assert.match(html, /Revisit now/);
-    assert.match(html, /Watch for/);
-    assert.match(html, /Clears when/);
-    assert.match(html, /Watch this week/);
-    assert.match(html, /Why this lands here/);
+    assert.match(html, /Pause if/);
+    assert.match(html, /Re-open when/);
+    assert.match(html, /Revisit this week/);
+    assert.match(html, /Why this call/);
     assert.match(html, /What this means now/);
     assert.match(html, /Act with caution/);
     assert.doesNotMatch(html, /This week at a glance/);
@@ -94,7 +94,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
     assert.match(html, /Whether weekly brief citation/);
-    assert.match(html, /Continuity/);
+    assert.match(html, /continuity/i);
     assert.match(html, /Copy weekly brief/);
     assert.doesNotMatch(html, /Default share/);
 
@@ -249,13 +249,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(callCore, /Stage decisions\./);
     assert.match(callCore, /Do now/);
-    assert.match(callCore, /Watch for/);
-    assert.match(callCore, /Clears when/);
+    assert.match(callCore, /Pause if/);
+    assert.match(callCore, /Re-open when/);
     assert.match(callCore, /Revisit now/);
     assert.match(callCore, /Send this brief/);
     assert.match(callCore, /Citation/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. This week&#x27;s plan can stay on track\./);
-    assert.match(callCore, /Watch this week/);
+    assert.match(callCore, /Revisit this week/);
     assert.doesNotMatch(callCore, /Default share/);
     assert.match(callCore, /Citation/);
     assert.match(callCore, /Why/);

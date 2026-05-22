@@ -41,6 +41,7 @@ export function StartupModeSelector({
   return (
     <>
       <RadioGroup
+        name="startup-mode-selector"
         value={effectiveMode}
         onValueChange={(value) => onModeChange?.(value as StartupVariantMode)}
         aria-labelledby="company-mode-label"
@@ -65,7 +66,17 @@ export function StartupModeSelector({
         </div>
       </RadioGroup>
 
-      <div className="grid gap-2.5 sm:grid-cols-2">
+      {activeContent.description && (
+        <p className="text-xs text-slate-400 mt-2">{activeContent.description}</p>
+      )}
+
+      {activeContent.thresholdEmphasis && (
+        <p className="text-xs text-slate-300 font-medium">
+          Threshold emphasis: {activeContent.thresholdEmphasis}
+        </p>
+      )}
+
+      <div className="grid gap-2.5 sm:grid-cols-2 mt-2">
         <div className="rounded-lg border border-emerald-500/35 bg-emerald-500/5 px-3 py-3 space-y-1.5">
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
           <ul className="space-y-1 text-xs text-emerald-100">

@@ -105,7 +105,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.doesNotMatch(snapshotRegion, /Current conditions/);
     assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.doesNotMatch(html, /This week at a glance/);
-    assert.match(html, /Watch this week/);
+    assert.match(html, /Revisit this week/);
     assert.match(html, /Boldness budget/);
   });
 
@@ -197,7 +197,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     const regimeIndex = html.indexOf("Revise hiring and roadmap calls now.");
     const callIndex = html.indexOf("Stage approvals and protect runway.");
     const doNowIndex = html.indexOf(">Do now<");
-    const flipIndex = html.indexOf(">Clears when<");
+    const flipIndex = html.indexOf(">Re-open when<");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -283,7 +283,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, />Why this lands here</);
+    assert.match(html, />Why this call</);
     assert.match(html, />What this means now</);
     assert.doesNotMatch(html, />Diagnostics</);
     assert.doesNotMatch(html, />Deep evidence</);

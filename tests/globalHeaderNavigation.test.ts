@@ -25,7 +25,7 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/evidence/thresholds"), "Evidence");
     assert.equal(resolveGlobalHeaderRouteLabel("/planning/cli"), "Plan");
     assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
-    assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Verify");
+    assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Readiness");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
 

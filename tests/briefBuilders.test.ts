@@ -153,14 +153,14 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(Forecast \/ Do now \/ Watch for \/ Clears when\):/);
-    assert.match(brief, /• Forecast: Constraint one/);
+    assert.match(brief, /Bounded decision \(Posture \/ Do now \/ Pause if \/ Re-open when\):/);
+    assert.match(brief, /• Posture: Constraint one/);
     assert.match(brief, /• Do now: Limit net new hiring\./);
-    assert.match(brief, /• Watch for: Pause approvals when tightness > 70\./);
-    assert.match(brief, /• Clears when: Resume when tightness < 64\./);
-    assert.ok(brief.indexOf("• Forecast: Constraint one") < brief.indexOf("• Do now: Limit net new hiring."));
-    assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Watch for: Pause approvals when tightness > 70."));
-    assert.ok(brief.indexOf("• Watch for: Pause approvals when tightness > 70.") < brief.indexOf("• Clears when: Resume when tightness < 64."));
+    assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
+    assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
+    assert.ok(brief.indexOf("• Posture: Constraint one") < brief.indexOf("• Do now: Limit net new hiring."));
+    assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
+    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
     assert.match(brief, /Decision transmission check:/);
     assert.match(brief, /• Confidence: MEDIUM confidence/);
     assert.match(brief, /• Why this could be wrong:/);
@@ -243,12 +243,13 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Trend: DETERIORATING/);
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
     assert.match(brief, /• Regime shift watch: ON/);
-    assert.match(brief, /• Forecast:/);
+    assert.match(brief, /• Posture: Stage decisions/);
     assert.match(brief, /• Re-check owner\/cadence: Owner: CEO \+ Finance lead/);
-    assert.match(brief, /• Trust markers: Confidence: Guarded · Freshness: Stale/);
+    assert.match(brief, /• Trust markers: Confidence: Guarded/);
+    assert.match(brief, /• Posture:/);
     assert.match(brief, /Do now: Backfills only/);
-    assert.match(brief, /Watch for: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Clears when: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
+    assert.match(brief, /Re-open when: Resume staged approvals when tightness < 66/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {

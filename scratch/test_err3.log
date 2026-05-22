@@ -1,0 +1,10 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/homeWeeklyComposition.test.tsx:
+(pass) weekly card and interpretation panel composition > keeps top-fold semantics while layering interpretation bullets below [16.27ms]
+(pass) weekly card and interpretation panel composition > renders weekly card before interpretation panel and preserves homepage hierarchy [3.79ms]
+(pass) weekly card and interpretation panel composition > renders orientation strip before the weekly decision card without replacing core card content [2.05ms]
+
+ 3 pass
+ 0 fail
+Ran 3 tests across 1 file. [134.00ms]
