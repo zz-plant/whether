@@ -48,7 +48,8 @@
     "cli:whether": "node scripts/whether-cli.mjs",
     "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
     "check:vinext": "bun run check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:production-edge": "bash scripts/check_production_edge.sh"
   },
   "engines": {
     "bun": "1.3.x",
