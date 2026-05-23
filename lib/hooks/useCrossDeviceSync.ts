@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const STATE_KEY = "whether_state";
 const SYNC_ID_KEY = "whether_sync_id";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
+
+type StateBlob = Record<string, { value: unknown; ts: number }>;
 
 function getSyncId(): string {
   const existing = localStorage.getItem(SYNC_ID_KEY);
@@ -14,9 +17,20 @@ function getSyncId(): string {
   return id;
 }
 
-type SyncState = Record<string, { value: unknown; ts: number }>;
+function loadStateBlob(): StateBlob {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
 
-type SyncedKeys = Record<string, unknown>;
+function saveStateBlob(blob: StateBlob) {
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify(blob));
+  } catch {}
+}
 
 export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
   const [synced, setSynced] = useState(false);
@@ -31,47 +45,63 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
       if (!res.ok) return;
       const json = await res.json();
       if (!json.ok || !json.state) return;
-      const serverState = json.state as SyncState;
-      const serverEntry = serverState[storageKey];
-      if (!serverEntry) return;
+      const serverState = json.state as StateBlob;
 
-      const localRaw = localStorage.getItem(storageKey);
-      const localParsed = localRaw ? JSON.parse(localRaw) : null;
-      const localTs = typeof localParsed === "object" && localParsed !== null && "_sync_ts" in (localParsed as Record<string, unknown>)
-        ? (localParsed as Record<string, unknown>)._sync_ts as number
-        : 0;
+      const localBlob = loadStateBlob();
+      let changed = false;
+      let serverValue: unknown = undefined;
 
-      if (serverEntry.ts > localTs) {
-        localStorage.setItem(storageKey, JSON.stringify(serverEntry.value));
-        return serverEntry.value;
+      for (const [key, entry] of Object.entries(serverState)) {
+        const localEntry = localBlob[key];
+        if (!localEntry || entry.ts > localEntry.ts) {
+          localBlob[key] = entry;
+          changed = true;
+          if (key === storageKey) serverValue = entry.value;
+        }
+      }
+
+      if (changed) {
+        saveStateBlob(localBlob);
+        return serverValue;
       }
     } catch {}
     return undefined;
   }, [syncId, storageKey]);
 
-  const pushToServer = useCallback(async (key: string, value: unknown, ts: number) => {
+  const pushToServer = useCallback(async (blob: StateBlob) => {
     try {
-      await fetch("/api/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: syncId, key, value, ts }),
-      });
+      await Promise.all(
+        Object.entries(blob).map(([key, entry]) =>
+          fetch("/api/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: syncId, key, value: entry.value, ts: entry.ts }),
+          })
+        )
+      );
     } catch {}
   }, [syncId]);
 
   const flushDirty = useCallback(() => {
-    dirty.current.forEach((key) => {
-      const raw = localStorage.getItem(key);
-      if (!raw) return;
+    const blob = loadStateBlob();
+    const dirtyKeys = dirty.current;
+    let hasNew = false;
+
+    dirtyKeys.forEach((key) => {
+      const localRaw = localStorage.getItem(key);
+      if (!localRaw) return;
       try {
-        const parsed = JSON.parse(raw);
-        const ts = Date.now();
-        const wrapped = { ...(typeof parsed === "object" && parsed !== null ? parsed : { _v: parsed }), _sync_ts: ts };
-        localStorage.setItem(key, JSON.stringify(wrapped));
-        pushToServer(key, parsed, ts);
+        const parsed = JSON.parse(localRaw);
+        blob[key] = { value: parsed, ts: Date.now() };
+        hasNew = true;
       } catch {}
     });
-    dirty.current.clear();
+
+    if (hasNew) {
+      saveStateBlob(blob);
+      pushToServer(blob);
+    }
+    dirtyKeys.clear();
   }, [pushToServer]);
 
   const markDirty = useCallback((key: string) => {
@@ -82,10 +112,6 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
 
   useEffect(() => {
     pullFromServer().then((serverValue) => {
-      if (serverValue !== undefined) {
-        setSynced(true);
-        return;
-      }
       setSynced(true);
     });
   }, [pullFromServer]);

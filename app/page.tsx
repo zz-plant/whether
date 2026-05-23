@@ -41,19 +41,12 @@ import { RegimeTransitionProbability } from "./components/home/RegimeTransitionP
 import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
 import { TickerCompany } from "./components/home/TickerCompany";
 import { RoleSelector } from "./components/home/RoleSelector";
-import { RoleEmphasis } from "./components/home/RoleEmphasis";
 import { EmailSubscribe } from "./components/home/EmailSubscribe";
 import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
 import { FrameworkCard } from "./components/home/FrameworkCard";
-import { StatusLine } from "./components/home/StatusLine";
-import { TheAnswer } from "./components/home/TheAnswer";
 import { PredictionPractice } from "./components/home/PredictionPractice";
-import { LiveTightness } from "./components/home/LiveTightness";
 import { TabNotifier } from "./components/home/TabNotifier";
-import { WeekDelta } from "./components/home/WeekDelta";
 import { FlipBanner } from "./components/home/FlipBanner";
-import { AudioBrief } from "./components/home/AudioBrief";
-import { CounterfactualSimulator } from "./components/home/CounterfactualSimulator";
 import { EvidenceContent } from "./components/home/EvidenceContent";
 import { TrustContent } from "./components/home/TrustContent";
 import { ResolveContent } from "./components/home/ResolveContent";
@@ -360,36 +353,9 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
-        <LiveTightness
-          initialTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          recordDate={homepage.reportShell.recordDateLabel}
-        />
-
-        <WeekDelta
-          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? ""}
-        />
-
-        <TheAnswer
-          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
-          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-          reliabilityScore={reliabilityScore}
-          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
-        />
-
         <PredictionPractice
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
-          recordDate={homepage.reportShell.recordDateLabel}
-        />
-
-        <StatusLine
-          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          reliabilityScore={reliabilityScore}
-          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
-          trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
           recordDate={homepage.reportShell.recordDateLabel}
         />
 
@@ -428,14 +394,6 @@ export const HomePageReportContent = async ({
           sourceLabel={homepage.reportShell.treasurySource}
         />
 
-        <AudioBrief
-          text={`${homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}. ${
-            homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-              ? `Pause if tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}. `
-              : ""
-          }${flipConditionLabels.length ? `Flip if: ${flipConditionLabels.join(". ")}.` : ""}`}
-        />
-
         <FrameworkCard
           call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
           actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
@@ -450,7 +408,6 @@ export const HomePageReportContent = async ({
         />
 
         <RoleSelector />
-        <RoleEmphasis />
 
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
@@ -534,7 +491,6 @@ export const HomePageReportContent = async ({
           <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Is this reliable?</h2>
             <TrustContent />
-            <CounterfactualSimulator currentRegime={regime} />
           </div>
 
           <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>

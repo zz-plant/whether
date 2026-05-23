@@ -113,6 +113,15 @@ export function FrameworkCard({
 
       <p className="text-lg font-bold text-slate-50 mb-1">{call}</p>
 
+      {guardrail && tightness < (pauseThreshold ?? 80) ? (
+        <p className="text-xs text-slate-500 mb-2">
+          {tightness >= (pauseThreshold ?? 80) - 5
+            ? `Close to the pause line — ${pauseThreshold ?? 80 - tightness} point${pauseThreshold ?? 80 - tightness === 1 ? "" : "s"} away. ${flipConditions?.length ? "Watch for a flip." : ""}`
+            : `You're ${(pauseThreshold ?? 80) - tightness} points from the pause line. Tightening remains the right call.`
+          }
+        </p>
+      ) : null}
+
       <div className="space-y-1.5 text-sm text-slate-300">
         {actionNow ? <p>{actionNow}</p> : null}
         {guardrail ? (
