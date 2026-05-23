@@ -2,6 +2,7 @@ import { RegimeCompass } from "../regimeCompass";
 import { ConfidenceGauge } from "../ConfidenceGauge";
 import { ExportImageButton } from "../exportImageButton";
 import { ScoreCard } from "../ScoreCard";
+import { AlertToggle } from "./AlertToggle";
 
 type BriefHeroProps = {
   regime: string;
@@ -148,6 +149,8 @@ export function BriefHero({
 
           {/* Share actions */}
           <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/50">
+            <AlertToggle label="Tightness" id="tightness" />
+            <AlertToggle label="Risk appetite" id="riskAppetite" />
             <ExportImageButton
               decision={decision}
               regime={regime}

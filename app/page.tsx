@@ -42,6 +42,10 @@ import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
 import { RoleSelector } from "./components/home/RoleSelector";
 import { EmailSubscribe } from "./components/home/EmailSubscribe";
 import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
+import { ProgressiveSection } from "./components/home/ProgressiveSection";
+import { EvidenceContent } from "./components/home/EvidenceContent";
+import { TrustContent } from "./components/home/TrustContent";
+import { ResolveContent } from "./components/home/ResolveContent";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
 export const revalidate = 300;
@@ -441,29 +445,59 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <details className="weather-auto-chevron max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/20 px-4 py-3">
-          <summary className="cursor-pointer list-none text-fluid-xs font-semibold text-slate-400 hover:text-slate-300 inline-flex items-center gap-2">
-            Explore scenarios
-            <span className="rounded-full bg-slate-800 px-2 py-0.5 text-fluid-micro text-slate-500">3 tools</span>
-          </summary>
-          <div className="mt-3 space-y-3">
-            <DecisionTrendline />
-            <DecisionSimulator
-              currentTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-              currentRiskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
-              currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
-            />
-            <RegimeTransitionProbability currentRegime={regime} />
+        <div className="space-y-3">
+          <ProgressiveSection
+            id="evidence"
+            label="Why this call"
+            description="The signals and data behind this week's operating posture"
+          >
+            <EvidenceContent />
+          </ProgressiveSection>
+
+          <ProgressiveSection
+            id="trust"
+            label="Is this reliable?"
+            description="Source freshness, confidence, and data quality"
+          >
+            <TrustContent />
+          </ProgressiveSection>
+
+          <ProgressiveSection
+            id="resolve"
+            label="Have a question?"
+            description="Challenge the call, translate for your role, or run what-if scenarios"
+          >
+            <ResolveContent />
+            <div className="mt-4 space-y-3">
+              <DecisionSimulator
+                currentTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+                currentRiskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+                currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+              />
+              <RegimeTransitionProbability currentRegime={regime} />
+            </div>
+          </ProgressiveSection>
+
+          <ProgressiveSection
+            id="you"
+            label="Your numbers"
+            description="Company metrics, decision history, and personalized guidance"
+          >
             <CompanyMetricsPanel
               tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
               companyStage={operatorContext.companyStage ?? undefined}
             />
-            <SourceDisagreement
-              tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
-              riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
-            />
-          </div>
-        </details>
+            <div className="mt-3">
+              <DecisionTrendline />
+            </div>
+            <div className="mt-3">
+              <SourceDisagreement
+                tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
+                riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
+              />
+            </div>
+          </ProgressiveSection>
+        </div>
 
         <OnboardingGate>
           <FirstVisitBanner />

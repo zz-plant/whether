@@ -28,6 +28,27 @@
   --color-semantic-reversal-fg: #fda4af;
   --color-semantic-reversal-border: #fb7185;
   --color-semantic-reversal-bg: #3c1420;
+
+  /* Decision semantics */
+  --color-decision-do: #6ee7b7;
+  --color-decision-do-bg: rgba(110, 231, 183, 0.08);
+  --color-decision-pause: #fda4af;
+  --color-decision-pause-bg: rgba(253, 164, 175, 0.08);
+  --color-decision-watch: #fcd34d;
+  --color-decision-watch-bg: rgba(252, 211, 77, 0.08);
+  --color-decision-flip: #7dd3fc;
+  --color-decision-flip-bg: rgba(125, 211, 252, 0.08);
+
+  /* Trust semantics */
+  --color-trust-high: #6ee7b7;
+  --color-trust-medium: #fcd34d;
+  --color-trust-low: #fda4af;
+
+  /* Text role tokens */
+  --text-display: clamp(2.5rem, 7vw, 6.5rem);
+  --text-heading: clamp(1.25rem, 1rem + 1.4vw, 2.15rem);
+  --text-label: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
+  --text-caption: clamp(0.625rem, 0.5rem + 0.2vw, 0.6875rem);
 }
 
 @layer base {

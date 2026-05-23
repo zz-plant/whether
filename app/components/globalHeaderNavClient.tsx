@@ -19,11 +19,11 @@ type GlobalHeaderNavClientProps = {
 
 const FIRST_VISIT_NAV_KEY = "whether_nav_hints_dismissed";
 const STEP_LABELS = ["Decide", "Plan", "Deepen"];
-const STEP_ORDER = ["/", "/planning", "/evidence"];
+const STEP_ORDER = ["/", "/planning", "/#evidence"];
 const STEP_HINTS = [
   "This week's decision and brief",
   "Turn the brief into approvals",
-  "Proof, thresholds, and sources",
+  "Evidence, trust, and tools — all on one page",
 ];
 
 function StepTooltip({ children, hint }: { children: React.ReactNode; hint: string }) {
