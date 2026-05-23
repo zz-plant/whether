@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
 
 const STORAGE_KEY = "whether_predictions";
 
@@ -39,6 +40,7 @@ export function PredictionPractice({
   const [submitted, setSubmitted] = useState(false);
   const [history, setHistory] = useState<PredictionRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const { markDirty } = useCrossDeviceSync(STORAGE_KEY, []);
 
   useEffect(() => {
     setHistory(loadHistory());
@@ -58,6 +60,7 @@ export function PredictionPractice({
     const updated = [...history, record];
     setHistory(updated);
     saveHistory(updated);
+    markDirty(STORAGE_KEY);
   };
 
   const accuracy = history.length > 0
@@ -132,6 +135,7 @@ export function PredictionPractice({
       {missesPattern ? (
         <p className="mt-1 text-fluid-micro text-amber-200/80">{missesPattern}</p>
       ) : null}
+      <p className="mt-1.5 text-[0.55rem] text-slate-700">Local only — not synced across devices</p>
     </div>
   );
 }

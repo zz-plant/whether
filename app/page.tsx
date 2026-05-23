@@ -111,7 +111,7 @@ export const HomePageReportContent = async ({
     ? resolvedSearchParams.artifactMode
     : undefined;
   const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-  const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel;
+  const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
@@ -350,9 +350,25 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
+        <TabNotifier
+          direction={
+            postureLabel.toLowerCase().includes("tighten") ? "tighten" :
+            postureLabel.toLowerCase().includes("eas") ? "ease" :
+            postureLabel.toLowerCase().includes("revisit") ? "revisit" : "hold"
+          }
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          reliabilityScore={reliabilityScore}
+        />
+
         <LiveTightness
           initialTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           recordDate={homepage.reportShell.recordDateLabel}
+        />
+
+        <WeekDelta
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? ""}
         />
 
         <TheAnswer
@@ -410,6 +426,14 @@ export const HomePageReportContent = async ({
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
           sourceLabel={homepage.reportShell.treasurySource}
+        />
+
+        <AudioBrief
+          text={`${homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}. ${
+            homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+              ? `Pause if tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}. `
+              : ""
+          }${flipConditionLabels.length ? `Flip if: ${flipConditionLabels.join(". ")}.` : ""}`}
         />
 
         <FrameworkCard
@@ -502,18 +526,18 @@ export const HomePageReportContent = async ({
         ) : null}
 
         <section className="space-y-6">
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Why this call</h2>
             <EvidenceContent />
           </div>
 
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Is this reliable?</h2>
             <TrustContent />
             <CounterfactualSimulator currentRegime={regime} />
           </div>
 
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Explore</h2>
             <ResolveContent />
             <div className="mt-4 space-y-3">
@@ -526,7 +550,7 @@ export const HomePageReportContent = async ({
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Your numbers</h2>
             <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
             <div className="mt-4">

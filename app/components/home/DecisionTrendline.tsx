@@ -1,14 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getMonthlyRegimeHistory } from "../../../lib/summary/monthlyRegimeHistory";
+import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
 
 const DECISION_LOG_KEY = "whether_decision_log";
 
 type DecisionEntry = { date: string; posture: string; action: string };
 
+const REGIME_COLORS: Record<string, string> = {
+  SCARCITY: "text-amber-300",
+  DEFENSIVE: "text-rose-300",
+  VOLATILE: "text-sky-300",
+  EXPANSION: "text-emerald-300",
+};
+
+function nearestRegime(dateStr: string): string | null {
+  const history = getMonthlyRegimeHistory();
+  if (!history.length) return null;
+  const target = new Date(dateStr).getTime();
+  let closest = history[0];
+  let minDiff = Math.abs(new Date(history[0].record_date).getTime() - target);
+  for (let i = 1; i < history.length; i++) {
+    const diff = Math.abs(new Date(history[i].record_date).getTime() - target);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = history[i];
+    }
+  }
+  const dateDiff = Math.abs(new Date(closest.record_date).getTime() - target);
+  if (dateDiff > 45 * 24 * 60 * 60 * 1000) return null;
+  return closest.regime;
+}
+
 export function DecisionTrendline() {
   const [entries, setEntries] = useState<DecisionEntry[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  useCrossDeviceSync(DECISION_LOG_KEY, []);
 
   useEffect(() => {
     try {
@@ -53,11 +81,12 @@ export function DecisionTrendline() {
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Decision trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
         </div>
-        <div className="flex items-end gap-1.5 h-10">
+        <div className="flex items-end gap-1.5 h-16">
           {entries.map((entry, i) => {
             const isTightening = entry.posture.toLowerCase().includes("tight");
             const isExpanding = entry.posture.toLowerCase().includes("expand");
             const height = 30 + (i / Math.max(entries.length - 1, 1)) * 60;
+            const regime = nearestRegime(entry.date);
             return (
               <div key={entry.date} className="flex flex-col items-center gap-0.5">
                 <div
@@ -65,8 +94,13 @@ export function DecisionTrendline() {
                     isTightening ? "bg-rose-400/60" : isExpanding ? "bg-emerald-400/60" : "bg-slate-500/40"
                   }`}
                   style={{ height: `${height}%` }}
-                  title={`${entry.date}: ${entry.posture}`}
+                  title={`${entry.date}: ${entry.posture}${regime ? ` · ${regime}` : ""}`}
                 />
+                {regime ? (
+                  <span className={`text-[0.5rem] font-semibold leading-none ${REGIME_COLORS[regime] ?? "text-slate-500"}`}>
+                    {regime.charAt(0) + regime.slice(1).toLowerCase()}
+                  </span>
+                ) : null}
                 <span className="text-[0.55rem] text-slate-600">
                   {new Date(entry.date).toLocaleDateString("en", { month: "short", day: "numeric" })}
                 </span>
@@ -75,6 +109,9 @@ export function DecisionTrendline() {
           })}
         </div>
       </div>
+      <p className="mt-2 text-[0.6rem] text-slate-600 text-right">
+        {entries.length} weeks · Bars show posture, labels show macro regime
+      </p>
     </div>
   );
 }

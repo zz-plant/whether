@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { CompanyMetrics } from "../../../lib/report/companyMetrics";
 import { computeMetricsGuidance } from "../../../lib/report/companyMetrics";
+import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
 
 const STORAGE_KEY = "whether_company_metrics";
 
@@ -40,6 +41,7 @@ export function CompanyMetricsPanel({
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<CompanyMetrics>({ burnRate: 0, runwayMonths: 0, headcount: 0 });
   const [hydrated, setHydrated] = useState(false);
+  const { markDirty } = useCrossDeviceSync(STORAGE_KEY, null);
 
   useEffect(() => {
     const saved = loadMetrics();
@@ -54,9 +56,10 @@ export function CompanyMetricsPanel({
       };
       setMetrics(m);
       saveMetrics(m);
+      markDirty(STORAGE_KEY);
     }
     setHydrated(true);
-  }, [companyStage]);
+  }, [companyStage, markDirty]);
 
   if (!hydrated) return null;
 

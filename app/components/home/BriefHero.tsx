@@ -82,6 +82,9 @@ export function BriefHero({
               {tightness}
             </p>
             <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Credit tightness</p>
+            {fetchedAt ? (
+              <p className="text-[0.6rem] text-slate-600 mt-0.5">Updated {fetchedAt}</p>
+            ) : null}
           </div>
           {reliabilityScore != null ? (
             <div>

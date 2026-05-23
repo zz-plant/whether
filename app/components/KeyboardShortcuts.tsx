@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { HelpModal } from "./home/HelpModal";
 
 const SHORTCUTS: Record<string, string> = {
   "e": "/evidence",
@@ -12,10 +13,39 @@ const SHORTCUTS: Record<string, string> = {
 };
 
 export function KeyboardShortcuts() {
+  const [helpOpen, setHelpOpen] = useState(false);
+
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === "?") {
+        e.preventDefault();
+        setHelpOpen((v) => !v);
+        return;
+      }
+
+      if (e.key === "Escape") {
+        setHelpOpen(false);
+        return;
+      }
+
+      if (e.key === "j" || e.key === "k") {
+        e.preventDefault();
+        const sections = document.querySelectorAll<HTMLElement>("[data-page-section]");
+        if (!sections.length) return;
+        const current = Array.from(sections).findIndex((s) =>
+          s.contains(document.activeElement) || s === document.activeElement);
+        const next = e.key === "j"
+          ? (current < 0 ? 0 : Math.min(current + 1, sections.length - 1))
+          : Math.max(0, current - 1);
+        if (sections[next]) {
+          (sections[next] as HTMLElement).focus({ preventScroll: false });
+          sections[next].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        return;
+      }
 
       const href = SHORTCUTS[e.key.toLowerCase()];
       if (href && document.activeElement === document.body) {
@@ -28,8 +58,15 @@ export function KeyboardShortcuts() {
   }, []);
 
   return (
-    <p className="hidden sm:block text-center text-fluid-micro text-slate-700 py-2">
-      Press <kbd className="rounded border border-slate-700 px-1 text-slate-600">E</kbd> Evidence <kbd className="rounded border border-slate-700 px-1 text-slate-600">P</kbd> Plan <kbd className="rounded border border-slate-700 px-1 text-slate-600">H</kbd> History <kbd className="rounded border border-slate-700 px-1 text-slate-600">/</kbd> Search
-    </p>
+    <>
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <p className="hidden sm:block text-center text-fluid-micro text-slate-700 py-2">
+        <kbd className="rounded border border-slate-700 px-1 text-slate-600">J</kbd>
+        /<kbd className="rounded border border-slate-700 px-1 text-slate-600">K</kbd>{" "}
+        Navigate{"    "}
+        <kbd className="rounded border border-slate-700 px-1 text-slate-600">?</kbd> Help
+      </p>
+    </>
   );
 }
+

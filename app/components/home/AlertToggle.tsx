@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
 
 const STORAGE_KEY = "whether_alerts";
 
@@ -27,6 +28,7 @@ function savePrefs(prefs: AlertPrefs) {
 export function AlertToggle({ label, id }: { label: string; id: "tightness" | "riskAppetite" }) {
   const [active, setActive] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const { markDirty } = useCrossDeviceSync(STORAGE_KEY, { tightness: false, riskAppetite: false });
 
   useEffect(() => {
     const prefs = loadPrefs();
@@ -40,6 +42,7 @@ export function AlertToggle({ label, id }: { label: string; id: "tightness" | "r
     const prefs = loadPrefs();
     prefs[id] = next;
     savePrefs(prefs);
+    markDirty(STORAGE_KEY);
   };
 
   if (!hydrated) return null;

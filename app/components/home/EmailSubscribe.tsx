@@ -10,7 +10,7 @@ export function EmailSubscribe() {
     if (!email.includes("@")) return;
     setStatus("subscribing");
     try {
-      const res = await fetch("/api/subscribe", {
+      const res = await fetch("/api/email/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -31,6 +31,7 @@ export function EmailSubscribe() {
 
   return (
     <div className="flex items-center gap-2">
+      <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[0.55rem] font-semibold uppercase tracking-[0.08em] text-amber-300 flex-shrink-0">Preview</span>
       <input
         type="email"
         value={email}
