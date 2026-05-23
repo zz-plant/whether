@@ -104,21 +104,6 @@ export function BriefHero({
         </p>
       </div>
 
-      {/* Forecast strip */}
-      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-        <span className="rounded-full border border-sky-400/25 bg-sky-500/10 px-3 py-1 text-fluid-xs font-semibold text-sky-100">
-          This week: {decision.length > 60 ? decision.slice(0, 57) + "…" : decision}
-        </span>
-        {trendLabel ? (
-          <span className={`rounded-full border px-3 py-1 text-fluid-xs font-semibold ${trendBadge}`}>
-            {trendLabel} trend
-          </span>
-        ) : null}
-        {confidencePercent != null ? (
-          <ConfidenceGauge percent={confidencePercent} label={confidenceLabel as "HIGH" | "MED" | "LOW" | undefined} size="md" />
-        ) : null}
-      </div>
-
       {/* Decision shift */}
       {decisionShiftSummary ? (
         <p className="text-fluid-xs text-slate-400 max-w-xl mx-auto">{decisionShiftSummary}</p>

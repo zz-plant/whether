@@ -31,10 +31,8 @@ import { RegimeSuggestions } from "./components/home/regimeSuggestions";
 import { CollapsibleGroup } from "./components/home/CollapsibleGroup";
 import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { BriefHero } from "./components/home/BriefHero";
-import { VerificationBlock } from "./components/home/verificationBlock";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { OnboardingGate } from "./components/home/OnboardingGate";
-import { VisitorContext } from "./components/home/VisitorContext";
 import { DecisionTrendline } from "./components/home/DecisionTrendline";
 import { DecisionSimulator } from "./components/home/DecisionSimulator";
 import { RegimeTransitionProbability } from "./components/home/RegimeTransitionProbability";
@@ -353,46 +351,44 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
-        <PredictionPractice
+        <details className="group max-w-xl mx-auto">
+          <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-600 hover:text-slate-400 select-none">
+            Calibrate your instincts ▸
+          </summary>
+          <div className="mt-2">
+            <PredictionPractice
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
           recordDate={homepage.reportShell.recordDateLabel}
         />
 
-        <VisitorContext
-          recordDate={homepage.reportShell.recordDateLabel}
-          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
-          actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-        />
+          </div>
+        </details>
 
-        {operatorContext.companyStage ? (
-          <p className="text-fluid-xs text-slate-500 max-w-xl mx-auto text-center">
-            Viewing for{" "}
-            <span className="text-slate-300 font-medium">
-              {operatorContext.companyStage === "pre-seed" ? "pre-seed" :
-               operatorContext.companyStage === "seed" ? "seed-stage" :
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-fluid-micro text-slate-500">
+          {operatorContext.companyStage ? (
+            <span>
+              {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
+               operatorContext.companyStage === "seed" ? "Seed" :
                operatorContext.companyStage === "series-a" ? "Series A" :
                operatorContext.companyStage === "series-b-plus" ? "Series B+" :
-               operatorContext.companyStage === "public" ? "public" : operatorContext.companyStage}
+               operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
+              {operatorContext.rateSensitivity ? (
+                <span> · {operatorContext.rateSensitivity === "high" ? "High" : operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"} sensitivity</span>
+              ) : null}
             </span>
-            {operatorContext.rateSensitivity ? (
-              <span> · <span className="text-slate-300 font-medium">{
-                operatorContext.rateSensitivity === "high" ? "high" :
-                operatorContext.rateSensitivity === "medium" ? "medium" : "low"
-              }</span> rate sensitivity</span>
-            ) : null}
-            {" · "}
-            <Link href="/trust" className="text-sky-300 hover:text-sky-200 underline decoration-slate-600 underline-offset-4">
-              Change
-            </Link>
-          </p>
-        ) : null}
-
-        <VerificationBlock
-          recordDate={homepage.reportShell.recordDateLabel}
-          fetchedAt={homepage.reportShell.fetchedAtLabel}
-          sourceLabel={homepage.reportShell.treasurySource}
-        />
+          ) : null}
+          {operatorContext.companyStage ? <span className="text-slate-700">·</span> : null}
+          <span>{homepage.reportShell.recordDateLabel}</span>
+          <span className="text-slate-700">·</span>
+          <span>Source: {homepage.reportShell.treasurySource}</span>
+          {homepage.reportShell.fetchedAtLabel ? (
+            <>
+              <span className="text-slate-700">·</span>
+              <span>Updated {homepage.reportShell.fetchedAtLabel}</span>
+            </>
+          ) : null}
+        </div>
 
         <FrameworkCard
           call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
@@ -482,49 +478,57 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <section className="space-y-6">
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Why this call</h2>
-            <EvidenceContent />
-          </div>
+        <section className="space-y-3">
+          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call ▸</summary>
+            <div className="mt-2">
+              <EvidenceContent />
+            </div>
+          </details>
 
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Is this reliable?</h2>
-            <TrustContent />
-          </div>
+          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Is this reliable? ▸</summary>
+            <div className="mt-2">
+              <TrustContent />
+            </div>
+          </details>
 
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Explore</h2>
-            <ResolveContent />
-            <div className="mt-4 space-y-3">
-              <DecisionSimulator
-                currentTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-                currentRiskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
-                currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Explore ▸</summary>
+            <div className="mt-2">
+              <ResolveContent />
+              <div className="mt-4 space-y-3">
+                <DecisionSimulator
+                  currentTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+                  currentRiskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+                  currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+                />
+                <RegimeTransitionProbability currentRegime={regime} />
+              </div>
+            </div>
+          </details>
+
+          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Your numbers ▸</summary>
+            <div className="mt-2">
+              <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
+              <div className="mt-4">
+                <CompanyMetricsPanel
+                tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+                companyStage={operatorContext.companyStage ?? undefined}
               />
-              <RegimeTransitionProbability currentRegime={regime} />
+              </div>
+              <div className="mt-3">
+                <DecisionTrendline />
+              </div>
+              <div className="mt-3">
+                <SourceDisagreement
+                  tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
+                  riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
+                />
+              </div>
             </div>
-          </div>
-
-          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Your numbers</h2>
-            <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
-            <div className="mt-4">
-              <CompanyMetricsPanel
-              tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-              companyStage={operatorContext.companyStage ?? undefined}
-            />
-            </div>
-            <div className="mt-3">
-              <DecisionTrendline />
-            </div>
-            <div className="mt-3">
-              <SourceDisagreement
-                tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
-                riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
-              />
-            </div>
-          </div>
+          </details>
         </section>
 
         <OnboardingGate>
