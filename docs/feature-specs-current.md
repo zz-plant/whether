@@ -439,3 +439,59 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 ## 7) Non-goals (as enforced in UI copy)
 - The UI is framed as operational guidance, not financial advice.
 - Evidence is deterministic and traceable; no predictive ML output is used.
+
+## 8) Demo and interactive features (2026-05-23)
+
+### 8.1 Decision simulation slider
+**Location**: `app/components/home/DecisionSimulator.tsx`, rendered on `/` below the hero.
+
+A what-if slider that lets operators drag tightness from 20–85 and see the regime, call, and action recompute in real time. Color-coded threshold markers show Defensive (↑65) and Scarcity (↑75) boundaries. A status badge indicates whether the current regime holds or the call would change.
+
+### 8.2 Regime transition probability
+**Location**: `app/components/home/RegimeTransitionProbability.tsx`, rendered on `/` below the simulator.
+
+Computes historical transition frequency from the time machine data and displays the probability of moving from the current regime to the most likely next regime, with an SVG arc visualization and average duration in weeks.
+
+### 8.3 Multi-week decision trendline
+**Location**: `app/components/home/DecisionTrendline.tsx`, rendered on `/` below the visitor context.
+
+Reads the decision journal from localStorage and renders a 6-week bar chart showing posture momentum. Color-coded bars (rose=tightening, emerald=expanding, slate=holding) with date labels. Momentum label and color gradient indicate direction.
+
+### 8.4 Decision journal and visitor context
+**Location**: `app/components/home/VisitorContext.tsx`, rendered on `/` below the hero.
+
+Stores weekly decisions in localStorage on each visit. On return visits, shows "It's been a few days" or "Last visit: X posture · This week: Y posture" when posture has changed.
+
+### 8.5 Reliability score
+**Location**: Computed in `app/page.tsx`, rendered in `BriefHero.tsx` next to the tightness number.
+
+Combines confidence (HIGH=90/MED=60/LOW=30), freshness (live=100/cached=50), and source coverage into a 0-100 score. Color-coded: emerald ≥80, amber ≥60, rose <60.
+
+### 8.6 Degraded-state decision guidance
+**Location**: `BriefHero.tsx` "What to adjust" section.
+
+When sources are degraded or the reliability score drops below 60, an amber warning appears: "Stage all irreversible decisions until the next clean refresh."
+
+### 8.7 Print layout
+**Location**: `app/styles/layout.css` @media print block.
+
+Hides navigation, sidebar, and non-essential chrome. Converts dark theme to light (white bg, dark text). A4 page size with `break-inside: avoid` on cards.
+
+### Demo recording guide
+To record GIFs of interactive features:
+
+```bash
+bun run dev                                    # Start dev server
+```
+
+**Decision simulator GIF**: Navigate to `/`, scroll to the simulator. Record dragging the tightness slider from current value to the flip threshold and back. The regime/call/action cells update in real time. ~8 seconds.
+
+**Reliability cascade GIF**: Open `/` with simulated degraded state (set `?offline=1` or use cached data). Record the hero: emerald reliability score → amber warning in "What to adjust." ~5 seconds.
+
+**Trendline GIF**: Visit `/` on 3+ different weeks (or pre-fill localStorage with mock entries). Record the trendline bar chart showing posture momentum. ~5 seconds.
+
+**Transition probability GIF**: Navigate to `/` and scroll to the probability arc. Record the SVG arc and percentage display. ~4 seconds.
+
+**Print layout GIF**: Open `/`, Cmd+P, show print preview with clean white layout. ~5 seconds.
+
+For screen recording, use macOS QuickTime (File → New Screen Recording) or Kap (https://getkap.co). Convert to GIF with `ffmpeg` or gifski.

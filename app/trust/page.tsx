@@ -39,45 +39,81 @@ export default async function MethodPage() {
 
   return (
     <ReportShell {...reportShellProps}>
-      <MethodSection id="trust-snapshot" title="Readiness snapshot" description="How current the data is, how reliable the signal, and whether this week's read is suitable as a planning prompt or needs deeper verification.">
-        <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
-          <p className={`inline-flex w-fit rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${trustVerdict.toneClasses}`}>
-            {trustVerdict.label}
-          </p>
-          <p className="text-sm leading-relaxed text-slate-200">{trustVerdict.detail}</p>
-          <p className="text-xs leading-5 text-slate-400 mt-2">
-            Whether is decision-support software, not an authority. Use this read as a planning prompt — not as the sole basis for irreversible hiring, fundraising, budget, or investment decisions. Verify the source data and combine it with company-specific metrics before acting.
-          </p>
-          <p className="text-xs leading-5 text-slate-400">
-            {PRIMARY_AUDIENCE_SUMMARY} {PRIMARY_AUDIENCE_ACTION}
-          </p>
-        </article>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <article className="weather-hub-card rounded-lg px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Freshness</p>
-            <p className="mt-2 text-sm text-slate-200">Decision date <span className="font-semibold text-slate-100">{reportData.recordDateLabel}</span></p>
-            <p className="mt-2 text-sm text-slate-200">Updated <span className="font-semibold text-slate-100">{reportData.fetchedAtLabel}</span></p>
-            <p className="mt-2 text-xs text-slate-400">{trustSummary}</p>
-          </article>
-          <article className="weather-hub-card rounded-lg px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Source coverage</p>
-            <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
-              <li>Treasury: <span className="font-semibold text-slate-100">{reportData.treasuryProvenance.statusLabel}</span></li>
-              <li>Macro: <span className="font-semibold text-slate-100">{reportData.macroProvenance.statusLabel}</span></li>
-              <li>Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></li>
-            </ul>
-            <p className="mt-3 text-xs text-slate-400">Coverage summary: {sourceCoverage}</p>
-          </article>
-          <article className="weather-hub-card rounded-lg px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Approval boundary</p>
-            <p className="mt-2 text-sm text-slate-200">{trustVerdict.detail}</p>
-            <p className="mt-2 text-sm text-slate-300">{reportData.flipThreshold}</p>
-            <p className="mt-2 text-xs text-slate-400">
-              {isFallback
-                ? "Wait for one clean live refresh before approving irreversible moves."
-                : "If freshness or confidence slips, slow approvals and keep decisions reversible."}
+      <MethodSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and decision readiness.">
+        <div className={`weather-hub-card rounded-lg px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
+          <div className="flex items-center gap-3">
+            <span className={`flex h-3 w-3 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
+            <p className="text-sm font-semibold text-slate-100">
+              {isFallback ? "Degraded — cached data in use" : "All systems operational"}
             </p>
-          </article>
+          </div>
+          <p className="mt-2 text-xs text-slate-400">Data refreshed {reportData.fetchedAtLabel}. Decision date: {reportData.recordDateLabel}.</p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="weather-hub-card rounded-lg px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                <p className="text-sm font-semibold text-slate-100">Freshness</p>
+              </div>
+              <span className="text-fluid-xs text-slate-400">Updated {reportData.fetchedAtLabel}</span>
+            </div>
+            <p className="mt-1 text-xs text-slate-400">{trustSummary}</p>
+          </div>
+
+          <div className="weather-hub-card rounded-lg px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className={`flex h-2.5 w-2.5 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
+                <p className="text-sm font-semibold text-slate-100">Sources</p>
+              </div>
+              <span className="text-fluid-xs text-slate-400">{sourceCoverage}</span>
+            </div>
+            <ul className="mt-1.5 space-y-0.5 text-xs text-slate-400">
+              <li>Treasury: {reportData.treasuryProvenance.statusLabel}</li>
+              <li>Macro: {reportData.macroProvenance.statusLabel}</li>
+            </ul>
+          </div>
+
+          <div className="weather-hub-card rounded-lg px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className={`flex h-2.5 w-2.5 rounded-full ${
+                  confidenceLabel === "HIGH" ? "bg-emerald-400" : confidenceLabel === "MED" ? "bg-amber-400" : "bg-rose-400"
+                }`} aria-hidden="true" />
+                <p className="text-sm font-semibold text-slate-100">Confidence</p>
+              </div>
+              <span className="text-fluid-xs text-slate-400">{confidenceLabel}</span>
+            </div>
+            <p className="mt-1 text-xs text-slate-400">{reportData.flipThreshold}</p>
+          </div>
+
+          {warnings.length > 0 ? (
+            <div className="weather-hub-card rounded-lg px-4 py-4 border border-amber-500/30 bg-amber-500/5">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden="true" />
+                <p className="text-sm font-semibold text-amber-100">Active warnings</p>
+              </div>
+              <ul className="mt-2 space-y-2">
+                {warnings.map((warning) => (
+                  <li key={warning.id} className="text-xs text-amber-200">{warning.warning}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="weather-hub-card rounded-lg px-4 py-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                <p className="text-sm font-semibold text-slate-100">Warnings</p>
+              </div>
+              <p className="mt-1 text-xs text-slate-400">No active warnings. Normal operating conditions.</p>
+            </div>
+          )}
+
+          <p className="text-xs leading-5 text-slate-500 px-1">
+            Whether is decision-support software, not an authority. Verify source data and combine it with company-specific metrics before acting on irreversible decisions. {PRIMARY_AUDIENCE_SUMMARY}
+          </p>
         </div>
       </MethodSection>
 

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
+import { RegimeStats } from "../components/history/RegimeStats";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 
 type Coverage = Record<number, number[]>;
@@ -32,7 +33,14 @@ export default function HistoryPage() {
     }
   }, []);
 
-  /* Compute regime for the selected month/year */
+  const regimeSeries = useMemo(() => getTimeMachineRegimeSeries(), []);
+
+  const REGIME_COLORS: Record<string, string> = {
+    EXPANSION: "bg-emerald-500",
+    SCARCITY: "bg-rose-500",
+    DEFENSIVE: "bg-amber-500",
+    VOLATILE: "bg-sky-500",
+  };
   const regimeForPeriod = useMemo(() => {
     if (!selectedYear || !selectedMonth || !coverage) return null;
     const series = getTimeMachineRegimeSeries();
@@ -71,6 +79,39 @@ export default function HistoryPage() {
         <p className="text-sm text-slate-300">
           Tightness and risk appetite over the last 12 available periods.
         </p>
+
+        {regimeSeries.length > 0 ? (
+          <div className="space-y-1.5">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Regime timeline</p>
+            <div className="flex flex-wrap gap-1">
+              {regimeSeries.slice(-24).map((entry) => {
+                const isSelected = entry.year === selectedYear && entry.month === selectedMonth;
+                const color = REGIME_COLORS[entry.regime] ?? "bg-slate-600";
+                const monthLabel = new Date(entry.year, entry.month - 1).toLocaleString("en", { month: "short" });
+                return (
+                  <button
+                    key={`${entry.year}-${entry.month}`}
+                    type="button"
+                    onClick={() => navigateTo(entry.year, entry.month)}
+                    title={`${monthLabel} ${entry.year}: ${entry.regime}`}
+                    className={`h-8 w-8 rounded-sm transition-transform hover:scale-110 ${color} ${
+                      isSelected ? "ring-2 ring-white ring-offset-1 ring-offset-slate-950 scale-110" : "opacity-80 hover:opacity-100"
+                    }`}
+                    aria-label={`${monthLabel} ${entry.year}: ${entry.regime}`}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
+              {Object.entries(REGIME_COLORS).map(([regime, color]) => (
+                <span key={regime} className="inline-flex items-center gap-1">
+                  <span className={`inline-block h-2.5 w-2.5 rounded-sm ${color}`} aria-hidden="true" />
+                  {regime.charAt(0) + regime.slice(1).toLowerCase()}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {/* Year/month navigation */}
         {years.length > 0 ? (
@@ -125,6 +166,8 @@ export default function HistoryPage() {
             }`}>{regimeForPeriod}</span>
           </div>
         ) : null}
+
+        <RegimeStats />
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">

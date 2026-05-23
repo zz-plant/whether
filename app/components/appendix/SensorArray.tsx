@@ -149,16 +149,31 @@ export const SensorArray = ({
             <div key={sensor.id} className="weather-panel rounded-lg p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="break-words text-sm text-slate-300">{sensor.label}</p>
-                  <p className="mono mt-2 text-2xl text-slate-100">
-                    {formatNumber(sensor.value, sensor.unit)}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-500">
-                    Δ {activeWindow.label}{" "}
-                    <span className="text-slate-300">
-                      {formatDelta(windowAggregation?.change ?? null, sensor.unit)}
-                    </span>
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="break-words text-sm font-semibold text-slate-200">{sensor.label}</p>
+                    {windowAggregation?.change != null ? (
+                      <span className={`rounded-full border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
+                        Math.abs(windowAggregation.change) > 2
+                          ? "border-rose-400/30 bg-rose-500/10 text-rose-200"
+                          : Math.abs(windowAggregation.change) > 0.5
+                            ? "border-amber-400/30 bg-amber-500/10 text-amber-200"
+                            : "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
+                      }`}>
+                        {Math.abs(windowAggregation.change) > 2 ? "Significant" : Math.abs(windowAggregation.change) > 0.5 ? "Elevated" : "Normal"}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="flex items-baseline gap-3 mt-1">
+                    <p className="mono text-2xl text-slate-100">
+                      {formatNumber(sensor.value, sensor.unit)}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Δ {activeWindow.label}{" "}
+                      <span className="text-slate-300">
+                        {formatDelta(windowAggregation?.change ?? null, sensor.unit)}
+                      </span>
+                    </p>
+                  </div>
                 </div>
                 <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   {provenance.statusLabel}
@@ -212,14 +227,12 @@ export const SensorArray = ({
                       {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, sensor.unit)}
                     </p>
                   ) : null}
-                  {sparkline?.hasGaps ? (
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                      Breaks mark missing readings
-                    </p>
-                  ) : null}
-                  <p className="break-words">{sensor.explanation}</p>
                 </figcaption>
               </figure>
+              <p className="mt-3 rounded-md bg-slate-950/40 px-3 py-2 text-xs leading-5 text-slate-300">
+                <span className="font-semibold text-slate-400">Interpretation: </span>
+                {sensor.explanation}
+              </p>
               <div className="mt-4 text-xs text-slate-300">
                 <p>
                   Formula:{" "}

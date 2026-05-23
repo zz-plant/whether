@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { ConfidenceGauge } from "../ConfidenceGauge";
 import { ConfidenceMiniChart } from "./ConfidenceMiniChart";
 import type { CallModePanelViewModel } from "./callModePanelModel";
 
@@ -123,10 +124,11 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
         </section>
       ) : null}
 
-      {(confidenceTrend || postureSteps.length > 1) ? (
+      {(confidencePercent != null) ? (
         <section>
           <h3 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Confidence</h3>
           <div className="mt-2 space-y-3">
+            <ConfidenceGauge percent={confidencePercent} size="md" />
             {postureSteps.length > 1 ? (
               <div className="flex flex-wrap items-center gap-2">
                 {postureSteps.map((step, index) => (
@@ -192,8 +194,27 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
         </p>
       ) : null}
 
-      {postureSummaryCards.length > 0 ? (
-        <footer className="border-t border-slate-800/60 pt-4">
+      <footer className="border-t border-slate-800/60 pt-4">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-2">Decision at a glance</p>
+        <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+          <div className="rounded-md bg-emerald-500/6 px-3 py-2">
+            <p className="text-emerald-200 font-semibold uppercase tracking-[0.08em]">Do now</p>
+            <p className="mt-1 text-slate-200">{actionNow || operatingCall}</p>
+          </div>
+          <div className="rounded-md bg-rose-500/6 px-3 py-2">
+            <p className="text-rose-200 font-semibold uppercase tracking-[0.08em]">Pause if</p>
+            <p className="mt-1 text-slate-200">{snapshotGuardrail || "No active pause trigger"}</p>
+          </div>
+          <div className="rounded-md bg-sky-500/6 px-3 py-2">
+            <p className="text-sky-200 font-semibold uppercase tracking-[0.08em]">Watch</p>
+            <p className="mt-1 text-slate-200">{snapshotWatch || "No active watch"}</p>
+          </div>
+          <div className="rounded-md bg-amber-500/6 px-3 py-2">
+            <p className="text-amber-200 font-semibold uppercase tracking-[0.08em]">Flip if</p>
+            <p className="mt-1 text-slate-200">{effectiveFlipLabels.length ? effectiveFlipLabels.join(" · ") : "No active flip trigger"}</p>
+          </div>
+        </div>
+        {postureSummaryCards.length > 0 ? (
           <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {postureSummaryCards.map((card) => (
               <div key={card.label} className={card.className}>
@@ -203,8 +224,8 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
               </div>
             ))}
           </dl>
-        </footer>
-      ) : null}
+        ) : null}
+      </footer>
 
       {actions ? (
         <footer className="border-t border-slate-800/60 pt-4">

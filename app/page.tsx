@@ -34,6 +34,14 @@ import { BriefHero } from "./components/home/BriefHero";
 import { VerificationBlock } from "./components/home/verificationBlock";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { OnboardingGate } from "./components/home/OnboardingGate";
+import { VisitorContext } from "./components/home/VisitorContext";
+import { DecisionTrendline } from "./components/home/DecisionTrendline";
+import { DecisionSimulator } from "./components/home/DecisionSimulator";
+import { RegimeTransitionProbability } from "./components/home/RegimeTransitionProbability";
+import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
+import { RoleSelector } from "./components/home/RoleSelector";
+import { EmailSubscribe } from "./components/home/EmailSubscribe";
+import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
 export const revalidate = 300;
@@ -94,6 +102,15 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
+
+  const reliabilityScore = (() => {
+    const confidenceScore = confidenceLabel === "HIGH" ? 90 : confidenceLabel === "MED" ? 60 : 30;
+    const freshnessScore = homepage.reportShell.showOfflineBadge ? 50 : 100;
+    const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
+    const totalSources = Math.max(degradedCount + 3, 4);
+    const coverageScore = Math.round(((totalSources - degradedCount) / totalSources) * 100);
+    return Math.round((confidenceScore + freshnessScore + coverageScore) / 3);
+  })();
 
   const compactShareText = [
     `Whether Weekly Brief — ${reportData.weeklyRecordDate}`,
@@ -299,6 +316,7 @@ export const HomePageReportContent = async ({
           tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
           riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
           confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+          confidencePercent={homepage.weeklyDecisionCardModel.status.confidencePercent}
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
           actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
@@ -310,13 +328,45 @@ export const HomePageReportContent = async ({
           degradedSourceCount={homepage.reportShell.degradedSourceRows?.length}
           decisionShiftSummary={homepage.weeklyDecisionCardModel.decision.decisionShiftSummary}
           trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
+          reliabilityScore={reliabilityScore}
         />
+
+        <VisitorContext
+          recordDate={homepage.reportShell.recordDateLabel}
+          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
+          actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+        />
+
+        {operatorContext.companyStage ? (
+          <p className="text-fluid-xs text-slate-500 max-w-xl mx-auto text-center">
+            Viewing for{" "}
+            <span className="text-slate-300 font-medium">
+              {operatorContext.companyStage === "pre-seed" ? "pre-seed" :
+               operatorContext.companyStage === "seed" ? "seed-stage" :
+               operatorContext.companyStage === "series-a" ? "Series A" :
+               operatorContext.companyStage === "series-b-plus" ? "Series B+" :
+               operatorContext.companyStage === "public" ? "public" : operatorContext.companyStage}
+            </span>
+            {operatorContext.rateSensitivity ? (
+              <span> · <span className="text-slate-300 font-medium">{
+                operatorContext.rateSensitivity === "high" ? "high" :
+                operatorContext.rateSensitivity === "medium" ? "medium" : "low"
+              }</span> rate sensitivity</span>
+            ) : null}
+            {" · "}
+            <Link href="/trust" className="text-sky-300 hover:text-sky-200 underline decoration-slate-600 underline-offset-4">
+              Change
+            </Link>
+          </p>
+        ) : null}
 
         <VerificationBlock
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
           sourceLabel={homepage.reportShell.treasurySource}
         />
+
+        <RoleSelector />
 
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
@@ -391,6 +441,30 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
+        <details className="weather-auto-chevron max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/20 px-4 py-3">
+          <summary className="cursor-pointer list-none text-fluid-xs font-semibold text-slate-400 hover:text-slate-300 inline-flex items-center gap-2">
+            Explore scenarios
+            <span className="rounded-full bg-slate-800 px-2 py-0.5 text-fluid-micro text-slate-500">3 tools</span>
+          </summary>
+          <div className="mt-3 space-y-3">
+            <DecisionTrendline />
+            <DecisionSimulator
+              currentTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+              currentRiskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
+              currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+            />
+            <RegimeTransitionProbability currentRegime={regime} />
+            <CompanyMetricsPanel
+              tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+              companyStage={operatorContext.companyStage ?? undefined}
+            />
+            <SourceDisagreement
+              tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
+              riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
+            />
+          </div>
+        </details>
+
         <OnboardingGate>
           <FirstVisitBanner />
 
@@ -416,6 +490,13 @@ export const HomePageReportContent = async ({
 
         {!isHistorical ? (
           <StayInTheLoop />
+        ) : null}
+
+        {!isHistorical ? (
+          <div className="max-w-sm mx-auto">
+            <p className="text-fluid-xs text-slate-400 mb-2 text-center">Get the brief in your inbox every Monday</p>
+            <EmailSubscribe />
+          </div>
         ) : null}
         <StartupActivity />
         <SaaSMultiplesIndicator />

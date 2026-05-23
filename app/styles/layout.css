@@ -902,3 +902,51 @@
     padding-block: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
   }
 }
+
+@media print {
+  nav, aside, footer, .weather-page-shell > header,
+  [class*="sidebar"], [class*="Sidebar"], [class*="sidebar"],
+  button:not(.weather-cta-primary), a[class*="weather-pill"],
+  .weather-page-shell > div:first-child > div:first-child {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .weather-page-shell {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  h1, h2, h3, [class*="text-slate-100"], [class*="text-slate-50"] {
+    color: #0f172a !important;
+  }
+
+  [class*="text-slate-300"], [class*="text-slate-400"] {
+    color: #475569 !important;
+  }
+
+  [class*="text-slate-200"] {
+    color: #334155 !important;
+  }
+
+  [class*="bg-slate-950"], [class*="bg-slate-900"] {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  article, section, [class*="weather-panel"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+}
