@@ -1,5 +1,9 @@
 # Whether
 
+<p align="center">
+  <img src="docs/assets/whether-demo.gif" alt="whether demo animation" width="720">
+</p>
+
 Whether turns public macro signals into a weekly operating posture for startup and product leaders.
 Each week it answers, fast: what should change right now, how sure we are, and what would flip the call.
 

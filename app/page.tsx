@@ -42,7 +42,6 @@ import { RoleSelector } from "./components/home/RoleSelector";
 import { EmailSubscribe } from "./components/home/EmailSubscribe";
 import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
 import { FrameworkCard } from "./components/home/FrameworkCard";
-import { PredictionPractice } from "./components/home/PredictionPractice";
 import { TabNotifier } from "./components/home/TabNotifier";
 import { FlipBanner } from "./components/home/FlipBanner";
 import { EvidenceContent } from "./components/home/EvidenceContent";
@@ -350,20 +349,6 @@ export const HomePageReportContent = async ({
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           reliabilityScore={reliabilityScore}
         />
-
-        <details className="group max-w-xl mx-auto">
-          <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-600 hover:text-slate-400 select-none">
-            Calibrate your instincts ▸
-          </summary>
-          <div className="mt-2">
-            <PredictionPractice
-          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
-          recordDate={homepage.reportShell.recordDateLabel}
-        />
-
-          </div>
-        </details>
 
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-fluid-micro text-slate-500">
           {operatorContext.companyStage ? (
