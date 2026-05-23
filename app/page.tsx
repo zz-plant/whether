@@ -33,6 +33,7 @@ import { TimeTravelTrigger } from "./components/home/TimeTravelTrigger";
 import { BriefHero } from "./components/home/BriefHero";
 import { VerificationBlock } from "./components/home/verificationBlock";
 import { CadenceSelector } from "./components/cadenceSelector";
+import { OnboardingGate } from "./components/home/OnboardingGate";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 
 export const revalidate = 300;
@@ -93,6 +94,22 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
+
+  const compactShareText = [
+    `Whether Weekly Brief — ${reportData.weeklyRecordDate}`,
+    `${postureLabel} \u00b7 ${confidenceLabel} confidence`,
+    homepage.weeklyDecisionCardModel.decision.operatingStanceLine,
+    [
+      homepage.weeklyDecisionCardModel.decision.actionNowShort,
+      homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+        ? `Pause if tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+        : null,
+      flipConditionLabels.length
+        ? `Flip if ${flipConditionLabels.join(", ")}`
+        : null,
+    ].filter(Boolean).join(" | "),
+    "whether.work",
+  ].filter(Boolean).join("\n");
   const isHistorical = Boolean(reportData.historicalSelection);
 
   /* Stage-specific action text — makes personalization visible */
@@ -203,6 +220,18 @@ export const HomePageReportContent = async ({
           ambientMode: "standard",
         },
         actions: {
+          exportCta: {
+            href: "/planning#ops-export-briefs",
+            label: "Copy brief",
+            copyText: compactShareText,
+            copyTarget: "Weekly brief",
+            telemetryEvent: {
+              pagePath: "/",
+              cluster: "authority" as const,
+              intent: "vp-product" as const,
+              ctaId: "homepage-copy-brief",
+            },
+          },
           nextStep: {
             href: "/planning",
             description: "Turn this into a weekly plan",
@@ -272,6 +301,15 @@ export const HomePageReportContent = async ({
           confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
+          actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+          guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+            ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+            : undefined}
+          flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
+          showOfflineBadge={homepage.reportShell.showOfflineBadge}
+          degradedSourceCount={homepage.reportShell.degradedSourceRows?.length}
+          decisionShiftSummary={homepage.weeklyDecisionCardModel.decision.decisionShiftSummary}
+          trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
         />
 
         <VerificationBlock
@@ -353,41 +391,17 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <FirstVisitBanner />
+        <OnboardingGate>
+          <FirstVisitBanner />
 
-        <PageDeltaSummary
-        regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey}
-        tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-        riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
-        tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
-        riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
-        actionShort={stageAction ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? undefined}
-        postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
-        recordDate={homepage.reportShell.recordDateLabel}
-        companyStage={operatorContext.companyStage}
-        rateSensitivity={operatorContext.rateSensitivity}
-        confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-        freshnessLabel={homepage.reportShell.fetchedAtLabel}
-        sourceLabel={homepage.reportShell.treasurySource}
-        tightnessThreshold={reportData.assessment?.thresholds?.tightnessRegime ?? 70}
-        riskAppetiteThreshold={reportData.assessment?.thresholds?.riskAppetiteRegime ?? 50}
-        directionLabel={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel}
-        regimeDistance={homepage.weeklyDecisionCardModel.diagnostics.regimeDistance}
-      />
+          <HowItWorks />
 
-        <HowItWorks />
+          <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
+            <HomeKeyTermsDisclosure />
+          </Suspense>
 
-        <Suspense fallback={<div className="h-24 animate-pulse rounded-md bg-slate-950/30" />}>
-          <HomeKeyTermsDisclosure />
-        </Suspense>
-
-        {!isHistorical ? (
-          <CollapsibleGroup storageKey="whether_act_open" label="Take action" forceOpen={true}>
-            <RegimeSuggestions regimeKey={homepage.weeklyDecisionCardModel.status.regimeKey} />
-          </CollapsibleGroup>
-        ) : null}
-
-        <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
+          <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
+        </OnboardingGate>
 
         {!isHistorical ? (
           <div className="flex items-center gap-3 text-fluid-micro">

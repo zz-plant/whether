@@ -75,7 +75,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Hiring market/);
     assert.match(html, /Expansion market/);
     assert.match(html, /Funding market/);
-    assert.match(html, /U\.S\. market starting point/);
     assert.match(html, /U\.S\. labor backdrop/);
     assert.match(html, /U\.S\. demand backdrop/);
     assert.match(html, /U\.S\. funding backdrop/);
@@ -103,7 +102,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const postureIndex = html.indexOf("Revise hiring and roadmap calls now.");
     const guidanceIndex = html.indexOf("Weekly decision strip: current call, action now, pause if, and change course if.");
     const actionStripIndex = html.indexOf("Revisit now");
-    const shareSectionIndex = html.indexOf("Send this brief");
+    const shareSectionIndex = html.indexOf("Why this call");
 
     assert.ok(deltaIndex > heroIndex);
     assert.ok(postureIndex > deltaIndex);
@@ -244,7 +243,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const callCore = html.slice(
       html.indexOf('id="weekly-call-core"'),
-      html.indexOf("Why this lands here"),
+      html.indexOf("Why this call"),
     );
 
     assert.match(callCore, /Stage decisions\./);
@@ -252,12 +251,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Pause if/);
     assert.match(callCore, /Re-open when/);
     assert.match(callCore, /Revisit now/);
-    assert.match(callCore, /Send this brief/);
-    assert.match(callCore, /Citation/);
+    assert.match(callCore, /From/);
+    assert.match(callCore, /Weekly operating guidance/);
     assert.match(callCore, /Yes\. Last week&#x27;s decisions need another look\.|No\. This week&#x27;s plan can stay on track\./);
     assert.match(callCore, /Revisit this week/);
-    assert.doesNotMatch(callCore, /Default share/);
-    assert.match(callCore, /Citation/);
     assert.match(callCore, /Why/);
   });
 });

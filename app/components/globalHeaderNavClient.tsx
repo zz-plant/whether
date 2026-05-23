@@ -18,15 +18,12 @@ type GlobalHeaderNavClientProps = {
 };
 
 const FIRST_VISIT_NAV_KEY = "whether_nav_hints_dismissed";
-const STEP_LABELS = ["Decide", "Evidence", "Plan", "Resolve", "Readiness", "History"];
-const STEP_ORDER = ["/", "/evidence", "/planning", "/resolve", "/trust", "/history"];
+const STEP_LABELS = ["Decide", "Plan", "Deepen"];
+const STEP_ORDER = ["/", "/planning", "/evidence"];
 const STEP_HINTS = [
   "This week's decision and brief",
-  "Proof and thresholds behind the brief",
   "Turn the brief into approvals",
-  "Close one open question",
-  "Freshness, confidence, and sources",
-  "Trends over time",
+  "Proof, thresholds, and sources",
 ];
 
 function StepTooltip({ children, hint }: { children: React.ReactNode; hint: string }) {
@@ -113,11 +110,13 @@ function SecondaryNavLinks() {
     { href: "/api-docs" as Route, label: "API" },
   ];
   const moreLinks = [
+    { href: "/resolve" as Route, label: "Resolve a question" },
+    { href: "/trust" as Route, label: "Readiness check" },
+    { href: "/history" as Route, label: "History & trends" },
     { href: "/threshold" as Route, label: "Decision Framework" },
     { href: "/template" as Route, label: "Decision Template" },
     { href: "/planning#ops-export-briefs" as Route, label: "Resources" },
     { href: "/feed.xml" as Route, label: "RSS Feed" },
-    { href: "/trust" as Route, label: "About" },
   ];
 
   return (
@@ -223,8 +222,12 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
     () => resolveGlobalHeaderNavigationLinks(resolvedPathname),
     [resolvedPathname],
   );
+  const displayLinks = useMemo(
+    () => navigationLinks.filter((link) => STEP_ORDER.includes(link.href)),
+    [navigationLinks],
+  );
   const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
-  const activeIndex = navigationLinks.findIndex((l) => l.isActive);
+  const activeIndex = displayLinks.findIndex((l) => l.isActive);
 
   return (
     <>
@@ -242,13 +245,13 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
 
       <nav aria-label="Workflow" className="hidden md:block lg:hidden">
         <ul className="flex items-center">
-          {navigationLinks.map((link, index) => (
+          {displayLinks.map((link, index) => (
             <WorkflowStep
               key={link.href}
               link={link}
               index={index}
               isActive={link.isActive}
-              isLast={index === navigationLinks.length - 1}
+              isLast={index === displayLinks.length - 1}
               showHints={showHints}
               nextStepActive={!link.isActive && index === activeIndex + 1}
             />

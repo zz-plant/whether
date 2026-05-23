@@ -15,12 +15,6 @@ type OperationsExecutionStep = {
   children: ReactNode;
 };
 
-const stepStateLabel = (index: number, activeIndex: number) => {
-  if (index < activeIndex) return "Reviewed";
-  if (index === activeIndex) return "Current";
-  return "Up next";
-};
-
 export const buildOperationsExecutionStepHref = (stepId: string) => `#${stepId}`;
 
 export const resolveOperationsExecutionStepActionLabel = (isActive: boolean) =>
@@ -61,6 +55,7 @@ export function OperationsExecutionStepper({
 }) {
   const firstStepId = steps[0]?.id ?? "";
   const [activeStepId, setActiveStepId] = useState(firstStepId);
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!firstStepId) {
@@ -84,58 +79,77 @@ export function OperationsExecutionStepper({
     };
   }, [firstStepId, steps]);
 
-  const activeIndex = Math.max(steps.findIndex((step) => step.id === activeStepId), 0);
+  const toggleCompleted = (stepId: string) => {
+    setCompletedSteps((prev) => {
+      const next = new Set(prev);
+      if (next.has(stepId)) {
+        next.delete(stepId);
+      } else {
+        next.add(stepId);
+      }
+      return next;
+    });
+  };
+
+  const completedCount = steps.filter((step) => completedSteps.has(step.id)).length;
 
   return (
-    <section id="planning-stepper" className="space-y-4" aria-label="Planning steps">
+    <section id="planning-stepper" className="space-y-4" aria-label="Planning checklist">
       <div className="weather-panel relative overflow-hidden space-y-3 px-4 py-4">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
-          <h2 className="mt-1 text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s sequence</h2>
+          <div className="flex items-baseline justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
+              <h2 className="mt-1 text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s checklist</h2>
+            </div>
+            <span className="text-fluid-xs font-medium text-slate-400 tabular-nums">
+              {completedCount}/{steps.length}
+            </span>
+          </div>
           <p className="mt-1 text-xs leading-5 text-slate-300">
-            Choose a step to open its detail panel. Back and forward keep your place in the sequence.
+            Check off each step as you complete it. Click to open the detail panel.
           </p>
         </div>
-        <ol className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-          {steps.map((step, index) => {
+
+        <ol className="space-y-1">
+          {steps.map((step) => {
             const isActive = step.id === activeStepId;
-            const cardTone = isActive
-              ? "border-sky-300/70 bg-[linear-gradient(180deg,rgba(14,165,233,0.16),rgba(8,16,30,0.98))] text-sky-100 shadow-[0_16px_32px_-28px_rgba(14,165,233,0.45)]"
-              : "border-slate-800/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:bg-slate-900/70";
+            const isCompleted = completedSteps.has(step.id);
             const stepHref = buildOperationsExecutionStepHref(step.id);
 
             return (
-              <li key={step.id}>
+              <li key={step.id} className="flex items-start gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-900/40 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => toggleCompleted(step.id)}
+                  aria-label={isCompleted ? `Mark "${step.title}" as incomplete` : `Mark "${step.title}" as complete`}
+                  className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
+                    isCompleted
+                      ? "border-emerald-400 bg-emerald-500/20 text-emerald-100"
+                      : "border-slate-600 hover:border-slate-400"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true">
+                      <path d="M2.5 6l2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : null}
+                </button>
                 <a
                   href={stepHref}
                   aria-current={isActive ? "step" : undefined}
-                  aria-controls={step.id}
-                  data-active={isActive ? "true" : "false"}
-                  data-reviewed={index < activeIndex ? "true" : "false"}
-                  className={`weather-surface weather-step-card flex min-h-[112px] w-full flex-col gap-2 rounded border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 hover:-translate-y-0.5 ${cardTone}`}
+                  className={`flex-1 min-w-0 no-underline ${isCompleted ? "opacity-60" : ""}`}
                 >
-                  <span className="inline-flex items-center justify-between gap-2 text-fluid-xs font-semibold uppercase tracking-[0.2em]">
-                    <span className="inline-flex items-center gap-2">
-                      <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-fluid-micro ${
-                          isActive
-                            ? "border-sky-300/80 bg-sky-500/35 text-sky-50 shadow-[0_0_0_1px_rgba(125,211,252,0.12)]"
-                            : "border-slate-600/80 bg-slate-950/75 text-slate-300"
-                        }`}
-                      >
-                        {index + 1}
-                      </span>
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
+                      {step.title}
+                    </span>
+                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 flex-shrink-0">
                       {step.label}
                     </span>
-                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.18em] text-slate-300">
-                      {resolveOperationsExecutionStepActionLabel(isActive)}
-                    </span>
-                  </span>
-                  <span className="text-sm font-semibold tracking-[0.01em] text-slate-100">{step.title}</span>
-                  <span className="text-xs text-slate-300">{stepStateLabel(index, activeIndex)}</span>
-                  {step.owner ? <span className="text-fluid-xs text-slate-300">Owner: {step.owner}</span> : null}
-                  {step.approvalStatus ? <span className="text-fluid-xs text-slate-300">{step.approvalStatus}</span> : null}
+                  </div>
+                  <p className="mt-0.5 text-fluid-xs text-slate-400">{step.description}</p>
                 </a>
               </li>
             );
@@ -146,7 +160,6 @@ export function OperationsExecutionStepper({
       <div className="space-y-4">
         {steps.map((step) => {
           const isActive = step.id === activeStepId;
-          const stepHref = buildOperationsExecutionStepHref(step.id);
 
           if (isActive) {
             return (
@@ -175,13 +188,13 @@ export function OperationsExecutionStepper({
                       ) : null}
                       <a
                         href="#planning-stepper"
-                        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100"
                       >
                         {resolveOperationsExecutionStepReturnLabel()}
                       </a>
                     </div>
                   </div>
-                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100 shadow-[0_10px_20px_-18px_rgba(14,165,233,0.55)]">
+                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
                     Current
                   </span>
                 </div>
@@ -213,8 +226,8 @@ export function OperationsExecutionStepper({
                 </div>
               </div>
               <a
-                href={stepHref}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                href={buildOperationsExecutionStepHref(step.id)}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
               >
                 Open step
               </a>

@@ -232,7 +232,7 @@ export const ReportShell = (props: ReportShellProps) => {
           <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
             {sidebarEnabled ? (
               <aside className="hidden md:block md:sticky md:top-4 md:self-start md:h-[calc(100vh-2rem)] md:overflow-y-auto">
-                <AppSidebar />
+                <AppSidebar sectionLinks={resolvedSectionLinks} />
               </aside>
             ) : null}
 

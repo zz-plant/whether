@@ -43,6 +43,11 @@ export function RegimeBanner(props: RegimeBannerProps) {
   const bannerTone = REGIME_BANNER_TOKENS[regimeKey];
   const activeWeather = getRegimeWeatherLabel(regimeKey);
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
+  const confidenceColor = confidenceLabel === "HIGH"
+    ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
+    : confidenceLabel === "MED"
+      ? "border-amber-400/25 bg-amber-500/10 text-amber-100"
+      : "border-rose-400/25 bg-rose-500/10 text-rose-100";
 
   return (
     <header className={`z-10 rounded border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
@@ -63,7 +68,7 @@ export function RegimeBanner(props: RegimeBannerProps) {
             <TrendGlyph trendLabel={trendValue} />
             <span>{trendValue} trend</span>
           </span>
-          <span className="inline-flex rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className={`inline-flex rounded-sm border px-3 py-1.5 text-fluid-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${confidenceColor}`}>
             {Math.round(confidencePercent)}% confidence ({confidenceLabel})
           </span>
           <span className="inline-flex rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">

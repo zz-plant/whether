@@ -357,8 +357,26 @@ export const ExportBriefPanel = ({
         />
 
         <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Default briefs</p>
-          <div className="mt-3 flex flex-wrap gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready brief</p>
+          <p className="mt-1 text-fluid-xs text-slate-400">One click copies everything your team needs in a Slack-ready format.</p>
+          <div className="mt-3">
+            <ClipboardActionRow
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-4 w-4" aria-hidden="true" />Copy share-ready brief</span>}
+              state={clipboardState("Leadership team brief")}
+              disabled={isCopyDisabled("Leadership team brief")}
+              onClick={() => void handleCopy(applyOverride(weeklyOperatorPlainText), "Leadership team brief")}
+              className="weather-cta-primary w-full justify-center px-5 py-3 text-sm"
+              buttonProps={{
+                "data-premium-intent": "export_brief",
+                "data-premium-cta": "copy_weekly_operator_brief",
+              }}
+            />
+          </div>
+          <details className="weather-auto-chevron mt-3 border-t border-slate-800/60 pt-3">
+            <summary className="cursor-pointer list-none text-fluid-xs font-medium text-slate-400 hover:text-slate-300">
+              More formats
+            </summary>
+            <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
               label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy leadership team brief</span>}
               state={clipboardState("Leadership team brief")}
@@ -402,6 +420,7 @@ export const ExportBriefPanel = ({
               <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Print / PDF</span>
             </Button>
           </div>
+          </details>
         </div>
 
         {hasOverride ? (

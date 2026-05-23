@@ -3,68 +3,47 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
-import { FileText, BarChart3, ClipboardList, Search, Shield, TrendingUp } from "lucide-react";
+import type { ReportSectionLink } from "./reportShellNavigation";
 
-const WORKFLOW_STEPS = [
-  { href: "/" as Route, label: "Brief", desc: "This week's call", Icon: FileText },
-  { href: "/evidence" as Route, label: "Evidence", desc: "Proof and thresholds", Icon: BarChart3 },
-  { href: "/planning" as Route, label: "Plan", desc: "Create your plan", Icon: ClipboardList },
-  { href: "/resolve" as Route, label: "Resolve", desc: "Answer one question", Icon: Search },
-  { href: "/trust" as Route, label: "Readiness", desc: "Methodology", Icon: Shield },
-  { href: "/history" as Route, label: "History", desc: "Trends over time", Icon: TrendingUp },
+const WORKFLOW_ROUTES = [
+  { href: "/" as Route, label: "Decide" },
+  { href: "/planning" as Route, label: "Plan" },
+  { href: "/evidence" as Route, label: "Deepen" },
 ] as const;
 
-const SECONDARY_LINKS = [
-  { href: "/history" as Route, label: "History" },
-  { href: "/comps" as Route, label: "Valuations" },
-  { href: "/" as Route, label: "Conditions" },
-  { href: "/regime-changes" as Route, label: "Changes" },
-  { href: "/archive" as Route, label: "Archive" },
-  { href: "/api-docs" as Route, label: "API" },
-  { href: "/trust" as Route, label: "Learn" },
-] as const;
-
-function NavItem({
+function OutlineItem({
   href,
   label,
-  desc,
-  Icon,
   isActive,
   onClick,
 }: {
   href: string;
   label: string;
-  desc?: string;
-  Icon?: React.ComponentType<{ className?: string }>;
   isActive: boolean;
   onClick?: () => void;
 }) {
   return (
-    <Link
+    <a
       href={href}
-      prefetch
       onClick={onClick}
-      aria-current={isActive ? "page" : undefined}
-      className={`group flex items-center gap-2 rounded-lg px-3 py-2 text-sm no-underline transition-colors ${
+      className={`block rounded-md px-3 py-1.5 text-sm no-underline transition-colors ${
         isActive
-          ? "bg-sky-500/10 text-sky-100"
-          : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
+          ? "bg-sky-500/10 text-sky-100 font-medium"
+          : "text-slate-400 hover:bg-slate-800/30 hover:text-slate-200"
       }`}
     >
-      {Icon ? <Icon className="h-4 w-4 flex-shrink-0" /> : null}
-      <div className="flex flex-col min-w-0">
-        <span className="font-medium">{label}</span>
-      {desc ? (
-        <span className="text-fluid-micro text-slate-500 group-hover:text-slate-400">
-          {desc}
-        </span>
-      ) : null}
-      </div>
-    </Link>
+      {label}
+    </a>
   );
 }
 
-function SidebarContent({ onClose }: { onClose?: () => void }) {
+function SidebarContent({
+  sectionLinks,
+  onClose,
+}: {
+  sectionLinks: ReportSectionLink[];
+  onClose?: () => void;
+}) {
   const pathname = usePathname() ?? "/";
 
   return (
@@ -72,43 +51,51 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       <Link
         href="/"
         onClick={onClose}
-        className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 no-underline hover:bg-slate-800/30"
+        className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 no-underline hover:bg-slate-800/30"
       >
         <span className="font-display text-lg font-semibold tracking-tight text-slate-100">
           Whether
         </span>
       </Link>
 
+      {sectionLinks.length > 0 ? (
+        <>
+          <p className="px-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
+            On this page
+          </p>
+          <nav aria-label="Page sections" className="space-y-0.5">
+            {sectionLinks.map((section) => {
+              const isActive = pathname.includes(section.href);
+              return (
+                <OutlineItem
+                  key={section.href}
+                  href={section.href}
+                  label={section.label}
+                  isActive={isActive}
+                  onClick={onClose}
+                />
+              );
+            })}
+          </nav>
+        </>
+      ) : null}
+
+      <div className="my-4 border-t border-slate-800/60" />
+
+      <p className="px-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
+        Workflow
+      </p>
       <nav aria-label="Workflow" className="space-y-0.5">
-        {WORKFLOW_STEPS.map((step) => {
+        {WORKFLOW_ROUTES.map((route) => {
           const isActive =
-            step.href === "/"
+            route.href === "/"
               ? pathname === "/"
-              : pathname.startsWith(step.href);
+              : pathname.startsWith(route.href);
           return (
-            <NavItem
-              key={step.href}
-              href={step.href}
-              label={step.label}
-              desc={step.desc}
-              Icon={step.Icon}
-              isActive={isActive}
-              onClick={onClose}
-            />
-          );
-        })}
-      </nav>
-
-      <div className="my-3 border-t border-slate-800/60" />
-
-      <nav aria-label="More pages" className="space-y-0.5">
-        {SECONDARY_LINKS.map((link) => {
-          const isActive = pathname.startsWith(link.href);
-          return (
-            <NavItem
-              key={`${link.href}-${link.label}`}
-              href={link.href}
-              label={link.label}
+            <OutlineItem
+              key={route.href}
+              href={route.href}
+              label={route.label}
               isActive={isActive}
               onClick={onClose}
             />
@@ -120,20 +107,18 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 }
 
 type AppSidebarProps = {
-  /** When true, renders as a mobile overlay instead of inline */
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  sectionLinks?: ReportSectionLink[];
 };
 
-export function AppSidebar({ mobileOpen, onMobileClose }: AppSidebarProps) {
+export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: AppSidebarProps) {
   return (
     <>
-      {/* Desktop: inline sidebar */}
       <aside className="hidden lg:flex lg:h-full lg:flex-col">
-        <SidebarContent />
+        <SidebarContent sectionLinks={sectionLinks} />
       </aside>
 
-      {/* Mobile: overlay sidebar */}
       {mobileOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
@@ -141,7 +126,7 @@ export function AppSidebar({ mobileOpen, onMobileClose }: AppSidebarProps) {
             onClick={onMobileClose}
           />
           <aside className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-2xl">
-            <SidebarContent onClose={onMobileClose} />
+            <SidebarContent sectionLinks={sectionLinks} onClose={onMobileClose} />
           </aside>
         </div>
       ) : null}

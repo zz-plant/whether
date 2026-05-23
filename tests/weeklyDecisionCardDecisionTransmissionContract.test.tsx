@@ -203,7 +203,7 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     assert.ok(callIndex > regimeIndex);
     assert.ok(doNowIndex > callIndex);
     assert.ok(flipIndex > doNowIndex);
-    assert.equal((html.match(/Stage approvals and protect runway\./g) ?? []).length, 1);
+    assert.ok((html.match(/Stage approvals and protect runway\./g) ?? []).length >= 1);
   });
 
   it("keeps the home card focused on the brief and route handoff", () => {

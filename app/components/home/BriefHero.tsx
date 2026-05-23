@@ -3,8 +3,6 @@ import { ConfidenceBadge } from "../ConfidenceBadge";
 import { ExportImageButton } from "../exportImageButton";
 import { ScoreCard } from "../ScoreCard";
 
-const REGIME_LABELS: Record<string, string> = { SCARCITY: "Scarcity", DEFENSIVE: "Defensive", VOLATILE: "Volatile", EXPANSION: "Expansion" };
-
 type BriefHeroProps = {
   regime: string;
   postureLabel: string;
@@ -16,6 +14,19 @@ type BriefHeroProps = {
   confidenceLabel?: string;
   recordDate?: string;
   fetchedAt?: string;
+  guardrail?: string;
+  flipConditions?: string[];
+  actionNow?: string;
+  showOfflineBadge?: boolean;
+  degradedSourceCount?: number;
+  decisionShiftSummary?: string;
+  trendLabel?: string;
+};
+
+const TREND_BADGE: Record<string, string> = {
+  tightening: "border-rose-400/25 bg-rose-500/10 text-rose-200",
+  easing: "border-emerald-400/25 bg-emerald-500/10 text-emerald-200",
+  stable: "border-slate-400/25 bg-slate-500/10 text-slate-200",
 };
 
 export function BriefHero({
@@ -29,57 +40,134 @@ export function BriefHero({
   confidenceLabel,
   recordDate,
   fetchedAt,
+  guardrail,
+  flipConditions,
+  actionNow,
+  showOfflineBadge,
+  degradedSourceCount,
+  decisionShiftSummary,
+  trendLabel,
 }: BriefHeroProps) {
+  const confidenceLevel = (confidenceLabel ?? "").toUpperCase();
+  const isLowConfidence = confidenceLevel === "LOW";
+  const isMedConfidence = confidenceLevel === "MED";
+  const heroTint = isLowConfidence
+    ? "border-l-rose-500/30 bg-gradient-to-r from-rose-500/5 to-transparent"
+    : isMedConfidence
+      ? "border-l-amber-500/30 bg-gradient-to-r from-amber-500/5 to-transparent"
+      : "border-l-emerald-500/30";
+
+  const tightnessDirection = tightnessDelta > 0 ? "↑" : tightnessDelta < 0 ? "↓" : "→";
+  const deltaEmphasis = tightnessDelta > 0 ? "text-rose-200" : tightnessDelta < 0 ? "text-emerald-200" : "text-slate-400";
+  const trendKey = (trendLabel ?? "").toLowerCase();
+  const trendBadge = TREND_BADGE[trendKey] ?? TREND_BADGE.stable;
+
+  const hasGuidance = Boolean(actionNow || guardrail || (flipConditions && flipConditions.length > 0));
+
   return (
-    <div className="text-center space-y-4 sm:space-y-6 py-4 sm:py-8">
+    <div className={`text-center space-y-5 sm:space-y-6 py-5 sm:py-8 border-l-2 ${heroTint}`}>
+      <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-400">
+        Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
+      </p>
+
+      {/* Dominant number */}
       <div className="space-y-1">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-400">
-          Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
+        <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight">
+          {tightness}
+        </p>
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Credit tightness</p>
+        <p className="text-fluid-xs text-slate-400">
+          {regime} regime{postureLabel ? ` · ${postureLabel}` : ""}{tightnessDelta !== 0 ? (
+            <span className={`ml-1 font-semibold ${deltaEmphasis}`}>{tightnessDirection} {Math.abs(tightnessDelta).toFixed(1)} pts</span>
+          ) : null}
         </p>
       </div>
 
-      <h2 className="text-fluid-lg sm:text-fluid-xl font-semibold text-slate-100 leading-snug max-w-2xl mx-auto font-display">
-        {decision}
-      </h2>
-
-      <div className="space-y-1">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
-          {REGIME_LABELS[regime] ?? regime}{" · "}{postureLabel}
-        </p>
+      {/* Forecast strip */}
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+        <span className="rounded-full border border-sky-400/25 bg-sky-500/10 px-3 py-1 text-fluid-xs font-semibold text-sky-100">
+          This week: {decision.length > 60 ? decision.slice(0, 57) + "…" : decision}
+        </span>
+        {trendLabel ? (
+          <span className={`rounded-full border px-3 py-1 text-fluid-xs font-semibold ${trendBadge}`}>
+            {trendLabel} trend
+          </span>
+        ) : null}
+        {confidenceLabel ? (
+          <ConfidenceBadge label={confidenceLabel} className="text-fluid-xs px-3 py-1" />
+        ) : null}
       </div>
 
-      <div className="flex justify-center">
-        <div className="w-full max-w-[16rem] sm:max-w-[20rem]">
-          <RegimeCompass
-            tightness={tightness}
-            riskAppetite={riskAppetite}
-            prevTightness={tightness - tightnessDelta}
-            prevRiskAppetite={riskAppetite - riskAppetiteDelta}
-            regimeKey={regime}
-          />
+      {/* Decision shift */}
+      {decisionShiftSummary ? (
+        <p className="text-fluid-xs text-slate-400 max-w-xl mx-auto">{decisionShiftSummary}</p>
+      ) : null}
+
+      {/* Plain-English guidance */}
+      {hasGuidance ? (
+        <div className="max-w-2xl mx-auto text-left space-y-3 rounded-lg border border-slate-800/60 bg-slate-950/40 px-5 py-4">
+          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to adjust this week</p>
+          <div className="space-y-2 text-sm leading-relaxed text-slate-200">
+            {actionNow ? (
+              <p>{actionNow}.</p>
+            ) : null}
+            {guardrail ? (
+              <p>Pause if {guardrail}.</p>
+            ) : null}
+            {flipConditions && flipConditions.length > 0 ? (
+              <p>Flip if {flipConditions.join(" or ")}.</p>
+            ) : null}
+          </div>
+
+          {/* Share actions */}
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/50">
+            <ExportImageButton
+              decision={decision}
+              regime={regime}
+              tightness={tightness}
+              riskAppetite={riskAppetite}
+              confidenceLabel={confidenceLabel}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      {/* Scores — card-based with visual weight */}
-      <div className="flex flex-wrap justify-center gap-4 pt-2">
-        <ScoreCard label="Credit conditions" value={tightness} delta={tightnessDelta} variant="large" />
-        <ScoreCard label="Investor sentiment" value={riskAppetite} delta={riskAppetiteDelta} variant="large" />
-      </div>
+      {/* Secondary detail — collapsible */}
+      <details className="weather-auto-chevron max-w-xl mx-auto text-left rounded-lg border border-slate-800/60 bg-slate-950/30 px-4 py-3">
+        <summary className="cursor-pointer list-none text-fluid-xs font-semibold text-slate-400 hover:text-slate-300">
+          Conditions detail
+        </summary>
+        <div className="mt-4 space-y-4">
+          <div className="flex justify-center">
+            <div className="w-full max-w-[14rem] sm:max-w-[18rem]">
+              <RegimeCompass
+                tightness={tightness}
+                riskAppetite={riskAppetite}
+                prevTightness={tightness - tightnessDelta}
+                prevRiskAppetite={riskAppetite - riskAppetiteDelta}
+                regimeKey={regime}
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            <ScoreCard label="Credit conditions" value={tightness} delta={tightnessDelta} variant="large" />
+            <ScoreCard label="Investor sentiment" value={riskAppetite} delta={riskAppetiteDelta} variant="large" />
+          </div>
+        </div>
+      </details>
 
-      {/* Confidence + source attribution */}
-      <div className="flex flex-col items-center gap-2 text-fluid-micro text-slate-400">
-        <div className="flex justify-center gap-3">
-          {confidenceLabel ? <ConfidenceBadge label={confidenceLabel} /> : null}
+      {/* Source trust line */}
+      <div className="flex flex-col items-center gap-1.5 text-fluid-micro text-slate-500">
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
           {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
-          <ExportImageButton
-            decision={decision}
-            regime={regime}
-            tightness={tightness}
-            riskAppetite={riskAppetite}
-            confidenceLabel={confidenceLabel}
-          />
+          {showOfflineBadge ? (
+            <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-amber-200">Cached</span>
+          ) : null}
+          {degradedSourceCount && degradedSourceCount > 0 ? (
+            <span className="rounded-full border border-rose-400/30 bg-rose-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-rose-200">{degradedSourceCount} source{degradedSourceCount > 1 ? "s" : ""} degraded</span>
+          ) : null}
         </div>
-        <p className="text-slate-600">Data: FRED · Treasury · Yahoo Finance</p>
+        <p>Data: FRED · Treasury · Yahoo Finance</p>
       </div>
     </div>
   );
