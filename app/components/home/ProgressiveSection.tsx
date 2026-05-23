@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useClipboardCopy } from "../useClipboardCopy";
 
 type ProgressiveSectionProps = {
   id: string;
@@ -33,6 +34,14 @@ export function ProgressiveSection({
   const hash = useHash();
   const targetHash = `#${id}`;
   const [expanded, setExpanded] = useState(defaultExpanded || hash === targetHash);
+  const { status, copyToClipboard } = useClipboardCopy();
+  const isLinkCopied = status === "copied";
+
+  const copyLink = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}${window.location.pathname}${targetHash}`;
+    await copyToClipboard(url, `Section link`);
+  }, [targetHash, copyToClipboard]);
 
   useEffect(() => {
     if (hash === targetHash) setExpanded(true);
@@ -59,14 +68,28 @@ export function ProgressiveSection({
           <p className="text-sm font-semibold text-slate-200">{label}</p>
           <p className="mt-0.5 text-xs text-slate-500">{description}</p>
         </div>
-        <span
-          className={`text-slate-500 text-sm transition-transform duration-200 ${
-            expanded ? "rotate-180" : ""
-          }`}
-          aria-hidden="true"
-        >
-          ▾
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={copyLink}
+            className="rounded p-1 text-slate-600 hover:text-sky-300 transition-colors"
+            title="Copy link to this section"
+          >
+            {isLinkCopied ? (
+              <svg className="h-3.5 w-3.5" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            ) : (
+              <svg className="h-3.5 w-3.5" viewBox="0 0 12 12" fill="none"><path d="M4 3h4.5a1.5 1.5 0 010 3H7M5 9H2.5a1.5 1.5 0 010-3H5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/></svg>
+            )}
+          </button>
+          <span
+            className={`text-slate-500 text-sm transition-transform duration-200 ${
+              expanded ? "rotate-180" : ""
+            }`}
+            aria-hidden="true"
+          >
+            ▾
+          </span>
+        </div>
       </button>
       {expanded ? (
         <div className="px-5 pb-5 border-t border-slate-800/40">

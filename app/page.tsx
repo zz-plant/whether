@@ -39,10 +39,21 @@ import { DecisionTrendline } from "./components/home/DecisionTrendline";
 import { DecisionSimulator } from "./components/home/DecisionSimulator";
 import { RegimeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
+import { TickerCompany } from "./components/home/TickerCompany";
 import { RoleSelector } from "./components/home/RoleSelector";
+import { RoleEmphasis } from "./components/home/RoleEmphasis";
 import { EmailSubscribe } from "./components/home/EmailSubscribe";
 import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
-import { ProgressiveSection } from "./components/home/ProgressiveSection";
+import { FrameworkCard } from "./components/home/FrameworkCard";
+import { StatusLine } from "./components/home/StatusLine";
+import { TheAnswer } from "./components/home/TheAnswer";
+import { PredictionPractice } from "./components/home/PredictionPractice";
+import { LiveTightness } from "./components/home/LiveTightness";
+import { TabNotifier } from "./components/home/TabNotifier";
+import { WeekDelta } from "./components/home/WeekDelta";
+import { FlipBanner } from "./components/home/FlipBanner";
+import { AudioBrief } from "./components/home/AudioBrief";
+import { CounterfactualSimulator } from "./components/home/CounterfactualSimulator";
 import { EvidenceContent } from "./components/home/EvidenceContent";
 import { TrustContent } from "./components/home/TrustContent";
 import { ResolveContent } from "./components/home/ResolveContent";
@@ -308,6 +319,10 @@ export const HomePageReportContent = async ({
         </div>
       ) : null}
       <div className="-mt-4 space-y-3" data-screenshot={isScreenshot ? "true" : undefined}>
+        <FlipBanner
+          direction={(homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold" | "revisit"}
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+        />
         <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
           Macro conditions translated into weekly operating decisions for leadership teams. No econ degree required.
         </p>
@@ -333,6 +348,33 @@ export const HomePageReportContent = async ({
           decisionShiftSummary={homepage.weeklyDecisionCardModel.decision.decisionShiftSummary}
           trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
           reliabilityScore={reliabilityScore}
+        />
+
+        <LiveTightness
+          initialTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          recordDate={homepage.reportShell.recordDateLabel}
+        />
+
+        <TheAnswer
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
+          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+          reliabilityScore={reliabilityScore}
+          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
+        />
+
+        <PredictionPractice
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          prevTightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness - (homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0)}
+          recordDate={homepage.reportShell.recordDateLabel}
+        />
+
+        <StatusLine
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          reliabilityScore={reliabilityScore}
+          postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel}
+          trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
+          recordDate={homepage.reportShell.recordDateLabel}
         />
 
         <VisitorContext
@@ -370,7 +412,21 @@ export const HomePageReportContent = async ({
           sourceLabel={homepage.reportShell.treasurySource}
         />
 
+        <FrameworkCard
+          call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
+          actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+          guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+            ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+            : undefined}
+          flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
+          confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
+          reliabilityScore={reliabilityScore}
+          tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
+          recordDate={homepage.reportShell.recordDateLabel}
+        />
+
         <RoleSelector />
+        <RoleEmphasis />
 
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
@@ -445,28 +501,20 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <div className="space-y-3">
-          <ProgressiveSection
-            id="evidence"
-            label="Why this call"
-            description="The signals and data behind this week's operating posture"
-          >
+        <section className="space-y-6">
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Why this call</h2>
             <EvidenceContent />
-          </ProgressiveSection>
+          </div>
 
-          <ProgressiveSection
-            id="trust"
-            label="Is this reliable?"
-            description="Source freshness, confidence, and data quality"
-          >
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Is this reliable?</h2>
             <TrustContent />
-          </ProgressiveSection>
+            <CounterfactualSimulator currentRegime={regime} />
+          </div>
 
-          <ProgressiveSection
-            id="resolve"
-            label="Have a question?"
-            description="Challenge the call, translate for your role, or run what-if scenarios"
-          >
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Explore</h2>
             <ResolveContent />
             <div className="mt-4 space-y-3">
               <DecisionSimulator
@@ -476,17 +524,17 @@ export const HomePageReportContent = async ({
               />
               <RegimeTransitionProbability currentRegime={regime} />
             </div>
-          </ProgressiveSection>
+          </div>
 
-          <ProgressiveSection
-            id="you"
-            label="Your numbers"
-            description="Company metrics, decision history, and personalized guidance"
-          >
-            <CompanyMetricsPanel
+          <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Your numbers</h2>
+            <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
+            <div className="mt-4">
+              <CompanyMetricsPanel
               tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
               companyStage={operatorContext.companyStage ?? undefined}
             />
+            </div>
             <div className="mt-3">
               <DecisionTrendline />
             </div>
@@ -496,8 +544,8 @@ export const HomePageReportContent = async ({
                 riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
               />
             </div>
-          </ProgressiveSection>
-        </div>
+          </div>
+        </section>
 
         <OnboardingGate>
           <FirstVisitBanner />

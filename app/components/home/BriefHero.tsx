@@ -2,7 +2,6 @@ import { RegimeCompass } from "../regimeCompass";
 import { ConfidenceGauge } from "../ConfidenceGauge";
 import { ExportImageButton } from "../exportImageButton";
 import { ScoreCard } from "../ScoreCard";
-import { AlertToggle } from "./AlertToggle";
 
 type BriefHeroProps = {
   regime: string;
@@ -67,7 +66,6 @@ export function BriefHero({
   const trendKey = (trendLabel ?? "").toLowerCase();
   const trendBadge = TREND_BADGE[trendKey] ?? TREND_BADGE.stable;
 
-  const hasGuidance = Boolean(actionNow || guardrail || (flipConditions && flipConditions.length > 0));
   const isDegraded = showOfflineBadge || (degradedSourceCount && degradedSourceCount > 0) || (reliabilityScore != null && reliabilityScore < 60);
 
   return (
@@ -78,7 +76,7 @@ export function BriefHero({
 
       {/* Dominant number */}
       <div className="space-y-1">
-        <div className="flex items-baseline justify-center gap-6 sm:gap-10">
+        <div className="flex items-baseline justify-center gap-6 sm:gap-10 weather-hero-scores">
           <div>
             <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight">
               {tightness}
@@ -123,42 +121,10 @@ export function BriefHero({
         <p className="text-fluid-xs text-slate-400 max-w-xl mx-auto">{decisionShiftSummary}</p>
       ) : null}
 
-      {/* Plain-English guidance */}
-      {hasGuidance ? (
-        <div className="max-w-2xl mx-auto text-left space-y-3 rounded-lg border border-slate-800/60 bg-slate-950/40 px-5 py-4">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to adjust this week</p>
-
-          {isDegraded ? (
-            <div className="rounded-md border border-amber-500/30 bg-amber-500/8 px-3 py-2 text-xs leading-5 text-amber-100">
-              <span className="font-semibold">Data quality is degraded.</span>{" "}
-              Stage all irreversible decisions until the next clean refresh. Use this read for discussion and planning context only — not for final approvals.
-            </div>
-          ) : null}
-
-          <div className="space-y-2 text-sm leading-relaxed text-slate-200">
-            {actionNow ? (
-              <p>{actionNow}.</p>
-            ) : null}
-            {guardrail ? (
-              <p>Pause if {guardrail}.</p>
-            ) : null}
-            {flipConditions && flipConditions.length > 0 ? (
-              <p>Flip if {flipConditions.join(" or ")}.</p>
-            ) : null}
-          </div>
-
-          {/* Share actions */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/50">
-            <AlertToggle label="Tightness" id="tightness" />
-            <AlertToggle label="Risk appetite" id="riskAppetite" />
-            <ExportImageButton
-              decision={decision}
-              regime={regime}
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              confidenceLabel={confidenceLabel}
-            />
-          </div>
+      {isDegraded ? (
+        <div className="max-w-xl mx-auto rounded-md border border-amber-500/30 bg-amber-500/8 px-3 py-2 text-xs leading-5 text-amber-100">
+          <span className="font-semibold">Data quality is degraded.</span>{" "}
+          Stage irreversible decisions until the next clean refresh.
         </div>
       ) : null}
 

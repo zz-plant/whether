@@ -4,7 +4,7 @@
  * $0 cost — no API key required for basic quote data.
  */
 
-const SAAS_BASKET = [
+export const SAAS_BASKET = [
   "SNOW", "SHOP", "CRM", "HUBS", "MDB", "DDOG", "TEAM", "WDAY",
   "NOW", "ZS", "CFLT", "TOST", "GTLB", "NET", "FRSH",
 ] as const;
@@ -25,7 +25,7 @@ type YahooQuote = {
   };
 };
 
-async function fetchQuote(symbol: string): Promise<YahooQuote | null> {
+export async function fetchQuote(symbol: string): Promise<YahooQuote | null> {
   try {
     const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics`;
     const res = await fetch(url, { signal: AbortSignal.timeout(4000) });

@@ -903,6 +903,16 @@
   }
 }
 
+@media (max-width: 480px) {
+  .weather-hero-scores {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .weather-hero-scores > div:last-child {
+    text-align: center !important;
+  }
+}
+
 @media print {
   nav, aside, footer, .weather-page-shell > header,
   [class*="sidebar"], [class*="Sidebar"], [class*="sidebar"],
