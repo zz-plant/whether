@@ -11,6 +11,10 @@ The core product loop is:
 
 `signals -> posture -> decision -> artifact`
 
+<p align="center">
+  <img src="docs/assets/whether-dashboard.png" alt="Whether signal dashboard showing CPI, Fed Rate, VIX, and operating posture" width="720">
+</p>
+
 Everything in this repo should make that loop faster to understand, easier to trust, and easier to share.
 
 ---
