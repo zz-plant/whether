@@ -38,7 +38,6 @@ import { DecisionSimulator } from "./components/home/DecisionSimulator";
 import { RegimeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
 import { TickerCompany } from "./components/home/TickerCompany";
-import { RoleSelector } from "./components/home/RoleSelector";
 import { EmailSubscribe } from "./components/home/EmailSubscribe";
 import { SourceDisagreement } from "./components/evidence/SourceDisagreement";
 import { FrameworkCard } from "./components/home/FrameworkCard";
@@ -319,24 +318,14 @@ export const HomePageReportContent = async ({
         <BriefHero
           regime={regime}
           postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
-          decision={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
-          riskAppetite={homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite}
           tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
-          riskAppetiteDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "riskAppetite")?.delta ?? 0}
           confidenceLabel={homepage.weeklyDecisionCardModel.status.confidenceLabel}
-          confidencePercent={homepage.weeklyDecisionCardModel.status.confidencePercent}
           recordDate={homepage.reportShell.recordDateLabel}
           fetchedAt={homepage.reportShell.fetchedAtLabel}
-          actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-          guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-            ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-            : undefined}
-          flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
           showOfflineBadge={homepage.reportShell.showOfflineBadge}
           degradedSourceCount={homepage.reportShell.degradedSourceRows?.length}
           decisionShiftSummary={homepage.weeklyDecisionCardModel.decision.decisionShiftSummary}
-          trendLabel={homepage.weeklyDecisionCardModel.status.trendLabel}
           reliabilityScore={reliabilityScore}
         />
 
@@ -387,8 +376,6 @@ export const HomePageReportContent = async ({
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           recordDate={homepage.reportShell.recordDateLabel}
         />
-
-        <RoleSelector />
 
         <ErrorBoundary label="Weekly decision card">
           <div data-share-section="decision">
@@ -465,22 +452,22 @@ export const HomePageReportContent = async ({
 
         <section className="space-y-3">
           <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call ▸</summary>
-            <div className="mt-2">
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call? ▸</summary>
+            <div className="mt-2 weather-reveal">
               <EvidenceContent />
             </div>
           </details>
 
           <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Is this reliable? ▸</summary>
-            <div className="mt-2">
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Can I trust this? ▸</summary>
+            <div className="mt-2 weather-reveal">
               <TrustContent />
             </div>
           </details>
 
           <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Explore ▸</summary>
-            <div className="mt-2">
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">What else can I explore? ▸</summary>
+            <div className="mt-2 weather-reveal">
               <ResolveContent />
               <div className="mt-4 space-y-3">
                 <DecisionSimulator
@@ -494,8 +481,8 @@ export const HomePageReportContent = async ({
           </details>
 
           <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Your numbers ▸</summary>
-            <div className="mt-2">
+            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">How does this affect me? ▸</summary>
+            <div className="mt-2 weather-reveal">
               <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
               <div className="mt-4">
                 <CompanyMetricsPanel

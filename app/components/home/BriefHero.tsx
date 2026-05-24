@@ -1,55 +1,28 @@
-import { RegimeCompass } from "../regimeCompass";
-import { ConfidenceGauge } from "../ConfidenceGauge";
-import { ExportImageButton } from "../exportImageButton";
-import { ScoreCard } from "../ScoreCard";
-
 type BriefHeroProps = {
   regime: string;
   postureLabel: string;
-  decision: string;
   tightness: number;
-  riskAppetite: number;
   tightnessDelta: number;
-  riskAppetiteDelta: number;
   confidenceLabel?: string;
-  confidencePercent?: number;
   recordDate?: string;
   fetchedAt?: string;
-  guardrail?: string;
-  flipConditions?: string[];
-  actionNow?: string;
   showOfflineBadge?: boolean;
   degradedSourceCount?: number;
   decisionShiftSummary?: string;
-  trendLabel?: string;
   reliabilityScore?: number;
-};
-
-const TREND_BADGE: Record<string, string> = {
-  tightening: "border-rose-400/25 bg-rose-500/10 text-rose-200",
-  easing: "border-emerald-400/25 bg-emerald-500/10 text-emerald-200",
-  stable: "border-slate-400/25 bg-slate-500/10 text-slate-200",
 };
 
 export function BriefHero({
   regime,
   postureLabel,
-  decision,
   tightness,
-  riskAppetite,
   tightnessDelta,
-  riskAppetiteDelta,
   confidenceLabel,
-  confidencePercent,
   recordDate,
   fetchedAt,
-  guardrail,
-  flipConditions,
-  actionNow,
   showOfflineBadge,
   degradedSourceCount,
   decisionShiftSummary,
-  trendLabel,
   reliabilityScore,
 }: BriefHeroProps) {
   const confidenceLevel = (confidenceLabel ?? "").toUpperCase();
@@ -63,8 +36,6 @@ export function BriefHero({
 
   const tightnessDirection = tightnessDelta > 0 ? "↑" : tightnessDelta < 0 ? "↓" : "→";
   const deltaEmphasis = tightnessDelta > 0 ? "text-rose-200" : tightnessDelta < 0 ? "text-emerald-200" : "text-slate-400";
-  const trendKey = (trendLabel ?? "").toLowerCase();
-  const trendBadge = TREND_BADGE[trendKey] ?? TREND_BADGE.stable;
 
   const isDegraded = showOfflineBadge || (degradedSourceCount && degradedSourceCount > 0) || (reliabilityScore != null && reliabilityScore < 60);
 
@@ -74,7 +45,6 @@ export function BriefHero({
         Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
       </p>
 
-      {/* Dominant number */}
       <div className="space-y-1">
         <div className="flex items-baseline justify-center gap-6 sm:gap-10 weather-hero-scores">
           <div>
@@ -104,7 +74,6 @@ export function BriefHero({
         </p>
       </div>
 
-      {/* Decision shift */}
       {decisionShiftSummary ? (
         <p className="text-fluid-xs text-slate-400 max-w-xl mx-auto">{decisionShiftSummary}</p>
       ) : null}
@@ -115,44 +84,6 @@ export function BriefHero({
           Stage irreversible decisions until the next clean refresh.
         </div>
       ) : null}
-
-      {/* Secondary detail — collapsible */}
-      <details className="weather-auto-chevron max-w-xl mx-auto text-left rounded-lg border border-slate-800/60 bg-slate-950/30 px-4 py-3">
-        <summary className="cursor-pointer list-none text-fluid-xs font-semibold text-slate-400 hover:text-slate-300">
-          Conditions detail
-        </summary>
-        <div className="mt-4 space-y-4">
-          <div className="flex justify-center">
-            <div className="w-full max-w-[14rem] sm:max-w-[18rem]">
-              <RegimeCompass
-                tightness={tightness}
-                riskAppetite={riskAppetite}
-                prevTightness={tightness - tightnessDelta}
-                prevRiskAppetite={riskAppetite - riskAppetiteDelta}
-                regimeKey={regime}
-              />
-            </div>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            <ScoreCard label="Credit conditions" value={tightness} delta={tightnessDelta} variant="large" />
-            <ScoreCard label="Investor sentiment" value={riskAppetite} delta={riskAppetiteDelta} variant="large" />
-          </div>
-        </div>
-      </details>
-
-      {/* Source trust line */}
-      <div className="flex flex-col items-center gap-1.5 text-fluid-micro text-slate-500">
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
-          {fetchedAt ? <span>Refreshed {fetchedAt}</span> : null}
-          {showOfflineBadge ? (
-            <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-amber-200">Cached</span>
-          ) : null}
-          {degradedSourceCount && degradedSourceCount > 0 ? (
-            <span className="rounded-full border border-rose-400/30 bg-rose-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-rose-200">{degradedSourceCount} source{degradedSourceCount > 1 ? "s" : ""} degraded</span>
-          ) : null}
-        </div>
-        <p>Data: FRED · Treasury · Yahoo Finance</p>
-      </div>
     </div>
   );
 }

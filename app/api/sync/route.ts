@@ -29,7 +29,9 @@ async function saveState(kv: KvLike, syncId: string, state: SyncState): Promise<
 
 export async function GET(request: Request) {
   const kv = getKv();
-  if (!kv) return NextResponse.json({ ok: false, error: "KV not available" }, { status: 503 });
+  if (!kv) {
+    return NextResponse.json({ ok: true, state: {}, degraded: true, reason: "KV unavailable — using local storage only" });
+  }
 
   const url = new URL(request.url);
   const syncId = url.searchParams.get("id");
@@ -41,7 +43,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const kv = getKv();
-  if (!kv) return NextResponse.json({ ok: false, error: "KV not available" }, { status: 503 });
+  if (!kv) {
+    return NextResponse.json({ ok: true, degraded: true, reason: "KV unavailable — sync skipped" });
+  }
 
   let body: { id?: string; key?: string; value?: unknown; ts?: number };
   try {

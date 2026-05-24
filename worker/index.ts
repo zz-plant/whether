@@ -23,6 +23,7 @@ interface Env {
   };
   WHETHER_CRON_SECRET?: string;
   SITE_URL?: string;
+  WHETHER_DURABLE_KV: { get(key: string): Promise<string | null>; put(key: string, value: string): Promise<void> };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -62,6 +63,10 @@ export default {
           return result.response();
         },
       });
+    }
+
+    if (env.WHETHER_DURABLE_KV) {
+      (globalThis as Record<string, unknown>).WHETHER_DURABLE_KV = env.WHETHER_DURABLE_KV;
     }
 
     return handler.fetch(request);

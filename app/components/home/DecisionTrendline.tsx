@@ -75,7 +75,7 @@ export function DecisionTrendline() {
     direction === "holding" ? "Holding steady" : "Shifting";
 
   return (
-    <div className={`max-w-xl mx-auto rounded-lg border bg-gradient-to-r ${momentumColor} px-4 py-3`}>
+    <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Decision trend</p>
