@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type FlipBannerProps = {
   direction: "tighten" | "ease" | "hold" | "revisit";
@@ -65,16 +67,14 @@ export function FlipBanner({ direction, tightness }: FlipBannerProps) {
         <p className={`text-sm font-medium ${isTightening ? "text-rose-200" : "text-emerald-200"}`}>
           {message}
         </p>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={() => setVisible(false)}
-          className={`flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors ${isTightening ? "hover:text-rose-300" : "hover:text-emerald-300"}`}
           aria-label="Dismiss"
         >
-          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <path d="M4 4l8 8M12 4l-8 8" />
-          </svg>
-        </button>
+          <X className="w-3.5 h-3.5" />
+        </Button>
       </div>
     </div>
   );

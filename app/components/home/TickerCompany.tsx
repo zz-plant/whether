@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { DataCard } from "../DataCard";
 import { computeSensitivity } from "../../../lib/sensitivityCoefficient";
 import { ErrorState } from "./ErrorState";
@@ -127,13 +128,14 @@ export function TickerCompany({
             maxLength={5}
             autoComplete="off"
           />
-          <button
+          <Button
             type="submit"
             disabled={loading || input.length < 1}
-            className="rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/20 disabled:opacity-50"
+            variant="default"
+            size="sm"
           >
             {loading ? "…" : "Load"}
-          </button>
+          </Button>
         </form>
       ) : (
         <div className="flex items-center gap-2">

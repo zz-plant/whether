@@ -16,6 +16,7 @@ import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDeci
 import type {
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
+import { SlackPreviewOverlay } from "./weekly-card/SlackPreviewOverlay";
 
 /**
  * Loop stage owner: presentation/artifact.
@@ -88,7 +89,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const overallDirection = primaryDriver?.postureDirection ?? "flat";
 
   return (
-    <section className="weather-panel weather-decision-card space-y-4 sm:space-y-5" aria-labelledby="weekly-decision-card-title">
+    <section className="relative overflow-hidden weather-panel weather-decision-card space-y-4 sm:space-y-5" aria-labelledby="weekly-decision-card-title">
       <h2 id="weekly-decision-card-title" className="sr-only">
         Weekly brief
       </h2>
@@ -147,18 +148,19 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
         topPinnedRule={
           actionStripItems.length > 0
-            ? (() => {
-                const top = actionStripItems[0];
-                return {
-                  label: top.label,
-                  actionNow: top.areaActionNow,
-                  triggerThreshold: top.triggerThreshold,
-                  reversalCondition: top.reversalCondition,
-                };
-              })()
-            : undefined
+             ? (() => {
+                 const top = actionStripItems[0];
+                 return {
+                   label: top.label,
+                   actionNow: top.areaActionNow,
+                   triggerThreshold: top.triggerThreshold,
+                   reversalCondition: top.reversalCondition,
+                 };
+               })()
+             : undefined
         }
       />
+      <SlackPreviewOverlay />
     </section>
   );
 }

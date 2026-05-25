@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePersistentClientId } from "../../components/clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
@@ -32,42 +32,115 @@ export const DecisionMemoryPanel = () => {
   const { copyToClipboard, status, activeTarget, copiedTarget } = useClipboardCopy();
   const clientId = usePersistentClientId();
 
-  useEffect(() => {
+  const fetchEntries = useCallback(() => {
     if (!clientId) {
       return;
     }
-    let active = true;
     setStatusMessage(null);
     void fetch(`/api/decision-memory?clientId=${encodeURIComponent(clientId)}`)
       .then(async (response) => {
         if (!response.ok) {
-          return;
+          throw new Error("HTTP error");
         }
         const payload = (await response.json()) as DecisionMemoryResponse;
-        if (active) {
-          setEntries(payload.entries);
-        }
+        
+        // Load local storage entries and merge
+        const localKey = `whether.decisionMemory:${clientId}`;
+        const localRaw = window.localStorage.getItem(localKey);
+        const localEntries = localRaw ? JSON.parse(localRaw) : [];
+        
+        const mergedMap = new Map();
+        localEntries.forEach((entry: any) => mergedMap.set(entry.id, entry));
+        payload.entries.forEach((entry: any) => mergedMap.set(entry.id, entry));
+        
+        const sortedEntries = Array.from(mergedMap.values()).sort(
+          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        // Write the merged set back
+        window.localStorage.setItem(localKey, JSON.stringify(sortedEntries.slice(0, 64)));
+
+        setEntries(sortedEntries);
       })
       .catch(() => {
-        if (active) {
+        // Fallback to local storage only
+        const localKey = `whether.decisionMemory:${clientId}`;
+        const localRaw = window.localStorage.getItem(localKey);
+        if (localRaw) {
+          try {
+            const localEntries = JSON.parse(localRaw);
+            setEntries(localEntries);
+          } catch {
+            setStatusMessage("Unable to load saved decisions right now.");
+            setEntries([]);
+          }
+        } else {
           setStatusMessage("Unable to load saved decisions right now.");
           setEntries([]);
         }
       });
-
-    return () => {
-      active = false;
-    };
   }, [clientId]);
+
+  useEffect(() => {
+    fetchEntries();
+    
+    const handleUpdate = () => {
+      fetchEntries();
+    };
+    window.addEventListener("whether-decision-memory-updated", handleUpdate);
+    return () => {
+      window.removeEventListener("whether-decision-memory-updated", handleUpdate);
+    };
+  }, [clientId, fetchEntries]);
 
   const latestEntry = entries[0] ?? null;
 
-  const csvDownloadHref = useMemo(() => {
-    if (entries.length === 0 || !clientId) {
-      return null;
-    }
-    return `/api/decision-memory?format=csv&clientId=${encodeURIComponent(clientId)}`;
-  }, [clientId, entries.length]);
+  const downloadCsv = () => {
+    if (entries.length === 0) return;
+    const header = [
+      "id",
+      "createdAt",
+      "clientId",
+      "recordDate",
+      "regime",
+      "verdict",
+      "lifecycle",
+      "category",
+      "action",
+      "summary",
+      "guardrail",
+      "reversalTrigger",
+      "sources",
+    ];
+
+    const escapeCsvCell = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    const rows = entries.map((entry) => [
+      entry.id,
+      entry.createdAt,
+      entry.context.clientId,
+      entry.context.recordDate,
+      entry.regime.label,
+      entry.outcome.verdict,
+      entry.decision.lifecycle,
+      entry.decision.category,
+      entry.decision.action,
+      entry.outcome.summary,
+      entry.outcome.guardrail,
+      entry.outcome.reversalTrigger,
+      entry.sources.join(" | "),
+    ]);
+
+    const csvContent = [header, ...rows].map((row) => row.map((value) => escapeCsvCell(String(value))).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "decision-memory.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <section id="decision-memory" aria-labelledby="decision-memory-title" className="mt-10">
@@ -83,13 +156,14 @@ export const DecisionMemoryPanel = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {csvDownloadHref ? (
-              <a
-                href={csvDownloadHref}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200"
+            {entries.length > 0 ? (
+              <button
+                type="button"
+                onClick={downloadCsv}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/50 hover:text-slate-100 transition-colors"
               >
                 <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export CSV</span>
-              </a>
+              </button>
             ) : null}
             {latestEntry ? (
               <ClipboardActionRow
@@ -118,32 +192,48 @@ export const DecisionMemoryPanel = () => {
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-4">
+          <div className="mt-6 relative border-l-2 border-slate-800/80 ml-4 pl-6 space-y-8">
             {entries.slice(0, 8).map((entry) => (
-              <div key={entry.id} className="weather-surface p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                      Captured {formatTimestampUTC(entry.createdAt)}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-100">
-                      {entry.decision.lifecycle} · {entry.decision.category} · {entry.decision.action}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      {entry.regime.label} regime · verdict {entry.outcome.verdict}
-                    </p>
+              <div key={entry.id} className="relative">
+                <div className="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full border-2 border-slate-900 bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+                
+                <div className="weather-surface p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                        Captured {formatTimestampUTC(entry.createdAt)}
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-slate-100">
+                        {entry.decision.lifecycle} · {entry.decision.category} · {entry.decision.action}
+                      </p>
+                      <p className="mt-1 text-xs text-sky-200">
+                        {entry.regime.label} regime · verdict: <span className="font-semibold">{entry.outcome.verdict}</span>
+                      </p>
+                    </div>
+                    <ClipboardActionRow
+                      label={<span className="inline-flex items-center gap-1"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy entry</span>}
+                      state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
+                      buttonVariant="pill"
+                      compact
+                      onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}
+                    />
                   </div>
-                  <ClipboardActionRow
-                    label={<span className="inline-flex items-center gap-1"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy entry</span>}
-                    state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
-                    buttonVariant="pill"
-                    compact
-                    onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}
-                  />
+                  <p className="mt-3 text-sm text-slate-300 break-words leading-relaxed">{entry.outcome.summary}</p>
+                  <div className="mt-4 pt-3 border-t border-slate-800/50 grid gap-2 text-xs">
+                    <p className="text-slate-400"><span className="font-medium text-slate-500">Guardrail:</span> {entry.outcome.guardrail}</p>
+                    <p className="text-slate-400"><span className="font-medium text-slate-500">Reversal:</span> {entry.outcome.reversalTrigger}</p>
+                    {entry.sources.length > 0 && (
+                      <p className="text-slate-500 break-all">
+                        <span className="font-medium">Sources:</span>{" "}
+                        {entry.sources.map((src, i) => (
+                          <a key={src} href={src} target="_blank" rel="noreferrer" className="text-sky-400/80 hover:text-sky-300 hover:underline mr-2">
+                            [{i + 1}]
+                          </a>
+                        ))}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <p className="mt-3 text-sm text-slate-300">{entry.outcome.summary}</p>
-                <p className="mt-2 text-xs text-slate-400">Guardrail: {entry.outcome.guardrail}</p>
-                <p className="mt-1 text-xs text-slate-500">Reversal: {entry.outcome.reversalTrigger}</p>
               </div>
             ))}
           </div>

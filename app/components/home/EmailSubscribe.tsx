@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function EmailSubscribe() {
   const [email, setEmail] = useState("");
@@ -39,14 +40,14 @@ export function EmailSubscribe() {
         placeholder="you@company.com"
         className="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-600"
       />
-      <button
-        type="button"
+      <Button
         onClick={handleSubscribe}
         disabled={status === "subscribing"}
-        className="rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/20 disabled:opacity-50"
+        variant="default"
+        size="sm"
       >
         {status === "subscribing" ? "…" : "Subscribe"}
-      </button>
+      </Button>
       {status === "error" ? (
         <span className="text-fluid-micro text-rose-300">Try again</span>
       ) : null}

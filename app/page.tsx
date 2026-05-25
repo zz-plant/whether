@@ -109,8 +109,10 @@ export const HomePageReportContent = async ({
   const regime = homepage.reportShell.regime;
   const regimeHistory = getMonthlyRegimeHistory();
   const prevRegime = regimeHistory.length >= 2 ? regimeHistory[regimeHistory.length - 2].regime : undefined;
+  const recentRegimes = regimeHistory.slice(-3).map((r) => r.regime);
   const macroTrendline = regimeHistory.slice(-6);
   const transition = computeTransitionProbability(regime);
+  const signalDirection = (homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold";
 
   const reliabilityScore = (() => {
     const confidenceScore = confidenceLabel === "HIGH" ? 90 : confidenceLabel === "MED" ? 60 : 30;
@@ -155,6 +157,8 @@ export const HomePageReportContent = async ({
     freshnessLabel: homepage.reportShell.fetchedAtLabel,
     transitionWatch: "OFF",
   });
+
+  const artifactPayload = await homepage.leadershipArtifactPayloadPromise.catch(() => null);
 
   const structuredDecisionData = {
     "@context": "https://schema.org",
@@ -258,6 +262,21 @@ export const HomePageReportContent = async ({
               ctaId: "homepage-copy-brief",
             },
           },
+          sharePayload: artifactPayload ? {
+            recordDate: reportData.weeklyRecordDate,
+            postureLabel: postureLabel,
+            confidenceLabel: confidenceLabel,
+            operatingStance: homepage.weeklyDecisionCardModel.decision.operatingStanceLine,
+            actionNow: homepage.weeklyDecisionCardModel.decision.actionNowShort || canonicalDecision?.doNowLines?.[0],
+            guardrail: homepage.weeklyDecisionCardModel.decision.guardrailThreshold?.toString(),
+            flipConditions: flipConditionLabels,
+            citation: artifactPayload.callCitation,
+            weeklyCallSnapshotText: artifactPayload.weeklyCallSnapshotText,
+            weeklyOperatorBriefText: artifactPayload.weeklyOperatorBriefText,
+            deltaOnlyBriefText: artifactPayload.deltaOnlyBriefText,
+            boardSummary: artifactPayload.boardSummary,
+            meetingPackText: artifactPayload.meetingPackText,
+          } : null,
           nextStep: {
             href: "/planning",
             description: "Turn this into a weekly plan",
@@ -312,14 +331,15 @@ export const HomePageReportContent = async ({
           </div>
         </div>
       ) : null}
-      <div className="-mt-4 space-y-3" data-screenshot={isScreenshot ? "true" : undefined}>
+      <div className="-mt-4 space-y-4" data-screenshot={isScreenshot ? "true" : undefined}>
         <FlipBanner
-          direction={(homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold" | "revisit"}
+          direction={signalDirection}
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
         />
         <BriefHero
           regime={regime}
           prevRegime={prevRegime}
+          regimeHistory={recentRegimes}
           postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
@@ -342,7 +362,7 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
-        <div className="relative flex items-center justify-center gap-2 py-1">
+        <div className="relative flex items-center justify-center gap-2 py-2 px-5">
           <span className="h-px flex-1 bg-slate-800/60" />
           <span className="text-fluid-micro text-slate-500 flex-shrink-0 flex items-center gap-2">
             {operatorContext.companyStage ? (
@@ -366,12 +386,24 @@ export const HomePageReportContent = async ({
                 <span>Updated {homepage.reportShell.fetchedAtLabel}</span>
               </>
             ) : null}
+            {transition.probability > 0 ? (
+              <>
+                <span className="text-slate-700">·</span>
+                <span>{transition.probability}% of {transition.likelyNext.charAt(0) + transition.likelyNext.slice(1).toLowerCase()} in ~{transition.avgDuration}w</span>
+              </>
+            ) : null}
+            {transition.probability > 0 ? (
+              <>
+                <span className="text-slate-700">·</span>
+                <span>{transition.probability > 50 ? "Check back Monday" : transition.probability > 25 ? "Watch for change" : "Conditions stable"}</span>
+              </>
+            ) : null}
           </span>
           <span className="h-px flex-1 bg-slate-800/60" />
         </div>
 
         <FrameworkCard
-          direction={(homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold"}
+          direction={signalDirection}
           call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
           actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
           guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
@@ -457,22 +489,22 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <section className="space-y-0">
-          <details className="group border-b border-app-border py-3" data-page-section="evidence" tabIndex={0}>
+        <section className="space-y-2">
+          <details className="group border-b border-app-border py-3 px-5 px-4" data-page-section="evidence" tabIndex={0}>
             <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">Why this call? ▸</summary>
             <div className="mt-2 weather-reveal">
               <EvidenceContent />
             </div>
           </details>
 
-          <details className="group border-b border-app-border py-3" data-page-section="trust" tabIndex={0}>
+          <details className="group border-b border-app-border py-3 px-5" data-page-section="trust" tabIndex={0}>
             <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">Can I trust this? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TrustContent />
             </div>
           </details>
 
-          <details className="group border-b border-app-border py-3" data-page-section="resolve" tabIndex={0}>
+          <details className="group border-b border-app-border py-3 px-5" data-page-section="resolve" tabIndex={0}>
             <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">What else can I explore? ▸</summary>
             <div className="mt-2 weather-reveal">
               <ResolveContent />
@@ -487,7 +519,7 @@ export const HomePageReportContent = async ({
             </div>
           </details>
 
-          <details className="group border-b border-app-border py-3" data-page-section="you" tabIndex={0}>
+          <details className="group border-b border-app-border py-3 px-5" data-page-section="you" tabIndex={0}>
             <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">How does this affect me? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />

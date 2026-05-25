@@ -61,10 +61,11 @@ export function KeyboardShortcuts() {
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       <p className="hidden sm:block text-center text-fluid-micro text-slate-700 py-2">
-        <kbd className="rounded border border-slate-700 px-1 text-slate-600">J</kbd>
-        /<kbd className="rounded border border-slate-700 px-1 text-slate-600">K</kbd>{" "}
-        Navigate{"    "}
-        <kbd className="rounded border border-slate-700 px-1 text-slate-600">?</kbd> Help
+        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono">J</kbd>
+        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono ml-0.5">K</kbd>{" "}
+        Navigate sections{"    "}
+        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono">?</kbd>{" "}
+        Keyboard shortcuts
       </p>
     </>
   );

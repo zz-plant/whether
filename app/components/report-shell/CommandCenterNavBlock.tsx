@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ArrowRightIcon } from "../uiIcons";
 import { ReportCta } from "../reportCta";
 import { InternalAwareLink } from "./InternalAwareLink";
+import { ShareMenuDropdown } from "./ShareMenuDropdown";
 import type {
   DecisionBanner,
   DecisionDiff,
@@ -21,6 +22,7 @@ export function CommandCenterNavBlock({
   primaryCta,
   secondaryCta,
   exportCta,
+  sharePayload,
   nextStep,
   statusLabel,
   trustStatusLabel,
@@ -43,6 +45,7 @@ export function CommandCenterNavBlock({
   primaryCta?: ReportCtaProps;
   secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
+  sharePayload?: React.ComponentProps<typeof ShareMenuDropdown> | null;
   nextStep?: { description: string; href: string };
   statusLabel: string;
   trustStatusLabel: string;
@@ -140,7 +143,7 @@ export function CommandCenterNavBlock({
             {nextStep ? <span>Next: {nextStep.description}</span> : null}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {primaryCta ? (
               <ReportCta
                 href={primaryCta.href}
@@ -160,7 +163,9 @@ export function CommandCenterNavBlock({
                 {secondaryCta.label}
               </InternalAwareLink>
             ) : null}
-            {exportCta ? (
+            {sharePayload ? (
+              <ShareMenuDropdown {...sharePayload} />
+            ) : exportCta ? (
               <ReportCta
                 href={exportCta.href}
                 copyText={exportCta.copyText}

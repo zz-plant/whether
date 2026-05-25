@@ -2,37 +2,54 @@
   "commands": [
     {
       "name": "Dev",
-      "description": "Start dev server with terminal and browser preview",
+      "description": "Whether dev server + browser preview",
       "workspace": {
-        "name": "whether dev",
+        "name": "Whether Dev",
         "cwd": ".",
         "layout": {
           "direction": "horizontal",
-          "split": 0.5,
           "children": [
             {
-              "direction": "vertical",
-              "children": [
-                {
-                  "pane": {
-                    "surfaces": [
-                      { "type": "terminal", "name": "Terminal" }
-                    ]
-                  }
-                },
-                {
-                  "pane": {
-                    "surfaces": [
-                      { "type": "browser", "name": "Preview", "url": "http://localhost:4321" }
-                    ]
-                  }
-                }
-              ]
+              "pane": {
+                "size": 0.45,
+                "surfaces": [
+                  { "type": "terminal", "name": "Dev Server", "command": "bun run dev" }
+                ]
+              }
             },
             {
               "pane": {
                 "surfaces": [
-                  { "type": "terminal", "name": "Dev Server", "command": "bun run dev" }
+                  { "type": "browser", "name": "Preview", "url": "http://localhost:3000" },
+                  { "type": "terminal", "name": "Terminal" }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Deploy",
+      "description": "Whether deploy to Cloudflare",
+      "workspace": {
+        "name": "Whether Deploy",
+        "cwd": ".",
+        "layout": {
+          "direction": "horizontal",
+          "children": [
+            {
+              "pane": {
+                "size": 0.35,
+                "surfaces": [
+                  { "type": "terminal", "name": "Deploy", "command": "bun scripts/cloudflare-run.mjs deploy" }
+                ]
+              }
+            },
+            {
+              "pane": {
+                "surfaces": [
+                  { "type": "browser", "name": "Prod", "url": "https://whether.work" }
                 ]
               }
             }

@@ -1,6 +1,7 @@
 type BriefHeroProps = {
   regime: string;
   prevRegime?: string;
+  regimeHistory?: string[];
   postureLabel: string;
   tightness: number;
   tightnessDelta: number;
@@ -16,6 +17,7 @@ type BriefHeroProps = {
 export function BriefHero({
   regime,
   prevRegime,
+  regimeHistory,
   postureLabel,
   tightness,
   tightnessDelta,
@@ -42,7 +44,7 @@ export function BriefHero({
   const isDegraded = showOfflineBadge || (degradedSourceCount && degradedSourceCount > 0) || (reliabilityScore != null && reliabilityScore < 60);
 
   return (
-    <div className={`text-center space-y-5 sm:space-y-6 py-5 sm:py-8 border-l-2 ${heroTint}`}>
+    <div className={`text-center space-y-4 sm:space-y-5 py-5 sm:py-8 border-l-2 ${heroTint}`}>
       <h1 className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
         Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
       </h1>
@@ -53,7 +55,9 @@ export function BriefHero({
             <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight tabular-nums">
               {tightness}
             </p>
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Credit tightness</p>
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400" title="Credit tightness measures how restrictive lending conditions are. Scale: 0–100.">
+              Credit tightness
+            </p>
             {fetchedAt ? (
               <p className="text-[0.6rem] text-slate-600 mt-0.5">Updated {fetchedAt}</p>
             ) : null}
@@ -70,8 +74,23 @@ export function BriefHero({
           ) : null}
         </div>
         <p className="text-fluid-xs text-slate-400">
-          {regime} regime{postureLabel ? ` · ${postureLabel}` : ""}{prevRegime ? ` · Prev: ${prevRegime.charAt(0) + prevRegime.slice(1).toLowerCase()}` : ""}{tightnessDelta !== 0 ? (
+          {regime} regime{postureLabel ? ` · ${postureLabel}` : ""}{tightnessDelta !== 0 ? (
             <span className={`ml-1 font-semibold ${deltaEmphasis}`}>{tightnessDirection} {Math.abs(tightnessDelta).toFixed(1)} pts</span>
+          ) : null}
+          {regimeHistory ? (
+            <span className="inline-flex items-center gap-1 ml-1.5">
+              {regimeHistory.map((r, i) => (
+                <span
+                  key={i}
+                  className={`inline-block w-1.5 h-1.5 rounded-full ${
+                    r === "SCARCITY" ? "bg-amber-400" :
+                    r === "DEFENSIVE" ? "bg-rose-400" :
+                    r === "VOLATILE" ? "bg-sky-400" : "bg-emerald-400"
+                  }`}
+                  title={r}
+                />
+              ))}
+            </span>
           ) : null}
         </p>
       </div>

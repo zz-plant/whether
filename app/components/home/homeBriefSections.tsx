@@ -109,16 +109,6 @@ export const HomeWhatChangedSection = ({
     <WeeklyDecisionCard
       model={weeklyDecisionCardModel}
       searchParams={searchParams}
-      actions={(
-        <Suspense fallback={<ArtifactActionsFallback />}>
-          <LeadershipArtifactActions
-            leadershipArtifactPayloadPromise={leadershipArtifactPayloadPromise}
-            fallbackActive={fallbackActive}
-            initialArtifactMode={initialArtifactMode}
-            recordDateLabel={weeklyDecisionCardModel.artifact.recordDateLabel}
-          />
-        </Suspense>
-      )}
     />
     <StartupModeSection startupVariantPolicy={weeklyDecisionCardModel.decision.startupVariantPolicy} />
   </>

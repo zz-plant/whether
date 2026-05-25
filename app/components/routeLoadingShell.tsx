@@ -28,62 +28,47 @@ export function RouteLoadingShell({
       trustStatusTone="stable"
       currentPath={currentPath}
     >
-      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="weather-panel-static space-y-5 rounded-lg px-5 py-5 sm:px-6 sm:py-6">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{pageTitle}</p>
-              <p className="max-w-2xl text-sm leading-relaxed text-slate-100">{description}</p>
-            </div>
+      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.12em]">
+          <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
+          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
+        </div>
+
+        <div className="text-center space-y-4 py-5">
+          <Skeleton className="h-20 w-24 mx-auto rounded-lg bg-slate-500/48" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-48 mx-auto rounded-full bg-slate-500/36" />
+            <Skeleton className="h-3 w-64 mx-auto rounded-full bg-slate-500/28" />
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Skeleton className="h-7 w-28 rounded-full bg-slate-500/38" />
-            <Skeleton className="h-7 w-36 rounded-full bg-slate-500/30" />
-          </div>
-          <div className="space-y-2.5">
-            <Skeleton className="h-10 w-full max-w-3xl rounded-lg bg-slate-500/48" />
-            <Skeleton className="h-4 w-11/12 max-w-2xl rounded-full bg-slate-500/36" />
-          </div>
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.22fr)_minmax(18rem,0.78fr)]">
-            <section className="grid gap-3 sm:grid-cols-2">
-              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Summary</p>
-                <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/38" />
-              </article>
-              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Action</p>
-                <Skeleton className="mt-3 h-5 w-11/12 rounded-full bg-slate-500/38" />
-              </article>
-              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Evidence</p>
-                <Skeleton className="mt-3 h-5 w-10/12 rounded-full bg-slate-500/34" />
-              </article>
-              <article className="rounded-md border border-slate-800/65 bg-slate-950/70 px-4 py-4">
-                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next step</p>
-                <Skeleton className="mt-3 h-5 w-8/12 rounded-full bg-slate-500/30" />
-              </article>
-            </section>
+        <div className="relative flex items-center justify-center gap-2 py-2">
+          <span className="h-px flex-1 bg-slate-500/18" />
+          <Skeleton className="h-3 w-48 rounded-full bg-slate-500/24" />
+          <span className="h-px flex-1 bg-slate-500/18" />
+        </div>
 
-            <section className="space-y-3 rounded-md border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Trust</p>
-                <Skeleton className="h-6 w-24 rounded-full bg-slate-500/32" />
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Skeleton className="h-16 w-full rounded-md bg-slate-500/36" />
-                <Skeleton className="h-16 w-full rounded-md bg-slate-500/30" />
-                <Skeleton className="h-16 w-full rounded-md bg-slate-500/28" />
-                <Skeleton className="h-16 w-full rounded-md bg-slate-500/24" />
-              </div>
-            </section>
+        <div className="rounded-xl border border-slate-700/60 px-5 py-5 space-y-3">
+          <Skeleton className="h-10 w-full rounded-lg bg-slate-500/48" />
+          <Skeleton className="h-8 w-11/12 rounded-lg bg-slate-500/30" />
+          <Skeleton className="h-2 w-full rounded-full bg-slate-500/28" />
+          <div className="flex justify-between">
+            <Skeleton className="h-3 w-12 rounded-full bg-slate-500/24" />
+            <Skeleton className="h-3 w-8 rounded-full bg-slate-500/24" />
           </div>
+          <Skeleton className="h-3 w-2/3 rounded-full bg-slate-500/22" />
+          <div className="flex gap-3 pt-3 border-t border-slate-700/30">
+            <Skeleton className="h-4 w-20 rounded-full bg-slate-500/20" />
+            <Skeleton className="h-4 w-16 rounded-full bg-slate-500/20" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {["Why this call?", "Can I trust this?", "What else can I explore?", "How does this affect me?"].map((q) => (
+            <div key={q} className="border-b border-slate-800/60 py-3">
+              <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">{q} ▸</span>
+            </div>
+          ))}
         </div>
       </section>
     </ReportShell>

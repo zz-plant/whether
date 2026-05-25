@@ -7,6 +7,7 @@ import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { ThemeCycler } from "./components/ThemeCycler";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
 
@@ -151,6 +152,7 @@ export default function RootLayout({
         <Script id="whether-persisted-ui-bootstrap" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: buildPersistedUiBootstrapScript() }} />
       </head>
       <body>
+        <TooltipProvider>
         <ScrollProgressBar />
         <ToastProviderRoot>
           <a className="skip-link" href="#main-content">
@@ -173,6 +175,7 @@ export default function RootLayout({
         </footer>
         <KeyboardShortcuts />
         <ThemeCycler />
+        </TooltipProvider>
       </body>
     </html>
   );

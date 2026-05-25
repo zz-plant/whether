@@ -1,5 +1,6 @@
 "use client";
 
+import { Copy, Download, CopyCheck, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useClipboardCopy } from "../useClipboardCopy";
 
@@ -71,12 +72,12 @@ export function FrameworkCard({
       >
         {isCopied ? (
           <span className="inline-flex items-center gap-1.5">
-            <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 8l3.5 3.5L13 5" /></svg>
+            <CopyCheck className="w-4 h-4" />
             Copied — paste anywhere
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5">
-            <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="5" width="9" height="11" rx="1.5" /><path d="M3 11V3a1 1 0 011-1h7" /></svg>
+            <Copy className="w-4 h-4" />
             Copy share-ready brief
           </span>
         )}
@@ -88,7 +89,7 @@ export function FrameworkCard({
           download="whether-brief.png"
           className={buttonVariants({ variant: "outline", size: "sm", className: "flex-1" })}
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="1" y="3" width="14" height="10" rx="1.5" /><circle cx="5" cy="8" r="1.5" /><path d="M13 5l-4 4-3-2-4 3" /></svg>
+          <Download className="w-3.5 h-3.5" />
           Save as image
         </a>
       </div>

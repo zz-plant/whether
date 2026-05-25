@@ -6,7 +6,8 @@ export type NavigationLayerKey =
   | "planning"
   | "resolve"
   | "trust"
-  | "history";
+  | "history"
+  | "compare";
 
 export type NavigationLayer = {
   key: NavigationLayerKey;
@@ -86,6 +87,17 @@ export const navigationLayers: NavigationLayer[] = [
     boundary: "Use this to spot regime transitions and compare current conditions to past periods.",
     group: "reference",
     tier: "primary",
+  },
+  {
+    key: "compare",
+    href: "/history/compare",
+    label: "Compare Epochs",
+    navLabel: "Compare",
+    description: "Compare side-by-side macro signal diffs across historical epochs.",
+    boundary: "Use this to contrast the current posture with previous periods.",
+    group: "reference",
+    tier: "supporting",
+    parentKey: "history",
   },
 ] as const;
 

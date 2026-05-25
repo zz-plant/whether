@@ -329,7 +329,7 @@ export async function buildPlanningPageModel(
                 provenance: treasuryProvenance,
                 showProvenance: false,
               }),
-              h(RunwayPlannerPanel, { assessment }),
+              h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
               ),
             }),
           },

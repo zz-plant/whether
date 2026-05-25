@@ -1,4 +1,5 @@
 /** Lightweight monthly regime history for forecast-history assembly. */
+import { cache } from "react";
 import { z } from "zod";
 
 import type { RegimeKey } from "../regimeEngine";
@@ -28,4 +29,4 @@ const sortedMonthlyRegimeHistory = parseMonthlyRegimeHistory(rawMonthlyRegimeHis
   (left, right) => new Date(left.record_date).getTime() - new Date(right.record_date).getTime(),
 );
 
-export const getMonthlyRegimeHistory = () => sortedMonthlyRegimeHistory;
+export const getMonthlyRegimeHistory = cache(() => sortedMonthlyRegimeHistory);

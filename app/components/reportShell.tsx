@@ -63,6 +63,7 @@ type ReportShellInput = {
   primaryCta?: ReportCtaProps;
   secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
+  sharePayload?: React.ComponentProps<typeof ShareMenuDropdown> | null;
   structuredData?: unknown;
   historicalBanner?: ReactNode;
   currentPath: string;
@@ -87,7 +88,7 @@ type ReportShellModel = {
   page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
   chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
-  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
+  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "sharePayload" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
 
@@ -102,6 +103,8 @@ export {
   resolveTrustProvenance,
 } from "./report-shell/TrustBlocks";
 export { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
+
+import { ShareMenuDropdown } from "./report-shell/ShareMenuDropdown";
 
 const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput => {
   if ("model" in props && props.model) {
@@ -151,6 +154,7 @@ export const ReportShell = (props: ReportShellProps) => {
     primaryCta: inputPrimaryCta,
     secondaryCta: resolvedSecondaryCta,
     exportCta: inputExportCta,
+    sharePayload: resolvedSharePayload,
     structuredData: resolvedStructuredData,
     historicalBanner: resolvedHistoricalBanner,
     stageRail: resolvedStageRail,
@@ -237,7 +241,7 @@ export const ReportShell = (props: ReportShellProps) => {
             ) : null}
 
             <div className={`order-1 min-w-0 space-y-5 lg:space-y-6 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
