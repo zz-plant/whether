@@ -362,9 +362,9 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
-        <div className="relative flex items-center justify-center gap-2 py-2 px-5">
+        <div className="relative flex items-center justify-center gap-2 px-5 py-2">
           <span className="h-px flex-1 bg-slate-800/60" />
-          <span className="text-fluid-micro text-slate-500 flex-shrink-0 flex items-center gap-2">
+          <span className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-fluid-micro text-slate-500">
             {operatorContext.companyStage ? (
               <span>
                 {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
