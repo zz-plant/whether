@@ -20,17 +20,18 @@ export async function GET() {
       postureLabel:
         model.status.postureWithStageLabel ?? model.status.postureLabel,
       tightness: model.diagnostics.currentScores.tightness,
-      riskAppetite: model.diagnostics.currentScores.riskAppetite,
       tightnessDelta:
         model.decision.reportDynamics.changedSignals.find(
           (s: SignalChange) => s.key === "tightness",
         )?.delta ?? 0,
-      riskAppetiteDelta:
-        model.decision.reportDynamics.changedSignals.find(
-          (s: SignalChange) => s.key === "riskAppetite",
-        )?.delta ?? 0,
       confidenceLabel: model.status.confidenceLabel,
       recordDate: shell.recordDateLabel,
+      guardrail: model.decision.guardrailThreshold
+        ? `tightness crosses ${model.decision.guardrailThreshold}`
+        : undefined,
+      flipConditions: model.decision.compactFlipConditionLabels?.length
+        ? model.decision.compactFlipConditionLabels
+        : undefined,
     }),
     { width: 1200, height: 800 },
   );

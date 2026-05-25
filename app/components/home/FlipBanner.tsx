@@ -27,6 +27,18 @@ export function FlipBanner({ direction, tightness }: FlipBannerProps) {
       setPrevDirection(lastCall);
       setVisible(true);
     }
+
+    fetch("/api/check-regime-change", { method: "POST" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.changed && !d.previousRegime && !d.velocityLabel) return;
+        if (d?.changed) {
+          setPrevDirection(d.previousRegime?.toLowerCase() ?? "unknown");
+          setVisible(true);
+        }
+      })
+      .catch(() => {});
+
     localStorage.setItem(LAST_CALL_KEY, direction);
   }, [direction]);
 
