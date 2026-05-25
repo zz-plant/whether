@@ -116,13 +116,16 @@ export function TickerCompany({
     <div className="space-y-3">
       {!ticker ? (
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <label htmlFor="ticker-input" className="sr-only">Ticker symbol</label>
           <input
+            id="ticker-input"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value.toUpperCase())}
-            placeholder="Add ticker (e.g. CRM)"
+            placeholder="e.g. CRM…"
             className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-600 max-w-[14rem]"
             maxLength={5}
+            autoComplete="off"
           />
           <button
             type="submit"

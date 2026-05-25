@@ -47,6 +47,7 @@ import { TrustContent } from "./components/home/TrustContent";
 import { ResolveContent } from "./components/home/ResolveContent";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
+import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -109,6 +110,7 @@ export const HomePageReportContent = async ({
   const regimeHistory = getMonthlyRegimeHistory();
   const prevRegime = regimeHistory.length >= 2 ? regimeHistory[regimeHistory.length - 2].regime : undefined;
   const macroTrendline = regimeHistory.slice(-6);
+  const transition = computeTransitionProbability(regime);
 
   const reliabilityScore = (() => {
     const confidenceScore = confidenceLabel === "HIGH" ? 90 : confidenceLabel === "MED" ? 60 : 30;
@@ -369,6 +371,7 @@ export const HomePageReportContent = async ({
         </div>
 
         <FrameworkCard
+          direction={(homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold"}
           call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? homepage.weeklyDecisionCardModel.decision.immediateDecision}
           actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
           guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
@@ -412,11 +415,11 @@ export const HomePageReportContent = async ({
               <CadenceSelector />
               <div className="flex items-center gap-x-2">
                 <span className="text-slate-400">View</span>
-                <Link href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Standard operating brief">Default</Link>
-                <Link href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View through your sector's lens">Sector</Link>
-                <Link href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="View for your company stage">Company</Link>
-                <Link href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="CFO and finance lens">Financial</Link>
-                <Link href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-slate-400 hover:text-slate-300"} no-underline`} title="Posture-focused forecast view">Posture</Link>
+                <Link href="/" className={`${!resolvedSearchParams?.view || resolvedSearchParams.view === "default" ? "text-sky-200" : "text-app-text-secondary hover:text-app-text"} no-underline`} title="Standard operating brief">Default</Link>
+                <Link href="/?view=sector" className={`${resolvedSearchParams?.view === "sector" ? "text-sky-200" : "text-app-text-secondary hover:text-app-text"} no-underline`} title="View through your sector's lens">Sector</Link>
+                <Link href="/?view=company" className={`${resolvedSearchParams?.view === "company" ? "text-sky-200" : "text-app-text-secondary hover:text-app-text"} no-underline`} title="View for your company stage">Company</Link>
+                <Link href="/?view=financial" className={`${resolvedSearchParams?.view === "financial" ? "text-sky-200" : "text-app-text-secondary hover:text-app-text"} no-underline`} title="CFO and finance lens">Financial</Link>
+                <Link href="/?view=forecast" className={`${resolvedSearchParams?.view === "forecast" ? "text-sky-200" : "text-app-text-secondary hover:text-app-text"} no-underline`} title="Posture-focused forecast view">Posture</Link>
               </div>
             </div>
 
@@ -454,23 +457,23 @@ export const HomePageReportContent = async ({
           </>
         ) : null}
 
-        <section className="space-y-3">
-          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call? ▸</summary>
+        <section className="space-y-0">
+          <details className="group border-b border-app-border py-3" data-page-section="evidence" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">Why this call? ▸</summary>
             <div className="mt-2 weather-reveal">
               <EvidenceContent />
             </div>
           </details>
 
-          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Can I trust this? ▸</summary>
+          <details className="group border-b border-app-border py-3" data-page-section="trust" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">Can I trust this? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TrustContent />
             </div>
           </details>
 
-          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">What else can I explore? ▸</summary>
+          <details className="group border-b border-app-border py-3" data-page-section="resolve" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">What else can I explore? ▸</summary>
             <div className="mt-2 weather-reveal">
               <ResolveContent />
               <div className="mt-4 space-y-3">
@@ -484,8 +487,8 @@ export const HomePageReportContent = async ({
             </div>
           </details>
 
-          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">How does this affect me? ▸</summary>
+          <details className="group border-b border-app-border py-3" data-page-section="you" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-app-text-secondary hover:text-app-text select-none">How does this affect me? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
               <div className="mt-4">

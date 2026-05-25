@@ -3,7 +3,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 
 const REGIME_ORDER: RegimeKey[] = ["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"];
 
-function computeTransitionProbability(currentRegime: string): {
+export function computeTransitionProbability(currentRegime: string): {
   probability: number;
   likelyNext: string;
   avgDuration: number;

@@ -59,7 +59,7 @@ export function FlipBanner({ direction, tightness }: FlipBannerProps) {
           className={`flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors ${isTightening ? "hover:text-rose-300" : "hover:text-emerald-300"}`}
           aria-label="Dismiss"
         >
-          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
             <path d="M4 4l8 8M12 4l-8 8" />
           </svg>
         </button>

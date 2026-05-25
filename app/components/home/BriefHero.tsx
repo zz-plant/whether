@@ -43,14 +43,14 @@ export function BriefHero({
 
   return (
     <div className={`text-center space-y-5 sm:space-y-6 py-5 sm:py-8 border-l-2 ${heroTint}`}>
-      <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
+      <h1 className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
         Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
-      </p>
+      </h1>
 
       <div className="space-y-1">
         <div className="flex items-baseline justify-center gap-6 sm:gap-10 weather-hero-scores">
           <div>
-            <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight">
+            <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight tabular-nums">
               {tightness}
             </p>
             <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Credit tightness</p>
