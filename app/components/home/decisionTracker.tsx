@@ -18,7 +18,7 @@ export function DecisionTracker({ action, regime, recordDate, confidence }: {
         const parsed = JSON.parse(stored);
         if (parsed.recordDate !== recordDate) setLastDecision(parsed);
       }
-    } catch { /* ignore */ }
+    } catch {}
     localStorage.setItem("whether_last_decision", JSON.stringify({ action, regime, recordDate }));
   }, [action, regime, recordDate, confidence, addRecord]);
 

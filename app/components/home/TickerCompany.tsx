@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { DataCard } from "../DataCard";
 import { computeSensitivity } from "../../../lib/sensitivityCoefficient";
+import { ErrorState } from "./ErrorState";
 
 const STORAGE_KEY = "whether_ticker";
 const METRICS_KEY = "whether_company_metrics";
@@ -148,7 +149,7 @@ export function TickerCompany({
       )}
 
       {error ? (
-        <p className="text-fluid-xs text-rose-300">{error}</p>
+        <ErrorState title={error} description="Check the ticker symbol or try again later." onRetry={() => ticker ? fetchData(ticker) : undefined} />
       ) : null}
 
       {data ? (

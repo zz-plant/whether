@@ -1,5 +1,6 @@
 type BriefHeroProps = {
   regime: string;
+  prevRegime?: string;
   postureLabel: string;
   tightness: number;
   tightnessDelta: number;
@@ -14,6 +15,7 @@ type BriefHeroProps = {
 
 export function BriefHero({
   regime,
+  prevRegime,
   postureLabel,
   tightness,
   tightnessDelta,
@@ -41,7 +43,7 @@ export function BriefHero({
 
   return (
     <div className={`text-center space-y-5 sm:space-y-6 py-5 sm:py-8 border-l-2 ${heroTint}`}>
-      <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-slate-400">
+      <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
         Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
       </p>
 
@@ -51,7 +53,7 @@ export function BriefHero({
             <p className="text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 font-display tracking-tight">
               {tightness}
             </p>
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Credit tightness</p>
+            <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Credit tightness</p>
             {fetchedAt ? (
               <p className="text-[0.6rem] text-slate-600 mt-0.5">Updated {fetchedAt}</p>
             ) : null}
@@ -63,12 +65,12 @@ export function BriefHero({
               }`}>
                 {reliabilityScore}
               </p>
-              <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Reliability</p>
+              <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-500">Reliability</p>
             </div>
           ) : null}
         </div>
         <p className="text-fluid-xs text-slate-400">
-          {regime} regime{postureLabel ? ` · ${postureLabel}` : ""}{tightnessDelta !== 0 ? (
+          {regime} regime{postureLabel ? ` · ${postureLabel}` : ""}{prevRegime ? ` · Prev: ${prevRegime.charAt(0) + prevRegime.slice(1).toLowerCase()}` : ""}{tightnessDelta !== 0 ? (
             <span className={`ml-1 font-semibold ${deltaEmphasis}`}>{tightnessDirection} {Math.abs(tightnessDelta).toFixed(1)} pts</span>
           ) : null}
         </p>

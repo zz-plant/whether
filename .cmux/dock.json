@@ -1,0 +1,17 @@
+{
+  "controls": [
+    {
+      "id": "git",
+      "title": "Git",
+      "command": "lazygit",
+      "cwd": ".",
+      "height": 320
+    },
+    {
+      "id": "feed",
+      "title": "Feed",
+      "command": "cmux feed tui --opentui",
+      "height": 260
+    }
+  ]
+}

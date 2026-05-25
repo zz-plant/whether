@@ -21,7 +21,6 @@ import {
 } from "./components/home/homeBriefSections";
 import { FirstVisitBanner } from "./components/home/firstVisitBanner";
 import { RitualComplete } from "./components/home/ritualComplete";
-import { StayInTheLoop } from "./components/home/StayInTheLoop";
 import { HowItWorks } from "./components/home/howItWorks";
 import { DiscoverabilityStrip } from "./components/home/discoverabilityStrip";
 import { StartupActivity } from "./components/home/startupActivity";
@@ -47,6 +46,7 @@ import { EvidenceContent } from "./components/home/EvidenceContent";
 import { TrustContent } from "./components/home/TrustContent";
 import { ResolveContent } from "./components/home/ResolveContent";
 import { ErrorBoundary } from "../lib/components/ErrorBoundary";
+import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -106,6 +106,9 @@ export const HomePageReportContent = async ({
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const regime = homepage.reportShell.regime;
+  const regimeHistory = getMonthlyRegimeHistory();
+  const prevRegime = regimeHistory.length >= 2 ? regimeHistory[regimeHistory.length - 2].regime : undefined;
+  const macroTrendline = regimeHistory.slice(-6);
 
   const reliabilityScore = (() => {
     const confidenceScore = confidenceLabel === "HIGH" ? 90 : confidenceLabel === "MED" ? 60 : 30;
@@ -312,11 +315,9 @@ export const HomePageReportContent = async ({
           direction={(homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten" : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease" : "hold") as "tighten" | "ease" | "hold" | "revisit"}
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
         />
-        <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
-          Macro conditions translated into weekly operating decisions for leadership teams. No econ degree required.
-        </p>
         <BriefHero
           regime={regime}
+          prevRegime={prevRegime}
           postureLabel={homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? homepage.weeklyDecisionCardModel.status.postureLabel}
           tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness}
           tightnessDelta={homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.find((s) => s.key === "tightness")?.delta ?? 0}
@@ -339,29 +340,32 @@ export const HomePageReportContent = async ({
           reliabilityScore={reliabilityScore}
         />
 
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-fluid-micro text-slate-500">
-          {operatorContext.companyStage ? (
-            <span>
-              {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
-               operatorContext.companyStage === "seed" ? "Seed" :
-               operatorContext.companyStage === "series-a" ? "Series A" :
-               operatorContext.companyStage === "series-b-plus" ? "Series B+" :
-               operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
-              {operatorContext.rateSensitivity ? (
-                <span> · {operatorContext.rateSensitivity === "high" ? "High" : operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"} sensitivity</span>
-              ) : null}
-            </span>
-          ) : null}
-          {operatorContext.companyStage ? <span className="text-slate-700">·</span> : null}
-          <span>{homepage.reportShell.recordDateLabel}</span>
-          <span className="text-slate-700">·</span>
-          <span>Source: {homepage.reportShell.treasurySource}</span>
-          {homepage.reportShell.fetchedAtLabel ? (
-            <>
-              <span className="text-slate-700">·</span>
-              <span>Updated {homepage.reportShell.fetchedAtLabel}</span>
-            </>
-          ) : null}
+        <div className="relative flex items-center justify-center gap-2 py-1">
+          <span className="h-px flex-1 bg-slate-800/60" />
+          <span className="text-fluid-micro text-slate-500 flex-shrink-0 flex items-center gap-2">
+            {operatorContext.companyStage ? (
+              <span>
+                {operatorContext.companyStage === "pre-seed" ? "Pre-seed" :
+                 operatorContext.companyStage === "seed" ? "Seed" :
+                 operatorContext.companyStage === "series-a" ? "Series A" :
+                 operatorContext.companyStage === "series-b-plus" ? "Series B+" :
+                 operatorContext.companyStage === "public" ? "Public" : operatorContext.companyStage}
+                {operatorContext.rateSensitivity ? (
+                  <span> · {operatorContext.rateSensitivity === "high" ? "High" : operatorContext.rateSensitivity === "medium" ? "Medium" : "Low"} sensitivity</span>
+                ) : null}
+              </span>
+            ) : null}
+            <span>{homepage.reportShell.recordDateLabel}</span>
+            <span className="text-slate-700">·</span>
+            <span>{homepage.reportShell.treasurySource}</span>
+            {homepage.reportShell.fetchedAtLabel ? (
+              <>
+                <span className="text-slate-700">·</span>
+                <span>Updated {homepage.reportShell.fetchedAtLabel}</span>
+              </>
+            ) : null}
+          </span>
+          <span className="h-px flex-1 bg-slate-800/60" />
         </div>
 
         <FrameworkCard
@@ -451,22 +455,22 @@ export const HomePageReportContent = async ({
         ) : null}
 
         <section className="space-y-3">
-          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call? ▸</summary>
+          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="evidence" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Why this call? ▸</summary>
             <div className="mt-2 weather-reveal">
               <EvidenceContent />
             </div>
           </details>
 
-          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Can I trust this? ▸</summary>
+          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="trust" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">Can I trust this? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TrustContent />
             </div>
           </details>
 
-          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">What else can I explore? ▸</summary>
+          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="resolve" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">What else can I explore? ▸</summary>
             <div className="mt-2 weather-reveal">
               <ResolveContent />
               <div className="mt-4 space-y-3">
@@ -480,8 +484,8 @@ export const HomePageReportContent = async ({
             </div>
           </details>
 
-          <details className="group rounded-xl border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
-            <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">How does this affect me? ▸</summary>
+          <details className="group rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3" data-page-section="you" tabIndex={0}>
+            <summary className="cursor-pointer list-none text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-300 select-none">How does this affect me? ▸</summary>
             <div className="mt-2 weather-reveal">
               <TickerCompany tightness={homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness} />
               <div className="mt-4">
@@ -491,7 +495,7 @@ export const HomePageReportContent = async ({
               />
               </div>
               <div className="mt-3">
-                <DecisionTrendline />
+                <DecisionTrendline regimes={macroTrendline} />
               </div>
               <div className="mt-3">
                 <SourceDisagreement
@@ -514,21 +518,6 @@ export const HomePageReportContent = async ({
 
           <RitualComplete recordDate={homepage.reportShell.recordDateLabel} />
         </OnboardingGate>
-
-        {!isHistorical ? (
-          <div className="flex items-center gap-3 text-fluid-micro">
-            <Link href="/planning" className="rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-2 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline">
-              Turn this into a plan →
-            </Link>
-            <Link href="/share" className="text-slate-400 hover:text-sky-200 transition-colors no-underline">
-              Or share this brief
-            </Link>
-          </div>
-        ) : null}
-
-        {!isHistorical ? (
-          <StayInTheLoop />
-        ) : null}
 
         {!isHistorical ? (
           <div className="max-w-sm mx-auto">

@@ -27,9 +27,7 @@ export function HomeDeltaStrip({
       if (stored) {
         setPrevious(JSON.parse(stored));
       }
-    } catch {
-      /* noop */
-    }
+    } catch {}
     localStorage.setItem(
       SNAPSHOT_KEY,
       JSON.stringify({ tightness, riskAppetite, recordDate }),

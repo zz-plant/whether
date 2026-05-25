@@ -1,0 +1,44 @@
+{
+  "commands": [
+    {
+      "name": "Dev",
+      "description": "Start dev server with terminal and browser preview",
+      "workspace": {
+        "name": "whether dev",
+        "cwd": ".",
+        "layout": {
+          "direction": "horizontal",
+          "split": 0.5,
+          "children": [
+            {
+              "direction": "vertical",
+              "children": [
+                {
+                  "pane": {
+                    "surfaces": [
+                      { "type": "terminal", "name": "Terminal" }
+                    ]
+                  }
+                },
+                {
+                  "pane": {
+                    "surfaces": [
+                      { "type": "browser", "name": "Preview", "url": "http://localhost:4321" }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "pane": {
+                "surfaces": [
+                  { "type": "terminal", "name": "Dev Server", "command": "bun run dev" }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMonthlyRegimeHistory } from "../../../lib/summary/monthlyRegimeHistory";
 import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
 
 const DECISION_LOG_KEY = "whether_decision_log";
@@ -9,32 +8,25 @@ const DECISION_LOG_KEY = "whether_decision_log";
 type DecisionEntry = { date: string; posture: string; action: string };
 
 const REGIME_COLORS: Record<string, string> = {
+  SCARCITY: "bg-amber-400/60",
+  DEFENSIVE: "bg-rose-400/60",
+  VOLATILE: "bg-sky-400/60",
+  EXPANSION: "bg-emerald-400/60",
+};
+
+const REGIME_TEXT_COLORS: Record<string, string> = {
   SCARCITY: "text-amber-300",
   DEFENSIVE: "text-rose-300",
   VOLATILE: "text-sky-300",
   EXPANSION: "text-emerald-300",
 };
 
-function nearestRegime(dateStr: string): string | null {
-  const history = getMonthlyRegimeHistory();
-  if (!history.length) return null;
-  const target = new Date(dateStr).getTime();
-  let closest = history[0];
-  let minDiff = Math.abs(new Date(history[0].record_date).getTime() - target);
-  for (let i = 1; i < history.length; i++) {
-    const diff = Math.abs(new Date(history[i].record_date).getTime() - target);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = history[i];
-    }
-  }
-  const dateDiff = Math.abs(new Date(closest.record_date).getTime() - target);
-  if (dateDiff > 45 * 24 * 60 * 60 * 1000) return null;
-  return closest.regime;
-}
+type MacroTrendlineProps = {
+  regimes: Array<{ record_date: string; regime: string }>;
+};
 
-export function DecisionTrendline() {
-  const [entries, setEntries] = useState<DecisionEntry[]>([]);
+export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
+  const [logEntries, setLogEntries] = useState<DecisionEntry[]>([]);
   const [hydrated, setHydrated] = useState(false);
   useCrossDeviceSync(DECISION_LOG_KEY, []);
 
@@ -43,66 +35,54 @@ export function DecisionTrendline() {
       const raw = localStorage.getItem(DECISION_LOG_KEY);
       if (raw) {
         const log: DecisionEntry[] = JSON.parse(raw);
-        setEntries(log.slice(-6));
+        setLogEntries(log.slice(-6));
       }
-    } catch { /* ignore */ }
+    } catch {}
     setHydrated(true);
   }, []);
 
-  if (!hydrated) return null;
-  if (entries.length < 2) {
+  const data = regimes.length >= 2 ? regimes : [];
+
+  if (!hydrated || data.length < 2) {
     return (
       <p className="text-fluid-xs text-slate-600 text-center">
-        Decision trendline will appear after your second weekly review.
+        Macro trendline will appear once sufficient data is available.
       </p>
     );
   }
 
-  const latest = entries[entries.length - 1];
-  const previous = entries[entries.length - 2];
-  const direction = latest.posture === previous.posture ? "holding" :
-    latest.posture.includes("Tight") && !previous.posture.includes("Tight") ? "tightening" :
-    latest.posture.includes("Expand") && !previous.posture.includes("Expand") ? "expanding" :
-    "shifting";
+  const latestRegime = data[data.length - 1].regime;
+  const prevRegime = data[data.length - 2].regime;
+  const changed = latestRegime !== prevRegime;
+  const directionLabel = changed
+    ? `Shifted to ${latestRegime.charAt(0) + latestRegime.slice(1).toLowerCase()}`
+    : `${latestRegime.charAt(0) + latestRegime.slice(1).toLowerCase()} holding`;
 
-  const momentumColor = direction === "tightening" ? "from-rose-500/20 to-rose-500/5 border-rose-500/30" :
-    direction === "expanding" ? "from-emerald-500/20 to-emerald-500/5 border-emerald-500/30" :
-    direction === "holding" ? "from-slate-500/20 to-slate-500/5 border-slate-500/30" :
-    "from-amber-500/20 to-amber-500/5 border-amber-500/30";
-
-  const momentumLabel = direction === "tightening" ? "Tightening" :
-    direction === "expanding" ? "Expanding" :
-    direction === "holding" ? "Holding steady" : "Shifting";
+  const latestLog = logEntries.length >= 2 ? logEntries[logEntries.length - 1] : null;
+  const momentumLabel = latestLog ? directionLabel : directionLabel;
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Decision trend</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Macro trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
         </div>
         <div className="flex items-end gap-1.5 h-16">
-          {entries.map((entry, i) => {
-            const isTightening = entry.posture.toLowerCase().includes("tight");
-            const isExpanding = entry.posture.toLowerCase().includes("expand");
-            const height = 30 + (i / Math.max(entries.length - 1, 1)) * 60;
-            const regime = nearestRegime(entry.date);
+          {data.map((entry, i) => {
+            const height = 30 + (i / Math.max(data.length - 1, 1)) * 60;
             return (
-              <div key={entry.date} className="flex flex-col items-center gap-0.5">
+              <div key={entry.record_date} className="flex flex-col items-center gap-0.5">
                 <div
-                  className={`w-3 rounded-t-sm transition-all ${
-                    isTightening ? "bg-rose-400/60" : isExpanding ? "bg-emerald-400/60" : "bg-slate-500/40"
-                  }`}
+                  className={`w-3 rounded-t-sm transition-all ${REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"}`}
                   style={{ height: `${height}%` }}
-                  title={`${entry.date}: ${entry.posture}${regime ? ` · ${regime}` : ""}`}
+                  title={`${entry.record_date}: ${entry.regime}`}
                 />
-                {regime ? (
-                  <span className={`text-[0.5rem] font-semibold leading-none ${REGIME_COLORS[regime] ?? "text-slate-500"}`}>
-                    {regime.charAt(0) + regime.slice(1).toLowerCase()}
-                  </span>
-                ) : null}
+                <span className={`text-[0.5rem] font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-500"}`}>
+                  {entry.regime.charAt(0) + entry.regime.slice(1).toLowerCase()}
+                </span>
                 <span className="text-[0.55rem] text-slate-600">
-                  {new Date(entry.date).toLocaleDateString("en", { month: "short", day: "numeric" })}
+                  {new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}
                 </span>
               </div>
             );
@@ -110,7 +90,7 @@ export function DecisionTrendline() {
         </div>
       </div>
       <p className="mt-2 text-[0.6rem] text-slate-600 text-right">
-        {entries.length} weeks · Bars show posture, labels show macro regime
+        Last {data.length} months · MacRo regime history
       </p>
     </div>
   );
