@@ -8,7 +8,7 @@ export function SaaSMultiplesIndicator() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/comps")
+    fetch("/api/comps", { priority: "low" })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((r) => {
         if (active && r.medianEvToRevenue) {

@@ -201,7 +201,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         {composeArticleSections(article).map((section) => {
           const anchor = buildAnchor(section.heading);
           return (
-            <section id={anchor} key={section.heading} className="weather-panel space-y-3 px-6 py-6 scroll-mt-24 print:border print:border-slate-300 print:bg-white">
+            <section id={anchor} key={section.heading} className="weather-panel space-y-3 px-6 py-6 scroll-mt-28 print:border print:border-slate-300 print:bg-white">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-xl font-semibold text-slate-100 print:text-slate-900">{section.heading}</h2>
                 <CopyAnchorButton anchor={anchor} />

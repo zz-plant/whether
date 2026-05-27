@@ -19,9 +19,9 @@ type FrameworkCardProps = {
 
 const ARROW = { tighten: "↑", ease: "↓", hold: "→" } as const;
 const ACCENT = {
-  tighten: "border-l-rose-400/40 bg-gradient-to-r from-rose-500/5 to-transparent",
-  ease: "border-l-emerald-400/40 bg-gradient-to-r from-emerald-500/5 to-transparent",
-  hold: "border-l-amber-400/40",
+  tighten: "border-t-rose-400/30",
+  ease: "border-t-emerald-400/30",
+  hold: "border-t-amber-400/30",
 } as const;
 
 export function FrameworkCard({
@@ -63,7 +63,7 @@ export function FrameworkCard({
   const isCopied = status === "copied";
 
   return (
-    <div className={`framework-card rounded-xl border border-app-border px-5 py-5 shadow-lg ${accent}`} data-share-card="true">
+    <div className={`framework-card rounded-xl border border-app-border px-5 py-5 border-t-2 ${accent}`} data-share-card="true">
       <Button
         onClick={handleCopy}
         variant="default"
@@ -123,31 +123,36 @@ export function FrameworkCard({
         ) : null}
       </div>
 
-      <div className="mt-3 pt-3 border-t border-app-border flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <div className="h-2 w-8 bg-app-nested rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${confidenceLabel === "HIGH" ? "bg-emerald-400" : confidenceLabel === "MED" ? "bg-amber-400" : "bg-rose-400"}`}
-                style={{ width: confidenceLabel === "HIGH" ? "100%" : confidenceLabel === "MED" ? "66%" : "33%" }}
-              />
-            </div>
+      <div className="mt-3 pt-3 border-t border-app-border space-y-2">
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-fluid-micro">
+            <span className="text-app-text-muted">Call certainty</span>
             {confidenceLabel ? (
-              <span className="text-fluid-micro tabular-nums text-app-text-muted">{confidenceLabel}</span>
+              <span className="tabular-nums text-app-text-secondary">{confidenceLabel}</span>
             ) : null}
           </div>
-          {reliabilityScore != null ? (
-            <div className="flex items-center gap-1.5">
-              <div className="h-2 w-8 bg-app-nested rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${reliabilityScore >= 80 ? "bg-emerald-400" : reliabilityScore >= 60 ? "bg-amber-400" : "bg-rose-400"}`}
-                  style={{ width: `${reliabilityScore}%` }}
-                />
-              </div>
-              <span className="text-fluid-micro tabular-nums text-app-text-muted">{reliabilityScore}%</span>
-            </div>
-          ) : null}
+          <div className="h-2 w-full bg-app-nested rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full ${confidenceLabel === "HIGH" ? "bg-emerald-400" : confidenceLabel === "MED" ? "bg-amber-400" : "bg-rose-400"}`}
+              style={{ width: confidenceLabel === "HIGH" ? "100%" : confidenceLabel === "MED" ? "66%" : "33%" }}
+            />
+          </div>
         </div>
+        {reliabilityScore != null ? (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-fluid-micro">
+              <span className="text-app-text-muted">Reliability</span>
+              <span className="tabular-nums text-app-text-secondary">{reliabilityScore}%</span>
+            </div>
+            <div className="h-2 w-full bg-app-nested rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${reliabilityScore >= 80 ? "bg-emerald-400" : reliabilityScore >= 60 ? "bg-amber-400" : "bg-rose-400"}`}
+                style={{ width: `${reliabilityScore}%` }}
+              />
+            </div>
+          </div>
+        ) : null}
+        <div className="flex justify-end">
         <Button
           onClick={handleCopy}
           variant="ghost"
@@ -156,6 +161,7 @@ export function FrameworkCard({
         >
           {isCopied ? "Copied" : "Copy"}
         </Button>
+        </div>
       </div>
     </div>
   );

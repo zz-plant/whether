@@ -29,7 +29,7 @@ const resolveHistoricalContext = (searchParams?: HomePageStreamingFallbackProps[
 export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFallbackProps) => {
   const historicalContext = resolveHistoricalContext(searchParams);
   const contextLabel = historicalContext ?? "Current weekly brief";
-  const valueProp = "Whether translates macro conditions into weekly operating decisions for leadership teams. No econ degree required.";
+  const valueProp = "Whether translates macro conditions into weekly operating decisions for leadership teams.";
 
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">

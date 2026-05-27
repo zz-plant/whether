@@ -335,7 +335,7 @@ export const ExportBriefPanel = ({
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Share first"
-          title="Pick the update"
+          title="Update"
           titleId="export-briefs-title"
           description={
             <>

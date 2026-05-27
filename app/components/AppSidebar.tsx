@@ -125,7 +125,7 @@ export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: App
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onMobileClose}
           />
-          <aside className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-2xl">
+          <aside className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-lg">
             <SidebarContent sectionLinks={sectionLinks} onClose={onMobileClose} />
           </aside>
         </div>

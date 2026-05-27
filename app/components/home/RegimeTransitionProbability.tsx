@@ -65,17 +65,17 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/30 px-5 py-4">
       <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Regime outlook</p>
       <div className="mt-3 flex items-center gap-4">
-        <svg viewBox="0 0 64 36" className="h-12 w-24 flex-shrink-0" aria-hidden="true">
+        <svg viewBox="0 0 80 44" className="h-16 w-28 flex-shrink-0" aria-hidden="true">
           <path
-            d="M 4 32 A 28 28 0 0 1 60 32"
+            d="M 10 34 A 30 30 0 0 1 70 34"
             fill="none"
             stroke={strokeColor}
-            strokeWidth="3"
+            strokeWidth="3.5"
             strokeLinecap="round"
-            strokeDasharray={`${(arcRotation / 180) * 88} 200`}
-            opacity="0.8"
+            strokeDasharray={`${(arcRotation / 180) * 94} 200`}
+            opacity="0.85"
           />
-          <circle cx="32" cy="32" r="1.5" fill={strokeColor} />
+          <circle cx="40" cy="34" r="2" fill={strokeColor} />
         </svg>
         <div>
           <p className={`text-lg font-bold ${color}`}>{probability}%</p>

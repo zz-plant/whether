@@ -28,6 +28,12 @@ const deltaColor = (label: string, delta: number) => {
   return isTightness ? "text-emerald-200" : "text-amber-200";
 };
 
+const scoreColor = (value: number) => {
+  if (value >= 70) return "border-emerald-400/50";
+  if (value >= 40) return "border-amber-400/50";
+  return "border-rose-400/50";
+};
+
 const deltaArrow = (delta: number) => (delta > 0 ? "↑" : delta < 0 ? "↓" : "—");
 
 export function ScoreCard({
@@ -40,8 +46,9 @@ export function ScoreCard({
   children,
 }: ScoreCardProps) {
   if (variant === "large") {
+    const scoreBorder = scoreColor(value);
     return (
-      <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
+      <div className={`rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem] border-b-2 ${scoreBorder}`}>
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
           {label}
         </p>
@@ -75,8 +82,9 @@ export function ScoreCard({
   }
 
   /* card (default) */
+  const scoreBorder = scoreColor(value);
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem]">
+    <div className={`rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem] border-b-2 ${scoreBorder}`}>
       <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
         {label}
       </p>

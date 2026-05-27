@@ -13,6 +13,7 @@ import {
 import { GLOBAL_HEADER_BRAND_LINK_CLASSNAME } from "./globalHeaderShared";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
+import { CadenceSelector, ViewSelector } from "./cadenceSelector";
 import { ThemeToggleButton } from "./themeToggleButton";
 import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 import { SettingsPanel } from "./settingsPanel";
@@ -113,28 +114,28 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
               {isReportRoute ? (
                 <>
-                  {reportHeaderAction ? (
-                    <Link
-                      href={reportHeaderAction.href}
-                      className="weather-button-primary inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
-                    >
-                      {reportHeaderAction.label}
-                    </Link>
-                  ) : null}
                   {isHomeBrief ? (
-                    <Link
-                      href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-200 sm:inline-flex"
-                    >
-                      {reportHeaderUtilityAction.label}
-                    </Link>
+                    <div className="hidden sm:flex items-center gap-1.5">
+                      <CadenceSelector />
+                      <ViewSelector />
+                    </div>
                   ) : (
-                    <Link
-                      href={reportHeaderUtilityAction.href}
-                      className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
-                    >
-                      {reportHeaderUtilityAction.label}
-                    </Link>
+                    <>
+                      {reportHeaderAction ? (
+                        <Link
+                          href={reportHeaderAction.href}
+                          className="weather-button-primary inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
+                        >
+                          {reportHeaderAction.label}
+                        </Link>
+                      ) : null}
+                      <Link
+                        href={reportHeaderUtilityAction.href}
+                        className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
+                      >
+                        {reportHeaderUtilityAction.label}
+                      </Link>
+                    </>
                   )}
                   <button
                     type="button"

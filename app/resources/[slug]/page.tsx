@@ -263,7 +263,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         const anchor = buildSectionAnchor(section.heading);
 
         return (
-          <section id={anchor} key={section.heading} className="weather-panel space-y-4 px-6 py-6 scroll-mt-24">
+          <section id={anchor} key={section.heading} className="weather-panel space-y-4 px-6 py-6 scroll-mt-28">
             <h2 className="text-xl font-semibold text-slate-100">{section.heading}</h2>
             {section.paragraphs.flatMap((paragraph) => splitParagraphForReadability(paragraph)).map((paragraphChunk, paragraphIndex) => (
               <p key={`${section.heading}-p-${paragraphIndex}`} className="text-sm leading-7 text-slate-200">

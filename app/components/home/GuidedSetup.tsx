@@ -5,17 +5,17 @@ import { useState, useEffect } from "react";
 const DISMISS_KEY = "whether_setup_done";
 
 const STAGES = [
-  { key: "pre-seed", label: "Pre-seed", desc: "Validating product-market fit" },
-  { key: "seed", label: "Seed", desc: "Building repeatable pipeline" },
-  { key: "series-a", label: "Series A", desc: "Scaling proven channels" },
-  { key: "series-b-plus", label: "Series B+", desc: "Managing growth efficiency" },
-  { key: "public", label: "Public", desc: "Managing shareholder expectations" },
+  { key: "pre-seed", label: "Pre-seed" },
+  { key: "seed", label: "Seed" },
+  { key: "series-a", label: "Series A" },
+  { key: "series-b-plus", label: "Series B+" },
+  { key: "public", label: "Public" },
 ] as const;
 
 const SENSITIVITIES = [
-  { key: "high", label: "High", desc: "Heavily affected by rate changes (fintech, real estate, capital-intensive)" },
-  { key: "medium", label: "Medium", desc: "Moderately affected (most SaaS, services)" },
-  { key: "low", label: "Low", desc: "Minimally affected (bootstrapped, cash-rich)" },
+  { key: "high", label: "High" },
+  { key: "medium", label: "Medium" },
+  { key: "low", label: "Low" },
 ] as const;
 
 type Step = "stage" | "sensitivity" | "done";
@@ -84,7 +84,6 @@ export function GuidedSetup({ onComplete }: { onComplete?: () => void }) {
               }`}
             >
               <span className="block text-sm font-semibold">{s.label}</span>
-              <span className="block text-fluid-micro text-slate-500 mt-0.5">{s.desc}</span>
             </button>
           ))}
         </div>
@@ -102,7 +101,6 @@ export function GuidedSetup({ onComplete }: { onComplete?: () => void }) {
               }`}
             >
               <span className="block text-sm font-semibold">{s.label}</span>
-              <span className="block text-fluid-micro text-slate-500 mt-0.5">{s.desc}</span>
             </button>
           ))}
         </div>

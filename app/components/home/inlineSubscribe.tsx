@@ -24,7 +24,7 @@ export function InlineSubscribe() {
             await getSubscriberStore().subscribe(email);
             setMsg("Subscribed!");
           } catch {
-            setMsg("Try again.");
+            setMsg("Retry");
           }
           setTimeout(() => setMsg(""), 3000);
         }}

@@ -5,6 +5,7 @@ type ConfidenceGaugeProps = {
   label?: "HIGH" | "MED" | "LOW";
   trend?: "up" | "down" | "stable";
   size?: "sm" | "md" | "lg";
+  variant?: "bar" | "donut";
 };
 
 const ZONES = [
@@ -41,7 +42,7 @@ export function ConfidenceGauge({ percent, label, trend, size = "md" }: Confiden
     <div className="inline-flex items-center gap-2.5">
       <div className="flex-1 min-w-[4rem]">
         <div className="flex items-baseline justify-between gap-2">
-          <span className={`${s.text} font-semibold uppercase tracking-[0.08em] text-slate-400`}>Confidence</span>
+          <span className={`${s.text} font-semibold tracking-[0.04em] text-slate-400`}>Call certainty</span>
           {trend ? (
             <span className={`${s.text} font-semibold ${TREND_COLOR[trend]}`}>
               {TREND_ARROW[trend]}
@@ -50,7 +51,7 @@ export function ConfidenceGauge({ percent, label, trend, size = "md" }: Confiden
         </div>
         <div className={`mt-1 w-full rounded-full bg-slate-800 ${s.bar} overflow-hidden`}>
           <div
-            className={`h-full rounded-full transition-all duration-500 ${zone.color}`}
+            className={`h-full rounded-full transition-[width] duration-500 ${zone.color}`}
             style={{ width: `${clamped}%` }}
           />
         </div>

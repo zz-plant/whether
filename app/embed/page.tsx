@@ -175,7 +175,7 @@ export default function EmbedPlaygroundPage() {
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={handleCopy}
-                className={`flex-1 rounded-lg px-3 py-2 text-fluid-xs font-semibold uppercase tracking-[0.08em] transition-all ${
+                className={`flex-1 rounded-lg px-3 py-2 text-fluid-xs font-semibold tracking-[0.04em] transition-colors ${
                   copied
                     ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
                     : "bg-sky-500/20 text-sky-300 hover:bg-sky-400/30 hover:text-sky-200 ring-1 ring-sky-500/30 hover:ring-sky-400/50"

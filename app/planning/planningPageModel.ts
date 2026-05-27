@@ -26,6 +26,8 @@ import { PlaybookPanel } from "../components/appendix/playbookPanel";
 import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
 import { ReportShell } from "../components/reportShell";
 import { DecisionMemoryPanel } from "./components/decisionMemoryPanel";
+import { DecisionShieldPanel } from "./components/decisionShieldPanel";
+import { ExecutiveBriefingPanel } from "./components/executiveBriefingPanel";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
@@ -331,6 +333,36 @@ export async function buildPlanningPageModel(
               }),
               h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
               ),
+            }),
+          },
+          {
+            id: "ops-decision-shield",
+            label: "Test",
+            title: "Test a decision",
+            description: "Check if a specific move is safe right now — hiring, pricing, roadmap, M&A.",
+            hashAliases: ["ops-decision-shield-panel"],
+            children: h(SectionedReportPanel, {
+              id: "ops-decision-shield-panel",
+              label: "Test",
+              title: "Is this move safe right now?",
+              description: "Rate a specific business decision against current macro conditions.",
+              defaultOpen: false,
+              children: h(DecisionShieldPanel, { assessment, provenance: treasuryProvenance }),
+            }),
+          },
+          {
+            id: "ops-executive-briefing",
+            label: "Brief",
+            title: "Brief your team",
+            description: "Role-specific memos for CFO, COO, CTO/CPO tailored to current conditions.",
+            hashAliases: ["ops-executive-briefing-panel"],
+            children: h(SectionedReportPanel, {
+              id: "ops-executive-briefing-panel",
+              label: "Brief",
+              title: "Brief your leadership team",
+              description: "Generate role-specific guidance for each executive function.",
+              defaultOpen: false,
+              children: h(ExecutiveBriefingPanel, { assessment, recordDateLabel, provenance: treasuryProvenance, showProvenance: false }),
             }),
           },
           {

@@ -162,16 +162,28 @@ export default function RootLayout({
           <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
-        <footer className="border-t border-slate-800/60 px-4 py-6 text-center">
-          <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
-            <a href="/acceptable-use-policy" className="hover:text-slate-300 transition-colors no-underline">Acceptable Use</a>
-            <a href="/terms-of-service" className="hover:text-slate-300 transition-colors no-underline">Terms of Service</a>
-            <span className="text-slate-600">·</span>
-            <span>Built by <a href="https://kanav.net" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">Kanav Jain</a></span>
-            <a href="https://thecrumplezone.substack.com" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">The Crumple Zone</a>
-            <span className="text-slate-600">·</span>
-            <span className="text-slate-600">© 2026 Whether</span>
-          </nav>
+        <footer className="border-t border-slate-800/60 px-4 py-8">
+          <div className="mx-auto max-w-4xl space-y-4">
+            <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-fluid-sm text-slate-400">
+              <a href="/about" className="hover:text-slate-200 transition-colors no-underline">About</a>
+              <a href="/threshold" className="hover:text-slate-200 transition-colors no-underline">Framework</a>
+              <a href="/template" className="hover:text-slate-200 transition-colors no-underline">Template</a>
+              <a href="/planning" className="hover:text-slate-200 transition-colors no-underline">Resources</a>
+              <a href="/search" className="hover:text-slate-200 transition-colors no-underline">Search</a>
+              <a href="/api-docs" className="hover:text-slate-200 transition-colors no-underline">API</a>
+              <a href="/feed.xml" className="hover:text-slate-200 transition-colors no-underline">RSS</a>
+            </nav>
+            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-fluid-micro text-slate-600">
+              <a href="/acceptable-use-policy" className="hover:text-slate-400 transition-colors no-underline">Acceptable Use</a>
+              <a href="/terms-of-service" className="hover:text-slate-400 transition-colors no-underline">Terms</a>
+              <span aria-hidden="true">·</span>
+              <span>Built by <a href="https://kanav.net" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">Kanav Jain</a></span>
+              <span aria-hidden="true">·</span>
+              <a href="https://nextconsensus.com" className="hover:text-sky-200 transition-colors no-underline" target="_blank" rel="noreferrer">Next Consensus</a>
+              <span aria-hidden="true">·</span>
+              <span>© 2026 Whether</span>
+            </nav>
+          </div>
         </footer>
         <KeyboardShortcuts />
         <ThemeCycler />

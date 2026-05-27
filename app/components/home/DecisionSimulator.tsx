@@ -72,6 +72,24 @@ export function DecisionSimulator({
         <span className="text-xs text-slate-500 w-20 text-left">{deltaLabel}</span>
       </div>
 
+      <div className="mt-3 flex items-center gap-3">
+        <svg viewBox="0 0 60 60" className="h-16 w-16 flex-shrink-0 rounded-md border border-slate-800/60 bg-slate-950/30" aria-hidden="true">
+          <line x1="30" y1="0" x2="30" y2="60" stroke="rgba(148,163,184,0.15)" strokeWidth="1" />
+          <line x1="0" y1="30" x2="60" y2="30" stroke="rgba(148,163,184,0.15)" strokeWidth="1" />
+          <circle cx={(currentTightness / 100) * 60} cy={60 - (currentRiskAppetite / 100) * 60} r="4" fill="rgba(148,163,184,0.6)" stroke="rgba(148,163,184,0.3)" strokeWidth="1" />
+          {sim ? (
+            <circle cx={(sliderTightness / 100) * 60} cy={60 - (currentRiskAppetite / 100) * 60} r="4" fill="rgba(56,189,248,0.8)" stroke="rgba(56,189,248,0.4)" strokeWidth="1" />
+          ) : null}
+          {sim ? (
+            <line x1={(currentTightness / 100) * 60} y1={60 - (currentRiskAppetite / 100) * 60} x2={(sliderTightness / 100) * 60} y2={60 - (currentRiskAppetite / 100) * 60} stroke="rgba(56,189,248,0.25)" strokeWidth="1.5" strokeDasharray="3 2" />
+          ) : null}
+        </svg>
+        <div className="text-fluid-micro text-slate-500 space-y-0.5">
+          <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-slate-400/60" />Current ({currentRegime})</div>
+          {sim ? <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-sky-400/80" />Simulated ({sim.regime})</div> : null}
+        </div>
+      </div>
+
       <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
         <div className={`rounded-md px-3 py-2 ${isDifferent ? "bg-sky-500/10 border border-sky-400/20" : "bg-slate-950/30"}`}>
           <p className="text-slate-500 uppercase tracking-[0.08em]">Regime</p>

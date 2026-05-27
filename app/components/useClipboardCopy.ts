@@ -64,6 +64,7 @@ export const useClipboardCopy = (
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  const statusRef = useRef<ClipboardCopyStatus>("idle");
 
   const clearResetTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -80,26 +81,30 @@ export const useClipboardCopy = (
 
   const copyToClipboard = useCallback(
     async (text: string, target?: string) => {
-      if (status === "copying") {
+      if (statusRef.current === "copying") {
         return false;
       }
       if (!navigator.clipboard?.writeText) {
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
+        statusRef.current = "error";
         return false;
       }
       setStatus("copying");
+      statusRef.current = "copying";
       setActiveTarget(target ?? null);
       try {
         await navigator.clipboard.writeText(text);
         setError(false);
         setErrorReason(null);
         setStatus("copied");
+        statusRef.current = "copied";
         setCopiedTarget(target ?? null);
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
+          statusRef.current = "idle";
           setCopiedTarget(null);
         }, resetDelay);
         return true;
@@ -107,12 +112,13 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
+        statusRef.current = "error";
         return false;
       } finally {
         setActiveTarget(null);
       }
     },
-    [clearResetTimer, resetDelay, status]
+    [clearResetTimer, resetDelay]
   );
 
   return {

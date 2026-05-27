@@ -27,7 +27,7 @@ export const FirstTimeGuidePanel = ({
         <div className="max-w-2xl">
           <p className="type-label text-slate-400">Recommended start</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Recommended quick scan in three stops
+            Three-stop orientation
           </h2>
           <p className="mt-2 type-data text-slate-300">
             Use this walkthrough to align on the core recommendation before you dive into deeper sections. Whether starts from a U.S. market read so you can get to the decision faster.
@@ -79,7 +79,7 @@ export const FirstTimeGuidePanel = ({
         </div>
         <aside className="weather-surface p-4" aria-label="Onboarding highlights">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Quick scan highlights
+            Highlights
           </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             {FIRST_TIME_GUIDE_HIGHLIGHTS.map((highlight) => (

@@ -81,6 +81,7 @@ export const trackOperatorWorkflowEvent = (event: OperatorWorkflowEvent) => {
     headers: { "content-type": "application/json" },
     body,
     keepalive: true,
+    priority: "low",
   }).catch(() => {
     // Ignore telemetry network failures to keep the client console clean.
   });

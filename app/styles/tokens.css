@@ -8,6 +8,7 @@
 @theme {
   --color-slate-950: #101114;
   --text-fluid-micro: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
+  --text-fluid-nano: clamp(0.5rem, 0.42rem + 0.18vw, 0.625rem);
   --text-fluid-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
   --text-fluid-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
   --text-fluid-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
@@ -80,8 +81,10 @@
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-display: "Fraunces", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --text-primary: var(--app-text);
 
   /* Type scale */
+  --fs-nano: clamp(0.5rem, 0.42rem + 0.18vw, 0.625rem);
   --fs-micro: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
   --fs-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
   --fs-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
@@ -147,6 +150,13 @@
   --accent-border-soft: rgba(56, 189, 248, 0.15);
   --accent-glow: rgba(56, 189, 248, 0.06);
   --accent-glow-faint: rgba(56, 189, 248, 0.03);
+
+  /* Z-index scale */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-overlay: 30;
+  --z-modal: 40;
+  --z-toast: 50;
 
   /* Overlay highlights */
   --white-overlay-subtle: rgba(255, 255, 255, 0.02);
@@ -340,18 +350,75 @@ html[data-screenshot="true"] body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
 }
 
-[data-theme="light"] body {
-  filter: invert(1) hue-rotate(180deg);
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg-body: #f8fafc;
+  --bg-panel: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-muted: rgba(241, 245, 249, 0.75);
+  --bg-raised: #e2e8f0;
+  --bg-nested: #e8edf2;
+  --bg-nested-light: rgba(0, 0, 0, 0.035);
+
+  --border-faint: rgba(0, 0, 0, 0.03);
+  --border-subtle: rgba(0, 0, 0, 0.045);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+
+  --app-surface: #ffffff;
+  --app-raised: #f1f5f9;
+  --app-nested: #e2e8f0;
+  --app-text: #0f172a;
+  --app-text-secondary: #334155;
+  --app-text-muted: #64748b;
+  --app-border: rgba(0, 0, 0, 0.08);
+  --app-border-strong: rgba(0, 0, 0, 0.15);
+
+  --accent-action: #0284c7;
+  --accent-info: #2563eb;
+  --accent-success: #059669;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
+
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-mid: 0 6px 16px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.10);
+  --shadow-heavy: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+  /* shadcn light mode overrides */
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.961 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.961 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.961 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.205 0 0);
 }
 
-[data-theme="light"] img,
-[data-theme="light"] video,
-[data-theme="light"] canvas,
-[data-theme="light"] [style*="background-image"] {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-[data-theme="light"] button svg,
-[data-theme="light"] a svg {
-  filter: invert(1) hue-rotate(180deg);
-}
+html[data-theme="light"] .regime-compass-text { fill: rgba(71,85,105,0.7); }
+html[data-theme="light"] .regime-compass-grid { stroke: rgba(0,0,0,0.1); }
+html[data-theme="light"] .regime-compass-dot { stroke: #fff; }
+html[data-theme="light"] .weather-input,
+html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme="light"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
+html[data-theme="light"] .weather-button-primary { color: #0a1628; }
+html[data-theme="light"] .bg-slate-950\/40 { background: rgba(0,0,0,0.03) !important; }
+html[data-theme="light"] .bg-slate-950 { background: var(--bg-body) !important; }
+html[data-theme="light"] .bg-slate-800\/50 { background: rgba(0,0,0,0.05) !important; }
+html[data-theme="light"] .text-amber-200,
+html[data-theme="light"] .text-amber-200\/80 { color: #b45309 !important; }
+html[data-theme="light"] .text-emerald-200 { color: #047857 !important; }
+html[data-theme="light"] .text-sky-200 { color: #0369a1 !important; }

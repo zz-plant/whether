@@ -105,7 +105,7 @@ export const SignalsModeSwitcherSection = ({
     <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-          Choose your depth
+          Depth
         </p>
         <h2 className="text-base font-semibold text-slate-100">
           Start with the short read, then open deeper evidence only if you need to defend it.

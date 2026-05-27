@@ -209,7 +209,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     setSubscribed(true);
                     setSubscribeMsg("Subscribed! Check your inbox.");
                   } catch {
-                    setSubscribeMsg("Something went wrong.");
+                    setSubscribeMsg("Subscription update failed.");
                   }
                   setSaved(false);
                   setTimeout(() => setSubscribeMsg(""), 3000);

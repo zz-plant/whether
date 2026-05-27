@@ -48,7 +48,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgb(148 163 184 / 0.90);
 }
 
@@ -69,7 +69,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgb(226 232 240 / 0.92);
 }
 
@@ -171,8 +171,7 @@
 
 :where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
   border-color: rgba(71, 85, 105, 0.14);
-  background-image:
-    radial-gradient(140% 120% at 0% 0%, rgba(56, 189, 248, 0.04), transparent 38%),
+  background:
     linear-gradient(180deg, rgba(9, 16, 30, 0.74), rgba(5, 10, 22, 0.82));
   box-shadow:
     0 12px 24px -22px rgba(2, 6, 23, 0.8),
@@ -248,7 +247,7 @@
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   font-variant-numeric: tabular-nums;
 }
 
@@ -258,7 +257,7 @@
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   font-variant-numeric: tabular-nums;
   transition: border-color var(--transition-fast) var(--ease-out),
               background-color var(--transition-fast) var(--ease-out);
@@ -357,7 +356,7 @@ button .weather-chip:active,
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgb(148 163 184 / 0.85);
 }
 
@@ -835,7 +834,7 @@ button .weather-chip:active,
   padding: 0.6rem 1.2rem;
   font-size: 0.75rem;
   letter-spacing: 0.2em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgba(248, 250, 252, 0.9);
 }
 
@@ -854,7 +853,7 @@ button .weather-chip:active,
   font-size: 0.94rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgb(248 250 252);
   background:
     radial-gradient(120% 120% at 0% 0%, var(--accent-glow), transparent 42%),
@@ -933,6 +932,7 @@ button .weather-chip:active,
   font-size: var(--fs-base);
 }
 
+.text-fluid-nano { font-size: var(--fs-nano); }
 .text-fluid-micro { font-size: var(--fs-micro); }
 .text-fluid-xs { font-size: var(--fs-micro); }
 .text-fluid-sm { font-size: var(--fs-sm); }
@@ -962,6 +962,10 @@ button .weather-chip:active,
 }
 
 :root:not([data-theme="light"]) :where(.text-slate-500) {
+  color: rgb(148 163 184) !important;
+}
+
+:root:not([data-theme="light"]) :where(.text-slate-600) {
   color: rgb(119 134 154) !important;
 }
 
@@ -1137,7 +1141,7 @@ html {
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
+  text-transform: none;
   color: rgba(226, 232, 240, 0.80);
 }
 
@@ -1254,22 +1258,12 @@ html {
   border-color: rgba(94, 234, 212, 0.28);
 }
 
-.weather-step-card[data-active="true"]::before,
-.weather-step-card[data-reviewed="true"]::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  border-radius: 999px;
-  pointer-events: none;
+.weather-step-card[data-active="true"] {
+  border-top: 2px solid rgba(56, 189, 248, 0.35);
 }
 
-.weather-step-card[data-active="true"]::before {
-  background: linear-gradient(180deg, rgba(224, 242, 254, 0.96), rgba(56, 189, 248, 0.52));
-}
-
-.weather-step-card[data-reviewed="true"]::before {
-  background: linear-gradient(180deg, rgba(209, 250, 229, 0.94), rgba(16, 185, 129, 0.5));
+.weather-step-card[data-reviewed="true"] {
+  border-top: 2px solid rgba(16, 185, 129, 0.30);
 }
 
 .weather-step-panel {
@@ -1439,7 +1433,7 @@ body::-webkit-scrollbar-thumb:hover,
 }
 
 .weather-mobile-nav {
-  @apply border border-white/[0.08] bg-slate-950/90 backdrop-blur-2xl;
+  @apply border border-white/[0.08] bg-slate-950/90 backdrop-blur-lg;
   border-radius: var(--radius-xl);
   box-shadow:
     0 -20px 40px -28px rgba(2, 6, 23, 0.92),
@@ -1449,7 +1443,7 @@ body::-webkit-scrollbar-thumb:hover,
 }
 
 .weather-mobile-panel {
-  @apply border border-white/[0.08] bg-slate-950/95 backdrop-blur-2xl;
+  @apply border border-white/[0.08] bg-slate-950/95 backdrop-blur-lg;
   border-radius: var(--radius-xl);
   box-shadow:
     0 22px 44px -32px rgba(2, 6, 23, 0.88),

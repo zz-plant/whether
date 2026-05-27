@@ -75,7 +75,7 @@ export function HomeFirstRunOrientation({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">This week at a glance</p>
-              <h2 className="text-sm font-semibold text-slate-100 sm:text-base">A quick read for this week</h2>
+              <h2 className="text-sm font-semibold text-slate-100 sm:text-base">Weekly read</h2>
               <p className="text-xs text-slate-300">See what changed, confirm the read, then open the page you need.</p>
             </div>
               <button

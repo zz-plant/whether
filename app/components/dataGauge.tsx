@@ -55,7 +55,7 @@ export const DataGauge = ({
                     />
                     {/* Progress Arc */}
                     <circle
-                        className={`${colorClasses[color]} transition-all duration-500 ease-out`}
+                        className={`${colorClasses[color]} transition-[width] duration-500 ease-out`}
                         strokeWidth={strokeWidth}
                         strokeDasharray={`${circumference} ${circumference}`}
                         style={{ strokeDashoffset }}

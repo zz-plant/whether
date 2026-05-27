@@ -68,13 +68,25 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Macro trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
         </div>
-        <div className="flex items-end gap-1.5 h-16">
+        <div className="flex items-end gap-1.5 h-16 relative">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100" aria-hidden="true">
+            <polyline
+              fill="none"
+              stroke="rgba(148,163,184,0.4)"
+              strokeWidth="2"
+              points={data.map((_, i) => {
+                const x = (i / Math.max(data.length - 1, 1)) * 100;
+                const y = 100 - (30 + (i / Math.max(data.length - 1, 1)) * 60);
+                return `${x},${y}`;
+              }).join(" ")}
+            />
+          </svg>
           {data.map((entry, i) => {
             const height = 30 + (i / Math.max(data.length - 1, 1)) * 60;
             return (
               <div key={entry.record_date} className="flex flex-col items-center gap-0.5">
                 <div
-                  className={`w-3 rounded-t-sm transition-all ${REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"}`}
+                  className={`w-3 rounded-t-sm transition-[height,background-color] ${REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"}`}
                   style={{ height: `${height}%` }}
                   title={`${entry.record_date}: ${entry.regime}`}
                 />

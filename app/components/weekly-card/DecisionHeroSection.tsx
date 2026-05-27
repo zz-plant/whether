@@ -95,7 +95,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
                 </ul>
                 {glossaryHref ? (
                   <a href={glossaryHref} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
-                    Open glossary help
+                    Open glossary
                   </a>
                 ) : null}
               </details>

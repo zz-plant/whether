@@ -26,7 +26,7 @@ const featuredStakeholderSlugs = [
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Get help with one decision",
-  description: "Pick the right next help for one open question without needing the full site map.",
+  description: "Help for one open question.",
   path: "/resolve",
   imageAlt: "Whether decision tools",
   imagePath: "/social/resolve.svg",
@@ -95,7 +95,7 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       treasurySource={reportData.treasury.source}
       trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="Pick the narrowest path that answers the question."
+      trustStatusDetail="The narrowest path that answers the question."
       trustStatusAction="Return to Planning after the question is answered."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve"
@@ -112,7 +112,7 @@ export default async function DecidePage({
         description: "Return to Planning next",
       }}
       decisionBanner={{
-        label: "Choose the right help",
+        label: "Help options",
         decision: "Close one remaining question, then return to planning.",
         horizon: "This week",
         confidence: homeBriefModel.confidenceLabel,

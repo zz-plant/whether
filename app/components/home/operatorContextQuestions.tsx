@@ -62,10 +62,10 @@ const STAGE_SHORT: Record<CompanyStage, string> = {
   "public": "Public",
 };
 
-const RATE_LABELS: Record<RateSensitivity, { label: string; detail: string }> = {
-  high: { label: "High", detail: "Rates directly impact revenue, cost of capital, or customer demand (fintech, real estate, lending, capital-intensive)" },
-  medium: { label: "Medium", detail: "Rates matter for fundraising and hiring pace, but not day-to-day operations" },
-  low: { label: "Low", detail: "Rates have limited direct impact (bootstrapped SaaS, consumer apps, services)" },
+const RATE_LABELS: Record<RateSensitivity, { label: string }> = {
+  high: { label: "High" },
+  medium: { label: "Medium" },
+  low: { label: "Low" },
 };
 
 const setCookie = (name: string, value: string, days: number) => {
@@ -204,7 +204,6 @@ export const OperatorContextBanner = ({
               <button
                 key={sensitivity}
                 onClick={() => handleSensitivitySelect(sensitivity)}
-                title={RATE_LABELS[sensitivity].detail}
                 className="rounded-lg border border-slate-600/50 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-indigo-400/60 hover:bg-indigo-900/30 hover:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
               >
                 {RATE_LABELS[sensitivity].label}

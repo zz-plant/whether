@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollArea } from "@base-ui/react/scroll-area";
-import { Tooltip } from "@base-ui/react/tooltip";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { useMemo, useState } from "react";
@@ -14,19 +13,6 @@ export type ExecutionTableRow = {
   href: string;
   ctaLabel: string;
 };
-
-const HeaderTooltip = ({ label, detail }: { label: string; detail: string }) => (
-  <Tooltip.Root>
-    <Tooltip.Trigger className="underline decoration-dotted underline-offset-4">{label}</Tooltip.Trigger>
-    <Tooltip.Portal>
-      <Tooltip.Positioner side="top" sideOffset={8}>
-        <Tooltip.Popup className="max-w-[220px] rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-fluid-xs normal-case tracking-normal text-slate-200 shadow-lg">
-          {detail}
-        </Tooltip.Popup>
-      </Tooltip.Positioner>
-    </Tooltip.Portal>
-  </Tooltip.Root>
-);
 
 type SortKey = "horizon" | "owner" | "due";
 
@@ -74,24 +60,15 @@ export const ExecutionTable = ({
           </select>
         </div>
       </div>
-      <Tooltip.Provider delay={150} closeDelay={50}>
-        <ScrollArea.Root className="mt-3 overflow-hidden rounded-md border border-slate-800/80">
+      <ScrollArea.Root className="mt-3 overflow-hidden rounded-md border border-slate-800/80">
           <ScrollArea.Viewport className="max-w-full overscroll-contain">
             <table className="min-w-[720px] border-collapse text-left text-sm text-slate-200">
               <thead>
                 <tr className="border-b border-slate-800/80 text-xs uppercase tracking-[0.14em] text-slate-500">
-                  <th className="px-2 py-2 font-semibold">
-                    <HeaderTooltip label="Horizon" detail="Planning window for this operating action." />
-                  </th>
-                  <th className="px-2 py-2 font-semibold">
-                    <HeaderTooltip label="Owner" detail="Primary accountable team or function." />
-                  </th>
-                  <th className="px-2 py-2 font-semibold">
-                    <HeaderTooltip label="Due" detail="Expected completion timing for this action." />
-                  </th>
-                  <th className="px-2 py-2 font-semibold">
-                    <HeaderTooltip label="Expected impact" detail="Operational outcome expected if delivered on time." />
-                  </th>
+                  <th className="px-2 py-2 font-semibold">Horizon</th>
+                  <th className="px-2 py-2 font-semibold">Owner</th>
+                  <th className="px-2 py-2 font-semibold">Due</th>
+                  <th className="px-2 py-2 font-semibold">Expected impact</th>
                   <th className="px-2 py-2 font-semibold">Action</th>
                 </tr>
               </thead>
@@ -126,7 +103,6 @@ export const ExecutionTable = ({
             <ScrollArea.Thumb className="rounded-full bg-slate-700" />
           </ScrollArea.Scrollbar>
         </ScrollArea.Root>
-      </Tooltip.Provider>
     </section>
   );
 };

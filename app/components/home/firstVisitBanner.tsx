@@ -71,7 +71,7 @@ export function FirstVisitBanner() {
           className="flex-shrink-0 rounded-full px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.08em] text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-slate-200"
           aria-label="Dismiss"
         >
-          Got it
+          Dismiss
         </button>
       </div>
     </div>

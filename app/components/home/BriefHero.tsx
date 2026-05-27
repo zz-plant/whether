@@ -33,10 +33,10 @@ export function BriefHero({
   const isLowConfidence = confidenceLevel === "LOW";
   const isMedConfidence = confidenceLevel === "MED";
   const heroTint = isLowConfidence
-    ? "border-l-rose-500/30 bg-gradient-to-r from-rose-500/5 to-transparent"
+    ? "border-t-rose-500/20 bg-rose-500/[0.03]"
     : isMedConfidence
-      ? "border-l-amber-500/30 bg-gradient-to-r from-amber-500/5 to-transparent"
-      : "border-l-emerald-500/30";
+      ? "border-t-amber-500/20 bg-amber-500/[0.03]"
+      : "border-t-emerald-500/20";
 
   const tightnessDirection = tightnessDelta > 0 ? "↑" : tightnessDelta < 0 ? "↓" : "→";
   const deltaEmphasis = tightnessDelta > 0 ? "text-rose-200" : tightnessDelta < 0 ? "text-emerald-200" : "text-slate-400";
@@ -44,8 +44,8 @@ export function BriefHero({
   const isDegraded = showOfflineBadge || (degradedSourceCount && degradedSourceCount > 0) || (reliabilityScore != null && reliabilityScore < 60);
 
   return (
-    <div className={`text-center space-y-4 sm:space-y-5 py-5 sm:py-8 border-l-2 ${heroTint}`}>
-      <h1 className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
+    <div className={`space-y-4 sm:space-y-5 py-5 sm:py-8 border-t ${heroTint}`}>
+      <h1 className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 text-left">
         Whether · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
       </h1>
 
@@ -56,7 +56,7 @@ export function BriefHero({
               {tightness}
             </p>
             <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400" title="Credit tightness measures how restrictive lending conditions are. Scale: 0–100.">
-              Credit tightness
+              Credit conditions
             </p>
             {fetchedAt ? (
               <p className="text-[0.6rem] text-slate-600 mt-0.5">Updated {fetchedAt}</p>
@@ -96,11 +96,11 @@ export function BriefHero({
       </div>
 
       {decisionShiftSummary ? (
-        <p className="text-fluid-xs text-slate-400 max-w-xl mx-auto">{decisionShiftSummary}</p>
+        <p className="text-fluid-xs text-slate-400 max-w-xl">{decisionShiftSummary}</p>
       ) : null}
 
       {isDegraded ? (
-        <div className="max-w-xl mx-auto rounded-md border border-amber-500/30 bg-amber-500/8 px-3 py-2 text-xs leading-5 text-amber-100">
+        <div className="max-w-xl rounded-md border border-amber-500/30 bg-amber-500/8 px-3 py-2 text-xs leading-5 text-amber-100">
           <span className="font-semibold">Data quality is degraded.</span>{" "}
           Stage irreversible decisions until the next clean refresh.
         </div>

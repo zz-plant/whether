@@ -139,7 +139,7 @@ export const CanonicalTrustModule = ({
           {config.label}
         </span>
         <p className="text-xs font-semibold tracking-[0.16em]">
-          Data provenance
+          Sources
         </p>
       </div>
       <p className="text-sm font-semibold text-slate-100">{label}</p>

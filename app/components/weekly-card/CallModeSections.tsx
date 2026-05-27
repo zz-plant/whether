@@ -189,7 +189,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       {glossaryHref ? (
         <p className="text-xs text-slate-500">
           <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-            Open the glossary
+            Open glossary
           </Link>
         </p>
       ) : null}

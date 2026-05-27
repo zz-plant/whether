@@ -95,7 +95,7 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
               <p className="mt-1.5 type-data font-semibold text-slate-50">{operatingCall}</p>
             </div>
             <div className="weather-surface-utility px-3 py-2 sm:max-w-[14rem]">
-              <p className="type-kicker text-slate-400">Quick summary</p>
+              <p className="type-kicker text-slate-400">Summary</p>
               <p className="mt-1 text-xs font-semibold leading-5 text-slate-100">{weeklyLeadershipSummary.shorthandLine}</p>
             </div>
           </div>
