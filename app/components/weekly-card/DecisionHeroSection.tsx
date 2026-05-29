@@ -74,7 +74,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
           </div>
           <div className="space-y-2">
             <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Decision posture</p>
-            <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-slate-50 sm:text-[2.15rem]">
+            <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-slate-50 sm:text-fluid-2xl">
               {operatingStanceLine}
             </h1>
             {whyItMattersLine ? (

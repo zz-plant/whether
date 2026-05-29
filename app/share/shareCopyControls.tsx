@@ -62,7 +62,7 @@ export function ShareCopyControls({
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       <div className="grid gap-4 sm:grid-cols-2">
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-sky-200">Slack</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-200">Slack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
           <button
             type="button"
@@ -74,7 +74,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-emerald-200">Email</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-emerald-200">Email</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the same call with citation context for leadership notes.</p>
           <button
             type="button"
@@ -86,7 +86,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-amber-200">Meeting pack</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-amber-200">Meeting pack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, and citation.</p>
           <button
             type="button"
@@ -98,7 +98,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-violet-200">Calendar</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-violet-200">Calendar</h2>
           <p className="text-xs leading-relaxed text-slate-300">Open a Monday review invite with the current call in the agenda.</p>
           <a
             href={calendarHref}
@@ -113,7 +113,7 @@ export function ShareCopyControls({
 
       <article className="weather-surface min-w-0 space-y-3 px-4 py-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-300">
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-300">
             Preview
           </h2>
           <span className="text-fluid-micro text-slate-500">

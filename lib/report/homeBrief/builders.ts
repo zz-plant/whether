@@ -6,6 +6,7 @@ import {
 } from "../boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../operatingCalls";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
+import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } from "../../regimeEngineCore";
 import { type ReportDynamics } from "../reportData";
 import {
   REGIME_SEVERITY_RANK,
@@ -258,7 +259,7 @@ export const buildHomeBriefModelInternal = (
   });
   const primaryShiftRegimeLabel = resolvePrimaryShiftRegimeLabel(assessment.regime);
 
-  const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
+  const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
   const signalConfidenceReason = buildSignalConfidenceReason({

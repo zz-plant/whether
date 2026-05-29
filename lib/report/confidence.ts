@@ -1,3 +1,10 @@
+import {
+  CONFIDENCE_PERCENT_BASELINE,
+  CONFIDENCE_PERCENT_PER_POINT,
+  CONFIDENCE_PERCENT_FLOOR,
+  CONFIDENCE_PERCENT_CEILING,
+} from "../regimeEngineCore";
+
 type ConfidenceInputs = {
   scores: {
     tightness: number;
@@ -16,7 +23,8 @@ export const resolveDistanceToFlip = ({ scores, thresholds }: ConfidenceInputs):
 };
 
 export const resolveConfidencePercentFromDistance = (distanceToFlip: number): number =>
-  Math.max(35, Math.min(92, Math.round(55 + distanceToFlip * 3)));
+  Math.max(CONFIDENCE_PERCENT_FLOOR, Math.min(CONFIDENCE_PERCENT_CEILING,
+    Math.round(CONFIDENCE_PERCENT_BASELINE + distanceToFlip * CONFIDENCE_PERCENT_PER_POINT)));
 
 export const resolveConfidencePercent = (inputs: ConfidenceInputs): number =>
   resolveConfidencePercentFromDistance(resolveDistanceToFlip(inputs));

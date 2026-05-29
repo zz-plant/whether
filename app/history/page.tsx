@@ -8,6 +8,13 @@ import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 
+const REGIME_DISPLAY: Record<string, string> = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Uncertain",
+  EXPANSION: "Expansion",
+};
+
 type Coverage = Record<number, number[]>;
 
 export default function HistoryPage() {
@@ -104,10 +111,10 @@ export default function HistoryPage() {
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
               {Object.entries(REGIME_COLORS).map(([regime, color]) => (
-                <span key={regime} className="inline-flex items-center gap-1">
-                  <span className={`inline-block h-2.5 w-2.5 rounded-sm ${color}`} aria-hidden="true" />
-                  {regime.charAt(0) + regime.slice(1).toLowerCase()}
-                </span>
+                  <span key={regime} className="inline-flex items-center gap-1">
+                    <span className={`inline-block h-2.5 w-2.5 rounded-sm ${color}`} aria-hidden="true" />
+                    {REGIME_DISPLAY[regime] ?? regime}
+                  </span>
               ))}
             </div>
           </div>

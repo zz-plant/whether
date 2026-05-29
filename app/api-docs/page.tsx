@@ -42,6 +42,11 @@ export default function ApiDocsPage() {
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">For developers</h2>
           <div className="space-y-3">
             <div className="weather-surface px-4 py-3 space-y-1">
+              <p className="text-fluid-xs font-semibold text-sky-200">GET /api/posture/current</p>
+              <p className="text-xs text-slate-300">Stable JSON endpoint for the current posture. Returns regime, tightness, direction, confidence, week, summary, url, and version. Type contract at lib/types.ts.</p>
+              <a href="/api/posture/current" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>
+            </div>
+            <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /api/agent?cadence=weekly</p>
               <p className="text-xs text-slate-300">Full structured brief data with handoff payload. Supports weekly, monthly, quarterly, yearly.</p>
               <a href="/api/agent?cadence=weekly" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>

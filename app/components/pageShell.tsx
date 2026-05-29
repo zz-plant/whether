@@ -51,7 +51,7 @@ export function PageShell({
 
       {showFooter ? (
         <footer className="mx-auto mt-8 w-full max-w-[96rem] border-t border-white/[0.04] px-[var(--weather-shell-pad-inline)] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400 sm:pb-8">
-          <p>{INTERNAL_USE_LABEL}</p>
+          {INTERNAL_USE_LABEL && <p>{INTERNAL_USE_LABEL}</p>}
         </footer>
       ) : null}
     </main>

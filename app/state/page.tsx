@@ -11,7 +11,7 @@ import {
 const REGIME_LABELS: Record<string, string> = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
+  VOLATILE: "Uncertain",
   EXPANSION: "Expansion",
 };
 

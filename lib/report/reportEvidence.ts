@@ -15,12 +15,12 @@ export const buildActionNowShort = ({
   regimeChanged,
 }: Pick<ReportDynamics, "directionLabel" | "regimeChanged">): string => {
   if (regimeChanged || directionLabel === "deteriorating") {
-    return "Tighten approvals now; keep new spend reversible.";
+    return "Conditions tightening — freeze new commitments and keep spend flexible.";
   }
   if (directionLabel === "improving") {
-    return "Move forward on proven bets. Require a clear success metric for each.";
+    return "Conditions easing — resume paused work with clear milestones.";
   }
-  return "Hold current pace. Gate new commitments behind measurable milestones.";
+  return "Conditions holding — continue at current pace with measurable outcomes.";
 };
 
 export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {
@@ -141,10 +141,13 @@ const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["ke
   curveSlope: "Recession warning gauge",
 };
 
+const EVIDENCE_SIGNAL_MAGNITUDE_HIGH = 3;
+const EVIDENCE_SIGNAL_MAGNITUDE_MEDIUM = 1;
+
 const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {
   const magnitude = Math.abs(delta);
-  if (magnitude >= 3) return "HIGH";
-  if (magnitude >= 1) return "MED";
+  if (magnitude >= EVIDENCE_SIGNAL_MAGNITUDE_HIGH) return "HIGH";
+  if (magnitude >= EVIDENCE_SIGNAL_MAGNITUDE_MEDIUM) return "MED";
   return "LOW";
 };
 

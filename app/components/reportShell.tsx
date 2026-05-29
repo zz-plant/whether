@@ -267,7 +267,7 @@ export const ReportShell = (props: ReportShellProps) => {
               </div>
 
               <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
-                <p>{INTERNAL_USE_LABEL}</p>
+                {INTERNAL_USE_LABEL && <p>{INTERNAL_USE_LABEL}</p>}
               </footer>
             </div>
           </div>

@@ -22,7 +22,7 @@ const confidenceRank: Record<ConfidenceLevel, number> = {
   HIGH: 3,
 };
 
-export const MIN_ALERT_CONFIDENCE: ConfidenceLevel = "MEDIUM";
+export const MIN_ALERT_CONFIDENCE: ConfidenceLevel = "LOW";
 
 const isConfidenceBelowMinimum = (confidence: ConfidenceLevel) =>
   confidenceRank[confidence] < confidenceRank[MIN_ALERT_CONFIDENCE];

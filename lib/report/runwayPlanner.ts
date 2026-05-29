@@ -41,6 +41,8 @@ export type RunwayPlannerActionOutput = {
 export type RunwayPlannerInput = RunwayPlannerRequest & {
   regime: RegimeKey;
   posture: PlannerPosture;
+  tightnessScore?: number;
+  riskAppetiteScore?: number;
 };
 
 export type RunwayPlannerOutput = {
@@ -112,6 +114,19 @@ const parseKnobLevelLabel = (value: string): number => {
 
 const growthToDecimal = (growthRate: number) => growthRate / 100;
 
+const GROWTH_HIGH_THRESHOLD = 20;
+const GROWTH_MODERATE_THRESHOLD = 12;
+const GROWTH_LOW_THRESHOLD = 4;
+const GROWTH_HIGH_DELTA = -2;
+const GROWTH_MODERATE_DELTA = -1;
+const GROWTH_LOW_DELTA = 1;
+
+const RUNWAY_RISK_CRITICAL = 80;
+const RUNWAY_RISK_HIGH = 65;
+const RUNWAY_RISK_MODERATE = 45;
+
+const BURN_MULTIPLE_DEFAULT = 4;
+
 const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
   ...input,
   runway: clamp(Number.isFinite(input.runway) ? input.runway : 0, 1, 60),
@@ -121,15 +136,15 @@ const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
 });
 
 const inferRiskLevel = (score: number): RunwayPlannerOutput["runwayRisk"]["level"] => {
-  if (score >= 80) return "critical";
-  if (score >= 65) return "high";
-  if (score >= 45) return "moderate";
+  if (score >= RUNWAY_RISK_CRITICAL) return "critical";
+  if (score >= RUNWAY_RISK_HIGH) return "high";
+  if (score >= RUNWAY_RISK_MODERATE) return "moderate";
   return "low";
 };
 
 const buildSafeBand = (input: RunwayPlannerInput) => {
   const base = SAFE_RUNWAY_BAND_BY_REGIME[input.regime];
-  const growthDelta = input.growthRate >= 20 ? -2 : input.growthRate >= 12 ? -1 : input.growthRate <= 4 ? 1 : 0;
+  const growthDelta = input.growthRate >= GROWTH_HIGH_THRESHOLD ? GROWTH_HIGH_DELTA : input.growthRate >= GROWTH_MODERATE_THRESHOLD ? GROWTH_MODERATE_DELTA : input.growthRate <= GROWTH_LOW_THRESHOLD ? GROWTH_LOW_DELTA : 0;
   const minMonths = clamp(base.min + STAGE_BAND_DELTA[input.stage] + SECTOR_BAND_DELTA[input.sector] + growthDelta, 6, 36);
   const maxMonths = clamp(base.max + STAGE_BAND_DELTA[input.stage] + SECTOR_BAND_DELTA[input.sector] + growthDelta, minMonths + 4, 42);
   return { minMonths, maxMonths };
@@ -147,7 +162,7 @@ const projectRunwayTrajectory = (input: RunwayPlannerInput) => {
     netBurnNow,
     netBurnInSixMonths,
     burnImprovementPct,
-    burnMultiple: input.revenue > 0 ? input.burn / input.revenue : 4,
+    burnMultiple: input.revenue > 0 ? input.burn / input.revenue : BURN_MULTIPLE_DEFAULT,
   };
 };
 
@@ -166,8 +181,8 @@ const getKnobLevel = (
     },
     nearestThresholdGap: Math.abs(runwayGap) * 3,
     weakSignalCount: 0,
-    tightnessScore: 70,
-    riskAppetiteScore: 50,
+    tightnessScore: input.tightnessScore ?? 70,
+    riskAppetiteScore: input.riskAppetiteScore ?? 50,
   });
   const knob = knobs.find((item) => item.key === key);
   if (!knob) {
@@ -245,7 +260,7 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
 
   const baseBurnRange = BURN_RANGE_BY_REGIME[input.regime];
   const riskTightening = riskLevel === "critical" ? -8 : riskLevel === "high" ? -5 : riskLevel === "moderate" ? -2 : 0;
-  const growthOffset = input.growthRate >= 20 && input.regime === "EXPANSION" ? 4 : 0;
+  const growthOffset = input.growthRate >= GROWTH_HIGH_THRESHOLD && input.regime === "EXPANSION" ? 4 : 0;
   const burnMinPercent = clamp(baseBurnRange.min + riskTightening, -45, 10);
   const burnMaxPercent = clamp(baseBurnRange.max + growthOffset, burnMinPercent + 4, 20);
   const recommendedDeltaPercent = round((burnMinPercent + burnMaxPercent) / 2);

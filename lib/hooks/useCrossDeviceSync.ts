@@ -9,6 +9,7 @@ const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 type StateBlob = Record<string, { value: unknown; ts: number }>;
 
 function getSyncId(): string {
+  if (typeof window === "undefined") return "";
   const existing = localStorage.getItem(SYNC_ID_KEY);
   if (existing) return existing;
   const id = crypto.randomUUID();
@@ -18,6 +19,7 @@ function getSyncId(): string {
 }
 
 function loadStateBlob(): StateBlob {
+  if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(STATE_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -27,6 +29,7 @@ function loadStateBlob(): StateBlob {
 }
 
 function saveStateBlob(blob: StateBlob) {
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STATE_KEY, JSON.stringify(blob));
   } catch {}

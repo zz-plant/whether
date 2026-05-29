@@ -19,6 +19,9 @@ export const isReportShellRoute = (pathname: string) => {
 
 export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
+  if (normalizedPathname === "/v2") {
+    return "Start here";
+  }
   const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname));
   return activeLayer ? activeLayer.navLabel ?? activeLayer.label : fallbackLabel;
 };
@@ -26,7 +29,7 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
 export const resolveGlobalHeaderTagline = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
 
-  if (pathMatchesLink("/", normalizedPathname)) {
+  if (pathMatchesLink("/", normalizedPathname) || pathMatchesLink("/v2", normalizedPathname)) {
     return {
       title: "Weekly planning brief for hiring, spending, and growth pace.",
       description: "Start here for this week's brief, what to do now, and what would change it.",
@@ -68,6 +71,6 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
 
   return primaryNavigationLayers.map((link) => ({
     ...link,
-    isActive: pathMatchesLink(link.href, normalizedPathname),
+    isActive: pathMatchesLink(link.href, normalizedPathname) || (link.href === "/" && normalizedPathname === "/v2"),
   }));
 };

@@ -20,6 +20,7 @@ const TREASURY_FISCALDATA_ENDPOINT =
   "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/avg_interest_rates?filter=security_desc:in:(Treasury%20Bills:%204-Week,Treasury%20Bills:%2013-Week,Treasury%20Notes:%202-Year,Treasury%20Notes:%2010-Year)&fields=record_date,security_desc,avg_interest_rate_amt&sort=-record_date&page[number]=1&page[size]=800";
 
 export const TREASURY_ENDPOINTS = {
+  fedFunds: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFF",
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
   threeMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO",
   twoYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2",

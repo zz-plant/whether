@@ -98,7 +98,7 @@ export const MiniSeriesRow = ({
           <svg viewBox={`0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`} className="h-16 w-full" aria-hidden="true" preserveAspectRatio="none">
             <path d={parsed.path} fill="none" stroke={lineColor} strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
             <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={parsed.toY(parsed.median)} y2={parsed.toY(parsed.median)} stroke="#475569" strokeDasharray="3 3" strokeWidth="1" />
-            <text x={SPARK_WIDTH - PADDING} y={parsed.toY(parsed.median) - 2} textAnchor="end" className="fill-slate-500 text-[9px]">Median</text>
+            <text x={SPARK_WIDTH - PADDING} y={parsed.toY(parsed.median) - 2} textAnchor="end" className="fill-slate-500 text-fluid-nano">Median</text>
             <circle cx={parsed.latest.x} cy={parsed.latest.y} r="2" fill="#e2e8f0" />
             {thresholds.map((threshold) => {
               if (threshold.value < parsed.min || threshold.value > parsed.max) {
@@ -108,7 +108,7 @@ export const MiniSeriesRow = ({
               return (
                 <g key={threshold.label}>
                   <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={y} y2={y} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
-                  <text x={SPARK_WIDTH - PADDING} y={y - 2} textAnchor="end" className="fill-slate-400 text-[9px]">{threshold.label}</text>
+                  <text x={SPARK_WIDTH - PADDING} y={y - 2} textAnchor="end" className="fill-slate-400 text-fluid-nano">{threshold.label}</text>
                 </g>
               );
             })}

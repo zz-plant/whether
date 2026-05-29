@@ -1,4 +1,4 @@
-export const INTERNAL_USE_LABEL = "Internal use only";
+export const INTERNAL_USE_LABEL = "";
 
 export const buildComplianceStamp = ({
   sourceLine,
@@ -9,6 +9,5 @@ export const buildComplianceStamp = ({
   timestamp: string;
   confidence: string;
 }) => [
-  "Internal use only",
   `Source: ${sourceLine} · ${timestamp} · Confidence: ${confidence}`,
 ];

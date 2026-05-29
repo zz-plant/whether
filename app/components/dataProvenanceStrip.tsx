@@ -153,7 +153,7 @@ export const DataProvenanceStrip = ({
             <Popover.Portal>
               <Popover.Positioner side="top" align="center" sideOffset={10}>
                 <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
-                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">Trust snapshot</p>
+                  <p className="text-fluid-micro font-medium tracking-[0.06em] text-slate-300">Trust snapshot</p>
                   <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
                   <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>

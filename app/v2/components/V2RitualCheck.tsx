@@ -19,6 +19,11 @@ export function V2RitualCheck({ recordDate }: { recordDate?: string }) {
     return s;
   }, [data]);
 
+  const recentWeeks = useMemo(() => {
+    const keys = Object.keys(data).sort().reverse().slice(0, 4);
+    return keys.map((k) => data[k]?.reviewed ?? false);
+  }, [data]);
+
   const handleToggle = () => {
     if (!recordDate) return;
     setData((prev) => ({
@@ -30,14 +35,15 @@ export function V2RitualCheck({ recordDate }: { recordDate?: string }) {
   if (!recordDate) return null;
 
   return (
-    <div className="weather-card flex items-center justify-between">
+    <div className="weather-card flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
       <button
         type="button"
         onClick={handleToggle}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
+        aria-label={reviewed ? "Mark as unreviewed" : "Mark this week as reviewed"}
+        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
           reviewed
             ? "bg-emerald-500/12 text-emerald-300 border border-emerald-500/30"
-            : "bg-slate-800/50 text-slate-400 border border-slate-700/60 hover:border-slate-600"
+            : "bg-white/[0.04] text-white/40 border border-white/[0.06] hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-sky-400"
         }`}
       >
         <span className={reviewed ? "" : "opacity-40"}>
@@ -45,11 +51,25 @@ export function V2RitualCheck({ recordDate }: { recordDate?: string }) {
         </span>
         {reviewed ? "Reviewed" : "Mark reviewed"}
       </button>
-      {streak >= 4 ? (
-        <span className="text-[0.6rem] text-slate-600">
-          {streak}-week streak
-        </span>
-      ) : null}
+      <div className="flex items-center gap-1.5">
+        {recentWeeks.length > 0 ? (
+          <div className="flex items-center gap-1" title={`${recentWeeks.filter(Boolean).length} of last ${recentWeeks.length} weeks reviewed`}>
+            {recentWeeks.map((r, i) => (
+              <span
+                key={i}
+                className={`block w-1.5 h-1.5 rounded-full transition-colors ${
+                  r ? "bg-emerald-400/60" : "bg-white/[0.08]"
+                }`}
+              />
+            ))}
+          </div>
+        ) : null}
+        {streak >= 4 ? (
+          <span className="text-fluid-nano text-white/20">
+            {streak}w
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }

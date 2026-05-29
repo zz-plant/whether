@@ -21,7 +21,7 @@ import { ShareRail } from "./shareRail";
 import { HistoryIcon } from "./uiIcons";
 
 export const reportHeaderNextStep = (pathname: string) => {
-  if (pathname === "/") {
+  if (pathname === "/" || pathname === "/v2") {
     return { href: "/evidence", label: "Evidence" };
   }
 
@@ -45,7 +45,7 @@ export const reportHeaderNextStep = (pathname: string) => {
 };
 
 export const resolveReportHeaderUtilityAction = (pathname: string) =>
-  pathname === "/"
+  pathname === "/" || pathname === "/v2"
     ? { href: buildToolkitLibraryHref(), label: "Toolkits" }
     : pathname.startsWith("/evidence")
       ? { href: "/evidence", label: "Evidence" }
@@ -84,7 +84,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   }, [direction, isPastThreshold]);
 
   const isReportRoute = isReportShellRoute(pathname);
-  const isHomeBrief = pathname === "/";
+  const isHomeBrief = pathname === "/" || pathname === "/v2";
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
   const reportHeaderAction = reportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
@@ -93,25 +93,22 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
   return (
     <header
-      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-3 pt-1 sm:px-5 sm:pt-1.5 lg:px-8 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
-      } ${atTop ? "" : "shadow-[0_8px_20px_-16px_rgba(2,6,23,0.72)]"}`}
+      } ${atTop ? "" : "shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)]"}`}
     >
-      <div className="weather-appbar weather-topbar px-3 py-2 sm:px-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <Link href="/" className={GLOBAL_HEADER_BRAND_LINK_CLASSNAME}>
-                  Whether
-                </Link>
-                <span className="weather-tag weather-tag-slate">
-                  {isHomeBrief ? "Weekly Brief" : routeLabel}
-                </span>
-              </div>
-            </div>
+      <div className="border-b border-white/[0.06] bg-[var(--bg-body)]/95 rounded-b-lg">
+        <div className="flex items-center gap-3 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
+              Whether
+            </Link>
+            <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/30">
+              {isHomeBrief ? "Weekly Brief" : routeLabel}
+            </span>
+          </div>
 
-            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
               {isReportRoute ? (
                 <>
                   {isHomeBrief ? (
@@ -140,14 +137,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   <button
                     type="button"
                     onClick={() => setShowShare(true)}
-                    className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
+                    className="inline-flex min-h-[36px] items-center justify-center rounded-full border border-white/[0.08] px-3 py-1.5 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97]"
                     aria-label="Share brief"
                   >
                     Share
                   </button>
                   <Link
                     href="/history"
-                    className="weather-button hidden min-h-[36px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] no-underline sm:inline-flex"
+                    className="hidden sm:inline-flex min-h-[36px] items-center gap-1 rounded-full border border-white/[0.08] px-2.5 py-1.5 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] no-underline transition-colors active:scale-[0.97]"
                     aria-label="History"
                   >
                     <HistoryIcon />
@@ -155,18 +152,18 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                   </Link>
                   <Link
                     href="/resolve"
-                    className="weather-button hidden min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm text-slate-200 sm:inline-flex"
+                    className="hidden sm:inline-flex min-h-[36px] w-[36px] items-center justify-center rounded-full border border-slate-800/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-colors"
                     aria-label="Search"
                   >
-                    <Search aria-hidden="true" className="text-slate-100" size={18} strokeWidth={2.4} />
+                    <Search aria-hidden="true" size={16} strokeWidth={1.8} />
                   </Link>
                   <button
                     type="button"
                     onClick={() => setShowSettings(true)}
-                    className="weather-button hidden min-h-[36px] w-[36px] items-center justify-center rounded-full p-0 text-sm text-slate-200 sm:inline-flex"
+                    className="hidden sm:inline-flex min-h-[36px] w-[36px] items-center justify-center rounded-full border border-slate-800/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-colors"
                     aria-label="Settings"
                   >
-                    <Settings aria-hidden="true" className="text-slate-100" size={18} strokeWidth={2.4} />
+                    <Settings aria-hidden="true" size={16} strokeWidth={1.8} />
                   </button>
                   <ThemeToggleButton className="min-h-[36px]" />
                 </>
@@ -182,11 +179,10 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
 
           {/* Navigation — workflow stepper on desktop, sheet on mobile */}
-          <div className="flex items-center justify-between gap-2 border-t border-slate-800/65 pt-2 lg:hidden">
+          <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] pt-2 lg:hidden">
             <GlobalHeaderNavClient pathname={pathname} />
           </div>
         </div>
-      </div>
     </header>
   );
 }

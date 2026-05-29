@@ -41,7 +41,7 @@ type WeeklyOutputTemplate = {
 const weeklyActionGuidance: Record<RegimeAssessment["regime"], string> = {
   SCARCITY: "freeze discretionary scope, protect runway, and require proof before new bets",
   DEFENSIVE: "prioritize retention, tighten costs, and ship only revenue or reliability work",
-  VOLATILE: "balance experiments with safeguards, and keep spend approvals reversible",
+  VOLATILE: "balance experiments with safeguards, and keep spend approvals flexible",
   EXPANSION: "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
 };
 

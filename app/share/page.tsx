@@ -71,14 +71,14 @@ export default async function SharePage() {
     <PageShell backdropVariant="default" showFooter>
       <section className="weather-panel space-y-5 px-5 py-5">
         <div className="max-w-3xl space-y-3">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-sky-200">
+          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
             Current weekly artifact
           </p>
-          <h1 className="text-fluid-xl font-semibold text-slate-100">Share this week&apos;s operating brief</h1>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <h1 className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s operating brief</h1>
+          <p className="text-sm leading-relaxed text-white/60">
             Copy the live weekly call, bounded action, pause line, and change-course condition into Slack, email, calendar agendas, or meeting notes.
           </p>
-          <p className="text-fluid-xs text-slate-500">{artifact.trustLine}</p>
+          <p className="text-fluid-xs text-white/40">{artifact.trustLine}</p>
         </div>
 
         <ShareCopyControls
@@ -91,19 +91,19 @@ export default async function SharePage() {
       </section>
 
       <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What sharing produces</h2>
+        <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-white/40">What sharing produces</h2>
         <div className="grid gap-3 md:grid-cols-3">
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold text-sky-200">Slack</p>
-            <p className="text-xs leading-relaxed text-slate-300">A compact weekly operator brief with posture, action, pause condition, reversal condition, and why the call could be wrong.</p>
+            <p className="text-xs leading-relaxed text-white/60">A compact weekly operator brief with posture, action, pause condition, reversal condition, and why the call could be wrong.</p>
           </div>
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold text-emerald-200">Email</p>
-            <p className="text-xs leading-relaxed text-slate-300">The same current brief plus citation lines, ready for leadership updates or follow-up notes.</p>
+            <p className="text-xs leading-relaxed text-white/60">The same current brief plus citation lines, ready for leadership updates or follow-up notes.</p>
           </div>
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold text-amber-200">Meeting pack</p>
-            <p className="text-xs leading-relaxed text-slate-300">Board note, call snapshot, weekly brief, board summary, and citation in one pasteable artifact.</p>
+            <p className="text-xs leading-relaxed text-white/60">Board note, call snapshot, weekly brief, board summary, and citation in one pasteable artifact.</p>
           </div>
         </div>
         <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">

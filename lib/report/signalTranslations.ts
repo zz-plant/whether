@@ -120,7 +120,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
   },
   DEFENSIVE: {
     plainLabel: "Cloudy",
-    stance: "Gate new commitments to short-payback work only.",
+    stance: "Focus on efficiency — new commitments should pay back within 12 months.",
     whatItMeans:
       "Conditions are cautious but not critical. Approve only work that pays back quickly. Keep a cash buffer and avoid bets that take years to prove out.",
     doExamples: [
@@ -138,7 +138,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
   },
   VOLATILE: {
     plainLabel: "Stormy",
-    stance: "Approve only reversible moves with clear checkpoint exits.",
+    stance: "Conditions uncertain — make reversible moves with clear exit criteria.",
     whatItMeans:
       "Conditions are mixed — some signals support growth, others warn caution. Make small, reversible moves. Set clear success/failure checkpoints for every new initiative.",
     doExamples: [
@@ -156,7 +156,7 @@ export const regimePlainEnglish: Record<RegimeKey, RegimePlainEnglish> = {
   },
   EXPANSION: {
     plainLabel: "Sunny",
-    stance: "Scale proven bets with milestone-based approval gates.",
+    stance: "Growth conditions — scale what's working and keep milestones for new bets.",
     whatItMeans:
       "Money is flowing and markets are confident. This is the time to invest in growth — with discipline. Scale what's working, don't chase everything.",
     doExamples: [

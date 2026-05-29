@@ -138,7 +138,7 @@ export const PlaybookPanel = ({
                     <a
                       key={link.href}
                       href={link.href}
-                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-fluid-nano font-semibold tracking-[0.08em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                     >
                       {link.label}
                     </a>

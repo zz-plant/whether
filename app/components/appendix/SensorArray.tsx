@@ -102,7 +102,7 @@ export const SensorArray = ({
                 </p>
               </div>
               <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 p-4 text-xs text-slate-400">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
                   Leading group
                 </p>
                 <p className="mt-2 text-sm text-slate-200">{mostChanged.sensor.group.label}</p>
@@ -218,12 +218,12 @@ export const SensorArray = ({
                 )}
                 <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
                   {hasTrend ? (
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
                       12-month trend (cache)
                     </p>
                   ) : null}
                   {sparkline ? (
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
                       {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, sensor.unit)}
                     </p>
                   ) : null}

@@ -21,6 +21,13 @@ const REGIME_TEXT_COLORS: Record<string, string> = {
   EXPANSION: "text-emerald-300",
 };
 
+const REGIME_DISPLAY: Record<string, string> = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Uncertain",
+  EXPANSION: "Expansion",
+};
+
 type MacroTrendlineProps = {
   regimes: Array<{ record_date: string; regime: string }>;
 };
@@ -63,7 +70,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Macro trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
@@ -90,10 +97,10 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
                   style={{ height: `${height}%` }}
                   title={`${entry.record_date}: ${entry.regime}`}
                 />
-                <span className={`text-[0.5rem] font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-500"}`}>
-                  {entry.regime.charAt(0) + entry.regime.slice(1).toLowerCase()}
+                <span className={`text-fluid-nano font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-500"}`}>
+                  {REGIME_DISPLAY[entry.regime] ?? entry.regime}
                 </span>
-                <span className="text-[0.55rem] text-slate-600">
+                <span className="text-fluid-nano text-slate-600">
                   {new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}
                 </span>
               </div>
@@ -101,7 +108,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
           })}
         </div>
       </div>
-      <p className="mt-2 text-[0.6rem] text-slate-600 text-right">
+      <p className="mt-2 text-fluid-nano text-slate-600 text-right">
         Last {data.length} months · MacRo regime history
       </p>
     </div>

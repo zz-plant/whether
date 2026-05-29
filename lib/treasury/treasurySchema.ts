@@ -11,6 +11,7 @@ export const TreasuryApiPayloadSchema = z.object({
 });
 
 export const TreasuryYieldsSchema = z.object({
+  fedFunds: z.number().nullable().optional(),
   oneMonth: z.number().nullable(),
   threeMonth: z.number().nullable().optional(),
   twoYear: z.number().nullable(),

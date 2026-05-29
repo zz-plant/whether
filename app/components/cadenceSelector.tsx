@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -19,10 +19,11 @@ const VIEWS = [
 export function CadenceSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname() ?? "/";
   const current = (searchParams?.get("cadence") as string) ?? "weekly";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5">
+    <div className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5">
       {CADENCES.map((c) => (
         <button
           key={c.key}
@@ -32,10 +33,10 @@ export function CadenceSelector() {
             if (c.key === "weekly") params.delete("cadence");
             else params.set("cadence", c.key);
             const qs = params.toString();
-            router.replace(qs ? `/?${qs}` : "/", { scroll: false });
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
           }}
           aria-pressed={current === c.key}
-          className={`rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
             current === c.key
               ? "bg-sky-500/14 text-sky-100"
               : "text-slate-400 hover:text-slate-200"
@@ -51,10 +52,11 @@ export function CadenceSelector() {
 export function ViewSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname() ?? "/";
   const current = (searchParams?.get("view") as string) ?? "default";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-full border border-slate-800/60 bg-slate-950/60 p-0.5">
+    <div className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5">
       {VIEWS.map((v) => (
         <button
           key={v.key}
@@ -64,7 +66,7 @@ export function ViewSelector() {
             if (v.key === "default") params.delete("view");
             else params.set("view", v.key);
             const qs = params.toString();
-            router.replace(qs ? `/?${qs}` : "/", { scroll: false });
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
           }}
           aria-pressed={current === v.key}
           className={`rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors ${

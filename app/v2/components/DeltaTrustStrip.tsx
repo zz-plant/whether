@@ -1,3 +1,5 @@
+import { DIRECTION_LABEL, DIRECTION_COLOR, CONFIDENCE_COLOR, RELIABILITY_COLOR, type SignalDirection } from "../viewModel";
+
 export function DeltaTrustStrip({
   tightnessDelta,
   riskAppetiteDelta,
@@ -13,31 +15,31 @@ export function DeltaTrustStrip({
   reliabilityScore: number;
   sourceCount: number;
   degradedCount: number;
-  direction: "tighten" | "ease" | "hold";
+  direction: SignalDirection;
 }) {
-  const deltaLabel = direction === "tighten" ? "Tightening" : direction === "ease" ? "Easing" : "Holding";
-  const deltaColor = direction === "tighten" ? "text-rose-300" : direction === "ease" ? "text-emerald-300" : "text-slate-400";
-  const confColor = confidenceLabel === "HIGH" ? "text-emerald-300" : confidenceLabel === "MED" ? "text-amber-300" : "text-rose-300";
-  const relColor = reliabilityScore >= 80 ? "text-emerald-300" : reliabilityScore >= 60 ? "text-amber-300" : "text-rose-300";
+  const deltaLabel = DIRECTION_LABEL[direction];
+  const deltaColor = DIRECTION_COLOR[direction];
+  const confColor = CONFIDENCE_COLOR(confidenceLabel);
+  const relColor = RELIABILITY_COLOR(reliabilityScore);
 
   return (
-    <div className="weather-card space-y-3">
+    <div className="weather-card space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-500">Trend</span>
+          <span className="text-white/40">Trend</span>
           <span className={`font-semibold ${deltaColor}`}>{deltaLabel}</span>
         </div>
-      <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-500">Call certainty</span>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-white/40">Signal confidence</span>
           <span className={`font-semibold ${confColor}`}>{confidenceLabel}</span>
         </div>
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-500">Reliability</span>
+          <span className="text-white/40">Reliability</span>
           <span className={`font-semibold tabular-nums ${relColor}`}>{reliabilityScore}%</span>
         </div>
       </div>
       <div className="border-t border-slate-800/60 pt-2">
-        <div className="flex items-center justify-between text-[0.6rem] text-slate-600">
+        <div className="flex items-center justify-between text-fluid-nano text-white/30">
           <span>Sources</span>
           <span>{sourceCount - degradedCount} live{degradedCount > 0 ? ` · ${degradedCount} cached` : ""}</span>
         </div>

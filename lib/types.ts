@@ -3,6 +3,7 @@
  * Keeps Treasury source metadata explicit for traceable outputs.
  */
 export interface TreasuryYields {
+  fedFunds?: number | null;
   oneMonth: number | null;
   threeMonth?: number | null;
   twoYear: number | null;
@@ -92,3 +93,16 @@ export interface MacroSeriesReading {
   isLive: boolean;
   history?: SeriesHistoryPoint[];
 }
+
+export interface PostureApiResponse {
+  regime: string;
+  tightness: number;
+  direction: string;
+  confidence: number;
+  week: string;
+  summary: string;
+  url: string;
+  version: string;
+}
+
+export const POSTURE_API_VERSION = "1.0";

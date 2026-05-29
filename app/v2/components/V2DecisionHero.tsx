@@ -1,33 +1,27 @@
 import type { OperatorContext } from "../../../lib/report/operatorContext";
+import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY } from "../viewModel";
+import type { SignalDirection } from "../viewModel";
+import { DeltaBadge } from "./DeltaBadge";
+import { SignalWaterfall } from "./SignalWaterfall";
+import { StageSwitcher } from "./StageSwitcher";
 
 type Props = {
   tightness: number;
   tightnessDelta: number;
   regime: string;
   postureLabel: string;
-  signalDirection: "tighten" | "ease" | "hold";
+  signalDirection: SignalDirection;
   recordDate: string;
   fetchedAt: string;
   operatorContext: OperatorContext;
-};
-
-const DIRECTION_LABEL: Record<string, string> = {
-  tighten: "Tightening",
-  ease: "Easing",
-  hold: "Holding",
-};
-
-const DIRECTION_COLOR: Record<string, string> = {
-  tighten: "text-rose-300",
-  ease: "text-emerald-300",
-  hold: "text-slate-400",
-};
-
-const REGIME_DESCRIPTORS: Record<string, string> = {
-  EXPANSION: "growth conditions",
-  DEFENSIVE: "caution warranted",
-  SCARCITY: "preserve runway",
-  VOLATILE: "conditions shifting",
+  confidenceLabel?: string;
+  signalData?: {
+    baseRate?: number | null;
+    baseRateUsed?: string;
+    curveSlope?: number | null;
+    macroContributors?: string[];
+    tightnessThreshold?: number;
+  };
 };
 
 export function V2DecisionHero({
@@ -39,10 +33,15 @@ export function V2DecisionHero({
   recordDate,
   fetchedAt,
   operatorContext,
+  confidenceLabel,
+  signalData,
 }: Props) {
-  const regimeDisplay = regime.charAt(0) + regime.slice(1).toLowerCase();
+  const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
   const deltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const deltaLabel = tightnessDelta !== 0 ? `${deltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
+
+  const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
+  const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
 
   const stageLabel = operatorContext.companyStage
     ? operatorContext.companyStage === "pre-seed" ? "Pre-seed"
@@ -54,16 +53,35 @@ export function V2DecisionHero({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-baseline gap-6 sm:gap-10">
+      <div className="flex flex-col sm:flex-row sm:items-baseline gap-3 sm:gap-10 w-full min-w-0">
         <div>
-          <p className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-slate-50 tracking-tight tabular-nums">
-            {tightness}
-          </p>
-          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-400">
+          <div className="relative inline-block">
+            <svg className="absolute inset-0 w-full h-full -m-[14%]" viewBox="0 0 100 100" aria-hidden="true">
+              {confidenceLabel ? (
+                <circle
+                  cx="50" cy="50" r="46"
+                  fill="none"
+                  stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.25)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.25)" : "rgba(253,164,175,0.25)"}
+                  strokeWidth="1.5"
+                  strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                />
+              ) : null}
+            </svg>
+            <SignalWaterfall data={signalData ?? {}}>
+              <h1 className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
+                style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
+                <DeltaBadge tightness={tightness}>{tightness}</DeltaBadge>
+              </h1>
+            </SignalWaterfall>
+          </div>
+          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
             Credit conditions
+            <span className={`ml-1.5 ${tightnessLevelColor}`}>{tightnessLevel}</span>
           </p>
         </div>
-        <div className="text-fluid-xs text-slate-500 space-y-0.5">
+        <div className="text-fluid-xs text-white/50 space-y-0.5 w-full min-w-0">
           <p>
             <span className={DIRECTION_COLOR[signalDirection]}>
               {DIRECTION_LABEL[signalDirection]}
@@ -72,10 +90,11 @@ export function V2DecisionHero({
               <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>{deltaLabel}</span>
             ) : null}
           </p>
-          <p>{regimeDisplay} — {REGIME_DESCRIPTORS[regime] ?? ""} · {postureLabel}</p>
+          <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
           {stageLabel ? <p>{stageLabel}</p> : null}
-          <p className="text-slate-600">{recordDate}</p>
-          {fetchedAt ? <p className="text-slate-600">Updated {fetchedAt}</p> : null}
+          <p className="text-white/30">{recordDate}</p>
+          {fetchedAt ? <p className="text-white/20">Updated {fetchedAt}</p> : null}
+          <StageSwitcher currentStage={operatorContext.companyStage} />
         </div>
       </div>
     </div>

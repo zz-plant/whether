@@ -63,7 +63,7 @@ export const OperatorCommandActionItem = ({
             {(action.tags ?? [action.group]).map((tag) => (
               <span
                 key={`${action.href}-${tag}`}
-                className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                className="weather-pill text-fluid-nano font-semibold tracking-[0.06em] text-slate-400"
               >
                 {tagLabelMap[tag]}
               </span>

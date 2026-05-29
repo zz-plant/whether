@@ -1,5 +1,7 @@
 import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
+import { FORECAST_CONE_HIGH, FORECAST_CONE_MEDIUM, FORECAST_CONE_LOW } from "../../lib/regimeEngineCore";
+import type { Route } from "../../lib/navigation/routeType";
 
 export type RegimeCommandBarProps = {
   regime: RegimeKey;
@@ -33,7 +35,7 @@ const regimeStyleByKey: Record<RegimeKey, { label: string; toneClass: string; po
     markerClass: "bg-amber-200",
   },
   VOLATILE: {
-    label: "Volatile",
+    label: "Uncertain",
     toneClass: "border-sky-300/70 bg-sky-300/10 text-sky-100",
     pointClass: "fill-sky-300",
     markerClass: "bg-sky-300",
@@ -101,7 +103,7 @@ const TrajectoryMap = ({
   const previousY = clamp(100 - postureTrajectory.previous.tightness);
   const projectedX = clamp(currentX + postureTrajectory.weeklyDelta.riskAppetite * 1.35);
   const projectedY = clamp(currentY - postureTrajectory.weeklyDelta.tightness * 1.35);
-  const coneWidth = confidenceLabel === "LOW" ? 7 : confidenceLabel === "MED" ? 5 : 3.5;
+  const coneWidth = confidenceLabel === "LOW" ? FORECAST_CONE_LOW : confidenceLabel === "MED" ? FORECAST_CONE_MEDIUM : FORECAST_CONE_HIGH;
   const riskThresholdX = clamp(postureTrajectory.thresholds.riskAppetite);
   const tightnessThresholdY = clamp(100 - postureTrajectory.thresholds.tightness);
   const regimeStyle = regimeStyleByKey[regime];
@@ -168,7 +170,7 @@ const TrajectoryMap = ({
           <text
             x={highlightNearestTightness ? 3 : Math.min(98, riskThresholdX + 2)}
             y={highlightNearestTightness ? Math.max(5, tightnessThresholdY - 2) : 7}
-            className="fill-amber-200 text-[7px] uppercase tracking-[0.14em]"
+            className="fill-amber-200 text-fluid-nano tracking-[0.08em]"
           >
             Nearest flip
           </text>
@@ -179,7 +181,7 @@ const TrajectoryMap = ({
           <span className="absolute left-2 top-4 -rotate-90 origin-left">Loose</span>
           <span className="absolute right-2 bottom-7 -rotate-90 origin-right">Tight</span>
         </div>
-        <div className="pointer-events-none absolute inset-0 text-[9px] font-semibold uppercase tracking-[0.1em]">
+        <div className="pointer-events-none absolute inset-0 text-fluid-nano font-semibold tracking-[0.04em]">
           {postureMapQuadrants.map((quadrant) => (
             <span
               key={quadrant.key}

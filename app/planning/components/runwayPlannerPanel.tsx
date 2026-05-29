@@ -60,8 +60,10 @@ export function RunwayPlannerPanel({
         stage,
         regime: assessment.regime,
         posture: postureForPolicyPosture(assessment.policyAssessment.posture),
+        tightnessScore: assessment.scores.tightness,
+        riskAppetiteScore: assessment.scores.riskAppetite,
       }),
-    [assessment.policyAssessment.posture, assessment.regime, burn, growthRate, revenue, runway, sector, stage],
+    [assessment.policyAssessment.posture, assessment.regime, assessment.scores.tightness, assessment.scores.riskAppetite, burn, growthRate, revenue, runway, sector, stage],
   );
 
   const shareBlock = useMemo(() => formatRunwayPlanCompactBlock(output), [output]);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
@@ -44,7 +45,12 @@ function SidebarContent({
   sectionLinks: ReportSectionLink[];
   onClose?: () => void;
 }) {
-  const pathname = usePathname() ?? "/";
+  const currentPathname = usePathname() ?? "/";
+  const [pathname, setPathname] = useState("/");
+
+  useEffect(() => {
+    setPathname(currentPathname);
+  }, [currentPathname]);
 
   return (
     <>

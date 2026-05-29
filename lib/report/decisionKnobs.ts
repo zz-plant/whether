@@ -126,10 +126,10 @@ type WeeklyLockCommitmentContext = {
 };
 
 const weeklyCallByRegime: Record<RegimeKey, string> = {
-  SCARCITY: "Freeze discretionary spend; protect cash-critical execution.",
-  DEFENSIVE: "Gate net-new commitments to short-payback work only.",
-  VOLATILE: "Make only reversible moves with clear exit criteria.",
-  EXPANSION: "Scale proven bets, but keep milestone-based approval gates.",
+  SCARCITY: "Capital is tight — freeze discretionary spend and protect cash.",
+  DEFENSIVE: "Focus on efficiency — new commitments should pay back within 12 months.",
+  VOLATILE: "Conditions uncertain — make reversible moves with clear exit criteria.",
+  EXPANSION: "Growth conditions — scale what's working and keep milestones for new bets.",
 };
 
 const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobContext) => {

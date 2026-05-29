@@ -239,7 +239,7 @@ const buildProvenance = (fetchedAt: string, now: Date) => {
   };
 };
 
-const buildInputSourceUrls = (baseRateUsed: "1M" | "3M" | "MISSING") => {
+const buildInputSourceUrls = (baseRateUsed: "FED" | "1M" | "3M" | "MISSING") => {
   const baseRateSourceUrl =
     baseRateUsed === "3M" ? seriesSourceUrls.threeMonth : seriesSourceUrls.oneMonth;
   return {

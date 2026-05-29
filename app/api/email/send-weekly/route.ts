@@ -77,7 +77,7 @@ export async function POST(request: Request) {
           sections.push(
             `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
             `<td style="padding:12px 16px;border:1px solid rgba(251,191,36,0.2);border-radius:8px;background:rgba(245,158,11,0.06);">`,
-            `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#fbbf24;margin:0 0 6px;">Volatile conditions</p>`,
+            `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#fbbf24;margin:0 0 6px;">Uncertain conditions</p>`,
             `<p style="font-size:0.85rem;color:#e2e8f0;margin:0;">Conditions can shift quickly. Favor reversible decisions and keep checkpoints active.</p>`,
             `</td></tr></table>`
           );

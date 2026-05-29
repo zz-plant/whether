@@ -21,8 +21,11 @@ export function DecisionSimulator({
   const [sim, setSim] = useState<SimResult | null>(null);
   const [loading, setLoading] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const lastFetched = useRef(currentTightness);
 
   const fetchSim = useCallback(async (t: number) => {
+    if (t === lastFetched.current) return;
+    lastFetched.current = t;
     setLoading(true);
     try {
       const res = await fetch(
@@ -36,12 +39,22 @@ export function DecisionSimulator({
     setLoading(false);
   }, [currentRiskAppetite]);
 
-  useEffect(() => { fetchSim(sliderTightness); }, [fetchSim, sliderTightness]);
+  useEffect(() => {
+    setSliderTightness(currentTightness);
+    fetchSim(currentTightness);
+  }, [currentTightness, fetchSim]);
 
   const handleChange = (value: number) => {
     setSliderTightness(value);
     clearTimeout(debounce.current);
-    debounce.current = setTimeout(() => fetchSim(value), 150);
+    debounce.current = setTimeout(() => fetchSim(value), 400);
+  };
+
+  const handleRelease = () => {
+    clearTimeout(debounce.current);
+    if (sliderTightness !== lastFetched.current) {
+      fetchSim(sliderTightness);
+    }
   };
 
   const isDifferent = sim ? sim.regime !== currentRegime : false;
@@ -62,7 +75,9 @@ export function DecisionSimulator({
           min={20}
           max={85}
           value={sliderTightness}
-          onChange={(e) => setSliderTightness(Number(e.target.value))}
+          onChange={(e) => handleChange(Number(e.target.value))}
+          onMouseUp={handleRelease}
+          onTouchEnd={handleRelease}
           className="flex-1 h-2 rounded-full appearance-none bg-slate-800 cursor-pointer
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sky-400 [&::-webkit-slider-thumb]:cursor-pointer
@@ -105,7 +120,7 @@ export function DecisionSimulator({
         </div>
       </div>
 
-      <div className="mt-3 flex justify-between text-[0.6rem] text-slate-600 px-1">
+      <div className="mt-3 flex justify-between text-fluid-nano text-slate-600 px-1">
         <span>Loose</span>
         <span className={`${currentTightness >= 65 ? "text-amber-400" : "text-slate-600"}`}>Defensive ↑65</span>
         <span className={`${currentTightness >= 75 ? "text-rose-400" : "text-slate-600"}`}>Scarcity ↑75</span>

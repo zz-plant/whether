@@ -24,7 +24,7 @@ export function SlackPreviewOverlay() {
       {/* 1.91:1 Slack aspect ratio box centered */}
       <div className="relative w-full max-w-[1200px] aspect-[1.91/1] border-2 border-dashed border-sky-500/80 bg-sky-500/[0.02] shadow-[0_0_0_9999px_rgba(4,8,16,0.75)] rounded">
         {/* Label badge */}
-        <span className="absolute top-3 left-3 rounded-full bg-sky-500/90 backdrop-blur px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-950 shadow-lg">
+        <span className="absolute top-3 left-3 rounded-full bg-sky-500/90 backdrop-blur px-2.5 py-1 text-fluid-nano font-bold tracking-[0.06em] text-slate-950 shadow-lg">
           Slack Preview Area (1.91:1)
         </span>
       </div>

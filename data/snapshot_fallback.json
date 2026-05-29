@@ -4,6 +4,7 @@
   "fetched_at": "2026-04-12T18:41:16.398Z",
   "isLive": false,
   "yields": {
+    "fedFunds": 4.33,
     "oneMonth": 3.66,
     "threeMonth": 3.68,
     "twoYear": 3.78,

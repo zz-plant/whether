@@ -34,7 +34,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         <div className="space-y-1.5">
           {SHORTCUTS.map(([key, desc]) => (
             <div key={key} className="flex items-center gap-3 text-xs">
-              <kbd className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 text-slate-300 font-mono text-[11px] min-w-[1.5rem] text-center">
+              <kbd className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 text-slate-300 font-mono text-fluid-nano min-w-[1.5rem] text-center">
                 {key}
               </kbd>
               <span className="text-slate-400">{desc}</span>

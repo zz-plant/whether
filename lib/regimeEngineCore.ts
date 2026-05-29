@@ -7,7 +7,7 @@ export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 export interface RegimeScores {
   tightness: number;
   riskAppetite: number;
-  baseRateUsed: "1M" | "3M" | "MISSING";
+  baseRateUsed: "FED" | "1M" | "3M" | "MISSING";
   baseRate: number;
   curveSlope: number | null;
 }
@@ -116,7 +116,7 @@ export interface RegimeAssessment {
   signalInfluence?: RegimeSignalInfluence[];
 }
 
-export const BASE_RATE_TIGHTNESS_THRESHOLD = 5;
+export const BASE_RATE_TIGHTNESS_THRESHOLD = 3.5;
 export const TIGHTNESS_BASE_RATE_POINTS = 90;
 export const TIGHTNESS_INVERSION_POINTS = 25;
 export const TIGHTNESS_CAP = 100;
@@ -125,12 +125,24 @@ export const RISK_APPETITE_MAX_SLOPE = 1.5;
 export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
 export const REGIME_REVERSAL_DAYS = 30;
-export const TREASURY_SOURCE_LABEL = "FRED CSV (DGS1MO, DGS3MO, DGS2, DGS10)";
+export const TREASURY_SOURCE_LABEL = "FRED CSV (DFF, DGS1MO, DGS3MO, DGS2, DGS10)";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
+
 const BASE_RATE_TIGHTNESS_MULTIPLIER = 180;
 const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
+
+export const REGIME_CONFIDENCE_NEAR_THRESHOLD = 5;
+export const REGIME_CONFIDENCE_MEDIUM_THRESHOLD = 12;
+export const CONFIDENCE_PERCENT_BASELINE = 55;
+export const CONFIDENCE_PERCENT_PER_POINT = 3;
+export const CONFIDENCE_PERCENT_FLOOR = 35;
+export const CONFIDENCE_PERCENT_CEILING = 92;
+
+export const FORECAST_CONE_HIGH = 3.5;
+export const FORECAST_CONE_MEDIUM = 5;
+export const FORECAST_CONE_LOW = 7;
 
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
@@ -187,6 +199,9 @@ export const RISK_APPETITE_EXPLANATION =
 export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export const getBaseRate = (yields: TreasuryYields) => {
+  if (typeof yields.fedFunds === "number") {
+    return { value: yields.fedFunds, used: "FED" as const };
+  }
   if (typeof yields.oneMonth === "number") {
     return { value: yields.oneMonth, used: "1M" as const };
   }
