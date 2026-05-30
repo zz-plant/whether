@@ -10,10 +10,9 @@ import {
 } from "../../lib/navigation/globalHeader";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
+import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 import { CadenceSelector, ViewSelector } from "./cadenceSelector";
 import { ThemeToggleButton } from "./themeToggleButton";
-import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
-import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 
 export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/" || pathname === "/v2") {
