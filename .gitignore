@@ -29,7 +29,6 @@ artifacts/agent
 
 # Tooling
 .cmux/
-.opencode/
 .sisyphus/
 .codex/
 .agent/
