@@ -58,8 +58,11 @@ export async function GET(request: Request) {
   const shares = quote.defaultKeyStatistics?.sharesOutstanding;
   const marketCap = price && shares ? price * shares : quote.price?.marketCap;
 
-  const fcfMargin = revenue && revenue > 0
-    ? Math.round(((cash ?? 0) - (debt ?? 0)) / revenue * 1000) / 10
+  const ocf = quote.cashflowStatementHistory?.cashflowStatements?.[0]?.operatingCashFlow?.raw;
+  const capex = quote.cashflowStatementHistory?.cashflowStatements?.[0]?.capitalExpenditure?.raw;
+  const fcf = ocf != null && capex != null ? ocf - Math.abs(capex) : null;
+  const fcfMargin = fcf != null && revenue && revenue > 0
+    ? Math.round((fcf / revenue) * 1000) / 10
     : null;
 
   const ev = marketCap && (marketCap > 0) ? marketCap + (debt ?? 0) - (cash ?? 0) : null;
@@ -67,18 +70,21 @@ export async function GET(request: Request) {
     ? Math.round((ev / revenue) * 10) / 10
     : null;
 
+  const peerSymbols = SAAS_BASKET.filter((s) => s !== ticker);
+  const peerQuotes = await Promise.all(peerSymbols.map((s) => fetchQuote(s)));
+
   const peerData: Array<{ symbol: string; growth?: number; fcfMargin?: number | null }> = [];
-  for (const symbol of SAAS_BASKET) {
-    if (symbol === ticker) continue;
-    const peerQuote = await fetchQuote(symbol);
+  for (let i = 0; i < peerSymbols.length; i++) {
+    const peerQuote = peerQuotes[i];
     if (!peerQuote) continue;
     const pRev = peerQuote.financialData?.totalRevenue;
-    const pCash = peerQuote.financialData?.totalCash;
-    const pDebt = peerQuote.financialData?.totalDebt;
+    const pOcf = peerQuote.cashflowStatementHistory?.cashflowStatements?.[0]?.operatingCashFlow?.raw;
+    const pCapex = peerQuote.cashflowStatementHistory?.cashflowStatements?.[0]?.capitalExpenditure?.raw;
+    const pFcf = pOcf != null && pCapex != null ? pOcf - Math.abs(pCapex) : null;
     peerData.push({
-      symbol,
+      symbol: peerSymbols[i],
       growth: peerQuote.financialData?.revenueGrowth,
-      fcfMargin: pRev && pRev > 0 ? Math.round(((pCash ?? 0) - (pDebt ?? 0)) / pRev * 1000) / 10 : null,
+      fcfMargin: pFcf != null && pRev && pRev > 0 ? Math.round((pFcf / pRev) * 1000) / 10 : null,
     });
   }
 

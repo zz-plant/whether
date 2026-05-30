@@ -1,19 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SectionedReportPanel } from "../app/planning/components/sectionedReportPanel";
+import { ReportSection } from "../app/components/reportSection";
 
-describe("SectionedReportPanel", () => {
-  it("renders a static section header and body without nested disclosure controls", () => {
+describe("ReportSection", () => {
+  it("renders a static section header and body in split variant", () => {
     const html = renderToStaticMarkup(
-      <SectionedReportPanel
+      <ReportSection
         id="ops-weekly-plan"
         label="Start"
         title="Weekly plan"
         description="Review this before changing team pace."
+        variant="split"
       >
         <p>Weekly approval boundary</p>
-      </SectionedReportPanel>,
+      </ReportSection>,
     );
 
     assert.match(html, /Weekly plan/);
@@ -22,3 +23,4 @@ describe("SectionedReportPanel", () => {
     assert.doesNotMatch(html, /type="button"/);
   });
 });
+

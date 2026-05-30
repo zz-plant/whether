@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { IBM_Plex_Sans, Fraunces } from "next/font/google";
 import { GlobalHeader } from "./components/globalHeader";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
@@ -10,6 +11,20 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
+
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans-google",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-display-google",
+  display: "swap",
+});
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -142,7 +157,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="font-sans">
+    <html lang="en" suppressHydrationWarning className={`${ibmPlexSans.variable} ${fraunces.variable} font-sans`}>
       <head>
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

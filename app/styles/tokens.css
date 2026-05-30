@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 @import 'tailwindcss';
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -78,8 +77,8 @@
 :root {
   --weather-shell-pad-inline: 1rem;
   color-scheme: dark;
-  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: var(--font-sans-google, "IBM Plex Sans", system-ui, sans-serif);
+  --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
 
@@ -126,8 +125,8 @@
   --app-raised: #1a1d22;
   --app-nested: #0d0f12;
   --app-text: #f4f7fb;
-  --app-text-secondary: #aab7c8;
-  --app-text-muted: #748196;
+  --app-text-secondary: #cbd5e1;
+  --app-text-muted: #94a3b8;
   --app-border: rgba(226, 232, 240, 0.085);
   --app-border-strong: rgba(226, 232, 240, 0.14);
 

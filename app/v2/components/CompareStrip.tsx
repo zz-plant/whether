@@ -7,9 +7,11 @@ import { REGIME_DISPLAY } from "../viewModel";
 export function CompareStrip({
   currentRegime,
   currentTightness,
+  tightnessDelta,
 }: {
   currentRegime: string;
   currentTightness: number;
+  tightnessDelta?: number;
 }) {
   const [isComparing, setIsComparing] = useState(false);
   const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(null);
@@ -60,6 +62,11 @@ export function CompareStrip({
           {previous.regime !== currentRegime ? (
             <p className="col-span-2 text-fluid-micro text-sky-300/80">
               Regime shifted from {REGIME_DISPLAY[previous.regime] ?? previous.regime} to {REGIME_DISPLAY[currentRegime] ?? currentRegime}
+            </p>
+          ) : null}
+          {tightnessDelta != null && tightnessDelta !== 0 ? (
+            <p className="col-span-2 text-fluid-micro text-white/40">
+              Tightness {tightnessDelta > 0 ? "increased" : "decreased"} by {Math.abs(tightnessDelta).toFixed(1)} pts since last period
             </p>
           ) : null}
         </div>

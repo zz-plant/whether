@@ -31,7 +31,7 @@ import { ExecutiveBriefingPanel } from "./components/executiveBriefingPanel";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
-import { SectionedReportPanel } from "./components/sectionedReportPanel";
+import { ReportSection } from "../components/reportSection";
 
 export type PlanningSearchParams = {
   month?: string;
@@ -228,7 +228,7 @@ export async function buildPlanningPageModel(
             title: "Weekly plan",
             description: "What to approve, hold, or revisit this cycle.",
             hashAliases: ["ops-monthly-action-summary-panel"],
-              children: h(SectionedReportPanel, {
+              children: h(ReportSection, { variant: "split",
                 id: "ops-operator-requests-panel",
                 label: "Coordinate",
                 title: "Execution asks",
@@ -286,7 +286,7 @@ export async function buildPlanningPageModel(
             title: "Rules before you commit",
             description: "Do, don't, and limit rules for new commitments.",
             hashAliases: ["ops-playbook-panel"],
-            children: h(SectionedReportPanel, {
+            children: h(ReportSection, { variant: "split",
               id: "ops-playbook-panel",
               label: "Rules",
               title: "Approve or hold moves",
@@ -319,7 +319,7 @@ export async function buildPlanningPageModel(
             title: "Finance strategy",
             description: "Budget direction and cash timing for the quarter.",
             hashAliases: ["ops-finance-strategy-panel"],
-            children: h(SectionedReportPanel, {
+            children: h(ReportSection, { variant: "split",
               id: "ops-finance-strategy-panel",
               label: "Verify",
               title: "Finance strategy",
@@ -341,7 +341,7 @@ export async function buildPlanningPageModel(
             title: "Test a decision",
             description: "Check if a specific move is safe right now — hiring, pricing, roadmap, M&A.",
             hashAliases: ["ops-decision-shield-panel"],
-            children: h(SectionedReportPanel, {
+            children: h(ReportSection, { variant: "split",
               id: "ops-decision-shield-panel",
               label: "Test",
               title: "Is this move safe right now?",
@@ -356,7 +356,7 @@ export async function buildPlanningPageModel(
             title: "Brief your team",
             description: "Role-specific memos for CFO, COO, CTO/CPO tailored to current conditions.",
             hashAliases: ["ops-executive-briefing-panel"],
-            children: h(SectionedReportPanel, {
+            children: h(ReportSection, { variant: "split",
               id: "ops-executive-briefing-panel",
               label: "Brief",
               title: "Brief your leadership team",
@@ -378,7 +378,7 @@ export async function buildPlanningPageModel(
               "decision-memory",
             ],
             children: h("div", { className: "space-y-6" },
-              h(SectionedReportPanel, {
+              h(ReportSection, { variant: "split",
                 id: "ops-export-briefs-panel",
                 label: "Share",
                 title: "Send this brief",
@@ -415,7 +415,7 @@ export async function buildPlanningPageModel(
                 h(DecisionMemoryPanel),
                 ),
               }),
-              h(SectionedReportPanel, {
+              h(ReportSection, { variant: "split",
                 id: "ops-operator-requests-panel",
                 label: "Coordinate",
                 title: "Execution asks",

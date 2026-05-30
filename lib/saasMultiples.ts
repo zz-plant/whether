@@ -23,11 +23,17 @@ type YahooQuote = {
     totalRevenue?: number; revenueGrowth?: number;
     totalDebt?: number; totalCash?: number;
   };
+  cashflowStatementHistory?: {
+    cashflowStatements?: Array<{
+      operatingCashFlow?: { raw?: number };
+      capitalExpenditure?: { raw?: number };
+    }>;
+  };
 };
 
 export async function fetchQuote(symbol: string): Promise<YahooQuote | null> {
   try {
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics`;
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics,cashflowStatementHistory`;
     const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
     if (!res.ok) return null;
     const data = await res.json() as { quoteSummary?: { result?: [YahooQuote] } };

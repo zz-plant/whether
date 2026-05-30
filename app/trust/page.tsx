@@ -8,7 +8,7 @@ import {
   PRIMARY_AUDIENCE_ACTION,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
-import { MethodSection } from "./components/MethodSection";
+import { ReportSection } from "../components/reportSection";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -37,7 +37,7 @@ export default async function MethodPage() {
     reportShellProps,
   } = await buildTrustPageModel();  const secondaryContent = (
     <>
-      <MethodSection
+      <ReportSection
         id="source-board"
         title="Source board"
         description="The compact source handoff behind the homepage trust board."
@@ -67,9 +67,9 @@ export default async function MethodPage() {
             </div>
           </article>
         </div>
-      </MethodSection>
+      </ReportSection>
 
-      <MethodSection
+      <ReportSection
         id="sources-freshness"
         title="Sources and freshness"
         description="Where the current recommendation came from and how current it is."
@@ -89,9 +89,9 @@ export default async function MethodPage() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Per-source status</p>
           <SourceHealthPanel rows={reportData.sourceHealth} />
         </div>
-      </MethodSection>
+      </ReportSection>
 
-      <MethodSection
+      <ReportSection
         id="confidence-limits"
         title="Confidence and reliability limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
@@ -117,9 +117,9 @@ export default async function MethodPage() {
             </div>
           </article>
         </div>
-      </MethodSection>
+      </ReportSection>
 
-      <MethodSection
+      <ReportSection
         id="formula-reference"
         title="Formula reference"
         description="How this score is built."
@@ -138,9 +138,9 @@ export default async function MethodPage() {
             <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source health</Link>
           </div>
         </div>
-      </MethodSection>
+      </ReportSection>
 
-      <MethodSection id="revisit-call" title="What would make this recommendation wrong?">
+      <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 rounded-md px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Active warning patterns</p>
@@ -170,13 +170,13 @@ export default async function MethodPage() {
             </ul>
           </article>
         </div>
-      </MethodSection>
+      </ReportSection>
 
-      <MethodSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
+      <ReportSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
         <pre className="weather-hub-card overflow-x-auto rounded-lg px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>
-      </MethodSection>
+      </ReportSection>
 
       <BeginnerGlossaryPanel />
     </>
@@ -184,7 +184,7 @@ export default async function MethodPage() {
 
   return (
     <ReportShell {...reportShellProps}>
-      <MethodSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and decision readiness.">
+      <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and decision readiness.">
         <div className={`weather-hub-card rounded-lg px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
           <div className="flex items-center gap-3">
             <span className={`flex h-3 w-3 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
@@ -260,7 +260,7 @@ export default async function MethodPage() {
             Whether is decision-support software, not an authority. Verify source data and combine it with company-specific metrics before acting on irreversible decisions. {PRIMARY_AUDIENCE_SUMMARY}
           </p>
         </div>
-      </MethodSection>
+      </ReportSection>
 
       {!isFallback && warnings.length === 0 ? (
         <details className="group mt-6 rounded-xl border border-white/[0.06] bg-slate-950/20 px-5 py-4">

@@ -17,7 +17,7 @@ import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { DecisionSimulator } from "../components/home/DecisionSimulator";
-import { RegimeTransitionProbability } from "../components/home/RegimeTransitionProbability";
+import { RegimeTransitionProbability, computeTransitionProbability } from "../components/home/RegimeTransitionProbability";
 import { DecisionTrendline } from "../components/home/DecisionTrendline";
 import { CompanyMetricsPanel } from "../components/home/CompanyMetricsPanel";
 import { TickerCompany } from "../components/home/TickerCompany";
@@ -74,6 +74,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   ]);
 
   const { homepage, regimeHistory, operatorContext } = data;
+  const isDegraded = !homepage.reportResult.ok;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
@@ -108,9 +109,18 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
   const isScreenshot = searchParams?.screenshot === "1";
 
+  const transition = computeTransitionProbability(regime);
+  const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
+
   return (
     <V2Shell regime={regime}>
       <FreshnessDot label={homepage.reportShell.fetchedAtLabel} />
+      {isDegraded ? (
+        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
+          <span className="font-semibold text-amber-300/80">Data is degraded.</span>{" "}
+          <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
+        </div>
+      ) : null}
       <p className="text-fluid-micro text-center text-white/25 mb-4 lg:hidden">
         Tightness {tightness}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · {signalDirection === "tighten" ? "tightening" : signalDirection === "ease" ? "easing" : "holding"} · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
@@ -134,7 +144,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             }}
           />
 
-          <CompareStrip currentRegime={regime} currentTightness={tightness} />
+          <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
 
           <V2ActionCard
             call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
@@ -163,7 +173,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
           </div>
 
-          <V2EvidenceDrawer>
+          <V2EvidenceDrawer highlight={toolHighlight}>
             <V2ToolsPanel>
               <DecisionSimulator
                 currentTightness={tightness}

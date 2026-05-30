@@ -50,12 +50,23 @@ export function V2RegimeHistory({ regimes, currentRegime }: Props) {
           {isViewingHistory && selectedLabel ? selectedLabel : "Conditions over time"}
         </p>
         {isViewingHistory ? (
-          <Link
-            href="/"
-            className="text-fluid-nano font-medium text-sky-300 hover:text-sky-200 transition-colors no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
-          >
-            Back to now
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href).catch(() => {});
+              }}
+              className="text-fluid-nano font-medium text-white/30 hover:text-white/50 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+            >
+              Copy link
+            </button>
+            <Link
+              href="/"
+              className="text-fluid-nano font-medium text-sky-300 hover:text-sky-200 transition-colors no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
+            >
+              Back to now
+            </Link>
+          </div>
         ) : null}
       </div>
 
