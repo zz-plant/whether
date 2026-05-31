@@ -8,11 +8,11 @@ import {
   normalizePathname,
   resolveGlobalHeaderRouteLabel,
 } from "../../lib/navigation/globalHeader";
+import { CadenceSelector, ViewSelector } from "./cadenceSelector";
+import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
-import { CadenceSelector, ViewSelector } from "./cadenceSelector";
-import { ThemeToggleButton } from "./themeToggleButton";
 
 export const reportHeaderNextStep = (pathname: string) => {
   if (pathname === "/" || pathname === "/v2") {
@@ -40,7 +40,7 @@ export const reportHeaderNextStep = (pathname: string) => {
 
 export const resolveReportHeaderUtilityAction = (pathname: string) =>
   pathname === "/" || pathname === "/v2"
-    ? { href: "/v2", label: "Toolkits" }
+    ? { href: "/resolve#toolkit-library", label: "Toolkits" }
     : pathname.startsWith("/evidence")
       ? { href: "/evidence", label: "Evidence" }
       : pathname.startsWith("/planning")
@@ -82,7 +82,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </span>
           </div>
 
-          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <div className="ml-auto flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
             {isReportRoute ? (
               <>
                 {isHomeBrief ? (
@@ -108,11 +108,12 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     </Link>
                   </>
                 )}
+                <GlobalHeaderActionsClient />
               </>
             ) : (
               <>
                 <GlobalHeaderSearchForm className="grid w-full gap-2 sm:w-auto sm:grid-cols-[minmax(0,16rem)_auto] sm:items-center" />
-                <ThemeToggleButton />
+                <GlobalHeaderActionsClient />
               </>
             )}
           </div>

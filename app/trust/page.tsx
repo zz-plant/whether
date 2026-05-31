@@ -35,7 +35,9 @@ export default async function MethodPage() {
     revisitBullets,
     trustVerdict,
     reportShellProps,
-  } = await buildTrustPageModel();  const secondaryContent = (
+  } = await buildTrustPageModel();
+
+  const secondaryContent = (
     <>
       <ReportSection
         id="source-board"

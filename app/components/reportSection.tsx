@@ -6,9 +6,8 @@ type ReportSectionProps = {
   description?: string;
   children: ReactNode;
   variant?: "unified" | "split";
-  label?: string; // only used in variant="split"
+  label?: string;
   headingLevel?: "h2" | "h3" | "h4";
-  defaultOpen?: boolean;
 };
 
 export function ReportSection({
@@ -17,7 +16,7 @@ export function ReportSection({
   description,
   children,
   variant = "unified",
-  label = "Section",
+  label,
   headingLevel,
 }: ReportSectionProps) {
   const headingId = `section-${id}-heading`;
@@ -31,9 +30,11 @@ export function ReportSection({
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
             aria-hidden="true"
           />
-          <span className="text-xs font-semibold tracking-[0.2em] text-sky-200/80">
-            {label}
-          </span>
+          {label ? (
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200/80">
+              {label}
+            </span>
+          ) : null}
           <HeadingTag id={headingId} className="mt-1 max-w-2xl text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
             {title}
           </HeadingTag>
@@ -50,7 +51,6 @@ export function ReportSection({
     );
   }
 
-  // Unified variant (MethodSection styling)
   return (
     <section
       id={id}
