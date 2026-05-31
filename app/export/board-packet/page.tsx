@@ -9,7 +9,7 @@ export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Board packet — Whether",
-  description: "Meeting-ready one-pager with the weekly call, evidence summary, and action items.",
+  description: "Meeting-ready one-pager with the weekly call, supporting evidence, and action items.",
   path: "/export/board-packet",
   imageAlt: "Whether board packet",
 });
