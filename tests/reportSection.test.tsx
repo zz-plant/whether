@@ -4,6 +4,24 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { ReportSection } from "../app/components/reportSection";
 
 describe("ReportSection", () => {
+  it("renders unified sections with generated heading labels", () => {
+    const html = renderToStaticMarkup(
+      <ReportSection
+        id="trust-snapshot"
+        title="System status"
+        description="Current operating state."
+      >
+        <p>All systems operational</p>
+      </ReportSection>,
+    );
+
+    assert.match(html, /id="trust-snapshot"/);
+    assert.match(html, /aria-labelledby="section-trust-snapshot-heading"/);
+    assert.match(html, /id="section-trust-snapshot-heading"/);
+    assert.match(html, /System status/);
+    assert.match(html, /All systems operational/);
+  });
+
   it("renders a static section header and body in split variant", () => {
     const html = renderToStaticMarkup(
       <ReportSection
@@ -23,4 +41,3 @@ describe("ReportSection", () => {
     assert.doesNotMatch(html, /type="button"/);
   });
 });
-

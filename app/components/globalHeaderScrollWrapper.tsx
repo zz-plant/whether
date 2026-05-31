@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useScrollDirection } from "./useScrollDirection";
 
 type GlobalHeaderScrollWrapperProps = {
   children: ReactNode;
 };
 
-export function GlobalHeaderScrollWrapper({ children }: { children: ReactNode }) {
+export function GlobalHeaderScrollWrapper({ children }: GlobalHeaderScrollWrapperProps) {
   const { direction, isPastThreshold } = useScrollDirection();
   const [hidden, setHidden] = useState(false);
   const [atTop, setAtTop] = useState(true);
 
-  /* Hide header on scroll down past threshold, reveal on scroll up */
   useEffect(() => {
     if (!isPastThreshold) {
       setHidden(false);
