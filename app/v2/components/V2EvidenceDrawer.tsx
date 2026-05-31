@@ -6,7 +6,7 @@ export function V2EvidenceDrawer({ children, highlight }: { children?: ReactNode
   const [open, setOpen] = useState(false);
 
   return (
-    <details className="group weather-card shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+    <details className="group weather-card" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary className="cursor-pointer list-none px-4 py-3 text-xs font-semibold tracking-[0.04em] text-white/40 hover:text-white/70 transition-colors select-none focus-visible:outline-2 focus-visible:outline-sky-400 focus-visible:outline-offset-1 rounded-md">
         <div>
           <span>Evidence &amp; tools</span>

@@ -5,8 +5,8 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../../lib/report/h
 import { loadHomePageAssembly } from "../../lib/report/homePageAssemblyLoader";
 import { V2Shell } from "./components/V2Shell";
 import { V2DecisionHero } from "./components/V2DecisionHero";
-import { V2DeltaTrust } from "./components/V2DeltaTrust";
-import { V2ActionCard } from "./components/V2ActionCard";
+import { DeltaTrustStrip } from "./components/DeltaTrustStrip";
+import { ActionCard } from "./components/ActionCard";
 import { V2RegimeHistory } from "./components/V2RegimeHistory";
 import { V2EvidenceDrawer } from "./components/V2EvidenceDrawer";
 import { V2RitualCheck } from "./components/V2RitualCheck";
@@ -66,12 +66,26 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
 async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
-  const [data, cadenceData] = await Promise.all([
-    loadHomePageAssembly(searchParams),
-    activeCadence !== "weekly"
-      ? buildAgentInterfaceResponse(activeCadence).catch(() => null)
-      : Promise.resolve(null),
-  ]);
+  let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
+  let cadenceData: Awaited<ReturnType<typeof buildAgentInterfaceResponse>> | null = null;
+
+  try {
+    [data, cadenceData] = await Promise.all([
+      loadHomePageAssembly(searchParams),
+      activeCadence !== "weekly"
+        ? buildAgentInterfaceResponse(activeCadence).catch(() => null)
+        : Promise.resolve(null),
+    ]);
+  } catch {
+    return (
+      <V2Shell regime="EXPANSION">
+        <div className="text-center py-16 space-y-3">
+          <p className="text-white/40 text-sm">Unable to load the weekly brief.</p>
+          <p className="text-white/30 text-fluid-micro">The data pipeline may be temporarily unavailable. Please try again shortly.</p>
+        </div>
+      </V2Shell>
+    );
+  }
 
   const { homepage, regimeHistory, operatorContext } = data;
   const isDegraded = !homepage.reportResult.ok;
@@ -79,7 +93,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
-  const macroTrendline = regimeHistory.slice(-6);
+  const macroTrendline = regimeHistory.slice(-12);
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
@@ -121,7 +135,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
         </div>
       ) : null}
-      <p className="text-fluid-micro text-center text-white/25 mb-4 lg:hidden">
+      <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
         Tightness {tightness}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · {signalDirection === "tighten" ? "tightening" : signalDirection === "ease" ? "easing" : "holding"} · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
       <div data-screenshot={isScreenshot ? "true" : undefined}>
@@ -146,7 +160,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
 
           <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
 
-          <V2ActionCard
+          <ActionCard
             call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
             actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
             guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
@@ -161,7 +175,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           </SwipeableWeek>
 
           <div className="lg:hidden space-y-4">
-            <V2DeltaTrust
+            <DeltaTrustStrip
               tightnessDelta={tightnessDelta}
               riskAppetiteDelta={riskAppetiteDelta}
               confidenceLabel={confidenceLabel}
@@ -194,7 +208,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
 
           <Link
             href="/planning"
-            className="weather-card flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)] hover:border-sky-500/30 transition-colors no-underline group"
+            className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
           >
             <div>
               <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Next step</p>
@@ -217,7 +231,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         </div>
 
         <aside className="hidden lg:block space-y-4">
-          <V2DeltaTrust
+          <DeltaTrustStrip
             tightnessDelta={tightnessDelta}
             riskAppetiteDelta={riskAppetiteDelta}
             confidenceLabel={confidenceLabel}
@@ -265,6 +279,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
       <StickyCallStrip
         call={canonicalDecision?.doNowLines?.[0] ?? ""}
         arrow={DIRECTION_ARROW[signalDirection]}
+        tightnessDelta={tightnessDelta}
       />
     </V2Shell>
   );

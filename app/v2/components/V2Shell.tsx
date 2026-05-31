@@ -31,7 +31,7 @@ export function V2Shell({
 
   return (
     <div className={`min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] ${atmosphereGradient ? `bg-gradient-to-b ${atmosphereGradient}` : ""}`}>
-      <main className="mx-auto max-w-[72rem] px-4 py-6 sm:py-8">
+      <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-6 sm:py-8">
         {children}
       </main>
 

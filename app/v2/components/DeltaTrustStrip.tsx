@@ -23,7 +23,7 @@ export function DeltaTrustStrip({
   const relColor = RELIABILITY_COLOR(reliabilityScore);
 
   return (
-    <div className="weather-card space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
+    <div className="weather-card space-y-3">
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="text-white/40">Trend</span>

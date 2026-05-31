@@ -38,10 +38,10 @@ export function V2SubscribeForm() {
   };
 
   return (
-    <div className="weather-card bg-slate-900/60 backdrop-blur border border-white/10 p-4 sm:p-6 rounded-none space-y-4">
+    <div className="weather-card space-y-3">
       <div>
-        <h3 className="text-fluid-xs font-semibold text-white/90 tracking-wide">Weekly Posture Alerts</h3>
-        <p className="text-fluid-micro text-white/50 mt-1">Get the US Macro Operating Posture briefing in your inbox every Sunday morning.</p>
+        <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70">Weekly briefing</p>
+        <p className="text-fluid-micro text-white/40 mt-1">Get the operating posture in your inbox every Monday.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
@@ -54,7 +54,7 @@ export function V2SubscribeForm() {
           }}
           placeholder="your@email.com"
           disabled={status === "loading"}
-          className="flex-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white rounded-none focus:outline-none focus:border-sky-500/50 disabled:opacity-50"
+          className="flex-1 px-3 py-2 text-xs bg-[var(--bg-nested)] border border-white/[0.06] text-white/80 rounded-lg focus:outline-none focus:border-sky-500/50 disabled:opacity-50"
         />
         <button
           type="submit"

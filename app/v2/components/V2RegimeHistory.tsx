@@ -44,7 +44,7 @@ export function V2RegimeHistory({ regimes, currentRegime }: Props) {
     : null;
 
   return (
-    <div className="weather-card shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
+    <div className="weather-card">
       <div className="flex items-center justify-between mb-2">
         <p className="text-fluid-nano font-semibold tracking-[0.06em] text-white/40">
           {isViewingHistory && selectedLabel ? selectedLabel : "Conditions over time"}
@@ -56,7 +56,7 @@ export function V2RegimeHistory({ regimes, currentRegime }: Props) {
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href).catch(() => {});
               }}
-              className="text-fluid-nano font-medium text-white/30 hover:text-white/50 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="text-fluid-nano font-medium text-white/40 hover:text-white/60 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
             >
               Copy link
             </button>

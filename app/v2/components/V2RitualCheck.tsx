@@ -35,7 +35,7 @@ export function V2RitualCheck({ recordDate }: { recordDate?: string }) {
   if (!recordDate) return null;
 
   return (
-    <div className="weather-card flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
+    <div className="weather-card flex items-center justify-between">
       <button
         type="button"
         onClick={handleToggle}

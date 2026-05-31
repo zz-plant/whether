@@ -6,14 +6,23 @@ import { useClipboardCopy } from "../../components/useClipboardCopy";
 type Props = {
   call: string;
   arrow: string;
+  tightnessDelta?: number;
 };
 
-export function StickyCallStrip({ call, arrow }: Props) {
+export function StickyCallStrip({ call, arrow, tightnessDelta }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
 
+  const deltaLabel = tightnessDelta != null && tightnessDelta !== 0
+    ? `${tightnessDelta > 0 ? "+" : ""}${tightnessDelta.toFixed(1)} pts`
+    : "unchanged";
+  const deltaColor = tightnessDelta != null && tightnessDelta > 0 ? "text-rose-300" : tightnessDelta != null && tightnessDelta < 0 ? "text-emerald-300" : "";
+
   const handleCopy = async () => {
-    await copyToClipboard(`Whether · ${arrow} ${call} — whether.work`, "Weekly call");
+    const text = tightnessDelta != null
+      ? `Whether · ${arrow} ${call} (${deltaLabel}) — whether.work`
+      : `Whether · ${arrow} ${call} — whether.work`;
+    await copyToClipboard(text, "Weekly call");
   };
 
   return (
@@ -23,6 +32,9 @@ export function StickyCallStrip({ call, arrow }: Props) {
           <span className="mr-1.5">{arrow}</span>
           {call}
         </span>
+        {tightnessDelta != null && tightnessDelta !== 0 ? (
+          <span className={`text-fluid-xs font-semibold ${deltaColor} flex-shrink-0`}>{deltaLabel}</span>
+        ) : null}
         <a
           href="/api/image/brief"
           download="whether-brief.png"

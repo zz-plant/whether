@@ -58,7 +58,7 @@ export function ActionCard({
   return (
       <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
       <div className="flex items-center justify-between gap-3 mb-4">
-        <p className="text-xs font-semibold tracking-[0.06em] text-slate-500">
+        <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
           {DIRECTION_LABEL[direction]}
         </p>
         <button
@@ -101,7 +101,7 @@ export function ActionCard({
               <div className="mt-2 h-2 w-full rounded-full bg-[var(--bg-nested)] overflow-hidden">
                 <div className={`h-full rounded-full ${pauseColor}`} style={{ width: `${Math.min(100, (tightness / pauseThreshold) * 100)}%` }} />
               </div>
-              <div className="flex justify-between text-[0.55rem] text-white/30 mt-0.5">
+              <div className="flex justify-between text-[0.55rem] text-white/50 mt-0.5">
                 <span>{tightness}</span>
                 <span>{pauseThreshold}</span>
               </div>

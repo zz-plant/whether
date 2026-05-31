@@ -29,7 +29,7 @@ export function CompareStrip({
   if (!previous) return null;
 
   return (
-    <div className="weather-card shadow-[0_2px_8px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.12)]">
+    <div className="weather-card">
       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
         <input
           type="checkbox"
@@ -46,14 +46,14 @@ export function CompareStrip({
       {isComparing ? (
         <div className="mt-2 pt-2 border-t border-white/[0.04] grid grid-cols-2 gap-3 text-fluid-micro">
           <div>
-            <p className="text-white/30">Previous</p>
+            <p className="text-white/40">Previous</p>
             <p className="text-white/50 font-semibold mt-0.5">
               {REGIME_DISPLAY[previous.regime] ?? previous.regime}
             </p>
-            <p className="text-white/20 mt-0.5">{previous.recordDate}</p>
+            <p className="text-white/30 mt-0.5">{previous.recordDate}</p>
           </div>
           <div>
-            <p className="text-white/30">Current</p>
+            <p className="text-white/40">Current</p>
             <p className="text-white/70 font-semibold mt-0.5">
               {REGIME_DISPLAY[currentRegime] ?? currentRegime}
             </p>

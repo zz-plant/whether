@@ -108,7 +108,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     </Link>
                   </>
                 )}
-                <GlobalHeaderActionsClient />
               </>
             ) : (
               <>

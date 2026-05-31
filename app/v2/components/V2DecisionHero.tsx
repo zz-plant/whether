@@ -42,6 +42,7 @@ export function V2DecisionHero({
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
+  const isUnusual = Math.abs(tightnessDelta) >= 3;
 
   const stageLabel = operatorContext.companyStage
     ? operatorContext.companyStage === "pre-seed" ? "Pre-seed"
@@ -87,13 +88,16 @@ export function V2DecisionHero({
               {DIRECTION_LABEL[signalDirection]}
             </span>
             {tightnessDelta !== 0 ? (
-              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>{deltaLabel}</span>
+              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
+                {deltaLabel}
+                {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
+              </span>
             ) : null}
           </p>
           <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
           {stageLabel ? <p>{stageLabel}</p> : null}
-          <p className="text-white/30">{recordDate}</p>
-          {fetchedAt ? <p className="text-white/20">Updated {fetchedAt}</p> : null}
+          <p className="text-white/40">{recordDate}</p>
+          {fetchedAt ? <p className="text-white/30">Updated {fetchedAt}</p> : null}
           <StageSwitcher currentStage={operatorContext.companyStage} />
         </div>
       </div>
