@@ -81,6 +81,7 @@ describe("assembleHomePage streaming contract", () => {
       actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
       flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
       weeklyCall: homepage.weeklyCall,
+      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
     });
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);

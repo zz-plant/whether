@@ -173,7 +173,7 @@ Canonical top-fold order on homepage must remain:
 7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
-- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`.
+- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Boldness Budget`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
   - **Action**: what to do now.
@@ -190,7 +190,7 @@ Implementation guardrails:
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
 - Homepage utility search should stay demoted behind a secondary `Find a tool` action so the first-screen priority remains reading the weekly call.
-- The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance.
+- The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Boldness Budget first, tightness only as a supporting driver or guardrail input.
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane, the bounded action to reopen now, and the flip-back condition.
