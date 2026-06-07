@@ -9,10 +9,12 @@ import { buildImageBriefApiPath } from "../../../lib/report/imageBriefSearchPara
 type Props = {
   call: string;
   arrow: string;
-  tightnessDelta?: number;
+  boldnessScore: number;
+  boldnessDelta: number;
+  guardrail?: string;
 };
 
-export function StickyCallStrip({ call, arrow, tightnessDelta }: Props) {
+export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, guardrail }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
@@ -21,15 +23,18 @@ export function StickyCallStrip({ call, arrow, tightnessDelta }: Props) {
     [currentSearchParams],
   );
 
-  const deltaLabel = tightnessDelta != null && tightnessDelta !== 0
-    ? `${tightnessDelta > 0 ? "+" : ""}${tightnessDelta.toFixed(1)} pts`
+  const deltaLabel = boldnessDelta !== 0
+    ? `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`
     : "unchanged";
-  const deltaColor = tightnessDelta != null && tightnessDelta > 0 ? "text-rose-300" : tightnessDelta != null && tightnessDelta < 0 ? "text-emerald-300" : "";
+  const deltaColor = boldnessDelta > 0 ? "text-emerald-300" : boldnessDelta < 0 ? "text-rose-300" : "text-white/45";
 
   const handleCopy = async () => {
-    const text = tightnessDelta != null
-      ? `Whether · ${arrow} ${call} (${deltaLabel}) — whether.work`
-      : `Whether · ${arrow} ${call} — whether.work`;
+    const text = [
+      `Whether · Boldness Budget ${boldnessScore}/100 (${deltaLabel})`,
+      `${arrow} ${call}`,
+      guardrail ? `Bounded condition: ${guardrail}` : null,
+      "whether.work",
+    ].filter(Boolean).join(" — ");
     await copyToClipboard(text, "Weekly call");
   };
 
@@ -38,11 +43,9 @@ export function StickyCallStrip({ call, arrow, tightnessDelta }: Props) {
       <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[var(--bg-raised)] px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.3)]">
         <span className="text-sm font-semibold text-white/90 flex-1 min-w-0">
           <span className="mr-1.5">{arrow}</span>
-          {call}
+          <span className="text-white/45">Boldness {boldnessScore}/100</span> · {call}
         </span>
-        {tightnessDelta != null && tightnessDelta !== 0 ? (
-          <span className={`text-fluid-xs font-semibold ${deltaColor} flex-shrink-0`}>{deltaLabel}</span>
-        ) : null}
+        <span className={`text-fluid-xs font-semibold ${deltaColor} flex-shrink-0`}>{deltaLabel}</span>
         <a
           href={imageBriefHref}
           download="whether-brief.png"

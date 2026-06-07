@@ -27,6 +27,7 @@ import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInte
 import {
   computeReliabilityScore,
   DIRECTION_ARROW,
+  buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
 
@@ -63,6 +64,82 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
   );
 }
 
+function formatSignedDelta(value: number) {
+  return `${value > 0 ? "+" : ""}${value}`;
+}
+
+function WeeklyTopFoldContract({
+  model,
+  memoryRegimes,
+}: {
+  model: Awaited<ReturnType<typeof loadHomePageAssembly>>["homepage"]["weeklyDecisionCardModel"];
+  memoryRegimes: Array<{ record_date: string; regime: string }>;
+}) {
+  const weeklySummary = model.decision.weeklyLeadershipSummary;
+  const memoryRailItems = model.history.memoryRail.slice(-4).map((item) => item.posture);
+  const memoryFallbackItems = memoryRegimes.slice(-4).map((item) => item.regime);
+  const memoryItems = (memoryRailItems.length >= 4 ? memoryRailItems : memoryFallbackItems).slice(-4);
+  const revisitState = model.decision.revisitDecisions
+    ? "YES — Revisit queue active."
+    : "NO — Hold posture.";
+  const revisitQueue = model.decision.revisitQueue.slice(0, 3);
+  const guardrailRows = [
+    {
+      trigger: model.decision.guardrailThreshold ?? model.decision.guardrail,
+      consequence: model.decision.actionNowShort ?? model.decision.immediateDecision,
+      reversal: model.decision.reversalTrigger,
+    },
+    {
+      trigger: model.decision.flipThreshold ?? model.decision.compactFlipConditionLabels?.[0] ?? model.diagnostics.flipRiskMeter.triggerLabel,
+      consequence: model.decision.netConstraintSummary,
+      reversal: model.decision.canonicalDecisionCopy?.flipTrigger ?? model.decision.reversalTrigger,
+    },
+  ].filter((row) => row.trigger && row.consequence && row.reversal);
+
+  return (
+    <section
+      data-testid="weekly-top-fold"
+      aria-label="Weekly decision transmission contract"
+      className="weather-card grid gap-4 lg:grid-cols-12"
+    >
+      <div className="space-y-2 lg:col-span-7">
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">THIS WEEK</p>
+        <div className="grid gap-2 text-fluid-micro text-white/55 sm:grid-cols-2 lg:grid-cols-4">
+          <span>Boldness budget: {weeklySummary.notchShiftLabel}</span>
+          <span>Hiring window: {weeklySummary.hiringWindow}</span>
+          <span>Expansion window: {weeklySummary.expansionWindow}</span>
+          <span>Raise window: {weeklySummary.raiseWindow}</span>
+        </div>
+        <p className="text-sm font-semibold text-white/75">Boldness Budget: {weeklySummary.boldnessScore} / 100</p>
+        <p className="text-fluid-micro text-white/50">Change: {formatSignedDelta(weeklySummary.boldnessDelta)}</p>
+        <p className="text-fluid-micro text-white/50">Net delta: {weeklySummary.netDeltaLabel}</p>
+        <p className="text-fluid-micro font-medium text-sky-200/80">{weeklySummary.shorthandLine}</p>
+      </div>
+
+      <div className="space-y-2 lg:col-span-5">
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">Revisit last week’s roadmap/hiring decisions?</p>
+        <p className="text-sm font-semibold text-white/75">{revisitState}</p>
+        {revisitQueue.length ? (
+          <ul className="space-y-1 text-fluid-micro text-white/50">
+            {revisitQueue.map((item) => (
+              <li key={item.id}>{item.label}: {item.action} Flip: {item.flipCondition}</li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
+          {guardrailRows.map((row, index) => (
+            <p key={index}>If {row.trigger} → {row.consequence} → {row.reversal}</p>
+          ))}
+        </div>
+        {memoryItems.length ? (
+          <p className="text-fluid-micro text-white/45">Last 4 weeks: {memoryItems.join(" → ")}</p>
+        ) : null}
+        <p className="text-fluid-micro text-white/45">Hiring window trend: {weeklySummary.hiringWindow}</p>
+      </div>
+    </section>
+  );
+}
+
 async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
@@ -87,7 +164,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
     );
   }
 
-  const { homepage, regimeHistory, operatorContext } = data;
+  const { homepage, reportData, regimeHistory, operatorContext } = data;
   const isDegraded = !homepage.reportResult.ok;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
@@ -97,6 +174,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
+  const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
 
   const signalDeltas = new Map(
     homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
@@ -120,6 +198,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
+  const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
   const isScreenshot = searchParams?.screenshot === "1";
 
@@ -136,7 +215,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         </div>
       ) : null}
       <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
-        Tightness {tightness}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · {signalDirection === "tighten" ? "tightening" : signalDirection === "ease" ? "easing" : "holding"} · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
+        Boldness Budget {weeklyLeadershipSummary.boldnessScore}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · tightness guardrail {tightness}/100 · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
       <div data-screenshot={isScreenshot ? "true" : undefined}>
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
@@ -145,6 +224,9 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             <V2DecisionHero
             tightness={tightness}
             tightnessDelta={tightnessDelta}
+            boldnessScore={weeklyLeadershipSummary.boldnessScore}
+            boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+            boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
             regime={regime}
             postureLabel={postureLabel}
             signalDirection={signalDirection}
@@ -152,10 +234,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             fetchedAt={homepage.reportShell.fetchedAtLabel}
             operatorContext={operatorContext}
             confidenceLabel={confidenceLabel}
-            signalData={{
-              baseRate: 4.33,
-              baseRateUsed: "FED",
-            }}
+            signalData={v2HeroSignalData}
           />
 
           <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
@@ -168,8 +247,15 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               : undefined}
             flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
             tightness={tightness}
+            boldnessScore={weeklyLeadershipSummary.boldnessScore}
+            boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             direction={signalDirection}
             recordDate={homepage.reportShell.recordDateLabel}
+          />
+
+          <WeeklyTopFoldContract
+            model={homepage.weeklyDecisionCardModel}
+            memoryRegimes={macroTrendline}
           />
 
           </SwipeableWeek>
@@ -279,7 +365,11 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
       <StickyCallStrip
         call={canonicalDecision?.doNowLines?.[0] ?? ""}
         arrow={DIRECTION_ARROW[signalDirection]}
-        tightnessDelta={tightnessDelta}
+        boldnessScore={weeklyLeadershipSummary.boldnessScore}
+        boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+        guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+          ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+          : undefined}
       />
     </V2Shell>
   );

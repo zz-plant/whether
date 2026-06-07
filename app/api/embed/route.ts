@@ -62,6 +62,7 @@ export async function GET(request: Request) {
       flipConditionLabels,
       canonicalDecisionCopy: canonicalDecision,
       weeklyCall: homepage.weeklyCall,
+      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
     });
 
     const trustCue = buildWeeklyTrustCueLine({

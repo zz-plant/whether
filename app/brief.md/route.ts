@@ -43,6 +43,7 @@ export async function GET() {
     flipConditionLabels,
     canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,
     weeklyCall: homepage.weeklyCall,
+    weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
   });
 
   const markdown = md`
