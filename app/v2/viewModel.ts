@@ -1,3 +1,5 @@
+import { REGIME_PUBLIC_LABELS } from "../../lib/regimePresentation";
+
 export type SignalDirection = "tighten" | "ease" | "hold";
 
 export const DIRECTION_ARROW: Record<SignalDirection, string> = {
@@ -33,12 +35,7 @@ export const REGIME_DESCRIPTOR: Record<string, string> = {
   VOLATILE: "mixed signals",
 };
 
-export const REGIME_DISPLAY: Record<string, string> = {
-  EXPANSION: "Expansion",
-  DEFENSIVE: "Defensive",
-  SCARCITY: "Scarcity",
-  VOLATILE: "Uncertain",
-};
+export const REGIME_DISPLAY: Record<string, string> = { ...REGIME_PUBLIC_LABELS };
 
 export const REGIME_COLORS: Record<string, string> = {
   SCARCITY: "bg-amber-400/60",

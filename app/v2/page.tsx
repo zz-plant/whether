@@ -24,6 +24,7 @@ import { TickerCompany } from "../components/home/TickerCompany";
 import { EmailSubscribe } from "../components/home/EmailSubscribe";
 import { SourceDisagreement } from "../components/evidence/SourceDisagreement";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInterface";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import {
   computeReliabilityScore,
   DIRECTION_ARROW,
@@ -93,6 +94,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
+  const publicRegimeLabel = getRegimePublicLabel(regime);
   const macroTrendline = regimeHistory.slice(-12);
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
@@ -258,7 +260,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             "dateModified": homepage.reportShell.fetchedAtLabel,
             "result": {
               "posture": postureLabel,
-              "regime": regime,
+              "regime": publicRegimeLabel,
               "confidence": confidenceLabel,
               "provenance": {
                 "source": homepage.reportShell.treasurySource ?? "FRED",
