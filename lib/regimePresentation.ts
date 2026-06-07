@@ -35,6 +35,13 @@ export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
   EXPANSION: "Sunny",
 };
 
+export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Uncertain",
+  EXPANSION: "Expansion",
+};
+
 export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
 // Used by RegimeBadgeIcon in regimeIcons.tsx — icon name must match the component prop type.
 
@@ -68,6 +75,12 @@ export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
 
+
+export const isRegimeKey = (regime: string): regime is RegimeKey =>
+  Object.prototype.hasOwnProperty.call(REGIME_PUBLIC_LABELS, regime);
+
+export const getRegimePublicLabel = (regime: RegimeKey | string) =>
+  isRegimeKey(regime) ? REGIME_PUBLIC_LABELS[regime] : regime;
 
 export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];
 export const getRegimeWeatherIcon = (regime: RegimeKey) => REGIME_WEATHER_ICONS[regime];

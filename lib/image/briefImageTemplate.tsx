@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { getRegimePublicLabel } from "../regimePresentation";
 
 export type BriefImageProps = {
   decision: string;
@@ -32,9 +33,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const gaugeColor = tightness >= pauseThreshold ? "#f87171"
     : tightness >= pauseThreshold - 5 ? "#fbbf24" : "#34d399";
 
-  const displayRegime =
-    regime === "SCARCITY" ? "Scarcity" : regime === "DEFENSIVE" ? "Defensive"
-    : regime === "VOLATILE" ? "Volatile" : "Expansion";
+  const displayRegime = getRegimePublicLabel(regime);
 
   const truncated = decision.length > 80 ? decision.slice(0, 77) + "\u2026" : decision;
 
