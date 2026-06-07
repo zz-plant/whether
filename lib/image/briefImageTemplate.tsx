@@ -9,6 +9,7 @@ export type BriefImageProps = {
   confidenceLabel: string;
   recordDate: string;
   guardrail?: string;
+  pauseThreshold: number;
   flipConditions?: string[];
 };
 
@@ -17,12 +18,11 @@ const confidenceColor = (label: string) =>
 
 export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const {
-    decision, regime, postureLabel, tightness,
+    decision, regime, postureLabel, tightness, pauseThreshold,
     confidenceLabel, recordDate, guardrail, flipConditions,
   } = props;
 
   const cc = confidenceColor(confidenceLabel);
-  const pauseThreshold = 80;
   const arrow = decision.toLowerCase().includes("tighten") ? "↑"
     : decision.toLowerCase().includes("ease") ? "↓" : "→";
   const arrowColor = arrow === "↑" ? "#f87171" : arrow === "↓" ? "#34d399" : "#fbbf24";
@@ -63,7 +63,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
             </div>
           </div>
         </div>
-        {guardrail ? <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>Until tightness reaches {pauseThreshold}</div> : null}
+        {guardrail ? <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>{guardrail}</div> : null}
         {flipConditions && flipConditions.length > 0 ? (
           <div style={{ display: "flex", alignItems: "center", fontSize: 13, color: "#93c5fd", marginTop: 8 }}>
             <div style={{ width: 6, height: 6, borderRadius: 6, background: "#38bdf8", marginRight: 6 }} />
