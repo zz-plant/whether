@@ -126,6 +126,7 @@ export const buildLeadershipArtifactPayload = async ({
       postureState,
       canonicalDecisionCopy,
       weeklyCall,
+      weeklyLeadershipSummary: homeBriefModel.weeklyLeadershipSummary,
     });
     const callCitation = buildCallCitation(assessment, treasury, {
       interpretationLayer,
@@ -136,7 +137,7 @@ export const buildLeadershipArtifactPayload = async ({
       trustLine: treasury.fallback_at || treasury.fallback_reason
         ? `TRUST: FALLBACK SNAPSHOT · As of ${freshnessLabel}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
         : `TRUST: LIVE · As of ${freshnessLabel}`,
-      postureLine: `POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
+      postureLine: `BOLDNESS BUDGET: ${homeBriefModel.weeklyLeadershipSummary.boldnessScore}/100 (${homeBriefModel.weeklyLeadershipSummary.boldnessDelta === 0 ? "no change vs last week" : `${homeBriefModel.weeklyLeadershipSummary.boldnessDelta > 0 ? "+" : ""}${homeBriefModel.weeklyLeadershipSummary.boldnessDelta} vs last week`}) · POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
       changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
       guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
       flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,

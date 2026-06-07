@@ -72,7 +72,6 @@ export function V2RegimeHistory({ regimes, currentRegime }: Props) {
 
       <div className="flex items-end gap-0.5 h-12">
         {regimes.map((entry, i) => {
-          const height = 20 + (i / Math.max(regimes.length - 1, 1)) * 70;
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
           const selected = isSelectedEntry(entry);
           return (
@@ -80,11 +79,10 @@ export function V2RegimeHistory({ regimes, currentRegime }: Props) {
               key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
-              className={`flex-1 rounded-t-sm cursor-pointer transition-[height,opacity] hover:opacity-80 focus-visible:outline-2 focus-visible:outline-sky-400 focus-visible:outline-offset-1 ${
+              className={`flex-1 h-8 rounded-t-sm cursor-pointer transition-[opacity] hover:opacity-80 focus-visible:outline-2 focus-visible:outline-sky-400 focus-visible:outline-offset-1 ${
                 REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
               } ${isCurrent ? "ring-1 ring-white/30" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
-              style={{ height: `${height}%` }}
-              aria-label={`${entry.record_date}: ${entry.regime} regime`}
+              aria-label={`${entry.record_date}: ${entry.regime} regime marker`}
             />
           );
         })}
