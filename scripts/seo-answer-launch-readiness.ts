@@ -1,6 +1,6 @@
 import { scoreAnswerLaunchReadiness, summarizeAnswerLaunchReadiness } from "../lib/seo/answerLaunchReadiness";
 
-const records = scoreAnswerLaunchReadiness();
+const records = await scoreAnswerLaunchReadiness();
 const summary = summarizeAnswerLaunchReadiness(records);
 
 console.log(`Answer launch readiness: ${summary.eligible}/${summary.total} eligible (${summary.blocked} blocked).`);
