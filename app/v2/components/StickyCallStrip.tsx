@@ -1,7 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { Copy, Image } from "lucide-react";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { buildImageBriefApiPath } from "../../../lib/report/imageBriefSearchParams";
 
 type Props = {
   call: string;
@@ -14,6 +17,11 @@ type Props = {
 export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, guardrail }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
+  const currentSearchParams = useSearchParams();
+  const imageBriefHref = useMemo(
+    () => buildImageBriefApiPath(currentSearchParams),
+    [currentSearchParams],
+  );
 
   const deltaLabel = boldnessDelta !== 0
     ? `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`
@@ -39,7 +47,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
         </span>
         <span className={`text-fluid-xs font-semibold ${deltaColor} flex-shrink-0`}>{deltaLabel}</span>
         <a
-          href="/api/image/brief"
+          href={imageBriefHref}
           download="whether-brief.png"
           className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-3 py-1.5 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] no-underline"
         >
