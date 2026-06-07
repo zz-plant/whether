@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import {
   buildSourceHealthRows,
+  summarizeSourceHealthCoverage,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
 } from "../lib/report/sourceHealth";
@@ -82,5 +83,45 @@ describe("buildSourceHealthRows", () => {
 
     assert.equal(marketStress?.mode, "fallback");
     assert.match(marketStress?.activeFallbackReason ?? "", /mixing live and cached values/i);
+  });
+
+  it("summarizes live, cached, and missing source coverage", () => {
+    const summary = summarizeSourceHealthCoverage([
+      {
+        sourceName: "Treasury",
+        cadenceLabel: "Intraday rates",
+        freshnessStatus: "fresh",
+        freshnessSlaHours: 6,
+        lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
+        activeFallbackReason: null,
+        mode: "live",
+      },
+      {
+        sourceName: "Startup/private markets",
+        cadenceLabel: "Curated snapshot",
+        freshnessStatus: "fresh",
+        freshnessSlaHours: 1080,
+        lastSuccessfulFetchAt: "2026-03-02T00:00:00.000Z",
+        activeFallbackReason: null,
+        mode: "snapshot",
+      },
+      {
+        sourceName: "Labor",
+        cadenceLabel: "Monthly release",
+        freshnessStatus: "unknown",
+        freshnessSlaHours: 1080,
+        lastSuccessfulFetchAt: null,
+        activeFallbackReason: "Labor unavailable; no series were loaded for this refresh.",
+        mode: "fallback",
+      },
+    ]);
+
+    assert.deepEqual(summary, {
+      liveCount: 1,
+      cachedCount: 1,
+      missingCount: 1,
+      totalCount: 3,
+      inputsComplete: false,
+    });
   });
 });
