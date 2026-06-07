@@ -64,6 +64,82 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
   );
 }
 
+function formatSignedDelta(value: number) {
+  return `${value > 0 ? "+" : ""}${value}`;
+}
+
+function WeeklyTopFoldContract({
+  model,
+  memoryRegimes,
+}: {
+  model: Awaited<ReturnType<typeof loadHomePageAssembly>>["homepage"]["weeklyDecisionCardModel"];
+  memoryRegimes: Array<{ record_date: string; regime: string }>;
+}) {
+  const weeklySummary = model.decision.weeklyLeadershipSummary;
+  const memoryRailItems = model.history.memoryRail.slice(-4).map((item) => item.posture);
+  const memoryFallbackItems = memoryRegimes.slice(-4).map((item) => item.regime);
+  const memoryItems = (memoryRailItems.length >= 4 ? memoryRailItems : memoryFallbackItems).slice(-4);
+  const revisitState = model.decision.revisitDecisions
+    ? "YES — Revisit queue active."
+    : "NO — Hold posture.";
+  const revisitQueue = model.decision.revisitQueue.slice(0, 3);
+  const guardrailRows = [
+    {
+      trigger: model.decision.guardrailThreshold ?? model.decision.guardrail,
+      consequence: model.decision.actionNowShort ?? model.decision.immediateDecision,
+      reversal: model.decision.reversalTrigger,
+    },
+    {
+      trigger: model.decision.flipThreshold ?? model.decision.compactFlipConditionLabels?.[0] ?? model.diagnostics.flipRiskMeter.triggerLabel,
+      consequence: model.decision.netConstraintSummary,
+      reversal: model.decision.canonicalDecisionCopy?.flipTrigger ?? model.decision.reversalTrigger,
+    },
+  ].filter((row) => row.trigger && row.consequence && row.reversal);
+
+  return (
+    <section
+      data-testid="weekly-top-fold"
+      aria-label="Weekly decision transmission contract"
+      className="weather-card grid gap-4 lg:grid-cols-12"
+    >
+      <div className="space-y-2 lg:col-span-7">
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">THIS WEEK</p>
+        <div className="grid gap-2 text-fluid-micro text-white/55 sm:grid-cols-2 lg:grid-cols-4">
+          <span>Boldness budget: {weeklySummary.notchShiftLabel}</span>
+          <span>Hiring window: {weeklySummary.hiringWindow}</span>
+          <span>Expansion window: {weeklySummary.expansionWindow}</span>
+          <span>Raise window: {weeklySummary.raiseWindow}</span>
+        </div>
+        <p className="text-sm font-semibold text-white/75">Boldness Budget: {weeklySummary.boldnessScore} / 100</p>
+        <p className="text-fluid-micro text-white/50">Change: {formatSignedDelta(weeklySummary.boldnessDelta)}</p>
+        <p className="text-fluid-micro text-white/50">Net delta: {weeklySummary.netDeltaLabel}</p>
+        <p className="text-fluid-micro font-medium text-sky-200/80">{weeklySummary.shorthandLine}</p>
+      </div>
+
+      <div className="space-y-2 lg:col-span-5">
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">Revisit last week’s roadmap/hiring decisions?</p>
+        <p className="text-sm font-semibold text-white/75">{revisitState}</p>
+        {revisitQueue.length ? (
+          <ul className="space-y-1 text-fluid-micro text-white/50">
+            {revisitQueue.map((item) => (
+              <li key={item.id}>{item.label}: {item.action} Flip: {item.flipCondition}</li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
+          {guardrailRows.map((row, index) => (
+            <p key={index}>If {row.trigger} → {row.consequence} → {row.reversal}</p>
+          ))}
+        </div>
+        {memoryItems.length ? (
+          <p className="text-fluid-micro text-white/45">Last 4 weeks: {memoryItems.join(" → ")}</p>
+        ) : null}
+        <p className="text-fluid-micro text-white/45">Hiring window trend: {weeklySummary.hiringWindow}</p>
+      </div>
+    </section>
+  );
+}
+
 async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
@@ -175,6 +251,11 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             direction={signalDirection}
             recordDate={homepage.reportShell.recordDateLabel}
+          />
+
+          <WeeklyTopFoldContract
+            model={homepage.weeklyDecisionCardModel}
+            memoryRegimes={macroTrendline}
           />
 
           </SwipeableWeek>
