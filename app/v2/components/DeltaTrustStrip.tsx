@@ -1,13 +1,12 @@
-import { DIRECTION_LABEL, DIRECTION_COLOR, CONFIDENCE_COLOR, RELIABILITY_COLOR, type SignalDirection } from "../viewModel";
+import { CONFIDENCE_COLOR, RELIABILITY_COLOR } from "../viewModel";
 
 export function DeltaTrustStrip({
-  tightnessDelta,
-  riskAppetiteDelta,
   confidenceLabel,
   reliabilityScore,
   sourceCount,
   degradedCount,
-  direction,
+  fetchedAtLabel,
+  inputsComplete = true,
 }: {
   tightnessDelta: number;
   riskAppetiteDelta: number;
@@ -15,35 +14,24 @@ export function DeltaTrustStrip({
   reliabilityScore: number;
   sourceCount: number;
   degradedCount: number;
-  direction: SignalDirection;
+  direction: unknown;
+  fetchedAtLabel?: string;
+  inputsComplete?: boolean;
 }) {
-  const deltaLabel = DIRECTION_LABEL[direction];
-  const deltaColor = DIRECTION_COLOR[direction];
   const confColor = CONFIDENCE_COLOR(confidenceLabel);
   const relColor = RELIABILITY_COLOR(reliabilityScore);
+  const freshnessLabel = fetchedAtLabel?.match(/\d+h/)?.[0] ?? "0h";
+  const normalizedConfidence = confidenceLabel === "HIGH" ? "High" : confidenceLabel === "MED" ? "Medium" : confidenceLabel === "LOW" ? "Low" : confidenceLabel;
 
   return (
-    <div className="weather-card space-y-3">
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-white/40">Trend</span>
-          <span className={`font-semibold ${deltaColor}`}>{deltaLabel}</span>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-white/40">Signal confidence</span>
-          <span className={`font-semibold ${confColor}`}>{confidenceLabel}</span>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-white/40">Reliability</span>
-          <span className={`font-semibold tabular-nums ${relColor}`}>{reliabilityScore}%</span>
-        </div>
+    <section className="weather-card lg:col-span-12" aria-label="compact confidence strip">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-fluid-micro">
+        <p className="font-semibold tracking-[0.14em] text-white/40">compact confidence strip</p>
+        <p className="text-white/55">Data freshness: <strong className="text-white">{freshnessLabel}</strong></p>
+        <p className="text-white/55">Confidence: <strong className={confColor}>{normalizedConfidence}</strong></p>
+        <p className="text-white/55">Inputs complete: <strong className={inputsComplete ? "text-emerald-300" : "text-amber-300"}>{inputsComplete ? "Yes" : "No"}</strong></p>
+        <p className="text-white/40">Reliability <strong className={`tabular-nums ${relColor}`}>{reliabilityScore}%</strong> · {sourceCount - degradedCount} live{degradedCount > 0 ? ` · ${degradedCount} cached` : ""}</p>
       </div>
-      <div className="border-t border-slate-800/60 pt-2">
-        <div className="flex items-center justify-between text-fluid-nano text-white/30">
-          <span>Sources</span>
-          <span>{sourceCount - degradedCount} live{degradedCount > 0 ? ` · ${degradedCount} cached` : ""}</span>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }

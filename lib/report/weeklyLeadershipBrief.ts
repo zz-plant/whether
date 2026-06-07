@@ -135,6 +135,7 @@ export const buildWeeklyLeadershipBriefModel = ({
         (previousAssessment?.scores.riskAppetite ?? assessment.scores.riskAppetite),
     ),
     stabilityWeeks: Math.max(stabilityWeeks, 1),
+    last4Boldness: last4Boldness.slice(-4),
     revisitYes: Math.abs(boldnessDelta) >= 6 || hiringWindow !== previousHiringWindow,
     tightnessDelta,
     riskDelta,

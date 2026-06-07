@@ -3,7 +3,7 @@
 import { Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
-import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection } from "../viewModel";
+import { DIRECTION_ARROW, type SignalDirection } from "../viewModel";
 
 type ActionCardProps = {
   call: string;
@@ -13,6 +13,8 @@ type ActionCardProps = {
   tightness: number;
   direction: SignalDirection;
   recordDate?: string;
+  revisitDecisions: boolean;
+  revisitCause?: string;
   pauseThreshold?: number;
 };
 
@@ -24,19 +26,30 @@ export function ActionCard({
   tightness,
   direction,
   recordDate,
+  revisitDecisions,
+  revisitCause,
   pauseThreshold = 80,
 }: ActionCardProps) {
   const { status, copyToClipboard } = useClipboardCopy();
   const { add } = Toast.useToastManager();
   const isCopied = status === "copied";
   const arrow = DIRECTION_ARROW[direction];
+  const tightnessTrigger = Math.max(1, pauseThreshold - tightness);
+  const boldnessDrop = Math.max(8, Math.round(tightnessTrigger * 0.6));
+  const revisitLabel = revisitDecisions ? "YES — Regime shift detected." : "NO — Hold posture.";
+  const guardrailRows = [
+    `If tightness rises ${tightnessTrigger} points → Hiring window closes → Boldness budget drops ${boldnessDrop} points`,
+    "If curve inverts → Payback tolerance tightens to ≤ 9 months",
+  ];
 
   const buildText = () => [
     `Whether · Weekly Brief · ${recordDate ?? ""}`,
     "",
     `${arrow} ${call}`,
-    actionNow ? `Do now: ${actionNow}` : null,
-    guardrail ? `Threshold: ${guardrail} (tightness ${tightness}/${pauseThreshold})` : null,
+    `Revisit last week’s roadmap/hiring decisions? ${revisitLabel}`,
+    actionNow ? `Action: ${actionNow}` : null,
+    guardrailRows.join("\n"),
+    guardrail ? `Source guardrail: ${guardrail}` : null,
     flipConditions?.length ? `Watching: ${flipConditions.join(" · ")}` : null,
     "",
     "whether.work",
@@ -53,76 +66,54 @@ export function ActionCard({
     }
   };
 
-  const pauseColor = tightness >= pauseThreshold ? "bg-rose-500" : tightness >= pauseThreshold - 5 ? "bg-amber-500" : "bg-emerald-500";
-
   return (
-      <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
-          {DIRECTION_LABEL[direction]}
-        </p>
+    <section className="weather-surface rounded-2xl border border-white/[0.06] p-5 lg:col-span-8" aria-labelledby="bounded-guardrails-heading">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-fluid-nano font-semibold tracking-[0.16em] text-amber-200/70" id="bounded-guardrails-heading">
+            bounded guardrails
+          </p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-100">
+            <span className="mr-1.5">{arrow}</span>
+            {call}
+          </h2>
+        </div>
         <button
           onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-4 py-2 text-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-4 py-2 text-xs font-medium text-white/60 transition-colors hover:border-white/[0.14] hover:text-white/80 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label={isCopied ? "Copied to clipboard" : "Copy brief to clipboard"}
         >
           {isCopied ? (
-            <>            <CopyCheck className="w-3.5 h-3.5" aria-hidden="true" /> Copied</>
+            <><CopyCheck className="h-3.5 w-3.5" aria-hidden="true" /> Copied</>
           ) : (
-            <>            <Copy className="w-3.5 h-3.5" aria-hidden="true" /> Copy</>
+            <><Copy className="h-3.5 w-3.5" aria-hidden="true" /> Copy</>
           )}
         </button>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-100 mb-4">
-        <span className="mr-1.5">{arrow}</span>
-        {call}
-      </h2>
+      <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+        <p className="text-fluid-micro font-semibold text-white/45">Revisit last week’s roadmap/hiring decisions?</p>
+        <p className="mt-1 text-base font-semibold text-white">{revisitLabel}</p>
+        {revisitDecisions && revisitCause ? <p className="mt-1 text-fluid-micro text-white/45">{revisitCause}</p> : null}
+      </div>
 
-      <div className="space-y-3 text-sm">
+      <div className="mt-4 grid gap-3 lg:grid-cols-4">
+        {guardrailRows.map((row) => (
+          <p key={row} className="rounded-xl border border-white/[0.06] bg-[var(--bg-nested)] px-3 py-3 text-fluid-micro font-medium leading-relaxed text-slate-200 lg:col-span-2">
+            {row}
+          </p>
+        ))}
         {actionNow ? (
-          <details className="group">
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">Do now</p>
-            </summary>
-            <p className="text-slate-200 ml-3.5 mt-1">{actionNow}</p>
-          </details>
+          <p className="rounded-xl border border-emerald-400/10 bg-emerald-400/[0.04] px-3 py-3 text-fluid-micro leading-relaxed text-emerald-100/80 lg:col-span-2">
+            Action: {actionNow}
+          </p>
         ) : null}
-
-        {guardrail ? (
-          <details className="group">
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">Pause if</p>
-            </summary>
-            <div className="ml-3.5 mt-1">
-              <p className="text-white/50 text-xs">{guardrail}</p>
-              <div className="mt-2 h-2 w-full rounded-full bg-[var(--bg-nested)] overflow-hidden">
-                <div className={`h-full rounded-full ${pauseColor}`} style={{ width: `${Math.min(100, (tightness / pauseThreshold) * 100)}%` }} />
-              </div>
-              <div className="flex justify-between text-[0.55rem] text-white/50 mt-0.5">
-                <span>{tightness}</span>
-                <span>{pauseThreshold}</span>
-              </div>
-            </div>
-          </details>
-        ) : null}
-
         {flipConditions?.length ? (
-          <details className="group" open>
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">If conditions shift</p>
-            </summary>
-            <ul className="space-y-0.5 ml-3.5 mt-1">
-              {flipConditions.map((c, i) => (
-                <li key={i} className="text-xs text-sky-300">{c}</li>
-              ))}
-            </ul>
-          </details>
+          <p className="rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-fluid-micro leading-relaxed text-sky-100/80 lg:col-span-2">
+            Reverse: {flipConditions.join(" · ")}
+          </p>
         ) : null}
       </div>
-    </div>
+    </section>
   );
 }

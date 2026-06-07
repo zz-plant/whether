@@ -1,7 +1,7 @@
 import type { OperatorContext } from "../../../lib/report/operatorContext";
-import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY } from "../viewModel";
+import type { WeeklyLeadershipSummary } from "../../../lib/report/homeBriefModel";
 import type { SignalDirection } from "../viewModel";
-import { DeltaBadge } from "./DeltaBadge";
+import { REGIME_DISPLAY } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
 
@@ -15,6 +15,7 @@ type Props = {
   fetchedAt: string;
   operatorContext: OperatorContext;
   confidenceLabel?: string;
+  weeklyLeadershipSummary: WeeklyLeadershipSummary;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -24,26 +25,51 @@ type Props = {
   };
 };
 
+const formatSignedInteger = (value: number) =>
+  value > 0 ? `+${Math.round(value)}` : `${Math.round(value)}`;
+
+const normalizeShorthand = (line: string, notchShiftLabel: string) => {
+  if (line.toLowerCase().includes("bold this week")) {
+    return line.replace(/^We're/, "We’re");
+  }
+
+  return `We’re ${notchShiftLabel} bold this week.`;
+};
+
+const buildDriverChips = ({
+  tightnessDelta,
+  signalData,
+}: {
+  tightnessDelta: number;
+  signalData?: Props["signalData"];
+}) => {
+  const riskDriver = signalData?.macroContributors?.find((driver) => driver.toLowerCase().includes("risk"));
+  const curveStable = Math.abs(signalData?.curveSlope ?? 0) < 0.1;
+
+  return [
+    riskDriver ?? "Risk appetite unchanged",
+    tightnessDelta === 0 ? "Tightness unchanged" : `Tightness ${formatSignedInteger(tightnessDelta)}`,
+    curveStable ? "Curve stable" : "Curve moving",
+  ].slice(0, 3);
+};
+
 export function V2DecisionHero({
   tightness,
   tightnessDelta,
   regime,
   postureLabel,
-  signalDirection,
   recordDate,
   fetchedAt,
   operatorContext,
   confidenceLabel,
+  weeklyLeadershipSummary,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
-  const deltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
-  const deltaLabel = tightnessDelta !== 0 ? `${deltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
-
-  const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
-  const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
-  const isUnusual = Math.abs(tightnessDelta) >= 3;
-
+  const shorthand = normalizeShorthand(weeklyLeadershipSummary.shorthandLine, weeklyLeadershipSummary.notchShiftLabel);
+  const stabilityBand = weeklyLeadershipSummary.stabilityWeeks >= 4 ? "High" : weeklyLeadershipSummary.stabilityWeeks >= 2 ? "Moderate" : "Low";
+  const stabilityLabel = `${stabilityBand} (Week ${weeklyLeadershipSummary.stabilityWeeks})`;
+  const driverChips = buildDriverChips({ tightnessDelta, signalData });
   const stageLabel = operatorContext.companyStage
     ? operatorContext.companyStage === "pre-seed" ? "Pre-seed"
     : operatorContext.companyStage === "seed" ? "Seed"
@@ -53,54 +79,67 @@ export function V2DecisionHero({
     : null;
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col sm:flex-row sm:items-baseline gap-3 sm:gap-10 w-full min-w-0">
-        <div>
-          <div className="relative inline-block">
-            <svg className="absolute inset-0 w-full h-full -m-[14%]" viewBox="0 0 100 100" aria-hidden="true">
-              {confidenceLabel ? (
-                <circle
-                  cx="50" cy="50" r="46"
-                  fill="none"
-                  stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.25)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.25)" : "rgba(253,164,175,0.25)"}
-                  strokeWidth="1.5"
-                  strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
-                  strokeLinecap="round"
-                  transform="rotate(-90 50 50)"
-                />
-              ) : null}
-            </svg>
-            <SignalWaterfall data={signalData ?? {}}>
-              <h1 className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
-                style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
-                <DeltaBadge tightness={tightness}>{tightness}</DeltaBadge>
-              </h1>
-            </SignalWaterfall>
+    <section className="weather-surface rounded-2xl border border-white/[0.06] p-5 sm:p-6 lg:col-span-12" aria-labelledby="this-week-heading">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 flex-1 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-fluid-nano font-semibold tracking-[0.18em] text-sky-200/80" id="this-week-heading">
+                THIS WEEK
+              </p>
+              <p className="mt-1 text-fluid-micro text-white/35">{recordDate} · {regimeDisplay}{stageLabel ? ` · ${stageLabel}` : ""}</p>
+            </div>
+            <StageSwitcher currentStage={operatorContext.companyStage} />
           </div>
-          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
-            Credit conditions
-            <span className={`ml-1.5 ${tightnessLevelColor}`}>{tightnessLevel}</span>
-          </p>
+
+          <div className="grid gap-2 text-fluid-xs sm:grid-cols-2 lg:grid-cols-3">
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Boldness budget:</span> <strong className="text-white">{weeklyLeadershipSummary.notchShiftLabel}</strong>
+            </p>
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Hiring window:</span> <strong className="text-white">{weeklyLeadershipSummary.hiringWindow}</strong>
+            </p>
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Expansion window:</span> <strong className="text-white">{weeklyLeadershipSummary.expansionWindow}</strong>
+            </p>
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Raise window:</span> <strong className="text-white">{weeklyLeadershipSummary.raiseWindow}</strong>
+            </p>
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Stability:</span> <strong className="text-white">{stabilityLabel}</strong>
+            </p>
+            <p className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-white/75">
+              <span className="text-white/40">Net delta:</span> <strong className="text-white">{weeklyLeadershipSummary.netDeltaLabel}</strong>
+            </p>
+          </div>
         </div>
-        <div className="text-fluid-xs text-white/50 space-y-0.5 w-full min-w-0">
-          <p>
-            <span className={DIRECTION_COLOR[signalDirection]}>
-              {DIRECTION_LABEL[signalDirection]}
-            </span>
-            {tightnessDelta !== 0 ? (
-              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-                {deltaLabel}
-                {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
-              </span>
-            ) : null}
-          </p>
-          <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
-          {stageLabel ? <p>{stageLabel}</p> : null}
-          <p className="text-white/40">{recordDate}</p>
-          {fetchedAt ? <p className="text-white/30">Updated {fetchedAt}</p> : null}
-          <StageSwitcher currentStage={operatorContext.companyStage} />
+
+        <div className="w-full shrink-0 space-y-3 lg:w-72">
+          <SignalWaterfall data={signalData ?? {}}>
+            <div className="rounded-2xl border border-sky-400/15 bg-sky-400/[0.06] p-4">
+              <p className="text-fluid-nano font-semibold tracking-[0.14em] text-sky-200/70">Boldness Budget: {weeklyLeadershipSummary.boldnessScore} / 100</p>
+              <p className="mt-2 font-display text-5xl font-bold leading-none text-white tabular-nums">
+                {weeklyLeadershipSummary.boldnessScore} <span className="text-xl text-white/35">/ 100</span>
+              </p>
+              <p className="mt-2 text-fluid-xs text-white/55">Change: <strong className="text-white">{formatSignedInteger(weeklyLeadershipSummary.boldnessDelta)}</strong></p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {driverChips.map((driver) => (
+                  <span key={driver} className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-fluid-nano text-white/55">
+                    {driver}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </SignalWaterfall>
         </div>
       </div>
-    </div>
+
+      <div className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.05] px-4 py-3">
+        <p className="text-fluid-nano font-semibold tracking-[0.14em] text-emerald-200/70">spoken shorthand</p>
+        <p className="mt-1 text-lg font-semibold text-white">{shorthand}</p>
+        {postureLabel ? <p className="mt-1 text-fluid-micro text-white/40">Baseline posture: {postureLabel}.</p> : null}
+      </div>
+      {fetchedAt ? <p className="mt-3 text-fluid-nano text-white/25">Updated {fetchedAt}</p> : null}
+    </section>
   );
 }

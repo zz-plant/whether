@@ -63,7 +63,7 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
   );
 }
 
-async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
+export async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
@@ -139,42 +139,45 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         Tightness {tightness}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · {signalDirection === "tighten" ? "tightening" : signalDirection === "ease" ? "easing" : "holding"} · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
       <div data-screenshot={isScreenshot ? "true" : undefined}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
-        <div className="space-y-6 min-w-0">
-          <SwipeableWeek>
+      <div className="space-y-6">
+        <SwipeableWeek>
+          <div data-testid="weekly-top-fold" className="grid gap-4 lg:grid-cols-12">
             <V2DecisionHero
-            tightness={tightness}
-            tightnessDelta={tightnessDelta}
-            regime={regime}
-            postureLabel={postureLabel}
-            signalDirection={signalDirection}
-            recordDate={homepage.reportShell.recordDateLabel}
-            fetchedAt={homepage.reportShell.fetchedAtLabel}
-            operatorContext={operatorContext}
-            confidenceLabel={confidenceLabel}
-            signalData={{
-              baseRate: 4.33,
-              baseRateUsed: "FED",
-            }}
-          />
+              tightness={tightness}
+              tightnessDelta={tightnessDelta}
+              regime={regime}
+              postureLabel={postureLabel}
+              signalDirection={signalDirection}
+              recordDate={homepage.reportShell.recordDateLabel}
+              fetchedAt={homepage.reportShell.fetchedAtLabel}
+              operatorContext={operatorContext}
+              confidenceLabel={confidenceLabel}
+              weeklyLeadershipSummary={homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary}
+              signalData={{
+                baseRate: 4.33,
+                baseRateUsed: "FED",
+                macroContributors: [`Risk appetite ${riskAppetiteDelta === 0 ? "unchanged" : riskAppetiteDelta > 0 ? `+${riskAppetiteDelta}` : riskAppetiteDelta}`],
+              }}
+            />
 
-          <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
+            <ActionCard
+              call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
+              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+              guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold}
+              flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
+              tightness={tightness}
+              direction={signalDirection}
+              recordDate={homepage.reportShell.recordDateLabel}
+              revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
+              revisitCause={homepage.weeklyDecisionCardModel.decision.revisitQueue[0]?.reason}
+            />
 
-          <ActionCard
-            call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
-            actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-            guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-              ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-              : undefined}
-            flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
-            tightness={tightness}
-            direction={signalDirection}
-            recordDate={homepage.reportShell.recordDateLabel}
-          />
+            <V2RegimeHistory
+              regimes={macroTrendline}
+              currentRegime={regime}
+              weeklyLeadershipSummary={homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary}
+            />
 
-          </SwipeableWeek>
-
-          <div className="lg:hidden space-y-4">
             <DeltaTrustStrip
               tightnessDelta={tightnessDelta}
               riskAppetiteDelta={riskAppetiteDelta}
@@ -183,9 +186,16 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               sourceCount={sourceCount}
               degradedCount={degradedCount}
               direction={signalDirection}
+              fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
+              inputsComplete={!isDegraded}
             />
-            <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
           </div>
+        </SwipeableWeek>
+
+        <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
+        <div className="space-y-6 min-w-0">
 
           <V2EvidenceDrawer highlight={toolHighlight}>
             <V2ToolsPanel>
@@ -230,19 +240,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
 
         </div>
 
-        <aside className="hidden lg:block space-y-4">
-          <DeltaTrustStrip
-            tightnessDelta={tightnessDelta}
-            riskAppetiteDelta={riskAppetiteDelta}
-            confidenceLabel={confidenceLabel}
-            reliabilityScore={reliabilityScore}
-            sourceCount={sourceCount}
-            degradedCount={degradedCount}
-            direction={signalDirection}
-          />
-
-          <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
-        </aside>
+        <aside className="hidden lg:block" aria-label="Weekly context spacer" />
       </div>
 
       <script
@@ -270,6 +268,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         }),
           }}
         />
+      </div>
       </div>
 
       <div className="mb-8">

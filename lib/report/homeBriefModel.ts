@@ -266,6 +266,10 @@ export type WeeklyLeadershipSummary = {
   expansionWindow: string;
   raiseWindow: string;
   netDeltaLabel: string;
+  stabilityWeeks: number;
+  last4Boldness: number[];
+  hiringTrend: string;
+  expansionTrend: string;
 };
 
 export type RevisitQueueItem = {

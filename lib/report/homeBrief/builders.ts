@@ -580,30 +580,16 @@ export const buildHomeBriefModelInternal = (
       notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
       shorthandLine:
         weeklyLeadershipSummary.boldnessDelta === 0
-          ? "The call is holding steady this week."
-          : (() => {
-              const absoluteDelta = Math.abs(weeklyLeadershipSummary.boldnessDelta);
-              const intensity =
-                absoluteDelta >= 12
-                  ? "materially "
-                  : absoluteDelta >= 4
-                    ? ""
-                    : "slightly ";
-
-              if (weeklyLeadershipSummary.boldnessDelta > 0) {
-                return `The call moved ${intensity}more aggressive this week.`;
-              }
-
-              if (weeklyLeadershipSummary.boldnessDelta < 0) {
-                return `The call moved ${intensity}more defensive this week.`;
-              }
-
-              return "The call is holding steady this week.";
-            })(),
+          ? "We're holding steady this week."
+          : `We're ${weeklyLeadershipSummary.notchShiftLabel} bold this week.`,
       hiringWindow: weeklyLeadershipSummary.hiringWindow,
       expansionWindow: weeklyLeadershipSummary.expansionWindow,
       raiseWindow: weeklyLeadershipSummary.raiseWindow,
       netDeltaLabel: weeklyLeadershipSummary.netDeltaLabel,
+      stabilityWeeks: weeklyLeadershipSummary.stabilityWeeks,
+      last4Boldness: weeklyLeadershipSummary.last4Boldness,
+      hiringTrend: weeklyLeadershipSummary.hiringTrend,
+      expansionTrend: weeklyLeadershipSummary.expansionTrend,
     },
     guardrail,
     actionNowShort: conciseActionNow,
