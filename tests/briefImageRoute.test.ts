@@ -37,7 +37,7 @@ describe("buildBriefImagePayload", () => {
 
     const payload = buildBriefImagePayload(homepage);
 
-    assert.equal(payload.guardrail, weeklyDecisionCardModel.decision.guardrailThreshold);
+    assert.equal(payload.guardrail, weeklyDecisionCardModel.decision.guardrail);
     assert.equal(payload.pauseThreshold, weeklyDecisionCardModel.diagnostics.regimeDistance.thresholdValue);
 
     const exportedImageText = JSON.stringify(renderBriefImage(payload));
