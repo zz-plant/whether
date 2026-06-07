@@ -1,13 +1,15 @@
 import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
-import { DeltaBadge } from "./DeltaBadge";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
 
 type Props = {
   tightness: number;
   tightnessDelta: number;
+  boldnessScore: number;
+  boldnessDelta: number;
+  boldnessShorthand?: string;
   regime: string;
   postureLabel: string;
   signalDirection: SignalDirection;
@@ -27,6 +29,9 @@ type Props = {
 export function V2DecisionHero({
   tightness,
   tightnessDelta,
+  boldnessScore,
+  boldnessDelta,
+  boldnessShorthand,
   regime,
   postureLabel,
   signalDirection,
@@ -37,8 +42,10 @@ export function V2DecisionHero({
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
-  const deltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
-  const deltaLabel = tightnessDelta !== 0 ? `${deltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
+  const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
+  const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
+  const boldnessDeltaSign = boldnessDelta > 0 ? "+" : boldnessDelta < 0 ? "" : "";
+  const boldnessDeltaLabel = boldnessDelta !== 0 ? `${boldnessDeltaSign}${boldnessDelta.toFixed(0)} vs last week` : "No change vs last week";
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
@@ -73,13 +80,13 @@ export function V2DecisionHero({
             <SignalWaterfall data={signalData ?? {}}>
               <h1 className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
-                <DeltaBadge tightness={tightness}>{tightness}</DeltaBadge>
+                {boldnessScore}
               </h1>
             </SignalWaterfall>
           </div>
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
-            Credit conditions
-            <span className={`ml-1.5 ${tightnessLevelColor}`}>{tightnessLevel}</span>
+            Boldness Budget
+            <span className="ml-1.5 text-white/35">/100</span>
           </p>
         </div>
         <div className="text-fluid-xs text-white/50 space-y-0.5 w-full min-w-0">
@@ -87,9 +94,17 @@ export function V2DecisionHero({
             <span className={DIRECTION_COLOR[signalDirection]}>
               {DIRECTION_LABEL[signalDirection]}
             </span>
+            <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
+              {boldnessDeltaLabel}
+            </span>
+          </p>
+          {boldnessShorthand ? <p className="text-white/55">{boldnessShorthand}</p> : null}
+          <p>
+            <span className="text-white/35">Guardrail input:</span>{" "}
+            <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
             {tightnessDelta !== 0 ? (
               <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-                {deltaLabel}
+                {tightnessDeltaLabel}
                 {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
               </span>
             ) : null}

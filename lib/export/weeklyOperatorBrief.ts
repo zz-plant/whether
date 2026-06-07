@@ -10,6 +10,11 @@ import type { WeeklyCallContract } from "../report/weeklyCallContract";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
+  boldnessBudget?: {
+    score: number;
+    delta: number;
+    line: string;
+  };
   regimeStage: string;
   confidence: string;
   currentCall: string;
@@ -53,6 +58,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   postureState,
   canonicalDecisionCopy,
   weeklyCall,
+  weeklyLeadershipSummary,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
@@ -64,10 +70,24 @@ export const buildWeeklyOperatorBriefPayload = ({
   postureState?: PostureStateContract;
   canonicalDecisionCopy?: CanonicalDecisionCopy;
   weeklyCall?: WeeklyCallContract;
+  weeklyLeadershipSummary?: {
+    boldnessScore: number;
+    boldnessDelta: number;
+    shorthandLine: string;
+  };
 }): WeeklyOperatorBriefPayload => {
+  const boldnessBudget = weeklyLeadershipSummary
+    ? {
+        score: weeklyLeadershipSummary.boldnessScore,
+        delta: weeklyLeadershipSummary.boldnessDelta,
+        line: weeklyLeadershipSummary.shorthandLine,
+      }
+    : undefined;
+
   if (weeklyCall) {
     return {
       date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
+      boldnessBudget,
       regimeStage: weeklyCall.regimeStage,
       confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
       currentCall: weeklyCall.currentCall,
@@ -129,6 +149,7 @@ export const buildWeeklyOperatorBriefPayload = ({
 
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
+    boldnessBudget,
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     currentCall,
@@ -150,8 +171,16 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     .filter((bullet) => bullet.trim().length > 0)
     .filter((bullet) => bullet !== payload.actionNow);
 
+  const boldnessDeltaLabel = payload.boldnessBudget
+    ? payload.boldnessBudget.delta === 0
+      ? "no change vs last week"
+      : `${payload.boldnessBudget.delta > 0 ? "+" : ""}${payload.boldnessBudget.delta.toFixed(0)} vs last week`
+    : null;
+
   return [
     `Weekly Operator Brief — ${payload.date}`,
+    payload.boldnessBudget ? `Boldness Budget: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
+    payload.boldnessBudget?.line ? `Budget signal: ${payload.boldnessBudget.line}` : null,
     `Posture: ${payload.regimeStage}`,
     `Confidence: ${payload.confidence}`,
     "",
@@ -167,7 +196,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     ...(payload.flipConditionLabels.length > 0
       ? ["", "Other change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
       : []),
-  ].join("\n");
+  ].filter((line): line is string => line != null).join("\n");
 };
 
 export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBriefPayload) =>
@@ -184,6 +213,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
         {
           type: "section",
           fields: [
+            ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*Boldness Budget*\n${payload.boldnessBudget.score}/100` }] : []),
             { type: "mrkdwn", text: `*Posture*\n${payload.regimeStage}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],

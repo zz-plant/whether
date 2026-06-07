@@ -11,6 +11,8 @@ type ActionCardProps = {
   guardrail?: string;
   flipConditions?: string[];
   tightness: number;
+  boldnessScore: number;
+  boldnessDelta: number;
   direction: SignalDirection;
   recordDate?: string;
   pauseThreshold?: number;
@@ -22,6 +24,8 @@ export function ActionCard({
   guardrail,
   flipConditions,
   tightness,
+  boldnessScore,
+  boldnessDelta,
   direction,
   recordDate,
   pauseThreshold = 80,
@@ -30,13 +34,17 @@ export function ActionCard({
   const { add } = Toast.useToastManager();
   const isCopied = status === "copied";
   const arrow = DIRECTION_ARROW[direction];
+  const boldnessDeltaLabel = boldnessDelta === 0
+    ? "no change vs last week"
+    : `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`;
 
   const buildText = () => [
     `Whether · Weekly Brief · ${recordDate ?? ""}`,
     "",
+    `Boldness Budget: ${boldnessScore}/100 (${boldnessDeltaLabel})`,
     `${arrow} ${call}`,
     actionNow ? `Do now: ${actionNow}` : null,
-    guardrail ? `Threshold: ${guardrail} (tightness ${tightness}/${pauseThreshold})` : null,
+    guardrail ? `Bounded condition: ${guardrail} (tightness ${tightness}/${pauseThreshold})` : null,
     flipConditions?.length ? `Watching: ${flipConditions.join(" · ")}` : null,
     "",
     "whether.work",
@@ -59,9 +67,10 @@ export function ActionCard({
       <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
       <div className="flex items-center justify-between gap-3 mb-4">
         <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
-          {DIRECTION_LABEL[direction]}
+          Boldness Budget · {DIRECTION_LABEL[direction]}
         </p>
         <button
+          type="button"
           onClick={handleCopy}
           className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-4 py-2 text-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label={isCopied ? "Copied to clipboard" : "Copy brief to clipboard"}
@@ -74,10 +83,15 @@ export function ActionCard({
         </button>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-100 mb-4">
-        <span className="mr-1.5">{arrow}</span>
-        {call}
-      </h2>
+      <div className="mb-4 space-y-1">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-white/35">
+          {boldnessScore}/100 · {boldnessDeltaLabel}
+        </p>
+        <h2 className="text-lg font-semibold text-slate-100">
+          <span className="mr-1.5">{arrow}</span>
+          {call}
+        </h2>
+      </div>
 
       <div className="space-y-3 text-sm">
         {actionNow ? (
@@ -97,7 +111,7 @@ export function ActionCard({
               <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">Pause if</p>
             </summary>
             <div className="ml-3.5 mt-1">
-              <p className="text-white/50 text-xs">{guardrail}</p>
+              <p className="text-white/50 text-xs">Bounded condition: {guardrail}</p>
               <div className="mt-2 h-2 w-full rounded-full bg-[var(--bg-nested)] overflow-hidden">
                 <div className={`h-full rounded-full ${pauseColor}`} style={{ width: `${Math.min(100, (tightness / pauseThreshold) * 100)}%` }} />
               </div>
