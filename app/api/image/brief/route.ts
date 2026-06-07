@@ -28,7 +28,7 @@ export const buildBriefImagePayload = (
       )?.delta ?? 0,
     confidenceLabel: model.status.confidenceLabel,
     recordDate: shell.recordDateLabel,
-    guardrail: model.decision.guardrailThreshold,
+    guardrail: model.decision.guardrail,
     pauseThreshold:
       model.diagnostics.postureTrajectory?.thresholds.tightness ??
       model.diagnostics.regimeDistance.thresholdValue,
