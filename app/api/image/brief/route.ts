@@ -2,11 +2,44 @@ import { ImageResponse } from "next/og";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
 import { renderBriefImage } from "../../../../lib/image/briefImageTemplate";
 import type { SignalChange } from "../../../../lib/report/homeBriefModel";
+import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
+import { SECTOR_TAXONOMY, type SectorKey } from "../../../../lib/report/sectorSensitivity";
+import type { CompanyStage } from "../../../../lib/report/operatorContext";
 
 export const runtime = "edge";
 
-export async function GET() {
-  const homepage = await assembleHomePage({});
+const cadenceLabel: Record<string, string> = {
+  weekly: "Weekly Brief",
+  monthly: "Monthly Brief",
+  quarterly: "Quarterly Brief",
+  yearly: "Yearly Brief",
+};
+
+const stageLabel: Record<CompanyStage, string> = {
+  "pre-seed": "Pre-seed",
+  seed: "Seed",
+  "series-a": "Series A",
+  "series-b-plus": "Series B+",
+  public: "Public",
+};
+
+const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBriefRequestContext>) => {
+  const labels = [
+    requestContext.searchParams?.sector
+      ? SECTOR_TAXONOMY[requestContext.searchParams.sector as SectorKey]?.label
+      : null,
+    requestContext.operatorContext?.ticker,
+    requestContext.operatorContext?.companyStage
+      ? stageLabel[requestContext.operatorContext.companyStage]
+      : null,
+  ].filter((label): label is string => Boolean(label));
+
+  return labels.length ? labels.join(" · ") : undefined;
+};
+
+export async function GET(request: Request) {
+  const requestContext = parseImageBriefRequestContext(new URL(request.url).searchParams);
+  const homepage = await assembleHomePage(requestContext);
   const model = homepage.weeklyDecisionCardModel;
   const shell = homepage.reportShell;
 
@@ -26,6 +59,8 @@ export async function GET() {
         )?.delta ?? 0,
       confidenceLabel: model.status.confidenceLabel,
       recordDate: shell.recordDateLabel,
+      briefLabel: cadenceLabel[requestContext.searchParams?.cadence ?? "weekly"] ?? "Weekly Brief",
+      contextLabel: buildImageContextLabel(requestContext),
       guardrail: model.decision.guardrailThreshold
         ? `tightness crosses ${model.decision.guardrailThreshold}`
         : undefined,

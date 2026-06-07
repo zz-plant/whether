@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Image as ImageIcon, Loader2, Check, AlertTriangle } from "lucide-react";
+import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 
 type ExportImageButtonProps = {
   decision?: string;
@@ -16,13 +18,18 @@ type ButtonState = "idle" | "loading" | "success" | "error";
 export function ExportImageButton(_props: ExportImageButtonProps) {
   const [state, setState] = useState<ButtonState>("idle");
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const currentSearchParams = useSearchParams();
+  const imageBriefHref = useMemo(
+    () => buildImageBriefApiPath(currentSearchParams),
+    [currentSearchParams],
+  );
 
   const handleCopy = useCallback(async () => {
     setState("loading");
     setDownloadUrl(null);
 
     try {
-      const response = await fetch("/api/image/brief");
+      const response = await fetch(imageBriefHref);
 
       if (!response.ok) {
         throw new Error(`Server responded with ${response.status}`);
@@ -42,7 +49,7 @@ export function ExportImageButton(_props: ExportImageButtonProps) {
     } catch (_fetchError) {
       setState("error");
     }
-  }, []);
+  }, [imageBriefHref]);
 
   return (
     <span className="inline-flex items-center gap-2">
