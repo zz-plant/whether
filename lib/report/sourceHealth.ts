@@ -13,6 +13,44 @@ export type SourceHealthRow = {
   mode: SourceModeStatus;
 };
 
+export type SourceHealthCoverageSummary = {
+  liveCount: number;
+  cachedCount: number;
+  missingCount: number;
+  totalCount: number;
+  inputsComplete: boolean;
+};
+
+export const summarizeSourceHealthCoverage = (rows: SourceHealthRow[]): SourceHealthCoverageSummary => {
+  const summary: SourceHealthCoverageSummary = {
+    liveCount: 0,
+    cachedCount: 0,
+    missingCount: 0,
+    totalCount: rows.length,
+    inputsComplete: true,
+  };
+
+  for (const row of rows) {
+    const hasUsableFetch = Boolean(row.lastSuccessfulFetchAt) && row.freshnessStatus !== "unknown";
+
+    if (!hasUsableFetch) {
+      summary.missingCount += 1;
+      continue;
+    }
+
+    if (row.mode === "live") {
+      summary.liveCount += 1;
+      continue;
+    }
+
+    summary.cachedCount += 1;
+  }
+
+  summary.inputsComplete = summary.missingCount === 0;
+
+  return summary;
+};
+
 type SourceGroupDefinition = {
   sourceName: string;
   cadenceLabel: string;

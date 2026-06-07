@@ -24,6 +24,7 @@ import { TickerCompany } from "../components/home/TickerCompany";
 import { EmailSubscribe } from "../components/home/EmailSubscribe";
 import { SourceDisagreement } from "../components/evidence/SourceDisagreement";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInterface";
+import { summarizeSourceHealthCoverage } from "../../lib/report/sourceHealth";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import {
   computeReliabilityScore,
@@ -199,6 +200,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
+  const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
@@ -268,8 +270,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               riskAppetiteDelta={riskAppetiteDelta}
               confidenceLabel={confidenceLabel}
               reliabilityScore={reliabilityScore}
-              sourceCount={sourceCount}
-              degradedCount={degradedCount}
+              sourceHealthSummary={sourceHealthSummary}
               direction={signalDirection}
             />
             <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
@@ -324,8 +325,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             riskAppetiteDelta={riskAppetiteDelta}
             confidenceLabel={confidenceLabel}
             reliabilityScore={reliabilityScore}
-            sourceCount={sourceCount}
-            degradedCount={degradedCount}
+            sourceHealthSummary={sourceHealthSummary}
             direction={signalDirection}
           />
 

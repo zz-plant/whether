@@ -1,3 +1,4 @@
+import type { SourceHealthCoverageSummary } from "../../../lib/report/sourceHealth";
 import { DIRECTION_LABEL, DIRECTION_COLOR, CONFIDENCE_COLOR, RELIABILITY_COLOR, type SignalDirection } from "../viewModel";
 
 export function DeltaTrustStrip({
@@ -5,16 +6,14 @@ export function DeltaTrustStrip({
   riskAppetiteDelta,
   confidenceLabel,
   reliabilityScore,
-  sourceCount,
-  degradedCount,
+  sourceHealthSummary,
   direction,
 }: {
   tightnessDelta: number;
   riskAppetiteDelta: number;
   confidenceLabel: string;
   reliabilityScore: number;
-  sourceCount: number;
-  degradedCount: number;
+  sourceHealthSummary: SourceHealthCoverageSummary;
   direction: SignalDirection;
 }) {
   const deltaLabel = DIRECTION_LABEL[direction];
@@ -41,7 +40,15 @@ export function DeltaTrustStrip({
       <div className="border-t border-slate-800/60 pt-2">
         <div className="flex items-center justify-between text-fluid-nano text-white/30">
           <span>Sources</span>
-          <span>{sourceCount - degradedCount} live{degradedCount > 0 ? ` · ${degradedCount} cached` : ""}</span>
+          <span>
+            {sourceHealthSummary.liveCount} live · {sourceHealthSummary.cachedCount} cached · {sourceHealthSummary.missingCount} missing
+          </span>
+        </div>
+        <div className="mt-1 flex items-center justify-between text-fluid-nano text-white/30">
+          <span>Inputs complete:</span>
+          <span className={sourceHealthSummary.inputsComplete ? "text-emerald-300/80" : "text-amber-300/80"}>
+            {sourceHealthSummary.inputsComplete ? "Yes" : "No"}
+          </span>
         </div>
       </div>
     </div>
