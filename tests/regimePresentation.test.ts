@@ -1,6 +1,29 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { getRegimeDisplayLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
+import { isValidElement, type ReactNode } from "react";
+import { REGIME_DISPLAY } from "../app/v2/viewModel";
+import { renderBriefImage } from "../lib/image/briefImageTemplate";
+import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
+
+const collectText = (node: ReactNode): string => {
+  if (node === null || node === undefined || typeof node === "boolean") {
+    return "";
+  }
+
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (Array.isArray(node)) {
+    return node.map(collectText).join("");
+  }
+
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return collectText(node.props.children);
+  }
+
+  return "";
+};
 
 describe("regime presentation labels", () => {
   it("keeps contraction mapping for defensive/scarcity regimes", () => {
@@ -12,6 +35,23 @@ describe("regime presentation labels", () => {
     const presentation = getRegimeDisplayLabel({ regime: "VOLATILE" });
     assert.equal(presentation.label, "Transitional Mixed");
     assert.equal(presentation.canonicalRegime, "VOLATILE");
+  });
+
+  it("centralizes public volatile labels across homepage and image export paths", () => {
+    const image = renderBriefImage({
+      decision: "Hold reversible bets",
+      regime: "VOLATILE",
+      postureLabel: "Transitional Mixed",
+      tightness: 64,
+      tightnessDelta: 0,
+      confidenceLabel: "MED",
+      recordDate: "June 7, 2026",
+    });
+
+    assert.equal(getRegimePublicLabel("VOLATILE"), "Uncertain");
+    assert.equal(REGIME_DISPLAY.VOLATILE, getRegimePublicLabel("VOLATILE"));
+    assert.match(collectText(image), /Uncertain · Transitional Mixed/);
+    assert.doesNotMatch(collectText(image), /Volatile · Transitional Mixed/);
   });
 
 

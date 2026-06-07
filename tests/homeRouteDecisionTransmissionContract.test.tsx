@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
@@ -74,4 +75,30 @@ describe("home route render contract", () => {
     assert.equal(canonicalOrders.length, 1);
     assert.equal(shareArtifacts.length, 1);
   });
+
+  it("keeps the active / route wired through the v2 homepage decision contract", () => {
+    const rootRouteSource = readFileSync("app/page.tsx", "utf8");
+    const v2RouteSource = readFileSync("app/v2/page.tsx", "utf8");
+
+    assert.match(rootRouteSource, /import Page, \{ generateMetadata, revalidate, runtime \} from "\.\/v2\/page"/);
+    assert.match(rootRouteSource, /export default Page/);
+    assert.match(v2RouteSource, /data-testid="weekly-top-fold"/);
+    assert.match(v2RouteSource, /lg:grid-cols-12/);
+    assert.match(v2RouteSource, /lg:grid-cols-4/);
+
+    const scalarIndex = v2RouteSource.indexOf("Boldness Budget:");
+    const netDeltaIndex = v2RouteSource.indexOf("Net delta:");
+    const revisitIndex = v2RouteSource.indexOf("Revisit last week’s roadmap/hiring decisions?");
+    const guardrailIndex = v2RouteSource.indexOf("If {row.trigger}");
+    const memoryIndex = v2RouteSource.indexOf("Last 4 weeks:");
+    const trustStripIndex = v2RouteSource.indexOf("<DeltaTrustStrip");
+
+    assert.ok(scalarIndex >= 0, "active v2 route exposes the canonical scalar");
+    assert.ok(netDeltaIndex > scalarIndex, "active v2 route exposes net delta after the scalar");
+    assert.ok(revisitIndex > netDeltaIndex, "active v2 route exposes the revisit decision state after net delta");
+    assert.ok(guardrailIndex > revisitIndex, "active v2 route exposes bounded guardrails after revisit state");
+    assert.ok(memoryIndex > guardrailIndex, "active v2 route exposes memory rail after guardrails");
+    assert.ok(trustStripIndex > memoryIndex, "active v2 route keeps the compact trust strip after the decision contract");
+  });
+
 });
