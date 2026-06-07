@@ -27,6 +27,7 @@ import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInte
 import {
   computeReliabilityScore,
   DIRECTION_ARROW,
+  buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
 
@@ -163,7 +164,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
     );
   }
 
-  const { homepage, regimeHistory, operatorContext } = data;
+  const { homepage, reportData, regimeHistory, operatorContext } = data;
   const isDegraded = !homepage.reportResult.ok;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
@@ -173,6 +174,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
+  const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
 
   const signalDeltas = new Map(
     homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
@@ -196,6 +198,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
+  const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
   const isScreenshot = searchParams?.screenshot === "1";
 
@@ -212,7 +215,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         </div>
       ) : null}
       <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
-        Tightness {tightness}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · {signalDirection === "tighten" ? "tightening" : signalDirection === "ease" ? "easing" : "holding"} · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
+        Boldness Budget {weeklyLeadershipSummary.boldnessScore}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · tightness guardrail {tightness}/100 · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
       <div data-screenshot={isScreenshot ? "true" : undefined}>
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
@@ -221,6 +224,9 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             <V2DecisionHero
             tightness={tightness}
             tightnessDelta={tightnessDelta}
+            boldnessScore={weeklyLeadershipSummary.boldnessScore}
+            boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+            boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
             regime={regime}
             postureLabel={postureLabel}
             signalDirection={signalDirection}
@@ -228,10 +234,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             fetchedAt={homepage.reportShell.fetchedAtLabel}
             operatorContext={operatorContext}
             confidenceLabel={confidenceLabel}
-            signalData={{
-              baseRate: 4.33,
-              baseRateUsed: "FED",
-            }}
+            signalData={v2HeroSignalData}
           />
 
           <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
@@ -244,6 +247,8 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               : undefined}
             flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
             tightness={tightness}
+            boldnessScore={weeklyLeadershipSummary.boldnessScore}
+            boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             direction={signalDirection}
             recordDate={homepage.reportShell.recordDateLabel}
           />
@@ -360,7 +365,11 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
       <StickyCallStrip
         call={canonicalDecision?.doNowLines?.[0] ?? ""}
         arrow={DIRECTION_ARROW[signalDirection]}
-        tightnessDelta={tightnessDelta}
+        boldnessScore={weeklyLeadershipSummary.boldnessScore}
+        boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+        guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+          ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+          : undefined}
       />
     </V2Shell>
   );

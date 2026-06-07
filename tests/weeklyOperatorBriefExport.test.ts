@@ -43,10 +43,20 @@ describe("weekly operator brief export adapters", () => {
       treasury,
       postureWithStageLabel: "Defensive · Late Cycle",
       confidenceLabel: "HIGH",
+      weeklyLeadershipSummary: {
+        boldnessScore: 42,
+        boldnessDelta: -3,
+        shorthandLine: "The call moved slightly more defensive this week.",
+      },
     });
 
     assert.equal(payload.date, "2026-03-06");
     assert.equal(payload.regimeStage, "Defensive · Late Cycle");
+    assert.deepEqual(payload.boldnessBudget, {
+      score: 42,
+      delta: -3,
+      line: "The call moved slightly more defensive this week.",
+    });
     assert.equal(payload.confidence, "HIGH confidence");
     assert.ok(payload.doNowBullets.length > 0);
     assert.ok(payload.whyCouldBeWrong.length > 0);
@@ -54,11 +64,22 @@ describe("weekly operator brief export adapters", () => {
   });
 
   it("renders plain text and image/PDF card text adapters", () => {
-    const payload = buildWeeklyOperatorBriefPayload({ assessment, treasury, confidenceLabel: "MED" });
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "MED",
+      weeklyLeadershipSummary: {
+        boldnessScore: 58,
+        boldnessDelta: 4,
+        shorthandLine: "The call moved more aggressive this week.",
+      },
+    });
     const text = buildWeeklyOperatorBriefPlainText(payload);
     const cardText = buildWeeklyOperatorBriefCardText(payload);
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
+    assert.match(text, /Boldness Budget: 58\/100 \(\+4 vs last week\)/);
+    assert.ok(text.indexOf("Boldness Budget:") < text.indexOf("Posture:"));
     assert.match(text, /Posture:/);
     assert.match(text, /Posture:/); // replaces Forecast
     assert.match(text, /Do now:/);
@@ -69,11 +90,21 @@ describe("weekly operator brief export adapters", () => {
   });
 
   it("renders Slack blocks adapter with required sections", () => {
-    const payload = buildWeeklyOperatorBriefPayload({ assessment, treasury, confidenceLabel: "LOW" });
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "LOW",
+      weeklyLeadershipSummary: {
+        boldnessScore: 58,
+        boldnessDelta: 0,
+        shorthandLine: "The call is holding steady this week.",
+      },
+    });
     const blocksJson = buildWeeklyOperatorBriefSlackBlocks(payload);
     const parsed = JSON.parse(blocksJson) as { blocks: Array<{ type: string }> };
 
     assert.equal(parsed.blocks[0]?.type, "header");
+    assert.ok(blocksJson.includes("Boldness Budget"));
     assert.ok(parsed.blocks.some((block) => block.type === "section"));
     assert.ok(parsed.blocks.some((block) => block.type === "context"));
   });
