@@ -200,7 +200,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
-  const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData.sourceHealth);
+  const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
