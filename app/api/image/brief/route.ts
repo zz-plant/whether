@@ -31,7 +31,10 @@ export const buildBriefImagePayload = (
     guardrail: model.decision.guardrail,
     pauseThreshold:
       model.diagnostics.postureTrajectory?.thresholds.tightness ??
-      model.diagnostics.regimeDistance.thresholdValue,
+      (model.diagnostics.regimeDistance.dimensionKey === "tightness"
+        ? model.diagnostics.regimeDistance.thresholdValue
+        : model.diagnostics.inputInfluence.find((i) => i.key === "tightness")?.watchValue) ??
+      80,
     flipConditions: model.decision.compactFlipConditionLabels?.length
       ? model.decision.compactFlipConditionLabels
       : undefined,
