@@ -8,6 +8,8 @@ export type BriefImageProps = {
   tightnessDelta: number;
   confidenceLabel: string;
   recordDate: string;
+  briefLabel?: string;
+  contextLabel?: string;
   guardrail?: string;
   flipConditions?: string[];
 };
@@ -18,7 +20,7 @@ const confidenceColor = (label: string) =>
 export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const {
     decision, regime, postureLabel, tightness,
-    confidenceLabel, recordDate, guardrail, flipConditions,
+    confidenceLabel, recordDate, briefLabel = "Weekly Brief", contextLabel, guardrail, flipConditions,
   } = props;
 
   const cc = confidenceColor(confidenceLabel);
@@ -40,14 +42,14 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
     <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: "linear-gradient(160deg, #020617 0%, #0f172a 100%)", color: "#f8fafc", fontFamily: "ui-sans-serif, system-ui, sans-serif", justifyContent: "space-between" }}>
       <div>
         <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 32 }}>
-          WHETHER · Weekly Brief{recordDate ? ` · ${recordDate}` : ""}
+          WHETHER · {briefLabel}{recordDate ? ` · ${recordDate}` : ""}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <span style={{ fontSize: 52, color: arrowColor, marginRight: 16 }}>{arrow}</span>
           <span style={{ fontSize: 40, fontWeight: 800, color: "#f8fafc", maxWidth: 800 }}>{truncated}</span>
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 48 }}>
-          {displayRegime}{" \u00b7 "}{postureLabel}
+          {displayRegime}{" \u00b7 "}{postureLabel}{contextLabel ? ` · ${contextLabel}` : ""}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
           <div style={{ marginRight: 32 }}>
