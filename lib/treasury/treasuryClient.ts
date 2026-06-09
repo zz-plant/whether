@@ -6,9 +6,9 @@ import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
 
-const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
-const RETRY_FETCH_TIMEOUT_MS = 20_000;
-const MAX_SERIES_FETCH_ATTEMPTS = 3;
+const PRIMARY_FETCH_TIMEOUT_MS = 1_500;
+const RETRY_FETCH_TIMEOUT_MS = 2_500;
+const MAX_SERIES_FETCH_ATTEMPTS = 2;
 const RETRY_BACKOFF_MS = 250;
 const TREASURY_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",

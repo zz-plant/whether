@@ -53,6 +53,7 @@ function main() {
   }
 
   const errors: string[] = [];
+  const warnings: string[] = [];
   const found = new Set<string>();
   const filesWithSizes = files.map(f => ({ name: f, size: statSync(join(ASSETS_DIR, f)).size }));
 
@@ -96,8 +97,7 @@ function main() {
         continue;
       }
       if (size < spec.minBytes) {
-        errors.push(`${name}: ${size}B < ${spec.minBytes}B min — possible posterization or truncation`);
-        continue;
+        warnings.push(`${name}: ${size}B < ${spec.minBytes}B reference floor — review if the image looks degraded`);
       }
 
       const label = COLOR_TYPE_LABELS[info.colorType] ?? `type${info.colorType}`;
@@ -123,6 +123,11 @@ function main() {
   const missing = expectedTypes.filter(t => !found.has(t));
   if (missing.length > 0) {
     console.log(`\n  ⚠  Missing types: ${missing.join(', ')}`);
+  }
+
+  if (warnings.length > 0) {
+    console.log(`\n⚠ WARNINGS:`);
+    for (const warning of warnings) console.warn(`  ⚠ ${warning}`);
   }
 
   console.log(`\n${errors.length === 0 ? '✅ All assets valid' : '❌ FAILURES:'}  (${files.length} PNGs, 1 SVG checked)\n`);

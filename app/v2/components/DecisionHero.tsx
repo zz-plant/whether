@@ -10,6 +10,7 @@ type Props = {
   boldnessScore: number;
   boldnessDelta: number;
   boldnessShorthand?: string;
+  weeklyCall?: string;
   regime: string;
   postureLabel: string;
   signalDirection: SignalDirection;
@@ -26,12 +27,13 @@ type Props = {
   };
 };
 
-export function V2DecisionHero({
+export function DecisionHero({
   tightness,
   tightnessDelta,
   boldnessScore,
   boldnessDelta,
   boldnessShorthand,
+  weeklyCall,
   regime,
   postureLabel,
   signalDirection,
@@ -60,9 +62,44 @@ export function V2DecisionHero({
     : null;
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col sm:flex-row sm:items-baseline gap-3 sm:gap-10 w-full min-w-0">
-        <div>
+    <section className="space-y-4" aria-labelledby="weekly-call-title">
+      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="min-w-0 space-y-3">
+          <div className="space-y-1">
+            <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-white/35">This week&apos;s call</p>
+            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
+              {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
+            </h2>
+          </div>
+          <div className="space-y-1 text-fluid-xs text-white/50">
+            <p>
+              <span className={DIRECTION_COLOR[signalDirection]}>
+                {DIRECTION_LABEL[signalDirection]}
+              </span>
+              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
+                {boldnessDeltaLabel}
+              </span>
+            </p>
+            {boldnessShorthand && boldnessShorthand !== weeklyCall ? <p className="text-white/55">{boldnessShorthand}</p> : null}
+            <p>
+              <span className="text-white/35">Guardrail input:</span>{" "}
+              <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
+              {tightnessDelta !== 0 ? (
+                <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
+                  {tightnessDeltaLabel}
+                  {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
+                </span>
+              ) : null}
+            </p>
+            <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
+            {stageLabel ? <p>{stageLabel}</p> : null}
+            <p className="text-white/40">{recordDate}</p>
+            {fetchedAt ? <p className="text-white/30">Updated {fetchedAt}</p> : null}
+          </div>
+          <StageSwitcher currentStage={operatorContext.companyStage} />
+        </div>
+
+        <div className="sm:text-right">
           <div className="relative inline-block">
             <svg className="absolute inset-0 w-full h-full -m-[14%]" viewBox="0 0 100 100" aria-hidden="true">
               {confidenceLabel ? (
@@ -78,10 +115,10 @@ export function V2DecisionHero({
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
-              <h1 className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
+              <div className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
                 {boldnessScore}
-              </h1>
+              </div>
             </SignalWaterfall>
           </div>
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
@@ -89,33 +126,7 @@ export function V2DecisionHero({
             <span className="ml-1.5 text-white/35">/100</span>
           </p>
         </div>
-        <div className="text-fluid-xs text-white/50 space-y-0.5 w-full min-w-0">
-          <p>
-            <span className={DIRECTION_COLOR[signalDirection]}>
-              {DIRECTION_LABEL[signalDirection]}
-            </span>
-            <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-              {boldnessDeltaLabel}
-            </span>
-          </p>
-          {boldnessShorthand ? <p className="text-white/55">{boldnessShorthand}</p> : null}
-          <p>
-            <span className="text-white/35">Guardrail input:</span>{" "}
-            <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
-            {tightnessDelta !== 0 ? (
-              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-                {tightnessDeltaLabel}
-                {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
-              </span>
-            ) : null}
-          </p>
-          <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
-          {stageLabel ? <p>{stageLabel}</p> : null}
-          <p className="text-white/40">{recordDate}</p>
-          {fetchedAt ? <p className="text-white/30">Updated {fetchedAt}</p> : null}
-          <StageSwitcher currentStage={operatorContext.companyStage} />
-        </div>
       </div>
-    </div>
+    </section>
   );
 }

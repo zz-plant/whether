@@ -34,9 +34,9 @@ describe("v2 hero signal data", () => {
     });
   });
 
-  it("keeps the route from passing literal macro values into V2DecisionHero", () => {
+  it("keeps the route from passing literal macro values into DecisionHero", () => {
     const source = readFileSync("app/v2/page.tsx", "utf8");
-    const heroCall = source.match(/<V2DecisionHero[\s\S]*?\/>/)?.[0] ?? "";
+    const heroCall = source.match(/<DecisionHero[\s\S]*?\/>/)?.[0] ?? "";
 
     assert.match(heroCall, /signalData=\{v2HeroSignalData\}/);
     assert.doesNotMatch(heroCall, /signalData=\{\{[\s\S]*?(baseRate|baseRateUsed|curveSlope|tightnessThreshold)/);

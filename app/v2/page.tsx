@@ -3,15 +3,15 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../../lib/report/homeMetadata";
 import { loadHomePageAssembly } from "../../lib/report/homePageAssemblyLoader";
-import { V2Shell } from "./components/V2Shell";
-import { V2DecisionHero } from "./components/V2DecisionHero";
+import { Shell } from "./components/Shell";
+import { DecisionHero } from "./components/DecisionHero";
 import { DeltaTrustStrip } from "./components/DeltaTrustStrip";
 import { ActionCard } from "./components/ActionCard";
-import { V2RegimeHistory } from "./components/V2RegimeHistory";
-import { V2EvidenceDrawer } from "./components/V2EvidenceDrawer";
-import { V2RitualCheck } from "./components/V2RitualCheck";
-import { V2ToolsPanel } from "./components/V2ToolsPanel";
-import { V2SubscribeForm } from "./components/V2SubscribeForm";
+import { RegimeHistory } from "./components/RegimeHistory";
+import { EvidenceDrawer } from "./components/EvidenceDrawer";
+import { RitualCheck } from "./components/RitualCheck";
+import { ToolsPanel } from "./components/ToolsPanel";
+import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
@@ -21,7 +21,6 @@ import { RegimeTransitionProbability, computeTransitionProbability } from "../co
 import { DecisionTrendline } from "../components/home/DecisionTrendline";
 import { CompanyMetricsPanel } from "../components/home/CompanyMetricsPanel";
 import { TickerCompany } from "../components/home/TickerCompany";
-import { EmailSubscribe } from "../components/home/EmailSubscribe";
 import { SourceDisagreement } from "../components/evidence/SourceDisagreement";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInterface";
 import { summarizeSourceHealthCoverage } from "../../lib/report/sourceHealth";
@@ -42,7 +41,7 @@ export const generateMetadata = async ({
   searchParams?: Promise<HomePageSearchParams>;
 }): Promise<Metadata> => buildHomeMetadata(searchParams);
 
-export default async function V2Page({
+export default async function Page({
   searchParams,
 }: {
   searchParams?: Promise<HomePageSearchParams>;
@@ -50,8 +49,8 @@ export default async function V2Page({
   const resolved = searchParams ? await searchParams : undefined;
 
   return (
-    <Suspense fallback={<V2Shell loading />}>
-      <V2PageContent searchParams={resolved} />
+    <Suspense fallback={<Shell loading />}>
+      <PageContent searchParams={resolved} />
     </Suspense>
   );
 }
@@ -66,8 +65,20 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
   );
 }
 
+function hasCadenceSummary(value: unknown): value is { summary?: { regime?: string; action?: string }; recordDateLabel?: string } {
+  return typeof value === "object" && value !== null;
+}
+
 function formatSignedDelta(value: number) {
   return `${value > 0 ? "+" : ""}${value}`;
+}
+
+function compactSentence(value: string | undefined, maxLength = 132) {
+  if (!value) return "";
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
 function WeeklyTopFoldContract({
@@ -96,7 +107,7 @@ function WeeklyTopFoldContract({
       consequence: model.decision.netConstraintSummary,
       reversal: model.decision.canonicalDecisionCopy?.flipTrigger ?? model.decision.reversalTrigger,
     },
-  ].filter((row) => row.trigger && row.consequence && row.reversal);
+  ].filter((row) => row.trigger && row.consequence && row.reversal).slice(0, 1);
 
   return (
     <section
@@ -122,15 +133,20 @@ function WeeklyTopFoldContract({
         <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">Revisit last week’s roadmap/hiring decisions?</p>
         <p className="text-sm font-semibold text-white/75">{revisitState}</p>
         {revisitQueue.length ? (
-          <ul className="space-y-1 text-fluid-micro text-white/50">
+          <ul className="space-y-1.5 text-fluid-micro text-white/50">
             {revisitQueue.map((item) => (
-              <li key={item.id}>{item.label}: {item.action} Flip: {item.flipCondition}</li>
+              <li key={item.id}>
+                <span className="font-medium text-white/65">{item.label}:</span>{" "}
+                {compactSentence(item.action, 96)}
+              </li>
             ))}
           </ul>
         ) : null}
         <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
           {guardrailRows.map((row, index) => (
-            <p key={index}>If {row.trigger} → {row.consequence} → {row.reversal}</p>
+            <p key={index}>
+              <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}
+            </p>
           ))}
         </div>
         {memoryItems.length ? (
@@ -142,7 +158,7 @@ function WeeklyTopFoldContract({
   );
 }
 
-async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
+async function PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
@@ -157,12 +173,12 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
     ]);
   } catch {
     return (
-      <V2Shell regime="EXPANSION">
+      <Shell regime="EXPANSION">
         <div className="text-center py-16 space-y-3">
           <p className="text-white/40 text-sm">Unable to load the weekly brief.</p>
           <p className="text-white/30 text-fluid-micro">The data pipeline may be temporarily unavailable. Please try again shortly.</p>
         </div>
-      </V2Shell>
+      </Shell>
     );
   }
 
@@ -198,19 +214,20 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   });
 
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
+  const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
   const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
-  const isScreenshot = searchParams?.screenshot === "1";
 
   const transition = computeTransitionProbability(regime);
   const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
 
   return (
-    <V2Shell regime={regime}>
+    <Shell regime={regime}>
+      <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
       <FreshnessDot label={homepage.reportShell.fetchedAtLabel} />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
@@ -218,19 +235,16 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
         </div>
       ) : null}
-      <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
-        Boldness Budget {weeklyLeadershipSummary.boldnessScore}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · tightness guardrail {tightness}/100 · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
-      </p>
-      <div data-screenshot={isScreenshot ? "true" : undefined}>
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
         <div className="space-y-6 min-w-0">
           <SwipeableWeek>
-            <V2DecisionHero
+            <DecisionHero
             tightness={tightness}
             tightnessDelta={tightnessDelta}
             boldnessScore={weeklyLeadershipSummary.boldnessScore}
             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
+            weeklyCall={primaryCall}
             regime={regime}
             postureLabel={postureLabel}
             signalDirection={signalDirection}
@@ -244,7 +258,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
 
           <ActionCard
-            call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
+            call={primaryCall}
             actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
             guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
               ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
@@ -273,11 +287,11 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               sourceHealthSummary={sourceHealthSummary}
               direction={signalDirection}
             />
-            <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+            <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
           </div>
 
-          <V2EvidenceDrawer highlight={toolHighlight}>
-            <V2ToolsPanel>
+          <EvidenceDrawer highlight={toolHighlight}>
+            <ToolsPanel>
               <DecisionSimulator
                 currentTightness={tightness}
                 currentRiskAppetite={riskAppetite}
@@ -288,19 +302,19 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               <CompanyMetricsPanel tightness={tightness} companyStage={operatorContext.companyStage ?? undefined} />
               <TickerCompany tightness={tightness} />
               <SourceDisagreement tightnessDelta={tightnessDelta} riskAppetiteDelta={riskAppetiteDelta} />
-            </V2ToolsPanel>
-          </V2EvidenceDrawer>
+            </ToolsPanel>
+          </EvidenceDrawer>
 
-          <V2SubscribeForm />
+          <SubscribeForm />
 
-          <V2RitualCheck recordDate={homepage.reportShell.recordDateLabel} />
+          <RitualCheck recordDate={homepage.reportShell.recordDateLabel} />
 
           <Link
             href="/planning"
             className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
           >
             <div>
-              <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Next step</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Open weekly plan</p>
               <p className="text-fluid-micro text-white/40 mt-0.5">Turn this read into this week&apos;s plan</p>
             </div>
             <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
@@ -311,8 +325,8 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               <p className="text-xs font-semibold tracking-[0.06em] text-sky-200">
                 {activeCadence === "monthly" ? "Monthly" : activeCadence === "quarterly" ? "Quarterly" : "Yearly"} summary
               </p>
-              {cadenceData && typeof cadenceData === "object" ? (
-                <CadenceSummary cadenceData={cadenceData as { summary?: { regime?: string; action?: string }; recordDateLabel?: string }} />
+              {hasCadenceSummary(cadenceData) ? (
+                <CadenceSummary cadenceData={cadenceData} />
               ) : <span className="text-xs text-white/40">Viewing the {activeCadence} brief.</span>}
             </div>
           ) : null}
@@ -329,7 +343,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             direction={signalDirection}
           />
 
-          <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
         </aside>
       </div>
 
@@ -358,14 +372,9 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         }),
           }}
         />
-      </div>
-
-      <div className="mb-8">
-        <EmailSubscribe />
-      </div>
 
       <StickyCallStrip
-        call={canonicalDecision?.doNowLines?.[0] ?? ""}
+        call={primaryCall}
         arrow={DIRECTION_ARROW[signalDirection]}
         boldnessScore={weeklyLeadershipSummary.boldnessScore}
         boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
@@ -373,6 +382,6 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
           : undefined}
       />
-    </V2Shell>
+    </Shell>
   );
 }

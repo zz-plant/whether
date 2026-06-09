@@ -8,8 +8,8 @@ const treasury = {
   fetched_at: "2026-03-12T12:00:00.000Z",
   isLive: true,
   yields: {
-    oneMonth: 5.25,
-    threeMonth: 5.2,
+    oneMonth: 3.0,
+    threeMonth: 3.0,
     twoYear: 4.5,
     tenYear: 4.1,
   },
@@ -35,8 +35,8 @@ describe("cli scenario route helpers", () => {
     });
 
     assert.deepEqual(unchanged.yields, {
-      oneMonth: 5.25,
-      threeMonth: 5.2,
+      oneMonth: 3.0,
+      threeMonth: 3.0,
       twoYear: 4.5,
       tenYear: 4.1,
     });

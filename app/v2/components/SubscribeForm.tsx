@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function V2SubscribeForm() {
+export function SubscribeForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");

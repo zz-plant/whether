@@ -231,7 +231,12 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
       const outputPath = path.resolve(process.cwd(), outDir, `${target.id}.png`);
 
       console.log(`Capturing ${target.id} -> ${outputPath}`);
-      await page.goto(url, { waitUntil: "networkidle" });
+      await page.goto(url, { waitUntil: "load" });
+      try {
+        await page.waitForSelector("#share-ready-artifact", { timeout: 15000 });
+      } catch (e) {
+        // Fallback if the element is not present on the target page
+      }
       await page.screenshot({
         path: outputPath,
         fullPage: target.fullPage ?? true,

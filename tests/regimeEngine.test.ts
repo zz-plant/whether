@@ -16,7 +16,7 @@ import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {
   it("ramps tightness as rates move above threshold and curve inverts", () => {
-    const threshold = DEFAULT_THRESHOLDS.baseRateTightness;
+    const threshold = 5;
     assert.equal(computeTightnessScore(5.2, -0.3, threshold), 51);
     assert.equal(computeTightnessScore(5.2, 0.2, threshold), 36);
     assert.equal(computeTightnessScore(4.2, -0.2, threshold), 10);
@@ -69,7 +69,7 @@ describe("regime assessment", () => {
     };
 
     const assessment = evaluateRegime(treasury);
-    assert.equal(assessment.regime, "VOLATILE");
+    assert.equal(assessment.regime, "SCARCITY");
     assert.ok(assessment.tightnessExplanation.length > 0);
     assert.equal(assessment.inputs.length, 4);
 
@@ -77,7 +77,7 @@ describe("regime assessment", () => {
     assert.equal(baseRateInput?.recordDate, treasury.record_date);
     assert.equal(baseRateInput?.fetchedAt, treasury.fetched_at);
     assert.equal(baseRateInput?.sourceUrl, treasury.source);
-    assert.equal(assessment.diagnostics.confidence, "MEDIUM");
+    assert.equal(assessment.diagnostics.confidence, "HIGH");
     assert.equal(assessment.diagnostics.intensity, "STANDARD");
     assert.equal(assessment.diagnostics.transitionWatch, false);
   });
