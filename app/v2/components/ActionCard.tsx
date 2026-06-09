@@ -76,9 +76,13 @@ export function ActionCard({
           aria-label={isCopied ? "Copied to clipboard" : "Copy brief to clipboard"}
         >
           {isCopied ? (
-            <>            <CopyCheck className="w-3.5 h-3.5" aria-hidden="true" /> Copied</>
+            <>
+              <CopyCheck className="w-3.5 h-3.5" aria-hidden="true" /> Copied
+            </>
           ) : (
-            <>            <Copy className="w-3.5 h-3.5" aria-hidden="true" /> Copy</>
+            <>
+              <Copy className="w-3.5 h-3.5" aria-hidden="true" /> Copy
+            </>
           )}
         </button>
       </div>

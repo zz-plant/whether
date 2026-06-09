@@ -65,8 +65,20 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
   );
 }
 
+function hasCadenceSummary(value: unknown): value is { summary?: { regime?: string; action?: string }; recordDateLabel?: string } {
+  return typeof value === "object" && value !== null;
+}
+
 function formatSignedDelta(value: number) {
   return `${value > 0 ? "+" : ""}${value}`;
+}
+
+function compactSentence(value: string | undefined, maxLength = 132) {
+  if (!value) return "";
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
 function WeeklyTopFoldContract({
@@ -95,7 +107,7 @@ function WeeklyTopFoldContract({
       consequence: model.decision.netConstraintSummary,
       reversal: model.decision.canonicalDecisionCopy?.flipTrigger ?? model.decision.reversalTrigger,
     },
-  ].filter((row) => row.trigger && row.consequence && row.reversal);
+  ].filter((row) => row.trigger && row.consequence && row.reversal).slice(0, 1);
 
   return (
     <section
@@ -121,15 +133,20 @@ function WeeklyTopFoldContract({
         <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">Revisit last week’s roadmap/hiring decisions?</p>
         <p className="text-sm font-semibold text-white/75">{revisitState}</p>
         {revisitQueue.length ? (
-          <ul className="space-y-1 text-fluid-micro text-white/50">
+          <ul className="space-y-1.5 text-fluid-micro text-white/50">
             {revisitQueue.map((item) => (
-              <li key={item.id}>{item.label}: {item.action} Flip: {item.flipCondition}</li>
+              <li key={item.id}>
+                <span className="font-medium text-white/65">{item.label}:</span>{" "}
+                {compactSentence(item.action, 96)}
+              </li>
             ))}
           </ul>
         ) : null}
         <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
           {guardrailRows.map((row, index) => (
-            <p key={index}>If {row.trigger} → {row.consequence} → {row.reversal}</p>
+            <p key={index}>
+              <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}
+            </p>
           ))}
         </div>
         {memoryItems.length ? (
@@ -197,6 +214,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
   });
 
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
+  const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
   const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
@@ -217,9 +235,6 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
         </div>
       ) : null}
-      <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
-        Boldness Budget {weeklyLeadershipSummary.boldnessScore}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · tightness guardrail {tightness}/100 · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
-      </p>
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
         <div className="space-y-6 min-w-0">
           <SwipeableWeek>
@@ -229,6 +244,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             boldnessScore={weeklyLeadershipSummary.boldnessScore}
             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
+            weeklyCall={primaryCall}
             regime={regime}
             postureLabel={postureLabel}
             signalDirection={signalDirection}
@@ -242,7 +258,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           <CompareStrip currentRegime={regime} currentTightness={tightness} tightnessDelta={tightnessDelta} />
 
           <ActionCard
-            call={canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? ""}
+            call={primaryCall}
             actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
             guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
               ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
@@ -309,8 +325,8 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
               <p className="text-xs font-semibold tracking-[0.06em] text-sky-200">
                 {activeCadence === "monthly" ? "Monthly" : activeCadence === "quarterly" ? "Quarterly" : "Yearly"} summary
               </p>
-              {cadenceData && typeof cadenceData === "object" ? (
-                <CadenceSummary cadenceData={cadenceData as { summary?: { regime?: string; action?: string }; recordDateLabel?: string }} />
+              {hasCadenceSummary(cadenceData) ? (
+                <CadenceSummary cadenceData={cadenceData} />
               ) : <span className="text-xs text-white/40">Viewing the {activeCadence} brief.</span>}
             </div>
           ) : null}
@@ -358,7 +374,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
         />
 
       <StickyCallStrip
-        call={canonicalDecision?.doNowLines?.[0] ?? ""}
+        call={primaryCall}
         arrow={DIRECTION_ARROW[signalDirection]}
         boldnessScore={weeklyLeadershipSummary.boldnessScore}
         boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
