@@ -86,8 +86,8 @@ export async function GET(request: Request) {
       tickerLabel: tickerParam || null,
       stageLabel: stageParam || null,
       sourceLabel: homepage.reportShell.treasurySource,
-      briefUrl: `https://whether.work/${tickerParam ? `?ticker=${tickerParam}` : ""}${ref ? `&ref=${ref}` : ""}`,
-      attributionUrl: `https://whether.work/?ref=${ref}`,
+      briefUrl: `https://whether.work/${tickerParam ? `?ticker=${encodeURIComponent(tickerParam)}` : ""}${ref ? (tickerParam ? `&ref=${encodeURIComponent(ref)}` : `?ref=${encodeURIComponent(ref)}`) : ""}`,
+      attributionUrl: `https://whether.work/?ref=${encodeURIComponent(ref)}`,
     };
 
     if (format === "json") {
