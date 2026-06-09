@@ -86,8 +86,8 @@ export async function GET(request: Request) {
       tickerLabel: tickerParam || null,
       stageLabel: stageParam || null,
       sourceLabel: homepage.reportShell.treasurySource,
-      briefUrl: `https://whether.app/${tickerParam ? `?ticker=${tickerParam}` : ""}${ref ? `&ref=${ref}` : ""}`,
-      attributionUrl: `https://whether.app/?ref=${ref}`,
+      briefUrl: `https://whether.work/${tickerParam ? `?ticker=${tickerParam}` : ""}${ref ? `&ref=${ref}` : ""}`,
+      attributionUrl: `https://whether.work/?ref=${ref}`,
     };
 
     if (format === "json") {
@@ -168,21 +168,21 @@ const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   const { operatingCall, actionNow, doNowItems, flipTrigger, postureLabel, confidenceLabel, recordDate, tickerLabel, attributionUrl } = data;
   const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel].filter(Boolean);
 
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0;padding:16px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;color:#1e293b;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;">Whether — Weekly Brief</span>
-    <span style="font-size:10px;color:#94a3b8;">${metaParts.join(" · ")}</span>
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0;padding:16px;background:#0d0f12;border:1px solid rgba(255,255,255,0.06);border-radius:12px;color:rgba(255,255,255,0.9);">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.5);">Whether — Weekly Brief</span>
+    <span style="font-size:10px;color:rgba(255,255,255,0.3);">${metaParts.join(" · ")}</span>
   </div>
-  <div style="background:#f0f9ff;border-left:3px solid #38bdf8;padding:12px 14px;border-radius:6px;margin:8px 0;">
-    <p style="font-size:13px;font-weight:600;color:#0284c7;margin:0 0 4px 0;text-transform:uppercase;letter-spacing:0.06em;">Operating call</p>
-    <p style="font-size:16px;font-weight:600;color:#0f172a;margin:0;line-height:1.4;">${operatingCall}</p>
+  <div style="background:rgba(56,189,248,0.08);border-left:3px solid rgba(56,189,248,0.4);padding:12px 14px;border-radius:6px;margin:8px 0;">
+    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">Operating call</p>
+    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${operatingCall}</p>
   </div>
-  <p style="font-size:14px;color:#1e293b;margin:12px 0;"><strong>Decision now:</strong> ${actionNow}</p>
-  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;margin:0 0 4px 0;">Do now</p>${doNowItems.map((item) => `<p style="font-size:13px;color:#475569;margin:2px 0;padding:4px 0;border-bottom:1px solid #f1f5f9;">${item}</p>`).join("")}</div>` : ""}
-  ${flipTrigger ? `<div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:#78350f;"><strong style="color:#92400e;">Watch:</strong> ${flipTrigger}</div>` : ""}
-  <div style="margin-top:14px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;">
-    <span>Macro brief by <a href="${attributionUrl}" style="color:#0284c7;text-decoration:underline;font-weight:600;">Whether</a></span>
-    <a href="${data.briefUrl}" style="color:#0284c7;text-decoration:underline;">Get your own →</a>
+  <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:12px 0;"><strong style="color:rgba(255,255,255,0.8);">Decision now:</strong> ${actionNow}</p>
+  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">Do now</p>${doNowItems.map((item) => `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:2px 0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">${item}</p>`).join("")}</div>` : ""}
+  ${flipTrigger ? `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">Watch:</strong> ${flipTrigger}</div>` : ""}
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">
+    <span>Macro brief by <a href="${attributionUrl}" style="color:rgba(56,189,248,0.8);text-decoration:underline;font-weight:600;">Whether</a></span>
+    <a href="${data.briefUrl}" style="color:rgba(56,189,248,0.6);text-decoration:underline;">Get your own →</a>
   </div>
 </div>`;
 };

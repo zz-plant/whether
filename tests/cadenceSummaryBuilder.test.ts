@@ -56,7 +56,6 @@ const assertCadenceCopy = ({
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
     "",
-    "Internal use only",
     `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Confidence: Live`,
   ].join("\n");
 

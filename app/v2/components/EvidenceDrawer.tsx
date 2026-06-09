@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-export function V2EvidenceDrawer({ children, highlight }: { children?: ReactNode; highlight?: string }) {
+export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; highlight?: string }) {
   const [open, setOpen] = useState(false);
 
   return (

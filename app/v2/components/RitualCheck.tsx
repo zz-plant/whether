@@ -5,7 +5,7 @@ import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const COMPLETE_KEY = "whether_reviewed";
 
-export function V2RitualCheck({ recordDate }: { recordDate?: string }) {
+export function RitualCheck({ recordDate }: { recordDate?: string }) {
   const [data, setData] = useLocalStorageState<Record<string, { reviewed: boolean }>>(COMPLETE_KEY, {});
 
   const reviewed = recordDate ? data[recordDate]?.reviewed ?? false : false;

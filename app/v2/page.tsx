@@ -3,15 +3,15 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../../lib/report/homeMetadata";
 import { loadHomePageAssembly } from "../../lib/report/homePageAssemblyLoader";
-import { V2Shell } from "./components/V2Shell";
-import { V2DecisionHero } from "./components/V2DecisionHero";
+import { Shell } from "./components/Shell";
+import { DecisionHero } from "./components/DecisionHero";
 import { DeltaTrustStrip } from "./components/DeltaTrustStrip";
 import { ActionCard } from "./components/ActionCard";
-import { V2RegimeHistory } from "./components/V2RegimeHistory";
-import { V2EvidenceDrawer } from "./components/V2EvidenceDrawer";
-import { V2RitualCheck } from "./components/V2RitualCheck";
-import { V2ToolsPanel } from "./components/V2ToolsPanel";
-import { V2SubscribeForm } from "./components/V2SubscribeForm";
+import { RegimeHistory } from "./components/RegimeHistory";
+import { EvidenceDrawer } from "./components/EvidenceDrawer";
+import { RitualCheck } from "./components/RitualCheck";
+import { ToolsPanel } from "./components/ToolsPanel";
+import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
@@ -21,7 +21,6 @@ import { RegimeTransitionProbability, computeTransitionProbability } from "../co
 import { DecisionTrendline } from "../components/home/DecisionTrendline";
 import { CompanyMetricsPanel } from "../components/home/CompanyMetricsPanel";
 import { TickerCompany } from "../components/home/TickerCompany";
-import { EmailSubscribe } from "../components/home/EmailSubscribe";
 import { SourceDisagreement } from "../components/evidence/SourceDisagreement";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../../lib/agentInterface";
 import { summarizeSourceHealthCoverage } from "../../lib/report/sourceHealth";
@@ -42,7 +41,7 @@ export const generateMetadata = async ({
   searchParams?: Promise<HomePageSearchParams>;
 }): Promise<Metadata> => buildHomeMetadata(searchParams);
 
-export default async function V2Page({
+export default async function Page({
   searchParams,
 }: {
   searchParams?: Promise<HomePageSearchParams>;
@@ -50,8 +49,8 @@ export default async function V2Page({
   const resolved = searchParams ? await searchParams : undefined;
 
   return (
-    <Suspense fallback={<V2Shell loading />}>
-      <V2PageContent searchParams={resolved} />
+    <Suspense fallback={<Shell loading />}>
+      <PageContent searchParams={resolved} />
     </Suspense>
   );
 }
@@ -142,7 +141,7 @@ function WeeklyTopFoldContract({
   );
 }
 
-async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
+async function PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
@@ -157,12 +156,12 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
     ]);
   } catch {
     return (
-      <V2Shell regime="EXPANSION">
+      <Shell regime="EXPANSION">
         <div className="text-center py-16 space-y-3">
           <p className="text-white/40 text-sm">Unable to load the weekly brief.</p>
           <p className="text-white/30 text-fluid-micro">The data pipeline may be temporarily unavailable. Please try again shortly.</p>
         </div>
-      </V2Shell>
+      </Shell>
     );
   }
 
@@ -204,13 +203,13 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
   const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
   const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
-  const isScreenshot = searchParams?.screenshot === "1";
 
   const transition = computeTransitionProbability(regime);
   const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
 
   return (
-    <V2Shell regime={regime}>
+    <Shell regime={regime}>
+      <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
       <FreshnessDot label={homepage.reportShell.fetchedAtLabel} />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
@@ -221,11 +220,10 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
       <p className="text-fluid-micro text-center text-white/35 mb-4 lg:hidden">
         Boldness Budget {weeklyLeadershipSummary.boldnessScore}/100 · {regime.charAt(0) + regime.slice(1).toLowerCase()} · tightness guardrail {tightness}/100 · {confidenceLabel === "HIGH" ? "high confidence" : confidenceLabel === "MED" ? "moderate confidence" : "low confidence"}
       </p>
-      <div data-screenshot={isScreenshot ? "true" : undefined}>
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
         <div className="space-y-6 min-w-0">
           <SwipeableWeek>
-            <V2DecisionHero
+            <DecisionHero
             tightness={tightness}
             tightnessDelta={tightnessDelta}
             boldnessScore={weeklyLeadershipSummary.boldnessScore}
@@ -273,11 +271,11 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               sourceHealthSummary={sourceHealthSummary}
               direction={signalDirection}
             />
-            <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+            <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
           </div>
 
-          <V2EvidenceDrawer highlight={toolHighlight}>
-            <V2ToolsPanel>
+          <EvidenceDrawer highlight={toolHighlight}>
+            <ToolsPanel>
               <DecisionSimulator
                 currentTightness={tightness}
                 currentRiskAppetite={riskAppetite}
@@ -288,19 +286,19 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
               <CompanyMetricsPanel tightness={tightness} companyStage={operatorContext.companyStage ?? undefined} />
               <TickerCompany tightness={tightness} />
               <SourceDisagreement tightnessDelta={tightnessDelta} riskAppetiteDelta={riskAppetiteDelta} />
-            </V2ToolsPanel>
-          </V2EvidenceDrawer>
+            </ToolsPanel>
+          </EvidenceDrawer>
 
-          <V2SubscribeForm />
+          <SubscribeForm />
 
-          <V2RitualCheck recordDate={homepage.reportShell.recordDateLabel} />
+          <RitualCheck recordDate={homepage.reportShell.recordDateLabel} />
 
           <Link
             href="/planning"
             className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
           >
             <div>
-              <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Next step</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Open weekly plan</p>
               <p className="text-fluid-micro text-white/40 mt-0.5">Turn this read into this week&apos;s plan</p>
             </div>
             <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
@@ -329,7 +327,7 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
             direction={signalDirection}
           />
 
-          <V2RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
         </aside>
       </div>
 
@@ -358,11 +356,6 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
         }),
           }}
         />
-      </div>
-
-      <div className="mb-8">
-        <EmailSubscribe />
-      </div>
 
       <StickyCallStrip
         call={canonicalDecision?.doNowLines?.[0] ?? ""}
@@ -373,6 +366,6 @@ async function V2PageContent({ searchParams }: { searchParams?: HomePageSearchPa
           ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
           : undefined}
       />
-    </V2Shell>
+    </Shell>
   );
 }

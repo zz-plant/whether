@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { ShareRail } from "../../components/shareRail";
 
-export function V2Shell({
+export function Shell({
   children,
   loading,
   regime,

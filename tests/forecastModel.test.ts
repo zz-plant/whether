@@ -78,8 +78,8 @@ describe("forecast model probabilities and risk bounds", () => {
   });
 
   it("raises crossing risk to high when nearest distance is inside boundary band", () => {
-    const current = evaluateRegime(makeTreasury({ baseRate: 5.43, curveSlope: 0.19, recordDate: "2026-06-01" }));
-    const previous = evaluateRegime(makeTreasury({ baseRate: 5.49, curveSlope: 0.25, recordDate: "2026-05-01" }));
+    const current = evaluateRegime(makeTreasury({ baseRate: 3.93, curveSlope: 0.19, recordDate: "2026-06-01" }));
+    const previous = evaluateRegime(makeTreasury({ baseRate: 3.99, curveSlope: 0.25, recordDate: "2026-05-01" }));
 
     const model = buildForecastModel({
       assessment: current,

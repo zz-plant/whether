@@ -257,16 +257,9 @@ html:has([data-historical="true"]) {
 html[data-screenshot="true"] body > header,
 html[data-screenshot="true"] aside,
 html[data-screenshot="true"] nav,
-html[data-screenshot="true"] .weather-card[class*="bg-slate-950/20"],
-html[data-screenshot="true"] [class*="Discoverability"],
-html[data-screenshot="true"] [class*="KeyTerms"],
-html[data-screenshot="true"] [class*="Workspace"],
-html[data-screenshot="true"] [class*="Explore"],
-html[data-screenshot="true"] [class*="View past"],
-html[data-screenshot="true"] [class*="HomeRoutePrefetch"],
 html[data-screenshot="true"] footer { display: none !important; }
 html[data-screenshot="true"] .lg\:grid { display: block !important; }
-html[data-screenshot="true"] .lg\:grid-cols-\[14rem_minmax\(0\2c 1fr\)\] { grid-template-columns: 1fr !important; }
+html[data-screenshot="true"] .lg\:grid-cols-\[1fr_18rem\] { grid-template-columns: 1fr !important; }
 html[data-screenshot="true"] .max-w-\[72rem\] { max-width: 100% !important; }
 html[data-screenshot="true"] { font-size: 16px; }
 html[data-screenshot="true"] body {

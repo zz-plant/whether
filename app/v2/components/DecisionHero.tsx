@@ -26,7 +26,7 @@ type Props = {
   };
 };
 
-export function V2DecisionHero({
+export function DecisionHero({
   tightness,
   tightnessDelta,
   boldnessScore,
@@ -78,10 +78,10 @@ export function V2DecisionHero({
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
-              <h1 className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
+              <div className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
                 {boldnessScore}
-              </h1>
+              </div>
             </SignalWaterfall>
           </div>
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">

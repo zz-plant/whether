@@ -231,7 +231,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
       const outputPath = path.resolve(process.cwd(), outDir, `${target.id}.png`);
 
       console.log(`Capturing ${target.id} -> ${outputPath}`);
-      await page.goto(url, { waitUntil: "networkidle" });
+      await page.goto(url, { waitUntil: "load" });
       await page.screenshot({
         path: outputPath,
         fullPage: target.fullPage ?? true,

@@ -330,7 +330,7 @@ describe("treasury client", () => {
 
     assert.equal(
       data.fallback_reason,
-      "FRED Treasury upstream unavailable (HTTP 520) after 3 attempts."
+      "FRED Treasury upstream unavailable (HTTP 520) after 2 attempts."
     );
   });
 
@@ -364,7 +364,7 @@ describe("treasury client", () => {
 
     assert.equal(
       data.fallback_reason,
-      "Treasury live fetch timed out after 12s (retried once)."
+      "Treasury live fetch timed out after 1.5s (retried once)."
     );
   });
 
