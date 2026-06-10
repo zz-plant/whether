@@ -76,7 +76,7 @@ export function PostureHistoryTimeline({ historicalTimeline }: Pick<HistorySecti
         return (
           <li key={`${item.label}-${item.posture}-${index}`}>
             {href ? (
-              <Link href={href} prefetch={false} className="block min-h-[44px] rounded-md transition hover:bg-slate-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+              <Link href={href} className="block min-h-[44px] rounded-md transition hover:bg-slate-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                 {card}
               </Link>
             ) : (

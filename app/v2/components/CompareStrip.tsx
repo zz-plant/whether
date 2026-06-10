@@ -30,15 +30,16 @@ export function CompareStrip({
 
   return (
     <div className="weather-card">
-      <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+      <label className="inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-lg">
         <input
           type="checkbox"
+          name="compare-previous"
           checked={isComparing}
           onChange={(e) => setIsComparing(e.target.checked)}
           className="sr-only peer"
         />
-        <span className="h-4 w-8 rounded-full border border-white/[0.08] bg-white/[0.04] transition-colors peer-checked:bg-sky-500/20 peer-checked:border-sky-500/30 relative after:absolute after:top-0.5 after:left-0.5 after:h-3 after:w-3 after:rounded-full after:bg-white/40 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
-        <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/40 peer-checked:text-sky-300 transition-colors">
+        <span className="relative h-5 w-9 rounded-full border border-white/[0.1] bg-white/[0.05] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
+        <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/55 transition-colors peer-checked:text-sky-200">
           Compare to previous
         </span>
       </label>

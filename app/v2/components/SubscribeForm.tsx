@@ -44,29 +44,37 @@ export function SubscribeForm() {
         <p className="text-fluid-micro text-white/40 mt-1">Get the operating posture in your inbox every Monday.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
+        <label htmlFor="subscribe-email" className="sr-only">Email address</label>
         <input
+          id="subscribe-email"
+          name="email"
           type="email"
+          inputMode="email"
+          autoComplete="email"
+          spellCheck={false}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
             if (status === "error") setStatus("idle");
           }}
-          placeholder="your@email.com"
+          placeholder="you@example.com"
           disabled={status === "loading"}
-          className="flex-1 px-3 py-2 text-xs bg-[var(--bg-nested)] border border-white/[0.06] text-white/80 rounded-lg focus:outline-none focus:border-sky-500/50 disabled:opacity-50"
+          aria-invalid={status === "error" ? true : undefined}
+          aria-describedby={message ? "subscribe-message" : undefined}
+          className="min-h-11 flex-1 rounded-lg border border-white/[0.08] bg-[var(--bg-nested)] px-3 py-2 text-xs text-white/85 transition-colors placeholder:text-white/25 disabled:opacity-50 focus-visible:border-sky-400/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="px-4 py-2 text-xs font-medium bg-sky-500 hover:bg-sky-600 text-slate-950 transition-colors rounded-none disabled:opacity-50"
+          className="min-h-11 rounded-lg bg-sky-400 px-4 py-2 text-xs font-semibold text-slate-950 transition-colors hover:bg-sky-300 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         >
           {status === "loading" ? "Subscribing..." : "Subscribe"}
         </button>
       </form>
 
       {message && (
-        <p className={`text-fluid-micro ${status === "success" ? "text-emerald-400" : "text-rose-400"}`}>
+        <p id="subscribe-message" aria-live="polite" className={`text-fluid-micro ${status === "success" ? "text-emerald-400" : "text-rose-400"}`}>
           {message}
         </p>
       )}

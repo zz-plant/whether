@@ -31,6 +31,7 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
+import { formatSignedDelta } from "../../lib/formatters";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -67,10 +68,6 @@ function CadenceSummary({ cadenceData }: { cadenceData: { summary?: { regime?: s
 
 function hasCadenceSummary(value: unknown): value is { summary?: { regime?: string; action?: string }; recordDateLabel?: string } {
   return typeof value === "object" && value !== null;
-}
-
-function formatSignedDelta(value: number) {
-  return `${value > 0 ? "+" : ""}${value}`;
 }
 
 function compactSentence(value: string | undefined, maxLength = 132) {
@@ -218,9 +215,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
   const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
-  const sourceCount = Math.max((homepage.reportShell.degradedSourceRows?.length ?? 0) + 3, 4);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
-  const degradedCount = homepage.reportShell.degradedSourceRows?.length ?? 0;
 
   const transition = computeTransitionProbability(regime);
   const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
@@ -277,19 +272,21 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           />
 
           </SwipeableWeek>
+        </div>
 
-          <div className="lg:hidden space-y-4">
-            <DeltaTrustStrip
-              tightnessDelta={tightnessDelta}
-              riskAppetiteDelta={riskAppetiteDelta}
-              confidenceLabel={confidenceLabel}
-              reliabilityScore={reliabilityScore}
-              sourceHealthSummary={sourceHealthSummary}
-              direction={signalDirection}
-            />
-            <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
-          </div>
+        <div className="space-y-4 lg:col-start-2">
+          <DeltaTrustStrip
+            tightnessDelta={tightnessDelta}
+            riskAppetiteDelta={riskAppetiteDelta}
+            confidenceLabel={confidenceLabel}
+            reliabilityScore={reliabilityScore}
+            sourceHealthSummary={sourceHealthSummary}
+            direction={signalDirection}
+          />
+          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+        </div>
 
+        <div className="space-y-6 min-w-0">
           <EvidenceDrawer highlight={toolHighlight}>
             <ToolsPanel>
               <DecisionSimulator
@@ -330,21 +327,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
               ) : <span className="text-xs text-white/40">Viewing the {activeCadence} brief.</span>}
             </div>
           ) : null}
-
         </div>
-
-        <aside className="hidden lg:block space-y-4">
-          <DeltaTrustStrip
-            tightnessDelta={tightnessDelta}
-            riskAppetiteDelta={riskAppetiteDelta}
-            confidenceLabel={confidenceLabel}
-            reliabilityScore={reliabilityScore}
-            sourceHealthSummary={sourceHealthSummary}
-            direction={signalDirection}
-          />
-
-          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
-        </aside>
       </div>
 
       <script

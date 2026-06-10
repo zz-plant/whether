@@ -44,6 +44,12 @@ export const REGIME_COLORS: Record<string, string> = {
   EXPANSION: "bg-emerald-400/60",
 };
 
+export const formatBoldnessDeltaLabel = (delta: number) => {
+  if (delta === 0) return "no change vs last week";
+  const sign = delta > 0 ? "+" : "";
+  return `${sign}${delta.toFixed(0)} vs last week`;
+};
+
 export const computeReliabilityScore = ({
   confidenceLabel,
   showOfflineBadge,

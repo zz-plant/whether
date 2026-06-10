@@ -1,9 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
 import { Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
-import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection } from "../viewModel";
+import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
 
 type ActionCardProps = {
   call: string;
@@ -34,11 +35,9 @@ export function ActionCard({
   const { add } = Toast.useToastManager();
   const isCopied = status === "copied";
   const arrow = DIRECTION_ARROW[direction];
-  const boldnessDeltaLabel = boldnessDelta === 0
-    ? "no change vs last week"
-    : `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`;
+  const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
 
-  const buildText = () => [
+  const buildText = useCallback(() => [
     `Whether · Weekly Brief · ${recordDate ?? ""}`,
     "",
     `Boldness Budget: ${boldnessScore}/100 (${boldnessDeltaLabel})`,
@@ -48,7 +47,7 @@ export function ActionCard({
     flipConditions?.length ? `Watching: ${flipConditions.join(" · ")}` : null,
     "",
     "whether.work",
-  ].filter(Boolean).join("\n");
+  ].filter(Boolean).join("\n"), [recordDate, boldnessScore, boldnessDeltaLabel, arrow, call, actionNow, guardrail, tightness, pauseThreshold, flipConditions]);
 
   const handleCopy = async () => {
     const success = await copyToClipboard(buildText(), "Weekly brief");

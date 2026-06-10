@@ -73,22 +73,24 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
     <GlobalHeaderScrollWrapper>
       <div className="border-b border-white/[0.06] bg-[var(--bg-body)]/95 rounded-b-lg">
         <div className="flex items-center gap-3 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
+          <div className="flex min-w-0 items-center gap-2">
+            <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
-            <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/30">
+            <span className="hidden truncate text-fluid-micro font-medium tracking-[0.04em] text-white/35 min-[360px]:inline">
               {isHomeBrief ? "Weekly Brief" : routeLabel}
             </span>
           </div>
 
-          <div className="ml-auto flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+          <div className="ml-auto flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-none">
             {isReportRoute ? (
               <>
                 {isHomeBrief ? (
-                  <div className="hidden sm:flex items-center gap-1.5">
+                  <div className="order-2 flex w-full items-center justify-end gap-1.5 sm:order-none sm:w-auto">
                     <CadenceSelector />
-                    <ViewSelector />
+                    <div className="hidden sm:flex items-center gap-1.5">
+                      <ViewSelector />
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -108,7 +110,9 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     </Link>
                   </>
                 )}
-                <GlobalHeaderActionsClient />
+                <div className="order-1 sm:order-none">
+                  <GlobalHeaderActionsClient />
+                </div>
               </>
             ) : (
               <>
@@ -120,7 +124,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
         </div>
 
         {/* Navigation — workflow stepper on desktop, sheet on mobile */}
-        <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] pt-2 lg:hidden">
+        <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] px-3 py-2 lg:hidden">
           <GlobalHeaderNavClient pathname={pathname} />
         </div>
       </div>

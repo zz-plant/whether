@@ -36,7 +36,7 @@ export function CadenceSelector() {
             router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
           }}
           aria-pressed={current === c.key}
-          className={`rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
+          className={`min-h-8 rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
             current === c.key
               ? "bg-sky-500/14 text-sky-100"
               : "text-slate-400 hover:text-slate-200"
@@ -69,7 +69,7 @@ export function ViewSelector() {
             router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
           }}
           aria-pressed={current === v.key}
-          className={`rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors ${
+          className={`min-h-8 rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
             current === v.key
               ? "bg-sky-500/14 text-sky-100"
               : "text-slate-400 hover:text-slate-200"

@@ -50,7 +50,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
         <a
           href={imageBriefHref}
           download="whether-brief.png"
-          className="flex-shrink-0 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full border border-white/[0.08] text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="flex-shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/[0.08] text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label="Download decision card image"
         >
           <ImageIcon className="w-3 h-3" aria-hidden="true" />
@@ -58,7 +58,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
         <button
           type="button"
           onClick={handleCopy}
-          className="flex-shrink-0 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/[0.08] px-3 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="flex-shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/[0.08] px-3 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label={isCopied ? "Copied weekly call" : "Copy weekly call"}
         >
           {isCopied ? (

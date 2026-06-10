@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { REGIME_COLORS } from "../viewModel";
@@ -22,21 +23,19 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
   const selectedYear = searchParams?.get("year");
   const isViewingHistory = Boolean(selectedMonth && selectedYear);
 
-  if (regimes.length < 2) return null;
-
-  const handleSelect = (entry: { record_date: string }) => {
+  const handleSelect = useCallback((entry: { record_date: string }) => {
     const ym = parseYearMonth(entry.record_date);
     if (!ym) return;
     router.push(`/?month=${ym.month}&year=${ym.year}`, { scroll: false });
-  };
+  }, [router]);
 
-  const lastEntry = regimes[regimes.length - 1];
-  const lastYM = parseYearMonth(lastEntry.record_date);
-  const isSelectedEntry = (entry: { record_date: string }) => {
+  const isSelectedEntry = useCallback((entry: { record_date: string }) => {
     if (!selectedMonth || !selectedYear) return false;
     const ym = parseYearMonth(entry.record_date);
     return ym?.month === Number(selectedMonth) && ym?.year === Number(selectedYear);
-  };
+  }, [selectedMonth, selectedYear]);
+
+  if (regimes.length < 2) return null;
 
   const selectedEntry = regimes.find(isSelectedEntry);
   const selectedLabel = selectedEntry
@@ -70,7 +69,7 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
         ) : null}
       </div>
 
-      <div className="flex items-end gap-0.5 h-12">
+      <div className="flex h-12 items-end gap-0.5">
         {regimes.map((entry, i) => {
           const height = 20 + (i / Math.max(regimes.length - 1, 1)) * 70;
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
@@ -80,12 +79,17 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
               key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
-              className={`flex-1 rounded-t-sm cursor-pointer transition-[height,opacity] hover:opacity-80 focus-visible:outline-2 focus-visible:outline-sky-400 focus-visible:outline-offset-1 ${
-                REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
-              } ${isCurrent ? "ring-1 ring-white/30" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
-              style={{ height: `${height}%` }}
+              className="group flex h-12 min-h-11 flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               aria-label={`${entry.record_date}: ${entry.regime} regime`}
-            />
+            >
+              <span
+                aria-hidden="true"
+                className={`block w-full rounded-t-sm transition-[height,opacity] group-hover:opacity-80 ${
+                  REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
+                } ${isCurrent ? "ring-1 ring-white/30" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
+                style={{ height: `${height}%` }}
+              />
+            </button>
           );
         })}
       </div>

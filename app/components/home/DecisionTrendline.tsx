@@ -2,30 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
+import { REGIME_COLORS, REGIME_DISPLAY } from "../../v2/viewModel";
 
 const DECISION_LOG_KEY = "whether_decision_log";
 
 type DecisionEntry = { date: string; posture: string; action: string };
-
-const REGIME_COLORS: Record<string, string> = {
-  SCARCITY: "bg-amber-400/60",
-  DEFENSIVE: "bg-rose-400/60",
-  VOLATILE: "bg-sky-400/60",
-  EXPANSION: "bg-emerald-400/60",
-};
 
 const REGIME_TEXT_COLORS: Record<string, string> = {
   SCARCITY: "text-amber-300",
   DEFENSIVE: "text-rose-300",
   VOLATILE: "text-sky-300",
   EXPANSION: "text-emerald-300",
-};
-
-const REGIME_DISPLAY: Record<string, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Uncertain",
-  EXPANSION: "Expansion",
 };
 
 type MacroTrendlineProps = {

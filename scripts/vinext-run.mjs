@@ -23,7 +23,7 @@ if (!existsSync(vinextCliPath)) {
   console.error(`Unable to locate the Vinext CLI at ${vinextCliPath}. Run bun install first.`);
   process.exit(1);
 }
-const result = spawnSync(process.execPath, [vinextCliPath, command, ...rest], {
+const result = spawnSync(process.execPath, ["--no-deprecation", vinextCliPath, command, ...rest], {
   env: process.env,
   stdio: "inherit",
 });

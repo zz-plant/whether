@@ -56,7 +56,7 @@ const confidenceToneClass: Record<NonNullable<RegimeCommandBarProps["confidenceL
 
 const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
-const formatSignedDelta = (value: number) => `${value > 0 ? "+" : value < 0 ? "" : ""}${value.toFixed(1)}`;
+import { formatSignedDelta } from "../../lib/formatters";
 
 const buildForecastCone = ({
   currentX,
@@ -200,10 +200,10 @@ const TrajectoryMap = ({
           {nearestBoundaryLabel}
         </span>
         <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
-          Tightness {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness)})
+          Tightness {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness, 1)})
         </span>
         <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
-          Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.riskAppetite)})
+          Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.riskAppetite, 1)})
         </span>
       </div>
     </figure>

@@ -89,7 +89,7 @@ describe("home route render contract", () => {
     const scalarIndex = v2RouteSource.indexOf("Boldness Budget:");
     const netDeltaIndex = v2RouteSource.indexOf("Net delta:");
     const revisitIndex = v2RouteSource.indexOf("Revisit last week’s roadmap/hiring decisions?");
-    const guardrailIndex = v2RouteSource.indexOf("If {row.trigger}");
+    const guardrailIndex = v2RouteSource.indexOf("Watch:");
     const memoryIndex = v2RouteSource.indexOf("Last 4 weeks:");
     const trustStripIndex = v2RouteSource.indexOf("<DeltaTrustStrip");
 

@@ -132,3 +132,8 @@ export const formatSignedDeltaWithUnit = (value: number | null, unit: string) =>
   const formatted = formatSignedDeltaValue(value);
   return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
 };
+
+export const formatSignedDelta = (value: number, precision = 0): string => {
+  const formatted = value.toFixed(precision);
+  return value > 0 ? `+${formatted}` : formatted;
+};

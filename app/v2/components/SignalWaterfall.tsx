@@ -13,11 +13,9 @@ type SignalData = {
 export function SignalWaterfall({
   data,
   children,
-  decorative,
 }: {
   data: SignalData;
   children: React.ReactNode;
-  decorative?: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
   const hasData = data.baseRate != null || data.curveSlope != null;
@@ -28,7 +26,6 @@ export function SignalWaterfall({
       onMouseEnter={() => hasData && setShow(true)}
       onMouseLeave={() => setShow(false)}
     >
-      {decorative}
       {children}
 
       {show && hasData ? (

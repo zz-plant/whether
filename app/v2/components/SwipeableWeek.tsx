@@ -78,8 +78,14 @@ export function SwipeableWeek({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className="touch-pan-y"
+      aria-label="Swipe left for current week, right for previous weeks"
     >
       {children}
+      {months.length > 0 ? (
+        <p className="mt-2 text-center text-fluid-nano text-white/20 lg:hidden" aria-hidden="true">
+          ← swipe to browse past weeks →
+        </p>
+      ) : null}
     </div>
   );
 }

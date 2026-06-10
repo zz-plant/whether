@@ -1,8 +1,8 @@
 import type { OperatorContext } from "../../../lib/report/operatorContext";
-import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY } from "../viewModel";
+import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
-import { StageSwitcher } from "./StageSwitcher";
+import { StageSwitcher, COMPANY_STAGES } from "./StageSwitcher";
 
 type Props = {
   tightness: number;
@@ -46,28 +46,23 @@ export function DecisionHero({
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
-  const boldnessDeltaSign = boldnessDelta > 0 ? "+" : boldnessDelta < 0 ? "" : "";
-  const boldnessDeltaLabel = boldnessDelta !== 0 ? `${boldnessDeltaSign}${boldnessDelta.toFixed(0)} vs last week` : "No change vs last week";
+  const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
 
   const stageLabel = operatorContext.companyStage
-    ? operatorContext.companyStage === "pre-seed" ? "Pre-seed"
-    : operatorContext.companyStage === "seed" ? "Seed"
-    : operatorContext.companyStage === "series-a" ? "Series A"
-    : operatorContext.companyStage === "series-b-plus" ? "Series B+"
-    : "Public"
+    ? COMPANY_STAGES.find((s) => s.key === operatorContext.companyStage)?.label ?? null
     : null;
 
   return (
     <section className="space-y-4" aria-labelledby="weekly-call-title">
-      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">
             <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-white/35">This week&apos;s call</p>
-            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
+            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-[1.7rem] font-semibold leading-[1.08] text-white sm:text-3xl">
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
@@ -115,7 +110,7 @@ export function DecisionHero({
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
-              <div className="font-display text-[clamp(4rem,12vw,6.5rem)] font-bold leading-none text-white tracking-[-0.02em] tabular-nums"
+              <div className="font-display text-[clamp(3.5rem,10vw,5.75rem)] font-bold leading-none text-white tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
                 {boldnessScore}
               </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const STAGES = [
+export const COMPANY_STAGES = [
   { key: "pre-seed", label: "Pre-seed" },
   { key: "seed", label: "Seed" },
   { key: "series-a", label: "Series A" },
@@ -26,7 +26,7 @@ export function StageSwitcher({
     router.refresh();
   };
 
-  const currentLabel = STAGES.find((s) => s.key === currentStage)?.label;
+  const currentLabel = COMPANY_STAGES.find((s) => s.key === currentStage)?.label;
 
   return (
     <div className="relative inline-block">
@@ -50,7 +50,7 @@ export function StageSwitcher({
             role="menu"
             aria-label="Company stage"
           >
-            {STAGES.map((s) => (
+            {COMPANY_STAGES.map((s) => (
               <button
                 key={s.key}
                 type="button"
