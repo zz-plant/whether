@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type SignalData = {
   baseRate?: number | null;
@@ -18,13 +18,41 @@ export function SignalWaterfall({
   children: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const hasData = data.baseRate != null || data.curveSlope != null;
+
+  useEffect(() => {
+    if (!show) return;
+    const clickAway = (event: MouseEvent) => {
+      if (event.target instanceof Node && containerRef.current && !containerRef.current.contains(event.target)) {
+        setShow(false);
+      }
+    };
+    document.addEventListener("mousedown", clickAway);
+    return () => document.removeEventListener("mousedown", clickAway);
+  }, [show]);
 
   return (
     <div
-      className="relative inline-block"
+      ref={containerRef}
+      role="button"
+      tabIndex={hasData ? 0 : undefined}
+      aria-haspopup="true"
+      aria-expanded={show}
+      className="relative inline-block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-md select-none"
       onMouseEnter={() => hasData && setShow(true)}
       onMouseLeave={() => setShow(false)}
+      onClick={() => hasData && setShow((s) => !s)}
+      onKeyDown={(e) => {
+        if (!hasData) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setShow((s) => !s);
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          setShow(false);
+        }
+      }}
     >
       {children}
 

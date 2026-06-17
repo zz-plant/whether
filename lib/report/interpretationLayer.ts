@@ -11,6 +11,8 @@ import {
   type PlannerSector,
   type PlannerStage,
 } from "./runwayPlanner";
+import { deriveSectorAdjustedPosture, type SectorKey } from "./sectorSensitivity";
+
 
 export const interpretationViews = [
   "default",
@@ -34,7 +36,7 @@ export type InterpretationLayer = {
   };
 };
 
-const compactClause = (value: string, max = 96) => {
+const compactClause = (value: string, max = 120) => {
   const normalized = value.replace(/\s+/g, " ").trim();
   if (normalized.length <= max) {
     return normalized;
@@ -118,6 +120,8 @@ export const buildInterpretationLayer = ({
   decisionRules,
   financialInput,
   companyProfile,
+  sector,
+  isFallback,
 }: {
   view: InterpretationView;
   homeBriefModel: ReturnType<
@@ -128,6 +132,8 @@ export const buildInterpretationLayer = ({
   decisionRules: BoundedDecisionRule[];
   financialInput?: FinancialViewInput;
   companyProfile?: Partial<CompanyProfile>;
+  sector?: SectorKey;
+  isFallback?: boolean;
 }): InterpretationLayer => {
   const canonicalBullets = [
     boundedLine("Action", homeBriefModel.decisionShiftSummary),
@@ -135,21 +141,45 @@ export const buildInterpretationLayer = ({
     boundedLine("Reverse", homeBriefModel.reversalTrigger),
   ];
 
+  const formatBullets = (bullets: string[]) => {
+    if (isFallback) {
+      return bullets.map((b) => b.replace(/^Action:\s*/, "Action: [Cached Signal] "));
+    }
+    return bullets;
+  };
+
+
   if (view === "sector") {
-    const primaryOverlay = homeBriefModel.macroOverlay.slice(0, 1);
-    const sectorShift = primaryOverlay[0]
-      ? `${primaryOverlay[0].label}: ${primaryOverlay[0].detail}`
-      : homeBriefModel.decisionShiftSummary;
+    const sectorKey = sector ?? companyProfile?.sector ?? "b2b-saas";
+    const adjusted = deriveSectorAdjustedPosture(
+      {
+        regime: assessment.regime,
+        scores: assessment.scores,
+        thresholds: assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      },
+      sectorKey,
+    );
+
+    const baseAction = homeBriefModel.decisionShiftSummary;
+    let sectorAction = baseAction;
+    if (adjusted.postureVariant !== "neutral") {
+      const directionLabel = adjusted.actionBias === "loosen" ? "easing/growth" : "tightening/caution";
+      sectorAction = `${adjusted.adjustedPostureLabel} variant: Shift operating pace to bias ${directionLabel}. ${baseAction}`;
+    } else {
+      sectorAction = `${adjusted.adjustedPostureLabel}: ${baseAction}`;
+    }
+
     return {
       view,
       label: "Sector view",
-      summary:
-        "Translate the weekly call through sector demand context without rewriting the base posture.",
-      bullets: [
-        boundedLine("Action", sectorShift),
+      summary: `Sector posture adjusted for ${adjusted.adjustedPostureLabel}: ${
+        adjusted.actionBias === "hold" ? "Hold baseline calls." : `Bias ${adjusted.actionBias}.`
+      }`,
+      bullets: formatBullets([
+        boundedLine("Action", sectorAction),
         boundedLine("Trigger", homeBriefModel.guardrail),
-        boundedLine("Reverse", homeBriefModel.reversalTrigger),
-      ],
+        boundedLine("Reverse", adjusted.reversalCondition),
+      ]),
     };
   }
 
@@ -166,7 +196,7 @@ export const buildInterpretationLayer = ({
         label: "Company view",
         summary:
           "Company-specific rules are unavailable this week; use canonical bounded decisions until profile rules return.",
-        bullets: canonicalBullets,
+        bullets: formatBullets(canonicalBullets),
       };
     }
 
@@ -175,15 +205,17 @@ export const buildInterpretationLayer = ({
       label: "Company view",
       summary:
         "Translate the weekly call into company-specific bounded rules without changing the base posture.",
-      bullets: adjustedRules
-        .slice(0, 3)
-        .map((rule) =>
-          boundedTriplet({
-            action: rule.recommendation,
-            trigger: rule.pauseTrigger,
-            reverse: rule.resumeTrigger,
-          }),
-        ),
+      bullets: formatBullets(
+        adjustedRules
+          .slice(0, 3)
+          .map((rule) =>
+            boundedTriplet({
+              action: rule.recommendation,
+              trigger: rule.pauseTrigger,
+              reverse: rule.resumeTrigger,
+            }),
+          ),
+      ),
     };
   }
 
@@ -196,16 +228,18 @@ export const buildInterpretationLayer = ({
       },
     );
 
+    const isTighteningRegime = assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE";
+    const actionPhrase = isTighteningRegime
+      ? `Runway risk ${plan.runwayRisk.level.toUpperCase()}: Tighten burn immediately to match the ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth}m window.`
+      : `Runway risk ${plan.runwayRisk.level.toUpperCase()}: Sustain growth investments within the ${plan.burnAdjustment.ceilingPercent}% ceiling limit.`;
+
     return {
       view,
       label: "Financial view",
       summary:
         "Translate this week into bounded runway decisions: pace now, raise window, and burn range.",
-      bullets: [
-        boundedLine(
-          "Action",
-          `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; set pace to match the current window.`,
-        ),
+      bullets: formatBullets([
+        boundedLine("Action", actionPhrase),
         boundedLine(
           "Trigger",
           `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
@@ -214,7 +248,7 @@ export const buildInterpretationLayer = ({
           "Reverse",
           `Use burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%) to move faster or slower.`,
         ),
-      ],
+      ]),
       financialAction: {
         runwayRisk: plan.runwayRisk.summary,
         raiseTiming: plan.raiseTimingRecommendation.summary,
@@ -238,19 +272,33 @@ export const buildInterpretationLayer = ({
       stable: "Momentum is stable with no directional boundary drift.",
     };
 
+    const thresholds = assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const tightnessGap = Math.abs(assessment.scores.tightness - thresholds.tightnessRegime);
+    const riskGap = Math.abs(assessment.scores.riskAppetite - thresholds.riskAppetiteRegime);
+    const closestDimension = tightnessGap <= riskGap ? "Tightness" : "Risk Appetite";
+    const closestScore = tightnessGap <= riskGap ? assessment.scores.tightness : assessment.scores.riskAppetite;
+    const closestThreshold = tightnessGap <= riskGap ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
+
+    let dynamicMomentum = momentumCopy[forecast.boundaryPressure.momentum];
+    if (forecast.boundaryPressure.momentum === "toward-threshold") {
+      dynamicMomentum = `Momentum is accelerating toward the ${closestDimension} boundary (now ${closestScore.toFixed(1)} vs gate ${closestThreshold.toFixed(1)}).`;
+    } else if (forecast.boundaryPressure.momentum === "away-from-threshold") {
+      dynamicMomentum = `Momentum is widening buffer from ${closestDimension} boundary (now ${closestScore.toFixed(1)} vs gate ${closestThreshold.toFixed(1)}).`;
+    }
+
     return {
       view,
       label: "Forecast view",
       summary:
         "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
-      bullets: [
+      bullets: formatBullets([
         boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
         boundedLine(
           "Trigger",
-          `${forecast.boundaryPressure.distance} points to boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
+          `${forecast.boundaryPressure.distance} points to ${closestDimension} boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toUpperCase()}.`,
         ),
-        boundedLine("Reverse", momentumCopy[forecast.boundaryPressure.momentum]),
-      ],
+        boundedLine("Reverse", dynamicMomentum),
+      ]),
     };
   }
 
@@ -258,6 +306,6 @@ export const buildInterpretationLayer = ({
     view: "default",
     label: "Default view",
     summary: "Core weekly interpretation for operators. The canonical decision lives above.",
-    bullets: canonicalBullets,
+    bullets: formatBullets(canonicalBullets),
   };
 };

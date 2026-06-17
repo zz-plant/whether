@@ -203,17 +203,30 @@ describe("interpretation view panel", () => {
     const financialHtml = renderToStaticMarkup(<HomeInterpretationPanel layer={financial} searchParams={{}} />);
 
     assert.match(sectorHtml, /Sector view/);
-    assert.match(sectorHtml, /Action: Sector sensitivity: Consumer teams should stage expansions\./);
+    assert.match(sectorHtml, /Action: Cloudy\+ variant: Shift operating pace to bias easing\/growth\. Pressure rose compared to last week\./);
     assert.match(financialHtml, /Financial view/);
     assert.match(financialHtml, /Runway risk/);
     assert.match(financialHtml, /Trigger: Raise window/);
     assert.match(financialHtml, /Reverse: Use burn delta/);
     assert.match(financialHtml, /Financial action summary/);
     assert.match(sectorHtml, /Trigger: Hold irreversible hiring\./);
-    assert.match(sectorHtml, /Reverse: Reopen if risk appetite rises above 55\./);
+    assert.match(sectorHtml, /Reverse: Reverse overlay bias if tightness rises above 70\.0\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });
+
+  it("adds fallback indicator when isFallback is active", () => {
+    const layer = buildInterpretationLayer({
+      view: "default",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules,
+      isFallback: true,
+    });
+    assert.ok(layer.bullets[0].includes("[Cached Signal]"));
+  });
+
   it("keeps interpretation bullets compact for screenshot-safe handoff", () => {
     const views = ["default", "sector", "company", "financial", "forecast"] as const;
 

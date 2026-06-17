@@ -90,6 +90,7 @@ export const buildLeadershipArtifactPayload = async ({
       assessment,
       forecast,
       decisionRules: homeBriefModel.decisionRules,
+      isFallback: Boolean(treasury?.fallback_at || treasury?.fallback_reason),
     });
     const exportLayerOptions = {
       interpretationLayer,

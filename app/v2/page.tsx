@@ -223,7 +223,14 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
   return (
     <Shell regime={regime}>
       <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
-      <FreshnessDot label={homepage.reportShell.fetchedAtLabel} />
+      <FreshnessDot
+        label={homepage.reportShell.fetchedAtLabel}
+        recordDate={homepage.reportShell.recordDateLabel}
+        treasurySource={homepage.reportShell.treasurySource}
+        trustStatusLabel={homepage.reportShell.trustStatusLabel}
+        degradedSourceRows={homepage.reportShell.degradedSourceRows}
+        showOfflineBadge={homepage.reportShell.showOfflineBadge}
+      />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
           <span className="font-semibold text-amber-300/80">Data is degraded.</span>{" "}
@@ -264,6 +271,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
             direction={signalDirection}
             recordDate={homepage.reportShell.recordDateLabel}
+            pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
           />
 
           <WeeklyTopFoldContract

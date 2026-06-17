@@ -1,3 +1,4 @@
+import type { RegimeKey } from "../../lib/regimeEngineCore";
 import { REGIME_PUBLIC_LABELS } from "../../lib/regimePresentation";
 
 export type SignalDirection = "tighten" | "ease" | "hold";
@@ -27,22 +28,23 @@ export const RELIABILITY_COLOR = (score: number) =>
 export const RELIABILITY_BAR = (score: number) =>
   score >= 80 ? "bg-emerald-400" : score >= 60 ? "bg-amber-400" : "bg-rose-400";
 
+// Annotated as Record<string, string> for consumer convenience (indexed with string at call sites).
+// satisfies checks that all RegimeKey values have entries — remove a regime, get a compile error.
 export const REGIME_DESCRIPTOR: Record<string, string> = {
   EXPANSION: "growth conditions",
   DEFENSIVE: "operating efficiently",
   SCARCITY: "capital constrained",
-  UNCERTAIN: "mixed signals",
   VOLATILE: "mixed signals",
-};
+} satisfies Record<RegimeKey, string>;
 
-export const REGIME_DISPLAY: Record<string, string> = { ...REGIME_PUBLIC_LABELS };
+export const REGIME_DISPLAY: Record<string, string> = { ...REGIME_PUBLIC_LABELS } satisfies Record<RegimeKey, string>;
 
 export const REGIME_COLORS: Record<string, string> = {
   SCARCITY: "bg-amber-400/60",
   DEFENSIVE: "bg-rose-400/60",
   VOLATILE: "bg-sky-400/60",
   EXPANSION: "bg-emerald-400/60",
-};
+} satisfies Record<RegimeKey, string>;
 
 export const formatBoldnessDeltaLabel = (delta: number) => {
   if (delta === 0) return "no change vs last week";

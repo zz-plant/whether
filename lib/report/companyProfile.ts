@@ -191,6 +191,7 @@ export const buildCompanyAdjustedRules = ({
     .map((rule) => {
       const sectorRule = sectorAdjustment[resolvedProfile.sector][rule.area];
       const stageRule = stageAdjustment[resolvedProfile.stage][rule.area];
+
       const runwayConstraint =
         rule.area === "capital-raising"
           ? runwayPlan.raiseTimingRecommendation.summary

@@ -34,6 +34,15 @@ describe("v2 hero signal data", () => {
     });
   });
 
+  it("keeps the v2 hero metadata compact and spaced", () => {
+    const source = readFileSync("app/v2/components/DecisionHero.tsx", "utf8");
+
+    assert.match(source, /Updated \{freshnessLabel\}/);
+    assert.doesNotMatch(source, /<p className="text-white\/40">\{recordDate\}<\/p>/);
+    assert.doesNotMatch(source, /\{stageLabel \? <p>\{stageLabel\}<\/p> : null\}/);
+    assert.doesNotMatch(source, /\{tightnessDeltaLabel\}\s*\{isUnusual/);
+  });
+
   it("keeps the route from passing literal macro values into DecisionHero", () => {
     const source = readFileSync("app/v2/page.tsx", "utf8");
     const heroCall = source.match(/<DecisionHero[\s\S]*?\/>/)?.[0] ?? "";

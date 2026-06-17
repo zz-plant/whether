@@ -230,6 +230,8 @@ export const assembleHomePage = async ({
     assessment,
     forecast,
     decisionRules: homeBriefModel.decisionRules,
+    sector: homepageOverlaySector,
+    isFallback,
   });
   const interpretationSearchParams = searchParams
     ? Object.entries(searchParams).reduce<Record<string, string | undefined>>((result, [key, value]) => {

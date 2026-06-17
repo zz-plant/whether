@@ -2,7 +2,7 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
-import { StageSwitcher, COMPANY_STAGES } from "./StageSwitcher";
+import { StageSwitcher } from "./StageSwitcher";
 
 type Props = {
   tightness: number;
@@ -47,14 +47,12 @@ export function DecisionHero({
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
+  const freshnessLabel = fetchedAt || recordDate;
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
-
-  const stageLabel = operatorContext.companyStage
-    ? COMPANY_STAGES.find((s) => s.key === operatorContext.companyStage)?.label ?? null
-    : null;
+  const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
   return (
     <section className="space-y-4" aria-labelledby="weekly-call-title">
@@ -66,30 +64,23 @@ export function DecisionHero({
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
-          <div className="space-y-1 text-fluid-xs text-white/50">
-            <p>
-              <span className={DIRECTION_COLOR[signalDirection]}>
-                {DIRECTION_LABEL[signalDirection]}
-              </span>
-              <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-                {boldnessDeltaLabel}
-              </span>
+          <div className="space-y-2 text-fluid-xs text-white/55">
+            <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
+              {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
-            {boldnessShorthand && boldnessShorthand !== weeklyCall ? <p className="text-white/55">{boldnessShorthand}</p> : null}
-            <p>
-              <span className="text-white/35">Guardrail input:</span>{" "}
-              <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white/45">
+              <span>
+                <span className="text-white/35">Guardrail:</span>{" "}
+                <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
+              </span>
               {tightnessDelta !== 0 ? (
-                <span className={`ml-1.5 ${DIRECTION_COLOR[signalDirection]}`}>
-                  {tightnessDeltaLabel}
-                  {isUnusual ? <span className="ml-1 text-white/20">· notable</span> : null}
+                <span className={DIRECTION_COLOR[signalDirection]}>
+                  {tightnessDeltaMetadataLabel}
                 </span>
               ) : null}
+              <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
+              {freshnessLabel ? <span className="text-white/35">Updated {freshnessLabel}</span> : null}
             </p>
-            <p>{regimeDisplay} — {REGIME_DESCRIPTOR[regime] ?? ""}</p>
-            {stageLabel ? <p>{stageLabel}</p> : null}
-            <p className="text-white/40">{recordDate}</p>
-            {fetchedAt ? <p className="text-white/30">Updated {fetchedAt}</p> : null}
           </div>
           <StageSwitcher currentStage={operatorContext.companyStage} />
         </div>
@@ -118,7 +109,7 @@ export function DecisionHero({
           </div>
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
             Boldness Budget
-            <span className="ml-1.5 text-white/35">/100</span>
+            <span className="ml-1.5 text-white/35"> /100</span>
           </p>
         </div>
       </div>

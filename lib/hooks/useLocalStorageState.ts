@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -36,8 +36,19 @@ function remove(key: string): void {
   }
 }
 
+function dispatch(key: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+  } catch {
+    // ignore
+  }
+}
+
 /**
  * useState backed by localStorage. Survives page reloads.
+ * Uses useSyncExternalStore to avoid hydration flash — the first painted
+ * state matches localStorage, not the server fallback.
  *
  * @param key localStorage key
  * @param fallback default value (also determines type: string | number | boolean | object)
@@ -46,31 +57,39 @@ export function useLocalStorageState<T extends string | number | boolean | objec
   key: string,
   fallback: T,
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
-  const [state, setState] = useState<T>(fallback);
-
-  useEffect(() => {
-    const stored = read<T>(key, fallback);
-    if (JSON.stringify(stored) !== JSON.stringify(state)) {
-      setState(stored);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  const set = useCallback(
-    (value: T | ((prev: T) => T)) => {
-      setState((prev) => {
-        const next = typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
-        write(key, next);
-        return next;
-      });
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const handler = (e: StorageEvent) => {
+        if (e.key === key) onStoreChange();
+      };
+      window.addEventListener("storage", handler);
+      return () => window.removeEventListener("storage", handler);
     },
     [key],
   );
 
+  const getSnapshot = useCallback((): T => read(key, fallback), [key, fallback]);
+
+  const getServerSnapshot = useCallback((): T => fallback, [fallback]);
+
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const set = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      const isUpdater = (v: unknown): v is (prev: T) => T => typeof v === "function";
+      const next = isUpdater(value)
+        ? value(read(key, fallback))
+        : value;
+      write(key, next);
+      dispatch(key);
+    },
+    [key, fallback],
+  );
+
   const clear = useCallback(() => {
     remove(key);
-    setState(fallback);
-  }, [key, fallback]);
+    dispatch(key);
+  }, [key]);
 
   return [state, set, clear];
 }

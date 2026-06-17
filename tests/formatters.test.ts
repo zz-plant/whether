@@ -4,6 +4,7 @@ import {
   formatNumberWithUnit,
   formatWeekEndingUTC,
   resolveWeekEndingIsoDateUTC,
+  formatSignedDelta,
 } from "../lib/formatters";
 import {
   formatQuarterLabel,
@@ -58,5 +59,28 @@ describe("summaryFormatting", () => {
   it("returns null quarter and year labels for invalid record dates", () => {
     assert.equal(formatQuarterLabel("not-a-date"), null);
     assert.equal(formatYearLabel("not-a-date"), null);
+  });
+});
+
+describe("formatSignedDelta", () => {
+  it("prefixes positive values with + at default precision", () => {
+    assert.equal(formatSignedDelta(5), "+5");
+    assert.equal(formatSignedDelta(0.6), "+1");
+  });
+
+  it("keeps negative values with leading minus at default precision", () => {
+    assert.equal(formatSignedDelta(-3), "-3");
+    assert.equal(formatSignedDelta(-0.4), "-0");
+  });
+
+  it("returns unsigned zero for exactly zero", () => {
+    assert.equal(formatSignedDelta(0), "0");
+    assert.equal(formatSignedDelta(-0), "0");
+  });
+
+  it("respects custom precision", () => {
+    assert.equal(formatSignedDelta(2.567, 1), "+2.6");
+    assert.equal(formatSignedDelta(-2.567, 2), "-2.57");
+    assert.equal(formatSignedDelta(0, 3), "0.000");
   });
 });

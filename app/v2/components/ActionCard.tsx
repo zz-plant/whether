@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { Copy, CopyCheck } from "lucide-react";
+import { ChevronRight, Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
@@ -16,7 +16,7 @@ type ActionCardProps = {
   boldnessDelta: number;
   direction: SignalDirection;
   recordDate?: string;
-  pauseThreshold?: number;
+  pauseThreshold?: number | string;
 };
 
 export function ActionCard({
@@ -29,13 +29,15 @@ export function ActionCard({
   boldnessDelta,
   direction,
   recordDate,
-  pauseThreshold = 80,
+  pauseThreshold,
 }: ActionCardProps) {
   const { status, copyToClipboard } = useClipboardCopy();
   const { add } = Toast.useToastManager();
   const isCopied = status === "copied";
   const arrow = DIRECTION_ARROW[direction];
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
+  const disclosureSummaryClass = "flex min-h-8 cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1 -mx-2 text-white/45 transition-colors hover:bg-white/[0.04] hover:text-white/65 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-400/55 [&::-webkit-details-marker]:hidden";
+  const disclosureChevronClass = "h-3 w-3 text-white/25 transition-transform group-open:rotate-90 group-hover:text-white/45";
 
   const buildText = useCallback(() => [
     `Whether · Weekly Brief · ${recordDate ?? ""}`,
@@ -60,10 +62,18 @@ export function ActionCard({
     }
   };
 
-  const pauseColor = tightness >= pauseThreshold ? "bg-rose-500" : tightness >= pauseThreshold - 5 ? "bg-amber-500" : "bg-emerald-500";
+  const numericThreshold = typeof pauseThreshold === "number"
+    ? pauseThreshold
+    : typeof pauseThreshold === "string" && !isNaN(parseInt(pauseThreshold, 10))
+    ? parseInt(pauseThreshold, 10)
+    : guardrail
+    ? parseInt(guardrail.match(/\d+/)?.[0] ?? "70", 10)
+    : 70;
+
+  const pauseColor = tightness >= numericThreshold ? "bg-rose-500 animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 animate-pulse" : "bg-emerald-500";
 
   return (
-      <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
+    <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
       <div className="flex items-center justify-between gap-3 mb-4">
         <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
           Boldness Budget · {DIRECTION_LABEL[direction]}
@@ -96,41 +106,53 @@ export function ActionCard({
         </h2>
       </div>
 
-      <div className="space-y-3 text-sm">
+      {guardrail ? (
+        <div className="mb-4 rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 space-y-2">
+          <div className="flex items-center justify-between text-fluid-nano font-semibold uppercase tracking-[0.06em]">
+            <span className="text-white/40">Guardrail Proximity</span>
+            <span className={tightness >= numericThreshold ? "text-rose-300 font-bold" : tightness >= numericThreshold - 5 ? "text-amber-300" : "text-emerald-300"}>
+              {tightness >= numericThreshold ? "PAUSE TRIGGERED" : tightness >= numericThreshold - 5 ? "WARNING RANGE" : "SAFE ZONE"}
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden relative">
+            <div className={`h-full rounded-full ${pauseColor} transition-all duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
+            <div className="absolute right-[0%] top-0 h-full w-[2px] bg-white/30" title="Threshold limit" />
+          </div>
+          <div className="flex justify-between text-[0.6rem] text-white/35 font-mono">
+            <span>Tightness {tightness}</span>
+            <span>Limit {numericThreshold}</span>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="space-y-3 text-sm border-t border-white/[0.04] pt-3">
         {actionNow ? (
           <details className="group">
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">Do now</p>
+            <summary className={disclosureSummaryClass}>
+              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
+              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">Do now</span>
             </summary>
-            <p className="text-slate-200 ml-3.5 mt-1">{actionNow}</p>
+            <p className="text-slate-200 ml-3.5 mt-1 text-xs">{actionNow}</p>
           </details>
         ) : null}
 
         {guardrail ? (
           <details className="group">
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">Pause if</p>
+            <summary className={disclosureSummaryClass}>
+              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
+              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">Pause details</span>
             </summary>
-            <div className="ml-3.5 mt-1">
-              <p className="text-white/50 text-xs">Bounded condition: {guardrail}</p>
-              <div className="mt-2 h-2 w-full rounded-full bg-[var(--bg-nested)] overflow-hidden">
-                <div className={`h-full rounded-full ${pauseColor}`} style={{ width: `${Math.min(100, (tightness / pauseThreshold) * 100)}%` }} />
-              </div>
-              <div className="flex justify-between text-[0.55rem] text-white/50 mt-0.5">
-                <span>{tightness}</span>
-                <span>{pauseThreshold}</span>
-              </div>
+            <div className="ml-3.5 mt-1 text-xs text-white/60">
+              <p>Bounded condition: {guardrail}</p>
             </div>
           </details>
         ) : null}
 
         {flipConditions?.length ? (
           <details className="group" open>
-            <summary className="cursor-pointer list-none flex items-center gap-1.5">
-              <span aria-hidden="true" className="text-white/20 text-[0.5rem] transition-transform group-open:rotate-90">▸</span>
-              <p className="text-[0.6rem] font-semibold tracking-[0.06em] text-white/40">If conditions shift</p>
+            <summary className={disclosureSummaryClass}>
+              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
+              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">If conditions shift</span>
             </summary>
             <ul className="space-y-0.5 ml-3.5 mt-1">
               {flipConditions.map((c, i) => (

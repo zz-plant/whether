@@ -1,3 +1,4 @@
+import { type NextRequest } from "next/server";
 import { getDecisionEventStore, type RegimeDecisionEvent } from "../../../lib/events/decisionEventStore";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 
@@ -28,8 +29,8 @@ const json = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json" },
   });
 
-export async function GET(request: { nextUrl?: URL; url?: string }) {
-  const nextUrl = request.nextUrl ?? (request.url ? new URL(request.url) : new URL("http://localhost"));
+export async function GET(request: NextRequest) {
+  const nextUrl = request.nextUrl;
   const params = nextUrl.searchParams;
   const cursor = params.get("cursor");
   const limit = parseLimit(params.get("limit"));
