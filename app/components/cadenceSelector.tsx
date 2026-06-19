@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -16,68 +17,123 @@ const VIEWS = [
   { key: "forecast", label: "Posture" },
 ] as const;
 
-export function CadenceSelector() {
+type SegmentOption = { key: string; label: string };
+
+type SegmentControlProps = {
+  options: readonly SegmentOption[];
+  paramName: string;
+  defaultKey: string;
+  ariaLabel: string;
+};
+
+function buildHref(pathname: string, searchParams: URLSearchParams | null, paramName: string, value: string, defaultKey: string) {
+  const params = new URLSearchParams(searchParams?.toString() ?? "");
+  if (value === defaultKey) {
+    params.delete(paramName);
+  } else {
+    params.set(paramName, value);
+  }
+  const qs = params.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
+}
+
+function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentControlProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "/";
-  const current = (searchParams?.get("cadence") as string) ?? "weekly";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const current = mounted ? (searchParams?.get(paramName) ?? defaultKey) : defaultKey;
+  const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const activeIndex = Math.max(
+    options.findIndex((option) => option.key === current),
+    0,
+  );
+
+  const navigate = useCallback(
+    (key: string) => {
+      const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
+      router.replace(href, { scroll: false });
+    },
+    [pathname, searchParams, paramName, defaultKey, router],
+  );
+
+  const prefetch = useCallback(
+    (key: string) => {
+      const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
+      router.prefetch(href);
+    },
+    [pathname, searchParams, paramName, defaultKey, router],
+  );
+
+  const moveFocus = (nextIndex: number) => {
+    buttonsRef.current[nextIndex]?.focus();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const delta = event.key === "ArrowLeft" ? -1 : 1;
+    const nextIndex = (activeIndex + delta + options.length) % options.length;
+    const nextKey = options[nextIndex]?.key ?? defaultKey;
+    moveFocus(nextIndex);
+    navigate(nextKey);
+  };
 
   return (
-    <div className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5">
-      {CADENCES.map((c) => (
-        <button
-          key={c.key}
-          type="button"
-          onClick={() => {
-            const params = new URLSearchParams(searchParams?.toString() ?? "");
-            if (c.key === "weekly") params.delete("cadence");
-            else params.set("cadence", c.key);
-            const qs = params.toString();
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-          }}
-          aria-pressed={current === c.key}
-          className={`min-h-8 rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
-            current === c.key
-              ? "bg-sky-500/14 text-sky-100"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          {c.label}
-        </button>
-      ))}
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      onKeyDown={handleKeyDown}
+      className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5"
+    >
+      {options.map((option, index) => {
+        const isActive = current === option.key;
+        return (
+          <button
+            key={option.key}
+            ref={(el) => {
+              buttonsRef.current[index] = el;
+            }}
+            type="button"
+            aria-current={isActive ? "true" : undefined}
+            onClick={() => navigate(option.key)}
+            onMouseEnter={() => prefetch(option.key)}
+            onFocus={() => prefetch(option.key)}
+            className={`min-h-10 min-w-[2.75rem] rounded-full px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+              isActive
+                ? "bg-sky-500/14 text-sky-100"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-export function ViewSelector() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname() ?? "/";
-  const current = (searchParams?.get("view") as string) ?? "default";
-
+export function CadenceSelector() {
   return (
-    <div className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5">
-      {VIEWS.map((v) => (
-        <button
-          key={v.key}
-          type="button"
-          onClick={() => {
-            const params = new URLSearchParams(searchParams?.toString() ?? "");
-            if (v.key === "default") params.delete("view");
-            else params.set("view", v.key);
-            const qs = params.toString();
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-          }}
-          aria-pressed={current === v.key}
-          className={`min-h-8 rounded-full px-2.5 py-1 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${
-            current === v.key
-              ? "bg-sky-500/14 text-sky-100"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          {v.label}
-        </button>
-      ))}
-    </div>
+    <SegmentControl
+      options={CADENCES}
+      paramName="cadence"
+      defaultKey="weekly"
+      ariaLabel="Cadence"
+    />
+  );
+}
+
+export function ViewSelector() {
+  return (
+    <SegmentControl
+      options={VIEWS}
+      paramName="view"
+      defaultKey="default"
+      ariaLabel="View"
+    />
   );
 }

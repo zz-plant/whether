@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type OrientationDestination = {
   href: string;
@@ -50,7 +50,11 @@ export function HomeFirstRunOrientation({
   quickActions = [],
   currentPath = "/",
 }: HomeFirstRunOrientationProps) {
-  const [dismissed, setDismissed] = useState(getBootstrappedDismissedState);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    setDismissed(getBootstrappedDismissedState());
+  }, []);
 
   const handleDismiss = () => {
     try {

@@ -31,7 +31,14 @@ jobs:
       - name: Generate latest weekly Slack brief markdown
         run: bun scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown
 
+      - name: Upload weekly Slack brief artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-slack-brief
+          path: artifacts/weekly-slack-brief.txt
+
       - name: Open pull request with latest weekly brief
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           branch: automation/weekly-slack-brief
@@ -51,9 +58,3 @@ jobs:
             briefs
           add-paths: |
             docs/briefs/latest-weekly-slack-brief.md
-
-      - name: Upload weekly Slack brief artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: weekly-slack-brief
-          path: artifacts/weekly-slack-brief.txt

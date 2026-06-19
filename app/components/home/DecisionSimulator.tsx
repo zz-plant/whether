@@ -22,27 +22,46 @@ export function DecisionSimulator({
   const [loading, setLoading] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
   const lastFetched = useRef(currentTightness);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchSim = useCallback(async (t: number) => {
     if (t === lastFetched.current) return;
     lastFetched.current = t;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setLoading(true);
     try {
       const res = await fetch(
         `/api/simulate?tightness=${Math.round(t)}&riskAppetite=${Math.round(currentRiskAppetite)}`,
+        { signal: controller.signal },
       );
       if (res.ok) {
         const data: SimResult = await res.json();
         setSim(data);
       }
-    } catch { /* keep last result on network error */ }
-    setLoading(false);
+    } catch {
+      if (controller.signal.aborted) return;
+      /* keep last result on network error */
+    } finally {
+      setLoading(false);
+    }
   }, [currentRiskAppetite]);
 
   useEffect(() => {
     setSliderTightness(currentTightness);
     fetchSim(currentTightness);
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [currentTightness, fetchSim]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(debounce.current);
+      abortRef.current?.abort();
+    };
+  }, []);
 
   const handleChange = (value: number) => {
     setSliderTightness(value);

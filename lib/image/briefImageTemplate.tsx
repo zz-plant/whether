@@ -12,6 +12,7 @@ export type BriefImageProps = {
   briefLabel?: string;
   contextLabel?: string;
   guardrail?: string;
+  pauseThreshold?: number;
   flipConditions?: string[];
 };
 
@@ -20,18 +21,18 @@ const confidenceColor = (label: string) =>
 
 export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const {
-    decision, regime, postureLabel, tightness,
+    decision, regime, postureLabel, tightness, pauseThreshold,
     confidenceLabel, recordDate, briefLabel = "Weekly Brief", contextLabel, guardrail, flipConditions,
   } = props;
 
   const cc = confidenceColor(confidenceLabel);
-  const pauseThreshold = 80;
+  const gaugeThreshold = Math.max(1, pauseThreshold ?? tightness);
   const arrow = decision.toLowerCase().includes("tighten") ? "↑"
     : decision.toLowerCase().includes("ease") ? "↓" : "→";
   const arrowColor = arrow === "↑" ? "#f87171" : arrow === "↓" ? "#34d399" : "#fbbf24";
-  const gaugePct = Math.min(100, Math.round((tightness / pauseThreshold) * 100));
-  const gaugeColor = tightness >= pauseThreshold ? "#f87171"
-    : tightness >= pauseThreshold - 5 ? "#fbbf24" : "#34d399";
+  const gaugePct = Math.min(100, Math.round((tightness / gaugeThreshold) * 100));
+  const gaugeColor = tightness >= gaugeThreshold ? "#f87171"
+    : tightness >= gaugeThreshold - 5 ? "#fbbf24" : "#34d399";
 
   const displayRegime = getRegimePublicLabel(regime);
 
@@ -60,11 +61,11 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
               <div style={{ height: 6, borderRadius: 3, width: `${gaugePct}%`, background: gaugeColor }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748b", marginTop: 4 }}>
-              <span>{tightness}</span><span>{pauseThreshold}</span>
+              <span>{tightness}</span><span>{gaugeThreshold}</span>
             </div>
           </div>
         </div>
-        {guardrail ? <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>Until tightness reaches {pauseThreshold}</div> : null}
+        {guardrail ? <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>{guardrail}</div> : null}
         {flipConditions && flipConditions.length > 0 ? (
           <div style={{ display: "flex", alignItems: "center", fontSize: 13, color: "#93c5fd", marginTop: 8 }}>
             <div style={{ width: 6, height: 6, borderRadius: 6, background: "#38bdf8", marginRight: 6 }} />

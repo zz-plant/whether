@@ -39,6 +39,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [saved, setSaved] = useState(false);
 
@@ -85,6 +86,26 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     saveDisplayMode(value);
     showSaved();
   }, [saveDisplayMode, showSaved]);
+
+  const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email || !email.includes("@")) {
+      setSubscribeMsg("Enter a valid email.");
+      return;
+    }
+    setIsSubscribing(true);
+    try {
+      await getSubscriberStore().subscribe(email);
+      setSubscribed(true);
+      setSubscribeMsg("Subscribed! Check your inbox.");
+    } catch {
+      setSubscribeMsg("Subscription update failed.");
+    } finally {
+      setIsSubscribing(false);
+      setSaved(false);
+      setTimeout(() => setSubscribeMsg(""), 3000);
+    }
+  }, [email]);
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -187,7 +208,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             <p className="mt-1 text-xs leading-relaxed text-slate-500">
               Get the weekly brief delivered to your inbox.
             </p>
-            <div className="mt-2 flex gap-2">
+            <form onSubmit={handleSubscribe} className="mt-2 flex gap-2">
               <label htmlFor="settings-email" className="sr-only">Email address</label>
               <input
                 id="settings-email"
@@ -198,27 +219,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 className="weather-input min-h-[44px] flex-1 rounded-md px-3 py-2 text-xs"
               />
               <button
-                type="button"
-                onClick={async () => {
-                  if (!email || !email.includes("@")) {
-                    setSubscribeMsg("Enter a valid email.");
-                    return;
-                  }
-                  try {
-                    await getSubscriberStore().subscribe(email);
-                    setSubscribed(true);
-                    setSubscribeMsg("Subscribed! Check your inbox.");
-                  } catch {
-                    setSubscribeMsg("Subscription update failed.");
-                  }
-                  setSaved(false);
-                  setTimeout(() => setSubscribeMsg(""), 3000);
-                }}
-                className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold"
+                type="submit"
+                disabled={isSubscribing}
+                className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {subscribed ? "Subscribed" : "Subscribe"}
+                {isSubscribing ? "…" : subscribed ? "Subscribed" : "Subscribe"}
               </button>
-            </div>
+            </form>
             {subscribeMsg ? (
               <p className="mt-1 text-fluid-micro text-emerald-200">{subscribeMsg}</p>
             ) : null}

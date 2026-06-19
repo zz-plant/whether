@@ -28,7 +28,7 @@ export const RELIABILITY_COLOR = (score: number) =>
 export const RELIABILITY_BAR = (score: number) =>
   score >= 80 ? "bg-emerald-400" : score >= 60 ? "bg-amber-400" : "bg-rose-400";
 
-// Annotated as Record<string, string> for consumer convenience (indexed with string at call sites).
+// Record<string, string> lets consumers index dictionary keys at call sites.
 // satisfies checks that all RegimeKey values have entries — remove a regime, get a compile error.
 export const REGIME_DESCRIPTOR: Record<string, string> = {
   EXPANSION: "growth conditions",

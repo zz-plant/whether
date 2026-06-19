@@ -69,9 +69,8 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
         ) : null}
       </div>
 
-      <div className="flex h-12 items-end gap-0.5">
+      <div className="flex h-12 items-end gap-1 overflow-x-auto">
         {regimes.map((entry, i) => {
-          const height = 20 + (i / Math.max(regimes.length - 1, 1)) * 70;
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
           const selected = isSelectedEntry(entry);
           return (
@@ -79,15 +78,15 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
               key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
-              className="group flex h-12 min-h-11 flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="group flex h-12 min-h-11 min-w-[1.5rem] flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               aria-label={`${entry.record_date}: ${entry.regime} regime`}
             >
               <span
                 aria-hidden="true"
-                className={`block w-full rounded-t-sm transition-[height,opacity] group-hover:opacity-80 ${
+                className={`block w-full rounded-t-sm transition-[opacity] group-hover:opacity-80 ${
                   REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
                 } ${isCurrent ? "ring-1 ring-white/30" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
-                style={{ height: `${height}%` }}
+                style={{ height: "75%" }}
               />
             </button>
           );

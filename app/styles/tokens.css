@@ -81,6 +81,10 @@
   --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
+  --footer-link: #94a3b8;
+  --footer-link-hover: #e2e8f0;
+  --footer-legal: #94a3b8;
+  --footer-legal-hover: #e2e8f0;
 
   /* Type scale */
   --fs-nano: clamp(0.5rem, 0.42rem + 0.18vw, 0.625rem);
@@ -209,7 +213,7 @@
 body {
   font-family: var(--font-sans);
   color: var(--text-primary);
-  background: transparent;
+  background-color: var(--bg-body);
   min-height: 100dvh;
   overflow-x: clip;
   overscroll-behavior: none;
@@ -344,6 +348,10 @@ html[data-screenshot="true"] body {
 
 html[data-theme="light"] {
   color-scheme: light;
+  --footer-link: #475569;
+  --footer-link-hover: #0f172a;
+  --footer-legal: #475569;
+  --footer-legal-hover: #334155;
   --bg-body: #faf8f5;
   --bg-panel: #ffffff;
   --bg-surface: #f5f2ed;

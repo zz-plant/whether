@@ -5,24 +5,44 @@ import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
 
 const COMPLETE_KEY = "whether_reviewed";
 
-export function RitualCheck({ recordDate }: { recordDate?: string }) {
+export function RitualCheck({
+  recordDate,
+  recentRecordDates = [],
+}: {
+  recordDate?: string;
+  recentRecordDates?: string[];
+}) {
   const [data, setData] = useLocalStorageState<Record<string, { reviewed: boolean }>>(COMPLETE_KEY, {});
 
   const reviewed = recordDate ? data[recordDate]?.reviewed ?? false : false;
   const streak = useMemo(() => {
-    const keys = Object.keys(data).sort().reverse();
+    if (recentRecordDates.length === 0) {
+      const keys = Object.keys(data).sort().reverse();
+      let s = 0;
+      for (const key of keys) {
+        if (data[key]?.reviewed) s++;
+        else break;
+      }
+      return s;
+    }
+
+    const datesDesc = [...recentRecordDates].reverse();
     let s = 0;
-    for (const key of keys) {
-      if (data[key]?.reviewed) s++;
+    const startIdx = data[datesDesc[0]]?.reviewed ? 0 : 1;
+    for (let i = startIdx; i < datesDesc.length; i++) {
+      if (data[datesDesc[i]]?.reviewed) s++;
       else break;
     }
     return s;
-  }, [data]);
+  }, [recentRecordDates, data]);
 
   const recentWeeks = useMemo(() => {
-    const keys = Object.keys(data).sort().reverse().slice(0, 4);
-    return keys.map((k) => data[k]?.reviewed ?? false);
-  }, [data]);
+    if (recentRecordDates.length === 0) {
+      const keys = Object.keys(data).sort().reverse().slice(0, 4);
+      return keys.map((k) => data[k]?.reviewed ?? false);
+    }
+    return recentRecordDates.map((d) => data[d]?.reviewed ?? false);
+  }, [recentRecordDates, data]);
 
   const handleToggle = () => {
     if (!recordDate) return;
@@ -39,7 +59,7 @@ export function RitualCheck({ recordDate }: { recordDate?: string }) {
       <button
         type="button"
         onClick={handleToggle}
-        aria-label={reviewed ? "Mark as unreviewed" : "Mark this week as reviewed"}
+        aria-label={reviewed ? "Reviewed: remove confirmation" : "Mark reviewed: confirm this week"}
         className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
           reviewed
             ? "bg-emerald-500/12 text-emerald-300 border border-emerald-500/30"
@@ -64,7 +84,7 @@ export function RitualCheck({ recordDate }: { recordDate?: string }) {
             ))}
           </div>
         ) : null}
-        {streak >= 4 ? (
+        {streak >= 1 ? (
           <span className="text-fluid-nano text-white/20">
             {streak}w
           </span>

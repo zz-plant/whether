@@ -3,6 +3,7 @@ import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, fo
 import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
+import { ShareBriefButton } from "../../components/shareBriefButton";
 
 type Props = {
   tightness: number;
@@ -11,6 +12,7 @@ type Props = {
   boldnessDelta: number;
   boldnessShorthand?: string;
   weeklyCall?: string;
+  actionNow?: string;
   regime: string;
   postureLabel: string;
   signalDirection: SignalDirection;
@@ -18,6 +20,10 @@ type Props = {
   fetchedAt: string;
   operatorContext: OperatorContext;
   confidenceLabel?: string;
+  trustStatusLabel?: string;
+  treasurySource?: string;
+  degradedCount?: number;
+  isFallback?: boolean;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -34,6 +40,7 @@ export function DecisionHero({
   boldnessDelta,
   boldnessShorthand,
   weeklyCall,
+  actionNow,
   regime,
   postureLabel,
   signalDirection,
@@ -41,6 +48,10 @@ export function DecisionHero({
   fetchedAt,
   operatorContext,
   confidenceLabel,
+  trustStatusLabel,
+  treasurySource,
+  degradedCount,
+  isFallback,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -54,6 +65,10 @@ export function DecisionHero({
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
+  const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? "Partial" : "Live";
+  const dataStatusColor = isFallback ? "text-amber-300" : degradedCount && degradedCount > 0 ? "text-amber-300" : "text-emerald-300";
+  const provenanceLabel = [treasurySource ?? "FRED", recordDate, trustStatusLabel].filter(Boolean).join(" · ");
+
   return (
     <section className="space-y-4" aria-labelledby="weekly-call-title">
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
@@ -64,14 +79,19 @@ export function DecisionHero({
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
+          {actionNow ? (
+            <p className="text-fluid-sm font-medium text-slate-100">
+              <span className="text-emerald-300/80">Do this week:</span> {actionNow}
+            </p>
+          ) : null}
           <div className="space-y-2 text-fluid-xs text-white/55">
             <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
               {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white/45">
               <span>
-                <span className="text-white/35">Guardrail:</span>{" "}
-                <span className={tightnessLevelColor}>tightness {tightness}/100 · {tightnessLevel.toLowerCase()}</span>
+                <span className="text-white/35">Tightness:</span>{" "}
+                <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
                 <span className={DIRECTION_COLOR[signalDirection]}>
@@ -79,10 +99,18 @@ export function DecisionHero({
                 </span>
               ) : null}
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
-              {freshnessLabel ? <span className="text-white/35">Updated {freshnessLabel}</span> : null}
+              <span className="inline-flex items-center gap-1.5">
+                <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
+                <span className={dataStatusColor}>{dataStatus}</span>
+                <span className="text-white/30">· {provenanceLabel}</span>
+              </span>
             </p>
           </div>
           <StageSwitcher currentStage={operatorContext.companyStage} />
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
+            <span className="text-fluid-micro text-white/35 hidden sm:inline">Copy or share this week&apos;s call.</span>
+          </div>
         </div>
 
         <div className="sm:text-right">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { CompanyMetrics } from "../../../lib/report/companyMetrics";
 import { computeMetricsGuidance } from "../../../lib/report/companyMetrics";
 import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
@@ -42,6 +42,7 @@ export function CompanyMetricsPanel({
   const [form, setForm] = useState<CompanyMetrics>({ burnRate: 0, runwayMonths: 0, headcount: 0 });
   const [hydrated, setHydrated] = useState(false);
   const { markDirty } = useCrossDeviceSync(STORAGE_KEY, null);
+  const inputId = useId();
 
   useEffect(() => {
     const saved = loadMetrics();
@@ -91,7 +92,7 @@ export function CompanyMetricsPanel({
         <button
           type="button"
           onClick={editing ? handleSave : handleStartEdit}
-          className="text-fluid-micro text-sky-300 hover:text-sky-200"
+          className="min-h-11 min-w-11 px-2 text-fluid-micro text-sky-300 hover:text-sky-200"
         >
           {editing ? "Save" : metrics ? "Edit" : "Set your numbers"}
         </button>
@@ -100,8 +101,9 @@ export function CompanyMetricsPanel({
       {editing ? (
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div>
-            <label className="text-slate-500">Monthly burn</label>
+            <label htmlFor={`${inputId}-burn`} className="text-slate-500">Monthly burn</label>
             <input
+              id={`${inputId}-burn`}
               type="number"
               value={form.burnRate || ""}
               onChange={(e) => setForm((f) => ({ ...f, burnRate: Number(e.target.value) }))}
@@ -110,8 +112,9 @@ export function CompanyMetricsPanel({
             />
           </div>
           <div>
-            <label className="text-slate-500">Runway (months)</label>
+            <label htmlFor={`${inputId}-runway`} className="text-slate-500">Runway (months)</label>
             <input
+              id={`${inputId}-runway`}
               type="number"
               value={form.runwayMonths || ""}
               onChange={(e) => setForm((f) => ({ ...f, runwayMonths: Number(e.target.value) }))}
@@ -120,8 +123,9 @@ export function CompanyMetricsPanel({
             />
           </div>
           <div>
-            <label className="text-slate-500">Headcount</label>
+            <label htmlFor={`${inputId}-headcount`} className="text-slate-500">Headcount</label>
             <input
+              id={`${inputId}-headcount`}
               type="number"
               value={form.headcount || ""}
               onChange={(e) => setForm((f) => ({ ...f, headcount: Number(e.target.value) }))}

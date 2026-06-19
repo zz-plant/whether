@@ -8,6 +8,8 @@ export const DEFAULT_UI_CAPTURE_BASE_URL =
   process.env.UI_CAPTURE_BASE_URL ?? "http://127.0.0.1:3000";
 export const DEFAULT_UI_CAPTURE_OUT_DIR = "artifacts/ui";
 const HTML_ASSET_PATTERN = /<(?:link|script)\b[^>]+(?:href|src)="([^"]+)"/gi;
+export const STREAMED_CONTENT_READY_SELECTOR = "#share-ready-artifact";
+export const STREAMED_CONTENT_READY_TIMEOUT_MS = 15000;
 
 export const readArgValue = (args, flag, fallback) => {
   const index = args.indexOf(flag);
@@ -218,6 +220,28 @@ export const ensureBaseUrlReachable = async (baseUrl) => {
   );
 };
 
+const isStreamedCapturePath = (targetPath) => {
+  try {
+    return new URL(targetPath, "http://capture.local").pathname === "/v2";
+  } catch {
+    return false;
+  }
+};
+
+export const waitForCaptureReady = async (page, target) => {
+  const readySelector = target.readySelector
+    ?? (isStreamedCapturePath(target.path) ? STREAMED_CONTENT_READY_SELECTOR : null);
+
+  if (!readySelector) {
+    return false;
+  }
+
+  await page.waitForSelector(readySelector, {
+    timeout: target.readyTimeoutMs ?? STREAMED_CONTENT_READY_TIMEOUT_MS,
+  });
+  return true;
+};
+
 export const captureTargets = async ({ baseUrl, outDir, targets }) => {
   await mkdir(outDir, { recursive: true });
 
@@ -232,11 +256,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
 
       console.log(`Capturing ${target.id} -> ${outputPath}`);
       await page.goto(url, { waitUntil: "load" });
-      try {
-        await page.waitForSelector("#share-ready-artifact", { timeout: 15000 });
-      } catch (e) {
-        // Fallback if the element is not present on the target page
-      }
+      await waitForCaptureReady(page, target);
       await page.screenshot({
         path: outputPath,
         fullPage: target.fullPage ?? true,

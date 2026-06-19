@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { ChevronRight, Copy, CopyCheck } from "lucide-react";
+import { Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
@@ -36,8 +36,6 @@ export function ActionCard({
   const isCopied = status === "copied";
   const arrow = DIRECTION_ARROW[direction];
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
-  const disclosureSummaryClass = "flex min-h-8 cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1 -mx-2 text-white/45 transition-colors hover:bg-white/[0.04] hover:text-white/65 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-400/55 [&::-webkit-details-marker]:hidden";
-  const disclosureChevronClass = "h-3 w-3 text-white/25 transition-transform group-open:rotate-90 group-hover:text-white/45";
 
   const buildText = useCallback(() => [
     `Whether · Weekly Brief · ${recordDate ?? ""}`,
@@ -45,7 +43,7 @@ export function ActionCard({
     `Boldness Budget: ${boldnessScore}/100 (${boldnessDeltaLabel})`,
     `${arrow} ${call}`,
     actionNow ? `Do now: ${actionNow}` : null,
-    guardrail ? `Bounded condition: ${guardrail} (tightness ${tightness}/${pauseThreshold})` : null,
+    guardrail ? `Watch: ${guardrail} (tightness ${tightness}/${pauseThreshold})` : null,
     flipConditions?.length ? `Watching: ${flipConditions.join(" · ")}` : null,
     "",
     "whether.work",
@@ -125,41 +123,30 @@ export function ActionCard({
         </div>
       ) : null}
 
-      <div className="space-y-3 text-sm border-t border-white/[0.04] pt-3">
+      <div className="space-y-2.5 border-t border-white/[0.04] pt-3">
         {actionNow ? (
-          <details className="group">
-            <summary className={disclosureSummaryClass}>
-              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
-              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">Do now</span>
-            </summary>
-            <p className="text-slate-200 ml-3.5 mt-1 text-xs">{actionNow}</p>
-          </details>
+          <div>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-emerald-300/80">Do this week</p>
+            <p className="text-sm text-slate-100">{actionNow}</p>
+          </div>
         ) : null}
 
         {guardrail ? (
-          <details className="group">
-            <summary className={disclosureSummaryClass}>
-              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
-              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">Pause details</span>
-            </summary>
-            <div className="ml-3.5 mt-1 text-xs text-white/60">
-              <p>Bounded condition: {guardrail}</p>
-            </div>
-          </details>
+          <div>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-amber-300/80">Pause if</p>
+            <p className="text-sm text-white/70">{guardrail}</p>
+          </div>
         ) : null}
 
         {flipConditions?.length ? (
-          <details className="group" open>
-            <summary className={disclosureSummaryClass}>
-              <ChevronRight className={disclosureChevronClass} aria-hidden="true" />
-              <span className="text-[0.6rem] font-semibold tracking-[0.06em]">If conditions shift</span>
-            </summary>
-            <ul className="space-y-0.5 ml-3.5 mt-1">
+          <div>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-sky-300/80">Flip if</p>
+            <ul className="space-y-0.5">
               {flipConditions.map((c, i) => (
-                <li key={i} className="text-xs text-sky-300">{c}</li>
+                <li key={i} className="text-sm text-sky-200">{c}</li>
               ))}
             </ul>
-          </details>
+          </div>
         ) : null}
       </div>
     </div>

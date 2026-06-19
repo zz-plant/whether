@@ -6,6 +6,7 @@ import {
   probeBaseUrl,
   probeHtmlAssetIntegrity,
   resolveCaptureTargets,
+  waitForCaptureReady,
 } from "../scripts/ui-capture.lib.mjs";
 
 describe("ui capture helpers", () => {
@@ -21,6 +22,42 @@ describe("ui capture helpers", () => {
     const targets = resolveCaptureTargets(["operator-brief-mobile"]);
 
     assert.deepEqual(targets.map((target: { id: string }) => target.id), ["operator-brief-mobile"]);
+  });
+
+  it("waits for streamed capture readiness on v2 before screenshots", async () => {
+    const calls: Array<{ selector: string; timeout: number }> = [];
+    const page = {
+      waitForSelector: async (selector: string, options: { timeout: number }) => {
+        calls.push({ selector, timeout: options.timeout });
+      },
+    };
+
+    const waited = await waitForCaptureReady(page, {
+      id: "v2",
+      label: "V2",
+      path: "/v2?screenshot=1",
+      viewport: { width: 1440, height: 1000 },
+    });
+
+    assert.equal(waited, true);
+    assert.deepEqual(calls, [{ selector: "#share-ready-artifact", timeout: 15000 }]);
+  });
+
+  it("does not add streamed readiness waits to non-streamed captures", async () => {
+    const page = {
+      waitForSelector: async () => {
+        throw new Error("unexpected streamed wait");
+      },
+    };
+
+    const waited = await waitForCaptureReady(page, {
+      id: "mockups",
+      label: "Mockups",
+      path: "/mockups",
+      viewport: { width: 1440, height: 1000 },
+    });
+
+    assert.equal(waited, false);
   });
 
   it("renders a gallery page with route and image references for each capture", () => {

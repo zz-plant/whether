@@ -77,7 +77,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
-            <span className="hidden truncate text-fluid-micro font-medium tracking-[0.04em] text-white/35 min-[360px]:inline sm:text-fluid-xs">
+            <span className="hidden truncate text-fluid-micro font-medium tracking-[0.04em] text-[var(--app-text-muted)] min-[360px]:inline sm:text-fluid-xs">
               {isHomeBrief ? "Weekly Brief" : routeLabel}
             </span>
           </div>
@@ -128,8 +128,9 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             {isHomeBrief ? (
               <div className="flex items-center gap-2 border-t border-white/[0.05] px-3 py-1.5 lg:hidden">
                 <GlobalHeaderNavClient pathname={pathname} />
-                <div className="ml-auto min-w-0 overflow-x-auto sm:hidden">
+                <div className="ml-auto flex min-w-0 items-center gap-1.5 overflow-x-auto sm:hidden">
                   <CadenceSelector />
+                  <ViewSelector />
                 </div>
               </div>
             ) : (

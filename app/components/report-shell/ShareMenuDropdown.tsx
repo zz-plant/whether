@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useClipboardCopy } from "../useClipboardCopy";
 import { CheckIcon, CopyIcon, DocumentIcon, ChevronDownIcon, AuditIcon } from "../uiIcons";
 
@@ -39,9 +39,52 @@ export function ShareMenuDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [slackOverlayActive, setSlackOverlayActive] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const menuId = useId();
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
 
   const handleToggleDropdown = () => setIsOpen((prev) => !prev);
+
+  const focusItem = (index: number) => {
+    itemRefs.current[index]?.focus();
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    window.setTimeout(() => focusItem(0), 0);
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsOpen(false);
+        triggerRef.current?.focus();
+        return;
+      }
+
+      const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const currentIndex = itemRefs.current.findIndex((el) => el === activeElement);
+      if (currentIndex === -1) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        focusItem((currentIndex + 1) % itemRefs.current.length);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        focusItem((currentIndex - 1 + itemRefs.current.length) % itemRefs.current.length);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        focusItem(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        focusItem(itemRefs.current.length - 1);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -103,19 +146,24 @@ ${citation}
   return (
     <div className="relative inline-block text-left" ref={containerRef}>
       <button
+        ref={triggerRef}
+        type="button"
         onClick={handleToggleDropdown}
         className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100 transition-colors focus:outline-none"
         aria-haspopup="true"
         aria-expanded={isOpen}
+        aria-controls={isOpen ? menuId : undefined}
       >
         <span>Share brief</span>
         <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md border border-slate-800 bg-slate-950/95 p-1 shadow-xl backdrop-blur-md">
+        <div id={menuId} className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md border border-slate-800 bg-slate-950/95 p-1 shadow-xl backdrop-blur-md">
           <div className="py-1" role="menu" aria-orientation="vertical">
             <button
+              ref={(el) => { itemRefs.current[0] = el; }}
+              type="button"
               onClick={() => handleCopy(weeklyCallSnapshotText || cleanMarkdownText, "Slack Text")}
               className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
               role="menuitem"
@@ -130,6 +178,8 @@ ${citation}
             </button>
 
             <button
+              ref={(el) => { itemRefs.current[1] = el; }}
+              type="button"
               onClick={() => handleCopy(cleanMarkdownText, "Markdown")}
               className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
               role="menuitem"
@@ -144,6 +194,8 @@ ${citation}
             </button>
 
             <button
+              ref={(el) => { itemRefs.current[2] = el; }}
+              type="button"
               onClick={() => handleCopy(weeklyOperatorBriefText || cleanMarkdownText, "Leadership Brief")}
               className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
               role="menuitem"
@@ -158,6 +210,8 @@ ${citation}
             </button>
 
             <button
+              ref={(el) => { itemRefs.current[3] = el; }}
+              type="button"
               onClick={() => handleCopy(deltaOnlyBriefText || cleanMarkdownText, "Delta Brief")}
               className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
               role="menuitem"
@@ -174,6 +228,8 @@ ${citation}
             <div className="my-1 border-t border-slate-800" />
 
             <button
+              ref={(el) => { itemRefs.current[4] = el; }}
+              type="button"
               onClick={handleToggleSlackOverlay}
               className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
               role="menuitem"

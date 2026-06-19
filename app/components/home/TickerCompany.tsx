@@ -143,7 +143,7 @@ export function TickerCompany({
           <button
             type="button"
             onClick={handleClear}
-            className="text-fluid-micro text-slate-500 hover:text-slate-300"
+            className="min-h-11 min-w-11 px-2 text-fluid-micro text-slate-500 hover:text-slate-300"
           >
             Change
           </button>

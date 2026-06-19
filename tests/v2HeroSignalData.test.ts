@@ -37,7 +37,8 @@ describe("v2 hero signal data", () => {
   it("keeps the v2 hero metadata compact and spaced", () => {
     const source = readFileSync("app/v2/components/DecisionHero.tsx", "utf8");
 
-    assert.match(source, /Updated \{freshnessLabel\}/);
+    assert.match(source, /\{provenanceLabel\}/);
+    assert.match(source, /\{dataStatus\}/);
     assert.doesNotMatch(source, /<p className="text-white\/40">\{recordDate\}<\/p>/);
     assert.doesNotMatch(source, /\{stageLabel \? <p>\{stageLabel\}<\/p> : null\}/);
     assert.doesNotMatch(source, /\{tightnessDeltaLabel\}\s*\{isUnusual/);

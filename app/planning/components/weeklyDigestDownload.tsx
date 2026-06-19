@@ -13,6 +13,7 @@ type DigestResponse = {
   postureState: {
     currentState: {
       confidenceLabel: string;
+      recordDate: string;
     };
   };
   alertCount: number;
@@ -37,6 +38,7 @@ const isDigestResponse = (value: unknown): value is DigestResponse => {
     && Boolean(currentState)
     && typeof currentState === "object"
     && typeof Reflect.get(currentState, "confidenceLabel") === "string"
+    && typeof Reflect.get(currentState, "recordDate") === "string"
     && typeof Reflect.get(value, "alertCount") === "number"
     && typeof Reflect.get(value, "degraded") === "boolean"
     && typeof Reflect.get(value, "generatedAt") === "string"
@@ -80,7 +82,7 @@ export function WeeklyDigestDownload() {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      const recordDate = data.postureState?.currentState?.confidenceLabel ?? "weekly";
+      const recordDate = data.postureState?.currentState?.recordDate ?? "weekly";
       anchor.download = `whether-weekly-digest-${recordDate.toLowerCase()}.txt`;
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 0);

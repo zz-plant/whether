@@ -8,10 +8,12 @@ export function CompareStrip({
   currentRegime,
   currentTightness,
   tightnessDelta,
+  serverPrevious,
 }: {
   currentRegime: string;
   currentTightness: number;
   tightnessDelta?: number;
+  serverPrevious?: { regime: string; recordDate: string } | null;
 }) {
   const [isComparing, setIsComparing] = useState(false);
   const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(null);
@@ -22,9 +24,14 @@ export function CompareStrip({
       if (series.length >= 2) {
         const prev = series[series.length - 2];
         setPrevious({ regime: prev.regime, recordDate: prev.recordDate });
+        return;
       }
     } catch { /* time machine may be empty */ }
-  }, []);
+    // Fall back to server-provided previous period when client cache is empty
+    if (serverPrevious) {
+      setPrevious(serverPrevious);
+    }
+  }, [serverPrevious]);
 
   if (!previous) return null;
 

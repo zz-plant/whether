@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -36,6 +37,18 @@ export function SubscribeForm() {
       setMessage("A network error occurred. Please try again.");
     }
   };
+
+  if (status === "success") {
+    return (
+      <div className="weather-card flex flex-col items-center justify-center py-6 text-center space-y-2">
+        <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
+          <Check className="size-5" aria-hidden="true" />
+        </span>
+        <p className="text-fluid-xs font-semibold text-white">Subscribed!</p>
+        <p className="text-fluid-micro text-white/50">{message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="weather-card space-y-3">
@@ -74,7 +87,7 @@ export function SubscribeForm() {
       </form>
 
       {message && (
-        <p id="subscribe-message" aria-live="polite" className={`text-fluid-micro ${status === "success" ? "text-emerald-400" : "text-rose-400"}`}>
+        <p id="subscribe-message" aria-live="polite" className="text-fluid-micro text-rose-400">
           {message}
         </p>
       )}

@@ -86,16 +86,14 @@ describe("home route render contract", () => {
     assert.match(v2RouteSource, /lg:grid-cols-12/);
     assert.match(v2RouteSource, /lg:grid-cols-4/);
 
-    const scalarIndex = v2RouteSource.indexOf("Boldness Budget:");
-    const netDeltaIndex = v2RouteSource.indexOf("Net delta:");
-    const revisitIndex = v2RouteSource.indexOf("Revisit last week’s roadmap/hiring decisions?");
+    const scalarIndex = v2RouteSource.indexOf("Boldness window:");
+    const revisitIndex = v2RouteSource.indexOf("Revisit queue");
     const guardrailIndex = v2RouteSource.indexOf("Watch:");
-    const memoryIndex = v2RouteSource.indexOf("Last 4 weeks:");
+    const memoryIndex = v2RouteSource.indexOf("Posture trend:");
     const trustStripIndex = v2RouteSource.indexOf("<DeltaTrustStrip");
 
     assert.ok(scalarIndex >= 0, "active v2 route exposes the canonical scalar");
-    assert.ok(netDeltaIndex > scalarIndex, "active v2 route exposes net delta after the scalar");
-    assert.ok(revisitIndex > netDeltaIndex, "active v2 route exposes the revisit decision state after net delta");
+    assert.ok(revisitIndex > scalarIndex, "active v2 route exposes the revisit decision state after scalar");
     assert.ok(guardrailIndex > revisitIndex, "active v2 route exposes bounded guardrails after revisit state");
     assert.ok(memoryIndex > guardrailIndex, "active v2 route exposes memory rail after guardrails");
     assert.ok(trustStripIndex > memoryIndex, "active v2 route keeps the compact trust strip after the decision contract");

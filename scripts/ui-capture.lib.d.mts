@@ -1,5 +1,7 @@
 export const DEFAULT_UI_CAPTURE_BASE_URL: string;
 export const DEFAULT_UI_CAPTURE_OUT_DIR: string;
+export const STREAMED_CONTENT_READY_SELECTOR: string;
+export const STREAMED_CONTENT_READY_TIMEOUT_MS: number;
 export function readArgValue(args: string[], flag: string, fallback: string): string;
 export function hasFlag(args: string[], flag: string): boolean;
 export function parseOnlyIds(value: string): string[];
@@ -34,6 +36,10 @@ export function probeBaseUrl(baseUrl: string): Promise<{
   healthError?: string;
 }>;
 export function ensureBaseUrlReachable(baseUrl: string): Promise<ReturnType<typeof probeBaseUrl>>;
+export function waitForCaptureReady(
+  page: { waitForSelector(selector: string, options: { timeout: number }): Promise<unknown> },
+  target: { path: string; readySelector?: string; readyTimeoutMs?: number; [key: string]: unknown },
+): Promise<boolean>;
 export function captureTargets(options: {
   baseUrl: string;
   outDir: string;

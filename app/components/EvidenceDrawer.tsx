@@ -17,11 +17,11 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-[0.6rem] font-medium text-white/40">
-              Interactive cockpit
+              Tools
             </span>
           )}
           <span className="hidden sm:inline text-[0.65rem] text-white/30 truncate">
-            (Simulator · Metrics · Trendline · Transition)
+            Stress test · Signals · Trendline · Transition risk
           </span>
         </div>
         <ChevronRight

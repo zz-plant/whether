@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Copy, ImageIcon } from "lucide-react";
+import { Copy, CopyCheck, ImageIcon } from "lucide-react";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { ShareBriefButton } from "../../components/shareBriefButton";
 import { buildImageBriefApiPath } from "../../../lib/report/imageBriefSearchParams";
 
 type Props = {
@@ -33,6 +34,10 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
     let subscribeFormInView = false;
 
     const updateStripVisibility = () => {
+      if (window.innerWidth >= 1024) {
+        setShowStrip(false);
+        return;
+      }
       const revealOffset = Math.min(640, window.innerHeight * 0.72);
       setShowStrip(window.scrollY > revealOffset && !subscribeFormInView);
     };
@@ -66,7 +71,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
     const text = [
       `Whether · Boldness Budget ${boldnessScore}/100 (${deltaLabel})`,
       `${arrow} ${call}`,
-      guardrail ? `Bounded condition: ${guardrail}` : null,
+      guardrail ? `Watch: ${guardrail}` : null,
       "whether.work",
     ].filter(Boolean).join(" — ");
     await copyToClipboard(text, "Weekly call");
@@ -95,6 +100,10 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
             >
               <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
+            <ShareBriefButton
+              text={[`Whether · Boldness Budget ${boldnessScore}/100 (${deltaLabel})`, `${arrow} ${call}`, guardrail ? `Watch: ${guardrail}` : null, "whether.work"].filter(Boolean).join(" — ")}
+              className="flex-shrink-0"
+            />
             <button
               type="button"
               onClick={handleCopy}
@@ -103,7 +112,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
             >
               {isCopied ? (
                 <>
-                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  <CopyCheck className="h-3.5 w-3.5" aria-hidden="true" />
                   <span className="max-[420px]:sr-only">Copied</span>
                 </>
               ) : (

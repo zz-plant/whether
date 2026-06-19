@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
-import { renderBriefImage } from "../../../../lib/image/briefImageTemplate";
+import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
 import type { SignalChange } from "../../../../lib/report/homeBriefModel";
 import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
 import { SECTOR_TAXONOMY, type SectorKey } from "../../../../lib/report/sectorSensitivity";
@@ -37,37 +37,48 @@ const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBrie
   return labels.length ? labels.join(" · ") : undefined;
 };
 
-export async function GET(request: Request) {
-  const requestContext = parseImageBriefRequestContext(new URL(request.url).searchParams);
-  const homepage = await assembleHomePage(requestContext);
+type BriefImageHomepage = Awaited<ReturnType<typeof assembleHomePage>>;
+
+export const buildBriefImagePayload = (
+  homepage: BriefImageHomepage,
+  requestContext: ReturnType<typeof parseImageBriefRequestContext> = {},
+): BriefImageProps => {
   const model = homepage.weeklyDecisionCardModel;
   const shell = homepage.reportShell;
 
+  return {
+    decision:
+      model.decision.canonicalDecisionCopy?.doNowLines?.[0] ??
+      model.decision.actionNowShort ??
+      model.decision.immediateDecision,
+    regime: shell.regime,
+    postureLabel:
+      model.status.postureWithStageLabel ?? model.status.postureLabel,
+    tightness: model.diagnostics.currentScores.tightness,
+    tightnessDelta:
+      model.decision.reportDynamics.changedSignals.find(
+        (s: SignalChange) => s.key === "tightness",
+      )?.delta ?? 0,
+    confidenceLabel: model.status.confidenceLabel,
+    recordDate: shell.recordDateLabel,
+    briefLabel: cadenceLabel[requestContext.searchParams?.cadence ?? "weekly"] ?? "Weekly Brief",
+    contextLabel: buildImageContextLabel(requestContext),
+    guardrail: model.decision.guardrailThreshold,
+    pauseThreshold:
+      model.diagnostics.postureTrajectory?.thresholds.tightness ??
+      model.diagnostics.regimeDistance.thresholdValue,
+    flipConditions: model.decision.compactFlipConditionLabels?.length
+      ? model.decision.compactFlipConditionLabels
+      : undefined,
+  };
+};
+
+export async function GET(request: Request) {
+  const requestContext = parseImageBriefRequestContext(new URL(request.url).searchParams);
+  const homepage = await assembleHomePage(requestContext);
+
   const image = new ImageResponse(
-    renderBriefImage({
-      decision:
-        model.decision.canonicalDecisionCopy?.doNowLines?.[0] ??
-        model.decision.actionNowShort ??
-        model.decision.immediateDecision,
-      regime: shell.regime,
-      postureLabel:
-        model.status.postureWithStageLabel ?? model.status.postureLabel,
-      tightness: model.diagnostics.currentScores.tightness,
-      tightnessDelta:
-        model.decision.reportDynamics.changedSignals.find(
-          (s: SignalChange) => s.key === "tightness",
-        )?.delta ?? 0,
-      confidenceLabel: model.status.confidenceLabel,
-      recordDate: shell.recordDateLabel,
-      briefLabel: cadenceLabel[requestContext.searchParams?.cadence ?? "weekly"] ?? "Weekly Brief",
-      contextLabel: buildImageContextLabel(requestContext),
-      guardrail: model.decision.guardrailThreshold
-        ? `tightness crosses ${model.decision.guardrailThreshold}`
-        : undefined,
-      flipConditions: model.decision.compactFlipConditionLabels?.length
-        ? model.decision.compactFlipConditionLabels
-        : undefined,
-    }),
+    renderBriefImage(buildBriefImagePayload(homepage, requestContext)),
     { width: 1200, height: 800 },
   );
 

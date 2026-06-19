@@ -40,8 +40,6 @@ export function SignalWaterfall({
       aria-haspopup="true"
       aria-expanded={show}
       className="relative inline-block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-md select-none"
-      onMouseEnter={() => hasData && setShow(true)}
-      onMouseLeave={() => setShow(false)}
       onClick={() => hasData && setShow((s) => !s)}
       onKeyDown={(e) => {
         if (!hasData) return;
@@ -57,7 +55,7 @@ export function SignalWaterfall({
       {children}
 
       {show && hasData ? (
-        <div className="absolute left-0 top-full mt-3 z-50 w-64 rounded-xl border border-white/[0.08] bg-[var(--bg-raised)] px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+        <div className="absolute right-0 top-full mt-3 z-50 w-64 origin-top-right rounded-xl border border-white/[0.08] bg-[var(--bg-raised)] px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
           <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/40 mb-2">Signal breakdown</p>
           <div className="space-y-2">
             {data.baseRate != null ? (

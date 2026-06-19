@@ -315,6 +315,23 @@ const findSignalDelta = (
   key: ReportDynamics["changedSignals"][number]["key"],
 ) => dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
 
+const deriveTightnessTrajectoryDelta = ({
+  tightnessDelta,
+  baseRateDelta,
+  curveDelta,
+}: {
+  tightnessDelta: number;
+  baseRateDelta: number;
+  curveDelta: number;
+}) => {
+  if (Math.abs(tightnessDelta) > DIRECTION_EPSILON) {
+    return tightnessDelta;
+  }
+
+  const proxyDelta = baseRateDelta * 4 - curveDelta;
+  return Math.abs(proxyDelta) > DIRECTION_EPSILON ? proxyDelta : 0;
+};
+
 const stressUpIsWorseSeries = new Set<MacroSeriesId>([
   "HY_CREDIT_SPREAD",
   "CHICAGO_FCI",
@@ -535,6 +552,12 @@ export const buildForecastModel = ({
   const tightnessDelta = findSignalDelta(reportDynamics, "tightness");
   const riskDelta = findSignalDelta(reportDynamics, "riskAppetite");
   const curveDelta = findSignalDelta(reportDynamics, "curveSlope");
+  const baseRateDelta = findSignalDelta(reportDynamics, "baseRate");
+  const tightnessTrajectoryDelta = deriveTightnessTrajectoryDelta({
+    tightnessDelta,
+    baseRateDelta,
+    curveDelta,
+  });
   const macroDownsideBias = computeMacroDownsideBias(macroSeries);
 
   const projectedTightnessDrift = tightnessDelta + macroDownsideBias * 7;
@@ -609,7 +632,7 @@ export const buildForecastModel = ({
     },
     signalTrajectory: {
       riskAppetite: toTrajectory({ key: "riskAppetite", delta: riskDelta }),
-      tightness: toTrajectory({ key: "tightness", delta: tightnessDelta }),
+      tightness: toTrajectory({ key: "tightness", delta: tightnessTrajectoryDelta }),
       yieldCurveProxy: toTrajectory({ key: "curveSlope", delta: curveDelta }),
     },
   };

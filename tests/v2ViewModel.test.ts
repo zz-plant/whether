@@ -86,7 +86,7 @@ describe("computeReliabilityScore", () => {
     assert.ok(degraded < clean, `degraded ${degraded} should be < clean ${clean}`);
   });
 
-  it("handles unknown confidence labels as LOW-equivalent", () => {
+  it("treats unknown confidence labels like LOW", () => {
     const score = computeReliabilityScore({
       confidenceLabel: "UNKNOWN",
       showOfflineBadge: false,

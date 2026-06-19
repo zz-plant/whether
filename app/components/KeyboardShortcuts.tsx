@@ -57,15 +57,27 @@ export function KeyboardShortcuts() {
     return () => window.removeEventListener("keydown", handle);
   }, []);
 
+  const openHelp = () => {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
+  };
+
   return (
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <p className="hidden sm:block text-center text-fluid-micro text-slate-700 py-2">
-        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono">J</kbd>
-        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono ml-0.5">K</kbd>{" "}
-        Navigate sections{"    "}
-        <kbd className="rounded border border-slate-600 px-1.5 py-0.5 text-slate-400 font-mono">?</kbd>{" "}
-        Keyboard shortcuts
+      <p className="flex flex-wrap items-center justify-center gap-2 text-center text-fluid-micro text-[var(--app-text-muted)] py-2">
+        <span className="inline-flex items-center gap-1">
+          <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">J</kbd>
+          <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">K</kbd>
+          <span className="ml-1">Navigate sections</span>
+        </span>
+        <button
+          type="button"
+          onClick={openHelp}
+          className="inline-flex items-center gap-1 rounded border border-[var(--app-border-strong)] px-2 py-0.5 font-medium text-[var(--app-text-muted)] hover:bg-[var(--app-border-strong)] hover:text-[var(--app-text)] transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+        >
+          <kbd className="font-mono">?</kbd>
+          <span>Shortcuts</span>
+        </button>
       </p>
     </>
   );
