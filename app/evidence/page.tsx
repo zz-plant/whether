@@ -56,11 +56,11 @@ export default async function SignalsPage({
       pageSummary="What moved, why it matters, and what would shift the forecast."
       pageSummaryLink={{
         href: "#decision-summary",
-        label: "Start with the summary ↓",
+        label: "Summary ↓",
       }}
       sectionLinks={model.sectionLinks}
       heroVariant="compact"
-      primaryCta={{ href: "#decision-summary", label: "Start with what changed" }}
+      primaryCta={{ href: "#decision-summary", label: "What changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/planning",

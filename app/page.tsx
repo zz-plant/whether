@@ -106,11 +106,11 @@ function WeeklyTopFoldContract({
     >
       <div className="space-y-2 lg:col-span-7">
         <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">THIS WEEK</p>
-        <div className="grid gap-2 text-fluid-micro text-white/55 sm:grid-cols-2 lg:grid-cols-4">
-          <span>Boldness window: {weeklySummary.notchShiftLabel}</span>
-          <span>Hiring: {weeklySummary.hiringWindow}</span>
-          <span>Expansion: {weeklySummary.expansionWindow}</span>
-          <span>Fundraise: {weeklySummary.raiseWindow}</span>
+        <div className="grid gap-2 text-fluid-micro text-white/55 grid-cols-2 xl:grid-cols-4">
+          <span>Boldness shift: {weeklySummary.notchShiftLabel}</span>
+          <span>Hiring window: {weeklySummary.hiringWindow}</span>
+          <span>Expansion window: {weeklySummary.expansionWindow}</span>
+          <span>Fundraise window: {weeklySummary.raiseWindow}</span>
         </div>
         <p className="text-fluid-micro font-medium text-sky-200/80">{weeklySummary.shorthandLine}</p>
       </div>
@@ -141,7 +141,7 @@ function WeeklyTopFoldContract({
         <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
           {guardrailRows.map((row, index) => (
             <p key={index}>
-              <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}
+              <span className="text-white/60">Watch if:</span> {compactSentence(row.trigger, 84)}
             </p>
           ))}
         </div>

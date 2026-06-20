@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useLocalStorageState } from "../../../lib/hooks/useLocalStorageState";
+import { useLocalStorageState } from "../../lib/hooks/useLocalStorageState";
 
 const COMPLETE_KEY = "whether_reviewed";
 

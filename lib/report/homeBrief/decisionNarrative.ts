@@ -170,8 +170,8 @@ export const buildWeeklyMemoLines = ({
   transitionWatch: "ON" | "OFF";
 }) => [
   trendLabel === "Stable"
-    ? "Changed: no material signal shift this week."
-    : `Changed: market conditions are ${trendLabel.toLowerCase()} this week.`,
+    ? "No material signal shift this week."
+    : `Market conditions are ${trendLabel.toLowerCase()} this week.`,
   operatingStanceLine,
   transitionWatch === "ON"
     ? "Flip watch is on: keep hiring, roadmap, and spend decisions reversible until the next live read."

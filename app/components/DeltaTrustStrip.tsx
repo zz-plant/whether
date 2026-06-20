@@ -1,4 +1,4 @@
-import type { SourceHealthCoverageSummary } from "../../../lib/report/sourceHealth";
+import type { SourceHealthCoverageSummary } from "../../lib/report/sourceHealth";
 import { DIRECTION_LABEL, DIRECTION_COLOR, CONFIDENCE_COLOR, RELIABILITY_COLOR, type SignalDirection } from "../viewModel";
 
 export function DeltaTrustStrip({

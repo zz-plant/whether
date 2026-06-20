@@ -1,9 +1,9 @@
-import type { OperatorContext } from "../../../lib/report/operatorContext";
+import type { OperatorContext } from "../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
-import { ShareBriefButton } from "../../components/shareBriefButton";
+import { ShareBriefButton } from "./shareBriefButton";
 
 type Props = {
   tightness: number;
@@ -58,7 +58,6 @@ export function DecisionHero({
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
-  const freshnessLabel = fetchedAt || recordDate;
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
@@ -67,7 +66,24 @@ export function DecisionHero({
 
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? "Partial" : "Live";
   const dataStatusColor = isFallback ? "text-amber-300" : degradedCount && degradedCount > 0 ? "text-amber-300" : "text-emerald-300";
-  const provenanceLabel = [treasurySource ?? "FRED", recordDate, trustStatusLabel].filter(Boolean).join(" · ");
+  const dataStatusBg = isFallback ? "bg-amber-500/10 border-amber-500/20" : degradedCount && degradedCount > 0 ? "bg-amber-500/10 border-amber-500/20" : "bg-emerald-500/10 border-emerald-500/20";
+
+  const isTreasuryUrl = treasurySource?.startsWith("http");
+  const sourceNode = isTreasuryUrl ? (
+    <a
+      href={treasurySource}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline decoration-white/20 underline-offset-2 hover:text-white/70 hover:decoration-white/40"
+    >
+      FRED
+    </a>
+  ) : (
+    <span>{treasurySource ?? "FRED"}</span>
+  );
+
+  const normalizedCall = (weeklyCall ?? "").trim();
+  const showActionNow = actionNow && actionNow.trim() !== normalizedCall && actionNow.trim() !== "";
 
   return (
     <section className="space-y-4" aria-labelledby="weekly-call-title">
@@ -79,7 +95,7 @@ export function DecisionHero({
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
-          {actionNow ? (
+          {showActionNow ? (
             <p className="text-fluid-sm font-medium text-slate-100">
               <span className="text-emerald-300/80">Do this week:</span> {actionNow}
             </p>
@@ -99,10 +115,12 @@ export function DecisionHero({
                 </span>
               ) : null}
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
-                <span className={dataStatusColor}>{dataStatus}</span>
-                <span className="text-white/30">· {provenanceLabel}</span>
+              <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
+                  <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
+                  {dataStatus}
+                </span>
+                <span className="text-white/30">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
               </span>
             </p>
           </div>
@@ -129,7 +147,7 @@ export function DecisionHero({
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
-              <div className="font-display text-[clamp(3.5rem,10vw,5.75rem)] font-bold leading-none text-white tabular-nums"
+              <div className="font-display text-[clamp(2.75rem,9vw,5.5rem)] font-bold leading-none text-white tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
                 {boldnessScore}
               </div>

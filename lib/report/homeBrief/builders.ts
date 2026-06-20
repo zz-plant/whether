@@ -513,12 +513,18 @@ export const buildHomeBriefModelInternal = (
     regimeSignalIndicators,
   });
 
+  const actionClause = conciseActionNow
+    ? `${conciseActionNow.charAt(0).toLowerCase()}${conciseActionNow.slice(1)}`
+    : "stay the course";
+  const flipClause = conciseFlipThreshold
+    ? `Flip if ${conciseFlipThreshold.charAt(0).toLowerCase()}${conciseFlipThreshold.slice(1)}`
+    : "";
   const netConstraintSummary =
     severityDelta > 0
-      ? `${displayRegime.label}. Changing: pressure rising. Do now: ${conciseActionNow ?? "slow new commitments"}. Shift: ${conciseFlipThreshold}`
+      ? `${displayRegime.label}. Pressure is rising, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`
       : severityDelta < 0
-        ? `${displayRegime.label}. Changing: pressure eased. Do now: ${conciseActionNow ?? "speed up on what's working"}. Shift: ${conciseFlipThreshold}`
-      : `${displayRegime.label}. Changing: conditions held. Do now: ${conciseActionNow ?? "stay the course"}. Shift: ${conciseFlipThreshold}`;
+        ? `${displayRegime.label}. Pressure eased, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`
+        : `${displayRegime.label}. Conditions held, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`;
 
   return {
     postureLabel: displayRegime.label,
@@ -595,7 +601,7 @@ export const buildHomeBriefModelInternal = (
               }
 
               if (weeklyLeadershipSummary.boldnessDelta < 0) {
-                return `The call moved ${intensity}more defensive this week.`;
+                return `The call shifted ${intensity}more defensive this week.`;
               }
 
               return "The call is holding steady this week.";

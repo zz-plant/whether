@@ -108,7 +108,7 @@ export function OperationsExecutionStepper({
             </span>
           </div>
           <p className="mt-1 text-xs leading-5 text-slate-300">
-            Check off each step as you complete it. Click to open the detail panel.
+            Mark each step once it is complete.
           </p>
         </div>
 

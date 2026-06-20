@@ -75,7 +75,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /weekly-posture-brief-title/);
-    assert.match(html, /Do now:/);
+    assert.match(html, /Do this week:/);
     assert.match(html, /Market posture/);
     assert.match(html, /What would change this call/);
     assert.doesNotMatch(html, /Data through Mar 6, 2026/);

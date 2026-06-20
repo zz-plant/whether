@@ -76,27 +76,24 @@ describe("home route render contract", () => {
     assert.equal(shareArtifacts.length, 1);
   });
 
-  it("keeps the active / route wired through the v2 homepage decision contract", () => {
-    const rootRouteSource = readFileSync("app/page.tsx", "utf8");
-    const v2RouteSource = readFileSync("app/v2/page.tsx", "utf8");
+  it("keeps the active / route carrying the homepage decision contract", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
 
-    assert.match(rootRouteSource, /import Page, \{ generateMetadata, revalidate, runtime \} from "\.\/v2\/page"/);
-    assert.match(rootRouteSource, /export default Page/);
-    assert.match(v2RouteSource, /data-testid="weekly-top-fold"/);
-    assert.match(v2RouteSource, /lg:grid-cols-12/);
-    assert.match(v2RouteSource, /lg:grid-cols-4/);
+    assert.match(routeSource, /data-testid="weekly-top-fold"/);
+    assert.match(routeSource, /lg:grid-cols-12/);
+    assert.match(routeSource, /lg:grid-cols-\[1fr_18rem\]/);
 
-    const scalarIndex = v2RouteSource.indexOf("Boldness window:");
-    const revisitIndex = v2RouteSource.indexOf("Revisit queue");
-    const guardrailIndex = v2RouteSource.indexOf("Watch:");
-    const memoryIndex = v2RouteSource.indexOf("Posture trend:");
-    const trustStripIndex = v2RouteSource.indexOf("<DeltaTrustStrip");
+    const scalarIndex = routeSource.indexOf("Boldness shift:");
+    const revisitIndex = routeSource.indexOf("Revisit queue");
+    const guardrailIndex = routeSource.indexOf("Watch if:");
+    const memoryIndex = routeSource.indexOf("Posture trend:");
+    const trustStripIndex = routeSource.indexOf("<DeltaTrustStrip");
 
-    assert.ok(scalarIndex >= 0, "active v2 route exposes the canonical scalar");
-    assert.ok(revisitIndex > scalarIndex, "active v2 route exposes the revisit decision state after scalar");
-    assert.ok(guardrailIndex > revisitIndex, "active v2 route exposes bounded guardrails after revisit state");
-    assert.ok(memoryIndex > guardrailIndex, "active v2 route exposes memory rail after guardrails");
-    assert.ok(trustStripIndex > memoryIndex, "active v2 route keeps the compact trust strip after the decision contract");
+    assert.ok(scalarIndex >= 0, "active route exposes the canonical scalar");
+    assert.ok(revisitIndex > scalarIndex, "active route exposes the revisit decision state after scalar");
+    assert.ok(guardrailIndex > revisitIndex, "active route exposes bounded guardrails after revisit state");
+    assert.ok(memoryIndex > guardrailIndex, "active route exposes memory rail after guardrails");
+    assert.ok(trustStripIndex > memoryIndex, "active route keeps the compact trust strip after the decision contract");
   });
 
 });

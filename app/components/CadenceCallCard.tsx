@@ -54,7 +54,7 @@ export function CadenceCallCard({ cadence, data }: Props) {
         {summary.title}
       </h2>
       {summary.guidance ? (
-        <p className="text-fluid-sm font-medium text-emerald-200/80">Do now: {summary.guidance}</p>
+        <p className="text-fluid-sm font-medium text-emerald-200/80">Do this week: {summary.guidance}</p>
       ) : null}
       <p className="text-fluid-sm leading-relaxed text-white/70">{summary.summary}</p>
       {provenance ? (

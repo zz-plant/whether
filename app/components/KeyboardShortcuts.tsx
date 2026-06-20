@@ -65,7 +65,7 @@ export function KeyboardShortcuts() {
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       <p className="flex flex-wrap items-center justify-center gap-2 text-center text-fluid-micro text-[var(--app-text-muted)] py-2">
-        <span className="inline-flex items-center gap-1">
+        <span className="hidden sm:inline-flex items-center gap-1">
           <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">J</kbd>
           <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">K</kbd>
           <span className="ml-1">Navigate sections</span>

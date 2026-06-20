@@ -39,8 +39,13 @@ const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBrie
 
 type BriefImageHomepage = Awaited<ReturnType<typeof assembleHomePage>>;
 
+type BuildBriefImagePayloadInput = {
+  weeklyDecisionCardModel: BriefImageHomepage["weeklyDecisionCardModel"];
+  reportShell: Pick<BriefImageHomepage["reportShell"], "regime" | "recordDateLabel">;
+};
+
 export const buildBriefImagePayload = (
-  homepage: BriefImageHomepage,
+  homepage: BuildBriefImagePayloadInput,
   requestContext: ReturnType<typeof parseImageBriefRequestContext> = {},
 ): BriefImageProps => {
   const model = homepage.weeklyDecisionCardModel;

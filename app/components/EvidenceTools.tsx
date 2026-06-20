@@ -1,11 +1,11 @@
 "use client";
 
-import { DecisionSimulator } from "../../components/home/DecisionSimulator";
-import { RegimeTransitionProbability } from "../../components/home/RegimeTransitionProbability";
-import { DecisionTrendline } from "../../components/home/DecisionTrendline";
-import { CompanyMetricsPanel } from "../../components/home/CompanyMetricsPanel";
-import { TickerCompany } from "../../components/home/TickerCompany";
-import { SourceDisagreement } from "../../components/evidence/SourceDisagreement";
+import { DecisionSimulator } from "./home/DecisionSimulator";
+import { RegimeTransitionProbability } from "./home/RegimeTransitionProbability";
+import { DecisionTrendline } from "./home/DecisionTrendline";
+import { CompanyMetricsPanel } from "./home/CompanyMetricsPanel";
+import { TickerCompany } from "./home/TickerCompany";
+import { SourceDisagreement } from "./evidence/SourceDisagreement";
 
 type EvidenceToolsProps = {
   currentTightness: number;

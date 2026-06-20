@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
-import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { useClipboardCopy } from "./useClipboardCopy";
 import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
 
 type ActionCardProps = {
@@ -79,16 +79,18 @@ export function ActionCard({
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] px-4 py-2 text-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-white/[0.08] px-2.5 py-2 text-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label={isCopied ? "Copied to clipboard" : "Copy brief to clipboard"}
         >
           {isCopied ? (
             <>
-              <CopyCheck className="w-3.5 h-3.5" aria-hidden="true" /> Copied
+              <CopyCheck className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Copied</span>
             </>
           ) : (
             <>
-              <Copy className="w-3.5 h-3.5" aria-hidden="true" /> Copy
+              <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Copy</span>
             </>
           )}
         </button>

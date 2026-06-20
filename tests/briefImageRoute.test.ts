@@ -56,7 +56,7 @@ describe("buildBriefImagePayload", () => {
         regime: "DEFENSIVE",
         recordDateLabel: "Mar 6, 2026",
       },
-    } as BriefImageHomepage;
+    } satisfies Parameters<typeof buildBriefImagePayload>[0];
 
     const payload = buildBriefImagePayload(homepage);
 

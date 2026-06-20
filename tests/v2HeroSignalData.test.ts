@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
-import { buildV2HeroSignalData } from "../app/v2/viewModel";
+import { buildV2HeroSignalData } from "../app/viewModel";
 
 describe("v2 hero signal data", () => {
   it("builds hero macro inputs from assembled report data", () => {
@@ -35,17 +35,18 @@ describe("v2 hero signal data", () => {
   });
 
   it("keeps the v2 hero metadata compact and spaced", () => {
-    const source = readFileSync("app/v2/components/DecisionHero.tsx", "utf8");
+    const source = readFileSync("app/components/DecisionHero.tsx", "utf8");
 
-    assert.match(source, /\{provenanceLabel\}/);
     assert.match(source, /\{dataStatus\}/);
+    assert.match(source, /\{recordDate\}/);
+    assert.match(source, /sourceNode/);
     assert.doesNotMatch(source, /<p className="text-white\/40">\{recordDate\}<\/p>/);
     assert.doesNotMatch(source, /\{stageLabel \? <p>\{stageLabel\}<\/p> : null\}/);
     assert.doesNotMatch(source, /\{tightnessDeltaLabel\}\s*\{isUnusual/);
   });
 
   it("keeps the route from passing literal macro values into DecisionHero", () => {
-    const source = readFileSync("app/v2/page.tsx", "utf8");
+    const source = readFileSync("app/page.tsx", "utf8");
     const heroCall = source.match(/<DecisionHero[\s\S]*?\/>/)?.[0] ?? "";
 
     assert.match(heroCall, /signalData=\{v2HeroSignalData\}/);

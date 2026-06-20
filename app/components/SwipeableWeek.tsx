@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 
 type MonthEntry = { recordDate: string; month: number; year: number };
 

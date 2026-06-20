@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Copy, CopyCheck, ImageIcon } from "lucide-react";
-import { useClipboardCopy } from "../../components/useClipboardCopy";
-import { ShareBriefButton } from "../../components/shareBriefButton";
-import { buildImageBriefApiPath } from "../../../lib/report/imageBriefSearchParams";
+import { useClipboardCopy } from "./useClipboardCopy";
+import { ShareBriefButton } from "./shareBriefButton";
+import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 
 type Props = {
   call: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { REGIME_DISPLAY } from "../viewModel";
 
 export function CompareStrip({

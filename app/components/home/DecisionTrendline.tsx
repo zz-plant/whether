@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCrossDeviceSync } from "../../../lib/hooks/useCrossDeviceSync";
-import { REGIME_COLORS, REGIME_DISPLAY } from "../../v2/viewModel";
+import { REGIME_COLORS, REGIME_DISPLAY } from "../../viewModel";
 
 const DECISION_LOG_KEY = "whether_decision_log";
 

@@ -6,7 +6,7 @@ import {
   CONFIDENCE_COLOR,
   RELIABILITY_COLOR,
   RELIABILITY_BAR,
-} from "../app/v2/viewModel";
+} from "../app/viewModel";
 
 describe("formatBoldnessDeltaLabel", () => {
   it("returns 'no change vs last week' for zero delta", () => {

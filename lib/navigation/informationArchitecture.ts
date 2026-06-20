@@ -32,7 +32,7 @@ export const navigationLayers: NavigationLayer[] = [
     key: "weekly-brief",
     href: "/",
     label: "Weekly Brief",
-    navLabel: "Start here",
+    navLabel: "Brief",
     description: "See this week's call, what to do now, and a brief you can share.",
     boundary: "Use this first to see the current call and the next move.",
     group: "core",

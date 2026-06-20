@@ -81,7 +81,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
               <p className="max-w-3xl text-sm text-slate-300">{whyItMattersLine}</p>
             ) : null}
             <p className="max-w-3xl text-sm text-slate-300">
-              <span className="font-semibold text-slate-100">Do now:</span> {immediateDecision}
+              <span className="font-semibold text-slate-100">Do this week:</span> {immediateDecision}
             </p>
             {cardReadItems.length > 0 ? (
               <details className="weather-auto-chevron rounded-lg border border-slate-800/55 bg-slate-950/55 px-3 py-3">

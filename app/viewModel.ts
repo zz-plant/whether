@@ -1,5 +1,5 @@
-import type { RegimeKey } from "../../lib/regimeEngineCore";
-import { REGIME_PUBLIC_LABELS } from "../../lib/regimePresentation";
+import type { RegimeKey } from "../lib/regimeEngineCore";
+import { REGIME_PUBLIC_LABELS } from "../lib/regimePresentation";
 
 export type SignalDirection = "tighten" | "ease" | "hold";
 

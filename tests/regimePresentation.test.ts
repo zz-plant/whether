@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
-import { REGIME_DISPLAY } from "../app/v2/viewModel";
+import { REGIME_DISPLAY } from "../app/viewModel";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
 import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
 

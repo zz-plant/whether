@@ -134,7 +134,7 @@ export async function buildTrustPageModel() {
     secondaryCta: { href: "/", label: "Weekly Brief" },
     nextStep: {
       href: "/evidence",
-      description: "Check evidence next",
+      description: "Check evidence",
     },
     decisionBanner: {
       label: "Readiness",

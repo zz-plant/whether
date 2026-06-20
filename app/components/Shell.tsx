@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { ShareRail } from "../../components/shareRail";
+import { ShareRail } from "./shareRail";
 
 export function Shell({
   children,

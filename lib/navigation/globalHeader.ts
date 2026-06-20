@@ -19,9 +19,6 @@ export const isReportShellRoute = (pathname: string) => {
 
 export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
-  if (normalizedPathname === "/v2") {
-    return "Start here";
-  }
   const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname));
   return activeLayer ? activeLayer.navLabel ?? activeLayer.label : fallbackLabel;
 };
@@ -71,6 +68,6 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
 
   return primaryNavigationLayers.map((link) => ({
     ...link,
-    isActive: pathMatchesLink(link.href, normalizedPathname) || (link.href === "/" && normalizedPathname === "/v2"),
+    isActive: pathMatchesLink(link.href, normalizedPathname),
   }));
 };
