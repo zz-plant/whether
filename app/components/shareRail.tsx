@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
@@ -19,7 +19,31 @@ const presetLabels: Record<SharePreset, string> = {
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
+  const [slackOverlayActive, setSlackOverlayActive] = useState(false);
   const { copyToClipboard, status, copiedTarget } = useClipboardCopy();
+
+  useEffect(() => {
+    const handleExternalToggle = (e: Event) => {
+      const customEvent = e as CustomEvent<{ active?: boolean }>;
+      if (customEvent.detail && typeof customEvent.detail.active === "boolean") {
+        setSlackOverlayActive(customEvent.detail.active);
+      }
+    };
+    window.addEventListener("whether-slack-preview-changed", handleExternalToggle);
+    return () => {
+      window.removeEventListener("whether-slack-preview-changed", handleExternalToggle);
+    };
+  }, []);
+
+  const handleToggleSlackOverlay = () => {
+    const nextActive = !slackOverlayActive;
+    setSlackOverlayActive(nextActive);
+    window.dispatchEvent(
+      new CustomEvent("whether-toggle-slack-preview", {
+        detail: { active: nextActive },
+      })
+    );
+  };
 
   const buildShareText = useCallback(() => {
     const context = includeContext
@@ -91,6 +115,17 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
             Include context for non-users
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <Switch.Root
+              checked={slackOverlayActive}
+              onCheckedChange={handleToggleSlackOverlay}
+              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
+            >
+              <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
+            </Switch.Root>
+            Slack preview overlay (1.91:1)
           </label>
 
           <div className="border-t border-slate-800/60 pt-3">

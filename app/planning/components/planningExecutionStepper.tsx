@@ -157,80 +157,58 @@ export function OperationsExecutionStepper({
         </ol>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {steps.map((step) => {
           const isActive = step.id === activeStepId;
-
-          if (isActive) {
-            return (
-              <section key={step.id} id={step.id} className="weather-step-panel scroll-mt-28 space-y-4">
-                <div className="weather-panel relative overflow-hidden flex flex-wrap items-start justify-between gap-3 px-5 py-4">
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
-                  <div className="space-y-1">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
-                    <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
-                    <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {step.owner ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                          Owner: {step.owner}
-                        </span>
-                      ) : null}
-                      {step.approvalStatus ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                          {step.approvalStatus}
-                        </span>
-                      ) : null}
-                      {step.changeSignal ? (
-                        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                          Check again if: {step.changeSignal}
-                        </span>
-                      ) : null}
-                      <a
-                        href="#planning-stepper"
-                        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100"
-                      >
-                        {resolveOperationsExecutionStepReturnLabel()}
-                      </a>
-                    </div>
-                  </div>
-                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
-                    Current
-                  </span>
-                </div>
-                {step.children}
-              </section>
-            );
-          }
+          const activeClass = isActive
+            ? "ring-1 ring-sky-500/30 border-sky-500/20 bg-slate-900/10"
+            : "border-white/[0.04] bg-slate-950/[0.05]";
 
           return (
             <section
               key={step.id}
               id={step.id}
-              className="weather-panel weather-step-summary scroll-mt-28 flex flex-wrap items-start justify-between gap-3 px-5 py-4"
+              className={`weather-step-panel scroll-mt-28 space-y-4 rounded-xl border p-4 sm:p-5 transition-all ${activeClass}`}
             >
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
-                <h3 className="text-base font-semibold tracking-[-0.01em] text-slate-100">{step.title}</h3>
-                <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.summary}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                    Owner: {step.owner}
-                  </span>
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                    {step.approvalStatus}
-                  </span>
-                  <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                    Check again if: {step.changeSignal}
-                  </span>
+              <div className="relative overflow-hidden flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-white/[0.04]">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
+                  <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
+                  <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {step.owner ? (
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
+                        Owner: {step.owner}
+                      </span>
+                    ) : null}
+                    {step.approvalStatus ? (
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
+                        {step.approvalStatus}
+                      </span>
+                    ) : null}
+                    {step.changeSignal ? (
+                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
+                        Check again if: {step.changeSignal}
+                      </span>
+                    ) : null}
+                    <a
+                      href="#planning-stepper"
+                      className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100"
+                    >
+                      {resolveOperationsExecutionStepReturnLabel()}
+                    </a>
+                  </div>
                 </div>
+                {isActive && (
+                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
+                    Active
+                  </span>
+                )}
               </div>
-              <a
-                href={buildOperationsExecutionStepHref(step.id)}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
-              >
-                Open step
-              </a>
+              <div className="mt-4">
+                {step.children}
+              </div>
             </section>
           );
         })}

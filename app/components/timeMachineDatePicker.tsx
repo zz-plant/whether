@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
+import Link from "next/link";
 import { CloseIcon, ChevronLeftIcon, ChevronRightIcon } from "./uiIcons";
 import { getTimeMachineMonthsByYear, getAdjacentTimeMachineEntry } from "../../lib/timeMachine/timeMachineCache";
 
@@ -121,6 +122,11 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
               ) : <p className="mt-2 text-xs text-slate-500">No data for {selectedYear}.</p>}
             </div>
           )}
+          <div className="mt-4 border-t border-slate-800/60 pt-3 text-center">
+            <Link href="/history" onClick={() => onClose()} className="inline-flex items-center gap-1 text-[0.7rem] font-medium text-sky-200 hover:text-sky-100 hover:underline">
+              Go to History Dashboard &rarr;
+            </Link>
+          </div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

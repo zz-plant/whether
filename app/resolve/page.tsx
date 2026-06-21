@@ -149,20 +149,15 @@ export default async function DecidePage({
             </Link>
           </article>
 
-          <details
-            className="weather-surface weather-auto-chevron scroll-mt-28 px-4 py-4"
-            open={hasGuidedTranslationSelection}
-          >
-            <summary className="cursor-pointer list-none">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">If the first path does not fit</p>
-                <p className="text-sm text-slate-200">If the recommended next step doesn&apos;t fit.</p>
-              </div>
-            </summary>
-            <div className="mt-4 space-y-4">
+          <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Alternative paths</p>
+              <p className="text-sm text-slate-300">If the recommended next step doesn&apos;t fit your current question.</p>
+            </div>
+            <div className="space-y-4">
               <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
-                <p className="mt-2 text-sm text-slate-200">For a yes-or-no question.</p>
+                <p className="mt-1 text-fluid-xs text-slate-300">For a yes-or-no question.</p>
                 <div className="mt-3 space-y-2">
                   {recommendedAnswerPages.map((page) => (
                     <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-surface block space-y-1">
@@ -172,16 +167,13 @@ export default async function DecidePage({
                   ))}
                 </div>
               </div>
-              <details
+              <div
                 id="guided-translation"
-                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4 [&>summary]:cursor-pointer [&>summary]:list-none"
-                open={hasGuidedTranslationSelection}
+                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
               >
-                <summary className="select-none">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
-                  <p className="mt-2 text-sm text-slate-200">For role-specific or company-stage views.</p>
-                </summary>
-                <div className="mt-4 grid gap-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
+                <p className="mt-1 text-fluid-xs text-slate-300">For role-specific or company-stage views.</p>
+                <div className="mt-3 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (
                     <Link
                       key={guide.slug}
@@ -203,9 +195,9 @@ export default async function DecidePage({
                     </Link>
                   ))}
                 </div>
-              </details>
+              </div>
             </div>
-          </details>
+          </div>
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </section>

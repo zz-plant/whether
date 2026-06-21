@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
@@ -162,15 +163,25 @@ export default function HistoryPage() {
         ) : <p className="text-xs text-slate-500">Loading historical data...</p>}
 
         {regimeForPeriod ? (
-          <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-4 py-3 space-y-1">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Selected period</p>
-            <p className="text-sm text-slate-100">{selectedMonth}/{selectedYear}</p>
-            <span className={`inline-block rounded-full px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
-              regimeForPeriod === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
-              regimeForPeriod === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
-              regimeForPeriod === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :
-              "text-slate-200 bg-slate-500/10"
-            }`}>{regimeForPeriod}</span>
+          <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-4 py-3 space-y-3">
+            <div className="space-y-1">
+              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Selected period</p>
+              <p className="text-sm text-slate-100">{selectedMonth}/{selectedYear}</p>
+              <span className={`inline-block rounded-full px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
+                regimeForPeriod === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
+                regimeForPeriod === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
+                regimeForPeriod === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :
+                "text-slate-200 bg-slate-500/10"
+              }`}>{regimeForPeriod}</span>
+            </div>
+            <div className="pt-2 border-t border-slate-800/60">
+              <Link
+                href={`/?month=${selectedMonth}&year=${selectedYear}`}
+                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] no-underline w-full sm:w-auto"
+              >
+                View Weekly Brief for this period &rarr;
+              </Link>
+            </div>
           </div>
         ) : null}
 

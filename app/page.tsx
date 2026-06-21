@@ -302,21 +302,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           />
 
           </SwipeableWeek>
-        </div>
 
-        <div className="space-y-4 lg:col-start-2">
-          <DeltaTrustStrip
-            tightnessDelta={tightnessDelta}
-            riskAppetiteDelta={riskAppetiteDelta}
-            confidenceLabel={confidenceLabel}
-            reliabilityScore={reliabilityScore}
-            sourceHealthSummary={sourceHealthSummary}
-            direction={signalDirection}
-          />
-          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
-        </div>
-
-        <div className="space-y-6 min-w-0">
           <EvidenceDrawer highlight={toolHighlight}>
             <ToolsPanel>
               <EvidenceTools
@@ -352,6 +338,18 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           {activeCadence !== "weekly" && cadenceData ? (
             <CadenceCallCard cadence={activeCadence} data={cadenceData} />
           ) : null}
+        </div>
+
+        <div className="space-y-4 lg:col-start-2">
+          <DeltaTrustStrip
+            tightnessDelta={tightnessDelta}
+            riskAppetiteDelta={riskAppetiteDelta}
+            confidenceLabel={confidenceLabel}
+            reliabilityScore={reliabilityScore}
+            sourceHealthSummary={sourceHealthSummary}
+            direction={signalDirection}
+          />
+          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
         </div>
       </div>
 
