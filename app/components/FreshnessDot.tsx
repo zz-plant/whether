@@ -75,9 +75,10 @@ export function FreshnessDot({
       {open ? (
         <div
           id={menuId}
-          role="region"
+          role="dialog"
+          aria-modal="true"
           aria-label="Data freshness"
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 w-72 rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left"
+          className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left overscroll-contain"
         >
           <div>
             <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/45 uppercase">Data Freshness</p>

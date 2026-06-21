@@ -16,6 +16,12 @@ function parseYearMonth(dateStr: string): { year: number; month: number } | null
   return { year: d.getFullYear(), month: d.getMonth() + 1 };
 }
 
+function formatAxisDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.valueOf())) return dateStr;
+  return d.toLocaleDateString("en", { month: "short", year: "2-digit" });
+}
+
 export function RegimeHistory({ regimes, currentRegime }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -75,11 +81,12 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
           const selected = isSelectedEntry(entry);
           return (
             <button
-              key={entry.record_date}
+                      key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
               className="group flex h-12 min-h-11 min-w-[1.5rem] flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-              aria-label={`${entry.record_date}: ${entry.regime} regime`}
+              aria-label={`${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime} regime`}
+              title={`${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime}`}
             >
               <span
                 aria-hidden="true"
@@ -93,11 +100,14 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
         })}
       </div>
       <div className="flex justify-between text-fluid-nano text-white/30 mt-1">
-        <span>{regimes[0].record_date}</span>
+        <span>{formatAxisDate(regimes[0].record_date)}</span>
+        {regimes.length >= 8 ? (
+          <span className="text-white/20">{formatAxisDate(regimes[Math.floor(regimes.length / 2)].record_date)}</span>
+        ) : null}
         {isViewingHistory ? (
           <span>Selected</span>
         ) : (
-          <span>{regimes[regimes.length - 1].record_date}</span>
+          <span>{formatAxisDate(regimes[regimes.length - 1].record_date)}</span>
         )}
       </div>
     </div>

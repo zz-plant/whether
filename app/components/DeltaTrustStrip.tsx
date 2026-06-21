@@ -23,10 +23,10 @@ export function DeltaTrustStrip({
 
   return (
     <div className="weather-card space-y-3">
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-white/40">Trend</span>
-          <span className={`font-semibold ${deltaColor}`}>{deltaLabel}</span>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-fluid-xs text-white/40">Trend</span>
+          <span className={`text-fluid-xs font-semibold ${deltaColor}`}>{deltaLabel}</span>
         </div>
         <div className="flex items-center justify-between text-xs">
           <span className="text-white/40">Signal confidence</span>
@@ -37,16 +37,16 @@ export function DeltaTrustStrip({
           <span className={`font-semibold tabular-nums ${relColor}`}>{reliabilityScore}%</span>
         </div>
       </div>
-      <div className="border-t border-slate-800/60 pt-2">
-        <div className="flex items-center justify-between text-fluid-nano text-white/30">
+      <div className="border-t border-slate-800/60 pt-2 space-y-1">
+        <div className="flex items-center justify-between text-fluid-nano text-white/25">
           <span>Sources</span>
           <span>
             {sourceHealthSummary.liveCount} live · {sourceHealthSummary.cachedCount} cached · {sourceHealthSummary.missingCount} missing
           </span>
         </div>
-        <div className="mt-1 flex items-center justify-between text-fluid-nano text-white/30">
+        <div className="flex items-center justify-between text-fluid-nano text-white/25">
           <span>Inputs complete:</span>
-          <span className={sourceHealthSummary.inputsComplete ? "text-emerald-300/80" : "text-amber-300/80"}>
+          <span className={sourceHealthSummary.inputsComplete ? "text-emerald-300/70" : "text-amber-300/70"}>
             {sourceHealthSummary.inputsComplete ? "Yes" : "No"}
           </span>
         </div>

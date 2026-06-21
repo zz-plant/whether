@@ -74,7 +74,7 @@ export function ActionCard({
     <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
       <div className="flex items-center justify-between gap-3 mb-4">
         <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
-          Boldness Budget · {DIRECTION_LABEL[direction]}
+          Decision · {DIRECTION_LABEL[direction]}
         </p>
         <button
           type="button"
@@ -100,16 +100,16 @@ export function ActionCard({
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-white/35">
           {boldnessScore}/100 · {boldnessDeltaLabel}
         </p>
-        <h2 className="text-lg font-semibold text-slate-100">
+        <p className="text-lg font-semibold text-slate-100">
           <span className="mr-1.5">{arrow}</span>
           {call}
-        </h2>
+        </p>
       </div>
 
       {guardrail ? (
         <div className="mb-4 rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 space-y-2">
           <div className="flex items-center justify-between text-fluid-nano font-semibold uppercase tracking-[0.06em]">
-            <span className="text-white/40">Guardrail Proximity</span>
+            <span className="text-white/40">Watch threshold</span>
             <span className={tightness >= numericThreshold ? "text-rose-300 font-bold" : tightness >= numericThreshold - 5 ? "text-amber-300" : "text-emerald-300"}>
               {tightness >= numericThreshold ? "PAUSE TRIGGERED" : tightness >= numericThreshold - 5 ? "WARNING RANGE" : "SAFE ZONE"}
             </span>
@@ -128,7 +128,7 @@ export function ActionCard({
       <div className="space-y-2.5 border-t border-white/[0.04] pt-3">
         {actionNow ? (
           <div>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-emerald-300/80">Do this week</p>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-emerald-300/80">Do now</p>
             <p className="text-sm text-slate-100">{actionNow}</p>
           </div>
         ) : null}
@@ -142,7 +142,7 @@ export function ActionCard({
 
         {flipConditions?.length ? (
           <div>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-sky-300/80">Flip if</p>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-sky-300/80">Reversal condition</p>
             <ul className="space-y-0.5">
               {flipConditions.map((c, i) => (
                 <li key={i} className="text-sm text-sky-200">{c}</li>

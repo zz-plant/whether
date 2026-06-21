@@ -104,7 +104,7 @@ export function DecisionHero({
             <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
               {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white/45">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/45">
               <span>
                 <span className="text-white/35">Tightness:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
@@ -115,19 +115,16 @@ export function DecisionHero({
                 </span>
               ) : null}
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
-              <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
-                  <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
-                  {dataStatus}
-                </span>
-                <span className="text-white/30">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
-              </span>
             </p>
           </div>
           <StageSwitcher currentStage={operatorContext.companyStage} />
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
-            <span className="text-fluid-micro text-white/35 hidden sm:inline">Copy or share this week&apos;s call.</span>
+            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
+              <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
+              {dataStatus}
+            </span>
+            <span className="text-fluid-micro text-white/30 hidden sm:inline">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
           </div>
         </div>
 

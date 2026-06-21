@@ -252,142 +252,143 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             {activeCadence !== "weekly" && cadenceData ? (
               <CadenceCallCard cadence={activeCadence} data={cadenceData} />
             ) : null}
-            <DecisionHero
-              tightness={tightness}
+           <DecisionHero
+               tightness={tightness}
+               tightnessDelta={tightnessDelta}
+               boldnessScore={weeklyLeadershipSummary.boldnessScore}
+               boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+               boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
+               weeklyCall={primaryCall}
+               actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+               regime={regime}
+               postureLabel={postureLabel}
+               signalDirection={signalDirection}
+               recordDate={homepage.reportShell.recordDateLabel}
+               fetchedAt={homepage.reportShell.fetchedAtLabel}
+               operatorContext={operatorContext}
+               confidenceLabel={confidenceLabel}
+               trustStatusLabel={homepage.reportShell.trustStatusLabel}
+               treasurySource={homepage.reportShell.treasurySource}
+               degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+               isFallback={homepage.reportShell.showOfflineBadge}
+               signalData={v2HeroSignalData}
+             />
+ 
+           <WeeklyTopFoldContract
+             model={homepage.weeklyDecisionCardModel}
+             memoryRegimes={macroTrendline}
+           />
+ 
+            <CompareStrip
+              currentRegime={regime}
+              currentTightness={tightness}
               tightnessDelta={tightnessDelta}
-              boldnessScore={weeklyLeadershipSummary.boldnessScore}
-              boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-              boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
-              weeklyCall={primaryCall}
-              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-              regime={regime}
-              postureLabel={postureLabel}
-              signalDirection={signalDirection}
-              recordDate={homepage.reportShell.recordDateLabel}
-              fetchedAt={homepage.reportShell.fetchedAtLabel}
-              operatorContext={operatorContext}
-              confidenceLabel={confidenceLabel}
-              trustStatusLabel={homepage.reportShell.trustStatusLabel}
-              treasurySource={homepage.reportShell.treasurySource}
-              degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-              isFallback={homepage.reportShell.showOfflineBadge}
-              signalData={v2HeroSignalData}
+              serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+              autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
             />
-
-          <CompareStrip
-            currentRegime={regime}
-            currentTightness={tightness}
-            tightnessDelta={tightnessDelta}
-            serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-          />
-
-          <ActionCard
-            call={primaryCall}
-            actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-            guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-              ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-              : undefined}
-            flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
-            tightness={tightness}
-            boldnessScore={weeklyLeadershipSummary.boldnessScore}
-            boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-            direction={signalDirection}
-            recordDate={homepage.reportShell.recordDateLabel}
-            pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
-          />
-
-          <WeeklyTopFoldContract
-            model={homepage.weeklyDecisionCardModel}
-            memoryRegimes={macroTrendline}
-          />
-
-          </SwipeableWeek>
-
-          <EvidenceDrawer highlight={toolHighlight}>
-            <ToolsPanel>
-              <EvidenceTools
-                currentTightness={tightness}
-                currentRiskAppetite={riskAppetite}
-                currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
-                regimes={macroTrendline}
-                companyStage={operatorContext.companyStage ?? undefined}
-                tightnessDelta={tightnessDelta}
-                riskAppetiteDelta={riskAppetiteDelta}
-              />
-            </ToolsPanel>
-          </EvidenceDrawer>
-
-          <SubscribeForm />
-
-          <RitualCheck
-            recordDate={homepage.reportShell.recordDateLabel}
-            recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-          />
-
-          <Link
-            href="/planning"
-            className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
-          >
-            <div>
-              <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Open weekly plan</p>
-              <p className="text-fluid-micro text-white/40 mt-0.5">Turn this read into this week&apos;s plan</p>
-            </div>
-            <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
-          </Link>
-
-          {activeCadence !== "weekly" && cadenceData ? (
-            <CadenceCallCard cadence={activeCadence} data={cadenceData} />
-          ) : null}
-        </div>
-
-        <div className="space-y-4 lg:col-start-2">
-          <DeltaTrustStrip
-            tightnessDelta={tightnessDelta}
-            riskAppetiteDelta={riskAppetiteDelta}
-            confidenceLabel={confidenceLabel}
-            reliabilityScore={reliabilityScore}
-            sourceHealthSummary={sourceHealthSummary}
-            direction={signalDirection}
-          />
-          <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
-        </div>
-      </div>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": ["Article", "Report"],
-            "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-            "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-            "about": "US Macro Operating Posture for Startup Leaders",
-            "datePublished": homepage.reportShell.recordDateLabel,
-            "dateModified": homepage.reportShell.fetchedAtLabel,
-            "result": {
-              "posture": postureLabel,
-              "regime": publicRegimeLabel,
-              "confidence": confidenceLabel,
-              "provenance": {
-                "source": homepage.reportShell.treasurySource ?? "FRED",
-                "dataDate": homepage.reportShell.recordDateLabel,
-                "refreshedAt": homepage.reportShell.fetchedAtLabel,
-                "confidence": confidenceLabel,
-              },
-            },
-        }),
-          }}
-        />
-
-      <StickyCallStrip
-        call={primaryCall}
-        arrow={DIRECTION_ARROW[signalDirection]}
-        boldnessScore={weeklyLeadershipSummary.boldnessScore}
-        boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-        guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-          ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-          : undefined}
-      />
-    </Shell>
-  );
+ 
+           <ActionCard
+             call={primaryCall}
+             actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+             guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+               ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+               : undefined}
+             flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
+             tightness={tightness}
+             boldnessScore={weeklyLeadershipSummary.boldnessScore}
+             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+             direction={signalDirection}
+             recordDate={homepage.reportShell.recordDateLabel}
+             pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
+           />
+ 
+           </SwipeableWeek>
+ 
+           <EvidenceDrawer highlight={toolHighlight}>
+             <ToolsPanel>
+               <EvidenceTools
+                 currentTightness={tightness}
+                 currentRiskAppetite={riskAppetite}
+                 currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+                 regimes={macroTrendline}
+                 companyStage={operatorContext.companyStage ?? undefined}
+                 tightnessDelta={tightnessDelta}
+                 riskAppetiteDelta={riskAppetiteDelta}
+               />
+             </ToolsPanel>
+           </EvidenceDrawer>
+ 
+           <RitualCheck
+             recordDate={homepage.reportShell.recordDateLabel}
+             recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
+           />
+ 
+           <Link
+             href="/planning"
+             className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
+           >
+             <div>
+               <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Open weekly plan</p>
+               <p className="text-fluid-micro text-white/40 mt-0.5">Turn this read into this week&apos;s plan</p>
+             </div>
+             <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
+           </Link>
+ 
+           <SubscribeForm />
+ 
+           {activeCadence !== "weekly" && cadenceData ? (
+             <CadenceCallCard cadence={activeCadence} data={cadenceData} />
+           ) : null}
+         </div>
+ 
+         <div className="space-y-4 lg:col-start-2">
+           <DeltaTrustStrip
+             tightnessDelta={tightnessDelta}
+             riskAppetiteDelta={riskAppetiteDelta}
+             confidenceLabel={confidenceLabel}
+             reliabilityScore={reliabilityScore}
+             sourceHealthSummary={sourceHealthSummary}
+             direction={signalDirection}
+           />
+           <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+         </div>
+       </div>
+ 
+       <script
+         type="application/ld+json"
+         dangerouslySetInnerHTML={{
+           __html: JSON.stringify({
+             "@context": "https://schema.org",
+             "@type": ["Article", "Report"],
+             "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+             "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+             "about": "US Macro Operating Posture for Startup Leaders",
+             "datePublished": homepage.reportShell.recordDateLabel,
+             "dateModified": homepage.reportShell.fetchedAtLabel,
+             "result": {
+               "posture": postureLabel,
+               "regime": publicRegimeLabel,
+               "confidence": confidenceLabel,
+               "provenance": {
+                 "source": homepage.reportShell.treasurySource ?? "FRED",
+                 "dataDate": homepage.reportShell.recordDateLabel,
+                 "refreshedAt": homepage.reportShell.fetchedAtLabel,
+                 "confidence": confidenceLabel,
+               },
+             },
+         }),
+           }}
+         />
+ 
+       <StickyCallStrip
+         call={primaryCall}
+         arrow={DIRECTION_ARROW[signalDirection]}
+         boldnessScore={weeklyLeadershipSummary.boldnessScore}
+         boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+         guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+           ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+           : undefined}
+       />
+     </Shell>
+   );
 }

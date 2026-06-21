@@ -85,8 +85,8 @@ export function RitualCheck({
           </div>
         ) : null}
         {streak >= 1 ? (
-          <span className="text-fluid-nano text-white/20">
-            {streak}w
+          <span className="text-fluid-nano text-white/35">
+            {streak}wk streak 🔥
           </span>
         ) : null}
       </div>

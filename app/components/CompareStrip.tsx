@@ -9,13 +9,15 @@ export function CompareStrip({
   currentTightness,
   tightnessDelta,
   serverPrevious,
+  autoExpand = false,
 }: {
   currentRegime: string;
   currentTightness: number;
   tightnessDelta?: number;
   serverPrevious?: { regime: string; recordDate: string } | null;
+  autoExpand?: boolean;
 }) {
-  const [isComparing, setIsComparing] = useState(false);
+  const [isComparing, setIsComparing] = useState(autoExpand);
   const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(null);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function CompareStrip({
         />
         <span className="relative h-5 w-9 rounded-full border border-white/[0.1] bg-white/[0.05] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
         <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/55 transition-colors peer-checked:text-sky-200">
-          Compare to previous period
+          vs. last week
         </span>
       </label>
 
