@@ -7,7 +7,7 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 const STALE_AFTER_HOURS = 6;
-const RECORD_DATE_STALE_AFTER_HOURS = 96;
+const RECORD_DATE_STALE_AFTER_HOURS = 120;
 
 const toHours = (isoTimestamp: string, now = new Date()) => {
   const timestamp = Date.parse(isoTimestamp);

@@ -1,4 +1,4 @@
-const DEFAULT_FETCH_TIMEOUT_MS = 4_000;
+const DEFAULT_FETCH_TIMEOUT_MS = 8_000;
 
 export const fetchWithTimeout = async (
   fetcher: typeof fetch,
