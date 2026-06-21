@@ -37,7 +37,7 @@ export const LabeledSelectField = <T extends string>({
   triggerClassName,
 }: LabeledSelectFieldProps<T>) => (
   <Field.Root className={containerClassName}>
-    <Field.Label className={labelClassName} nativeLabel={false}>
+    <Field.Label className={labelClassName} nativeLabel={false} render={<span />}>
       {label}
     </Field.Label>
     <Select.Root id={id} value={value} onValueChange={(nextValue) => onValueChange(nextValue as T)}>

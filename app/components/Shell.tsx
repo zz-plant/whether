@@ -18,7 +18,7 @@ export function Shell({
     return (
       <div className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-6 sm:py-8">
-          <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
             <div className="space-y-6 min-w-0">
               <div className="weather-card">
                 <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">

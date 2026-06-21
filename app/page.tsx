@@ -235,7 +235,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
           <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
         </div>
       ) : null}
-      <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
         <div className="space-y-6 min-w-0">
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}

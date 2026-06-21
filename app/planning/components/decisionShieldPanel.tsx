@@ -486,7 +486,7 @@ export const DecisionShieldPanel = ({
               <Fieldset.Root className="flex min-w-0 flex-wrap items-start gap-3 border-0 p-0">
                 <Fieldset.Legend className="sr-only">Save a reusable Decision Shield preset</Fieldset.Legend>
                 <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
-                  <Field.Label nativeLabel={false}>Preset name</Field.Label>
+                  <Field.Label nativeLabel={false} render={<span />}>Preset name</Field.Label>
                   <Input
                     ref={presetInputRef}
                     type="text"

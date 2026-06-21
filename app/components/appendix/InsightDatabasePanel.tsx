@@ -188,7 +188,7 @@ export const InsightDatabasePanel = ({
                 />
               </Field.Root>
               <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                <Field.Label id="evidence-climate-label" nativeLabel={false}>
+                <Field.Label id="evidence-climate-label" nativeLabel={false} render={<span />}>
                   Climate
                 </Field.Label>
                 <Select.Root
@@ -241,7 +241,7 @@ export const InsightDatabasePanel = ({
                 </Select.Root>
               </Field.Root>
               <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                <Field.Label id="evidence-signal-label" nativeLabel={false}>
+                <Field.Label id="evidence-signal-label" nativeLabel={false} render={<span />}>
                   Signal
                 </Field.Label>
                 <Select.Root

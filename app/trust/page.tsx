@@ -175,7 +175,7 @@ export default async function MethodPage() {
       </ReportSection>
 
       <ReportSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
-        <pre className="weather-hub-card overflow-x-auto rounded-lg px-4 py-4 text-xs leading-6 text-slate-200">
+        <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
           <code>{meetingSnippet}</code>
         </pre>
       </ReportSection>
