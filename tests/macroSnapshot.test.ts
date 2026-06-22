@@ -6,47 +6,29 @@ const buildFredCsv = (rows: string[]) => `DATE,VALUE\n${rows.join("\n")}\n`;
 
 describe("loadMacroSeries", () => {
   it("computes CPI as year-over-year percentage and loads Tier 1 live data", async () => {
-    const fetcher: typeof fetch = async (input, init) => {
+    const fetcher: typeof fetch = async (input) => {
       const url = String(input);
 
-      if (url.includes("api.bls.gov")) {
-        const payload = typeof init?.body === "string" ? JSON.parse(init.body) as { seriesid?: string[] } : {};
-        const seriesId = payload.seriesid?.[0];
-        if (seriesId === "CUUR0000SA0") {
-          return new Response(JSON.stringify({
-            Results: {
-              series: [
-                {
-                  data: [
-                    { year: "2026", period: "M02", value: "310.0" },
-                    { year: "2026", period: "M01", value: "309.0" },
-                    { year: "2025", period: "M12", value: "308.0" },
-                    { year: "2025", period: "M11", value: "307.0" },
-                    { year: "2025", period: "M02", value: "300.0" },
-                    { year: "2025", period: "M01", value: "299.0" },
-                    { year: "2024", period: "M12", value: "297.0" },
-                    { year: "2024", period: "M11", value: "296.0" },
-                  ],
-                },
-              ],
-            },
-          }), { status: 200 });
-        }
+      if (url.includes("CPIAUCSL")) {
+        return new Response(buildFredCsv([
+          "2024-11-01,296",
+          "2024-12-01,297",
+          "2025-01-01,299",
+          "2025-02-01,300",
+          "2025-11-01,307",
+          "2025-12-01,308",
+          "2026-01-01,309",
+          "2026-02-01,310",
+        ]), { status: 200 });
+      }
 
-        return new Response(JSON.stringify({
-          Results: {
-            series: [
-              {
-                data: [
-                  { year: "2026", period: "M02", value: "4.0" },
-                  { year: "2026", period: "M01", value: "4.1" },
-                  { year: "2025", period: "M12", value: "4.2" },
-                  { year: "2025", period: "M11", value: "4.3" },
-                ],
-              },
-            ],
-          },
-        }), { status: 200 });
+      if (url.includes("UNRATE")) {
+        return new Response(buildFredCsv([
+          "2025-11-01,4.3",
+          "2025-12-01,4.2",
+          "2026-01-01,4.1",
+          "2026-02-01,4.0",
+        ]), { status: 200 });
       }
 
       if (url.includes("BAMLH0A0HYM2")) {
@@ -112,29 +94,14 @@ describe("loadMacroSeries", () => {
   });
 
   it("keeps partial live coverage when one upstream series fails", async () => {
-    const fetcher: typeof fetch = async (input, init) => {
+    const fetcher: typeof fetch = async (input) => {
       const url = String(input);
 
-      if (url.includes("api.bls.gov")) {
-        const payload = typeof init?.body === "string" ? JSON.parse(init.body) as { seriesid?: string[] } : {};
-        const seriesId = payload.seriesid?.[0];
-
-        if (seriesId === "CUUR0000SA0") {
-          return new Response(JSON.stringify({
-            Results: {
-              series: [
-                {
-                  data: [
-                    { year: "2026", period: "M02", value: "310" },
-                    { year: "2025", period: "M02", value: "300" },
-                  ],
-                },
-              ],
-            },
-          }), { status: 200 });
-        }
-
-        return new Response("BLS unavailable", { status: 500 });
+      if (url.includes("CPIAUCSL")) {
+        return new Response(buildFredCsv([
+          "2025-02-01,300",
+          "2026-02-01,310",
+        ]), { status: 200 });
       }
 
       if (url.includes("id=BAA10Y")) {

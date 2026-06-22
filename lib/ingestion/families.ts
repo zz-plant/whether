@@ -2,13 +2,7 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 import type { SignalEntitySnapshot, SignalFamily } from "./types";
 
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
-const BLS_YOY_LOOKBACK_YEARS = 2;
 const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
-
-const getBlsApiKey = (): string | null => {
-  const key = (globalThis as { BLS_API_KEY?: string }).BLS_API_KEY ?? process.env.BLS_API_KEY;
-  return typeof key === "string" && key.length > 0 ? key : null;
-};
 
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
 
@@ -40,90 +34,46 @@ const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   };
 };
 
-const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const apiKey = getBlsApiKey();
-  const body: Record<string, unknown> = { seriesid: [seriesId], latest: true };
-  if (apiKey) body.registrationkey = apiKey;
-
-  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new Error(`BLS request failed for ${seriesId}`);
-  }
-
-  const payload = (await response.json()) as {
-    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
-  };
-
-  const point = payload.Results?.series?.[0]?.data?.[0];
-  if (!point?.year || !point.period || !point.value) {
-    throw new Error(`No BLS rows for ${seriesId}`);
-  }
-
-  const month = point.period.replace("M", "");
-  return {
-    observedAt: `${point.year}-${month.padStart(2, "0")}-01T00:00:00.000Z`,
-    value: Number(point.value),
-  };
-};
-
-const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
-  const currentYear = new Date().getUTCFullYear();
-  const apiKey = getBlsApiKey();
-  const body: Record<string, unknown> = {
-    seriesid: [seriesId],
-    startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
-    endyear: String(currentYear),
-  };
-  if (apiKey) body.registrationkey = apiKey;
-
-  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new Error(`BLS request failed for ${seriesId}`);
-  }
-
-  const payload = (await response.json()) as {
-    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
-  };
-
-  const points = (payload.Results?.series?.[0]?.data ?? [])
-    .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
-    .sort((a, b) => `${b.year}${b.period}`.localeCompare(`${a.year}${a.period}`));
-  const latest = points[0];
-
-  if (!latest) {
-    throw new Error(`No BLS rows for ${seriesId}`);
-  }
-
-  const previousYearPoint = points.find(
-    (point) => point.period === latest.period && point.year === String(Number(latest.year) - 1),
+const readFredLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
+  const response = await fetchWithTimeout(
+    fetcher,
+    `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
+    { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
   );
 
-  if (!previousYearPoint) {
-    throw new Error(`No prior year BLS row for ${seriesId}`);
+  if (!response.ok) {
+    throw new Error(`FRED request failed for ${seriesId}`);
   }
 
-  const latestValue = Number(latest.value);
-  const previousYearValue = Number(previousYearPoint.value);
-  if (!Number.isFinite(latestValue) || !Number.isFinite(previousYearValue) || previousYearValue === 0) {
-    throw new Error(`Invalid BLS rows for ${seriesId}`);
+  const csv = await response.text();
+  const rows = csv
+    .trim()
+    .split(/\r?\n/)
+    .slice(1)
+    .map((row) => row.split(","))
+    .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
+    .map((parts) => ({ date: parts[0] ?? "", value: Number(parts[1]) }))
+    .filter((point) => Number.isFinite(point.value))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const latest = rows[rows.length - 1];
+  if (!latest) {
+    throw new Error(`No FRED rows for ${seriesId}`);
   }
 
-  const month = latest.period.replace("M", "").padStart(2, "0");
+  const latestDate = new Date(latest.date + "T00:00:00.000Z");
+  const priorYear = new Date(latestDate);
+  priorYear.setUTCFullYear(priorYear.getUTCFullYear() - 1);
+  const priorKey = priorYear.toISOString().slice(0, 10);
+  const priorPoint = rows.find((r) => r.date === priorKey);
+
+  if (!priorPoint || priorPoint.value === 0) {
+    throw new Error(`No prior year FRED row for ${seriesId}`);
+  }
+
   return {
-    observedAt: `${latest.year}-${month}-01T00:00:00.000Z`,
-    value: ((latestValue - previousYearValue) / previousYearValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
+    observedAt: `${latest.date}T00:00:00.000Z`,
+    value: ((latest.value - priorPoint.value) / priorPoint.value) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
   };
 };
 
@@ -208,14 +158,14 @@ const fetchSpreads: FamilyFetcher = async (fetcher, ingestedAt) => {
 };
 
 const fetchLabor: FamilyFetcher = async (fetcher, ingestedAt) => {
-  const unemployment = await readBlsLatestValue("LNS14000000", fetcher);
+  const unemployment = await readFredLatestValue("UNRATE", fetcher);
   return [
     {
       signalKey: "UNEMPLOYMENT_RATE",
       family: "labor",
       value: unemployment.value,
       unit: "%",
-      source: { label: "BLS public API", url: "https://api.bls.gov/publicAPI/v2/timeseries/data/", seriesId: "LNS14000000" },
+      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/UNRATE", seriesId: "UNRATE" },
       observedAt: unemployment.observedAt,
       ingestedAt,
       quality: "observed",
@@ -225,14 +175,14 @@ const fetchLabor: FamilyFetcher = async (fetcher, ingestedAt) => {
 };
 
 const fetchInflation: FamilyFetcher = async (fetcher, ingestedAt) => {
-  const cpi = await readBlsLatestYearOverYear("CUUR0000SA0", fetcher);
+  const cpi = await readFredLatestYearOverYear("CPIAUCSL", fetcher);
   return [
     {
       signalKey: "CPI_YOY",
       family: "inflation",
       value: cpi.value,
       unit: "%",
-      source: { label: "BLS public API", url: "https://api.bls.gov/publicAPI/v2/timeseries/data/", seriesId: "CUUR0000SA0" },
+      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/CPIAUCSL", seriesId: "CPIAUCSL" },
       observedAt: cpi.observedAt,
       ingestedAt,
       quality: "observed",

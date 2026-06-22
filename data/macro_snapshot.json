@@ -8,8 +8,8 @@
       "value": 2.4141129866304056,
       "unit": "%",
       "explanation": "Year-over-year change in CPI-U, tracking consumer inflation momentum.",
-      "sourceLabel": "BLS public API",
-      "sourceUrl": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "sourceLabel": "FRED",
+      "sourceUrl": "https://fred.stlouisfed.org/series/CPIAUCSL",
       "formulaUrl": "/formulas#cpi-inflation",
       "record_date": "2026-02-01",
       "history": [
@@ -39,8 +39,8 @@
       "value": 4.4,
       "unit": "%",
       "explanation": "Headline unemployment rate for civilian workers.",
-      "sourceLabel": "BLS public API",
-      "sourceUrl": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "sourceLabel": "FRED",
+      "sourceUrl": "https://fred.stlouisfed.org/series/UNRATE",
       "formulaUrl": "/formulas#unemployment-rate",
       "record_date": "2026-02-01",
       "history": [
