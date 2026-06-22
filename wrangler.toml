@@ -45,7 +45,7 @@ preview_id = "d116663399244346bd302324b485e8f3"
 name = "EMAIL"
 
 [triggers]
-crons = ["0 14 * * 1"]
+crons = ["0 2 * * *", "0 14 * * 1"]
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"

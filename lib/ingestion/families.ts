@@ -1,132 +1,85 @@
-import { fetchWithTimeout } from "../fetchWithTimeout";
+import { fetchTreasuryData } from "../treasury/treasuryClient";
+import { computeLatestYearOverYear, fetchFredCsv, findLatestFredRow, parseFredCsvRows } from "../fred";
 import type { SignalEntitySnapshot, SignalFamily } from "./types";
-
-const MACRO_SERIES_REVALIDATE_SECONDS = 900;
-const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
 
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const response = await fetchWithTimeout(
-    fetcher,
-    `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
-    { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
-  );
-
-  if (!response.ok) {
-    throw new Error(`FRED request failed for ${seriesId}`);
-  }
-
-  const csv = await response.text();
-  const rows = csv.trim().split(/\r?\n/).slice(1);
-  const latestRow = rows
-    .map((row) => row.split(","))
-    .reverse()
-    .find((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])));
-
-  if (!latestRow) {
-    throw new Error(`No FRED rows for ${seriesId}`);
-  }
-
-  return {
-    observedAt: `${latestRow[0]}T00:00:00.000Z`,
-    value: Number(latestRow[1]),
-  };
+  const csv = await fetchFredCsv(fetcher, seriesId);
+  return findLatestFredRow(csv);
 };
 
 const readFredLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
-  const response = await fetchWithTimeout(
-    fetcher,
-    `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
-    { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
-  );
-
-  if (!response.ok) {
-    throw new Error(`FRED request failed for ${seriesId}`);
-  }
-
-  const csv = await response.text();
-  const rows = csv
-    .trim()
-    .split(/\r?\n/)
-    .slice(1)
-    .map((row) => row.split(","))
-    .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
-    .map((parts) => ({ date: parts[0] ?? "", value: Number(parts[1]) }))
-    .filter((point) => Number.isFinite(point.value))
-    .sort((a, b) => a.date.localeCompare(b.date));
-
-  const latest = rows[rows.length - 1];
-  if (!latest) {
-    throw new Error(`No FRED rows for ${seriesId}`);
-  }
-
-  const latestDate = new Date(latest.date + "T00:00:00.000Z");
-  const priorYear = new Date(latestDate);
-  priorYear.setUTCFullYear(priorYear.getUTCFullYear() - 1);
-  const priorKey = priorYear.toISOString().slice(0, 10);
-  const priorPoint = rows.find((r) => r.date === priorKey);
-
-  if (!priorPoint || priorPoint.value === 0) {
-    throw new Error(`No prior year FRED row for ${seriesId}`);
-  }
-
-  return {
-    observedAt: `${latest.date}T00:00:00.000Z`,
-    value: ((latest.value - priorPoint.value) / priorPoint.value) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
-  };
+  const csv = await fetchFredCsv(fetcher, seriesId);
+  return computeLatestYearOverYear(parseFredCsvRows(csv), seriesId);
 };
 
 const fetchRates: FamilyFetcher = async (fetcher, ingestedAt) => {
-  const ids = ["DGS1MO", "DGS3MO", "DGS2", "DGS10"] as const;
-  const [oneMonth, threeMonth, twoYear, tenYear] = await Promise.all(ids.map((id) => readFredLatestValue(id, fetcher)));
-
-  return [
-    {
-      signalKey: "TREASURY_1M",
-      family: "rates",
-      value: oneMonth.value,
-      unit: "%",
-      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/DGS1MO", seriesId: "DGS1MO" },
-      observedAt: oneMonth.observedAt,
-      ingestedAt,
-      quality: "observed",
-      confidence: "high",
-    },
-    {
-      signalKey: "TREASURY_3M",
-      family: "rates",
-      value: threeMonth.value,
-      unit: "%",
-      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/DGS3MO", seriesId: "DGS3MO" },
-      observedAt: threeMonth.observedAt,
-      ingestedAt,
-      quality: "observed",
-      confidence: "high",
-    },
-    {
-      signalKey: "TREASURY_2Y",
-      family: "rates",
-      value: twoYear.value,
-      unit: "%",
-      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/DGS2", seriesId: "DGS2" },
-      observedAt: twoYear.observedAt,
-      ingestedAt,
-      quality: "observed",
-      confidence: "high",
-    },
-    {
-      signalKey: "TREASURY_10Y",
-      family: "rates",
-      value: tenYear.value,
-      unit: "%",
-      source: { label: "FRED", url: "https://fred.stlouisfed.org/series/DGS10", seriesId: "DGS10" },
-      observedAt: tenYear.observedAt,
-      ingestedAt,
-      quality: "observed",
-      confidence: "high",
-    },
+  const ids: Array<{ signalKey: SignalEntitySnapshot["signalKey"]; seriesId: string }> = [
+    { signalKey: "TREASURY_1M", seriesId: "DGS1MO" },
+    { signalKey: "TREASURY_3M", seriesId: "DGS3MO" },
+    { signalKey: "TREASURY_2Y", seriesId: "DGS2" },
+    { signalKey: "TREASURY_10Y", seriesId: "DGS10" },
   ];
+
+  const fromFred = async (): Promise<SignalEntitySnapshot[]> => {
+    const results = await Promise.all(
+      ids.map(async ({ signalKey, seriesId }) => {
+        const { observedAt, value } = await readFredLatestValue(seriesId, fetcher);
+        return {
+          signalKey,
+          family: "rates" as const,
+          value,
+          unit: "%" as const,
+          source: { label: "FRED", url: `https://fred.stlouisfed.org/series/${seriesId}`, seriesId },
+          observedAt,
+          ingestedAt,
+          quality: "observed" as const,
+          confidence: "high" as const,
+        } satisfies SignalEntitySnapshot;
+      }),
+    );
+    return results;
+  };
+
+  const fromFallback = async (): Promise<SignalEntitySnapshot[]> => {
+    const data = await fetchTreasuryData({ fetcher });
+    const yieldMap: Record<string, { signalKey: SignalEntitySnapshot["signalKey"]; seriesId: string }> = {
+      oneMonth: { signalKey: "TREASURY_1M", seriesId: "DGS1MO" },
+      threeMonth: { signalKey: "TREASURY_3M", seriesId: "DGS3MO" },
+      twoYear: { signalKey: "TREASURY_2Y", seriesId: "DGS2" },
+      tenYear: { signalKey: "TREASURY_10Y", seriesId: "DGS10" },
+    };
+
+    const results: SignalEntitySnapshot[] = [];
+    for (const [key, value] of Object.entries(data.yields)) {
+      const mapping = yieldMap[key];
+      if (!mapping || value == null) continue;
+      results.push({
+        signalKey: mapping.signalKey,
+        family: "rates",
+        value,
+        unit: "%",
+        source: { label: data.source, url: `https://fred.stlouisfed.org/series/${mapping.seriesId}`, seriesId: mapping.seriesId },
+        observedAt: `${data.record_date}T00:00:00.000Z`,
+        ingestedAt,
+        quality: "observed",
+        confidence: "high",
+      });
+    }
+    return results;
+  };
+
+  try {
+    return await fromFred();
+  } catch {
+    console.warn("[families] FRED CSV failed for rates, trying treasuryClient fallback");
+    try {
+      return await fromFallback();
+    } catch {
+      return [];
+    }
+  }
 };
 
 const fetchSpreads: FamilyFetcher = async (fetcher, ingestedAt) => {

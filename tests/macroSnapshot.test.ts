@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, beforeEach } from "bun:test";
 import { loadMacroSeries } from "../lib/macroSnapshot";
+import { resetFredCircuitBreaker } from "../lib/fred";
 
 const buildFredCsv = (rows: string[]) => `DATE,VALUE\n${rows.join("\n")}\n`;
 
 describe("loadMacroSeries", () => {
+  beforeEach(() => {
+    resetFredCircuitBreaker();
+  });
+
   it("computes CPI as year-over-year percentage and loads Tier 1 live data", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = String(input);

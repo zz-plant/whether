@@ -260,9 +260,16 @@ export const buildHomeBriefModelInternal = (
   const primaryShiftRegimeLabel = resolvePrimaryShiftRegimeLabel(assessment.regime);
 
   const geometricConfidence: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
-  const dataDegraded = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
-  const confidenceLabel: RegimeConfidenceLabel = dataDegraded
-    ? geometricConfidence === "HIGH" ? "MED" : geometricConfidence === "MED" ? "LOW" : "LOW"
+  const isFallbackData = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
+  const recordDateAgeHours = isFallbackData && treasury?.record_date
+    ? Math.max(0, (Date.now() - Date.parse(`${treasury.record_date}T00:00:00.000Z`)) / 3_600_000)
+    : 0;
+  const FRESH_FALLBACK_HOURS = 48;
+  const STALE_FALLBACK_HOURS = 120;
+  const confidenceLabel: RegimeConfidenceLabel = isFallbackData && recordDateAgeHours > FRESH_FALLBACK_HOURS
+    ? recordDateAgeHours > STALE_FALLBACK_HOURS
+      ? geometricConfidence === "HIGH" ? "MED" : geometricConfidence === "MED" ? "LOW" : "LOW"
+      : geometricConfidence === "HIGH" ? "MED" : geometricConfidence
     : geometricConfidence;
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
@@ -356,8 +363,8 @@ export const buildHomeBriefModelInternal = (
     confidenceLabel,
     freshnessState: {
       updatedAtLabel: fetchedAtLabel ?? "Unavailable",
-      freshnessStatus: Boolean(treasury?.fallback_at || treasury?.fallback_reason)
-        ? "stale"
+      freshnessStatus: isFallbackData
+        ? recordDateAgeHours > FRESH_FALLBACK_HOURS ? "stale" : "fresh"
         : treasury?.fetched_at
           ? "fresh"
           : "unknown",
@@ -494,7 +501,7 @@ export const buildHomeBriefModelInternal = (
     thresholds: assessment.thresholds,
     decisionRules,
     confidenceDegraded: confidenceLabel === "LOW",
-    freshnessDegraded: Boolean(treasury?.fallback_at || treasury?.fallback_reason),
+    freshnessDegraded: isFallbackData && recordDateAgeHours > FRESH_FALLBACK_HOURS,
   });
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,

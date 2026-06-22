@@ -3,7 +3,10 @@ import { SIGNAL_FAMILIES, pullSignalFamily } from "./families";
 import { getDefaultIngestionStore, type IngestionStore } from "./store";
 import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
 import { loadMacroSeries, macroSeries as snapshotMacroSeries } from "../macroSnapshot";
+import snapshotFallbackJson from "../../data/snapshot_fallback.json";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot, SignalFamily, SignalKey } from "./types";
+
+const snapshotFallback = snapshotFallbackJson as TreasuryData;
 
 const signalKeysByFamily: Record<SignalFamily, SignalKey[]> = {
   rates: ["TREASURY_1M", "TREASURY_3M", "TREASURY_2Y", "TREASURY_10Y"],
@@ -207,29 +210,72 @@ const buildRecentHistoryBySignalKey = (snapshots: SignalEntitySnapshot[]) => {
   return historyByKey;
 };
 
-export const buildCanonicalTreasuryFromReadModel = (model: MaterializedSignalReadModel): TreasuryData | null => {
+export const buildCanonicalTreasuryFromReadModel = (
+  model: MaterializedSignalReadModel,
+  snapshotFallback?: TreasuryData,
+): TreasuryData | null => {
   const oneMonth = getSignalValue(model, "TREASURY_1M");
   const threeMonth = getSignalValue(model, "TREASURY_3M");
   const twoYear = getSignalValue(model, "TREASURY_2Y");
   const tenYear = getSignalValue(model, "TREASURY_10Y");
 
-  if ([oneMonth, threeMonth, twoYear, tenYear].some((value) => typeof value !== "number")) {
+  const liveValues = { oneMonth, threeMonth, twoYear, tenYear };
+  const allLive = Object.values(liveValues).every((v) => typeof v === "number");
+
+  if (allLive) {
+    const source = model.signals.TREASURY_1M?.snapshot.source.url ?? "https://fred.stlouisfed.org";
+    const observedAt = model.signals.TREASURY_1M?.snapshot.observedAt ?? model.asOf;
+    return {
+      source,
+      record_date: observedAt.slice(0, 10),
+      fetched_at: model.asOf,
+      isLive: true,
+      yields: {
+        oneMonth,
+        threeMonth,
+        twoYear,
+        tenYear,
+      },
+    };
+  }
+
+  if (!snapshotFallback) {
     return null;
   }
 
-  const source = model.signals.TREASURY_1M?.snapshot.source.url ?? "https://fred.stlouisfed.org";
-  const observedAt = model.signals.TREASURY_1M?.snapshot.observedAt ?? model.asOf;
+  const fy = snapshotFallback.yields;
+  const resolvedYields = {
+    oneMonth: typeof oneMonth === "number" ? oneMonth : fy.oneMonth,
+    threeMonth: typeof threeMonth === "number" ? threeMonth : fy.threeMonth,
+    twoYear: typeof twoYear === "number" ? twoYear : fy.twoYear,
+    tenYear: typeof tenYear === "number" ? tenYear : fy.tenYear,
+  };
+
+  if (Object.values(resolvedYields).every((v) => typeof v !== "number")) {
+    return null;
+  }
+
+  const firstAvailableModelSignal =
+    model.signals.TREASURY_1M ??
+    model.signals.TREASURY_3M ??
+    model.signals.TREASURY_2Y ??
+    model.signals.TREASURY_10Y;
+
+  const source = firstAvailableModelSignal?.snapshot.source.url
+    ?? snapshotFallback.source
+    ?? "https://fred.stlouisfed.org";
+  const observedAt = firstAvailableModelSignal?.snapshot.observedAt
+    ?? snapshotFallback.record_date
+    ?? model.asOf;
+
   return {
     source,
     record_date: observedAt.slice(0, 10),
     fetched_at: model.asOf,
-    isLive: true,
-    yields: {
-      oneMonth,
-      threeMonth,
-      twoYear,
-      tenYear,
-    },
+    isLive: false,
+    fallback_at: model.asOf,
+    fallback_reason: "Partial treasury data — missing series filled from snapshot",
+    yields: resolvedYields,
   };
 };
 
@@ -291,7 +337,7 @@ export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fet
     return null;
   }
 
-  const treasury = buildCanonicalTreasuryFromReadModel(model);
+  const treasury = buildCanonicalTreasuryFromReadModel(model, snapshotFallback);
   if (!treasury) {
     return null;
   }

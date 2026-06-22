@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { getBusinessDayElapsedHours, type SourceHealthRow } from "../../../lib/report/sourceHealth";
+import { getFredCircuitBreakerState } from "../../../lib/fred";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -183,6 +184,7 @@ export async function GET() {
           activeFallbackReason: macroHealthRow?.activeFallbackReason ?? null,
         },
       },
+      fredCircuitBreaker: getFredCircuitBreakerState(),
       sources,
     },
     { status: statusCode },

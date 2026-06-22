@@ -1,4 +1,4 @@
-import type { MacroSeriesReading } from "../types";
+import type { MacroSeriesReading, TreasuryMetadata } from "../types";
 import type {
   DecisionTransmission,
   HistoricalAnalog,
@@ -91,7 +91,7 @@ export type HomeReportData = {
   regimeSeries?: TimeMachineRegimeEntry[];
   macroProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
   treasuryProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
-  treasury?: { fetched_at?: string | null; fallback_at?: string | null; fallback_reason?: string | null };
+  treasury?: Partial<TreasuryMetadata>;
   actionStripItems?: ActionStripItem[];
   actionNowShort?: string;
   guardrailThreshold?: string;

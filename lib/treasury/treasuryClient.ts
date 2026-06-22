@@ -5,15 +5,12 @@
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
+import { FRED_FETCH_HEADERS as TREASURY_FETCH_HEADERS } from "../fred";
 
 const PRIMARY_FETCH_TIMEOUT_MS = 1_500;
 const RETRY_FETCH_TIMEOUT_MS = 2_500;
 const MAX_SERIES_FETCH_ATTEMPTS = 2;
 const RETRY_BACKOFF_MS = 250;
-const TREASURY_FETCH_HEADERS = {
-  accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
-  "user-agent": "WhetherDataBot/1.0 (+https://whether.app)",
-} as const;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 const TREASURY_FISCALDATA_ENDPOINT =

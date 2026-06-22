@@ -32,17 +32,24 @@ type ScheduledEvent = { cron: string; scheduledTime: number; type: "scheduled" }
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroughOnException(): void };
 
 export default {
-  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+  async scheduled(event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     const secret = env.WHETHER_CRON_SECRET;
     const headers: Record<string, string> = {};
     if (secret) headers["Authorization"] = `Bearer ${secret}`;
 
     const site = env.SITE_URL || "https://whether.work";
 
-    /* Ingest fresh signals to KV before sending briefs */
+    const isDailyIngestion = event.cron === "0 2 * * *";
+
+    /* Always ingest fresh signals to KV */
     await fetch(`${site}/api/ingest`, { method: "POST", headers });
 
-    /* Send weekly brief to email subscribers */
+    if (isDailyIngestion) {
+    /* Daily cron: ingestion only, no email or alerts */
+    return;
+    }
+
+    /* Weekly cron: send briefs, check regime change, deliver alerts */
     await fetch(`${site}/api/email/send-weekly`, { method: "POST", headers });
 
     /* Check if regime changed and alert if so */

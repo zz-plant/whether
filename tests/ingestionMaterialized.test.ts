@@ -7,6 +7,20 @@ import {
   resolveSignalFamiliesToRefresh,
 } from "../lib/ingestion/materialized";
 import type { SignalEntitySnapshot } from "../lib/ingestion/types";
+import type { TreasuryData } from "../lib/types";
+
+const mockSnapshotFallback: TreasuryData = {
+  source: "https://fred.stlouisfed.org",
+  record_date: "2026-06-17",
+  fetched_at: "2026-06-22T17:05:18.881Z",
+  isLive: false,
+  yields: {
+    oneMonth: 3.68,
+    threeMonth: 3.83,
+    twoYear: 4.2,
+    tenYear: 4.49,
+  },
+};
 
 const baseSnapshots: SignalEntitySnapshot[] = [
   {
@@ -166,5 +180,57 @@ describe("materialized ingestion model", () => {
     const dueFamilies = resolveSignalFamiliesToRefresh(model, new Date("2026-01-10T03:30:01.000Z"));
 
     assert.deepEqual(dueFamilies, ["rates", "spreads", "labor", "credit", "volatility"]);
+  });
+
+  it("fills missing treasury series from snapshot fallback and marks degraded", () => {
+    const partialSnapshots = baseSnapshots.filter(
+      (s) => s.signalKey !== "TREASURY_2Y" && s.signalKey !== "TREASURY_10Y",
+    );
+    const model = buildMaterializedReadModel(partialSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const treasury = buildCanonicalTreasuryFromReadModel(model, mockSnapshotFallback);
+
+    assert.ok(treasury);
+    assert.equal(treasury?.isLive, false);
+    assert.equal(
+      treasury?.fallback_reason,
+      "Partial treasury data — missing series filled from snapshot",
+    );
+    assert.equal(treasury?.yields.oneMonth, 5.2);
+    assert.equal(treasury?.yields.threeMonth, 5.1);
+    assert.equal(treasury?.yields.twoYear, 4.2);
+    assert.equal(treasury?.yields.tenYear, 4.49);
+  });
+
+  it("returns degraded treasury when all series come from snapshot", () => {
+    const nonRatesSnapshots = baseSnapshots.filter((s) => s.family !== "rates");
+    const model = buildMaterializedReadModel(nonRatesSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const treasury = buildCanonicalTreasuryFromReadModel(model, mockSnapshotFallback);
+
+    assert.ok(treasury);
+    assert.equal(treasury?.isLive, false);
+    assert.equal(treasury?.yields.oneMonth, 3.68);
+    assert.equal(treasury?.yields.threeMonth, 3.83);
+    assert.equal(treasury?.yields.twoYear, 4.2);
+    assert.equal(treasury?.yields.tenYear, 4.49);
+  });
+
+  it("returns null when no series available from model or snapshot", () => {
+    const nonRatesSnapshots = baseSnapshots.filter((s) => s.family !== "rates");
+    const model = buildMaterializedReadModel(nonRatesSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const emptySnapshot: TreasuryData = {
+      ...mockSnapshotFallback,
+      yields: { oneMonth: null, threeMonth: null, twoYear: null, tenYear: null },
+    };
+    const treasury = buildCanonicalTreasuryFromReadModel(model, emptySnapshot);
+
+    assert.equal(treasury, null);
+  });
+
+  it("returns null when some series missing and no snapshot provided", () => {
+    const partialSnapshots = baseSnapshots.filter((s) => s.signalKey !== "TREASURY_10Y");
+    const model = buildMaterializedReadModel(partialSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const treasury = buildCanonicalTreasuryFromReadModel(model);
+
+    assert.equal(treasury, null);
   });
 });

@@ -3,7 +3,7 @@
  * Prefers live series fetches and falls back to checked-in snapshot data.
  */
 import macroSnapshot from "../data/macro_snapshot.json";
-import { fetchWithTimeout } from "./fetchWithTimeout";
+import { computeYearOverYearPoints, fetchFredCsv, parseFredCsvRows } from "./fred";
 import type { MacroSeriesId, MacroSeriesReading, SeriesHistoryPoint } from "./types";
 
 type MacroSnapshotPayload = {
@@ -34,27 +34,9 @@ type LiveSeriesDefinition = {
 
 const payload = macroSnapshot as MacroSnapshotPayload;
 
-const MACRO_SERIES_REVALIDATE_SECONDS = 900;
-const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
+
 const RECENT_HISTORY_WINDOW_DAYS = 92;
 const RECENT_HISTORY_WINDOW_MS = RECENT_HISTORY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-const MACRO_RETRY_ATTEMPTS = 2;
-const MACRO_RETRY_BACKOFF_MS = 300;
-
-const withRetry = async <T>(fn: () => Promise<T>, attempts = MACRO_RETRY_ATTEMPTS): Promise<T> => {
-  let lastError: unknown;
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-      if (attempt < attempts - 1) {
-        await new Promise((resolve) => setTimeout(resolve, MACRO_RETRY_BACKOFF_MS * (attempt + 1)));
-      }
-    }
-  }
-  throw lastError;
-};
 
 const SIGNAL_SANITY_RANGES: Partial<Record<MacroSeriesId, { min: number; max: number }>> = {
   CPI_YOY: { min: -5, max: 20 },
@@ -119,101 +101,37 @@ const trimHistoryToRecentWindow = (points: SeriesHistoryPoint[]) => {
 };
 
 const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) => {
-  const { value, recordDate, history } = await withRetry(async () => {
-    const response = await fetchWithTimeout(
-      fetcher,
-      `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
-      { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
-    );
+  const csv = await fetchFredCsv(fetcher, seriesId);
+  const parsedHistory = trimHistoryToRecentWindow(parseFredCsvRows(csv));
+  const latest = parsedHistory.at(-1);
 
-    if (!response.ok) {
-      throw new Error(`FRED request failed for ${seriesId}`);
-    }
+  if (!latest) {
+    throw new Error(`No FRED rows for ${seriesId}`);
+  }
 
-    const csv = await response.text();
-    const parsedHistory = trimHistoryToRecentWindow(
-      csv
-        .trim()
-        .split(/\r?\n/)
-        .slice(1)
-        .map((row) => row.split(","))
-        .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
-        .map((parts) => ({
-          date: parts[0] ?? "",
-          value: Number(parts[1]),
-        })),
-    );
-    const latest = parsedHistory.at(-1);
-
-    if (!latest) {
-      throw new Error(`No FRED rows for ${seriesId}`);
-    }
-
-    return {
-      recordDate: latest.date,
-      value: latest.value,
-      history: parsedHistory,
-    };
-  });
-
-  return { value, recordDate, history };
+  return {
+    recordDate: latest.date,
+    value: latest.value,
+    history: parsedHistory,
+  };
 };
 
 const readFredYearOverYearPoints = async (seriesId: string, fetcher: typeof fetch) => {
-  const { value, recordDate, history } = await withRetry(async () => {
-    const response = await fetchWithTimeout(
-      fetcher,
-      `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
-      { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
-    );
+  const csv = await fetchFredCsv(fetcher, seriesId);
+  const yoyHistory = trimHistoryToRecentWindow(
+    computeYearOverYearPoints(parseFredCsvRows(csv), seriesId),
+  );
 
-    if (!response.ok) {
-      throw new Error(`FRED request failed for ${seriesId}`);
-    }
+  const latest = yoyHistory.at(-1);
+  if (!latest) {
+    throw new Error(`No YoY rows for ${seriesId}`);
+  }
 
-    const csv = await response.text();
-    const allPoints = csv
-      .trim()
-      .split(/\r?\n/)
-      .slice(1)
-      .map((row) => row.split(","))
-      .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
-      .map((parts) => ({
-        date: parts[0] ?? "",
-        value: Number(parts[1]),
-      }))
-      .filter((point) => Number.isFinite(point.value))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    const yoyHistory = trimHistoryToRecentWindow(
-      allPoints.flatMap((point) => {
-        const pointDate = new Date(point.date + "T00:00:00.000Z");
-        if (Number.isNaN(pointDate.getTime())) return [];
-        const priorYear = new Date(pointDate);
-        priorYear.setUTCFullYear(priorYear.getUTCFullYear() - 1);
-        const priorKey = priorYear.toISOString().slice(0, 10);
-        const priorPoint = allPoints.find((p) => p.date === priorKey);
-        if (!priorPoint || priorPoint.value === 0) return [];
-        return [{
-          date: point.date,
-          value: ((point.value - priorPoint.value) / priorPoint.value) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
-        }];
-      }),
-    );
-
-    const latest = yoyHistory.at(-1);
-    if (!latest) {
-      throw new Error(`No YoY rows for ${seriesId}`);
-    }
-
-    return {
-      recordDate: latest.date,
-      value: latest.value,
-      history: yoyHistory,
-    };
-  });
-
-  return { value, recordDate, history };
+  return {
+    recordDate: latest.date,
+    value: latest.value,
+    history: yoyHistory,
+  };
 };
 
 const liveSeriesDefinitions: LiveSeriesDefinition[] = [
