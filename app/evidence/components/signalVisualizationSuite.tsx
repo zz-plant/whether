@@ -288,10 +288,10 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {tenYearSeries.paths.map((path, index) => (
                 <path key={`10y-${index}`} d={path} fill="none" stroke="rgb(165 180 252)" strokeWidth="1.4" />
               ))}
-              {oneMonthSeries.lastPoint ? <text x="98" y={Math.max(5, oneMonthSeries.lastPoint.y - 6)} textAnchor="end" className="fill-slate-300 text-[5px] uppercase tracking-[0.12em]">1M</text> : null}
-              {threeMonthSeries.lastPoint ? <text x="98" y={Math.max(5, threeMonthSeries.lastPoint.y - 2)} textAnchor="end" className="fill-sky-200 text-[5px] uppercase tracking-[0.12em]">3M</text> : null}
-              {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" className="fill-teal-200 text-[5px] uppercase tracking-[0.12em]">2Y</text> : null}
-              {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" className="fill-indigo-200 text-[5px] uppercase tracking-[0.12em]">10Y</text> : null}
+              {oneMonthSeries.lastPoint ? <text x="98" y={Math.max(5, oneMonthSeries.lastPoint.y - 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-300 uppercase tracking-[0.12em]">1M</text> : null}
+              {threeMonthSeries.lastPoint ? <text x="98" y={Math.max(5, threeMonthSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-sky-200 uppercase tracking-[0.12em]">3M</text> : null}
+              {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-teal-200 uppercase tracking-[0.12em]">2Y</text> : null}
+              {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-indigo-200 uppercase tracking-[0.12em]">10Y</text> : null}
             </svg>
             <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
               <span>{points[0]?.label ?? "Start"}</span>
@@ -331,7 +331,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   x={Math.min(98, toChartX(monthlyScatter[monthlyScatter.length - 1].x, rateMin, rateMax, 100) + 4)}
                   y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, spreadMin, spreadMax, 72) - 4)}
                   textAnchor="end"
-                  className="fill-sky-200 text-[5px] uppercase tracking-[0.12em]"
+                  fontSize="5"
+                  fontFamily="Inter, system-ui, sans-serif"
+                  className="fill-sky-200 uppercase tracking-[0.12em]"
                 >
                   latest
                 </text>
@@ -347,15 +349,15 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="rgb(148 163 184 / 0.08)" />
               ))}
               <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-              <text x="2" y={Math.max(6, zeroLineY - 2)} className="fill-slate-400 text-[5px] uppercase tracking-[0.12em]">zero</text>
+              <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">zero</text>
               {spread10Y2YSeries.paths.map((path, index) => (
                 <path key={`spread-10-2-${index}`} d={path} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.4" />
               ))}
               {spread2Y3MSeries.paths.map((path, index) => (
                 <path key={`spread-2-3-${index}`} d={path} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.4" />
               ))}
-              {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" className="fill-emerald-200 text-[5px] uppercase tracking-[0.12em]">10Y-2Y</text> : null}
-              {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" className="fill-amber-200 text-[5px] uppercase tracking-[0.12em]">2Y-3M</text> : null}
+              {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">10Y-2Y</text> : null}
+              {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">2Y-3M</text> : null}
             </svg>
             <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
               <span>{points[0]?.label ?? "Start"}</span>

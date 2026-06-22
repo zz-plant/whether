@@ -86,7 +86,8 @@ export const navigationLayers: NavigationLayer[] = [
     description: "See how tightness and risk appetite have changed over time.",
     boundary: "Use this to spot regime transitions and compare current conditions to past periods.",
     group: "reference",
-    tier: "primary",
+    tier: "supporting",
+    parentKey: "signals",
   },
   {
     key: "compare",

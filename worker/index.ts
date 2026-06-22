@@ -37,8 +37,12 @@ export default {
     const headers: Record<string, string> = {};
     if (secret) headers["Authorization"] = `Bearer ${secret}`;
 
-    /* Send weekly brief to email subscribers */
     const site = env.SITE_URL || "https://whether.work";
+
+    /* Ingest fresh signals to KV before sending briefs */
+    await fetch(`${site}/api/ingest`, { method: "POST", headers });
+
+    /* Send weekly brief to email subscribers */
     await fetch(`${site}/api/email/send-weekly`, { method: "POST", headers });
 
     /* Check if regime changed and alert if so */

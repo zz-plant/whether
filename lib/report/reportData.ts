@@ -143,13 +143,7 @@ export type DecisionTransmission = {
   }>;
 };
 
-const isEdgeRuntime = () => typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime === "string";
-
 const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {
-  if (isEdgeRuntime()) {
-    return null;
-  }
-
   try {
     const dynamicImport = new Function("modulePath", "return import(modulePath);") as (
       modulePath: string,

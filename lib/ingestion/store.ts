@@ -108,17 +108,13 @@ const getKvBinding = () => {
 };
 
 export class KvIngestionStore implements IngestionStore {
-  // The FileIngestionStore is retained ONLY as a read fallback when KV is empty
-  // (e.g. the namespace was just provisioned and has no snapshots yet). It is
-  // intentionally not used as a write fallback: on Cloudflare Workers
-  // `node:fs` is backed by an ephemeral, per-isolate virtual FS, so writing
-  // there is pure waste *and* an unawaited failure surface that can block the
-  // KV write path. KV is the durable source of truth when this class is
-  // constructed (which only happens when WHETHER_DURABLE_KV is bound).
-  private readonly fallback = new FileIngestionStore();
+  private readonly fallback: FileIngestionStore | null;
   private queue: Promise<void> = Promise.resolve();
 
-  constructor(private readonly kv: KvNamespaceLike) {}
+  constructor(private readonly kv: KvNamespaceLike) {
+    const isEdge = typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime === "string";
+    this.fallback = isEdge ? null : new FileIngestionStore();
+  }
 
   async appendSnapshots(snapshots: SignalEntitySnapshot[]) {
     if (snapshots.length === 0) {
@@ -169,7 +165,7 @@ export class KvIngestionStore implements IngestionStore {
     } while (cursor);
 
     if (collected.length === 0) {
-      return this.fallback.readSnapshots(options);
+      return this.fallback?.readSnapshots(options) ?? [];
     }
 
     return collected.sort((a, b) => a.sequence - b.sequence).slice(0, limit).map((entry) => entry.snapshot);
@@ -179,7 +175,7 @@ export class KvIngestionStore implements IngestionStore {
     await this.queue;
     const raw = await this.kv.get(MATERIALIZED_KEY);
     if (!raw) {
-      return this.fallback.readLatestMaterialized();
+      return this.fallback?.readLatestMaterialized() ?? null;
     }
     return (JSON.parse(raw) as StoredMaterializedRecord).model;
   }

@@ -49,7 +49,7 @@ describe("navigation information architecture", () => {
   });
 
   it("exposes primary surface progress cues and route cues for navigation copy", () => {
-    assert.equal(primaryNavigationSurfaceCount, 6);
+    assert.equal(primaryNavigationSurfaceCount, 5);
     assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
     assert.equal(resolvePrimaryNavigationSurfaceCue("/evidence"), "Evidence");
     assert.equal(resolvePrimaryNavigationSurfaceCue("/planning"), "Plan");

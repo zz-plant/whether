@@ -183,7 +183,7 @@ export const ConfidenceMiniChart = ({
               </span>
             ) : null}
             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
-              <span className="h-3 w-3 rounded-full border border-amber-300/90 bg-amber-300" aria-hidden="true" />
+              <span className={`h-3 w-3 rounded-full border ${tier.dot}`} aria-hidden="true" />
               This week
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-1">
@@ -217,7 +217,7 @@ export const ConfidenceMiniChart = ({
                         point.isMissing
                           ? "border-amber-300/75 bg-[repeating-linear-gradient(135deg,rgba(251,191,36,0.22),rgba(251,191,36,0.22)_2px,transparent_2px,transparent_5px)]"
                           : point.isCurrent
-                            ? "border-amber-300/90 bg-amber-300 shadow-[0_0_0_1px_rgba(15,23,42,0.7)]"
+                            ? `${tier.dot} shadow-[0_0_0_1px_rgba(15,23,42,0.7)]`
                             : point.isPrevious
                               ? "border-slate-200/90 bg-slate-950"
                               : "border-slate-700/70 bg-slate-700/55"

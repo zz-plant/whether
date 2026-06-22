@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
-import type { SourceHealthRow } from "../../../lib/report/sourceHealth";
+import { getBusinessDayElapsedHours, type SourceHealthRow } from "../../../lib/report/sourceHealth";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -16,6 +16,12 @@ const toHours = (isoTimestamp: string, now = new Date()) => {
   }
 
   return Number(((now.getTime() - timestamp) / 3_600_000).toFixed(2));
+};
+
+const toBusinessHours = (isoTimestamp: string | null | undefined, now = new Date()): number | null => {
+  if (!isoTimestamp) return null;
+  const hours = getBusinessDayElapsedHours(isoTimestamp, now);
+  return hours === Infinity ? null : hours;
 };
 
 type WorkerVersionMetadata = {
@@ -128,16 +134,19 @@ export async function GET() {
   const now = new Date();
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/health" });
   const { treasury, sourceHealth } = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const fetchedAgeHours = toHours(treasury.fetched_at, now);
+  const fetchedAgeHours = toBusinessHours(treasury.fetched_at, now);
   const recordDateAgeHours = toHours(`${treasury.record_date}T00:00:00.000Z`, now);
-  const staleByFetchTimestamp = fetchedAgeHours === null ? true : fetchedAgeHours > STALE_AFTER_HOURS;
+  const staleByFetchTimestamp = fetchedAgeHours === null || fetchedAgeHours > STALE_AFTER_HOURS;
   const staleByRecordDate = recordDateAgeHours === null ? true : recordDateAgeHours > RECORD_DATE_STALE_AFTER_HOURS;
   const stale = staleByFetchTimestamp || staleByRecordDate;
   const treasuryStatus = stale ? "degraded" : "ok";
 
-  const status = reportResult.ok && treasuryStatus === "ok" ? "ok" : reportResult.ok ? "degraded" : "down";
-  const statusCode = status === "ok" ? 200 : 503;
   const sources = normalizeMonitorSourceHealth(sourceHealth);
+  const macroHealthRow = sources.find((row) => row.sourceName === "Macro");
+  const macroStatus: MonitorSourceHealthRow["status"] = !macroHealthRow ? "unknown" : macroHealthRow.status;
+
+  const status = reportResult.ok && treasuryStatus === "ok" && macroStatus === "ok" ? "ok" : reportResult.ok ? "degraded" : "down";
+  const statusCode = status === "ok" ? 200 : 503;
 
   return NextResponse.json(
     {
@@ -161,6 +170,17 @@ export async function GET() {
           recordDate: treasury.record_date,
           isLive: treasury.isLive,
           source: treasury.source,
+        },
+        macroData: {
+          status: macroStatus,
+          stale: macroHealthRow ? macroHealthRow.freshnessStatus === "stale" : true,
+          fallback: macroHealthRow ? macroHealthRow.mode === "fallback" : true,
+          source: "FRED",
+          freshnessStatus: macroHealthRow?.freshnessStatus ?? "unknown",
+          mode: macroHealthRow?.mode ?? "unknown",
+          freshnessSlaHours: macroHealthRow?.freshnessSlaHours ?? null,
+          lastSuccessfulFetchAt: macroHealthRow?.lastSuccessfulFetchAt ?? null,
+          activeFallbackReason: macroHealthRow?.activeFallbackReason ?? null,
         },
       },
       sources,

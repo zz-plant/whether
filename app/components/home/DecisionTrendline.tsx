@@ -9,8 +9,8 @@ const DECISION_LOG_KEY = "whether_decision_log";
 type DecisionEntry = { date: string; posture: string; action: string };
 
 const REGIME_TEXT_COLORS: Record<string, string> = {
-  SCARCITY: "text-amber-300",
-  DEFENSIVE: "text-rose-300",
+  SCARCITY: "text-rose-300",
+  DEFENSIVE: "text-amber-300",
   VOLATILE: "text-sky-300",
   EXPANSION: "text-emerald-300",
 };

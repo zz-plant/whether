@@ -40,8 +40,8 @@ export const REGIME_DESCRIPTOR: Record<string, string> = {
 export const REGIME_DISPLAY: Record<string, string> = { ...REGIME_PUBLIC_LABELS } satisfies Record<RegimeKey, string>;
 
 export const REGIME_COLORS: Record<string, string> = {
-  SCARCITY: "bg-amber-400/60",
-  DEFENSIVE: "bg-rose-400/60",
+  SCARCITY: "bg-rose-400/60",
+  DEFENSIVE: "bg-amber-400/60",
   VOLATILE: "bg-sky-400/60",
   EXPANSION: "bg-emerald-400/60",
 } satisfies Record<RegimeKey, string>;

@@ -259,7 +259,11 @@ export const buildHomeBriefModelInternal = (
   });
   const primaryShiftRegimeLabel = resolvePrimaryShiftRegimeLabel(assessment.regime);
 
-  const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
+  const geometricConfidence: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
+  const dataDegraded = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
+  const confidenceLabel: RegimeConfidenceLabel = dataDegraded
+    ? geometricConfidence === "HIGH" ? "MED" : geometricConfidence === "MED" ? "LOW" : "LOW"
+    : geometricConfidence;
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
   const signalConfidenceReason = buildSignalConfidenceReason({

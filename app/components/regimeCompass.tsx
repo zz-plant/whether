@@ -52,9 +52,9 @@ export function RegimeCompass({
       {/* Background fill per quadrant */}
       {/* Bottom-left: VOLATILE — low tightness, low risk appetite */}
       <rect x={M} y={thresholdY} width={thresholdX - M} height={H - (thresholdY - M)} fill="rgba(71,85,105,0.12)" rx="0" />
-      {/* Top-left: SCARCITY — high tightness, low risk appetite */}
-      <rect x={thresholdX} y={thresholdY} width={W - (thresholdX - M)} height={H - (thresholdY - M)} fill="rgba(251,191,36,0.08)" rx="0" />
-      {/* Bottom-right: EXPANSION — low tightness, high risk appetite */}
+      {/* Bottom-right: SCARCITY — high tightness, low risk appetite */}
+      <rect x={thresholdX} y={thresholdY} width={W - (thresholdX - M)} height={H - (thresholdY - M)} fill="rgba(244,63,94,0.08)" rx="0" />
+      {/* Top-left: EXPANSION — low tightness, high risk appetite */}
       <rect x={M} y={M} width={thresholdX - M} height={thresholdY - M} fill="rgba(52,211,153,0.08)" rx="0" />
       {/* Top-right: DEFENSIVE — high tightness, high risk appetite */}
       <rect x={thresholdX} y={M} width={W - (thresholdX - M)} height={thresholdY - M} fill="rgba(251,191,36,0.08)" rx="0" />

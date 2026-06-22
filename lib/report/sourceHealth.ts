@@ -57,6 +57,7 @@ type SourceGroupDefinition = {
   freshnessSlaHours: number;
   ids: MacroSeriesId[];
   supportsLive: boolean;
+  useBusinessDays?: boolean;
 };
 
 const TREASURY_SOURCE_SLA_HOURS = 6;
@@ -71,6 +72,7 @@ const macroSourceGroups: SourceGroupDefinition[] = [
     freshnessSlaHours: MARKET_SOURCE_SLA_HOURS,
     ids: ["BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD", "CHICAGO_FCI", "VIX_INDEX"],
     supportsLive: true,
+    useBusinessDays: true,
   },
   {
     sourceName: "Inflation",
@@ -102,10 +104,33 @@ const macroSourceGroups: SourceGroupDefinition[] = [
   },
 ];
 
+export const getBusinessDayElapsedHours = (timestamp: string, now: Date): number => {
+  const then = Date.parse(timestamp);
+  if (Number.isNaN(then)) return Infinity;
+
+  let elapsed = 0;
+  const cursor = new Date(then);
+
+  while (cursor < now) {
+    const dayOfWeek = cursor.getDay();
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      const endOfDay = new Date(cursor);
+      endOfDay.setHours(23, 59, 59, 999);
+      const sliceEnd = endOfDay < now ? endOfDay : now;
+      elapsed += (sliceEnd.getTime() - cursor.getTime()) / 3_600_000;
+    }
+    cursor.setDate(cursor.getDate() + 1);
+    cursor.setHours(0, 0, 0, 0);
+  }
+
+  return elapsed;
+};
+
 const classifyFreshness = (
   lastSuccessfulFetchAt: string | null | undefined,
   freshnessSlaHours: number,
   now: Date,
+  useBusinessDays = false,
 ): SourceFreshnessStatus => {
   if (!lastSuccessfulFetchAt) {
     return "unknown";
@@ -116,7 +141,11 @@ const classifyFreshness = (
     return "unknown";
   }
 
-  return (now.getTime() - timestamp) / 3_600_000 > freshnessSlaHours ? "stale" : "fresh";
+  const elapsedHours = useBusinessDays
+    ? getBusinessDayElapsedHours(lastSuccessfulFetchAt, now)
+    : (now.getTime() - timestamp) / 3_600_000;
+
+  return elapsedHours > freshnessSlaHours ? "stale" : "fresh";
 };
 
 export const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined>): string | null => {
@@ -196,7 +225,7 @@ const buildGroupedRow = ({
   return {
     sourceName: group.sourceName,
     cadenceLabel: group.cadenceLabel,
-    freshnessStatus: classifyFreshness(lastSuccessfulFetchAt, group.freshnessSlaHours, now),
+    freshnessStatus: classifyFreshness(lastSuccessfulFetchAt, group.freshnessSlaHours, now, group.useBusinessDays),
     freshnessSlaHours: group.freshnessSlaHours,
     lastSuccessfulFetchAt,
     activeFallbackReason: group.supportsLive
@@ -242,7 +271,7 @@ export const buildSourceHealthRows = ({
     {
       sourceName: "Treasury",
       cadenceLabel: "Intraday rates",
-      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
+      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
       activeFallbackReason: treasuryFallbackReason,
