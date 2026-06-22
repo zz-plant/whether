@@ -58,7 +58,7 @@ const baseSnapshots: SignalEntitySnapshot[] = [
     family: "inflation",
     value: 3.1,
     unit: "%",
-    source: { label: "BLS public API", url: "https://api.bls.gov/publicAPI/v2/timeseries/data/", seriesId: "CUUR0000SA0" },
+    source: { label: "FRED", url: "https://fred.stlouisfed.org/series/CPIAUCSL", seriesId: "CPIAUCSL" },
     observedAt: "2026-01-01T00:00:00.000Z",
     ingestedAt: "2026-01-10T01:00:00.000Z",
     quality: "observed",

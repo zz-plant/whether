@@ -4,7 +4,7 @@ export type PolicySignalId = "BASE_RATE" | "CURVE_SLOPE" | "BBB_CREDIT_SPREAD" |
 
 export interface PolicySignalConfig {
   id: PolicySignalId;
-  source: "TREASURY" | "FRED" | "BLS";
+  source: "TREASURY" | "FRED";
   cadence: "DAILY" | "MONTHLY";
   directional: "HIGHER_IS_TIGHTER" | "HIGHER_IS_LOOSER";
   macroSeriesId?: Extract<MacroSeriesId, "BBB_CREDIT_SPREAD" | "CPI_YOY" | "UNEMPLOYMENT_RATE">;
@@ -53,14 +53,14 @@ export const POLICY_SPEC_V1: PolicySpecConfig = {
     },
     {
       id: "CPI_YOY",
-      source: "BLS",
+      source: "FRED",
       cadence: "MONTHLY",
       directional: "HIGHER_IS_TIGHTER",
       macroSeriesId: "CPI_YOY",
     },
     {
       id: "UNEMPLOYMENT_RATE",
-      source: "BLS",
+      source: "FRED",
       cadence: "MONTHLY",
       directional: "HIGHER_IS_TIGHTER",
       macroSeriesId: "UNEMPLOYMENT_RATE",

@@ -362,7 +362,7 @@ export const loadReportDataUncachedInternal = async ({
         ? "Live (high confidence)"
         : "Cached (medium)";
   const treasuryProvenance = {
-    sourceLabel: canonicalInputs ? "Canonical ingestion (FRED/BLS)" : "Federal Reserve Economic Data (FRED)",
+    sourceLabel: canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)",
     sourceUrl: treasury.source,
     recordDateLabel,
     timestampLabel: fetchedAtLabel,

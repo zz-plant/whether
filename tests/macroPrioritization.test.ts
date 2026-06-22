@@ -9,7 +9,7 @@ const baseSignal = (overrides: Partial<MacroSeriesReading>): MacroSeriesReading 
   value: 3,
   unit: "%",
   explanation: "Inflation",
-  sourceLabel: "BLS",
+  sourceLabel: "FRED",
   sourceUrl: "https://example.com",
   formulaUrl: "https://example.com/formula",
   record_date: "2026-01-01",

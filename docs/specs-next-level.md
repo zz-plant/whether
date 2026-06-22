@@ -58,8 +58,8 @@
 
 ## 5) Macro data reliability
 - Add live fetchers for:
-  - CPI (BLS)
-  - Unemployment (BLS)
+  - CPI (FRED)
+  - Unemployment (FRED)
   - BBB credit spreads (FRED)
 - Cache each series with `fetched_at`, `record_date`, and `source` metadata.
 - Surface fallback reasons when snapshots are used.

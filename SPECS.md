@@ -20,7 +20,7 @@ so outputs remain traceable, explainable, and operator‑friendly.
   - `record_date`
   - `fetched_at`
 - Expanded macro snapshot:
-  - CPI (BLS), unemployment (BLS), and BBB credit spreads (FRED).
+  - CPI (FRED), unemployment (FRED), and BBB credit spreads (FRED).
   - Must include explicit source URLs and formula links.
   - Snapshot is stored locally in `data/macro_snapshot.json` until live fetchers are added.
 
