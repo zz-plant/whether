@@ -5,6 +5,11 @@ const MACRO_SERIES_REVALIDATE_SECONDS = 900;
 const BLS_YOY_LOOKBACK_YEARS = 2;
 const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 
+const getBlsApiKey = (): string | null => {
+  const key = (globalThis as { BLS_API_KEY?: string }).BLS_API_KEY ?? process.env.BLS_API_KEY;
+  return typeof key === "string" && key.length > 0 ? key : null;
+};
+
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
 
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
@@ -36,11 +41,15 @@ const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
 };
 
 const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
+  const apiKey = getBlsApiKey();
+  const body: Record<string, unknown> = { seriesid: [seriesId], latest: true };
+  if (apiKey) body.registrationkey = apiKey;
+
   const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
     next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
-    body: JSON.stringify({ seriesid: [seriesId], latest: true }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -65,15 +74,19 @@ const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
 
 const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
   const currentYear = new Date().getUTCFullYear();
+  const apiKey = getBlsApiKey();
+  const body: Record<string, unknown> = {
+    seriesid: [seriesId],
+    startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
+    endyear: String(currentYear),
+  };
+  if (apiKey) body.registrationkey = apiKey;
+
   const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
     next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
-    body: JSON.stringify({
-      seriesid: [seriesId],
-      startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
-      endyear: String(currentYear),
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
