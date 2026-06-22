@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, Fraunces } from "next/font/google";
+import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
@@ -10,20 +10,6 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
-
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans-google",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-display-google",
-  display: "swap",
-});
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -172,15 +158,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${ibmPlexSans.variable} ${fraunces.variable} font-sans`}>
+    <html lang="en" suppressHydrationWarning className="font-sans">
       <head>
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/planning" />
@@ -217,24 +203,24 @@ export default function RootLayout({
         </ToastProviderRoot>
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8">
           <div className="mx-auto max-w-4xl space-y-4">
-            <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-fluid-sm text-[var(--footer-link)]">
-              <a href="/about" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</a>
-              <a href="/threshold" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</a>
-              <a href="/template" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</a>
-              <a href="/planning" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resources</a>
-              <a href="/search" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</a>
-              <a href="/api-docs" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">API</a>
-              <a href="/feed.xml" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline">RSS</a>
+            <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-fluid-sm text-[var(--footer-link)]">
+              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</Link>
+              <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
+              <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>
+              <Link href="/planning" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resources</Link>
+              <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</Link>
+              <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">API</Link>
+              <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">RSS</a>
             </nav>
-            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
-              <a href="/acceptable-use-policy" className="hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</a>
-              <a href="/terms-of-service" className="hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Terms</a>
+            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
+              <Link href="/acceptable-use-policy" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</Link>
+              <Link href="/terms-of-service" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Terms</Link>
               <span aria-hidden="true">·</span>
-              <span>Built by <a href="https://kanav.net" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">Kanav Jain</a></span>
+              <span className="min-h-[44px] inline-flex items-center">Built by <a href="https://kanav.net" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline ml-1" target="_blank" rel="noreferrer">Kanav Jain</a></span>
               <span aria-hidden="true">·</span>
-              <a href="https://nextconsensus.com" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">Next Consensus</a>
+              <a href="https://nextconsensus.com" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">Next Consensus</a>
               <span aria-hidden="true">·</span>
-              <span>© 2026 Whether</span>
+              <span className="min-h-[44px] inline-flex items-center">© 2026 Whether</span>
             </nav>
           </div>
         </footer>

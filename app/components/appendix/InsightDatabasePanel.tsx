@@ -184,7 +184,7 @@ export const InsightDatabasePanel = ({
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search by source, tag, or recommendation"
-                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-base sm:text-sm text-slate-100 placeholder:text-slate-600"
                 />
               </Field.Root>
               <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -301,7 +301,7 @@ export const InsightDatabasePanel = ({
                     onChange={(event) =>
                       setDateRange((prev) => ({ ...prev, start: event.target.value }))
                     }
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-base sm:text-sm text-slate-100"
                   />
                 </Field.Root>
                 <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -313,7 +313,7 @@ export const InsightDatabasePanel = ({
                     onChange={(event) =>
                       setDateRange((prev) => ({ ...prev, end: event.target.value }))
                     }
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-base sm:text-sm text-slate-100"
                   />
                 </Field.Root>
               </div>

@@ -23,18 +23,25 @@ function OutlineItem({
   isActive: boolean;
   onClick?: () => void;
 }) {
+  const isHash = href.startsWith("#");
+  const linkClass = `block rounded-md px-3 py-2 md:py-1.5 text-sm no-underline transition-colors min-h-[44px] md:min-h-0 flex items-center ${
+    isActive
+      ? "bg-sky-500/10 text-sky-100 font-medium"
+      : "text-slate-400 hover:bg-slate-800/30 hover:text-slate-200"
+  }`;
+
+  if (isHash) {
+    return (
+      <a href={href} onClick={onClick} className={linkClass}>
+        {label}
+      </a>
+    );
+  }
+
   return (
-    <a
-      href={href}
-      onClick={onClick}
-      className={`block rounded-md px-3 py-1.5 text-sm no-underline transition-colors ${
-        isActive
-          ? "bg-sky-500/10 text-sky-100 font-medium"
-          : "text-slate-400 hover:bg-slate-800/30 hover:text-slate-200"
-      }`}
-    >
+    <Link href={href as Route} onClick={onClick} className={linkClass}>
       {label}
-    </a>
+    </Link>
   );
 }
 

@@ -53,7 +53,7 @@ export function ThemeCycler() {
     <button
       type="button"
       onClick={cycle}
-      className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-fluid-micro text-slate-500 hover:text-sky-200 transition-colors"
+      className="fixed bottom-4 left-4 z-50 inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-800 bg-slate-950/85 px-3 text-fluid-micro font-medium text-slate-400 backdrop-blur-sm transition-colors hover:text-slate-200 hover:border-slate-700 active:scale-[0.97]"
       title={`Theme: ${theme.label}. Click to cycle.`}
     >
       {theme.label}

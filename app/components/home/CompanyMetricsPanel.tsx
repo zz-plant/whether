@@ -107,7 +107,7 @@ export function CompanyMetricsPanel({
               type="number"
               value={form.burnRate || ""}
               onChange={(e) => setForm((f) => ({ ...f, burnRate: Number(e.target.value) }))}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-xs"
+              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-base sm:text-xs"
               placeholder="85000"
             />
           </div>
@@ -118,7 +118,7 @@ export function CompanyMetricsPanel({
               type="number"
               value={form.runwayMonths || ""}
               onChange={(e) => setForm((f) => ({ ...f, runwayMonths: Number(e.target.value) }))}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-xs"
+              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-base sm:text-xs"
               placeholder="18"
             />
           </div>
@@ -129,7 +129,7 @@ export function CompanyMetricsPanel({
               type="number"
               value={form.headcount || ""}
               onChange={(e) => setForm((f) => ({ ...f, headcount: Number(e.target.value) }))}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-xs"
+              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-200 text-base sm:text-xs"
               placeholder="20"
             />
           </div>

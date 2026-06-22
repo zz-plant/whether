@@ -75,7 +75,7 @@ export function SubscribeForm() {
           disabled={status === "loading"}
           aria-invalid={status === "error" ? true : undefined}
           aria-describedby={message ? "subscribe-message" : undefined}
-          className="min-h-11 flex-1 rounded-lg border border-white/[0.08] bg-[var(--bg-nested)] px-3 py-2 text-xs text-white/85 transition-colors placeholder:text-white/25 disabled:opacity-50 focus-visible:border-sky-400/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          className="min-h-11 flex-1 rounded-lg border border-white/[0.08] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-white/85 transition-colors placeholder:text-white/25 disabled:opacity-50 focus-visible:border-sky-400/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         />
         <button
           type="submit"

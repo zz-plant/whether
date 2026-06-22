@@ -64,7 +64,7 @@ export function DecisionHero({
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
-  const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? "Partial" : "Live";
+  const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
   const dataStatusColor = isFallback ? "text-amber-300" : degradedCount && degradedCount > 0 ? "text-amber-300" : "text-emerald-300";
   const dataStatusBg = isFallback ? "bg-amber-500/10 border-amber-500/20" : degradedCount && degradedCount > 0 ? "bg-amber-500/10 border-amber-500/20" : "bg-emerald-500/10 border-emerald-500/20";
 
@@ -120,7 +120,7 @@ export function DecisionHero({
           <StageSwitcher currentStage={operatorContext.companyStage} />
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
+            <span title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"} className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
               <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
               {dataStatus}
             </span>
@@ -129,14 +129,14 @@ export function DecisionHero({
         </div>
 
         <div className="sm:text-right">
-          <div className="relative inline-block">
-            <svg className="absolute inset-0 w-full h-full -m-[14%]" viewBox="0 0 100 100" aria-hidden="true">
+          <div className="relative inline-flex items-center justify-center p-3">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
               {confidenceLabel ? (
                 <circle
                   cx="50" cy="50" r="46"
                   fill="none"
                   stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.25)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.25)" : "rgba(253,164,175,0.25)"}
-                  strokeWidth="1.5"
+                  strokeWidth="2.5"
                   strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
                   strokeLinecap="round"
                   transform="rotate(-90 50 50)"
@@ -144,7 +144,7 @@ export function DecisionHero({
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
-              <div className="font-display text-[clamp(2.75rem,9vw,5.5rem)] font-bold leading-none text-white tabular-nums"
+              <div className="relative z-10 font-display text-[clamp(2.75rem,9vw,5.5rem)] font-bold leading-none text-white tabular-nums"
                 style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
                 {boldnessScore}
               </div>
