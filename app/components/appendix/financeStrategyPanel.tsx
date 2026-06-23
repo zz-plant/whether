@@ -60,7 +60,7 @@ export const FinanceStrategyPanel = ({
                 <ul className="mt-2 space-y-1">
                   {(entry?.budgetFocus ?? []).map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-400">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -75,7 +75,7 @@ export const FinanceStrategyPanel = ({
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {(entry?.watchSignals ?? []).map((signal) => (
                 <li key={signal} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span>{signal}</span>
                 </li>
               ))}

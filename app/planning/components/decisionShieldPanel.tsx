@@ -394,7 +394,7 @@ export const DecisionShieldPanel = ({
               onClick={handleSaveToDecisionMemory}
               disabled={isSavingMemory || !clientId}
               aria-busy={isSavingMemory}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
             >
               {isSavingMemory ? "Saving" : !clientId ? "Preparing memory" : "Save to memory"}
             </button>
@@ -478,7 +478,7 @@ export const DecisionShieldPanel = ({
                   Store common Decision Shield inputs as presets for faster reviews.
                 </p>
               </div>
-              <p id={presetHintId} className="text-xs text-slate-500">
+              <p id={presetHintId} className="text-xs text-slate-400">
                 Max 8 presets
               </p>
             </div>
@@ -520,7 +520,7 @@ export const DecisionShieldPanel = ({
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {presets.length === 0 ? (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-400">
                   No presets yet. Save one to reuse this scenario in future reviews.
                 </p>
               ) : (
@@ -565,7 +565,7 @@ export const DecisionShieldPanel = ({
                 {output.verdict}
               </div>
               <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
-              <p className="mt-3 text-xs text-slate-500">
+              <p className="mt-3 text-xs text-slate-400">
                 Copy-ready board update based on current signals; outcomes remain uncertain.
               </p>
             </div>
@@ -574,7 +574,7 @@ export const DecisionShieldPanel = ({
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {output.bullets.slice(0, 4).map((bullet) => (
                   <li key={bullet} className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span className="break-words">{bullet}</span>
                   </li>
                 ))}

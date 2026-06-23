@@ -33,7 +33,7 @@ export const RELIABILITY_BAR = (score: number) =>
 export const REGIME_DESCRIPTOR: Record<string, string> = {
   EXPANSION: "growth conditions",
   DEFENSIVE: "operating efficiently",
-  SCARCITY: "capital constrained",
+  SCARCITY: "capital is constrained",
   VOLATILE: "mixed signals",
 } satisfies Record<RegimeKey, string>;
 

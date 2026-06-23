@@ -135,12 +135,16 @@ export function SwipeableWeek({
       className="touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 rounded-lg"
       aria-label="Swipe left for current week, right for previous weeks. Use the left and right arrow keys to browse past weeks."
     >
-      {children}
       {months.length > 0 ? (
-        <p className="mt-2 text-center text-fluid-nano text-white/20 lg:hidden" aria-hidden="true">
-          ← swipe to browse past weeks →
-        </p>
+        <div className="mb-1 flex items-center justify-center gap-1" aria-hidden="true">
+          {months.slice(-6).map((m, i, arr) => {
+            const isActive = (currentMonth ?? new Date().getMonth() + 1) === m.month && (currentYear ?? new Date().getFullYear()) === m.year;
+            const isLast = i === arr.length - 1;
+            return <span key={`${m.month}-${m.year}`} className={`h-1 rounded-full transition-all ${isActive ? "w-4 bg-sky-400/60" : isLast ? "w-1.5 bg-white/30" : "w-1.5 bg-white/15"}`} />;
+          })}
+        </div>
       ) : null}
+      {children}
     </div>
   );
 }

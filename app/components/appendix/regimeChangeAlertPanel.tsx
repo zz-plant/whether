@@ -66,7 +66,7 @@ export const RegimeChangeAlertPanel = ({
                         {formatDateUTC(alert.previousRecordDate)}
                       </time>
                     </p>
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-slate-400">
                       Regime: <span className="text-slate-200">{alert.previousRegime}</span>
                     </p>
                   </div>
@@ -79,7 +79,7 @@ export const RegimeChangeAlertPanel = ({
                         {formatDateUTC(alert.currentRecordDate)}
                       </time>
                     </p>
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-slate-400">
                       Regime: <span className="text-slate-200">{alert.currentRegime}</span>
                     </p>
                   </div>
@@ -90,7 +90,7 @@ export const RegimeChangeAlertPanel = ({
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {alert.reasons.map((reason) => (
                     <li key={reason} className="flex gap-2">
-                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-400">•</span>
                       <span className="break-words">{reason}</span>
                     </li>
                   ))}
@@ -106,15 +106,15 @@ export const RegimeChangeAlertPanel = ({
                 </p>
                 <ul className="mt-4 space-y-2 text-xs text-slate-400">
                   <li className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span>Re-confirm approvals tied to long payback bets.</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span>Update leadership briefs before the next planning sync.</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span>Document the change in the operations log.</span>
                   </li>
                 </ul>
@@ -130,7 +130,7 @@ export const RegimeChangeAlertPanel = ({
                 <p className="mt-2 text-sm text-slate-200">
                   Alerts fire only on regime shifts or threshold crossings to avoid noise.
                 </p>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-slate-400">
                   Use this section to confirm the new posture before you move backlog approvals.
                 </p>
               </div>
@@ -144,7 +144,7 @@ export const RegimeChangeAlertPanel = ({
                 There is no active change alert. Alerts only fire when the regime changes or
                 tightness / risk appetite cross a threshold.
               </p>
-              <p className="mt-3 text-xs text-slate-500">
+              <p className="mt-3 text-xs text-slate-400">
                 Stay focused on weekly execution until the next signal shift is confirmed.
               </p>
             </div>
@@ -152,15 +152,15 @@ export const RegimeChangeAlertPanel = ({
               <p className="type-label text-slate-400">What would trigger an alert?</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span>Regime flips between Scarcity, Safety, Stability, and Growth.</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span>Tightness or risk appetite crosses the configured threshold.</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span>Material data quality flags force a posture review.</span>
                 </li>
               </ul>

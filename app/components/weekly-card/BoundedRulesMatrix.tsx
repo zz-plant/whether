@@ -39,7 +39,7 @@ const CorridorScale = () => (
     ].map((item) => (
       <span key={item.label} className="space-y-1">
         <span className={`block h-2 rounded-full ${item.className}`} />
-        <span className="block text-center text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">{item.label}</span>
+        <span className="block text-center text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">{item.label}</span>
       </span>
     ))}
   </div>

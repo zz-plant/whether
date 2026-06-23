@@ -196,7 +196,7 @@ export const StrategyBriefPanel = ({
                   ? "Brief copied to clipboard."
                   : "Ready to share in leadership updates."}
             </p>
-            <p className="mt-4 text-xs text-slate-500">
+            <p className="mt-4 text-xs text-slate-400">
               Public data only. No internal company inputs required.
             </p>
           </div>

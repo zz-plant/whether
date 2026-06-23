@@ -146,13 +146,13 @@ export const RegimeAssessmentCard = ({
       </p>
       <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">Constraints</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Constraints</p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
             {constraintCount}
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Cash availability (tightness)
           </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
@@ -160,7 +160,7 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Market risk appetite
           </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
@@ -170,7 +170,7 @@ export const RegimeAssessmentCard = ({
       </div>
       <div className="weather-surface relative mt-3 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Cash availability
           </p>
           <p className="mt-2 text-xs text-slate-400">
@@ -178,7 +178,7 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Risk appetite
           </p>
           <p className="mt-2 text-xs text-slate-400">
@@ -186,7 +186,7 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Score guidance
           </p>
           <p className="mt-2 text-xs text-slate-400">
@@ -198,7 +198,7 @@ export const RegimeAssessmentCard = ({
         {assessment.constraints.map((item) => (
           <li key={item} className="space-y-2">
             <div className="flex gap-2">
-              <span className="text-slate-500">•</span>
+              <span className="text-slate-400">•</span>
               <span className="break-words">{item}</span>
             </div>
             <Collapsible.Root className="ml-5 rounded-md border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
@@ -207,16 +207,16 @@ export const RegimeAssessmentCard = ({
                 className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
                 Because
-                <span className="text-slate-500">(show drivers)</span>
+                <span className="text-slate-400">(show drivers)</span>
               </Collapsible.Trigger>
               <Collapsible.Panel className="mt-2 space-y-2">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Driven by
                 </p>
                 <ul className="space-y-2">
                   {constraintDrivers.map((driver) => (
                     <li key={driver.id} className="flex flex-wrap items-center gap-2">
-                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-400">•</span>
                       <span className="break-words">{driver.label}</span>
                       <a
                         href={driver.href}
@@ -234,7 +234,7 @@ export const RegimeAssessmentCard = ({
       </ul>
       <div className="weather-surface relative mt-6 grid gap-4 p-4 text-xs text-slate-400 md:grid-cols-2">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
             <span>Cash availability (tightness)</span>
             <span className="text-slate-200 tabular-nums">
               {assessment.scores.tightness}/100
@@ -261,7 +261,7 @@ export const RegimeAssessmentCard = ({
           <p>{assessment.tightnessExplanation}</p>
         </div>
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
+          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
             <span>Market risk appetite</span>
             <span className="text-slate-200 tabular-nums">
               {assessment.scores.riskAppetite}/100

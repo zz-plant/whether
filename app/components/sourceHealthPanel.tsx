@@ -60,7 +60,7 @@ export function SourceHealthPanel({ rows }: { rows: SourceHealthRow[] }) {
                   </span>
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-fluid-xs text-slate-500">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-fluid-xs text-slate-400">
                 <span>Last fetch: {formatLastFetch(row.lastSuccessfulFetchAt)}</span>
               </div>
               {row.activeFallbackReason ? (

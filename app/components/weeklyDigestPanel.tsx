@@ -70,7 +70,7 @@ export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment
             ))}
           </ul>
           {payload ? (
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-slate-400">
               {alertCount} alerts tracked · {deliveryCount} deliveries · generated {formatTimestampUTC(payload.generatedAt)}
             </p>
           ) : null}

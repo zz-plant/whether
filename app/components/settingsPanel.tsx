@@ -120,10 +120,10 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="mt-4 space-y-4">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 pb-2">Personalization</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 border-b border-slate-800/60 pb-2">Personalization</p>
             <fieldset>
               <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Company stage</legend>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              <p className="mt-1 text-xs leading-relaxed text-slate-400">
                 Adjusts operating knobs to your company&apos;s maturity.
               </p>
               <div className="mt-2 space-y-1">
@@ -152,7 +152,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
             <fieldset>
               <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Rate sensitivity</legend>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              <p className="mt-1 text-xs leading-relaxed text-slate-400">
                 How much interest rates affect your business.
               </p>
               <div className="mt-2 space-y-1">
@@ -179,10 +179,10 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               </div>
             </fieldset>
 
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 border-b border-slate-800/60 pb-2 mt-4">Display &amp; notifications</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 border-b border-slate-800/60 pb-2 mt-4">Display &amp; notifications</p>
             <fieldset>
               <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Display mode</legend>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+              <p className="mt-1 text-xs leading-relaxed text-slate-400">
                 Larger text and buttons for screens across the room.
               </p>
               <div className="mt-2 flex gap-2">
@@ -205,7 +205,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
           <fieldset>
             <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Weekly delivery</legend>
-            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+            <p className="mt-1 text-xs leading-relaxed text-slate-400">
               Get the weekly brief delivered to your inbox.
             </p>
             <form onSubmit={handleSubscribe} className="mt-2 flex gap-2">
@@ -233,7 +233,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
           <fieldset>
             <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Alerts</legend>
-            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+            <p className="mt-1 text-xs leading-relaxed text-slate-400">
               Get notified when the regime changes.
             </p>
             <label className="mt-2 flex items-center gap-2 text-sm text-slate-300">
@@ -250,7 +250,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-fluid-micro text-slate-500">Changes apply on next brief refresh.</p>
+            <p className="text-fluid-micro text-slate-400">Changes apply on next brief refresh.</p>
             {saved ? (
               <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-200">Saved</span>
             ) : null}

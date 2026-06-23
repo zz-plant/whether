@@ -78,7 +78,7 @@ export default async function SharePage() {
           <p className="text-sm leading-relaxed text-white/60">
             Copy the live weekly call, bounded action, pause line, and change-course condition into Slack, email, calendar agendas, or meeting notes.
           </p>
-          <p className="text-fluid-xs text-white/40">{artifact.trustLine}</p>
+          <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
         </div>
 
         <ShareCopyControls
@@ -91,7 +91,7 @@ export default async function SharePage() {
       </section>
 
       <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-white/40">What sharing produces</h2>
+        <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">What sharing produces</h2>
         <div className="grid gap-3 md:grid-cols-3">
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold text-sky-200">Slack</p>

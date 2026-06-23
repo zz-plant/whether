@@ -135,7 +135,7 @@ export const SignalMatrixPanel = ({
                   {" "}· Risk <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-400">
                 Thresholds: tightness {tightnessThreshold}, risk {riskThreshold}. Use these to
                 decide when to shift approvals or move between quadrants.
               </p>
@@ -232,22 +232,22 @@ export const SignalMatrixPanel = ({
                 </text>
               </svg>
               <div className="pointer-events-none absolute inset-0">
-                <div className="absolute bottom-3 left-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute bottom-3 left-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Cautious
                 </div>
-                <div className="absolute bottom-3 right-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute bottom-3 right-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Bold
                 </div>
-                <div className="absolute left-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute left-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Tight
                 </div>
-                <div className="absolute right-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute right-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Loose
                 </div>
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Risk appetite →
                 </div>
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Cash tightness ↑
                 </div>
               </div>
@@ -271,7 +271,7 @@ export const SignalMatrixPanel = ({
                 </Tooltip.Portal>
               </Tooltip.Root>
             </div>
-            <figcaption id="signal-matrix-description" className="text-xs text-slate-500">
+            <figcaption id="signal-matrix-description" className="text-xs text-slate-400">
               Position is derived from tightness (
               <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
               appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).

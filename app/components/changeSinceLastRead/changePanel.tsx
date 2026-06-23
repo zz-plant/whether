@@ -262,7 +262,7 @@ export const ChangeSinceLastReadPanel = ({
                 Changes detected since your last read.
               </p>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs text-slate-400">
                 No detected deltas yet. Keep checking as new Treasury data arrives.
               </p>
             )}
@@ -297,7 +297,7 @@ export const ChangeSinceLastReadPanel = ({
                   </p>
                 </>
               ) : (
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-slate-400">
                   Historical match unavailable for this week in the Time Machine cache.
                 </p>
               )}

@@ -124,7 +124,7 @@ export function HeroTrustProvenanceBlock({
             >
               {controlHeadline}
             </span>
-            <span className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <span className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
               Approval readiness
             </span>
             {outageSeverity ? (
@@ -148,7 +148,7 @@ export function HeroTrustProvenanceBlock({
               : trustStatusDetailForDisplay}
           </p>
           {decisionImpactWindow ? (
-            <p className="text-xs leading-5 text-slate-500">{decisionImpactWindow}</p>
+            <p className="text-xs leading-5 text-slate-400">{decisionImpactWindow}</p>
           ) : null}
         </div>
         <div className="text-right text-fluid-xs leading-5 text-slate-400">
@@ -159,7 +159,7 @@ export function HeroTrustProvenanceBlock({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
             Approval lane
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -178,7 +178,7 @@ export function HeroTrustProvenanceBlock({
         </article>
 
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
             Reliability window
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -187,7 +187,7 @@ export function HeroTrustProvenanceBlock({
                 ? `${degradedSourceRows?.length} source${(degradedSourceRows?.length ?? 0) === 1 ? "" : "s"} degraded`
                 : "Core feeds look usable"}
             </p>
-            <span className="text-fluid-micro uppercase tracking-[0.12em] text-slate-500">
+            <span className="text-fluid-micro uppercase tracking-[0.12em] text-slate-400">
               {outageExitGate
                 ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear`
                 : trustReadiness.tone === "warning"
@@ -203,7 +203,7 @@ export function HeroTrustProvenanceBlock({
                 : "No additional recovery work is needed unless someone challenges freshness or provenance."}
           </p>
           {recoveryPlan ? (
-            <p className="mt-2 text-xs leading-5 text-slate-500">
+            <p className="mt-2 text-xs leading-5 text-slate-400">
               Owner {recoveryPlan.owner} · Checkpoint {recoveryPlan.nextCheckpoint}
             </p>
           ) : null}

@@ -145,7 +145,7 @@ export function OperationsExecutionStepper({
                     <span className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
                       {step.title}
                     </span>
-                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 flex-shrink-0">
+                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 flex-shrink-0">
                       {step.label}
                     </span>
                   </div>

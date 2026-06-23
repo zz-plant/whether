@@ -175,7 +175,7 @@ const TrajectoryMap = ({
             Nearest flip
           </text>
         </svg>
-        <div className="pointer-events-none absolute inset-0 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <div className="pointer-events-none absolute inset-0 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
           <span className="absolute bottom-2 left-3">Cautious</span>
           <span className="absolute bottom-2 right-3">Bold</span>
           <span className="absolute left-2 top-4 -rotate-90 origin-left">Loose</span>

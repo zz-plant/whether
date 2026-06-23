@@ -34,7 +34,7 @@ export const SeriesFreshnessBadge = ({
       </div>
       <dl className="mt-2 space-y-2 text-xs text-slate-400">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-slate-500">Source</dt>
+          <dt className="text-slate-400">Source</dt>
           <dd>
             <a
               href={sourceUrl}
@@ -47,13 +47,13 @@ export const SeriesFreshnessBadge = ({
           </dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-slate-500">Record date</dt>
+          <dt className="text-slate-400">Record date</dt>
           <dd className="mono text-slate-200">
             <time dateTime={recordDate}>{formatDateUTC(recordDate)}</time>
           </dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-slate-500">Fetched</dt>
+          <dt className="text-slate-400">Fetched</dt>
           <dd className="mono text-slate-200">
             <time dateTime={fetchedAt}>{formatTimestampUTC(fetchedAt)}</time>
           </dd>

@@ -4,15 +4,7 @@ import { useState, useEffect } from "react";
 
 const THEMES = [
   { key: "", label: "Dark" },
-  { key: "slate", label: "Slate" },
-  { key: "midnight", label: "Midnight" },
-  { key: "forest", label: "Forest" },
-  { key: "sepia", label: "Sepia" },
-  { key: "paper", label: "Paper Light" },
-  { key: "minimal", label: "Minimal Light" },
-  { key: "neon", label: "Neon" },
-  { key: "mono", label: "Mono" },
-  { key: "warm", label: "Warm" },
+  { key: "paper", label: "Paper" },
 ] as const;
 
 const STORAGE_KEY = "whether-theme-variant";
@@ -34,7 +26,7 @@ export function ThemeCycler() {
     const key = theme.key || "";
     if (key) {
       document.documentElement.dataset.themeVariant = key;
-      document.documentElement.style.colorScheme = ["paper", "minimal"].includes(key) ? "light" : "dark";
+      document.documentElement.style.colorScheme = key === "paper" ? "light" : "dark";
     } else {
       delete document.documentElement.dataset.themeVariant;
       document.documentElement.style.colorScheme = "dark";

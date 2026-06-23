@@ -22,7 +22,7 @@ type ScoreCardProps = {
 /** Delta direction: positive = metric moving up, negative = metric moving down.
  *  Credit conditions: up = tighter = amber (bad). Investor sentiment: up = easier = emerald (good). */
 const deltaColor = (label: string, delta: number) => {
-  if (delta === 0) return "text-slate-600";
+  if (delta === 0) return "text-slate-400";
   const isTightness = label.toLowerCase().includes("credit");
   if (delta > 0) return isTightness ? "text-amber-200" : "text-emerald-200";
   return isTightness ? "text-emerald-200" : "text-amber-200";

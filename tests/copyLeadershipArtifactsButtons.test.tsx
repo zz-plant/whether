@@ -19,7 +19,7 @@ describe("CopyLeadershipArtifactsButtons", () => {
       "focus-visible:outline-offset-2",
       "disabled:cursor-not-allowed",
       "disabled:border-slate-800",
-      "disabled:text-slate-500",
+      "disabled:text-slate-400",
       "touch-manipulation",
     ];
 

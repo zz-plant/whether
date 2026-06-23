@@ -198,7 +198,7 @@ export const ExecutiveBriefingPanel = ({
                     onClick={() => void copyToClipboard(guardrailChecklist, "Checklist")}
                   />
                 </div>
-                <p className="mt-4 text-xs text-slate-500">
+                <p className="mt-4 text-xs text-slate-400">
                   {error
                     ? "Clipboard unavailable in this environment."
                     : copiedTarget

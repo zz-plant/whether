@@ -186,7 +186,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
           <p className="text-sm text-slate-200 print:text-slate-700">{article.description}</p>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/resources/decision-shield-overview" className="text-sky-200 underline underline-offset-4">Decision Shield</Link>
-            <span className="text-slate-500">•</span>
+            <span className="text-slate-400">•</span>
             <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Posture Template</Link>
           </div>
         </section>
@@ -229,7 +229,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                       </div>
                     </div>
                     {importedEmbed.provider || importedEmbed.caption ? (
-                      <figcaption className="text-xs text-slate-400 print:text-slate-600">
+                      <figcaption className="text-xs text-slate-400 print:text-slate-400">
                         {importedEmbed.provider ? `${importedEmbed.provider} embed` : "Imported embed"}
                         {importedEmbed.caption ? ` · ${importedEmbed.caption}` : ""}
                       </figcaption>

@@ -95,7 +95,7 @@ export function CommandCenterNavBlock({
       <div className="space-y-3 sm:space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
           <div className="rounded border border-slate-800/55 bg-slate-950/40 p-3">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
               Role
             </p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -123,7 +123,7 @@ export function CommandCenterNavBlock({
         <div className="space-y-3">
           <div className="space-y-2">
             <p className="weather-brief-kicker">{briefKicker}</p>
-            <p className="text-fluid-micro leading-4 text-slate-500">{introMetaLine}</p>
+            <p className="text-fluid-micro leading-4 text-slate-400">{introMetaLine}</p>
             <h1 className={headingClassName}>{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
               <span>{pageSummary}</span>
@@ -137,7 +137,7 @@ export function CommandCenterNavBlock({
             </p>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400">
             <span>Updated {fetchedAtLabel}</span>
             <span>{resolvedNextRefreshLabel}</span>
             {nextStep ? <span>Next: {nextStep.description}</span> : null}
@@ -209,9 +209,9 @@ export function CommandCenterNavBlock({
                 <span className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
                   {missionSequenceTitle || "Use this order"}
                 </span>
-                <span className="mt-0.5 block text-fluid-xs text-slate-500">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
+                <span className="mt-0.5 block text-fluid-xs text-slate-400">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
               </span>
-              <span aria-hidden="true" className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-fluid-xs text-slate-500 transition group-open:rotate-180 sm:hidden">▾</span>
+              <span aria-hidden="true" className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-fluid-xs text-slate-400 transition group-open:rotate-180 sm:hidden">▾</span>
             </summary>
             <ol className="mt-3 grid gap-2 sm:grid-cols-3">
               {missionSequenceItems.map((item) => (

@@ -55,7 +55,7 @@ export default function EmbedPage() {
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-white/90 sm:text-3xl">
             Add a weekly brief to your newsletter
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
             Embed a live US macro brief in any newsletter or webpage. Readers get the current
             operating call, bounded decisions, and flip watch — updated automatically every week.
           </p>
@@ -64,7 +64,7 @@ export default function EmbedPage() {
         <div className="grid gap-8 lg:grid-cols-[1fr_14rem]">
           <div className="space-y-5">
             <div className="weather-card">
-              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/40">
+              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Live preview
               </p>
               <div
@@ -75,7 +75,7 @@ export default function EmbedPage() {
                 {...(stage ? { "data-whether-stage": stage } : {})}
                 style={{ minHeight: "80px" }}
               >
-                <div className="text-fluid-micro text-white/30 py-3 px-3">
+                <div className="text-fluid-micro text-white/50 py-3 px-3">
                   {ticker || stage
                     ? `Loading brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…`
                     : "Configure your brief to see a live preview"}
@@ -86,13 +86,13 @@ export default function EmbedPage() {
 
           <div className="space-y-5">
             <div className="weather-card">
-              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/40">
+              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Configure
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="embed-ticker" className="block text-fluid-xs font-medium text-white/50">
+                  <label htmlFor="embed-ticker" className="block text-fluid-xs font-medium text-white/60">
                     Ticker
                   </label>
                   <input
@@ -116,7 +116,7 @@ export default function EmbedPage() {
                       className={`rounded-md px-2 py-0.5 text-fluid-micro font-medium transition-colors active:scale-[0.97] ${
                         ticker === t
                           ? "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/40"
-                          : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white/60"
+                          : "bg-white/[0.04] text-white/60 hover:bg-white/[0.08] hover:text-white/60"
                       }`}
                     >
                       {t || "None"}
@@ -125,7 +125,7 @@ export default function EmbedPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="embed-stage" className="block text-fluid-xs font-medium text-white/50">
+                  <label htmlFor="embed-stage" className="block text-fluid-xs font-medium text-white/60">
                     Company stage
                   </label>
                   <select
@@ -145,11 +145,11 @@ export default function EmbedPage() {
             </div>
 
             <div className="weather-card">
-              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/40">
+              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Embed code
               </p>
 
-              <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/50">
+              <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/60">
                 <code>{embedCode}</code>
               </pre>
 
@@ -166,7 +166,7 @@ export default function EmbedPage() {
                 </button>
               </div>
 
-              <p className="mt-3 text-fluid-micro leading-relaxed text-white/40">
+              <p className="mt-3 text-fluid-micro leading-relaxed text-white/60">
                 Paste this into any HTML newsletter or webpage. The brief renders live and
                 auto-updates weekly. No API key needed.
               </p>
@@ -184,15 +184,15 @@ export default function EmbedPage() {
             ].map((item) => (
               <div key={item.step} className="weather-card">
                 <p className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-300">{item.step}</p>
-                <p className="mt-2 text-xs leading-relaxed text-white/40">{item.desc}</p>
+                <p className="mt-2 text-xs leading-relaxed text-white/60">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="mt-10 weather-card">
-          <p className="text-fluid-xs leading-relaxed text-white/40">
-            <strong className="text-white/50">Attribution:</strong> The embed block includes a small
+          <p className="text-fluid-xs leading-relaxed text-white/60">
+            <strong className="text-white/60">Attribution:</strong> The embed block includes a small
             &ldquo;Macro brief by Whether&rdquo; footer with a link back to whether.work.
             This attribution is required for free embed usage.
           </p>

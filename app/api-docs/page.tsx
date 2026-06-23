@@ -69,7 +69,7 @@ export default function ApiDocsPage() {
           </div>
         </section>
 
-        <p className="text-fluid-micro text-slate-500">
+        <p className="text-fluid-micro text-slate-400">
           All endpoints are free and require no authentication. Data is provided for informational purposes.
         </p>
       </article>

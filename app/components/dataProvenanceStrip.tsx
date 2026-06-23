@@ -156,9 +156,9 @@ export const DataProvenanceStrip = ({
                   <p className="text-fluid-micro font-medium tracking-[0.06em] text-slate-300">Trust snapshot</p>
                   <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
-                  <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
-                    <p><span className="text-slate-500">Decision as-of:</span> {provenance.recordDateLabel}</p>
-                    <p><span className="text-slate-500">Data refreshed:</span> {provenance.timestampLabel}</p>
+                  <p><span className="text-slate-400">Confidence:</span> {confidencePct}%</p>
+                    <p><span className="text-slate-400">Decision as-of:</span> {provenance.recordDateLabel}</p>
+                    <p><span className="text-slate-400">Data refreshed:</span> {provenance.timestampLabel}</p>
                 </div>
               </Popover.Popup>
             </Popover.Positioner>
@@ -167,7 +167,7 @@ export const DataProvenanceStrip = ({
           <ManualRefreshButton
             label="Refresh"
             title="Request a fresh snapshot for this provenance context."
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
           />
         </div>
         <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
@@ -186,7 +186,7 @@ export const DataProvenanceStrip = ({
     <div className="weather-surface space-y-2 rounded-lg border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
+        <span className="text-slate-400 uppercase tracking-[0.14em]">{label}</span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
         <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
           <span aria-hidden="true">{dataModeIcon}</span>
@@ -210,8 +210,8 @@ export const DataProvenanceStrip = ({
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
                 <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
-                  <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
-                  <p><span className="text-slate-500">Data age:</span> {provenance.ageLabel}</p>
+                  <p><span className="text-slate-400">Confidence:</span> {confidencePct}%</p>
+                  <p><span className="text-slate-400">Data age:</span> {provenance.ageLabel}</p>
                 </div>
               </Popover.Popup>
             </Popover.Positioner>
@@ -220,13 +220,13 @@ export const DataProvenanceStrip = ({
         <ManualRefreshButton
           label="Refresh"
           title="Request a fresh snapshot for this provenance context."
-          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
         />
       </div>
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (
           <p key={row.label} className="space-y-1">
-            <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-500">{row.label}</span>
+            <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
             <span className="block tracking-normal normal-case">{row.value}</span>
           </p>
         ))}

@@ -41,7 +41,7 @@ export function CadenceCallCard({ cadence, data }: Props) {
   return (
     <section className="weather-card space-y-3" aria-label={`${CADENCE_LABEL[cadence]} call`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-white/40">
+        <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-white/60">
           {CADENCE_LABEL[cadence]} call
         </p>
         {summary.regimeLabel ? (
@@ -54,11 +54,11 @@ export function CadenceCallCard({ cadence, data }: Props) {
         {summary.title}
       </h2>
       {summary.guidance ? (
-        <p className="text-fluid-sm font-medium text-emerald-200/80">Do this week: {summary.guidance}</p>
+        <p className="text-fluid-sm font-medium text-emerald-200/80">This {cadence === "monthly" ? "month" : cadence === "quarterly" ? "quarter" : "year"}: {summary.guidance}</p>
       ) : null}
       <p className="text-fluid-sm leading-relaxed text-white/70">{summary.summary}</p>
       {provenance ? (
-        <p className="text-fluid-micro text-white/40">{provenance}</p>
+        <p className="text-fluid-micro text-white/60">{provenance}</p>
       ) : null}
     </section>
   );

@@ -83,10 +83,10 @@ describe("home route render contract", () => {
     assert.match(routeSource, /lg:grid-cols-12/);
     assert.match(routeSource, /lg:grid-cols-\[1fr_18rem\]/);
 
-    const scalarIndex = routeSource.indexOf("Boldness shift:");
-    const revisitIndex = routeSource.indexOf("Revisit queue");
-    const guardrailIndex = routeSource.indexOf("Watch if:");
-    const memoryIndex = routeSource.indexOf("Posture trend:");
+    const scalarIndex = routeSource.indexOf("Posture shift:");
+    const revisitIndex = routeSource.indexOf(">Revisit<");
+    const guardrailIndex = routeSource.indexOf("Watch:");
+    const memoryIndex = routeSource.indexOf("memoryItems.join");
     const trustStripIndex = routeSource.indexOf("<DeltaTrustStrip");
 
     assert.ok(scalarIndex >= 0, "active route exposes the canonical scalar");

@@ -39,7 +39,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
 
   if (!hydrated || data.length < 2) {
     return (
-      <p className="text-fluid-xs text-slate-600 text-center">
+      <p className="text-fluid-xs text-slate-400 text-center">
         Macro trendline will appear once sufficient data is available.
       </p>
     );
@@ -59,7 +59,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Macro trend</p>
+          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Macro trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
         </div>
         <div className="flex items-end gap-1.5 h-16 relative">
@@ -84,10 +84,10 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
                   style={{ height: `${height}%` }}
                   title={`${entry.record_date}: ${entry.regime}`}
                 />
-                <span className={`text-fluid-nano font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-500"}`}>
+                <span className={`text-fluid-nano font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-400"}`}>
                   {REGIME_DISPLAY[entry.regime] ?? entry.regime}
                 </span>
-                <span className="text-fluid-nano text-slate-600">
+                <span className="text-fluid-nano text-slate-400">
                   {new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}
                 </span>
               </div>
@@ -95,7 +95,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
           })}
         </div>
       </div>
-      <p className="mt-2 text-fluid-nano text-slate-600 text-right">
+      <p className="mt-2 text-fluid-nano text-slate-400 text-right">
         Last {data.length} months · MacRo regime history
       </p>
     </div>

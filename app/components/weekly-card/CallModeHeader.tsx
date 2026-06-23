@@ -54,7 +54,7 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
             </span>
           </div>
           <div className="text-right">
-            <p className="type-kicker text-slate-500">
+            <p className="type-kicker text-slate-400">
               Net change
             </p>
             <p className="mt-1 type-data font-semibold text-slate-100">
@@ -64,7 +64,7 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {showModeChip ? (
-            <span className="text-fluid-xs font-medium text-slate-500">
+            <span className="text-fluid-xs font-medium text-slate-400">
               {selectedModeLabel}
             </span>
           ) : null}
@@ -74,9 +74,9 @@ export function CallModeHeader({ viewModel }: { viewModel: CallModePanelViewMode
         </h2>
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs leading-5 text-slate-200" style={{ fontVariantNumeric: "tabular-nums" }}>
           <span className="font-semibold text-slate-50">{weeklyLeadershipSummary.shorthandLine}</span>
-          <span aria-hidden="true" className="text-slate-600">·</span>
+          <span aria-hidden="true" className="text-slate-400">·</span>
           <span>Posture score {weeklyLeadershipSummary.boldnessScore}/100</span>
-          <span aria-hidden="true" className="text-slate-600">·</span>
+          <span aria-hidden="true" className="text-slate-400">·</span>
           <span>{Math.round(confidencePercent)}% confidence</span>
         </div>
 

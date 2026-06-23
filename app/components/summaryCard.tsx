@@ -89,7 +89,7 @@ export const SummaryCard = ({
             onClick={handleCopy}
             disabled={isCopying}
             aria-busy={isCopying}
-            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
           >
             {isCopying ? "Copying" : copied ? "Copied" : "Copy summary"}
           </Button>
@@ -119,7 +119,7 @@ export const SummaryCard = ({
                 <ul className="mt-1 space-y-1 text-xs text-slate-300">
                   {section.items.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-400">•</span>
                       <span>{item}</span>
                     </li>
                   ))}

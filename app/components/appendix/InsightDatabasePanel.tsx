@@ -184,7 +184,7 @@ export const InsightDatabasePanel = ({
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search by source, tag, or recommendation"
-                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-base sm:text-sm text-slate-100 placeholder:text-slate-600"
+                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-base sm:text-sm text-slate-100 placeholder:text-slate-400"
                 />
               </Field.Root>
               <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -317,7 +317,7 @@ export const InsightDatabasePanel = ({
                   />
                 </Field.Root>
               </div>
-              <p id="evidence-date-hint" className="text-xs text-slate-500">
+              <p id="evidence-date-hint" className="text-xs text-slate-400">
                 Use YYYY-MM-DD to filter evidence by publish date.
               </p>
             </div>
@@ -374,7 +374,7 @@ export const InsightDatabasePanel = ({
                   >
                     {item.title}
                   </a>
-                  <p className="mt-2 text-xs text-slate-500">{item.summary}</p>
+                  <p className="mt-2 text-xs text-slate-400">{item.summary}</p>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
                     <span className="weather-pill-muted inline-flex items-center px-2 py-1">
                       Climate: {getRegimeLabel(item.climate as RegimeAssessment["regime"])}
@@ -423,7 +423,7 @@ export const InsightDatabasePanel = ({
         <CollapsibleDeepDive label={`Deep dive: ${fossilRecord.title}`}>
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">{fossilRecord.title}</p>
-            <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
+            <p className="mt-2 text-xs text-slate-400">{fossilRecord.subtitle}</p>
             <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
           </div>
           <div className="mt-4 overflow-x-auto overscroll-contain">

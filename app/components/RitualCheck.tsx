@@ -63,7 +63,7 @@ export function RitualCheck({
         className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
           reviewed
             ? "bg-emerald-500/12 text-emerald-300 border border-emerald-500/30"
-            : "bg-white/[0.04] text-white/40 border border-white/[0.06] hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-sky-400"
+            : "bg-white/[0.04] text-white/60 border border-white/[0.06] hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-sky-400"
         }`}
       >
         <span className={reviewed ? "" : "opacity-40"}>
@@ -73,20 +73,25 @@ export function RitualCheck({
       </button>
       <div className="flex items-center gap-1.5">
         {recentWeeks.length > 0 ? (
-          <div className="flex items-center gap-1" title={`${recentWeeks.filter(Boolean).length} of last ${recentWeeks.length} weeks reviewed`}>
-            {recentWeeks.map((r, i) => (
-              <span
-                key={i}
-                className={`block w-1.5 h-1.5 rounded-full transition-colors ${
-                  r ? "bg-emerald-400/60" : "bg-white/[0.08]"
-                }`}
-              />
-            ))}
-          </div>
+          <>
+            <div className="flex items-center gap-1" title={`${recentWeeks.filter(Boolean).length} of last ${recentWeeks.length} weeks reviewed`}>
+              {recentWeeks.map((r, i) => (
+                <span
+                  key={i}
+                  className={`block w-1.5 h-1.5 rounded-full transition-colors ${
+                    r ? "bg-emerald-400/60" : "bg-white/[0.08]"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         ) : null}
         {streak >= 1 ? (
           <span className="text-fluid-nano text-white/35">
-            {streak}wk streak 🔥
+            <span className="inline-flex items-center gap-1">
+              <svg className="size-3 text-amber-300/70" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1c.5 2-1 3-2 4s-2 2-2 4a4 4 0 0 0 8 0c0-2-1-3-2-4 .5 1 .5 2 0 2.5C11 6 10 4 10 3c0-1-.5-1.5-2-2z"/></svg>
+              {streak}wk streak
+            </span>
           </span>
         ) : null}
       </div>

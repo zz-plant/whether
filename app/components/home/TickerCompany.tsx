@@ -124,7 +124,7 @@ export function TickerCompany({
             value={input}
             onChange={(e) => setInput(e.target.value.toUpperCase())}
             placeholder="e.g. CRM…"
-            className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-600 max-w-[14rem]"
+            className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-400 max-w-[14rem]"
             maxLength={5}
             autoComplete="off"
           />
@@ -143,12 +143,12 @@ export function TickerCompany({
           <button
             type="button"
             onClick={handleClear}
-            className="min-h-11 min-w-11 px-2 text-fluid-micro text-slate-500 hover:text-slate-300"
+            className="min-h-11 min-w-11 px-2 text-fluid-micro text-slate-400 hover:text-slate-300"
           >
             Change
           </button>
           {loading ? (
-            <span className="text-fluid-micro text-slate-600">Loading…</span>
+            <span className="text-fluid-micro text-slate-400">Loading…</span>
           ) : null}
         </div>
       )}
@@ -216,7 +216,7 @@ export function TickerCompany({
                   </span>
                   <span className="text-xs text-slate-300">{sensitivity.explanation}</span>
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-400">
                   <span className="font-semibold text-slate-400">Adjust:</span>{" "}
                   {sensitivity.adjustment}
                 </p>
@@ -225,7 +225,7 @@ export function TickerCompany({
           ) : null}
 
           {data.revenue && tightness ? (
-            <p className="text-fluid-xs text-slate-500">
+            <p className="text-fluid-xs text-slate-400">
               At current tightness ({tightness}),{" "}
               {data.revenueGrowth != null && data.revenueGrowth > 10
                 ? "your growth is above the sector median. Focus tightening on spend efficiency rather than headcount."

@@ -165,7 +165,7 @@ export default async function HistoryComparePage({
               <p className={`mt-2 text-2xl font-bold ${boldnessDelta > 0 ? "text-emerald-400" : boldnessDelta < 0 ? "text-rose-400" : "text-slate-300"}`}>
                 {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts
               </p>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 {boldnessDelta > 0 ? "Epoch A is more aggressive" : boldnessDelta < 0 ? "Epoch A is more defensive" : "Equivalent risk postures"}
               </p>
             </div>
@@ -175,7 +175,7 @@ export default async function HistoryComparePage({
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {spreadA !== null && spreadB !== null ? `${(spreadA - spreadB).toFixed(2)}%` : "N/A"}
               </p>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 Spread diff: {(spreadA ?? 0).toFixed(2)}% vs {(spreadB ?? 0).toFixed(2)}%
               </p>
             </div>
@@ -185,7 +185,7 @@ export default async function HistoryComparePage({
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
               </p>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 Risk premium: {(bbbA ?? 0).toFixed(2)}% vs {(bbbB ?? 0).toFixed(2)}%
               </p>
             </div>
@@ -212,9 +212,9 @@ export default async function HistoryComparePage({
             <div className="weather-panel p-6 space-y-4">
               <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Playbook Rules</h3>
               <div className="space-y-2">
-                <p className="text-sm"><span className="text-slate-500 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-500 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-500 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
               </div>
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
@@ -298,9 +298,9 @@ export default async function HistoryComparePage({
             <div className="weather-panel p-6 space-y-4">
               <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Playbook Rules</h3>
               <div className="space-y-2">
-                <p className="text-sm"><span className="text-slate-500 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-500 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-500 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
               </div>
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">

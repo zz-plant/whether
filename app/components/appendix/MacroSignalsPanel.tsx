@@ -113,26 +113,26 @@ export const MacroSignalsPanel = ({
                       aria-hidden="true"
                     />
                   )}
-                  <figcaption className="mt-2 space-y-1 text-xs text-slate-500">
+                  <figcaption className="mt-2 space-y-1 text-xs text-slate-400">
                     {sparkline ? (
-                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
                         {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, signal.unit)}
                       </p>
                     ) : null}
                     {sparkline?.hasGaps ? (
-                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
                         Breaks mark missing readings
                       </p>
                     ) : null}
                     {!signal.isLive ? (
-                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
                         Cache-backed read
                       </p>
                     ) : null}
                     <p>{signal.explanation}</p>
                   </figcaption>
                 </figure>
-                <div className="mt-3 text-xs text-slate-500">
+                <div className="mt-3 text-xs text-slate-400">
                   <p>
                     Formula:{" "}
                     <a

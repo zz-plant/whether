@@ -6,10 +6,10 @@
 
 @theme {
   --color-slate-950: #101114;
-  --text-fluid-micro: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
-  --text-fluid-nano: clamp(0.625rem, 0.58rem + 0.1vw, 0.6875rem);
-  --text-fluid-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
-  --text-fluid-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
+  --text-fluid-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
+  --text-fluid-sm: clamp(0.8125rem, 0.7rem + 0.4vw, 0.9375rem);
+  --text-fluid-base: clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem);
   --text-fluid-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
   --text-fluid-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
   --text-fluid-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
@@ -47,8 +47,8 @@
   /* Text role tokens */
   --text-display: clamp(2.5rem, 7vw, 6.5rem);
   --text-heading: clamp(1.25rem, 1rem + 1.4vw, 2.15rem);
-  --text-label: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
-  --text-caption: clamp(0.625rem, 0.5rem + 0.2vw, 0.6875rem);
+  --text-label: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
+  --text-caption: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
   --color-app-surface: var(--app-surface);
   --color-app-raised: var(--app-raised);
   --color-app-nested: var(--app-nested);
@@ -87,9 +87,9 @@
   --footer-legal-hover: #e2e8f0;
 
   /* Type scale */
-  --fs-nano: clamp(0.5rem, 0.42rem + 0.18vw, 0.625rem);
-  --fs-micro: clamp(0.6875rem, 0.55rem + 0.3vw, 0.75rem);
-  --fs-sm: clamp(0.75rem, 0.65rem + 0.4vw, 0.875rem);
+  --fs-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
+  --fs-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
+  --fs-sm: clamp(0.8125rem, 0.7rem + 0.4vw, 0.9375rem);
   --fs-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
   --fs-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
   --fs-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
@@ -416,8 +416,6 @@ html[data-theme="light"] {
 [data-theme="light"] .text-white\/70 { color: #3a3a3a !important; }
 [data-theme="light"] .text-white\/60 { color: #4a4a4a !important; }
 [data-theme="light"] .text-white\/50 { color: #5a5a5a !important; }
-[data-theme="light"] .text-white\/40 { color: #6a6a6a !important; }
-[data-theme="light"] .text-white\/30 { color: #7a7a7a !important; }
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
 [data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }

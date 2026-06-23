@@ -35,7 +35,7 @@ export const buildThemeBootstrapScript = () => `
     const variant = window.localStorage.getItem("whether-theme-variant");
     if (variant) {
       root.dataset.themeVariant = variant;
-      root.style.colorScheme = ["paper", "minimal"].includes(variant) ? "light" : "dark";
+      root.style.colorScheme = variant === "paper" ? "light" : "dark";
     }
   } catch {
     // Ignore bootstrap errors and let the server-rendered shell remain usable.

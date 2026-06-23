@@ -220,10 +220,10 @@ export const DecisionMemoryPanel = () => {
                   </div>
                   <p className="mt-3 text-sm text-slate-300 break-words leading-relaxed">{entry.outcome.summary}</p>
                   <div className="mt-4 pt-3 border-t border-slate-800/50 grid gap-2 text-xs">
-                    <p className="text-slate-400"><span className="font-medium text-slate-500">Guardrail:</span> {entry.outcome.guardrail}</p>
-                    <p className="text-slate-400"><span className="font-medium text-slate-500">Reversal:</span> {entry.outcome.reversalTrigger}</p>
+                    <p className="text-slate-400"><span className="font-medium text-slate-400">Guardrail:</span> {entry.outcome.guardrail}</p>
+                    <p className="text-slate-400"><span className="font-medium text-slate-400">Reversal:</span> {entry.outcome.reversalTrigger}</p>
                     {entry.sources.length > 0 && (
-                      <p className="text-slate-500 break-all">
+                      <p className="text-slate-400 break-all">
                         <span className="font-medium">Sources:</span>{" "}
                         {entry.sources.map((src, i) => (
                           <a key={src} href={src} target="_blank" rel="noreferrer" className="text-sky-400/80 hover:text-sky-300 hover:underline mr-2">

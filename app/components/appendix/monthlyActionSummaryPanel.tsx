@@ -55,7 +55,7 @@ const ActionSummaryPanel = ({
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {block.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span className="break-words">{bullet}</span>
                 </li>
               ))}
@@ -145,7 +145,7 @@ export const MonthlyActionSummaryPanel = ({
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               {monthlyFocus.map((item) => (
                 <li key={item} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-400">•</span>
                   <span>{item}</span>
                 </li>
               ))}

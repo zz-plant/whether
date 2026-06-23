@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { REGIME_DISPLAY } from "../viewModel";
+import { REGIME_DISPLAY, REGIME_COLORS } from "../viewModel";
 
 export function CompareStrip({
   currentRegime,
@@ -48,7 +48,7 @@ export function CompareStrip({
           className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
         />
         <span className="relative h-5 w-9 rounded-full border border-white/[0.1] bg-white/[0.05] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
-        <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/55 transition-colors peer-checked:text-sky-200">
+        <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/65 transition-colors peer-checked:text-sky-200">
           vs. last week
         </span>
       </label>
@@ -57,9 +57,10 @@ export function CompareStrip({
         <div className="mt-4 pt-3 border-t border-white/[0.06] space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-2.5">
-              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-white/30">Previous Period</p>
+              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/50">Last week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="text-fluid-xs font-semibold text-white/60">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2 py-0.5 text-fluid-micro font-medium">
+                  <span className={`size-1.5 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[previous.regime] ?? previous.regime}
                 </span>
               </div>
@@ -67,12 +68,13 @@ export function CompareStrip({
             </div>
 
             <div className="rounded-lg bg-white/[0.04] border border-white/[0.08] p-2.5">
-              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-sky-300/40">Current Period</p>
+              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/40">This week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="text-fluid-xs font-semibold text-white">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2 py-0.5 text-fluid-micro font-medium">
+                  <span className={`size-1.5 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[currentRegime] ?? currentRegime}
                 </span>
-                <span className="text-fluid-nano text-white/55 font-mono bg-white/[0.06] px-1.5 py-0.5 rounded">
+                <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.06] px-1.5 py-0.5 rounded">
                   {currentTightness} pts
                 </span>
               </div>
@@ -82,18 +84,18 @@ export function CompareStrip({
           <div className="flex flex-wrap gap-2 text-fluid-micro">
             {previous.regime !== currentRegime ? (
               <span className="inline-flex items-center gap-1.5 rounded bg-sky-500/10 px-2 py-0.5 font-medium text-sky-300">
-                Regime Shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
+                Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
               </span>
             ) : null}
             {tightnessDelta != null && tightnessDelta !== 0 ? (
               <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium ${
                 tightnessDelta > 0 ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"
               }`}>
-                Tightness: {tightnessDelta > 0 ? "Increased" : "Decreased"} by {Math.abs(tightnessDelta).toFixed(1)} pts
+                Capital tightness: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.05] px-2 py-0.5 font-medium text-white/40">
-                Tightness: Unchanged
+              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.05] px-2 py-0.5 font-medium text-white/60">
+                Capital tightness: → unchanged
               </span>
             )}
           </div>

@@ -78,17 +78,17 @@ export function RegimeBanner(props: RegimeBannerProps) {
       </div>
       <div className="mt-2 text-fluid-xs leading-5 text-slate-300" aria-label="Trust strip">
         <span>Flip trigger: {flipRiskMeter.triggerLabel}</span>
-        <span className="text-slate-500"> · </span>
+        <span className="text-slate-400"> · </span>
         <span className="font-semibold text-slate-100">{trustStrip.freshnessBadge}</span>
-        <span className="text-slate-500"> · </span>
+        <span className="text-slate-400"> · </span>
         <span className="font-semibold text-slate-100">{trustStrip.confidenceBadge}</span>
-        <span className="text-slate-500"> · </span>
+        <span className="text-slate-400"> · </span>
         <Link href={trustStrip.provenanceHref as Route} className="font-semibold text-sky-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50">
           {trustStrip.provenanceBadge}
         </Link>
         {trustStrip.fallbackBadge ? (
           <>
-            <span className="text-slate-500"> · </span>
+            <span className="text-slate-400"> · </span>
             <span className="font-semibold text-amber-100">{trustStrip.fallbackBadge}</span>
           </>
         ) : null}

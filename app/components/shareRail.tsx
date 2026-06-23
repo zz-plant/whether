@@ -140,7 +140,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 })()}
               />
             </div>
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Copy as</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Copy as</p>
             <div className="mt-2 flex gap-2">
               <button
                 type="button"

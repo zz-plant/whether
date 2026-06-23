@@ -28,7 +28,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
   const deltaLabel = boldnessDelta !== 0
     ? `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`
     : "unchanged";
-  const deltaColor = boldnessDelta > 0 ? "text-emerald-300" : boldnessDelta < 0 ? "text-rose-300" : "text-white/45";
+  const deltaColor = boldnessDelta > 0 ? "text-emerald-300" : boldnessDelta < 0 ? "text-rose-300" : "text-white/60";
 
   useEffect(() => {
     let subscribeFormInView = false;
@@ -87,8 +87,10 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 lg:hidden bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent">
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[var(--bg-raised)]/94 px-2 py-1.5 shadow-[0_-4px_16px_rgba(0,0,0,0.26)] backdrop-blur">
             <span className="flex min-w-0 flex-1 items-center gap-1.5 text-fluid-xs font-semibold leading-tight text-white/85">
-              <span>{arrow}</span>
-              <span className="text-white/45">{boldnessScore}/100</span>
+              <span className={`inline-flex size-7 items-center justify-center rounded-full text-sm font-bold ${
+                arrow === "↑" ? "bg-rose-500/20 text-rose-300" : arrow === "↓" ? "bg-emerald-500/20 text-emerald-300" : "bg-sky-500/20 text-sky-300"
+              }`}>{arrow}</span>
+              <span className="text-white/60">{boldnessScore}/100</span>
               <span className="min-w-0 truncate">{call}</span>
             </span>
             <span className={`hidden flex-shrink-0 text-fluid-xs font-semibold ${deltaColor} min-[430px]:inline`}>{deltaLabel}</span>

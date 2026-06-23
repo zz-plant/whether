@@ -52,7 +52,7 @@ export const PlaybookPanel = ({
               ? playbook.insight
               : "Playbook data unavailable. Use operating guardrails until data recovers."}
           </p>
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-slate-400">
             Align the team on what to stop, start, and keep limited before approvals move forward.
           </p>
         </div>
@@ -129,7 +129,7 @@ export const PlaybookPanel = ({
                     <p className="text-slate-400">Metric: {playbook.metric}</p>
                   </div>
                 ) : (
-                  <p className="mt-3 text-xs text-slate-500">
+                  <p className="mt-3 text-xs text-slate-400">
                     Playbook signals will return once Treasury data is refreshed.
                   </p>
                 )}

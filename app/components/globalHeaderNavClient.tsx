@@ -81,7 +81,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
           className={`rounded-full px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400 ${
             link.isActive
               ? "bg-sky-500/14 text-sky-100"
-              : "text-white/40 hover:text-white/70"
+              : "text-white/60 hover:text-white/70"
           }`}
           >
             {link.label}
@@ -90,7 +90,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         <span className="mx-1 h-4 w-px bg-slate-700/60" aria-hidden="true" />
         <Link
           href="/api-docs"
-          className="rounded-full px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] text-white/40 hover:text-white/70 no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="rounded-full px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] text-white/60 hover:text-white/70 no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
         >
           API
         </Link>

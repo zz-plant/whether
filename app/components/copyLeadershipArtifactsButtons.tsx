@@ -34,7 +34,7 @@ type ActionButtonVariant = "primary" | "secondary" | "confirm" | "danger";
 type ShareState = "idle" | "sharing" | "shared" | "copied" | "error";
 
 const actionButtonBaseClassName =
-  "inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation";
+  "inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400 touch-manipulation";
 
 export const actionButtonVariantClassNames: Record<ActionButtonVariant, string> = {
   primary: `weather-button-primary ${actionButtonBaseClassName} px-4 py-2 hover:border-sky-400/70 hover:text-slate-100`,

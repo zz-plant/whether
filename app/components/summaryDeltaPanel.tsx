@@ -35,7 +35,7 @@ export const SummaryDeltaPanel = ({
       <ul className="mt-4 space-y-2 text-sm text-slate-300">
         {delta.bullets.map((bullet) => (
           <li key={bullet} className="flex gap-2">
-            <span className="text-slate-500">•</span>
+            <span className="text-slate-400">•</span>
             <span className="break-words">{bullet}</span>
           </li>
         ))}

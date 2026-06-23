@@ -51,7 +51,7 @@ export function DataCard({
     return (
       <div className={`rounded-md bg-slate-950/25 px-3 py-3 ${className}`}>
         {label ? (
-          <p className="text-fluid-micro uppercase tracking-[0.1em] text-slate-500">{label}</p>
+          <p className="text-fluid-micro uppercase tracking-[0.1em] text-slate-400">{label}</p>
         ) : null}
         <p className="mt-1 text-sm font-bold tabular-nums text-slate-100">
           {value}{unit ? <span className="text-xs font-normal text-slate-400 ml-0.5">{unit}</span> : null}
@@ -85,7 +85,7 @@ export function DataCard({
             </div>
           </div>
           {source?.freshness ? (
-            <span className="text-fluid-micro text-slate-500">{source.freshness}</span>
+            <span className="text-fluid-micro text-slate-400">{source.freshness}</span>
           ) : null}
         </div>
         {sparkline ? (
@@ -98,7 +98,7 @@ export function DataCard({
           </p>
         ) : null}
         {source?.label ? (
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-slate-400">
             Source:{" "}
             {source.url ? (
               <a href={source.url} className="text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200">
@@ -127,7 +127,7 @@ export function DataCard({
       ) : null}
       {children}
       {source?.label ? (
-        <p className="mt-3 text-xs text-slate-500">Source: {source.label}</p>
+        <p className="mt-3 text-xs text-slate-400">Source: {source.label}</p>
       ) : null}
     </div>
   );

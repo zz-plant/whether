@@ -28,7 +28,7 @@ export function StartupActivity() {
   if (items.length === 0) return null;
 
   return (
-    <p className="text-fluid-micro text-slate-500">
+    <p className="text-fluid-micro text-slate-400">
       {items.join(" · ")}
     </p>
   );

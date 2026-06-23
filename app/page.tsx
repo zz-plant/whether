@@ -105,31 +105,31 @@ function WeeklyTopFoldContract({
       className="weather-card grid gap-4 lg:grid-cols-12"
     >
       <div className="space-y-2 lg:col-span-7">
-        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">THIS WEEK</p>
-        <div className="grid gap-2 text-fluid-micro text-white/55 grid-cols-2 xl:grid-cols-4">
-          <span>Boldness shift: {weeklySummary.notchShiftLabel}</span>
-          <span>Hiring window: {weeklySummary.hiringWindow}</span>
-          <span>Expansion window: {weeklySummary.expansionWindow}</span>
-          <span>Fundraise window: {weeklySummary.raiseWindow}</span>
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60">WEEKLY POSTURE</p>
+        <div className="grid gap-2 text-fluid-micro text-white/65 grid-cols-2 xl:grid-cols-4">
+          <span>Posture shift: {weeklySummary.notchShiftLabel}</span>
+          <span>Hiring: {weeklySummary.hiringWindow}</span>
+          <span>Expansion: {weeklySummary.expansionWindow}</span>
+          <span>Fundraising: {weeklySummary.raiseWindow}</span>
         </div>
         <p className="text-fluid-micro font-medium text-sky-200/80">{weeklySummary.shorthandLine}</p>
       </div>
 
       <div className="space-y-2 lg:col-span-5">
         <div className="flex items-center gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/40">Revisit queue</p>
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60">Revisit</p>
           <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.6rem] font-bold tracking-[0.06em] uppercase ${
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit
                 ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
                 : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
             }`}
           >
-            {shouldRevisit ? "REVISIT" : "HOLD"}
+            {shouldRevisit ? "REVISIT" : "ON TRACK"}
           </span>
         </div>
         {revisitQueue.length ? (
-          <ul className="space-y-1.5 text-fluid-micro text-white/50">
+          <ul className="space-y-1.5 text-fluid-micro text-white/60">
             {revisitQueue.map((item) => (
               <li key={item.id}>
                 <span className="font-medium text-white/65">{item.label}:</span>{" "}
@@ -138,15 +138,15 @@ function WeeklyTopFoldContract({
             ))}
           </ul>
         ) : null}
-        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/45">
+        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/60">
           {guardrailRows.map((row, index) => (
             <p key={index}>
-              <span className="text-white/60">Watch if:</span> {compactSentence(row.trigger, 84)}
+              <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}
             </p>
           ))}
         </div>
         {memoryItems.length ? (
-          <p className="text-fluid-micro text-white/45">Posture trend: {memoryItems.join(" → ")}</p>
+          <p className="text-fluid-micro text-white/60">{memoryItems.join(" → ")}</p>
         ) : null}
       </div>
     </section>
@@ -170,8 +170,8 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
     return (
       <Shell regime="EXPANSION">
         <div className="text-center py-16 space-y-3">
-          <p className="text-white/40 text-sm">Unable to load the weekly brief.</p>
-          <p className="text-white/30 text-fluid-micro">The data pipeline may be temporarily unavailable. Please try again shortly.</p>
+          <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
+          <p className="text-white/50 text-fluid-micro">Data may be temporarily unavailable. Please try again shortly.</p>
         </div>
       </Shell>
     );
@@ -184,7 +184,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
-  const macroTrendline = regimeHistory.slice(-12);
+  const macroTrendline = regimeHistory.slice(-24);
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
@@ -231,8 +231,8 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
       />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
-          <span className="font-semibold text-amber-300/80">Data is degraded.</span>{" "}
-          <span className="text-amber-300/50">Using cached snapshot. Decisions should be staged, not committed, until live data returns.</span>
+          <span className="font-semibold text-amber-300/80">Some data is cached.</span>{" "}
+          <span className="text-amber-300/50">Stage decisions but don&apos;t commit until live data returns.</span>
         </div>
       ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
@@ -328,10 +328,10 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
              className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
            >
              <div>
-               <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Open weekly plan</p>
-               <p className="text-fluid-micro text-white/40 mt-0.5">Turn this read into this week&apos;s plan</p>
+                <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Build this week&apos;s plan</p>
+                <p className="text-fluid-micro text-white/60 mt-0.5">Convert the brief into an action plan</p>
              </div>
-             <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
+             <span className="text-white/50 group-hover:text-white/60 transition-colors">→</span>
            </Link>
  
            <SubscribeForm />
@@ -350,7 +350,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
              sourceHealthSummary={sourceHealthSummary}
              direction={signalDirection}
            />
-           <RegimeHistory regimes={macroTrendline} currentRegime={regime} />
+            <RegimeHistory regimes={macroTrendline} />
          </div>
        </div>
  

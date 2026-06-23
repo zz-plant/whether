@@ -84,7 +84,7 @@ export const CxoFunctionPanel = ({
           <ul className="mt-4 space-y-2 text-sm text-slate-300">
             {item.outputs.map((output) => (
               <li key={output} className="flex gap-2">
-                <span className="text-slate-500">•</span>
+                <span className="text-slate-400">•</span>
                 <span className="break-words">{output}</span>
               </li>
             ))}

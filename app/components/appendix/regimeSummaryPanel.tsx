@@ -53,7 +53,7 @@ export const RegimeSummaryPanel = ({
                   <p className="mono mt-2 text-lg text-slate-100">
                     {assessment.scores.tightness}/100
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-400">
                     Threshold {assessment.thresholds.tightnessRegime}
                   </p>
                 </div>
@@ -64,7 +64,7 @@ export const RegimeSummaryPanel = ({
                   <p className="mono mt-2 text-lg text-slate-100">
                     {assessment.scores.riskAppetite}/100
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-400">
                     Threshold {assessment.thresholds.riskAppetiteRegime}
                   </p>
                 </div>
@@ -83,7 +83,7 @@ export const RegimeSummaryPanel = ({
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 {assessment.constraints.map((constraint) => (
                   <li key={constraint} className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span className="break-words">{constraint}</span>
                   </li>
                 ))}
@@ -102,7 +102,7 @@ export const RegimeSummaryPanel = ({
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 {constraintHighlights.map((constraint) => (
                   <li key={constraint} className="flex gap-2">
-                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">•</span>
                     <span className="break-words">{constraint}</span>
                   </li>
                 ))}

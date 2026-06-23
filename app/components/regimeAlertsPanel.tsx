@@ -230,7 +230,7 @@ export const RegimeAlertsPanel = () => {
             <p className="mt-2 type-data text-slate-300">
               Review major environment-change alerts and send them by Slack, email, or webhook.
             </p>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-400">
               Delivery preferences and logs are scoped to this device&apos;s operator profile.
             </p>
           </div>
@@ -260,7 +260,7 @@ export const RegimeAlertsPanel = () => {
             >
               Deliver latest alert
             </button>
-            {!clientId ? <p className="text-xs text-slate-500">Loading delivery profile…</p> : null}
+            {!clientId ? <p className="text-xs text-slate-400">Loading delivery profile…</p> : null}
             {deliveryStatus ? <p className="text-xs text-slate-300">{deliveryStatus}</p> : null}
           </div>
         </div>
@@ -288,7 +288,7 @@ export const RegimeAlertsPanel = () => {
                       <p className="mt-2 text-sm text-slate-100">
                         {entry.previous.assessment.regime} → {entry.current.assessment.regime}
                       </p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-slate-400">
                         Previous record: {formatRecordDate(entry.previous.recordDate)} · Current
                         record: {formatRecordDate(entry.current.recordDate)}
                       </p>
@@ -297,7 +297,7 @@ export const RegimeAlertsPanel = () => {
                       type="button"
                       onClick={() => copyToClipboard(copyText, entry.id)}
                       aria-busy={isCopying}
-                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
                     >
                       {isCopying ? "Copying" : isCopied ? "Copied" : "Copy alert"}
                     </button>

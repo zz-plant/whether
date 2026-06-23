@@ -38,7 +38,7 @@ function ErrorView() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md space-y-6 text-center">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400">
           WHETHER
         </p>
         <h1 className="text-fluid-lg font-semibold text-slate-100 font-display">
@@ -65,7 +65,7 @@ function MarketStateView({ state }: { state: MarketState }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-2xl space-y-6 text-center">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400">
           WHETHER
         </p>
 
@@ -95,11 +95,11 @@ function MarketStateView({ state }: { state: MarketState }) {
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
           <ConfidenceBadge label={state.confidenceLabel} />
           <span>Record {state.recordDate}</span>
-          <span className="text-slate-600">·</span>
+          <span className="text-slate-400">·</span>
           <span>Refreshed {state.fetchedAt}</span>
         </div>
 
-        <p className="text-fluid-micro text-slate-600">
+        <p className="text-fluid-micro text-slate-400">
           Data: FRED · Treasury · Yahoo Finance
         </p>
 
@@ -112,7 +112,7 @@ function MarketStateView({ state }: { state: MarketState }) {
           </Link>
         </div>
 
-        <p className="text-fluid-micro text-slate-600 max-w-md mx-auto leading-relaxed pt-4">
+        <p className="text-fluid-micro text-slate-400 max-w-md mx-auto leading-relaxed pt-4">
           Weekly operating brief for startup and product leaders. Based on U.S.
           Treasury data. No signup required.
         </p>

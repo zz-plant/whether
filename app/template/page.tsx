@@ -95,7 +95,7 @@ export default function TemplatePage() {
           </button>
         </div>
 
-        <p className="text-fluid-micro text-slate-500 italic">
+        <p className="text-fluid-micro text-slate-400 italic">
           No signup required. No data collected. This template is free to use, copy, and share.
           <br />Inspired by the bounded decision framework used in Whether&apos;s weekly brief.
         </p>
@@ -116,7 +116,7 @@ export default function TemplatePage() {
         <div className="border-t border-slate-700/50 pt-6 space-y-3">
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
+            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">Current brief</p>
               <p className="text-xs text-slate-300">See a live bounded decision in practice</p>
             </Link>

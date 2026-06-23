@@ -280,7 +280,7 @@ export const ThresholdsPanel = ({
                   onClick={() => handlePresetApply(preset.thresholds)}
                   disabled={isPending}
                   aria-busy={isPending}
-                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                 >
                   <span className="text-slate-100">{preset.label}</span>
                   <span className="text-fluid-xs font-medium tracking-[0.08em] text-slate-400">
@@ -297,7 +297,7 @@ export const ThresholdsPanel = ({
               className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
             >
               Edit exact numbers
-              <span className="text-fluid-micro text-slate-500">Show / hide</span>
+              <span className="text-fluid-micro text-slate-400">Show / hide</span>
             </Collapsible.Trigger>
             <Collapsible.Panel className="pt-4">
               <Form onFormSubmit={handleSubmit} className="grid gap-4">
@@ -353,7 +353,7 @@ export const ThresholdsPanel = ({
                       type="submit"
                       disabled={isPending}
                       aria-busy={isPending}
-                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
                       {isPending ? (
                         <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -365,7 +365,7 @@ export const ThresholdsPanel = ({
                       onClick={handleReset}
                       disabled={isPending}
                       aria-busy={isPending}
-                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
                       {isPending ? (
                         <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -428,11 +428,11 @@ export const ThresholdsPanel = ({
                         </Popover.Description>
                         <ul className="mt-3 space-y-2 text-xs text-slate-300">
                           <li className="flex gap-2">
-                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400">•</span>
                             <span>Lower numbers mean earlier alerts and stricter guardrails.</span>
                           </li>
                           <li className="flex gap-2">
-                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400">•</span>
                             <span>Higher numbers delay changes until signals are extreme.</span>
                           </li>
                         </ul>
@@ -461,7 +461,7 @@ export const ThresholdsPanel = ({
                   <ul className="space-y-3 text-xs text-slate-400">
                     {auditLog.map((entry) => (
                       <li key={`${entry.timestamp}-${entry.source}`}>
-                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                           {entry.source === "reset" ? "Reset" : entry.source === "preset" ? "Preset" : "Override"} ·{" "}
                           {new Date(entry.timestamp).toLocaleString("en-US", {
                             timeStyle: "short",
@@ -477,7 +477,7 @@ export const ThresholdsPanel = ({
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     No overrides logged yet. Defaults are active.
                   </p>
                 )}

@@ -45,7 +45,7 @@ export function SubscribeForm() {
           <Check className="size-5" aria-hidden="true" />
         </span>
         <p className="text-fluid-xs font-semibold text-white">Subscribed!</p>
-        <p className="text-fluid-micro text-white/50">{message}</p>
+        <p className="text-fluid-micro text-white/60">{message}</p>
       </div>
     );
   }
@@ -53,8 +53,8 @@ export function SubscribeForm() {
   return (
     <div className="weather-card space-y-3">
       <div>
-        <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70">Weekly briefing</p>
-        <p className="text-fluid-micro text-white/40 mt-1">Get the operating posture in your inbox every Monday.</p>
+        <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70">Get the weekly brief</p>
+        <p className="text-fluid-micro text-white/60 mt-1">Weekly operating call + evidence, every Monday.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">

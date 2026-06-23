@@ -49,9 +49,9 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
     <article className="max-w-3xl mx-auto space-y-5 py-4 sm:py-6">
       <header className="space-y-1 border-b border-slate-800/60 pb-4">
         <div className="grid grid-cols-[4rem_1fr] gap-x-3 gap-y-0.5 text-sm">
-          <span className="text-slate-500 font-medium">From</span>
+          <span className="text-slate-400 font-medium">From</span>
           <span className="text-slate-200 font-semibold">Whether</span>
-          <span className="text-slate-500 font-medium">Re</span>
+          <span className="text-slate-400 font-medium">Re</span>
           <span className="text-slate-100 font-semibold">Weekly operating guidance</span>
         </div>
 
@@ -137,7 +137,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
                       {step.posture}
                     </span>
                     {index < postureSteps.length - 1 ? (
-                      <span className="text-xs text-slate-500">→</span>
+                      <span className="text-xs text-slate-400">→</span>
                     ) : null}
                   </div>
                 ))}
@@ -175,7 +175,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       ) : null}
 
       {trustReason ? (
-        <p className="text-xs text-slate-500 italic">Using the last verified weekly read because {trustReason}</p>
+        <p className="text-xs text-slate-400 italic">Using the last verified weekly read because {trustReason}</p>
       ) : null}
 
       <section className="border-t border-slate-800/60 pt-4">
@@ -187,7 +187,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       </section>
 
       {glossaryHref ? (
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           <Link href={glossaryHref as Route} className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
             Open glossary
           </Link>
@@ -195,7 +195,7 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
       ) : null}
 
       <footer className="border-t border-slate-800/60 pt-4">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500 mb-2">Decision at a glance</p>
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Decision at a glance</p>
         <div className="grid grid-cols-2 gap-2 text-xs mb-4">
           <div className="rounded-md bg-emerald-500/6 px-3 py-2">
             <p className="text-emerald-200 font-semibold uppercase tracking-[0.08em]">Do now</p>
@@ -218,9 +218,9 @@ export function CallModeSections({ viewModel }: { viewModel: CallModePanelViewMo
           <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {postureSummaryCards.map((card) => (
               <div key={card.label} className={card.className}>
-                <dt className="text-fluid-micro uppercase tracking-[0.1em] text-slate-500">{card.label}</dt>
+                <dt className="text-fluid-micro uppercase tracking-[0.1em] text-slate-400">{card.label}</dt>
                 <dd className="mt-1 text-sm font-semibold text-slate-100">{card.value}</dd>
-                <dd className="mt-0.5 text-fluid-micro text-slate-500">{card.detail}</dd>
+                <dd className="mt-0.5 text-fluid-micro text-slate-400">{card.detail}</dd>
               </div>
             ))}
           </dl>

@@ -101,7 +101,7 @@ export function CompanyMetricsPanel({
       {editing ? (
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div>
-            <label htmlFor={`${inputId}-burn`} className="text-slate-500">Monthly burn</label>
+            <label htmlFor={`${inputId}-burn`} className="text-slate-400">Monthly burn</label>
             <input
               id={`${inputId}-burn`}
               type="number"
@@ -112,7 +112,7 @@ export function CompanyMetricsPanel({
             />
           </div>
           <div>
-            <label htmlFor={`${inputId}-runway`} className="text-slate-500">Runway (months)</label>
+            <label htmlFor={`${inputId}-runway`} className="text-slate-400">Runway (months)</label>
             <input
               id={`${inputId}-runway`}
               type="number"
@@ -123,7 +123,7 @@ export function CompanyMetricsPanel({
             />
           </div>
           <div>
-            <label htmlFor={`${inputId}-headcount`} className="text-slate-500">Headcount</label>
+            <label htmlFor={`${inputId}-headcount`} className="text-slate-400">Headcount</label>
             <input
               id={`${inputId}-headcount`}
               type="number"
@@ -137,13 +137,13 @@ export function CompanyMetricsPanel({
       ) : guidance ? (
         <div className="space-y-1 text-xs">
           <p className="text-slate-300">
-            <span className="text-slate-500">Burn:</span>{" "}
+            <span className="text-slate-400">Burn:</span>{" "}
             <span className="text-slate-200 font-medium">{formatCurrency(metrics!.burnRate)}/mo</span>
-            <span className="text-slate-600 mx-1.5">·</span>
-            <span className="text-slate-500">Runway:</span>{" "}
+            <span className="text-slate-400 mx-1.5">·</span>
+            <span className="text-slate-400">Runway:</span>{" "}
             <span className="text-slate-200 font-medium">{metrics!.runwayMonths} mo</span>
-            <span className="text-slate-600 mx-1.5">·</span>
-            <span className="text-slate-500">Team:</span>{" "}
+            <span className="text-slate-400 mx-1.5">·</span>
+            <span className="text-slate-400">Team:</span>{" "}
             <span className="text-slate-200 font-medium">{metrics!.headcount}</span>
           </p>
           {guidance.direction !== "maintain" ? (

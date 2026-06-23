@@ -70,7 +70,7 @@ export const OperatorCommandActionItem = ({
             ))}
           </span>
         )}
-        <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+        <ArrowRightIcon className="h-3.5 w-3.5 text-slate-400" />
       </span>
     </>
   );

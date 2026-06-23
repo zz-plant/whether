@@ -199,7 +199,7 @@ export const TimeMachinePanel = ({
   const centeredPillLinkClass = "justify-center";
   const fullWidthPillLinkClass = "w-full justify-center";
   const disabledPillClass =
-    "weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-500/90 opacity-70";
+    "weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-400/90 opacity-70";
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
@@ -258,7 +258,7 @@ export const TimeMachinePanel = ({
           <div className="weather-surface weather-delta-card p-4">
             <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
-            <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
+            <p className="mt-2 text-xs text-slate-400">Highlights the month loaded into the report.</p>
             {!isHistorical && replayPreviousHref ? (
               <ActionLink
                 href={replayPreviousHref as Route}

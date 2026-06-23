@@ -28,7 +28,7 @@ const BUTTON_VARIANT_CLASS: Record<"button" | "pill", string> = {
 };
 
 const BUTTON_BASE_CLASS =
-  "inline-flex items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500";
+  "inline-flex items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400";
 
 export function ClipboardActionRow({
   label,

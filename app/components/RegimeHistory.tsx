@@ -4,10 +4,17 @@ import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { REGIME_COLORS } from "../viewModel";
+import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
+
+type RegimeHistoryEntry = {
+  record_date: string;
+  regime: string;
+  tightness?: number;
+  riskAppetite?: number;
+};
 
 type Props = {
-  regimes: Array<{ record_date: string; regime: string }>;
-  currentRegime: string;
+  regimes: RegimeHistoryEntry[];
 };
 
 function parseYearMonth(dateStr: string): { year: number; month: number } | null {
@@ -22,7 +29,7 @@ function formatAxisDate(dateStr: string): string {
   return d.toLocaleDateString("en", { month: "short", year: "2-digit" });
 }
 
-export function RegimeHistory({ regimes, currentRegime }: Props) {
+export function RegimeHistory({ regimes }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedMonth = searchParams?.get("month");
@@ -48,10 +55,15 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
     ? new Date(selectedEntry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })
     : null;
 
+  const hasEvents = regimes.some((entry) => {
+    const ym = parseYearMonth(entry.record_date);
+    return ym ? findEventAt(ym.year, ym.month) !== null : false;
+  });
+
   return (
     <div className="weather-card">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-fluid-nano font-semibold tracking-[0.06em] text-white/40">
+        <p className="text-fluid-nano font-semibold tracking-[0.06em] text-white/60">
           {isViewingHistory && selectedLabel ? selectedLabel : "Conditions over time"}
         </p>
         {isViewingHistory ? (
@@ -61,7 +73,7 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href).catch(() => {});
               }}
-              className="text-fluid-nano font-medium text-white/40 hover:text-white/60 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="text-fluid-nano font-medium text-white/60 hover:text-white/60 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
             >
               Copy link
             </button>
@@ -75,31 +87,48 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
         ) : null}
       </div>
 
-      <div className="flex h-12 items-end gap-1 overflow-x-auto">
+      <div className="relative flex h-14 items-end gap-1 overflow-x-auto">
+        <div className="absolute left-0 right-0 top-1/2 h-px bg-white/[0.06]" aria-hidden="true" />
         {regimes.map((entry, i) => {
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
           const selected = isSelectedEntry(entry);
+          const boldness = entry.tightness != null && entry.riskAppetite != null
+            ? Math.round(entry.riskAppetite * 0.7 + (100 - entry.tightness) * 0.3)
+            : null;
+          const barHeight = boldness != null ? `${Math.max(20, Math.min(95, boldness))}%` : "85%";
+          const ym = parseYearMonth(entry.record_date);
+          const event = ym ? findEventAt(ym.year, ym.month) : null;
+          const nearest = ym && !event ? findNearestEvent(ym.year, ym.month) : null;
+          const tooltipParts = [
+            `${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime}`,
+            boldness != null ? `${boldness}/100` : null,
+            event ? event.label : null,
+            nearest ? `${nearest.monthsDistance === 0 ? "during" : nearest.monthsDistance === 1 ? "1 mo from" : `${nearest.monthsDistance} mo from`} ${nearest.event.label}` : null,
+          ].filter(Boolean);
           return (
             <button
                       key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
-              className="group flex h-12 min-h-11 min-w-[1.5rem] flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-              aria-label={`${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime} regime`}
-              title={`${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime}`}
+              className="group relative flex h-14 min-h-11 min-w-[1rem] flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              aria-label={tooltipParts.join(" · ")}
+              title={tooltipParts.join(" · ")}
             >
+              {event ? (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[7px] leading-none text-amber-300/70" aria-hidden="true">★</span>
+              ) : null}
               <span
                 aria-hidden="true"
                 className={`block w-full rounded-t-sm transition-[opacity] group-hover:opacity-80 ${
                   REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
-                } ${isCurrent ? "ring-1 ring-white/30" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
-                style={{ height: "75%" }}
+                } ${isCurrent ? "ring-2 ring-white/40" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
+                style={{ height: barHeight }}
               />
             </button>
           );
         })}
       </div>
-      <div className="flex justify-between text-fluid-nano text-white/30 mt-1">
+      <div className="flex justify-between text-fluid-nano text-white/50 mt-1">
         <span>{formatAxisDate(regimes[0].record_date)}</span>
         {regimes.length >= 8 ? (
           <span className="text-white/20">{formatAxisDate(regimes[Math.floor(regimes.length / 2)].record_date)}</span>
@@ -110,6 +139,11 @@ export function RegimeHistory({ regimes, currentRegime }: Props) {
           <span>{formatAxisDate(regimes[regimes.length - 1].record_date)}</span>
         )}
       </div>
+      {hasEvents ? (
+        <p className="text-fluid-nano text-white/25 mt-0.5">
+          <span className="text-amber-300/60">★</span> = notable event · hover for details
+        </p>
+      ) : null}
     </div>
   );
 }

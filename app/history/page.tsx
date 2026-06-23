@@ -90,7 +90,7 @@ export default function HistoryPage() {
 
         {regimeSeries.length > 0 ? (
           <div className="space-y-1.5">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Regime timeline</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Regime timeline</p>
             <div className="flex flex-wrap gap-1">
               {regimeSeries.slice(-24).map((entry) => {
                 const isSelected = entry.year === selectedYear && entry.month === selectedMonth;
@@ -110,7 +110,7 @@ export default function HistoryPage() {
                 );
               })}
             </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-500">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-400">
               {Object.entries(REGIME_COLORS).map(([regime, color]) => (
                   <span key={regime} className="inline-flex items-center gap-1">
                     <span className={`inline-block h-2.5 w-2.5 rounded-sm ${color}`} aria-hidden="true" />
@@ -160,7 +160,7 @@ export default function HistoryPage() {
               >Clear selection</button>
             ) : null}
           </div>
-        ) : <p className="text-xs text-slate-500">Loading historical data...</p>}
+        ) : <p className="text-xs text-slate-400">Loading historical data...</p>}
 
         {regimeForPeriod ? (
           <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-4 py-3 space-y-3">
@@ -233,7 +233,7 @@ export default function HistoryPage() {
             </table>
           </div>
           {history.length > 24 ? (
-            <p className="text-fluid-micro text-slate-500">Showing last 24 of {history.length} recorded weeks.</p>
+            <p className="text-fluid-micro text-slate-400">Showing last 24 of {history.length} recorded weeks.</p>
           ) : null}
         </section>
       ) : null}

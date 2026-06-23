@@ -49,7 +49,7 @@ export const DecisionShieldTemplatesPanel = ({
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 {Object.entries(decision.stances).map(([regimeKey, stance]) => (
                   <li key={regimeKey} className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                       {regimeKey}
                     </span>
                     <span>{stance}</span>

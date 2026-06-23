@@ -198,7 +198,7 @@ export const ExecutiveSnapshotPanel = ({
                 <li key={constraint} className="rounded-md border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">{constraint}</li>
               ))}
             </ul>
-            <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
+            <p className="mt-2 text-xs text-slate-400">{assessment.description}</p>
           </div>
 
           <div className="weather-tile p-4">
@@ -219,10 +219,10 @@ export const ExecutiveSnapshotPanel = ({
                 </span>
               </div>
             </div>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-slate-400">
               Curve slope = 10Y minus 2Y. Negative values can signal inversion risk.
             </p>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-400">
               Higher 10Y levels usually imply more expensive long-term borrowing, which can pressure fixed-cost expansion plans.
             </p>
             <div className="mt-3">
@@ -275,7 +275,7 @@ export const ExecutiveSnapshotPanel = ({
                   markerEnd={`url(#${curveMarkerId})`}
                 />
               </svg>
-              <p className="mt-2 text-xs text-slate-500">Curve status: {curveLabel}</p>
+              <p className="mt-2 text-xs text-slate-400">Curve status: {curveLabel}</p>
             </div>
           </div>
 
@@ -284,7 +284,7 @@ export const ExecutiveSnapshotPanel = ({
             <p className="mono mt-2 text-sm text-slate-100">
               <time dateTime={treasury.record_date}>{treasury.record_date}</time>
             </p>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-400">
               Fetched{" "}
               <time dateTime={treasury.fetched_at}>{formatTimestampUTC(treasury.fetched_at)}</time>
             </p>

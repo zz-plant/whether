@@ -87,7 +87,7 @@ export const SensorArray = ({
                 <p className="mono mt-2 text-3xl text-slate-100">
                   {formatDelta(mostChanged.change ?? null, mostChanged.sensor.unit)}
                 </p>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-slate-400">
                   {activeWindow.label} change · Current{" "}
                   <span className="text-slate-300">
                     {formatNumber(mostChanged.sensor.value, mostChanged.sensor.unit)}
@@ -102,15 +102,15 @@ export const SensorArray = ({
                 </p>
               </div>
               <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 p-4 text-xs text-slate-400">
-                <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
+                <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-400">
                   Leading group
                 </p>
                 <p className="mt-2 text-sm text-slate-200">{mostChanged.sensor.group.label}</p>
-                <p className="mt-2 text-slate-500">{mostChanged.sensor.group.description}</p>
+                <p className="mt-2 text-slate-400">{mostChanged.sensor.group.description}</p>
               </div>
             </div>
           ) : (
-            <p className="mt-4 text-sm text-slate-500">No measurable change in this window.</p>
+            <p className="mt-4 text-sm text-slate-400">No measurable change in this window.</p>
           )}
         </div>
         <div className="weather-panel p-5">
@@ -135,7 +135,7 @@ export const SensorArray = ({
               </Toggle>
             ))}
           </ToggleGroup>
-          {activeWindow ? <p className="mt-3 text-xs text-slate-500">{activeWindow.description}</p> : null}
+          {activeWindow ? <p className="mt-3 text-xs text-slate-400">{activeWindow.description}</p> : null}
         </div>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -167,7 +167,7 @@ export const SensorArray = ({
                     <p className="mono text-2xl text-slate-100">
                       {formatNumber(sensor.value, sensor.unit)}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Δ {activeWindow.label}{" "}
                       <span className="text-slate-300">
                         {formatDelta(windowAggregation?.change ?? null, sensor.unit)}
@@ -218,12 +218,12 @@ export const SensorArray = ({
                 )}
                 <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
                   {hasTrend ? (
-                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
+                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-400">
                       12-month trend (cache)
                     </p>
                   ) : null}
                   {sparkline ? (
-                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-500">
+                    <p className="text-fluid-micro font-semibold tracking-[0.08em] text-slate-400">
                       {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, sensor.unit)}
                     </p>
                   ) : null}

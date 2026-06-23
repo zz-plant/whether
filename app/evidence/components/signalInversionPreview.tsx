@@ -197,7 +197,7 @@ export function SignalInversionPreview({
             </>
           ) : null}
         </svg>
-        <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
+        <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-400">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
           <span>{latest?.label}</span>

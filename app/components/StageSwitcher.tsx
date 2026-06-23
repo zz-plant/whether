@@ -83,9 +83,9 @@ export function StageSwitcher({
         aria-labelledby={`${labelId} ${valueId}`}
         className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/[0.12] bg-white/[0.07] px-3.5 py-2 text-left text-fluid-xs font-semibold text-white/75 shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition-colors hover:border-white/[0.22] hover:bg-white/[0.1] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       >
-        <span id={labelId} className="text-white/45">Company stage</span>{" "}
+        <span id={labelId} className="text-white/60">Company stage</span>{" "}
         <span id={valueId} className="text-white">{currentLabel ?? "Choose"}</span>
-        <ChevronDown aria-hidden="true" className={`size-4 text-white/55 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown aria-hidden="true" className={`size-4 text-white/65 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
  
       {open ? (

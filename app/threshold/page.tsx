@@ -72,7 +72,7 @@ export default function ThresholdPage() {
               <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
               <p className="text-xs text-slate-300">See this week&apos;s posture and decisions</p>
             </Link>
-            <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
+            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">Current regime</p>
               <p className="text-xs text-slate-300">See the current macro regime and bounded decision</p>
             </Link>
@@ -82,7 +82,7 @@ export default function ThresholdPage() {
         <section className="space-y-4">
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/current-regime" className="weather-surface block no-underline px-4 py-3 space-y-1">
+            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-sky-200">Current regime</p>
               <p className="text-xs text-slate-300">See the current macro regime and bounded decision</p>
             </Link>

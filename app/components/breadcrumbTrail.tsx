@@ -25,7 +25,7 @@ export function BreadcrumbTrail({
           return (
             <li key={`${item.label}-${index}`} className="inline-flex min-h-[44px] items-center gap-1">
               {index > 0 ? (
-                <span aria-hidden="true" className="text-slate-500">
+                <span aria-hidden="true" className="text-slate-400">
                   / 
                 </span>
               ) : null}

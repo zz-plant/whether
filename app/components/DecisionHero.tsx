@@ -90,23 +90,23 @@ export function DecisionHero({
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">
-            <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-white/35">This week&apos;s call</p>
-            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-[1.7rem] font-semibold leading-[1.08] text-white sm:text-3xl">
+            <p className={`text-fluid-nano font-semibold uppercase tracking-[0.12em] ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
+            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-[2rem] font-semibold leading-[1.05] text-white sm:text-[2.4rem]">
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
           {showActionNow ? (
             <p className="text-fluid-sm font-medium text-slate-100">
-              <span className="text-emerald-300/80">Do this week:</span> {actionNow}
+              <span className="text-emerald-300/80">Do now:</span> {actionNow}
             </p>
           ) : null}
-          <div className="space-y-2 text-fluid-xs text-white/55">
+          <div className="space-y-2 text-fluid-xs text-white/65">
             <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
               {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/45">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/60">
               <span>
-                <span className="text-white/35">Tightness:</span>{" "}
+                 <span className="text-white/35">Capital tightness:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
@@ -120,11 +120,11 @@ export function DecisionHero({
           <StageSwitcher currentStage={operatorContext.companyStage} />
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
-            <span title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"} className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
-              <span className={`size-1.5 rounded-full ${dataStatusColor}`} aria-hidden="true" />
+            <span title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
+              <span className={`size-2 rounded-full ${dataStatusColor} ${isFallback || (degradedCount && degradedCount > 0) ? "animate-pulse" : ""}`} aria-hidden="true" />
               {dataStatus}
             </span>
-            <span className="text-fluid-micro text-white/30 hidden sm:inline">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
+            <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
           </div>
         </div>
 
@@ -132,15 +132,24 @@ export function DecisionHero({
           <div className="relative inline-flex items-center justify-center p-3">
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
               {confidenceLabel ? (
-                <circle
-                  cx="50" cy="50" r="46"
-                  fill="none"
-                  stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.25)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.25)" : "rgba(253,164,175,0.25)"}
-                  strokeWidth="2.5"
-                  strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
-                  strokeLinecap="round"
-                  transform="rotate(-90 50 50)"
-                />
+                <>
+                  <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                  <circle
+                    cx="50" cy="50" r="46"
+                    fill="none"
+                    stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.6)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.6)" : "rgba(253,164,175,0.6)"}
+                    strokeWidth="5"
+                    strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
+                    strokeLinecap="round"
+                    transform="rotate(-90 50 50)"
+                    style={{ filter: confidenceLabel === "HIGH" ? "drop-shadow(0 0 6px rgba(110,231,183,0.35))" : confidenceLabel === "MED" ? "drop-shadow(0 0 6px rgba(252,211,77,0.35))" : "drop-shadow(0 0 6px rgba(253,164,175,0.35))" }}
+                  />
+                  {[25, 50, 75].map((pct) => {
+                    const angle = (pct / 100) * 360 - 90;
+                    const rad = (angle * Math.PI) / 180;
+                    return <line key={pct} x1={50 + 42 * Math.cos(rad)} y1={50 + 42 * Math.sin(rad)} x2={50 + 50 * Math.cos(rad)} y2={50 + 50 * Math.sin(rad)} stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" strokeLinecap="round" />;
+                  })}
+                </>
               ) : null}
             </svg>
             <SignalWaterfall data={signalData ?? {}}>
@@ -150,10 +159,16 @@ export function DecisionHero({
               </div>
             </SignalWaterfall>
           </div>
-          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">
+          <div className="mt-2 h-1 w-full max-w-[8rem] mx-auto sm:ml-auto sm:mr-0 rounded-full" style={{ background: "linear-gradient(90deg, rgba(244,63,94,0.3), rgba(251,191,36,0.3), rgba(52,211,153,0.3))" }}>
+            <div className="relative h-full">
+              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-2 rounded-full bg-white ring-2 ring-white/20" style={{ left: `${Math.min(100, Math.max(0, boldnessScore))}%` }} />
+            </div>
+          </div>
+          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60 mt-1">
             Boldness Budget
             <span className="ml-1.5 text-white/35"> /100</span>
           </p>
+          <p className="text-fluid-micro text-white/50 mt-0.5">How much room you have to operate</p>
         </div>
       </div>
     </section>

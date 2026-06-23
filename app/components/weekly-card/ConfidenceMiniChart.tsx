@@ -154,7 +154,7 @@ export const ConfidenceMiniChart = ({
 
       {currentPercent !== null && threshold ? (
         <div className="rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-3">
-          <div className="flex items-center justify-between text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">
+          <div className="flex items-center justify-between text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
             <span>0</span>
             <span>100</span>
           </div>

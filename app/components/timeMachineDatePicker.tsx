@@ -93,13 +93,13 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
           ) : null}
 
           {!loaded ? (
-            <p className="mt-4 text-xs text-slate-500">Loading historical data...</p>
+            <p className="mt-4 text-xs text-slate-400">Loading historical data...</p>
           ) : years.length === 0 ? (
-            <p className="mt-4 text-xs text-slate-500">No historical data available.</p>
+            <p className="mt-4 text-xs text-slate-400">No historical data available.</p>
           ) : (
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Year</label>
+                <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Year</label>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {years.map((year) => (
                     <button key={year} type="button" onClick={() => setSelectedYear(year)}
@@ -110,7 +110,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
               </div>
               {months.length > 0 ? (
                 <div>
-                  <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-500">Month</label>
+                  <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Month</label>
                   <div className="mt-1.5 grid grid-cols-4 gap-1.5">
                     {months.map((month) => (
                       <button key={month} type="button" onClick={() => navigateTo(selectedYear, month)}
@@ -119,7 +119,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                     ))}
                   </div>
                 </div>
-              ) : <p className="mt-2 text-xs text-slate-500">No data for {selectedYear}.</p>}
+              ) : <p className="mt-2 text-xs text-slate-400">No data for {selectedYear}.</p>}
             </div>
           )}
           <div className="mt-4 border-t border-slate-800/60 pt-3 text-center">

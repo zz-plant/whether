@@ -46,9 +46,9 @@ export default async function MethodPage() {
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
-            <p className="text-xs font-semibold tracking-[0.06em] text-white/40">Current source mix</p>
+            <p className="text-xs font-semibold tracking-[0.06em] text-white/60">Current source mix</p>
             <ul className="space-y-2 text-sm text-white/70">
-              <li><span className="text-white/40">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
+              <li><span className="text-white/60">Treasury:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.treasuryProvenance.timestampLabel}</li>
               <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.statusLabel} · {reportData.macroProvenance.timestampLabel}</li>
               <li><span className="text-slate-400">Decision date:</span> {reportData.recordDateLabel}</li>
               <li><span className="text-slate-400">Trust summary:</span> {trustSummary}</li>
@@ -258,7 +258,7 @@ export default async function MethodPage() {
             </div>
           )}
 
-          <p className="text-xs leading-5 text-slate-500 px-1">
+          <p className="text-xs leading-5 text-slate-400 px-1">
             Whether is decision-support software, not an authority. Verify source data and combine it with company-specific metrics before acting on irreversible decisions. {PRIMARY_AUDIENCE_SUMMARY}
           </p>
         </div>
@@ -266,7 +266,7 @@ export default async function MethodPage() {
 
       {!isFallback && warnings.length === 0 ? (
         <details className="group mt-6 rounded-xl border border-white/[0.06] bg-slate-950/20 px-5 py-4">
-          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/50 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none">
             <span>Detailed verification &amp; source board</span>
             <span aria-hidden="true" className="rounded-sm border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
               ▾

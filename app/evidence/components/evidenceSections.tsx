@@ -256,7 +256,7 @@ export const SignalsDecisionSummarySection = ({
               {" "}
               <span>{triggerCondition}</span>
               {" "}
-              <span aria-hidden="true" className="text-slate-500">·</span>
+              <span aria-hidden="true" className="text-slate-400">·</span>
               {" "}
               <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
                 Safe again when:
@@ -480,7 +480,7 @@ export const SignalsCurrentScoresSection = ({
                             style={{ left: `${meterState.currentPercent}%` }}
                           />
                         </div>
-                        <div className="mt-1 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-500">
+                        <div className="mt-1 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-400">
                           <span>{meterState.leftLabel}</span>
                           <span>Watch line</span>
                           <span>{meterState.rightLabel}</span>

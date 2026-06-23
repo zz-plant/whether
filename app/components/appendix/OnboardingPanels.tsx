@@ -34,15 +34,15 @@ export const FirstTimeGuidePanel = ({
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
-          <p className="text-xs text-slate-500">{PRIMARY_AUDIENCE_LABEL}</p>
+          <p className="text-xs text-slate-400">{PRIMARY_AUDIENCE_LABEL}</p>
           <p className="mt-2 text-xs text-slate-200">{PRIMARY_AUDIENCE_SUMMARY}</p>
           <p className="mt-1 text-xs text-slate-400">{PRIMARY_AUDIENCE_ACTION}</p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
-          <p className="text-xs text-slate-500">Current snapshot</p>
+          <p className="text-xs text-slate-400">Current snapshot</p>
           <p className="mt-2 text-xs text-slate-200">Status: {statusLabel}</p>
           <p className="mt-1 text-xs text-slate-400">Record: {recordDateLabel}</p>
-          <p className="mt-1 text-xs text-slate-500">Fetched: {fetchedAtLabel}</p>
+          <p className="mt-1 text-xs text-slate-400">Fetched: {fetchedAtLabel}</p>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export const FirstTimeGuidePanel = ({
                   </Collapsible.Trigger>
                   <Collapsible.Panel className="animate-collapsible-in space-y-2 text-xs text-slate-400">
                     <p>{step.detail}</p>
-                    <p className="text-xs text-slate-500">{step.example}</p>
+                    <p className="text-xs text-slate-400">{step.example}</p>
                   </Collapsible.Panel>
                 </Collapsible.Root>
               </li>
@@ -84,7 +84,7 @@ export const FirstTimeGuidePanel = ({
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             {FIRST_TIME_GUIDE_HIGHLIGHTS.map((highlight) => (
               <li key={highlight.text} className="flex gap-2">
-                <span className="text-slate-500">•</span>
+                <span className="text-slate-400">•</span>
                 <span>{highlight.text}</span>
               </li>
             ))}
@@ -134,7 +134,7 @@ export const BeginnerGlossaryPanel = () => (
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
-          <p className="text-xs text-slate-500">Onboarding lens</p>
+          <p className="text-xs text-slate-400">Onboarding lens</p>
           <p className="mt-2 text-xs text-slate-200">Plain English over jargon</p>
           <p className="mt-1 text-xs text-slate-400">U.S. market terms, then constraints</p>
         </div>
@@ -158,7 +158,7 @@ export const BeginnerGlossaryPanel = () => (
                       <span className="mt-1 block text-xs text-slate-400">
                         {entry.summary}
                       </span>
-                      <span className="mt-1 block text-fluid-xs uppercase tracking-[0.14em] text-slate-500">Select to expand or collapse</span>
+                      <span className="mt-1 block text-fluid-xs uppercase tracking-[0.14em] text-slate-400">Select to expand or collapse</span>
                     </span>
                     <span className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180" aria-hidden="true">
                       <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
@@ -175,7 +175,7 @@ export const BeginnerGlossaryPanel = () => (
                   </Accordion.Trigger>
                 </Accordion.Header>
                 <Accordion.Panel className="mt-3 space-y-2 text-sm text-slate-400">
-                  <p className="text-xs text-slate-500">{entry.why}</p>
+                  <p className="text-xs text-slate-400">{entry.why}</p>
                   <p className="text-xs text-slate-400">
                     Used in:{" "}
                     <Link

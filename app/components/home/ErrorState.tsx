@@ -16,7 +16,7 @@ export function ErrorState({ title, description, onRetry }: ErrorStateProps) {
       <div>
         <p className="text-sm font-medium text-rose-300">{title}</p>
         {description ? (
-          <p className="mt-1 text-xs text-slate-500 max-w-xs mx-auto">{description}</p>
+          <p className="mt-1 text-xs text-slate-400 max-w-xs mx-auto">{description}</p>
         ) : null}
       </div>
       {onRetry ? (

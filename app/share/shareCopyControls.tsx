@@ -116,7 +116,7 @@ export function ShareCopyControls({
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-300">
             Preview
           </h2>
-          <span className="text-fluid-micro text-slate-500">
+          <span className="text-fluid-micro text-slate-400">
             {copiedTarget ? `${copyLabels[copiedTarget]} ready` : "Current Slack brief"}
           </span>
         </div>

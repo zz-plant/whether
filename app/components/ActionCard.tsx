@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { Copy, CopyCheck } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import { useClipboardCopy } from "./useClipboardCopy";
-import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_ACCENT, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
+import { DIRECTION_ARROW, DIRECTION_LABEL, DIRECTION_COLOR, type SignalDirection, formatBoldnessDeltaLabel } from "../viewModel";
 
 type ActionCardProps = {
   call: string;
@@ -71,15 +71,16 @@ export function ActionCard({
   const pauseColor = tightness >= numericThreshold ? "bg-rose-500 animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 animate-pulse" : "bg-emerald-500";
 
   return (
-    <div className={`weather-surface rounded-xl px-5 py-5 border-t-2 ${DIRECTION_ACCENT[direction]} border-white/[0.06]`}>
+    <div className={`weather-surface rounded-xl px-5 py-5 border-white/[0.06] relative overflow-hidden`}>
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${direction === "tighten" ? "bg-rose-400/40" : direction === "ease" ? "bg-emerald-400/40" : "bg-sky-400/40"}`} />
       <div className="flex items-center justify-between gap-3 mb-4">
-        <p className="text-xs font-semibold tracking-[0.06em] text-white/50">
-          Decision · {DIRECTION_LABEL[direction]}
+        <p className="text-xs font-semibold tracking-[0.06em] text-white/60">
+          {DIRECTION_LABEL[direction]}
         </p>
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-white/[0.08] px-2.5 py-2 text-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
           aria-label={isCopied ? "Copied to clipboard" : "Copy brief to clipboard"}
         >
           {isCopied ? (
@@ -109,16 +110,16 @@ export function ActionCard({
       {guardrail ? (
         <div className="mb-4 rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 space-y-2">
           <div className="flex items-center justify-between text-fluid-nano font-semibold uppercase tracking-[0.06em]">
-            <span className="text-white/40">Watch threshold</span>
+            <span className="text-white/60">Pause trigger</span>
             <span className={tightness >= numericThreshold ? "text-rose-300 font-bold" : tightness >= numericThreshold - 5 ? "text-amber-300" : "text-emerald-300"}>
-              {tightness >= numericThreshold ? "PAUSE TRIGGERED" : tightness >= numericThreshold - 5 ? "WARNING RANGE" : "SAFE ZONE"}
+              {tightness >= numericThreshold ? "Paused" : tightness >= numericThreshold - 5 ? "Near threshold" : "Clear"}
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden relative">
+          <div className="h-2 w-full rounded-full overflow-hidden relative" style={{ background: "linear-gradient(90deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.12) 60%, rgba(251,191,36,0.18) 85%, rgba(244,63,94,0.18) 100%)" }}>
             <div className={`h-full rounded-full ${pauseColor} transition-all duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
-            <div className="absolute right-[0%] top-0 h-full w-[2px] bg-white/30" title="Threshold limit" />
+            <div className="absolute top-0 h-full w-[2px] bg-white/50" title="Threshold limit" style={{ right: 0 }} />
           </div>
-          <div className="flex justify-between text-[0.6rem] text-white/35 font-mono">
+          <div className="flex justify-between text-fluid-nano text-white/35 font-mono">
             <span>Tightness {tightness}</span>
             <span>Limit {numericThreshold}</span>
           </div>
