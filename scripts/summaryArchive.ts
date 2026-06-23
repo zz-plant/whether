@@ -24,6 +24,8 @@ type MonthlySummaryArchiveEntry = {
   asOf: string;
   record_date: string;
   summary: MonthlySummary;
+  tightness?: number;
+  riskAppetite?: number;
 };
 
 type QuarterlySummaryArchiveEntry = {
@@ -57,6 +59,8 @@ type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: MonthlySummary;
+      tightness?: number;
+      riskAppetite?: number;
     }
   | {
       cadence: "quarterly";
@@ -181,6 +185,8 @@ export const writeSummaryArchive = async ({
       asOf: entry.asOf,
       record_date: entry.record_date,
       summary: entry.summary,
+      tightness: entry.tightness,
+      riskAppetite: entry.riskAppetite,
     }));
     nextEntries =
       mode === "merge"

@@ -34,6 +34,8 @@ describe("derived summary history artifacts", () => {
       .map((entry) => ({
         record_date: entry.record_date,
         regime: entry.summary.regime,
+        tightness: entry.tightness,
+        riskAppetite: entry.riskAppetite,
       }))
       .sort(byRecordDateAscending);
 

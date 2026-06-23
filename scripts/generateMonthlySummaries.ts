@@ -216,6 +216,8 @@ type MonthlySummaryArchiveEntry = {
   asOf: string;
   record_date: string;
   summary: MonthlySummary;
+  tightness: number;
+  riskAppetite: number;
 };
 
 type TimeMachineCacheEntry = TreasuryData & {
@@ -375,6 +377,8 @@ const generateMonthlySummaries = async () => {
         asOf,
         record_date: treasury.record_date,
         summary: adjustedSummary,
+        tightness: assessment.scores.tightness,
+        riskAppetite: assessment.scores.riskAppetite,
       });
     }
   }

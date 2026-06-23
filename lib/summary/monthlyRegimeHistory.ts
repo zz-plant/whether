@@ -8,6 +8,8 @@ import rawMonthlyRegimeHistory from "../../data/summary_monthly_regime_history.j
 const MonthlyRegimeHistoryEntrySchema = z.object({
   record_date: z.string(),
   regime: z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]) as z.ZodType<RegimeKey>,
+  tightness: z.number().optional(),
+  riskAppetite: z.number().optional(),
 });
 
 const MonthlyRegimeHistorySchema = z.array(MonthlyRegimeHistoryEntrySchema);

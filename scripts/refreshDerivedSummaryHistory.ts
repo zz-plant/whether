@@ -14,11 +14,15 @@ type SummaryArchiveEntry = {
   summary: {
     regime: RegimeKey;
   };
+  tightness?: number;
+  riskAppetite?: number;
 };
 
 type DerivedHistoryEntry = {
   record_date: string;
   regime: RegimeKey;
+  tightness?: number;
+  riskAppetite?: number;
 };
 
 const byAsOfAscending = (left: Pick<SummaryArchiveEntry, "asOf">, right: Pick<SummaryArchiveEntry, "asOf">) =>
@@ -36,6 +40,8 @@ const writeJson = async (filePath: string, value: unknown) => {
 const toDerivedHistoryEntry = (entry: SummaryArchiveEntry): DerivedHistoryEntry => ({
   record_date: entry.record_date,
   regime: entry.summary.regime,
+  tightness: entry.tightness,
+  riskAppetite: entry.riskAppetite,
 });
 
 export const refreshDerivedSummaryHistory = async () => {
