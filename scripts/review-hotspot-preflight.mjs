@@ -74,6 +74,11 @@ function addedTypeAssertions(diffRange) {
     const code = line.slice(1);
     // Strip single-line comments before matching to avoid false positives
     const codeWithoutComments = code.replace(/\/\/.*/g, "");
+    const nonTypeAssertionPrepostions = /\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(codeWithoutComments);
+    if (nonTypeAssertionPrepostions) {
+      // English prose false positives ("as of", "as in", etc.)
+      continue;
+    }
     const hasAssertion = /\sas\s+[A-Za-z_$<{\(]/.test(codeWithoutComments);
     const safePattern = /\sas\s+const\b/.test(codeWithoutComments);
 
@@ -90,7 +95,7 @@ function requiresTestCoverage(file) {
 }
 
 function isTestFile(file) {
-  return /^tests\/.+\.test\.ts$/.test(file);
+  return /^tests\/.+\.test\.tsx?$/.test(file);
 }
 
 function main() {

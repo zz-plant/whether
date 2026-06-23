@@ -1,0 +1,54 @@
+name: Monthly Summary Refresh
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh-monthly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate monthly summaries
+        run: bun scripts/generateMonthlySummaries.ts
+
+      - name: Open pull request with refreshed data
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/monthly-summary-refresh
+          delete-branch: true
+          title: "chore: refresh monthly summary data"
+          commit-message: "chore: refresh monthly regime history with latest FRED data"
+          body: |
+            ## Summary
+            - Regenerates monthly summaries from latest FRED Treasury yield curve data.
+            - Updates `data/summary_monthly_regime_history.json` with tightness/riskAppetite scores.
+            - Adds new months as FRED data becomes available.
+
+            ## Validation
+            - `bun scripts/generateMonthlySummaries.ts`
+          labels: |
+            automation
+            data
+          add-paths: |
+            data/summary_archive.json
+            data/summary_monthly_regime_history.json
+            data/monthly_summaries_2012_2025.json
+            data/time_machine_cache.json
+            data/summary_memory_rail_weekly.json

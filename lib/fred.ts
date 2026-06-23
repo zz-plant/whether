@@ -1,21 +1,19 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
 
 export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
-const ALFRED_BASE_URL = "https://alfred.stlouisfed.org/graph/fredgraph.csv";
-const FALLBACK_TIMEOUT_MS = 3_000;
 
 export const FRED_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
   "user-agent": "WhetherDataBot/1.0 (+https://whether.app)",
 } as const;
 
-const DEFAULT_TIMEOUT_MS = 4_000;
+const DEFAULT_TIMEOUT_MS = 8_000;
 const DEFAULT_REVALIDATE_SECONDS = 900;
-const DEFAULT_RETRY_ATTEMPTS = 2;
-const DEFAULT_RETRY_BACKOFF_MS = 300;
+const DEFAULT_RETRY_ATTEMPTS = 3;
+const DEFAULT_RETRY_BACKOFF_MS = 500;
 
 const CIRCUIT_BREAKER_THRESHOLD = 3;
-const CIRCUIT_BREAKER_COOLDOWN_MS = 60_000;
+const CIRCUIT_BREAKER_COOLDOWN_MS = 120_000;
 
 let cbConsecutiveFailures = 0;
 let cbLastFailureAt: number | null = null;
@@ -105,32 +103,10 @@ export const fetchFredCsv = async (
     cbConsecutiveFailures = 0;
     cbLastFailureAt = null;
     return result;
-  } catch (primaryError) {
-    try {
-      const alfredUrl = `${ALFRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`;
-      const alfredResponse = await fetchWithTimeout(
-        fetcher,
-        alfredUrl,
-        {
-          headers: FRED_FETCH_HEADERS,
-          next: { revalidate: revalidateSeconds },
-        },
-        FALLBACK_TIMEOUT_MS,
-      );
-
-      if (!alfredResponse.ok) {
-        throw new Error(`ALFRED request failed for ${seriesId}`);
-      }
-
-      const csv = await alfredResponse.text();
-      cbConsecutiveFailures = 0;
-      cbLastFailureAt = null;
-      return csv;
-    } catch {
-      cbConsecutiveFailures += 1;
-      cbLastFailureAt = Date.now();
-      throw primaryError;
-    }
+  } catch (error) {
+    cbConsecutiveFailures += 1;
+    cbLastFailureAt = Date.now();
+    throw error;
   }
 };
 

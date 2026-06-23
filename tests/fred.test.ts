@@ -9,27 +9,13 @@ import {
 const buildFredCsv = (rows: string[]) => `DATE,VALUE\n${rows.join("\n")}\n`;
 
 const FRED_CSV = buildFredCsv(["2024-01-01,4.00", "2024-01-02,4.01"]);
-const ALFRED_CSV = buildFredCsv(["2024-01-01,3.95", "2024-01-02,3.96"]);
 
-describe("fetchFredCsv — ALFRED fallback", () => {
+describe("fetchFredCsv", () => {
   beforeEach(() => {
     resetFredCircuitBreaker();
   });
 
-  it("falls back to ALFRED when FRED fails", async () => {
-    const fetcher: typeof fetch = (async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.includes("alfred.stlouisfed.org")) {
-        return new Response(ALFRED_CSV, { status: 200 });
-      }
-      return new Response("error", { status: 500 });
-    }) as typeof fetch;
-
-    const csv = await fetchFredCsv(fetcher, "DGS10", { backoffMs: 0 });
-    assert.ok(csv.includes("3.95"), "CSV should contain ALFRED data");
-  });
-
-  it("succeeds on FRED without trying ALFRED", async () => {
+  it("succeeds on FRED", async () => {
     const calls: string[] = [];
     const fetcher: typeof fetch = (async (input: RequestInfo | URL) => {
       const url = String(input);
@@ -44,7 +30,7 @@ describe("fetchFredCsv — ALFRED fallback", () => {
     );
   });
 
-  it("throws when both FRED and ALFRED fail", async () => {
+  it("throws when FRED fails", async () => {
     const fetcher: typeof fetch = (async () =>
       new Response("error", { status: 500 })) as typeof fetch;
 

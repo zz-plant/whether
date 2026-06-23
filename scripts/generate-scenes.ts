@@ -113,7 +113,9 @@ function main() {
       // Also add a subtle pattern for depth
       writeFileSync(compPath, composed);
       
-      // 3. Render via rsvg-convert
+      /* rsvg-convert called with hardcoded spec values only — no user input.
+         The template-literal execSync pattern is safe here because spec, outPath,
+         and compPath are all derived from hardcoded scene definitions, not external input. */
       execSync(`rsvg-convert -w ${spec.width} -h ${spec.height} -o "${outPath}" "${compPath}"`,
         { stdio: "pipe", timeout: 10000 });
       
