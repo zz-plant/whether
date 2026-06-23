@@ -5,7 +5,11 @@
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
-import { FRED_FETCH_HEADERS as TREASURY_FETCH_HEADERS } from "../fred";
+
+const TREASURY_FETCH_HEADERS = {
+  accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
+  "user-agent": "Mozilla/5.0 (compatible; WhetherApp/1.0)",
+} as const;
 
 const PRIMARY_FETCH_TIMEOUT_MS = 1_500;
 const RETRY_FETCH_TIMEOUT_MS = 2_500;
@@ -13,9 +17,6 @@ const MAX_SERIES_FETCH_ATTEMPTS = 2;
 const RETRY_BACKOFF_MS = 250;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
-const TREASURY_FISCALDATA_ENDPOINT =
-  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/avg_interest_rates?filter=security_desc:in:(Treasury%20Bills:%204-Week,Treasury%20Bills:%2013-Week,Treasury%20Notes:%202-Year,Treasury%20Notes:%2010-Year)&fields=record_date,security_desc,avg_interest_rate_amt&sort=-record_date&page[number]=1&page[size]=800";
-
 export const TREASURY_ENDPOINTS = {
   fedFunds: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFF",
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
@@ -187,108 +188,6 @@ const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: 
   }
 
   throw new Error("Treasury daily rates CSV missing one or more required tenors.");
-};
-
-const fiscalDescToKey: Record<string, keyof TreasuryData["yields"] | null> = {
-  "Treasury Bills: 4-Week": "oneMonth",
-  "Treasury Bills: 13-Week": "threeMonth",
-  "Treasury Notes: 2-Year": "twoYear",
-  "Treasury Notes: 10-Year": "tenYear",
-};
-
-type FiscalDataRow = {
-  record_date?: string;
-  security_desc?: string;
-  avg_interest_rate_amt?: string | number;
-};
-
-const parseFiscalDataRate = (value: FiscalDataRow["avg_interest_rate_amt"]) => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
-  }
-
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  if (!trimmed || trimmed === ".") {
-    return null;
-  }
-
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-const fetchTreasuryFromFiscalDataApi = async (fetcher: typeof fetch, fetchedAt: string) => {
-  const response = await fetchWithTimeout(
-    fetcher,
-    TREASURY_FISCALDATA_ENDPOINT,
-    { headers: TREASURY_FETCH_HEADERS },
-    PRIMARY_FETCH_TIMEOUT_MS
-  );
-  if (!response.ok) {
-    throw new Error(`Treasury fiscaldata API fetch error: ${response.status}`);
-  }
-
-  const payload = (await response.json()) as { data?: FiscalDataRow[] };
-  const rows = Array.isArray(payload.data) ? payload.data : [];
-  if (rows.length === 0) {
-    throw new Error("Treasury fiscaldata API returned no data.");
-  }
-
-  const yieldsByDate = new Map<string, Partial<TreasuryData["yields"]>>();
-  for (const row of rows) {
-    const recordDate = row.record_date;
-    const securityDesc = row.security_desc;
-    if (!recordDate || !securityDesc) {
-      continue;
-    }
-
-    const key = fiscalDescToKey[securityDesc] ?? null;
-    if (!key) {
-      continue;
-    }
-
-    const value = parseFiscalDataRate(row.avg_interest_rate_amt);
-    if (value === null) {
-      continue;
-    }
-
-    const existing = yieldsByDate.get(recordDate) ?? {};
-    existing[key] = value;
-    yieldsByDate.set(recordDate, existing);
-  }
-
-  const orderedDates = Array.from(yieldsByDate.keys()).sort((left, right) => right.localeCompare(left));
-  for (const date of orderedDates) {
-    const yields = yieldsByDate.get(date);
-    if (!yields) {
-      continue;
-    }
-
-    if (
-      typeof yields.oneMonth === "number" &&
-      typeof yields.threeMonth === "number" &&
-      typeof yields.twoYear === "number" &&
-      typeof yields.tenYear === "number"
-    ) {
-      return {
-        source: "https://api.fiscaldata.treasury.gov",
-        record_date: date,
-        fetched_at: fetchedAt,
-        isLive: true,
-        yields: {
-          oneMonth: yields.oneMonth,
-          threeMonth: yields.threeMonth,
-          twoYear: yields.twoYear,
-          tenYear: yields.tenYear,
-        },
-      } satisfies TreasuryData;
-    }
-  }
-
-  throw new Error("Treasury fiscaldata API missing one or more required tenors.");
 };
 
 
@@ -507,13 +406,7 @@ export const fetchTreasuryData = async (
     try {
       return await fetchTreasuryFromDailyRatesCsv(fetcher, fetched_at);
     } catch {
-      // Continue to fiscaldata API fallback before snapshot fallback.
-    }
-
-    try {
-      return await fetchTreasuryFromFiscalDataApi(fetcher, fetched_at);
-    } catch {
-      // If all live sources fail, preserve the primary FRED failure reason for clearer diagnostics.
+      // All live sources failed — fall through to snapshot fallback.
     }
 
     if (options.snapshotFallback) {

@@ -2,6 +2,15 @@
  * Shared data shapes for the Regime Station flow.
  * Keeps Treasury source metadata explicit for traceable outputs.
  */
+export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+
+export interface SourceProvenance {
+  fetched_at: string;
+  isLive: boolean;
+  fallback_at?: string | null;
+  fallback_reason?: string | null;
+}
+
 export interface TreasuryYields {
   fedFunds?: number | null;
   oneMonth: number | null;
@@ -10,13 +19,9 @@ export interface TreasuryYields {
   tenYear: number | null;
 }
 
-export interface TreasuryMetadata {
+export interface TreasuryMetadata extends SourceProvenance {
   source: string;
   record_date: string;
-  fetched_at: string;
-  isLive: boolean;
-  fallback_at?: string | null;
-  fallback_reason?: string | null;
 }
 
 export interface TreasuryData extends TreasuryMetadata {
@@ -44,7 +49,7 @@ export interface SensorWindowAggregation {
   previousValue: number | null;
 }
 
-export interface SensorReading {
+export interface SensorReading extends SourceProvenance {
   id: "BASE_RATE" | "CURVE_SLOPE";
   label: string;
   value: number | null;
@@ -58,8 +63,6 @@ export interface SensorReading {
   sourceUrl: string;
   formulaUrl: string;
   record_date: string;
-  fetched_at: string;
-  isLive: boolean;
   history?: SeriesHistoryPoint[];
   trend?: SeriesHistoryPoint[];
   timeWindows?: SensorWindowAggregation[];
@@ -79,7 +82,7 @@ export type MacroSeriesId =
   | "AI_COMPUTE_COST_TREND"
   | "REGULATORY_RISK_TRACKER";
 
-export interface MacroSeriesReading {
+export interface MacroSeriesReading extends SourceProvenance {
   id: MacroSeriesId;
   label: string;
   value: number | null;
@@ -89,13 +92,11 @@ export interface MacroSeriesReading {
   sourceUrl: string;
   formulaUrl: string;
   record_date: string;
-  fetched_at: string;
-  isLive: boolean;
   history?: SeriesHistoryPoint[];
 }
 
 export interface PostureApiResponse {
-  regime: string;
+  regime: RegimeKey;
   tightness: number;
   direction: string;
   confidence: number;

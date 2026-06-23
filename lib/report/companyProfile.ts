@@ -8,7 +8,7 @@ import {
   type PlannerStage,
 } from "./runwayPlanner";
 
-export type CompanyStage = "seed" | "series-b" | "late-stage";
+export type ProfileStage = "seed" | "series-b" | "late-stage";
 export type CompanyRevenueBand = "pre-revenue" | "sub-1m-arr" | "1-10m-arr" | "10m-plus-arr";
 export type CompanyRunwayBand = "under-12m" | "12-18m" | "18m-plus";
 export type CompanyGrowthBand = "contracting" | "flat" | "moderate" | "high";
@@ -17,7 +17,7 @@ export type CompanySector = PlannerSector;
 export type CompanyBusinessModel = "b2b" | "b2c" | "marketplace" | "usage-based";
 
 export type CompanyProfile = {
-  stage: CompanyStage;
+  stage: ProfileStage;
   revenueBand: CompanyRevenueBand;
   runwayBand: CompanyRunwayBand;
   growthBand: CompanyGrowthBand;
@@ -40,7 +40,7 @@ const defaultProfile: CompanyProfile = {
   businessModel: "b2b",
 };
 
-const stagePriorityDelta: Record<CompanyStage, Partial<Record<DecisionArea, number>>> = {
+const stagePriorityDelta: Record<ProfileStage, Partial<Record<DecisionArea, number>>> = {
   seed: {
     hiring: 5,
     "capital-raising": 3,
@@ -71,7 +71,7 @@ const sectorAdjustment: Record<CompanySector, Partial<Record<DecisionArea, strin
   },
 };
 
-const stageAdjustment: Record<CompanyStage, Partial<Record<DecisionArea, { recommendation: string; stop: string; reverse: string }>>> = {
+const stageAdjustment: Record<ProfileStage, Partial<Record<DecisionArea, { recommendation: string; stop: string; reverse: string }>>> = {
   seed: {
     hiring: {
       recommendation: "Keep net-new hiring founder-led and tied to immediate delivery risk.",
@@ -125,7 +125,7 @@ const growthRateByBand: Record<CompanyGrowthBand, number> = {
   high: 24,
 };
 
-const stageToPlannerStage: Record<CompanyStage, PlannerStage> = {
+const stageToPlannerStage: Record<ProfileStage, PlannerStage> = {
   seed: "seed",
   "series-b": "growth",
   "late-stage": "public",

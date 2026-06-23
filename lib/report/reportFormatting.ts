@@ -1,5 +1,6 @@
 import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
+import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue } from "../formatters";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
@@ -223,7 +224,7 @@ export type CompactFreshnessMeta = {
   updatedAtLabel: string;
   confidenceCue: string;
   maxAge: "fresh" | "stale";
-  freshnessStatus: "fresh" | "stale" | "unknown";
+  freshnessStatus: SourceFreshnessStatus;
   mode: "live" | "cached" | "historical";
   timestamp: string | null;
   ageHours: number | null;
@@ -263,7 +264,7 @@ export const buildCompactFreshnessMeta = ({
   const staleByDate = normalizedUpdatedAt === "Unavailable" || ageHours === null;
   const staleByAge = ageHours !== null && ageHours > staleAfterHours;
   const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate || staleByAge ? "stale" : "fresh";
-  const freshnessStatus: "fresh" | "stale" | "unknown" = staleByDate
+  const freshnessStatus: SourceFreshnessStatus = staleByDate
     ? "unknown"
     : staleByAge || isFallbackSnapshot
       ? "stale"

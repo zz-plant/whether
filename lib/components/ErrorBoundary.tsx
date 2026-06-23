@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="mt-1 text-xs leading-5 text-slate-300">
             {this.props.label ? `${this.props.label} could not render.` : "This section could not render."}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-400">
             The rest of the page is unaffected.
           </p>
         </div>

@@ -1,8 +1,8 @@
 import type { GovernanceParameterSet } from "./policy/governance";
 import { advanceRegimeState, type RegimeStateTransition } from "./report/regimeStateMachine";
-import type { TreasuryData, TreasuryYields } from "./types";
+import type { TreasuryData, TreasuryYields, RegimeKey } from "./types";
 
-export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+export type { RegimeKey };
 
 export interface RegimeScores {
   tightness: number;

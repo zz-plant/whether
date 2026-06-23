@@ -53,7 +53,7 @@ import {
 export { buildDecisionMatrixPayload } from "./homeBrief/decisionMatrix";
 export { buildFlipRiskMeterState, buildMemoryRail, extractExecutiveOperationalStance };
 
-export type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+export type Regime = RegimeKey;
 
 export type HomeReportData = {
   fetchedAtLabel?: string;

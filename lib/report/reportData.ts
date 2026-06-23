@@ -48,7 +48,8 @@ import { buildRegimeAlert } from "./reportFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
-import { buildSourceHealthRows, getLatestParseableTimestamp } from "./sourceHealth";
+import { buildSourceHealthRows, getLatestParseableTimestamp, type SourceFreshnessStatus } from "./sourceHealth";
+import { loadCanonicalReportInputs } from "../ingestion/materialized";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 import {
@@ -117,8 +118,6 @@ export type ReportDataLoadOptions = {
 
 export type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "unknown";
 
-export type DecisionTransmissionStalenessLabel = "fresh" | "stale" | "unknown";
-
 export type DecisionTransmissionBoundedRule = {
   action: string;
   triggerThreshold: string;
@@ -133,7 +132,7 @@ export type DecisionTransmission = {
   flipConditions: string[];
   freshness: {
     timestamp: string;
-    freshnessStatus: DecisionTransmissionStalenessLabel;
+    freshnessStatus: SourceFreshnessStatus;
   };
   confidence: DecisionTransmissionConfidenceLabel;
   provenance: Array<{
@@ -145,11 +144,7 @@ export type DecisionTransmission = {
 
 const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {
   try {
-    const dynamicImport = new Function("modulePath", "return import(modulePath);") as (
-      modulePath: string,
-    ) => Promise<typeof import("../ingestion/materialized")>;
-    const materialized = await dynamicImport("../ingestion/materialized");
-    return materialized.loadCanonicalReportInputs(options);
+    return await loadCanonicalReportInputs(options);
   } catch {
     return null;
   }
