@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/report/reportData";
 import { getRegimeProjection } from "../../../lib/report/regimeContext";
+import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const authToken = request.headers.get("authorization")?.replace("Bearer ", "");
     const expectedToken = process.env.WHETHER_CRON_SECRET;
-    if (expectedToken && authToken !== expectedToken) {
+    if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

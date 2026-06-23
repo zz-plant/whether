@@ -10,6 +10,7 @@ type NextConfigModule = {
   };
   canonicalSurfaceRedirectPairs: RedirectPair[];
   solutionRedirectPairs: RedirectPair[];
+  iaConsolidationRedirectPairs: RedirectPair[];
 };
 const require = createRequire(import.meta.url);
 
@@ -19,11 +20,12 @@ describe("next.config redirects", () => {
       default: nextConfig,
       canonicalSurfaceRedirectPairs,
       solutionRedirectPairs,
+      iaConsolidationRedirectPairs,
     } = require("../next.config.js") as NextConfigModule;
     const redirects = (await nextConfig.redirects?.()) ?? [];
     const hasRedirect = (predicate: (entry: RedirectEntry) => boolean) =>
       redirects.some((entry: RedirectEntry) => predicate(entry));
-    const expectedPairs = [...solutionRedirectPairs, ...canonicalSurfaceRedirectPairs];
+    const expectedPairs = [...solutionRedirectPairs, ...canonicalSurfaceRedirectPairs, ...iaConsolidationRedirectPairs];
 
     assert.equal(redirects.length, expectedPairs.length);
 

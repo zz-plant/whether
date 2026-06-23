@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { constantTimeCompare } from "../../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "missing_token" }, { status: 401 });
   }
 
-  if (!serverToken || token !== serverToken) {
+  if (!serverToken || !constantTimeCompare(token, serverToken)) {
     return NextResponse.json({ error: "invalid_token" }, { status: 401 });
   }
 

@@ -15,10 +15,20 @@ import {
 import { loadReportData } from "../../../lib/report/reportData";
 import { deliverAlerts } from "../../../lib/alert/alertDelivery";
 import type { AlertConditions } from "../../../lib/alert/alertEvaluator";
+import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
+/* GET requires authentication — exposes internal alert delivery data. */
 export async function GET(request: Request) {
+  const authToken = request.headers
+    .get("authorization")
+    ?.replace("Bearer ", "");
+  const expectedToken = process.env.WHETHER_CRON_SECRET;
+  if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const limitRaw = url.searchParams.get("limit");
@@ -53,7 +63,7 @@ export async function POST(request: Request) {
   const expectedToken = process.env.WHETHER_CRON_SECRET;
 
   /* Cron-triggered automated alert evaluation and delivery */
-  if (expectedToken && authToken === expectedToken) {
+  if (expectedToken && authToken && constantTimeCompare(authToken, expectedToken)) {
     try {
       const reportResult = await loadReportData();
       const { assessment } = reportResult;

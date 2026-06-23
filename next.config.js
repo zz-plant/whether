@@ -66,14 +66,43 @@ export const canonicalSurfaceRedirectPairs = [
   ["/toolkits", "/"],
 ];
 
+export const iaConsolidationRedirectPairs = [
+  // History surfaces consolidated into /history
+  ["/archive", "/history"],
+  ["/regime-changes", "/history"],
+  // Redirect stubs — kept as permanent redirects for external links
+  ["/current-regime", "/"],
+  ["/this-week", "/"],
+  // Orphaned export page — functionality lives in /share
+  ["/export/board-packet", "/share"],
+  // Empty container — no index page exists
+  ["/export", "/share"],
+];
+
 export const redirectEntries = [
   ...buildPermanentRedirects(solutionRedirectPairs),
   ...buildPermanentRedirects(canonicalSurfaceRedirectPairs),
+  ...buildPermanentRedirects(iaConsolidationRedirectPairs),
+];
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
 ];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
+    ];
+  },
   async redirects() {
     return redirectEntries;
   },

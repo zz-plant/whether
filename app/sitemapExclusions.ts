@@ -31,6 +31,12 @@ export const retiredSitemapPaths = [
   "/learn/failure-modes",
   "/about",
   "/confidence",
+  "/archive",
+  "/regime-changes",
+  "/current-regime",
+  "/this-week",
+  "/export",
+  "/export/board-packet",
 ] as const;
 
 const retiredPathSet = new Set<string>(retiredSitemapPaths);

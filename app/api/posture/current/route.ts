@@ -53,6 +53,8 @@ export async function GET() {
     version: POSTURE_API_VERSION,
   };
 
+  /* CORS wildcard is intentional — /api/posture/current is a public API
+     for programmatic consumption. No auth or cookies involved. */
   return NextResponse.json(body, {
     headers: {
       "Access-Control-Allow-Origin": "*",

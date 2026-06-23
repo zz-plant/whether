@@ -7,10 +7,17 @@ import {
   type SignalAlertInputPayload,
 } from "../../../lib/signalOps";
 import { buildLineage } from "../../../lib/storage/lineage";
+import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
+/* GET requires authentication — exposes internal alert data. */
 export async function GET(request: Request) {
+  const authToken = request.headers?.get?.("authorization")?.replace("Bearer ", "");
+  const expectedToken = process.env.WHETHER_CRON_SECRET;
+  if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const limitRaw = url.searchParams.get("limit");

@@ -1,6 +1,7 @@
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDecisionEventStore, type RegimeDecisionEvent } from "../../../lib/events/decisionEventStore";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -30,6 +31,12 @@ const json = (body: unknown, status = 200) =>
   });
 
 export async function GET(request: NextRequest) {
+  const authToken = request.headers?.get?.("authorization")?.replace("Bearer ", "");
+  const expectedToken = process.env.WHETHER_CRON_SECRET;
+  if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const nextUrl = request.nextUrl;
   const params = nextUrl.searchParams;
   const cursor = params.get("cursor");
