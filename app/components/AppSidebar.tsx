@@ -39,7 +39,7 @@ function OutlineItem({
   }
 
   return (
-    <Link href={href as Route} onClick={onClick} className={linkClass}>
+    <Link href={href} onClick={onClick} className={linkClass}>
       {label}
     </Link>
   );
