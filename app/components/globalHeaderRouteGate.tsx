@@ -71,7 +71,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
   return (
     <GlobalHeaderScrollWrapper>
-      <div className="rounded-b-md border-b border-white/[0.06] bg-[var(--bg-body)]/95">
+      <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]/95">
         <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3 sm:py-2">
           <div className="flex min-w-0 items-center gap-2">
             <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">

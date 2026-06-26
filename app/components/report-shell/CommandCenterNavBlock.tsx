@@ -158,7 +158,7 @@ export function CommandCenterNavBlock({
             {secondaryCta ? (
               <InternalAwareLink
                 href={secondaryCta.href}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {secondaryCta.label}
               </InternalAwareLink>
@@ -172,7 +172,7 @@ export function CommandCenterNavBlock({
                 copyTarget={exportCta.copyTarget}
                 telemetryEvent={exportCta.telemetryEvent}
                 label={exportCta.label}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
               >
                 {exportCta.label}
               </ReportCta>
@@ -218,7 +218,7 @@ export function CommandCenterNavBlock({
                 <li key={`${item.phase}-${item.title}`}>
                   <InternalAwareLink
                     href={item.href}
-                    className="block rounded-sm border border-slate-800/60 bg-slate-950/30 px-3 py-3 transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/40"
+                    className="block rounded-md border border-slate-800/60 bg-slate-950/30 px-3 py-3 transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/40"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>

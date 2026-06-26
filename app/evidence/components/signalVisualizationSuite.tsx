@@ -250,7 +250,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         <div className="mt-3 grid gap-2 lg:grid-cols-12">
           <FlatPanel className="lg:col-span-12">
             <PanelTitle title="1) Curve signal ribbon" subtitle="Green = steep/normal, Amber = flat, Red = inversion." />
-            <div className="flex min-h-[44px] overflow-hidden rounded-sm bg-slate-900/60">
+            <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
             <p className="mono text-xs text-slate-300">Latest curve signal: {formatPercent(latest?.curveSignal ?? null)}</p>

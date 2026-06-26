@@ -138,7 +138,7 @@ function WeeklyTopFoldContract({
             ))}
           </ul>
         ) : null}
-        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/60">
+        <div className="space-y-1 border-t border-white/[0.10] pt-2 text-fluid-micro text-white/60">
           {guardrailRows.map((row, index) => (
             <p key={index}>
               <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}

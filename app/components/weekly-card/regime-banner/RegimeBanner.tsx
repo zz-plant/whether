@@ -64,14 +64,14 @@ export function RegimeBanner(props: RegimeBannerProps) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:max-w-[24rem]" aria-label="This week metadata">
-          <span className={`inline-flex items-center gap-1.5 rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${bannerTone.metrics}`}>
             <TrendGlyph trendLabel={trendValue} />
             <span>{trendValue} trend</span>
           </span>
-          <span className={`inline-flex rounded-sm border px-3 py-1.5 text-fluid-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${confidenceColor}`}>
+          <span className={`inline-flex rounded-md border px-3 py-1.5 text-fluid-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ${confidenceColor}`}>
             {Math.round(confidencePercent)}% confidence ({confidenceLabel})
           </span>
-          <span className="inline-flex rounded-sm border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <span className="inline-flex rounded-md border border-white/10 bg-slate-950/25 px-3 py-1.5 text-fluid-xs font-semibold text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             {flipRiskValue} to flip
           </span>
         </div>

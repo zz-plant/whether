@@ -87,7 +87,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
       role="group"
       aria-label={ariaLabel}
       onKeyDown={handleKeyDown}
-      className="flex items-center gap-0.5 rounded-full border border-white/[0.06] bg-[var(--bg-nested)] p-0.5"
+      className="flex items-center gap-0.5 rounded-full border border-white/[0.10] bg-[var(--bg-nested)] p-0.5"
     >
       {options.map((option, index) => {
         const isActive = current === option.key;

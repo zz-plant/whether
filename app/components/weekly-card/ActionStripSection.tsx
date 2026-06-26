@@ -67,19 +67,19 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                       <p className="text-fluid-xs font-medium text-slate-400">Area</p>
                       <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
                     </div>
-                    <span className="rounded-sm border border-slate-700/70 bg-slate-950/80 px-2.5 py-1 text-fluid-micro font-semibold text-slate-200">
+                    <span className="rounded-md border border-slate-700/70 bg-slate-950/80 px-2.5 py-1 text-fluid-micro font-semibold text-slate-200">
                       {currentLabel}
                     </span>
                   </div>
                   {(item.tightenDistanceLabel || item.reopenDistanceLabel) ? (
                     <div className="mt-3 flex flex-wrap gap-1.5 text-fluid-micro font-semibold text-slate-300">
                       {item.tightenDistanceLabel ? (
-                        <span className="rounded-sm border border-amber-400/25 bg-amber-500/8 px-2 py-1">
+                        <span className="rounded-md border border-amber-400/25 bg-amber-500/8 px-2 py-1">
                           {item.tightenDistanceLabel}
                         </span>
                       ) : null}
                       {item.reopenDistanceLabel ? (
-                        <span className="rounded-sm border border-sky-400/25 bg-sky-500/8 px-2 py-1">
+                        <span className="rounded-md border border-sky-400/25 bg-sky-500/8 px-2 py-1">
                           {item.reopenDistanceLabel}
                         </span>
                       ) : null}
@@ -123,7 +123,7 @@ export function ActionStripSection({ items }: ActionStripSectionProps) {
                         <p className="text-fluid-xs font-medium text-slate-400">Area</p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
                       </div>
-                      <span className="rounded-sm border border-slate-700/70 bg-slate-950/80 px-2.5 py-1 text-fluid-micro font-semibold text-slate-200">
+                      <span className="rounded-md border border-slate-700/70 bg-slate-950/80 px-2.5 py-1 text-fluid-micro font-semibold text-slate-200">
                         {currentLabel}
                       </span>
                     </div>

@@ -106,7 +106,7 @@ export function DecisionHero({
             </p>
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/60">
               <span>
-                 <span className="text-white/35">Capital tightness:</span>{" "}
+                 <span className="text-white/50">Capital tightness:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
@@ -166,7 +166,7 @@ export function DecisionHero({
           </div>
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60 mt-1">
             Boldness Budget
-            <span className="ml-1.5 text-white/35"> /100</span>
+            <span className="ml-1.5 text-white/50"> /100</span>
           </p>
           <p className="text-fluid-micro text-white/50 mt-0.5">How much room you have to operate</p>
         </div>

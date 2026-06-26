@@ -101,7 +101,7 @@ export default function EmbedPage() {
                     placeholder="e.g. DOCU…"
                     value={ticker}
                     onChange={(e) => setTicker(e.target.value.toUpperCase().slice(0, 10))}
-                    className="mt-1 w-full rounded-lg border border-white/[0.06] bg-[var(--bg-nested)] px-2.5 py-1.5 text-xs text-white/80 focus:border-sky-500/50 focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] px-2.5 py-1.5 text-xs text-white/80 focus:border-sky-500/50 focus:outline-none"
                     maxLength={10}
                     autoComplete="off"
                     spellCheck={false}
@@ -116,7 +116,7 @@ export default function EmbedPage() {
                       className={`rounded-md px-2 py-0.5 text-fluid-micro font-medium transition-colors active:scale-[0.97] ${
                         ticker === t
                           ? "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/40"
-                          : "bg-white/[0.04] text-white/60 hover:bg-white/[0.08] hover:text-white/60"
+                          : "bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/60"
                       }`}
                     >
                       {t || "None"}
@@ -132,7 +132,7 @@ export default function EmbedPage() {
                     id="embed-stage"
                     value={stage}
                     onChange={(e) => setStage(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-white/[0.06] bg-[var(--bg-nested)] px-2.5 py-1.5 text-xs text-white/80 focus:border-sky-500/50 focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] px-2.5 py-1.5 text-xs text-white/80 focus:border-sky-500/50 focus:outline-none"
                   >
                     {STAGE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -149,7 +149,7 @@ export default function EmbedPage() {
                 Embed code
               </p>
 
-              <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/60">
+              <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/60">
                 <code>{embedCode}</code>
               </pre>
 

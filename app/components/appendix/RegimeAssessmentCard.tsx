@@ -81,7 +81,7 @@ export const RegimeAssessmentCard = ({
       className="relative overflow-hidden weather-panel p-6"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-80 blur-2xl" />
-      <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-50`} />
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="type-label text-slate-400">Current capital posture</p>

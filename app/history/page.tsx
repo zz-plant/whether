@@ -102,7 +102,7 @@ export default function HistoryPage() {
                     type="button"
                     onClick={() => navigateTo(entry.year, entry.month)}
                     title={`${monthLabel} ${entry.year}: ${entry.regime}`}
-                    className={`h-8 w-8 rounded-sm transition-transform hover:scale-110 ${color} ${
+                    className={`h-8 w-8 rounded-md transition-transform hover:scale-110 ${color} ${
                       isSelected ? "ring-2 ring-white ring-offset-1 ring-offset-slate-950 scale-110" : "opacity-80 hover:opacity-100"
                     }`}
                     aria-label={`${monthLabel} ${entry.year}: ${entry.regime}`}
@@ -113,7 +113,7 @@ export default function HistoryPage() {
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-400">
               {Object.entries(REGIME_COLORS).map(([regime, color]) => (
                   <span key={regime} className="inline-flex items-center gap-1">
-                    <span className={`inline-block h-2.5 w-2.5 rounded-sm ${color}`} aria-hidden="true" />
+                    <span className={`inline-block h-2.5 w-2.5 rounded-md ${color}`} aria-hidden="true" />
                     {REGIME_DISPLAY[regime] ?? regime}
                   </span>
               ))}

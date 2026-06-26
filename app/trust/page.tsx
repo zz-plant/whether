@@ -175,7 +175,7 @@ export default async function MethodPage() {
       </ReportSection>
 
       <ReportSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
-        <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
+        <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
           <code>{meetingSnippet}</code>
         </pre>
       </ReportSection>
@@ -265,10 +265,10 @@ export default async function MethodPage() {
       </ReportSection>
 
       {!isFallback && warnings.length === 0 ? (
-        <details className="group mt-6 rounded-xl border border-white/[0.06] bg-slate-950/20 px-5 py-4">
+        <details className="group mt-6 rounded-xl border border-white/[0.10] bg-slate-950/20 px-5 py-4">
           <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none">
             <span>Detailed verification &amp; source board</span>
-            <span aria-hidden="true" className="rounded-sm border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
+            <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
               ▾
             </span>
           </summary>

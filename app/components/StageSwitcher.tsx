@@ -128,7 +128,7 @@ export function StageSwitcher({
                 className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-fluid-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-300 ${
                   currentStage === s.key
                     ? "bg-sky-400/14 text-sky-100"
-                    : "text-white/68 hover:bg-white/[0.08] hover:text-white"
+                    : "text-white/68 hover:bg-white/[0.10] hover:text-white"
                 }`}
               >
                 <span>{s.label}</span>

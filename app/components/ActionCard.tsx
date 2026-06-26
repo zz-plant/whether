@@ -71,7 +71,7 @@ export function ActionCard({
   const pauseColor = tightness >= numericThreshold ? "bg-rose-500 animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 animate-pulse" : "bg-emerald-500";
 
   return (
-    <div className={`weather-surface rounded-xl px-5 py-5 border-white/[0.06] relative overflow-hidden`}>
+    <div className={`weather-surface rounded-xl px-5 py-5 border-white/[0.10] relative overflow-hidden`}>
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${direction === "tighten" ? "bg-rose-400/40" : direction === "ease" ? "bg-emerald-400/40" : "bg-sky-400/40"}`} />
       <div className="flex items-center justify-between gap-3 mb-4">
         <p className="text-xs font-semibold tracking-[0.06em] text-white/60">
@@ -98,7 +98,7 @@ export function ActionCard({
       </div>
 
       <div className="mb-4 space-y-1">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-white/35">
+        <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-white/50">
           {boldnessScore}/100 · {boldnessDeltaLabel}
         </p>
         <p className="text-lg font-semibold text-slate-100">
@@ -119,7 +119,7 @@ export function ActionCard({
             <div className={`h-full rounded-full ${pauseColor} transition-all duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
             <div className="absolute top-0 h-full w-[2px] bg-white/50" title="Threshold limit" style={{ right: 0 }} />
           </div>
-          <div className="flex justify-between text-fluid-nano text-white/35 font-mono">
+          <div className="flex justify-between text-fluid-nano text-white/50 font-mono">
             <span>Tightness {tightness}</span>
             <span>Limit {numericThreshold}</span>
           </div>

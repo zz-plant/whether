@@ -59,7 +59,7 @@ export function WeeklyDecisionContent({
                 Rules by area and what would change the call
               </span>
             </span>
-            <span aria-hidden="true" className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-fluid-xs text-slate-400 transition group-open:rotate-180">
+            <span aria-hidden="true" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-fluid-xs text-slate-400 transition group-open:rotate-180">
               ▾
             </span>
           </summary>

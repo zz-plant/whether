@@ -149,7 +149,7 @@ ${citation}
         ref={triggerRef}
         type="button"
         onClick={handleToggleDropdown}
-        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-sm border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100 transition-colors focus:outline-none"
+        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100 transition-colors focus:outline-none"
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-controls={isOpen ? menuId : undefined}
@@ -165,7 +165,7 @@ ${citation}
               ref={(el) => { itemRefs.current[0] = el; }}
               type="button"
               onClick={() => handleCopy(weeklyCallSnapshotText || cleanMarkdownText, "Slack Text")}
-              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.06] hover:text-slate-100"
               role="menuitem"
             >
               <span className="flex items-center gap-2">
@@ -181,7 +181,7 @@ ${citation}
               ref={(el) => { itemRefs.current[1] = el; }}
               type="button"
               onClick={() => handleCopy(cleanMarkdownText, "Markdown")}
-              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.06] hover:text-slate-100"
               role="menuitem"
             >
               <span className="flex items-center gap-2">
@@ -197,7 +197,7 @@ ${citation}
               ref={(el) => { itemRefs.current[2] = el; }}
               type="button"
               onClick={() => handleCopy(weeklyOperatorBriefText || cleanMarkdownText, "Leadership Brief")}
-              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.06] hover:text-slate-100"
               role="menuitem"
             >
               <span className="flex items-center gap-2">
@@ -213,7 +213,7 @@ ${citation}
               ref={(el) => { itemRefs.current[3] = el; }}
               type="button"
               onClick={() => handleCopy(deltaOnlyBriefText || cleanMarkdownText, "Delta Brief")}
-              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.06] hover:text-slate-100"
               role="menuitem"
             >
               <span className="flex items-center gap-2">
@@ -231,7 +231,7 @@ ${citation}
               ref={(el) => { itemRefs.current[4] = el; }}
               type="button"
               onClick={handleToggleSlackOverlay}
-              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.04] hover:text-slate-100"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-slate-300 hover:bg-white/[0.06] hover:text-slate-100"
               role="menuitem"
             >
               <span className="flex items-center gap-2">

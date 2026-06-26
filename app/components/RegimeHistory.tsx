@@ -110,7 +110,7 @@ export function RegimeHistory({ regimes }: Props) {
                       key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
-              className="group relative flex h-14 min-h-11 min-w-[1rem] flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="group relative flex h-14 min-h-11 min-w-[1.25rem] flex-1 cursor-pointer items-end justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               aria-label={tooltipParts.join(" · ")}
               title={tooltipParts.join(" · ")}
             >

@@ -54,7 +54,7 @@ export function CompareStrip({
       </label>
 
       {isComparing ? (
-        <div className="mt-4 pt-3 border-t border-white/[0.06] space-y-3">
+        <div className="mt-4 pt-3 border-t border-white/[0.10] space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-2.5">
               <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/50">Last week</p>
@@ -67,7 +67,7 @@ export function CompareStrip({
               <p className="text-fluid-nano text-white/25 mt-0.5 font-mono">{previous.recordDate}</p>
             </div>
 
-            <div className="rounded-lg bg-white/[0.04] border border-white/[0.08] p-2.5">
+            <div className="rounded-lg bg-white/[0.06] border border-white/[0.08] p-2.5">
               <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/40">This week</p>
               <div className="mt-1 flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2 py-0.5 text-fluid-micro font-medium">
