@@ -77,15 +77,16 @@ class KvDecisionMemoryRepository implements DecisionMemoryRepository {
 
   async append(entry: DecisionMemoryEntry) {
     await this.fallback.append(entry);
-    this.queue = this.queue.then(async () => {
+    const nextQueue = this.queue.then(async () => {
       const currentRaw = await this.kv.get(ENTRY_INDEX_KEY);
       const current = currentRaw ? Number.parseInt(currentRaw, 10) : -1;
       const next = Number.isNaN(current) ? 0 : current + 1;
       await this.kv.put(toKey(next), JSON.stringify(entry));
       await this.kv.put(ENTRY_INDEX_KEY, String(next));
-    }).catch(() => undefined);
+    });
 
-    await this.queue;
+    this.queue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   async list(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {

@@ -81,10 +81,10 @@
   --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
-  --footer-link: #94a3b8;
-  --footer-link-hover: #e2e8f0;
-  --footer-legal: #94a3b8;
-  --footer-legal-hover: #e2e8f0;
+  --footer-link: #cbd5e1;
+  --footer-link-hover: #ffffff;
+  --footer-legal: #cbd5e1;
+  --footer-legal-hover: #ffffff;
 
   /* Type scale */
   --fs-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);

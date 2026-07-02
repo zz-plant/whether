@@ -100,14 +100,15 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
 
   async appendAlert(event: RegimeAlertEvent) {
     await this.fallback.appendAlert(event);
-    this.queue = this.queue.then(async () => {
+    const nextQueue = this.queue.then(async () => {
       const currentRaw = await this.kv.get(ALERT_INDEX_KEY);
       const current = currentRaw ? Number.parseInt(currentRaw, 10) : -1;
       const next = Number.isNaN(current) ? 0 : current + 1;
       await this.kv.put(toKey(ALERT_PREFIX, next), JSON.stringify(event));
       await this.kv.put(ALERT_INDEX_KEY, String(next));
-    }).catch(() => undefined);
-    await this.queue;
+    });
+    this.queue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   async listAlerts(options?: { cursor?: Cursor; limit?: number }) {
@@ -131,14 +132,15 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
 
   async appendDelivery(event: AlertDeliveryEvent) {
     await this.fallback.appendDelivery(event);
-    this.queue = this.queue.then(async () => {
+    const nextQueue = this.queue.then(async () => {
       const currentRaw = await this.kv.get(DELIVERY_INDEX_KEY);
       const current = currentRaw ? Number.parseInt(currentRaw, 10) : -1;
       const next = Number.isNaN(current) ? 0 : current + 1;
       await this.kv.put(toKey(DELIVERY_PREFIX, next), JSON.stringify(event));
       await this.kv.put(DELIVERY_INDEX_KEY, String(next));
-    }).catch(() => undefined);
-    await this.queue;
+    });
+    this.queue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   async listDeliveries(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {

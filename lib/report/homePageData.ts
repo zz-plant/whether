@@ -71,7 +71,7 @@ export const createHomePageReportDataLoader = (
     ...dependencies,
   } satisfies HomePageDataDependencies;
 
-  const fallbackStateByCacheKey = new Map<string, HomePageFallbackState>();
+  const fallbackStateByCacheKey = new Map<string, { state: HomePageFallbackState; timestamp: number }>();
 
   const loadCachedHomePageReportResult = resolvedDependencies.unstableCache(
     async (cacheKey: string): Promise<CachedHomePageReportResult> => {
@@ -82,7 +82,7 @@ export const createHomePageReportDataLoader = (
       );
 
       if (!reportResult.ok) {
-        fallbackStateByCacheKey.set(cacheKey, reportResult);
+        fallbackStateByCacheKey.set(cacheKey, { state: reportResult, timestamp: Date.now() });
         throw new HomePageFallbackResultError(reportResult.fallback, reportResult.error);
       }
 
@@ -98,10 +98,14 @@ export const createHomePageReportDataLoader = (
 
     try {
       const cachedResult = await loadCachedHomePageReportResult(cacheKey);
-      const fallbackState = fallbackStateByCacheKey.get(cacheKey);
+      const fallbackEntry = fallbackStateByCacheKey.get(cacheKey);
 
-      if (fallbackState) {
-        return fallbackState;
+      if (fallbackEntry) {
+        if (Date.now() - fallbackEntry.timestamp > 30000) {
+          fallbackStateByCacheKey.delete(cacheKey);
+        } else {
+          return fallbackEntry.state;
+        }
       }
 
       return cachedResult;

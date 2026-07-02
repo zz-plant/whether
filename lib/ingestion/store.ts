@@ -121,22 +121,27 @@ export class KvIngestionStore implements IngestionStore {
       return;
     }
 
-    this.queue = this.queue.then(async () => {
+    const nextQueue = this.queue.then(async () => {
+      const currentRaw = await this.kv.get(SNAPSHOT_INDEX_KEY);
+      let current = currentRaw ? Number.parseInt(currentRaw, 10) : -1;
+      if (Number.isNaN(current)) {
+        current = -1;
+      }
+
       for (const snapshot of snapshots) {
-        const currentRaw = await this.kv.get(SNAPSHOT_INDEX_KEY);
-        const current = currentRaw ? Number.parseInt(currentRaw, 10) : -1;
-        const next = Number.isNaN(current) ? 0 : current + 1;
+        current++;
         const record: StoredSnapshotRecord = {
           ...buildLineage("source-ingested-at"),
-          sequence: next,
+          sequence: current,
           snapshot,
         };
-        await this.kv.put(`${SNAPSHOT_PREFIX}${String(next).padStart(12, "0")}`, JSON.stringify(record));
-        await this.kv.put(SNAPSHOT_INDEX_KEY, String(next));
+        await this.kv.put(`${SNAPSHOT_PREFIX}${String(current).padStart(12, "0")}`, JSON.stringify(record));
       }
-    }).catch(() => undefined);
+      await this.kv.put(SNAPSHOT_INDEX_KEY, String(current));
+    });
 
-    await this.queue;
+    this.queue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   async readSnapshots(options?: { cursor?: string | null; limit?: number }) {
@@ -181,15 +186,16 @@ export class KvIngestionStore implements IngestionStore {
   }
 
   async writeLatestMaterialized(model: MaterializedSignalReadModel) {
-    this.queue = this.queue.then(async () => {
+    const nextQueue = this.queue.then(async () => {
       const stored: StoredMaterializedRecord = {
         ...buildLineage("request-received-at"),
         model,
       };
       await this.kv.put(MATERIALIZED_KEY, JSON.stringify(stored));
-    }).catch(() => undefined);
+    });
 
-    await this.queue;
+    this.queue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   backendStatus() {

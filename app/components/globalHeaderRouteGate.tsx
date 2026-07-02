@@ -97,7 +97,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     {reportHeaderAction ? (
                       <Link
                         href={reportHeaderAction.href}
-                        className="weather-button-primary inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
+                        className="weather-button-primary inline-flex min-h-[44px] sm:min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
                       >
                         {reportHeaderAction.label}
                       </Link>
@@ -116,7 +116,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
               </>
             ) : (
               <>
-                <GlobalHeaderSearchForm className="grid w-full gap-2 sm:w-auto sm:grid-cols-[minmax(0,16rem)_auto] sm:items-center" />
+                <GlobalHeaderSearchForm className="grid grid-cols-[1fr_auto] w-full gap-2 sm:w-auto sm:grid-cols-[minmax(0,16rem)_auto] sm:items-center" />
                 <GlobalHeaderActionsClient />
               </>
             )}

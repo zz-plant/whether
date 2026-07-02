@@ -102,7 +102,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
             onClick={() => navigate(option.key)}
             onMouseEnter={() => prefetch(option.key)}
             onFocus={() => prefetch(option.key)}
-            className={`min-h-10 min-w-[2.75rem] rounded-full px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+            className={`min-h-[44px] sm:min-h-10 min-w-[2.75rem] rounded-full px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
               isActive
                 ? "bg-sky-500/14 text-sky-100"
                 : "text-slate-400 hover:text-slate-200"

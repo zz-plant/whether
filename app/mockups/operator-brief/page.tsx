@@ -64,7 +64,7 @@ const operatorBriefBullets = [
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
+    <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">
       {children}
     </p>
   );
@@ -170,7 +170,7 @@ export default async function OperatorBriefMockupPage({
                     key={item.label}
                     className="rounded-lg border border-slate-700/70 bg-slate-950/65 px-3 py-3"
                   >
-                    <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
+                    <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-300">
                       {item.label}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-slate-100">{item.value}</p>

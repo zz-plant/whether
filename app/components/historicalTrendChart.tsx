@@ -72,7 +72,7 @@ export function HistoricalTrendChart({ metric, label, color }: HistoricalTrendCh
           </span>
         </span>
       </div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-8" aria-label={`${label} trend over ${points.length} periods`}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-8 overflow-visible" aria-label={`${label} trend over ${points.length} periods`}>
         <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         <circle cx={w} cy={h - ((currentVal - min) / range) * (h - 4) - 2} r="2" fill={color} />
       </svg>

@@ -102,16 +102,17 @@ class KvPostureDecisionEventRepository implements PostureDecisionEventRepository
 
   async append(event: PostureDecisionEvent) {
     await this.fallback.append(event);
-    this.persistQueue = this.persistQueue.then(async () => {
+    const nextQueue = this.persistQueue.then(async () => {
       const currentIndexRaw = await this.kv.get(INDEX_KEY);
       const currentIndex = currentIndexRaw ? Number.parseInt(currentIndexRaw, 10) : -1;
       const nextIndex = Number.isNaN(currentIndex) ? 0 : currentIndex + 1;
       await this.kv.put(toEventKey(nextIndex), JSON.stringify(event));
       await this.kv.put(IDEMPOTENCY_PREFIX + event.idempotencyKey, String(nextIndex));
       await this.kv.put(INDEX_KEY, String(nextIndex));
-    }).catch(() => undefined);
+    });
 
-    await this.persistQueue;
+    this.persistQueue = nextQueue.catch(() => undefined);
+    await nextQueue;
   }
 
   async list(options?: { cursor?: PostureDecisionCursor; limit?: number }) {
