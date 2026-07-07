@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { requireCronAuth } from "../../../../lib/api/cronAuth";
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "../../../../lib/email/emailDelivery";
 import { buildAgentInterfaceResponse } from "../../../../lib/agentInterface";
-import { constantTimeCompare } from "../../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
@@ -9,11 +9,8 @@ export const runtime = "edge";
    Called by the cron trigger (Mon 14:00 UTC) or manually. */
 export async function POST(request: Request) {
   try {
-    const authToken = request.headers.get("authorization")?.replace("Bearer ", "");
-    const expectedToken = process.env.WHETHER_CRON_SECRET;
-    if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authError = requireCronAuth(request);
+    if (authError) return authError;
 
     const subscriptions = await getActiveSubscriptions();
     if (subscriptions.length === 0) {

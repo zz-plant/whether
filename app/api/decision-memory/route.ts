@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
   const entry = buildDecisionMemoryEntry(parsed);
   await repository.append(entry);
-  const listed = await repository.list({ limit: 64 });
+  const listed = await repository.list({ limit: 64, clientId: entry.context.clientId });
 
   return NextResponse.json({
     created: true,

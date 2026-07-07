@@ -73,6 +73,41 @@ describe("decision memory and alert routes", () => {
     assert.match(csvBody, /"recordDate"/);
   });
 
+  it("scopes POST response entries to the posting client", async () => {
+    const payload = (clientId: string) => ({
+      clientId,
+      recordDate: "2026-02-16",
+      decision: { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" },
+      outcome: {
+        verdict: "RISKY",
+        summary: `Hiring remains constrained for ${clientId}.`,
+        guardrail: "Require revenue-backed roles first.",
+        reversalTrigger: "tightness drops below 70",
+      },
+      assessment: {
+        regime: "DEFENSIVE",
+        scores: { tightness: 72, riskAppetite: 52, baseRate: 5.2, curveSlope: 0.2, baseRateUsed: "1M" },
+        thresholds: DEFAULT_THRESHOLDS,
+        inputs: [],
+      },
+    });
+
+    await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload("client-a")),
+    }));
+    const response = await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload("client-b")),
+    }));
+
+    const body: unknown = await response.json();
+    assert.ok(body && typeof body === "object");
+    const entries = "entries" in body ? body.entries : null;
+    const count = "count" in body ? body.count : null;
+    assert.equal(count, 1);
+    assert.ok(Array.isArray(entries));
+    assert.equal(entries[0]?.context?.clientId, "client-b");
+  });
+
   it("rejects invalid decision memory payload", async () => {
     const response = await postDecisionMemoryRoute(
       new Request("http://localhost/api/decision-memory", {

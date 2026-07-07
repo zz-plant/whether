@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import { constantTimeCompare } from "../../../lib/constantTimeCompare";
+import { requireCronAuth } from "../../../lib/api/cronAuth";
 import { loadCanonicalReportInputs } from "../../../lib/ingestion/materialized";
 
 export const runtime = "edge";
 
 export async function POST(request: Request) {
-  const auth = request.headers.get("Authorization");
-  const secret = (globalThis as { WHETHER_CRON_SECRET?: string }).WHETHER_CRON_SECRET
-    ?? process.env.WHETHER_CRON_SECRET;
-  if (secret && !constantTimeCompare(auth ?? "", `Bearer ${secret}`)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
 
   try {
     const result = await loadCanonicalReportInputs({});

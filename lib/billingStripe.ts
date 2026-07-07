@@ -53,6 +53,25 @@ export const isStripeBillingReady = () => {
   return Boolean(config.secretKey && config.appBaseUrl && config.priceIds.pro && config.priceIds.team);
 };
 
+
+export const buildStripeCheckoutReturnUrl = ({
+  appBaseUrl,
+  path,
+  checkout,
+  plan,
+}: {
+  appBaseUrl: string;
+  path: string;
+  checkout: "success" | "cancelled";
+  plan: PremiumPlan;
+}) => {
+  const safePath = path.startsWith("/") && !path.startsWith("//") ? path : "/pricing";
+  const url = new URL(safePath, appBaseUrl);
+  url.searchParams.set("checkout", checkout);
+  url.searchParams.set("plan", plan);
+  return url.toString();
+};
+
 export class StripeBillingError extends Error {
   readonly statusCode: number;
 
@@ -90,8 +109,8 @@ export const createStripeCheckoutSession = async ({
     throw new StripeBillingError("missing_price_id", 503);
   }
 
-  const successUrl = `${config.appBaseUrl}${path}?checkout=success&plan=${plan}`;
-  const cancelUrl = `${config.appBaseUrl}${path}?checkout=cancelled&plan=${plan}`;
+  const successUrl = buildStripeCheckoutReturnUrl({ appBaseUrl: config.appBaseUrl, path, checkout: "success", plan });
+  const cancelUrl = buildStripeCheckoutReturnUrl({ appBaseUrl: config.appBaseUrl, path, checkout: "cancelled", plan });
 
   const params = new URLSearchParams();
   params.set("mode", "subscription");
