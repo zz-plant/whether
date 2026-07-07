@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const STATE_KEY = "whether_state";
 const SYNC_ID_KEY = "whether_sync_id";
+const SYNC_SECRET_KEY = "whether_sync_secret";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
 type StateBlob = Record<string, { value: unknown; ts: number }>;
@@ -16,6 +17,15 @@ function getSyncId(): string {
   localStorage.setItem(SYNC_ID_KEY, id);
   document.cookie = `${SYNC_ID_KEY}=${id}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
   return id;
+}
+
+function getSyncSecret(): string {
+  if (typeof window === "undefined") return "";
+  const existing = localStorage.getItem(SYNC_SECRET_KEY);
+  if (existing) return existing;
+  const secret = crypto.randomUUID() + crypto.randomUUID();
+  localStorage.setItem(SYNC_SECRET_KEY, secret);
+  return secret;
 }
 
 function loadStateBlob(): StateBlob {
@@ -41,10 +51,13 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const syncId = getSyncId();
+  const syncSecret = getSyncSecret();
 
   const pullFromServer = useCallback(async () => {
     try {
-      const res = await fetch(`/api/sync?id=${encodeURIComponent(syncId)}`);
+      const res = await fetch(`/api/sync?id=${encodeURIComponent(syncId)}`, {
+        headers: { "x-whether-sync-secret": syncSecret },
+      });
       if (!res.ok) return;
       const json = await res.json();
       if (!json.ok || !json.state) return;
@@ -69,7 +82,7 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
       }
     } catch {}
     return undefined;
-  }, [syncId, storageKey]);
+  }, [syncId, syncSecret, storageKey]);
 
   const pushToServer = useCallback(async (blob: StateBlob) => {
     try {
@@ -77,13 +90,13 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
         Object.entries(blob).map(([key, entry]) =>
           fetch("/api/sync", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "x-whether-sync-secret": syncSecret },
             body: JSON.stringify({ id: syncId, key, value: entry.value, ts: entry.ts }),
           })
         )
       );
     } catch {}
-  }, [syncId]);
+  }, [syncId, syncSecret]);
 
   const flushDirty = useCallback(() => {
     const blob = loadStateBlob();

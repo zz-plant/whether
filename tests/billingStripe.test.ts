@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
+  buildStripeCheckoutReturnUrl,
   createStripeCheckoutSession,
   isStripeBillingReady,
   StripeBillingError,
@@ -57,6 +58,29 @@ describe("stripe billing helpers", () => {
     assert.equal(params.get("metadata[source]"), "export_brief");
     assert.equal(params.get("metadata[planCandidate]"), "team");
     assert.equal(params.get("metadata[seatBand]"), "6-20");
+  });
+
+
+  it("builds safe checkout return urls while preserving existing query params", () => {
+    assert.equal(
+      buildStripeCheckoutReturnUrl({
+        appBaseUrl: "https://whether.test",
+        path: "/pricing?source=hero",
+        checkout: "success",
+        plan: "pro",
+      }),
+      "https://whether.test/pricing?source=hero&checkout=success&plan=pro",
+    );
+
+    assert.equal(
+      buildStripeCheckoutReturnUrl({
+        appBaseUrl: "https://whether.test",
+        path: "//evil.example/path",
+        checkout: "cancelled",
+        plan: "team",
+      }),
+      "https://whether.test/pricing?checkout=cancelled&plan=team",
+    );
   });
 
   it("throws a typed error when billing config is missing", async () => {

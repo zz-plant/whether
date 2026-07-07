@@ -14,9 +14,12 @@ export type Subscriber = {
   active: boolean;
 };
 
+type KvListResult = { keys: Array<{ name: string }>; list_complete: boolean; cursor?: string };
 type KvNamespaceLike = {
   get(key: string): Promise<string | null>;
   put(key: string, value: string): Promise<void>;
+  delete?: (key: string) => Promise<void>;
+  list?: (options?: { prefix?: string; cursor?: string; limit?: number }) => Promise<KvListResult>;
 };
 
 export interface SubscriberStore {
@@ -31,6 +34,7 @@ export interface SubscriberStore {
 
 const SUB_PREFIX = "email:sub:";
 const TOKEN_PREFIX = "email:token:";
+const ACTIVE_PREFIX = "email:active:";
 
 const generateToken = (): string => crypto.randomUUID();
 
@@ -60,6 +64,10 @@ class KvSubscriberStore implements SubscriberStore {
         subscribedAt: existing.subscribedAt || new Date().toISOString(),
       };
       await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+      await this.kv.put(TOKEN_PREFIX + updated.token, normalized).catch(() => { /* non-fatal: token index repaired when KV is available */ });
+      if (updated.verified && updated.active) {
+        await this.kv.put(ACTIVE_PREFIX + normalized, normalized).catch(() => { /* non-fatal: active index repaired when KV is available */ });
+      }
       this.fallback.saveToMemory(updated);
       return updated;
     }
@@ -90,6 +98,7 @@ class KvSubscriberStore implements SubscriberStore {
     const sub: Subscriber = JSON.parse(raw);
     sub.active = false;
     await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    await this.kv.delete?.(ACTIVE_PREFIX + email).catch(() => undefined);
     this.fallback.saveToMemory(sub);
     return true;
   }
@@ -104,24 +113,35 @@ class KvSubscriberStore implements SubscriberStore {
     const sub: Subscriber = JSON.parse(raw);
     sub.verified = true;
     await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    if (sub.active) {
+      await this.kv.put(ACTIVE_PREFIX + email, email).catch(() => undefined);
+    }
     this.fallback.saveToMemory(sub);
     return true;
   }
 
   async getActiveSubscriptions(): Promise<string[]> {
-    // KV doesn't support listing, so we rely on the in-memory fallback
-    // for listing (populated on subscribe/verify/unsubscribe).
-    // In production, the worker runs as a single isolate per deploy,
-    // so the fallback cache is coherent for the lifetime of the request cycle.
-    // For the cron use case, this returns the emails from in-memory cache
-    // which is seeded by prior subscribe calls.
-    const active = this.fallback.listActive();
-    if (active.length > 0) return active;
+    if (!this.kv.list) {
+      return this.fallback.listActive();
+    }
 
-    // If memory is empty (first call after cold start), we can't enumerate KV.
-    // Return empty — subscribers will be picked up after the next subscribe call
-    // populates the in-memory cache. This is an acceptable tradeoff for KV.
-    return [];
+    const emails: string[] = [];
+    let cursor: string | undefined;
+
+    do {
+      const page = await this.kv.list({ prefix: ACTIVE_PREFIX, cursor, limit: 1000 });
+      for (const key of page.keys) {
+        const email = key.name.slice(ACTIVE_PREFIX.length);
+        const sub = await this.getSubscriberByEmail(email);
+        if (sub?.active && sub.verified) {
+          emails.push(sub.email);
+        }
+      }
+      cursor = page.cursor;
+      if (page.list_complete) break;
+    } while (cursor);
+
+    return emails;
   }
 
   async getSubscriberByEmail(email: string): Promise<Subscriber | null> {
@@ -131,6 +151,10 @@ class KvSubscriberStore implements SubscriberStore {
     const raw = await this.kv.get(SUB_PREFIX + normalized);
     if (raw) {
       const sub = JSON.parse(raw) as Subscriber;
+      await this.kv.put(TOKEN_PREFIX + sub.token, normalized).catch(() => undefined);
+      if (sub.active && sub.verified) {
+        await this.kv.put(ACTIVE_PREFIX + normalized, normalized).catch(() => undefined);
+      }
       this.fallback.saveToMemory(sub);
       return sub;
     }
@@ -253,6 +277,7 @@ export const getSubscriberStore = (): SubscriberStore => {
 };
 
 export const resetSubscriberStore = (): SubscriberStore => {
-  sharedStore = new InMemorySubscriberStore();
+  const kv = getKvBinding();
+  sharedStore = kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore();
   return sharedStore;
 };

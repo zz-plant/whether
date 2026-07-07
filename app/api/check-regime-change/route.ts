@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { requireCronAuth } from "../../../lib/api/cronAuth";
 import { loadReportData } from "../../../lib/report/reportData";
 import { getRegimeProjection } from "../../../lib/report/regimeContext";
-import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
@@ -10,11 +10,8 @@ export const runtime = "edge";
    Called by cron (Mon 14:00 UTC) and on key signal changes. */
 export async function POST(request: Request) {
   try {
-    const authToken = request.headers.get("authorization")?.replace("Bearer ", "");
-    const expectedToken = process.env.WHETHER_CRON_SECRET;
-    if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authError = requireCronAuth(request);
+    if (authError) return authError;
 
     const kv = (globalThis as { WHETHER_DURABLE_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string): Promise<void> } }).WHETHER_DURABLE_KV;
     if (!kv) return NextResponse.json({ ok: false, error: "KV not available" });
