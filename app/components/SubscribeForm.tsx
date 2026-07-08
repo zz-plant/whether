@@ -71,7 +71,7 @@ export function SubscribeForm() {
             setEmail(e.target.value);
             if (status === "error") setStatus("idle");
           }}
-          placeholder="you@example.com"
+          placeholder="e.g. you@company.com…"
           disabled={status === "loading"}
           aria-invalid={status === "error" ? true : undefined}
           aria-describedby={message ? "subscribe-message" : undefined}
@@ -82,7 +82,7 @@ export function SubscribeForm() {
           disabled={status === "loading"}
           className="min-h-11 rounded-lg bg-sky-400 px-4 py-2 text-xs font-semibold text-slate-950 transition-colors hover:bg-sky-300 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         >
-          {status === "loading" ? "Subscribing..." : "Subscribe"}
+          {status === "loading" ? "Subscribing…" : "Subscribe"}
         </button>
       </form>
 

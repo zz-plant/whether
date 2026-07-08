@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
@@ -20,7 +20,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
   const [slackOverlayActive, setSlackOverlayActive] = useState(false);
-  const { copyToClipboard, status, copiedTarget } = useClipboardCopy();
+  const includeContextLabelId = useId();
+  const slackOverlayLabelId = useId();
+  const { copyToClipboard, copiedTarget } = useClipboardCopy();
 
   useEffect(() => {
     const handleExternalToggle = (e: Event) => {
@@ -73,11 +75,22 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     copyToClipboard(slackFormatted, "slack");
   }, [copyToClipboard, buildShareText]);
 
+  const copyStatusMessage =
+    copiedTarget === "plain"
+      ? "Plain text copied."
+      : copiedTarget === "slack"
+      ? "Slack format copied."
+      : copiedTarget === "link"
+      ? "Page link copied."
+      : copiedTarget === "section"
+      ? "Decision card copied."
+      : "";
+
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-50 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[22rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Share brief">
+        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share brief">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Share</h2>
           <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">
@@ -110,22 +123,24 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <Switch.Root
               checked={includeContext}
               onCheckedChange={setIncludeContext}
+              aria-labelledby={includeContextLabelId}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
             >
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
-            Include context for non-users
+            <span id={includeContextLabelId}>Include context for non-users</span>
           </label>
 
           <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
             <Switch.Root
               checked={slackOverlayActive}
               onCheckedChange={handleToggleSlackOverlay}
+              aria-labelledby={slackOverlayLabelId}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
             >
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
-            Slack preview overlay (1.91:1)
+            <span id={slackOverlayLabelId}>Slack preview overlay (1.91:1)</span>
           </label>
 
           <div className="border-t border-slate-800/60 pt-3">
@@ -141,6 +156,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               />
             </div>
             <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Copy as</p>
+            <p role="status" aria-live="polite" className="sr-only">
+              {copyStatusMessage}
+            </p>
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
@@ -168,16 +186,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 {copiedTarget === "link" ? "Link copied!" : "Copy page link"}
               </button>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  copyToClipboard(window.location.href, "link");
-                }}
-                className="weather-button px-3 py-2 text-xs font-semibold"
-              >
-                {status === "copied" ? "Link copied!" : "Page link"}
-              </button>
+            <div className="mt-3">
               <button
                 type="button"
                 onClick={() => {
@@ -185,7 +194,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                   const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
                   copyToClipboard(text, "section");
                 }}
-                className="weather-button px-3 py-2 text-xs font-semibold"
+                className="weather-button w-full px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "section" ? "Copied!" : "Decision card"}
               </button>
