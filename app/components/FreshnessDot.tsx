@@ -69,7 +69,7 @@ export function FreshnessDot({
         aria-controls={open ? menuId : undefined}
       >
         <span className={`inline-flex items-center gap-1 rounded-full ${statusColor} px-1.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.06em]`}>
-          <span className="size-1.5 rounded-full bg-current animate-pulse" aria-hidden="true" />
+          <span className="size-1.5 rounded-full bg-current motion-safe:animate-pulse" aria-hidden="true" />
           {showOfflineBadge ? "Snapshot" : hasDegraded ? "Cached" : "Live"}
         </span>
         <span>Data as of {label}</span>

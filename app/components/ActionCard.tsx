@@ -68,7 +68,7 @@ export function ActionCard({
     ? parseInt(guardrail.match(/\d+/)?.[0] ?? "70", 10)
     : 70;
 
-  const pauseColor = tightness >= numericThreshold ? "bg-rose-500 animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 animate-pulse" : "bg-emerald-500";
+  const pauseColor = tightness >= numericThreshold ? "bg-rose-500 motion-safe:animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 motion-safe:animate-pulse" : "bg-emerald-500";
 
   return (
     <div className={`weather-surface rounded-xl px-5 py-5 border-white/[0.10] relative overflow-hidden`}>
@@ -116,7 +116,7 @@ export function ActionCard({
             </span>
           </div>
           <div className="h-2 w-full rounded-full overflow-hidden relative" style={{ background: "linear-gradient(90deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.12) 60%, rgba(251,191,36,0.18) 85%, rgba(244,63,94,0.18) 100%)" }}>
-            <div className={`h-full rounded-full ${pauseColor} transition-all duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
+            <div className={`h-full rounded-full ${pauseColor} transition-[width,background-color] duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
             <div className="absolute top-0 h-full w-[2px] bg-white/50" title="Threshold limit" style={{ right: 0 }} />
           </div>
           <div className="flex justify-between text-fluid-nano text-white/50 font-mono">
