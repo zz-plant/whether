@@ -130,7 +130,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 <GlobalHeaderNavClient pathname={pathname} />
                 <div className="ml-auto flex min-w-0 items-center gap-1.5 overflow-x-auto sm:hidden">
                   <CadenceSelector />
-                  <ViewSelector />
                 </div>
               </div>
             ) : (
