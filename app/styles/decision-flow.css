@@ -1,0 +1,195 @@
+.weather-decision-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.weather-decision-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, var(--accent-glow), transparent 36%);
+  pointer-events: none;
+}
+
+.weather-decision-chip {
+  position: relative;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.weather-decision-chip[data-priority="true"] {
+  border-color: rgba(125, 211, 252, 0.44);
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.1),
+    0 10px 24px -20px rgba(14, 165, 233, 0.5);
+}
+
+.weather-delta-card {
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.weather-delta-card:hover,
+.weather-delta-card:focus-within {
+  transform: translateY(-1px);
+}
+
+.weather-step-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(30, 30, 30, 0.55);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease,
+    color 220ms ease;
+}
+
+.weather-step-card[data-active="true"] {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.12),
+    0 24px 38px -28px rgba(14, 165, 233, 0.58),
+    0 10px 20px -18px rgba(251, 191, 36, 0.12);
+}
+
+.weather-step-card[data-reviewed="true"] {
+  border-color: rgba(94, 234, 212, 0.28);
+}
+
+.weather-step-card[data-active="true"] {
+  border-top: 2px solid rgba(56, 189, 248, 0.35);
+}
+
+.weather-step-card[data-reviewed="true"] {
+  border-top: 2px solid rgba(16, 185, 129, 0.30);
+}
+
+.weather-step-panel {
+  animation: weather-panel-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.weather-step-summary {
+  background: rgba(30, 30, 30, 0.45);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.weather-step-summary:hover,
+.weather-step-summary:focus-within {
+  transform: translateY(-1px);
+  border-color: rgba(125, 211, 252, 0.22);
+  box-shadow: 0 18px 30px -26px rgba(14, 165, 233, 0.18);
+}
+
+.weather-disclosure-panel {
+  overflow: hidden;
+  transform-origin: top center;
+}
+
+.weather-disclosure-trigger-indicator {
+  transition:
+    transform var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out);
+}
+
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent-action);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--accent-info);
+}
+
+:where(.weather-panel a, .weather-surface a) {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  text-decoration-color: rgba(56, 189, 248, 0.46);
+}
+
+:where(.weather-panel a:hover, .weather-surface a:hover) {
+  text-decoration-color: rgba(125, 211, 252, 0.9);
+}
+
+
+.weather-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.65rem;
+}
+
+.weather-meta-list__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.weather-meta-list__item:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.35rem;
+  color: rgba(148, 163, 184, 0.8);
+}
+
+:where(details) {
+  border-radius: 0.75rem;
+}
+
+:where(summary) {
+  cursor: pointer;
+}
+
+:where(summary::-webkit-details-marker) {
+  display: none;
+}
+
+:where(.weather-auto-chevron > [role="button"]) {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.95rem;
+  text-decoration: none;
+}
+
+:where(.weather-auto-chevron > [role="button"])::after {
+  content: "▾";
+  color: rgb(148 163 184);
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+:where(.weather-auto-chevron[data-panel-open] > [role="button"])::after {
+  transform: rotate(180deg);
+}
+
+:where(.weather-auto-chevron[data-panel-open] > [role="button"]) {
+  margin-bottom: 0.9rem;
+}
+
+:where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
+  text-wrap: pretty;
+}
+
+

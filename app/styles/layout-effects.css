@@ -1,0 +1,140 @@
+@keyframes weather-shell-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Tiny screen / short viewport — compact header and tighter spacing */
+@media (max-height: 700px) {
+  .weather-page-shell {
+    padding-block: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .weather-hero-scores {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .weather-hero-scores > div:last-child {
+    text-align: center !important;
+  }
+}
+
+@media print {
+  nav, aside, footer, .weather-page-shell > header,
+  [class*="sidebar"], [class*="Sidebar"], [class*="sidebar"],
+  button:not(.weather-cta-primary), a[class*="weather-pill"],
+  .weather-page-shell > div:first-child > div:first-child,
+  [data-print-hide],
+  [data-page-section] button,
+  .framework-card button,
+  .framework-card [class*="border-t"],
+  .skip-link,
+  [role="dialog"] {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .weather-page-shell {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  h1, h2, h3, [class*="text-slate-100"], [class*="text-slate-50"] {
+    color: #0f172a !important;
+  }
+
+  [class*="text-slate-300"], [class*="text-slate-400"] {
+    color: #475569 !important;
+  }
+
+  [class*="text-slate-200"] {
+    color: #334155 !important;
+  }
+
+  [class*="bg-slate-950"], [class*="bg-slate-900"], [class*="bg-slate-800"] {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  [class*="bg-gradient"], [class*="from-slate"], [class*="to-slate"] {
+    background: white !important;
+  }
+
+  [class*="text-slate-50"] {
+    color: #0f172a !important;
+  }
+
+  [class*="text-rose-200"], [class*="text-rose-300"] {
+    color: #b91c1c !important;
+  }
+
+  [class*="text-emerald-200"], [class*="text-emerald-300"] {
+    color: #047857 !important;
+  }
+
+  [class*="text-sky-200"], [class*="text-sky-300"] {
+    color: #0369a1 !important;
+  }
+
+  [class*="text-amber-200"], [class*="text-amber-300"] {
+    color: #b45309 !important;
+  }
+
+  [data-page-section] {
+    border-color: #d1d5db !important;
+    background: white !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+
+  [data-page-section] h2 {
+    color: #374151 !important;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .weather-hero-scores {
+    gap: 1.5rem !important;
+  }
+
+  article, section, [class*="weather-panel"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+}
+
+.weather-reveal {
+  animation: weather-section-reveal 150ms ease-out both;
+}
+
+@keyframes weather-section-reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* WCAG 2.3.3: Animation from interactions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

@@ -1,0 +1,390 @@
+
+@media (min-width: 1536px) {
+  .weather-bento-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.weather-icon-chip {
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border;
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+}
+
+.weather-surface {
+  @apply rounded-lg border;
+  border-color: var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.008)),
+    var(--bg-surface);
+  box-shadow:
+    0 12px 28px -24px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  container-type: inline-size;
+}
+
+.weather-card {
+  @apply rounded-lg border px-4 py-3;
+  border-color: var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.008)),
+    color-mix(in srgb, var(--bg-body) 38%, transparent);
+  box-shadow:
+    0 10px 26px -24px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.weather-brief-shell {
+  border-color: rgba(125, 211, 252, 0.20);
+  background:
+    linear-gradient(180deg, rgba(45, 212, 191, 0.035), rgba(251, 191, 36, 0.014)),
+    rgba(27, 30, 35, 0.78);
+  box-shadow:
+    0 18px 40px -30px var(--shadow-heavy),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.weather-brief-kicker {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: none;
+  color: rgb(148 163 184 / 0.90);
+}
+
+.weather-brief-meta-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.weather-brief-meta-chip {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid var(--border-default);
+  background: rgba(20, 23, 28, 0.82);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: none;
+  color: rgb(226 232 240 / 0.92);
+}
+
+.weather-brief-meta-chip-strong {
+  border-color: rgba(125, 211, 252, 0.22);
+  background: rgba(14, 116, 144, 0.12);
+  color: rgb(224 242 254);
+}
+
+.weather-brief-meta-chip-caution {
+  border-color: rgba(251, 191, 36, 0.18);
+  background: rgba(146, 64, 14, 0.12);
+  color: rgb(254 243 199);
+}
+
+.weather-nav-card-index {
+  display: inline-flex;
+  min-height: 1.55rem;
+  min-width: 1.55rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgb(186 230 253 / 0.86);
+}
+
+.weather-sequence-card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.008)),
+    rgba(24, 27, 32, 0.72);
+  box-shadow:
+    0 8px 16px -12px var(--shadow-mid);
+}
+
+.weather-route-card-proof {
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.weather-route-card-trust {
+  border-color: rgba(251, 191, 36, 0.20);
+}
+
+.weather-route-card-replay {
+  border-color: rgba(167, 139, 250, 0.20);
+}
+
+.weather-route-card-utility {
+  border-color: var(--border-default);
+}
+
+.weather-ritual-card {
+  border-radius: 1.25rem;
+  background: var(--bg-surface-muted);
+  box-shadow:
+    0 8px 16px -12px var(--shadow-light);
+}
+
+.weather-transmission-card {
+  border: 1px solid rgba(56, 189, 248, 0.14);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.035), rgba(52, 211, 153, 0.014)),
+    rgba(24, 27, 32, 0.72);
+  box-shadow:
+    0 8px 16px -12px var(--shadow-light);
+}
+
+.weather-transmission-segment {
+  border-radius: 1rem;
+  background: rgba(14, 14, 14, 0.25);
+}
+
+.weather-trust-board {
+  border-color: rgba(251, 191, 36, 0.14);
+  background: rgba(28, 28, 28, 0.65);
+  box-shadow:
+    0 8px 16px -12px var(--shadow-light);
+}
+
+.weather-trust-lane {
+  border: 1px solid var(--border-faint);
+  border-radius: 1rem;
+  background: var(--bg-surface-muted);
+}
+
+.weather-priority-card {
+  @apply rounded-lg border;
+  border-color: rgba(125, 211, 252, 0.18);
+  background: rgba(26, 26, 26, 0.75);
+  box-shadow:
+    0 8px 16px -12px rgba(2, 6, 23, 0.45);
+}
+
+:where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
+  border-color: rgba(71, 85, 105, 0.14);
+  background:
+    linear-gradient(180deg, rgba(9, 16, 30, 0.74), rgba(5, 10, 22, 0.82));
+  box-shadow:
+    0 12px 24px -22px rgba(2, 6, 23, 0.8),
+    inset 0 1px 0 rgba(148, 163, 184, 0.045),
+    inset 0 0 0 1px var(--bg-nested-light);
+}
+
+
+.weather-surface-sky {
+  border-color: rgba(56, 189, 248, 0.18);
+  background: rgba(14, 24, 24, 0.15);
+}
+
+.weather-data-mode {
+  @apply inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.14em];
+}
+
+.weather-data-mode-dynamic {
+  border-color: rgba(16, 185, 129, 0.30);
+  background-color: rgba(16, 185, 129, 0.08);
+  color: rgb(167 243 208);
+}
+
+.weather-data-mode-static {
+  border-color: var(--border-strong);
+  background-color: rgba(30, 41, 59, 0.30);
+  color: rgb(226 232 240);
+}
+
+.weather-surface-indigo {
+  border-color: rgba(129, 140, 248, 0.16);
+  background: rgba(30, 27, 75, 0.12);
+}
+
+.weather-surface-teal {
+  border-color: rgba(45, 212, 191, 0.16);
+  background: rgba(19, 78, 74, 0.10);
+}
+
+.weather-surface-amber {
+  border-color: rgba(251, 191, 36, 0.16);
+  background: rgba(120, 53, 15, 0.12);
+}
+
+:where(.weather-panel > .weather-surface),
+:where(.weather-surface > .weather-surface) {
+  border-color: rgba(148, 163, 184, 0.10);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
+    rgba(12, 14, 18, 0.46);
+}
+
+:where(.weather-panel > .weather-panel),
+:where(.weather-surface > .weather-panel) {
+  border-color: rgba(71, 85, 105, 0.12);
+  background: rgba(2, 6, 23, 0.20);
+}
+
+.weather-quick-glance {
+  border-color: var(--border-default);
+  background: rgba(30, 30, 30, 0.40);
+}
+
+/* Nav scroll fade — subtle right-edge gradient hinting at more items on small screens */
+.weather-nav-rail {
+  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
+}
+
+/* Chip base — normalizes sizing across all chip-like elements */
+:where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-brief-meta-chip, .weather-nav-card-index, .weather-data-mode) {
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-chip {
+  @apply rounded-sm border;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--transition-fast) var(--ease-out),
+              background-color var(--transition-fast) var(--ease-out);
+}
+
+a .weather-chip:hover,
+button .weather-chip:hover,
+[role="button"] .weather-chip:hover,
+.weather-chip:hover {
+  border-color: var(--border-strong);
+  background: rgba(15, 23, 42, 0.52);
+}
+
+a .weather-chip:active,
+button .weather-chip:active,
+.weather-chip:active {
+  border-color: rgba(148, 163, 184, 0.34);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.weather-chip:focus-visible {
+  outline: 2px solid var(--accent-action);
+  outline-offset: 2px;
+}
+
+.weather-chip-amber {
+  border-color: color-mix(in srgb, var(--color-semantic-caution-border) 25%, transparent);
+  background: color-mix(in srgb, var(--color-semantic-caution-bg) 12%, transparent);
+  color: var(--color-semantic-caution-fg);
+}
+
+.weather-chip-emerald {
+  border-color: color-mix(in srgb, var(--color-semantic-easing-border) 25%, transparent);
+  background: color-mix(in srgb, var(--color-semantic-easing-bg) 12%, transparent);
+  color: var(--color-semantic-easing-fg);
+}
+
+.weather-chip-sky {
+  border-color: color-mix(in srgb, var(--color-semantic-unchanged-border) 25%, transparent);
+  background: color-mix(in srgb, var(--color-semantic-unchanged-bg) 12%, transparent);
+  color: var(--color-semantic-unchanged-fg);
+}
+
+.weather-chip-slate {
+  border-color: var(--border-strong);
+  background: rgba(15, 23, 42, 0.35);
+  color: rgb(203 213 225);
+}
+
+.weather-chip-violet {
+  border-color: color-mix(in srgb, var(--color-semantic-reversal-border) 25%, transparent);
+  background: color-mix(in srgb, var(--color-semantic-reversal-bg) 12%, transparent);
+  color: var(--color-semantic-reversal-fg);
+}
+
+.weather-decision-cell {
+  border-radius: 0.55rem;
+  padding: 0.6rem 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-brief-container {
+  container-type: inline-size;
+  container-name: brief;
+}
+
+@container brief (max-width: 700px) {
+  .weather-brief-secondary-lane {
+    display: none;
+  }
+}
+
+@container brief (max-width: 860px) {
+  .weather-brief-call-heading {
+    font-size: 1.15rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.weather-decision-card {
+  padding: var(--space-md);
+}
+
+/* Decision delta strip — scannable in <5 seconds */
+.weather-decision-delta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem var(--space-md);
+  border-bottom: 1px solid var(--border-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-decision-delta-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: rgb(148 163 184 / 0.85);
+}
+
+.weather-decision-delta-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(226 232 240);
+}
+
+/* One-screen guarantee: compact the decision card on shorter viewports */
+@media (max-height: 880px) {
+  .weather-decision-card .weather-section-stage {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .weather-decision-card .weather-section-stage + .weather-section-stage {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 120px;
+  }
+
+  .weather-decision-card dt {
+    font-size: 0.6rem;
+  }
+
+  .weather-decision-card .type-data.font-semibold {
+    font-size: 0.8rem;
+  }
+}
+
+
+
