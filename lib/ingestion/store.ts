@@ -98,6 +98,20 @@ const SNAPSHOT_PREFIX = "ingestion:snapshot:";
 const SNAPSHOT_INDEX_KEY = "ingestion:snapshot:index";
 const MATERIALIZED_KEY = "ingestion:materialized:latest";
 
+/**
+ * Snapshot keys accumulate forever (one per signal per ingestion run, ~10/day), so an
+ * unbounded read grows without limit and eventually stalls every request that touches
+ * report data. Consumers only ever need the latest value per signal plus the trailing
+ * 92-day history window (see RECENT_HISTORY_WINDOW_DAYS in ./materialized), so cap
+ * unpaginated reads to the newest slice and let older records age out of the read path.
+ */
+const DEFAULT_SNAPSHOT_READ_LIMIT = 1500;
+
+/** KV round-trips dominate this read; issue them in parallel batches rather than serially. */
+const SNAPSHOT_READ_CONCURRENCY = 64;
+
+const formatSnapshotKey = (sequence: number) => `${SNAPSHOT_PREFIX}${String(sequence).padStart(12, "0")}`;
+
 const getKvBinding = () => {
   const binding = (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike; INGESTION_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV
     ?? (globalThis as { INGESTION_KV?: KvNamespaceLike }).INGESTION_KV;
@@ -135,7 +149,7 @@ export class KvIngestionStore implements IngestionStore {
           sequence: current,
           snapshot,
         };
-        await this.kv.put(`${SNAPSHOT_PREFIX}${String(current).padStart(12, "0")}`, JSON.stringify(record));
+        await this.kv.put(formatSnapshotKey(current), JSON.stringify(record));
       }
       await this.kv.put(SNAPSHOT_INDEX_KEY, String(current));
     });
@@ -144,36 +158,80 @@ export class KvIngestionStore implements IngestionStore {
     await nextQueue;
   }
 
-  async readSnapshots(options?: { cursor?: string | null; limit?: number }) {
-    await this.queue;
-    const threshold = options?.cursor ? Number.parseInt(options.cursor, 10) : -1;
-    const limit = options?.limit ?? Number.MAX_SAFE_INTEGER;
+  /**
+   * Sequence numbers are dense and monotonic, so the index key alone describes the whole
+   * keyspace. Listing is only needed when the index is missing (older namespaces).
+   */
+  private async resolveSequences(threshold: number): Promise<number[]> {
+    const rawLatest = await this.kv.get(SNAPSHOT_INDEX_KEY);
+    const latest = rawLatest === null ? Number.NaN : Number.parseInt(rawLatest, 10);
 
-    const collected: StoredSnapshotRecord[] = [];
+    if (Number.isFinite(latest)) {
+      const sequences: number[] = [];
+      for (let sequence = Math.max(threshold + 1, 0); sequence <= latest; sequence++) {
+        sequences.push(sequence);
+      }
+      return sequences;
+    }
+
+    const sequences: number[] = [];
     let cursor: string | undefined;
 
     do {
       const page = await this.kv.list({ prefix: SNAPSHOT_PREFIX, cursor, limit: 1000 });
       for (const key of page.keys) {
         const sequence = Number.parseInt(key.name.slice(SNAPSHOT_PREFIX.length), 10);
-        if (Number.isNaN(sequence) || sequence <= threshold) {
-          continue;
+        if (!Number.isNaN(sequence) && sequence > threshold) {
+          sequences.push(sequence);
         }
-        const raw = await this.kv.get(key.name);
-        if (!raw) {
-          continue;
-        }
-        collected.push(JSON.parse(raw) as StoredSnapshotRecord);
       }
       cursor = page.cursor;
       if (page.list_complete) break;
     } while (cursor);
 
+    return sequences.sort((left, right) => left - right);
+  }
+
+  private async readSequences(sequences: number[]): Promise<StoredSnapshotRecord[]> {
+    const collected: StoredSnapshotRecord[] = [];
+
+    for (let offset = 0; offset < sequences.length; offset += SNAPSHOT_READ_CONCURRENCY) {
+      const batch = sequences.slice(offset, offset + SNAPSHOT_READ_CONCURRENCY);
+      const raws = await Promise.all(batch.map((sequence) => this.kv.get(formatSnapshotKey(sequence))));
+
+      for (const raw of raws) {
+        if (!raw) {
+          continue;
+        }
+        try {
+          collected.push(JSON.parse(raw) as StoredSnapshotRecord);
+        } catch {
+          // Skip unparseable records rather than failing the whole read.
+        }
+      }
+    }
+
+    return collected;
+  }
+
+  async readSnapshots(options?: { cursor?: string | null; limit?: number }) {
+    await this.queue;
+    const threshold = options?.cursor ? Number.parseInt(options.cursor, 10) : -1;
+    const sequences = await this.resolveSequences(threshold);
+
+    // An explicit limit is a forward page from the cursor; without one, read the newest
+    // window so the cost stays flat as the namespace grows.
+    const selected = options?.limit === undefined
+      ? sequences.slice(-DEFAULT_SNAPSHOT_READ_LIMIT)
+      : sequences.slice(0, options.limit);
+
+    const collected = await this.readSequences(selected);
+
     if (collected.length === 0) {
       return this.fallback?.readSnapshots(options) ?? [];
     }
 
-    return collected.sort((a, b) => a.sequence - b.sequence).slice(0, limit).map((entry) => entry.snapshot);
+    return collected.sort((a, b) => a.sequence - b.sequence).map((entry) => entry.snapshot);
   }
 
   async readLatestMaterialized() {
