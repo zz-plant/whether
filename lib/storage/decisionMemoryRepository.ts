@@ -16,7 +16,7 @@ export interface DecisionMemoryRepository {
 }
 
 const ENTRY_PREFIX = "decision-memory:";
-const ENTRY_INDEX_KEY = "decision-memory:index";
+const ENTRY_INDEX_KEY = "meta:decision-memory:index";
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
@@ -99,12 +99,17 @@ class KvDecisionMemoryRepository implements DecisionMemoryRepository {
 
     do {
       const page = await this.kv.list({ prefix: ENTRY_PREFIX, cursor: listCursor, limit: 1000 });
+      const matchingKeys: Array<{ keyName: string; index: number }> = [];
       for (const key of page.keys) {
         const index = parseIndex(key.name);
-        if (index === null || index <= threshold) {
-          continue;
+        if (index !== null && index > threshold) {
+          matchingKeys.push({ keyName: key.name, index });
         }
-        const raw = await this.kv.get(key.name);
+      }
+
+      const raws = await Promise.all(matchingKeys.map(({ keyName }) => this.kv.get(keyName)));
+      for (let i = 0; i < matchingKeys.length; i++) {
+        const raw = raws[i];
         if (!raw) {
           continue;
         }
@@ -112,7 +117,7 @@ class KvDecisionMemoryRepository implements DecisionMemoryRepository {
         if (options?.clientId && parsed.context.clientId !== options.clientId) {
           continue;
         }
-        collected.push({ index, entry: parsed });
+        collected.push({ index: matchingKeys[i].index, entry: parsed });
       }
       listCursor = page.cursor;
       if (page.list_complete) {

@@ -36,26 +36,27 @@ export function ShareBriefButton({
       void navigator.share(payload);
       return;
     }
-    const clipboardText = url ? `${text} — ${url}` : text;
-    fallbackCopy(clipboardText);
+    const formattedSlackBrief = `*Whether Weekly Brief*\n> *Operating Call:* ${text}\n\n*Full Weekly Brief:* ${url || "https://whether.work"}`;
+    fallbackCopy(formattedSlackBrief);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setDidCopy(true);
-    timeoutRef.current = setTimeout(() => setDidCopy(false), 1500);
+    timeoutRef.current = setTimeout(() => setDidCopy(false), 2000);
   }, [title, text, url]);
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-white/[0.08] px-2.5 py-1.5 text-fluid-xs font-medium text-white/60 hover:text-white/80 hover:border-white/[0.14] transition-colors active:scale-[0.97] ${className}`}
+      title="Copies Slack-ready markdown brief"
+      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-semibold text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
       aria-label="Share brief"
     >
       {didCopy ? (
-        <Check aria-hidden="true" size={16} strokeWidth={1.8} className="text-emerald-300" />
+        <Check aria-hidden="true" size={16} strokeWidth={2} className="text-emerald-300" />
       ) : (
-        <Share2 aria-hidden="true" size={16} strokeWidth={1.8} />
+        <Share2 aria-hidden="true" size={16} strokeWidth={2} />
       )}
-      {showLabel ? <span>{didCopy ? "Copied" : "Share"}</span> : null}
+      {showLabel ? <span>{didCopy ? "Brief Copied" : "Copy Brief"}</span> : null}
     </button>
   );
 }

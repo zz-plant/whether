@@ -9,6 +9,7 @@ import {
   getAlertPreferenceRepository,
   type AlertPreferences,
 } from "../storage/alertPreferenceRepository";
+import { getSubscriberStore } from "../email/subscriberStore";
 
 type KvNamespaceLike = {
   get(key: string): Promise<string | null>;
@@ -112,6 +113,20 @@ const wasAlreadyDelivered = async (
   }
 };
 
+const isValidEmail = (raw: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(raw.trim());
+
+const resolveRecipientEmail = async (clientId: string): Promise<string | null> => {
+  if (isValidEmail(clientId)) return clientId.trim();
+  try {
+    const store = getSubscriberStore();
+    const sub = (await store.getSubscriberByEmail(clientId)) ?? (await store.getSubscriberByToken(clientId));
+    return sub && sub.email && isValidEmail(sub.email) ? sub.email : null;
+  } catch {
+    return null;
+  }
+};
+
 const recordDelivery = async (
   email: string,
   alertType: string,
@@ -208,6 +223,11 @@ export const deliverAlerts = async (
   let errors = 0;
 
   for (const sub of subscribers) {
+    const targetEmail = await resolveRecipientEmail(sub.clientId);
+    if (!targetEmail) {
+      errors++;
+      continue;
+    }
     for (const alert of alerts) {
       const already = await wasAlreadyDelivered(sub.clientId, alert.type);
       if (already) {
@@ -215,7 +235,7 @@ export const deliverAlerts = async (
         continue;
       }
       const ok = await deliverAlertToSubscriber(
-        sub.clientId,
+        targetEmail,
         alert,
         conditions,
         adapter,

@@ -20,9 +20,9 @@ export interface RegimeAlertRepository {
 }
 
 const ALERT_PREFIX = "regime-alert:";
-const ALERT_INDEX_KEY = "regime-alert:index";
+const ALERT_INDEX_KEY = "meta:regime-alert:index";
 const DELIVERY_PREFIX = "regime-alert-delivery:";
-const DELIVERY_INDEX_KEY = "regime-alert-delivery:index";
+const DELIVERY_INDEX_KEY = "meta:regime-alert-delivery:index";
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
@@ -164,12 +164,17 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
 
     do {
       const page = await this.kv.list({ prefix, cursor: listCursor, limit: 1000 });
+      const matchingKeys: Array<{ keyName: string; index: number }> = [];
       for (const key of page.keys) {
         const index = parseIndex(prefix, key.name);
-        if (index === null || index <= threshold) {
-          continue;
+        if (index !== null && index > threshold) {
+          matchingKeys.push({ keyName: key.name, index });
         }
-        const raw = await this.kv.get(key.name);
+      }
+
+      const raws = await Promise.all(matchingKeys.map(({ keyName }) => this.kv.get(keyName)));
+      for (let i = 0; i < matchingKeys.length; i++) {
+        const raw = raws[i];
         if (!raw) {
           continue;
         }
@@ -177,7 +182,7 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
         if (predicate && !predicate(item)) {
           continue;
         }
-        collected.push({ index, item });
+        collected.push({ index: matchingKeys[i].index, item });
       }
       listCursor = page.cursor;
       if (page.list_complete) break;

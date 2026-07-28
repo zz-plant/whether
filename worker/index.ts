@@ -76,8 +76,12 @@ export default {
       });
     }
 
-    if (env.WHETHER_DURABLE_KV) {
-      (globalThis as Record<string, unknown>).WHETHER_DURABLE_KV = env.WHETHER_DURABLE_KV;
+    if (env) {
+      for (const [key, value] of Object.entries(env)) {
+        if (value !== undefined && key !== "ASSETS" && key !== "IMAGES") {
+          (globalThis as Record<string, unknown>)[key] = value;
+        }
+      }
     }
 
     return handler.fetch(request);

@@ -6,8 +6,10 @@ type KvNamespaceLike = {
 };
 
 const SNAPSHOT_KV_KEY = "regime:machine-snapshot";
+const SNAPSHOT_CACHE_TTL_MS = 5000;
 
 let inMemorySnapshot: RegimeMachineSnapshot | null = null;
+let lastLoadedAt = 0;
 
 const getKvBinding = (): KvNamespaceLike | null => {
   const binding = (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV;
@@ -18,13 +20,15 @@ const getKvBinding = (): KvNamespaceLike | null => {
 };
 
 export const loadRegimeMachineSnapshot = async (): Promise<RegimeMachineSnapshot | null> => {
-  if (inMemorySnapshot) return inMemorySnapshot;
+  const now = Date.now();
+  if (inMemorySnapshot && now - lastLoadedAt < SNAPSHOT_CACHE_TTL_MS) return inMemorySnapshot;
   const kv = getKvBinding();
   if (!kv) return inMemorySnapshot;
   try {
     const raw = await kv.get(SNAPSHOT_KV_KEY);
     if (!raw) return null;
     inMemorySnapshot = JSON.parse(raw) as RegimeMachineSnapshot;
+    lastLoadedAt = now;
     return inMemorySnapshot;
   } catch {
     return inMemorySnapshot;
@@ -33,6 +37,7 @@ export const loadRegimeMachineSnapshot = async (): Promise<RegimeMachineSnapshot
 
 export const saveRegimeMachineSnapshot = async (snapshot: RegimeMachineSnapshot): Promise<void> => {
   inMemorySnapshot = snapshot;
+  lastLoadedAt = Date.now();
   const kv = getKvBinding();
   if (!kv) return;
   try {
@@ -44,4 +49,5 @@ export const saveRegimeMachineSnapshot = async (snapshot: RegimeMachineSnapshot)
 
 export const resetRegimeMachineSnapshot = () => {
   inMemorySnapshot = null;
+  lastLoadedAt = 0;
 };

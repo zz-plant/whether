@@ -221,6 +221,14 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
   const transition = computeTransitionProbability(regime);
   const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
 
+  // guardrailThreshold is string | number depending on the source row; the meter and the
+  // simulator both need a plain number, so coerce once and fall back to the default.
+  const guardrailThresholdRaw = homepage.weeklyDecisionCardModel.decision.guardrailThreshold;
+  const parsedGuardrailThreshold = typeof guardrailThresholdRaw === "number"
+    ? guardrailThresholdRaw
+    : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
+  const pauseThreshold = Number.isFinite(parsedGuardrailThreshold) ? parsedGuardrailThreshold : 70;
+
   return (
     <Shell regime={regime}>
       <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
@@ -285,7 +293,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             <FlipMeter
               tightness={tightness}
               tightnessDelta={tightnessDelta}
-              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? 70}
+              pauseThreshold={pauseThreshold}
               flipConditions={flipConditionLabels}
               signalDirection={signalDirection}
             />
@@ -304,9 +312,9 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             <ScenarioSimulator
               baseTightness={tightness}
               baseBoldness={weeklyLeadershipSummary.boldnessScore}
-              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? 70}
+              pauseThreshold={pauseThreshold}
             />
- 
+
             <CompareStrip
               currentRegime={regime}
               currentTightness={tightness}
@@ -314,23 +322,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
               autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
             />
- 
-           <ActionCard
-              call={primaryCall}
-              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-              guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-                ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-                : undefined}
-              flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
-              tightness={tightness}
-              boldnessScore={weeklyLeadershipSummary.boldnessScore}
-              boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-              direction={signalDirection}
-              recordDate={homepage.reportShell.recordDateLabel}
-              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
-            />
- 
-           </SwipeableWeek>
+          </SwipeableWeek>
  
            <EvidenceDrawer highlight={toolHighlight}>
              <ToolsPanel>

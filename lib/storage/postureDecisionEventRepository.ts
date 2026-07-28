@@ -30,7 +30,7 @@ type KvNamespaceLike = {
 };
 
 const EVENT_PREFIX = "posture-decision:";
-const INDEX_KEY = "posture-decision:index";
+const INDEX_KEY = "meta:posture-decision:index";
 const IDEMPOTENCY_PREFIX = "posture-decision:idempotency:";
 
 const clone = <T>(value: T): T => {
@@ -125,16 +125,21 @@ class KvPostureDecisionEventRepository implements PostureDecisionEventRepository
 
     do {
       const page = await this.kv.list({ prefix: EVENT_PREFIX, cursor: listCursor, limit: 1000 });
+      const matchingKeys: Array<{ keyName: string; index: number }> = [];
       for (const key of page.keys) {
         const index = parseEventIndex(key.name);
-        if (index === null || index <= threshold) {
-          continue;
+        if (index !== null && index > threshold) {
+          matchingKeys.push({ keyName: key.name, index });
         }
-        const raw = await this.kv.get(key.name);
+      }
+
+      const raws = await Promise.all(matchingKeys.map(({ keyName }) => this.kv.get(keyName)));
+      for (let i = 0; i < matchingKeys.length; i++) {
+        const raw = raws[i];
         if (!raw) {
           continue;
         }
-        collected.push({ index, event: JSON.parse(raw) as PostureDecisionEvent });
+        collected.push({ index: matchingKeys[i].index, event: JSON.parse(raw) as PostureDecisionEvent });
       }
       listCursor = page.cursor;
       if (page.list_complete) {

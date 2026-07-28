@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     if (authError) return authError;
 
     const kv = (globalThis as { WHETHER_DURABLE_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string): Promise<void> } }).WHETHER_DURABLE_KV;
-    if (!kv) return NextResponse.json({ ok: false, error: "KV not available" });
+    if (!kv) return NextResponse.json({ ok: false, error: "KV not available" }, { status: 503 });
 
     const { assessment, reportDynamics, actionNowShort } = await loadReportData({});
     const currentRegime = assessment.regime;

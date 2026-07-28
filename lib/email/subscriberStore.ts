@@ -130,9 +130,15 @@ class KvSubscriberStore implements SubscriberStore {
 
     do {
       const page = await this.kv.list({ prefix: ACTIVE_PREFIX, cursor, limit: 1000 });
-      for (const key of page.keys) {
-        const email = key.name.slice(ACTIVE_PREFIX.length);
-        const sub = await this.getSubscriberByEmail(email);
+      const candidateEmails = page.keys
+        .map((key) => key.name.slice(ACTIVE_PREFIX.length))
+        .filter(Boolean);
+
+      const subs = await Promise.all(
+        candidateEmails.map((email) => this.getSubscriberByEmail(email)),
+      );
+
+      for (const sub of subs) {
         if (sub?.active && sub.verified) {
           emails.push(sub.email);
         }

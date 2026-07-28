@@ -42,7 +42,7 @@ export type CloudflareKvNamespaceLike = {
 };
 
 const EVENT_PREFIX = "decision-event:";
-const EVENT_INDEX_KEY = "decision-event:index";
+const EVENT_INDEX_KEY = "meta:decision-event:index";
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
@@ -188,13 +188,20 @@ export class DecisionEventStore {
         limit: 1000,
       });
 
+      const matchingKeys: Array<{ keyName: string; index: number }> = [];
       for (const key of page.keys) {
         const index = parseEventIndex(key.name);
-        if (index === null || index <= thresholdIndex) {
-          continue;
+        if (index !== null && index > thresholdIndex) {
+          matchingKeys.push({ keyName: key.name, index });
         }
+      }
 
-        const raw = await this.cloudflareKv.get(key.name);
+      const raws = await Promise.all(
+        matchingKeys.map(({ keyName }) => this.cloudflareKv!.get(keyName)),
+      );
+
+      for (let i = 0; i < matchingKeys.length; i++) {
+        const raw = raws[i];
         if (!raw) {
           continue;
         }
@@ -204,7 +211,7 @@ export class DecisionEventStore {
           continue;
         }
 
-        collected.push({ index, event: parsed });
+        collected.push({ index: matchingKeys[i].index, event: parsed });
       }
 
       listCursor = page.cursor;
@@ -295,7 +302,8 @@ export const buildRegimeDecisionEvent = ({
 });
 
 const getCloudflareKvBinding = () => {
-  const maybeBinding = (globalThis as { DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).DECISION_EVENTS_KV;
+  const maybeBinding = (globalThis as { WHETHER_DURABLE_KV?: CloudflareKvNamespaceLike; DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).WHETHER_DURABLE_KV
+    ?? (globalThis as { DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).DECISION_EVENTS_KV;
   if (!maybeBinding) {
     return null;
   }

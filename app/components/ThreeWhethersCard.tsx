@@ -3,6 +3,8 @@
 import { Users, DollarSign, Lock, ArrowUpRight, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 
+import { ShareBriefButton } from "./shareBriefButton";
+
 type DecisionItem = {
   title: string;
   icon: typeof Users;
@@ -90,6 +92,8 @@ export function ThreeWhethersCard({
     }
   };
 
+  const briefText = actionNow ?? `${regime} regime: tightness ${tightness}/100, boldness budget ${boldnessScore}/100. ${hireVerdict === "TIGHTEN" ? "Tighten headcount and discretionary spend." : "Maintain planned operational tempo."}`;
+
   return (
     <section className="space-y-4" aria-labelledby="three-whethers-heading">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -101,9 +105,12 @@ export function ThreeWhethersCard({
             The 3 Operational &quot;Whethers&quot;
           </h3>
         </div>
-        <span className="text-fluid-xs text-white/50">
-          Weekly posture breakdown for operators
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="hidden sm:inline text-fluid-xs text-white/50">
+            Weekly posture breakdown for operators
+          </span>
+          <ShareBriefButton text={briefText} showLabel />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -143,14 +150,14 @@ export function ThreeWhethersCard({
                 </div>
               </div>
 
-              <div className="border-t border-white/[0.05] pt-3 space-y-1.5 text-fluid-nano text-white/50">
-                <div className="flex items-center justify-between">
-                  <span>Trigger:</span>
-                  <span className="text-white/70 font-mono">{item.threshold}</span>
+              <div className="border-t border-white/[0.08] pt-3 space-y-2 text-fluid-nano text-white/60">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-amber-300/80">Trigger:</span>
+                  <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span>Reversal:</span>
-                  <span className="text-sky-300/80 font-mono truncate max-w-[160px]" title={item.reversalCondition}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-rose-300/80">Reversal:</span>
+                  <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 truncate max-w-[170px]" title={item.reversalCondition}>
                     {item.reversalCondition}
                   </span>
                 </div>
