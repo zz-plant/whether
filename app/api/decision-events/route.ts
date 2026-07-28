@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
   const initialState = toRegimeKey(params.get("initialState"));
 
   const store = getDecisionEventStore();
-  const listed = await store.listSince(cursor);
+  const listed = await store.listSince(cursor, limit);
   const events = listed.events.slice(0, limit);
   const baseIndex = cursor ? Number.parseInt(cursor, 10) + 1 : 0;
   const nextCursor = events.length > 0 ? `${baseIndex + events.length - 1}` : cursor;

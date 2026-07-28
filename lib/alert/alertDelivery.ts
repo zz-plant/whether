@@ -76,15 +76,25 @@ const listAlertSubscribers = async (): Promise<
   }> = [];
   let cursor: string | undefined;
   const PREF_PREFIX = "alert-pref:";
+  const PREFERENCE_READ_CONCURRENCY = 32;
   do {
     try {
       const page = await kv.list({ prefix: PREF_PREFIX, cursor, limit: 500 });
-      for (const key of page.keys) {
-        const clientId = key.name.slice(PREF_PREFIX.length);
-        if (!clientId) continue;
-        const prefs = await repository.get(clientId);
-        if (prefs?.email) {
-          subscribers.push({ clientId, preferences: prefs });
+      const clientIds = page.keys
+        .map((key) => key.name.slice(PREF_PREFIX.length))
+        .filter(Boolean);
+
+      // Previously one serial KV read per key, so this scaled linearly in wall-clock with
+      // the subscriber count. Batched with a bound on simultaneous subrequests.
+      for (let offset = 0; offset < clientIds.length; offset += PREFERENCE_READ_CONCURRENCY) {
+        const batch = clientIds.slice(offset, offset + PREFERENCE_READ_CONCURRENCY);
+        const resolved = await Promise.all(batch.map((clientId) => repository.get(clientId)));
+
+        for (let i = 0; i < batch.length; i++) {
+          const prefs = resolved[i];
+          if (prefs?.email) {
+            subscribers.push({ clientId: batch[i], preferences: prefs });
+          }
         }
       }
       cursor = page.cursor;

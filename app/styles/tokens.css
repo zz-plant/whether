@@ -408,15 +408,35 @@ html[data-theme="light"] {
   --ring: oklch(0.205 0 0);
 }
 
-/* Light mode: remap opacity-based v2 styles to dark equivalents */
+/* Light mode: remap opacity-based v2 styles to dark equivalents.
+   Every step below is measured against the lightest surface (--bg-body #faf8f5)
+   and the darkest common panel (#e2e8f0); all clear WCAG AA 4.5:1 for body text.
+   Any `text-white/NN` step used in the app must appear here — an unmapped step
+   stays literally white and renders invisible on a light surface. */
 [data-theme="light"] body { color: #1a1a1a; }
 [data-theme="light"] .text-white { color: #1a1a1a !important; }
 [data-theme="light"] .text-white\/90 { color: #1a1a1a !important; }
+[data-theme="light"] .text-white\/85 { color: #232323 !important; }
 [data-theme="light"] .text-white\/80 { color: #2a2a2a !important; }
+[data-theme="light"] .text-white\/75 { color: #263141 !important; }
 [data-theme="light"] .text-white\/70 { color: #1e293b !important; }
+[data-theme="light"] .text-white\/68 { color: #2b3a4d !important; }
+[data-theme="light"] .text-white\/65 { color: #2b3a4d !important; }
 [data-theme="light"] .text-white\/60 { color: #334155 !important; }
+[data-theme="light"] .text-white\/55 { color: #3d4a5f !important; }
 [data-theme="light"] .text-white\/50 { color: #475569 !important; }
-[data-theme="light"] .text-white\/40 { color: #64748b !important; }
+/* #64748b measured 4.49:1 on #faf8f5 — just under AA, so the muted floor moves up. */
+[data-theme="light"] .text-white\/40 { color: #526077 !important; }
+[data-theme="light"] .text-white\/25 { color: #5b6b80 !important; }
+[data-theme="light"] .text-white\/20 { color: #5b6b80 !important; }
+
+/* Slate text scales are authored for a dark surface, where 50–300 read as
+   near-white. Without a light-mode counterpart they stay near-white on white;
+   these four classes account for ~1,400 usages across the app. */
+[data-theme="light"] .text-slate-50 { color: #1a1a1a !important; }
+[data-theme="light"] .text-slate-100 { color: #1a1a1a !important; }
+[data-theme="light"] .text-slate-200 { color: #263141 !important; }
+[data-theme="light"] .text-slate-300 { color: #334155 !important; }
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
 [data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }

@@ -36,6 +36,9 @@ const SUB_PREFIX = "email:sub:";
 const TOKEN_PREFIX = "email:token:";
 const ACTIVE_PREFIX = "email:active:";
 
+/** Bound on concurrent KV reads while scanning the subscriber list. */
+const SUBSCRIBER_READ_CONCURRENCY = 32;
+
 const generateToken = (): string => crypto.randomUUID();
 
 const normalizeEmail = (raw: string): string | null => {
@@ -134,13 +137,16 @@ class KvSubscriberStore implements SubscriberStore {
         .map((key) => key.name.slice(ACTIVE_PREFIX.length))
         .filter(Boolean);
 
-      const subs = await Promise.all(
-        candidateEmails.map((email) => this.getSubscriberByEmail(email)),
-      );
+      // Batched rather than one Promise.all over the whole page: a full page is 1000 keys,
+      // and Workers caps simultaneous subrequests well below that.
+      for (let offset = 0; offset < candidateEmails.length; offset += SUBSCRIBER_READ_CONCURRENCY) {
+        const batch = candidateEmails.slice(offset, offset + SUBSCRIBER_READ_CONCURRENCY);
+        const subs = await Promise.all(batch.map((email) => this.getSubscriberByEmail(email)));
 
-      for (const sub of subs) {
-        if (sub?.active && sub.verified) {
-          emails.push(sub.email);
+        for (const sub of subs) {
+          if (sub?.active && sub.verified) {
+            emails.push(sub.email);
+          }
         }
       }
       cursor = page.cursor;

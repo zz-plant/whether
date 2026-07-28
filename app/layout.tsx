@@ -4,7 +4,6 @@ import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
-import { ThemeCycler } from "./components/ThemeCycler";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,12 +30,6 @@ export const buildThemeBootstrapScript = () => `
     const nextTheme = theme === "light" ? "light" : "dark";
     root.dataset.theme = nextTheme;
     root.style.colorScheme = nextTheme;
-
-    const variant = window.localStorage.getItem("whether-theme-variant");
-    if (variant) {
-      root.dataset.themeVariant = variant;
-      root.style.colorScheme = variant === "paper" ? "light" : "dark";
-    }
   } catch {
     // Ignore bootstrap errors and let the server-rendered shell remain usable.
   }
@@ -225,7 +218,6 @@ export default function RootLayout({
           </div>
         </footer>
         <KeyboardShortcuts />
-        <ThemeCycler />
         </TooltipProvider>
       </body>
     </html>

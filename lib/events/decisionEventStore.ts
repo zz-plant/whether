@@ -44,6 +44,12 @@ export type CloudflareKvNamespaceLike = {
 const EVENT_PREFIX = "decision-event:";
 const EVENT_INDEX_KEY = "meta:decision-event:index";
 
+/** Ceiling on a single unpaginated read so log length cannot stall the route. */
+const MAX_EVENT_SCAN = 1000;
+
+/** KV round-trips dominate; batch rather than bursting a whole page of keys at once. */
+const EVENT_READ_CONCURRENCY = 64;
+
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
     return structuredClone(value);
@@ -131,14 +137,19 @@ export class DecisionEventStore {
     await this.persistQueue;
   }
 
-  async listSince(cursor: Cursor): Promise<ListSinceResult> {
-    const inMemory = this.listSinceInMemory(cursor);
+  /**
+   * `limit` bounds the durable read itself rather than trimming afterwards. Callers page
+   * through an append-only log that grows without end, so reading it whole to return a
+   * page puts this route on the same cost curve that stalled the report path.
+   */
+  async listSince(cursor: Cursor, limit?: number): Promise<ListSinceResult> {
+    const inMemory = this.listSinceInMemory(cursor, limit);
     if (!this.cloudflareKv) {
       return inMemory;
     }
 
     await this.whenDurableFlushCompletes();
-    const durable = await this.listSinceDurable(cursor);
+    const durable = await this.listSinceDurable(cursor, limit);
     if (durable.events.length === 0) {
       return inMemory;
     }
@@ -160,10 +171,14 @@ export class DecisionEventStore {
     this.events.length = 0;
   }
 
-  private listSinceInMemory(cursor: Cursor): ListSinceResult {
+  private listSinceInMemory(cursor: Cursor, limit?: number): ListSinceResult {
     const startIndex = parseCursorIndex(cursor) + 1;
     const safeStart = Math.max(0, startIndex);
-    const sliced = this.events.slice(safeStart).map((event) => clone(event));
+    const window = this.events.slice(safeStart);
+    // Mirrors the durable path: return one past the page so callers can detect `hasMore`.
+    const sliced = (limit === undefined ? window : window.slice(0, limit + 1)).map((event) =>
+      clone(event),
+    );
     const nextCursor = this.events.length > 0 ? `${this.events.length - 1}` : cursor;
 
     return {
@@ -172,46 +187,33 @@ export class DecisionEventStore {
     };
   }
 
-  private async listSinceDurable(cursor: Cursor): Promise<ListSinceResult> {
-    if (!this.cloudflareKv) {
-      return this.listSinceInMemory(cursor);
+  private async resolveEventIndexes(thresholdIndex: number): Promise<number[]> {
+    const rawLatest = await this.cloudflareKv!.get(EVENT_INDEX_KEY);
+    const latest = rawLatest === null ? Number.NaN : Number.parseInt(rawLatest, 10);
+
+    if (Number.isFinite(latest)) {
+      const indexes: number[] = [];
+      for (let index = Math.max(thresholdIndex + 1, 0); index <= latest; index++) {
+        indexes.push(index);
+      }
+      return indexes;
     }
 
-    const thresholdIndex = parseCursorIndex(cursor);
-    const collected: Array<{ index: number; event: RegimeDecisionEvent }> = [];
+    const indexes: number[] = [];
     let listCursor: string | undefined;
 
     do {
-      const page = await this.cloudflareKv.list({
+      const page = await this.cloudflareKv!.list({
         prefix: EVENT_PREFIX,
         cursor: listCursor,
         limit: 1000,
       });
 
-      const matchingKeys: Array<{ keyName: string; index: number }> = [];
       for (const key of page.keys) {
         const index = parseEventIndex(key.name);
         if (index !== null && index > thresholdIndex) {
-          matchingKeys.push({ keyName: key.name, index });
+          indexes.push(index);
         }
-      }
-
-      const raws = await Promise.all(
-        matchingKeys.map(({ keyName }) => this.cloudflareKv!.get(keyName)),
-      );
-
-      for (let i = 0; i < matchingKeys.length; i++) {
-        const raw = raws[i];
-        if (!raw) {
-          continue;
-        }
-
-        const parsed = JSON.parse(raw) as unknown;
-        if (!isRegimeDecisionEvent(parsed)) {
-          continue;
-        }
-
-        collected.push({ index: matchingKeys[i].index, event: parsed });
       }
 
       listCursor = page.cursor;
@@ -219,6 +221,47 @@ export class DecisionEventStore {
         break;
       }
     } while (listCursor);
+
+    return indexes.sort((left, right) => left - right);
+  }
+
+  private async listSinceDurable(cursor: Cursor, limit?: number): Promise<ListSinceResult> {
+    if (!this.cloudflareKv) {
+      return this.listSinceInMemory(cursor, limit);
+    }
+
+    const thresholdIndex = parseCursorIndex(cursor);
+    const collected: Array<{ index: number; event: RegimeDecisionEvent }> = [];
+
+    const available = await this.resolveEventIndexes(thresholdIndex);
+    // Read one past the requested page so callers can still detect `hasMore` without
+    // paying for the rest of the log.
+    const scanCeiling = limit === undefined ? MAX_EVENT_SCAN : Math.min(limit + 1, MAX_EVENT_SCAN);
+    const selected = available.slice(0, scanCeiling);
+
+    for (let offset = 0; offset < selected.length; offset += EVENT_READ_CONCURRENCY) {
+      const batch = selected.slice(offset, offset + EVENT_READ_CONCURRENCY);
+      const raws = await Promise.all(batch.map((index) => this.cloudflareKv!.get(toEventKey(index))));
+
+      for (let i = 0; i < batch.length; i++) {
+        const raw = raws[i];
+        if (!raw) {
+          continue;
+        }
+
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          continue;
+        }
+        if (!isRegimeDecisionEvent(parsed)) {
+          continue;
+        }
+
+        collected.push({ index: batch[i], event: parsed });
+      }
+    }
 
     collected.sort((left, right) => left.index - right.index);
     const events = collected.map(({ event }) => clone(event));
