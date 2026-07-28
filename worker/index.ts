@@ -31,8 +31,46 @@ type ScheduledEvent = { cron: string; scheduledTime: number; type: "scheduled" }
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroughOnException(): void };
 
+/**
+ * Bindings reach library code through globalThis, so they must be installed on every
+ * entry point. Missing them is silent: the storage repositories fall back to per-isolate
+ * in-memory stores and appear to work while persisting nothing.
+ */
+const installBindings = (env: Env) => {
+  if (!env) return;
+  for (const [key, value] of Object.entries(env)) {
+    if (value !== undefined && key !== "ASSETS" && key !== "IMAGES") {
+      (globalThis as Record<string, unknown>)[key] = value;
+    }
+  }
+};
+
+const CRON_STEP_TIMEOUT_MS = 60_000;
+
+/**
+ * Cron steps are independent: a failing ingest should not silently cancel the weekly
+ * email and alert delivery that follow it. Each step is bounded and its outcome logged
+ * rather than thrown, so one bad dependency degrades a single step.
+ */
+const runCronStep = async (label: string, url: string, headers: Record<string, string>) => {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      signal: AbortSignal.timeout(CRON_STEP_TIMEOUT_MS),
+    });
+    if (!response.ok) {
+      console.error(`[cron] ${label} responded ${response.status}`);
+    }
+  } catch (error) {
+    console.error(`[cron] ${label} failed`, error);
+  }
+};
+
 export default {
   async scheduled(event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    installBindings(env);
+
     const secret = env.WHETHER_CRON_SECRET;
     const headers: Record<string, string> = {};
     if (secret) headers["Authorization"] = `Bearer ${secret}`;
@@ -42,21 +80,17 @@ export default {
     const isDailyIngestion = event.cron === "0 2 * * *";
 
     /* Always ingest fresh signals to KV */
-    await fetch(`${site}/api/ingest`, { method: "POST", headers });
+    await runCronStep("ingest", `${site}/api/ingest`, headers);
 
     if (isDailyIngestion) {
-    /* Daily cron: ingestion only, no email or alerts */
-    return;
+      /* Daily cron: ingestion only, no email or alerts */
+      return;
     }
 
     /* Weekly cron: send briefs, check regime change, deliver alerts */
-    await fetch(`${site}/api/email/send-weekly`, { method: "POST", headers });
-
-    /* Check if regime changed and alert if so */
-    await fetch(`${site}/api/check-regime-change`, { method: "POST", headers });
-
-    /* Evaluate alert conditions and deliver to subscribers */
-    await fetch(`${site}/api/alert-deliveries`, { method: "POST", headers });
+    await runCronStep("email/send-weekly", `${site}/api/email/send-weekly`, headers);
+    await runCronStep("check-regime-change", `${site}/api/check-regime-change`, headers);
+    await runCronStep("alert-deliveries", `${site}/api/alert-deliveries`, headers);
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -76,13 +110,7 @@ export default {
       });
     }
 
-    if (env) {
-      for (const [key, value] of Object.entries(env)) {
-        if (value !== undefined && key !== "ASSETS" && key !== "IMAGES") {
-          (globalThis as Record<string, unknown>)[key] = value;
-        }
-      }
-    }
+    installBindings(env);
 
     return handler.fetch(request);
   },

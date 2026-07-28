@@ -71,7 +71,19 @@ export const createHomePageReportDataLoader = (
     ...dependencies,
   } satisfies HomePageDataDependencies;
 
+  // Lives for the lifetime of the isolate and is keyed by search params, so it is bounded
+  // explicitly: an unbounded Map here is a slow memory leak driven by arbitrary query strings.
+  const FALLBACK_STATE_MAX_ENTRIES = 64;
   const fallbackStateByCacheKey = new Map<string, { state: HomePageFallbackState; timestamp: number }>();
+
+  const rememberFallbackState = (cacheKey: string, state: HomePageFallbackState) => {
+    fallbackStateByCacheKey.set(cacheKey, { state, timestamp: Date.now() });
+    while (fallbackStateByCacheKey.size > FALLBACK_STATE_MAX_ENTRIES) {
+      const oldestKey = fallbackStateByCacheKey.keys().next().value;
+      if (oldestKey === undefined) break;
+      fallbackStateByCacheKey.delete(oldestKey);
+    }
+  };
 
   const loadCachedHomePageReportResult = resolvedDependencies.unstableCache(
     async (cacheKey: string): Promise<CachedHomePageReportResult> => {
@@ -82,7 +94,7 @@ export const createHomePageReportDataLoader = (
       );
 
       if (!reportResult.ok) {
-        fallbackStateByCacheKey.set(cacheKey, { state: reportResult, timestamp: Date.now() });
+        rememberFallbackState(cacheKey, reportResult);
         throw new HomePageFallbackResultError(reportResult.fallback, reportResult.error);
       }
 

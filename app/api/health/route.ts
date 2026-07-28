@@ -1,25 +1,48 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
+import { withDeadline } from "../../../lib/withDeadline";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
+/**
+ * Deliberately shorter than the report path's own deadline. A health check that blocks on
+ * the dependency it reports on goes down with it and returns nothing at all, which is the
+ * one outcome a monitor cannot act on. Probing with a tight bound means a stalled
+ * dependency gets reported as a stalled dependency.
+ */
+const DEPENDENCY_PROBE_TIMEOUT_MS = 3_000;
+
+type DependencyState = "ok" | "degraded" | "timeout";
+
+const probeReportData = async (): Promise<DependencyState> => {
+  try {
+    const reportResult = await withDeadline(
+      loadReportDataSafe(undefined, { route: "/api/health" }),
+      DEPENDENCY_PROBE_TIMEOUT_MS,
+      "health-report-data",
+    );
+    return reportResult.ok ? "ok" : "degraded";
+  } catch {
+    return "timeout";
+  }
+};
+
 export async function GET() {
   const now = new Date();
-  const reportResult = await loadReportDataSafe(undefined, { route: "/api/health" });
-  const { treasury, sourceHealth } = reportResult.ok ? reportResult.data : reportResult.fallback;
-
-  const status = reportResult.ok ? "ok" : "down";
-  const statusCode = status === "ok" ? 200 : 503;
+  const reportData = await probeReportData();
 
   return NextResponse.json(
     {
-      status,
+      status: reportData === "ok" ? "ok" : "down",
       service: "whether",
       generatedAt: now.toISOString(),
       version: "v1",
+      dependencies: {
+        reportData,
+      },
     },
-    { status: statusCode },
+    { status: reportData === "ok" ? 200 : 503 },
   );
 }

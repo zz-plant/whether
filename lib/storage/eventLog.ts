@@ -20,6 +20,18 @@ const parseCursor = (cursor: Cursor): number => {
   return Number.isNaN(parsed) ? -1 : parsed;
 };
 
+const DEFAULT_LIST_LIMIT = 64;
+
+/**
+ * Hard ceiling on how many entries a single list() may read. Topics grow without bound,
+ * so reading the whole log puts every caller on a cost curve that ends in a stalled
+ * request (and blows the Workers subrequest budget long before that).
+ */
+const MAX_SCAN_ENTRIES = 1000;
+
+/** KV round-trips dominate; batch them instead of bursting a whole page at once. */
+const READ_CONCURRENCY = 64;
+
 export class DurableEventLog<T> {
   private readonly prefix: string;
   private readonly indexKey: string;
@@ -63,7 +75,8 @@ export class DurableEventLog<T> {
       assignedIndex = nextIndex;
       await this.kv!.put(this.toKey(nextIndex), JSON.stringify(cloned));
       await this.kv!.put(this.indexKey, String(nextIndex));
-      this.inMemoryEntries.push({ index: nextIndex, item: cloned });
+      // Deliberately not mirrored into inMemoryEntries: reads go to KV in this mode, so
+      // retaining every appended item would grow the isolate's heap without ever being read.
     });
 
     this.persistQueue = nextQueue.catch(() => undefined);
@@ -78,58 +91,99 @@ export class DurableEventLog<T> {
   }): Promise<{ items: T[]; nextCursor: Cursor }> {
     await this.persistQueue;
     const cursor = options?.cursor ?? null;
-    const limit = options?.limit ?? 64;
+    const limit = options?.limit ?? DEFAULT_LIST_LIMIT;
     const threshold = parseCursor(cursor);
 
     if (!this.kv) {
       const matching = this.inMemoryEntries.filter(
         (entry) => entry.index > threshold && (!options?.filter || options.filter(entry.item)),
       );
-      const limited = matching.slice(0, limit);
+      const limited = cursor ? matching.slice(0, limit) : matching.slice(-limit);
       const items = limited.map((entry) => clone(entry.item)).reverse();
       const nextCursor =
         limited.length > 0 ? `${limited[limited.length - 1].index}` : cursor;
       return { items, nextCursor };
     }
 
-    const collected: Array<{ index: number; item: T }> = [];
-    let listCursor: string | undefined;
+    const candidates = await this.resolveIndexes(threshold);
 
-    do {
-      const page = await this.kv.list({ prefix: this.prefix, cursor: listCursor, limit: 1000 });
-      const matchingKeys: Array<{ keyName: string; index: number }> = [];
+    // Without a cursor the caller wants current state, so scan the newest slice. With a
+    // cursor they are following the tail forward, so scan from the cursor onward. Either
+    // way the window is capped so cost does not scale with total log length.
+    const scanned = cursor
+      ? candidates.slice(0, MAX_SCAN_ENTRIES)
+      : candidates.slice(-MAX_SCAN_ENTRIES);
 
-      for (const key of page.keys) {
-        const index = this.parseIndex(key.name);
-        if (index !== null && index > threshold) {
-          matchingKeys.push({ keyName: key.name, index });
-        }
-      }
-
-      const raws = await Promise.all(matchingKeys.map(({ keyName }) => this.kv!.get(keyName)));
-      for (let i = 0; i < matchingKeys.length; i++) {
-        const raw = raws[i];
-        if (!raw) continue;
-        try {
-          const parsed = JSON.parse(raw) as T;
-          if (options?.filter && !options.filter(parsed)) continue;
-          collected.push({ index: matchingKeys[i].index, item: parsed });
-        } catch {
-          /* Skip invalid JSON */
-        }
-      }
-
-      listCursor = page.cursor;
-      if (page.list_complete) break;
-    } while (listCursor);
+    const collected = await this.readIndexes(scanned, options?.filter);
 
     collected.sort((a, b) => a.index - b.index);
-    const limited = collected.slice(0, limit);
+    const limited = cursor ? collected.slice(0, limit) : collected.slice(-limit);
     const items = limited.map((entry) => clone(entry.item)).reverse();
     const nextCursor =
       limited.length > 0 ? `${limited[limited.length - 1].index}` : cursor;
 
     return { items, nextCursor };
+  }
+
+  /**
+   * The index key records the highest assigned index, and indexes are dense, so the whole
+   * keyspace is derivable without listing. Listing is the fallback for logs written before
+   * the index key existed.
+   */
+  private async resolveIndexes(threshold: number): Promise<number[]> {
+    const rawLatest = await this.kv!.get(this.indexKey);
+    const latest = rawLatest === null ? Number.NaN : Number.parseInt(rawLatest, 10);
+
+    if (Number.isFinite(latest)) {
+      const indexes: number[] = [];
+      for (let index = Math.max(threshold + 1, 0); index <= latest; index++) {
+        indexes.push(index);
+      }
+      return indexes;
+    }
+
+    const indexes: number[] = [];
+    let listCursor: string | undefined;
+
+    do {
+      const page = await this.kv!.list({ prefix: this.prefix, cursor: listCursor, limit: 1000 });
+      for (const key of page.keys) {
+        const index = this.parseIndex(key.name);
+        if (index !== null && index > threshold) {
+          indexes.push(index);
+        }
+      }
+      listCursor = page.cursor;
+      if (page.list_complete) break;
+    } while (listCursor);
+
+    return indexes.sort((left, right) => left - right);
+  }
+
+  private async readIndexes(
+    indexes: number[],
+    filter?: (item: T) => boolean,
+  ): Promise<Array<{ index: number; item: T }>> {
+    const collected: Array<{ index: number; item: T }> = [];
+
+    for (let offset = 0; offset < indexes.length; offset += READ_CONCURRENCY) {
+      const batch = indexes.slice(offset, offset + READ_CONCURRENCY);
+      const raws = await Promise.all(batch.map((index) => this.kv!.get(this.toKey(index))));
+
+      for (let i = 0; i < batch.length; i++) {
+        const raw = raws[i];
+        if (!raw) continue;
+        try {
+          const parsed = JSON.parse(raw) as T;
+          if (filter && !filter(parsed)) continue;
+          collected.push({ index: batch[i], item: parsed });
+        } catch {
+          /* Skip invalid JSON */
+        }
+      }
+    }
+
+    return collected;
   }
 
   async latest(): Promise<T | null> {

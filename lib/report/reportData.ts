@@ -71,6 +71,7 @@ import {
   buildHistoricalAnalogs,
   buildLastYearComparison,
 } from "./reportHistory";
+import { withDeadline } from "../withDeadline";
 import type {
   AnalogScoreDimensions,
   ConfidenceTrendFraming,
@@ -151,6 +152,13 @@ const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof 
 };
 
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
+
+/**
+ * Wall-clock ceiling for assembling report data before falling back to the snapshot.
+ * Chosen to sit above normal cold-path latency (upstream fetches are individually capped
+ * at 8s but run concurrently) while staying far below the point where a visitor gives up.
+ */
+const REPORT_DATA_DEADLINE_MS = 10_000;
 const REPORT_FALLBACK_REASON = "Report dependency outage: serving cached treasury snapshot.";
 
 type ReportDependency = "treasury" | "macro" | "report";
@@ -343,7 +351,11 @@ export const loadReportDataSafe = async (
   options?: ReportDataLoadOptions,
 ): Promise<LoadReportDataSafeResult> => {
   try {
-    const data = await loadReportData(searchParams, options);
+    const data = await withDeadline(
+      loadReportData(searchParams, options),
+      REPORT_DATA_DEADLINE_MS,
+      "report-data",
+    );
     return { ok: true, data };
   } catch (error) {
     const resolvedError = toError(error);
