@@ -13,6 +13,9 @@ import { RitualCheck } from "./components/RitualCheck";
 import { ToolsPanel } from "./components/ToolsPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
+import { FlipMeter } from "./components/FlipMeter";
+import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
+import { ScenarioSimulator } from "./components/ScenarioSimulator";
 import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
@@ -275,9 +278,34 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
              />
  
            <WeeklyTopFoldContract
-             model={homepage.weeklyDecisionCardModel}
-             memoryRegimes={macroTrendline}
-           />
+              model={homepage.weeklyDecisionCardModel}
+              memoryRegimes={macroTrendline}
+            />
+
+            <FlipMeter
+              tightness={tightness}
+              tightnessDelta={tightnessDelta}
+              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? 70}
+              flipConditions={flipConditionLabels}
+              signalDirection={signalDirection}
+            />
+
+            <ThreeWhethersCard
+              regime={regime}
+              signalDirection={signalDirection}
+              tightness={tightness}
+              boldnessScore={weeklyLeadershipSummary.boldnessScore}
+              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+              guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+                ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+                : undefined}
+            />
+
+            <ScenarioSimulator
+              baseTightness={tightness}
+              baseBoldness={weeklyLeadershipSummary.boldnessScore}
+              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? 70}
+            />
  
             <CompareStrip
               currentRegime={regime}
@@ -288,19 +316,19 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
             />
  
            <ActionCard
-             call={primaryCall}
-             actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-             guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-               ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-               : undefined}
-             flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
-             tightness={tightness}
-             boldnessScore={weeklyLeadershipSummary.boldnessScore}
-             boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-             direction={signalDirection}
-             recordDate={homepage.reportShell.recordDateLabel}
-             pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
-           />
+              call={primaryCall}
+              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+              guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+                ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+                : undefined}
+              flipConditions={flipConditionLabels.length ? flipConditionLabels : undefined}
+              tightness={tightness}
+              boldnessScore={weeklyLeadershipSummary.boldnessScore}
+              boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+              direction={signalDirection}
+              recordDate={homepage.reportShell.recordDateLabel}
+              pauseThreshold={homepage.weeklyDecisionCardModel.decision.guardrailThreshold ?? undefined}
+            />
  
            </SwipeableWeek>
  
