@@ -47,7 +47,16 @@ export interface MaterializedSignalState {
   cadence: SignalCadenceControl;
 }
 
+export interface MaterializedHistoryPoint {
+  date: string;
+  value: number | null;
+}
+
 export interface MaterializedSignalReadModel {
   asOf: string;
   signals: Partial<Record<SignalKey, MaterializedSignalState>>;
+  /** Trailing 92-day history per signal key, built at write time so the read path
+   * never needs to scan raw snapshot keys. Absent on legacy materialized records;
+   * callers should fall back to scanning snapshots when missing. */
+  recentHistory?: Partial<Record<SignalKey, MaterializedHistoryPoint[]>>;
 }

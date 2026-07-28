@@ -261,12 +261,14 @@ export class KvIngestionStore implements IngestionStore {
   }
 }
 
-let defaultStore: IngestionStore | null = null;
+let defaultStore: { store: IngestionStore; kvBinding: unknown } | null = null;
 
 export const getDefaultIngestionStore = () => {
-  if (!defaultStore) {
-    const kv = getKvBinding();
-    defaultStore = kv ? new KvIngestionStore(kv) : new FileIngestionStore();
+  const kvBinding = getKvBinding();
+  if (defaultStore && defaultStore.kvBinding === kvBinding) {
+    return defaultStore.store;
   }
-  return defaultStore;
+  const store = kvBinding ? new KvIngestionStore(kvBinding) : new FileIngestionStore();
+  defaultStore = { store, kvBinding };
+  return store;
 };

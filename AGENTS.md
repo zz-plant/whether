@@ -38,8 +38,17 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Full checks: `bun run check`
 - Lint: `bun run lint`
 - Tests: `bun run test`
+- CI: `.github/workflows/ci.yml` — runs lint, typecheck, test on push/PR to main
 
 Use targeted tests when possible before running full checks.
+
+## Architectural invariants
+
+- **Read deadlines**: `lib/report/reportData.ts` wraps report assembly in `withDeadline(10s)`. Health endpoint wraps its probe in `withDeadline(3s)`. Do not remove or increase these without commensurate fallback work.
+- **Cron does not self-fetch**: `worker/index.ts` calls `executeIngest()` directly instead of `fetch(${site}/api/ingest)`. The same `executeIngest` function powers the `/api/ingest` HTTP route.
+- **Materialized model includes history**: `MaterializedSignalReadModel.recentHistory` stores the trailing 92-day window per signal key, built at write time. The read path (`loadCanonicalReportInputs`) avoids scanning raw snapshot keys when `recentHistory` is present.
+- **`getDefaultIngestionStore` re-checks binding**: No longer permanently memoizes — if the KV binding becomes available after an earlier fallback, the store reinitializes.
+- **CI enforced**: `.github/workflows/ci.yml` blocks merges that fail lint, typecheck, or test.
 
 ---
 

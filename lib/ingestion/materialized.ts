@@ -4,7 +4,7 @@ import { getDefaultIngestionStore, type IngestionStore } from "./store";
 import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
 import { loadMacroSeries, macroSeries as snapshotMacroSeries } from "../macroSnapshot";
 import snapshotFallbackJson from "../../data/snapshot_fallback.json";
-import type { MaterializedSignalReadModel, SignalEntitySnapshot, SignalFamily, SignalKey } from "./types";
+import type { MaterializedHistoryPoint, MaterializedSignalReadModel, SignalEntitySnapshot, SignalFamily, SignalKey } from "./types";
 
 const snapshotFallback = snapshotFallbackJson as TreasuryData;
 
@@ -70,7 +70,93 @@ export const buildMaterializedReadModel = (
   return {
     asOf: now.toISOString(),
     signals,
+    recentHistory: buildRecentHistoryBySignalKey(snapshots),
   };
+};
+
+/**
+ * Merge new snapshots into the existing materialized model (signals + history) without
+ * re-reading the raw event log. This keeps the write path bounded: one KV read (materialized)
+ * and one KV write (updated materialized) regardless of namespace size.
+ */
+const mergeIntoReadModel = (
+  existing: MaterializedSignalReadModel,
+  snapshots: SignalEntitySnapshot[],
+  now: Date,
+): MaterializedSignalReadModel => {
+  const nowMs = now.getTime();
+
+  const mergedSignals: MaterializedSignalReadModel["signals"] = { ...existing.signals };
+  for (const snapshot of snapshots) {
+    const key = snapshot.signalKey;
+    const current = mergedSignals[key];
+    const latest = chooseLatest(current?.snapshot, snapshot);
+    if (latest === snapshot) {
+      const cadence = SIGNAL_CADENCE[key];
+      const ageMs = Math.max(0, nowMs - new Date(snapshot.ingestedAt).getTime());
+      mergedSignals[key] = {
+        snapshot,
+        cadence,
+        staleness: {
+          status: ageMs > cadence.staleAfterMs ? "stale" : "fresh",
+          ageMs,
+          staleAfterMs: cadence.staleAfterMs,
+        },
+      };
+    }
+  }
+
+  return {
+    asOf: now.toISOString(),
+    signals: mergedSignals,
+    recentHistory: mergeRecentHistory(existing.recentHistory, snapshots, now),
+  };
+};
+
+const toDateKey = (observedAt: string) => observedAt.slice(0, 10);
+
+const pruneHistoryWindow = (
+  history: MaterializedHistoryPoint[],
+  latestObservedAt: string,
+): MaterializedHistoryPoint[] => {
+  const latestMs = Date.parse(latestObservedAt);
+  if (!Number.isFinite(latestMs)) return history;
+  const cutoffMs = latestMs - RECENT_HISTORY_WINDOW_MS;
+  return history.filter((point) => {
+    const pointMs = Date.parse(point.date);
+    return Number.isFinite(pointMs) && pointMs >= cutoffMs;
+  });
+};
+
+const mergeRecentHistory = (
+  existing: MaterializedSignalReadModel["recentHistory"],
+  snapshots: SignalEntitySnapshot[],
+  now: Date,
+): MaterializedSignalReadModel["recentHistory"] => {
+  const merged: MaterializedSignalReadModel["recentHistory"] = existing
+    ? { ...existing }
+    : {};
+  const latestObservedAt = now.toISOString();
+
+  for (const snapshot of snapshots) {
+    if (typeof snapshot.value !== "number") continue;
+    const key = snapshot.signalKey;
+    const date = toDateKey(snapshot.observedAt);
+    const keyHistory = merged[key] ? [...merged[key]!] : [];
+    const existingIndex = keyHistory.findIndex((p) => p.date === date);
+    const point: MaterializedHistoryPoint = { date, value: snapshot.value };
+
+    if (existingIndex >= 0) {
+      keyHistory[existingIndex] = point;
+    } else {
+      keyHistory.push(point);
+    }
+
+    const sorted = keyHistory.sort((a, b) => a.date.localeCompare(b.date));
+    merged[key] = pruneHistoryWindow(sorted, latestObservedAt);
+  }
+
+  return merged;
 };
 
 export const ingestCanonicalSignals = async ({
@@ -83,13 +169,16 @@ export const ingestCanonicalSignals = async ({
   families?: SignalFamily[];
 } = {}) => {
   const ingestedAt = new Date().toISOString();
+  const now = new Date();
   const settled = await Promise.allSettled(families.map((family) => pullSignalFamily(family, fetcher, ingestedAt)));
   const snapshots = settled.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
 
   if (snapshots.length > 0) {
     await store.appendSnapshots(snapshots);
-    const existingSnapshots = await store.readSnapshots();
-    const readModel = buildMaterializedReadModel(existingSnapshots);
+    const existingModel = await store.readLatestMaterialized();
+    const readModel = existingModel
+      ? mergeIntoReadModel(existingModel, snapshots, now)
+      : buildMaterializedReadModel(snapshots, now);
     await store.writeLatestMaterialized(readModel);
   }
 
@@ -293,7 +382,10 @@ export const buildCanonicalMacroSeriesFromReadModel = (
   baseSeries: MacroSeriesReading[] = snapshotMacroSeries,
   snapshots: SignalEntitySnapshot[] = [],
 ): MacroSeriesReading[] => {
-  const historyBySignalKey = buildRecentHistoryBySignalKey(snapshots);
+  const recentHistory = model.recentHistory;
+  const historyBySignalKey = recentHistory
+    ? recentHistory
+    : buildRecentHistoryBySignalKey(snapshots);
 
   return baseSeries.map((series) => {
     const signalKey = macroSignalMap[series.id];
@@ -342,8 +434,11 @@ export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fet
     return null;
   }
 
-  const storedSnapshots = await store.readSnapshots();
   const hydratedMacroSeries = await loadMacroSeries(options?.fetcher);
+
+  /* Read snapshots only when the materialized model lacks recentHistory (legacy records).
+   * Newly-written models include history directly, so we avoid the snapshot scan entirely. */
+  const storedSnapshots = model.recentHistory ? [] : await store.readSnapshots();
 
   return {
     treasury,

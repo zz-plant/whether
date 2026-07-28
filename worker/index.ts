@@ -1,5 +1,6 @@
 import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { executeIngest } from "../lib/ingestion/executeIngest";
 
 interface Env {
   ASSETS: {
@@ -71,21 +72,24 @@ export default {
   async scheduled(event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     installBindings(env);
 
-    const secret = env.WHETHER_CRON_SECRET;
-    const headers: Record<string, string> = {};
-    if (secret) headers["Authorization"] = `Bearer ${secret}`;
-
-    const site = env.SITE_URL || "https://whether.work";
-
     const isDailyIngestion = event.cron === "0 2 * * *";
 
-    /* Always ingest fresh signals to KV */
-    await runCronStep("ingest", `${site}/api/ingest`, headers);
+    /* Always ingest fresh signals to KV — call directly instead of self-fetch */
+    const ingestResult = await executeIngest();
+    if (!ingestResult.ok) {
+      console.error("[cron] ingest failed", ingestResult.error);
+    }
 
     if (isDailyIngestion) {
       /* Daily cron: ingestion only, no email or alerts */
       return;
     }
+
+    const secret = env.WHETHER_CRON_SECRET;
+    const headers: Record<string, string> = {};
+    if (secret) headers["Authorization"] = `Bearer ${secret}`;
+
+    const site = env.SITE_URL || "https://whether.work";
 
     /* Weekly cron: send briefs, check regime change, deliver alerts */
     await runCronStep("email/send-weekly", `${site}/api/email/send-weekly`, headers);

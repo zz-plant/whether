@@ -33,6 +33,7 @@ import {
   type SignalDirection,
 } from "./viewModel";
 import { formatDateUTC, formatSignedDelta } from "../lib/formatters";
+import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 
 const EvidenceTools = dynamic(
   () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
@@ -57,11 +58,26 @@ export default async function Page({
   searchParams?: Promise<HomePageSearchParams>;
 }) {
   const resolved = searchParams ? await searchParams : undefined;
+  const regimeHistory = getMonthlyRegimeHistory();
 
   return (
-    <Suspense fallback={<Shell loading />}>
-      <PageContent searchParams={resolved} />
-    </Suspense>
+    <Shell regime={regimeHistory.at(-1)?.regime}>
+      <Suspense fallback={
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8 animate-pulse">
+          <div className="space-y-6">
+            <div className="weather-card h-40" />
+            <div className="weather-card h-32" />
+            <div className="weather-card h-24" />
+          </div>
+          <div className="space-y-4">
+            <div className="weather-card h-20" />
+            <div className="weather-card h-48" />
+          </div>
+        </div>
+      }>
+        <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
+      </Suspense>
+    </Shell>
   );
 }
 
@@ -156,7 +172,13 @@ function WeeklyTopFoldContract({
   );
 }
 
-async function PageContent({ searchParams }: { searchParams?: HomePageSearchParams }) {
+async function PageContent({
+  searchParams,
+  regimeHistory,
+}: {
+  searchParams?: HomePageSearchParams;
+  regimeHistory: ReturnType<typeof getMonthlyRegimeHistory>;
+}) {
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
@@ -180,7 +202,7 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
     );
   }
 
-  const { homepage, reportData, regimeHistory, operatorContext } = data;
+  const { homepage, reportData, operatorContext } = data;
   const isDegraded = !homepage.reportResult.ok;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
@@ -283,31 +305,31 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
                isFallback={homepage.reportShell.showOfflineBadge}
                signalData={v2HeroSignalData}
-             />
- 
-           <WeeklyTopFoldContract
-              model={homepage.weeklyDecisionCardModel}
-              memoryRegimes={macroTrendline}
-            />
-
-            <FlipMeter
-              tightness={tightness}
-              tightnessDelta={tightnessDelta}
-              pauseThreshold={pauseThreshold}
-              flipConditions={flipConditionLabels}
-              signalDirection={signalDirection}
-            />
+              />
 
             <ThreeWhethersCard
-              regime={regime}
-              signalDirection={signalDirection}
-              tightness={tightness}
-              boldnessScore={weeklyLeadershipSummary.boldnessScore}
-              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-              guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-                ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-                : undefined}
-            />
+               regime={regime}
+               signalDirection={signalDirection}
+               tightness={tightness}
+               boldnessScore={weeklyLeadershipSummary.boldnessScore}
+               actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+               guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+                 ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+                 : undefined}
+             />
+
+            <WeeklyTopFoldContract
+               model={homepage.weeklyDecisionCardModel}
+               memoryRegimes={macroTrendline}
+             />
+
+              <FlipMeter
+               tightness={tightness}
+               tightnessDelta={tightnessDelta}
+               pauseThreshold={pauseThreshold}
+               flipConditions={flipConditionLabels}
+               signalDirection={signalDirection}
+             />
 
             <ScenarioSimulator
               baseTightness={tightness}
@@ -343,25 +365,22 @@ async function PageContent({ searchParams }: { searchParams?: HomePageSearchPara
              recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
            />
  
-           <Link
-             href="/planning"
-             className="weather-card flex items-center justify-between hover:border-sky-500/30 transition-colors no-underline group"
-           >
-             <div>
-                <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70 group-hover:text-white/90">Build this week&apos;s plan</p>
-                <p className="text-fluid-micro text-white/60 mt-0.5">Convert the brief into an action plan</p>
-             </div>
-             <span className="text-white/50 group-hover:text-white/60 transition-colors">→</span>
-           </Link>
- 
-           <SubscribeForm />
- 
-           {activeCadence !== "weekly" && cadenceData ? (
-             <CadenceCallCard cadence={activeCadence} data={cadenceData} />
-           ) : null}
-         </div>
- 
-         <div className="space-y-4 lg:col-start-2">
+           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-4 mt-4">
+              <Link
+                href="/planning"
+                className="inline-flex items-center gap-2 text-fluid-micro text-sky-300/70 hover:text-sky-300 transition-colors no-underline"
+              >
+                Build this week&apos;s plan →
+              </Link>
+              <SubscribeForm />
+            </div>
+
+            {activeCadence !== "weekly" && cadenceData ? (
+              <CadenceCallCard cadence={activeCadence} data={cadenceData} />
+             ) : null}
+          </div>
+  
+          <div className="space-y-4 lg:col-start-2">
            <DeltaTrustStrip
              tightnessDelta={tightnessDelta}
              riskAppetiteDelta={riskAppetiteDelta}

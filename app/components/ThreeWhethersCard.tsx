@@ -32,12 +32,18 @@ export function ThreeWhethersCard({
   actionNow,
   guardrail,
 }: ThreeWhethersProps) {
-  const isTight = tightness >= 65 || signalDirection === "tighten";
-  const isEasy = tightness < 45 || signalDirection === "ease";
+  const hiringIsTight = tightness >= 55 || signalDirection === "tighten";
+  const hiringIsEasy = tightness < 35 && signalDirection !== "tighten";
 
-  const hireVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = isTight ? "TIGHTEN" : isEasy ? "EXPAND" : "HOLD";
-  const spendVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = isTight ? "TIGHTEN" : isEasy ? "EXPAND" : "HOLD";
-  const commitVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = isTight ? "TIGHTEN" : isEasy ? "EXPAND" : "HOLD";
+  const spendingIsTight = tightness >= 65 || (signalDirection === "tighten" && tightness >= 55);
+  const spendingIsEasy = tightness < 45 && signalDirection !== "tighten";
+
+  const committingIsTight = tightness >= 75 && signalDirection === "tighten";
+  const committingIsEasy = tightness < 55 || signalDirection === "ease";
+
+  const hireVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = hiringIsTight ? "TIGHTEN" : hiringIsEasy ? "EXPAND" : "HOLD";
+  const spendVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = spendingIsTight ? "TIGHTEN" : spendingIsEasy ? "EXPAND" : "HOLD";
+  const commitVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = committingIsTight ? "TIGHTEN" : committingIsEasy ? "EXPAND" : "HOLD";
 
   const decisions: DecisionItem[] = [
     {
@@ -45,39 +51,39 @@ export function ThreeWhethersCard({
       icon: Users,
       question: "Should headcount & engineering capacity expand?",
       verdict: hireVerdict,
-      recommendation: isTight
+      recommendation: hiringIsTight
         ? "Freeze non-revenue hires; focus capacity on core revenue-generating engineering."
-        : isEasy
+        : hiringIsEasy
         ? "Selectively accelerate key engineering & sales hires."
         : "Maintain existing headcount plan; replace critical backfills only.",
-      threshold: "Tightness > 65 / Boldness < 50",
-      reversalCondition: "Fed rate drop > 25bps or VIX below 16",
+      threshold: `Tightness ${tightness}/100`,
+      reversalCondition: `Hiring: tightness below 35 and easing trend`,
     },
     {
       title: "Whether to Spend",
       icon: DollarSign,
       question: "Should marketing & CAC payback periods loosen?",
       verdict: spendVerdict,
-      recommendation: isTight
+      recommendation: spendingIsTight
         ? "Cap paid acquisition payback at 6 months max; audit discretionary software spend."
-        : isEasy
+        : spendingIsEasy
         ? "Allow paid payback up to 12 months for top-tier channels."
         : "Keep payback targets at 8-10 months; re-evaluate monthly.",
-      threshold: "Capital tightness at " + tightness + "/100",
-      reversalCondition: "CPI inflation ticks below 2.5%",
+      threshold: `Capital tightness at ${tightness}/100`,
+      reversalCondition: `Spend: tightness below 45 and cooling inflation`,
     },
     {
       title: "Whether to Commit",
       icon: Lock,
       question: "Should long-term vendor contracts & capital be locked?",
       verdict: commitVerdict,
-      recommendation: isTight
+      recommendation: committingIsTight
         ? "Avoid multi-year vendor commitments; negotiate month-to-month or annual flex options."
-        : isEasy
+        : committingIsEasy
         ? "Lock multi-year discounts on critical core infrastructure."
         : "Standard 1-year caps; require executive sign-off for >$50k ARR commitments.",
-      threshold: guardrail ?? "Pause if market volatility spikes > 22",
-      reversalCondition: "Macro capital tightness drops below 55",
+      threshold: guardrail ?? `Pause if tightness exceeds ${tightness + 5}`,
+      reversalCondition: `Commit: tightness below 55 and risk appetite above 60`,
     },
   ];
 
@@ -92,7 +98,7 @@ export function ThreeWhethersCard({
     }
   };
 
-  const briefText = actionNow ?? `${regime} regime: tightness ${tightness}/100, boldness budget ${boldnessScore}/100. ${hireVerdict === "TIGHTEN" ? "Tighten headcount and discretionary spend." : "Maintain planned operational tempo."}`;
+  const briefText = actionNow ?? `${regime} regime: tightness ${tightness}/100, boldness budget ${boldnessScore}/100. ${hireVerdict === "TIGHTEN" ? "Hold headcount, tighten spend, avoid commitments." : hireVerdict === "EXPAND" ? "Consider expanding headcount and commitments." : "Maintain planned operational tempo."}`;
 
   return (
     <section className="space-y-4" aria-labelledby="three-whethers-heading">

@@ -28,15 +28,12 @@ export async function loadHomePageAssembly(
 
   const regimeHistory = getMonthlyRegimeHistory();
 
-  const artifactPayload = await homepage.leadershipArtifactPayloadPromise.catch(() => null);
-
   return {
     homepage,
     cadenceData,
     activeCadence,
     reportData,
     regimeHistory,
-    artifactPayload,
     operatorContext,
   };
 }
