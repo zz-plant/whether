@@ -18,6 +18,20 @@ const mockups = [
       "A simpler weekly-call concept that assumes the user wants an operating recommendation, not a macro lesson.",
     tags: ["weekly call", "operator-first", "proof-on-demand"],
   },
+  {
+    href: "/mockups/identicons",
+    title: "Parametric Identicons (SVG + Shader)",
+    summary:
+      "Deterministic visual identity avatars combining vector SVG geometry with GPU WebGL fragment shaders for top 5 real-world use cases.",
+    tags: ["web3", "ai agents", "saas orgs", "git provenance", "webgl"],
+  },
+  {
+    href: "/mockups/visual-system",
+    title: "Programmatic Visual Language System",
+    summary:
+      "A 4-tier hybrid graphics engine combining Generator Utilities, SVG Vector Geometry, Inline SVG Filter Shaders, and WebGL Fragment Shaders.",
+    tags: ["visual system", "svg filters", "webgl", "graphics engine"],
+  },
 ] as const;
 
 const starterViews = [

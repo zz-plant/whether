@@ -100,7 +100,6 @@ function WeeklyTopFoldContract({
   const memoryRailItems = model.history.memoryRail.slice(-4).map((item) => item.posture);
   const memoryFallbackItems = memoryRegimes.slice(-4).map((item) => item.regime);
   const rawItems = (memoryRailItems.length >= 4 ? memoryRailItems : memoryFallbackItems).slice(-4);
-  // Map internal codes to human-readable labels; fall back to "—" for unmapped values
   const memoryItems = rawItems.map((label) => REGIME_DISPLAY[label] ?? label ?? "—");
   const shouldRevisit = model.decision.revisitDecisions;
   const revisitQueue = model.decision.revisitQueue.slice(0, 3);
@@ -124,7 +123,16 @@ function WeeklyTopFoldContract({
       className="weather-card grid gap-4 lg:grid-cols-12"
     >
       <div className="space-y-2 lg:col-span-7">
-        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60">WEEKLY POSTURE</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">WEEKLY POSTURE</p>
+          <div className="flex items-center gap-1 rounded-full bg-white/[0.05] p-0.5 border border-white/[0.08] text-[10px] font-mono">
+            <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-bold">ALL</span>
+            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CFO</span>
+            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CPO</span>
+            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">COO</span>
+            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CTO</span>
+          </div>
+        </div>
         <div className="grid gap-2 text-fluid-micro text-white/65 grid-cols-2 xl:grid-cols-4">
           <span>Posture shift: {weeklySummary.notchShiftLabel}</span>
           <span>Hiring: {weeklySummary.hiringWindow}</span>
@@ -136,7 +144,7 @@ function WeeklyTopFoldContract({
 
       <div className="space-y-2 lg:col-span-5">
         <div className="flex items-center gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60">Revisit</p>
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit

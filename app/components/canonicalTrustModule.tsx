@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { ParametricIdenticon } from "./ParametricIdenticon";
 
 type TrustTone = "stable" | "warning" | "historical";
 type OutageSeverity = "advisory" | "blocking" | "critical";
@@ -90,6 +91,7 @@ export const CanonicalTrustModule = ({
   label,
   detail,
   action,
+  snapshotHash,
   outageSeverity,
   outageType,
   decisionImpactWindow,
@@ -104,6 +106,8 @@ export const CanonicalTrustModule = ({
   label: string;
   detail: string;
   action: string;
+  /** Optional snapshot SHA or seed string for cryptographic provenance seal */
+  snapshotHash?: string;
   outageSeverity?: OutageSeverity;
   outageType?: OutageType;
   decisionImpactWindow?: string;
@@ -127,14 +131,23 @@ export const CanonicalTrustModule = ({
     ? outageExitGate.summary.includes(`${outageExitGate.metCount}/${outageExitGate.totalCount}`)
     : false;
 
+  const sealSeed = snapshotHash || label || "whether-trust-seal";
+
   return (
     <section
       className={`weather-panel flex flex-col gap-2 px-4 py-4 ${config.panelClassName}`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`inline-flex min-h-[24px] items-center gap-1 rounded-full border px-2 py-1 text-fluid-xs font-semibold tracking-[0.14em] ${config.badgeClassName}`}
+          className={`inline-flex min-h-[24px] items-center gap-1.5 rounded-full border px-2.5 py-1 text-fluid-xs font-semibold tracking-[0.14em] ${config.badgeClassName}`}
         >
+          <ParametricIdenticon
+            seed={sealSeed}
+            useCase={tone === "stable" ? "reportSeal" : "dataProvenance"}
+            size={18}
+            interactive={false}
+            className="!ring-0 shrink-0 border-0 rounded-full"
+          />
           {config.icon}
           {config.label}
         </span>

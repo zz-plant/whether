@@ -28,6 +28,11 @@ export function StageSwitcher({
   const handleSelect = (key: string) => {
     // eslint-disable-next-line react-hooks/immutability
     document.cookie = `whether-company-stage=${key};path=/;max-age=31536000`;
+    try {
+      localStorage.setItem("whether_company_stage", key);
+    } catch {
+      // Fallback
+    }
     setOpen(false);
     router.refresh();
   };

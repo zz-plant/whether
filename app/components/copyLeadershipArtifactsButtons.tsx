@@ -27,7 +27,9 @@ type CopyTarget =
   | "Weekly delta"
   | "Leadership team brief"
   | "Board summary"
-  | "Citation";
+  | "Citation"
+  | "Notion Strategy"
+  | "Linear Mandate";
 
 type CopyState = "idle" | "copying" | "copied" | "error";
 type ActionButtonVariant = "primary" | "secondary" | "confirm" | "danger";
@@ -312,6 +314,32 @@ export function CopyLeadershipArtifactsButtons({
                 aria-busy={isCopying}
               >
                 {copyLabel("One-screen summary", "Copy one-screen summary")}
+              </ActionButton>
+              <ActionButton
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  trackFirstActionConversion("copy_weekly_brief");
+                  const notionContent = `# Notion Strategy Block\n\n## Weekly Posture\n${weeklyCallSnapshot}\n\n## Constraints\n- Tighten capital allocation\n- Revisit long-payback projects`;
+                  copyToClipboard(notionContent, "Notion Strategy");
+                }}
+                disabled={isCopying}
+                aria-busy={isCopying}
+              >
+                {copyLabel("Notion Strategy", "Copy Notion block")}
+              </ActionButton>
+              <ActionButton
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  trackFirstActionConversion("copy_weekly_brief");
+                  const linearContent = `[Linear Project Mandate]\nTitle: Macro Posture Alignment\nSummary: ${weeklyCallSnapshot.slice(0, 140)}`;
+                  copyToClipboard(linearContent, "Linear Mandate");
+                }}
+                disabled={isCopying}
+                aria-busy={isCopying}
+              >
+                {copyLabel("Linear Mandate", "Copy Linear mandate")}
               </ActionButton>
             </div>
 

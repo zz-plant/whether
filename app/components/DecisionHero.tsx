@@ -4,6 +4,8 @@ import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
+import { YieldCurvePlot } from "./YieldCurvePlot";
+import { DecisionMemoryButton } from "./DecisionMemoryButton";
 
 type Props = {
   tightness: number;
@@ -117,7 +119,15 @@ export function DecisionHero({
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
             </p>
           </div>
-          <StageSwitcher currentStage={operatorContext.companyStage} />
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <StageSwitcher currentStage={operatorContext.companyStage} />
+            <DecisionMemoryButton
+              regime={regime}
+              tightness={tightness}
+              riskAppetite={boldnessScore}
+              primaryCall={weeklyCall ?? postureLabel}
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
             <span title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
