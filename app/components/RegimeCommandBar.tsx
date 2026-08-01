@@ -185,7 +185,7 @@ const TrajectoryMap = ({
           {postureMapQuadrants.map((quadrant) => (
             <span
               key={quadrant.key}
-              className={`absolute rounded-full border border-white/8 bg-slate-950/55 px-2 py-1 ${quadrant.tone} ${quadrant.x} ${quadrant.y}`}
+              className={`absolute rounded-sm border border-white/8 bg-slate-950/55 px-2 py-1 ${quadrant.tone} ${quadrant.x} ${quadrant.y}`}
             >
               {quadrant.label}
             </span>
@@ -193,16 +193,16 @@ const TrajectoryMap = ({
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2 text-fluid-xs text-slate-300">
-        <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
+        <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Trend {trendLabel}
         </span>
-        <span className="rounded-full border border-amber-300/30 bg-amber-500/10 px-2.5 py-1 text-amber-100">
+        <span className="rounded-sm border border-amber-300/30 bg-amber-500/10 px-2.5 py-1 text-amber-100">
           {nearestBoundaryLabel}
         </span>
-        <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
+        <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Tightness {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness, 1)})
         </span>
-        <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
+        <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.riskAppetite, 1)})
         </span>
       </div>
@@ -242,14 +242,14 @@ const ThresholdRail = ({
         <span className="font-semibold text-slate-100">{label}</span>
         <span className="tabular-nums">{current.toFixed(1)} vs {threshold.toFixed(1)}</span>
       </div>
-      <div className="relative h-3 rounded-full border border-slate-800/80 bg-slate-950/80">
+      <div className="relative h-3 rounded-sm border border-slate-800/80 bg-slate-950/80">
         <span
           className="absolute inset-y-0 w-px bg-slate-400/80"
           style={{ left: `${thresholdPercent}%` }}
           aria-hidden="true"
         />
         <span
-          className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/95 ${currentColorClass}`}
+          className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-slate-950/95 ${currentColorClass}`}
           style={{ left: `${currentPercent}%` }}
           aria-hidden="true"
         />
@@ -295,7 +295,7 @@ export const RegimeCommandBar = ({
       <div className="relative grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(18rem,1fr)_minmax(0,0.88fr)] xl:items-stretch">
         <div className="min-w-0 rounded-lg border border-slate-700/70 bg-slate-950/72 px-3.5 py-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex min-h-[30px] items-center rounded-full border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${regimeStyle.toneClass}`}>
+            <span className={`inline-flex min-h-[30px] items-center rounded-sm border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${regimeStyle.toneClass}`}>
               {regimeStyle.label} outlook
             </span>
           </div>
@@ -307,11 +307,11 @@ export const RegimeCommandBar = ({
             <p className="text-sm text-slate-300">{resolvedPostureLabel}</p>
             <div className="flex flex-wrap gap-2 text-fluid-xs text-slate-300">
               {regimeDistance ? (
-                <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
+                <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
                   {regimeDistance.dimensionLabel} {regimeDistance.pointsToFlip.toFixed(1)} pts from flip
                 </span>
               ) : null}
-              <span className={`rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 ${confidenceToneClass[resolvedConfidenceLabel]}`}>
+              <span className={`rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 ${confidenceToneClass[resolvedConfidenceLabel]}`}>
                 Call certainty {resolvedConfidenceLabel} {Math.round(resolvedConfidencePercent)}%
               </span>
             </div>
@@ -354,8 +354,8 @@ export const RegimeCommandBar = ({
             <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">Weekly direction</p>
             <p className="mt-2 text-sm text-slate-100">Read the current call as the operating baseline for this cycle.</p>
             <div className="mt-3 flex flex-wrap gap-2 text-fluid-xs text-slate-300">
-              <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">Trend {resolvedTrendLabel}</span>
-              <span className="rounded-full border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">{regimeStyle.label}</span>
+              <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">Trend {resolvedTrendLabel}</span>
+              <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">{regimeStyle.label}</span>
             </div>
           </div>
         )}
@@ -385,7 +385,7 @@ export const RegimeCommandBar = ({
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {doNow.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-300" aria-hidden="true" />
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-sm bg-emerald-300" aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -399,7 +399,7 @@ export const RegimeCommandBar = ({
               <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
                 {trustChecklist.items.slice(0, 2).map((item) => (
                   <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-300" aria-hidden="true" />
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-sm bg-violet-300" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -411,7 +411,7 @@ export const RegimeCommandBar = ({
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {flipConditions.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-sky-300" aria-hidden="true" />
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-sm bg-sky-300" aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}

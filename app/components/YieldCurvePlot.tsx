@@ -88,7 +88,7 @@ export function YieldCurvePlot({
             YIELD CURVE VECTOR
           </p>
           <span
-            className={`inline-flex items-center rounded-full px-1.5 py-0.2 text-[10px] font-mono font-bold uppercase tracking-wider ${
+            className={`inline-flex items-center rounded-sm px-1.5 py-0.2 text-[10px] font-mono font-bold uppercase tracking-wider ${
               isInverted
                 ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
                 : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"

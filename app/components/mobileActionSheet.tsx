@@ -40,13 +40,13 @@ export const MobileActionSheet = ({
       }}
     >
       <Drawer.Trigger
-        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-sm px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         aria-label={`${triggerLabel}. ${open ? "Expanded" : "Collapsed"}.`}
       >
         <span>{triggerLabel}</span>
         <span
           aria-hidden="true"
-          className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-300 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         >
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
             <path
@@ -78,10 +78,10 @@ export const MobileActionSheet = ({
           }}
         >
           <div className="weather-mobile-panel weather-mobile-sheet w-full rounded-lg border border-slate-700/80 p-4 shadow-2xl">
-            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-600/90" aria-hidden="true" />
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-sm bg-slate-600/90" aria-hidden="true" />
             <div className="mb-3 flex items-center justify-between gap-3">
               <Drawer.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Drawer.Title>
-              <Drawer.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+              <Drawer.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                 <span aria-hidden="true">✕</span>
                 <span className="sr-only">Close actions menu</span>
               </Drawer.Close>
@@ -91,7 +91,7 @@ export const MobileActionSheet = ({
                 <li key={`${action.href}-${action.label}`}>
                   <a
                     href={action.href}
-                    className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    className="inline-flex min-h-[44px] w-full items-center justify-center rounded-sm border border-slate-700/70 px-3 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                     onClick={() => {
                       suppressCloseAutoFocusRef.current = true;
                       setOpen(false);

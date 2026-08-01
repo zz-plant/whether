@@ -115,13 +115,13 @@ export default async function OperatorBriefMockupPage({
         />
         <div className="relative space-y-5">
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex min-h-[38px] items-center rounded-full border border-cyan-300/35 bg-cyan-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-cyan-50">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-cyan-300/35 bg-cyan-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-cyan-50">
               Weekly brief
             </span>
-            <span className="inline-flex min-h-[38px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
               Default lens: Product / Eng
             </span>
-            <span className="inline-flex min-h-[38px] items-center rounded-full border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-amber-50">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-amber-50">
               Decision readiness: {weeklyCall.readiness}
             </span>
           </div>
@@ -223,7 +223,7 @@ export default async function OperatorBriefMockupPage({
               Open only after the direction is clear.
             </p>
           </div>
-          <span className="inline-flex min-h-[38px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+          <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
             Proof
           </span>
         </summary>
@@ -272,15 +272,15 @@ export default async function OperatorBriefMockupPage({
                   <SectionLabel>More formats</SectionLabel>
                   <p className="mt-2 text-sm font-semibold text-white">Only after the main brief is chosen.</p>
                 </div>
-                <span className="inline-flex min-h-[38px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+                <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
                   Optional
                 </span>
               </summary>
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex min-h-[42px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                <span className="inline-flex min-h-[42px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
                   Explainer brief
                 </span>
-                <span className="inline-flex min-h-[42px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                <span className="inline-flex min-h-[42px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
                   Board note
                 </span>
               </div>

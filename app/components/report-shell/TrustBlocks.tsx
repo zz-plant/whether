@@ -265,9 +265,9 @@ export function HeroTrustProvenanceBlock({
                           {row.modeLabel} · {row.freshnessStatus}
                         </span>
                       </div>
-                      <div className="h-2 rounded-full bg-slate-800/90">
+                      <div className="h-2 rounded-sm bg-slate-800/90">
                         <div
-                          className="h-2 rounded-full bg-gradient-to-r from-rose-300 via-amber-300 to-sky-300"
+                          className="h-2 rounded-sm bg-gradient-to-r from-rose-300 via-amber-300 to-sky-300"
                           style={{ width: `${score}%` }}
                         />
                       </div>

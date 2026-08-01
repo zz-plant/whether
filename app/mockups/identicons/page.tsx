@@ -68,10 +68,10 @@ export default function IdenticonsMockupPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+              <span className="inline-flex items-center gap-1.5 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
                 <Sparkles className="h-3.5 w-3.5" /> Whether Visual Lab
               </span>
-              <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950 px-2.5 py-1 text-fluid-micro font-medium text-slate-300">
+              <span className="inline-flex items-center rounded-sm border border-slate-700 bg-slate-950 px-2.5 py-1 text-fluid-micro font-medium text-slate-300">
                 SVG + GLSL Shader Seals
               </span>
             </div>
@@ -108,7 +108,7 @@ export default function IdenticonsMockupPage() {
                 Holographic GPU seals derived from snapshot SHA hashes for Slack shares, meeting decks, and history archives.
               </p>
             </div>
-            <span className="rounded-full bg-cyan-950 px-3 py-1 text-fluid-micro font-semibold tracking-wider text-cyan-300 border border-cyan-800/50">
+            <span className="rounded-sm bg-cyan-950 px-3 py-1 text-fluid-micro font-semibold tracking-wider text-cyan-300 border border-cyan-800/50">
               Shader: Report Seal
             </span>
           </div>
@@ -151,7 +151,7 @@ export default function IdenticonsMockupPage() {
                 GPU plasma turbulence speed scales with signal velocity (0 = stable hold, 1 = rapid regime shift).
               </p>
             </div>
-            <span className="rounded-full bg-indigo-950 px-3 py-1 text-fluid-micro font-semibold tracking-wider text-indigo-300 border border-indigo-800/50">
+            <span className="rounded-sm bg-indigo-950 px-3 py-1 text-fluid-micro font-semibold tracking-wider text-indigo-300 border border-indigo-800/50">
               Shader: Signal Volatility
             </span>
           </div>
@@ -205,7 +205,7 @@ export default function IdenticonsMockupPage() {
               <Database className="h-5 w-5 text-emerald-400" />
               <h2 className="text-lg font-bold text-white">Use Case 3: Ingestion &amp; KV Snapshot Provenance Seals</h2>
             </div>
-            <span className="rounded-full bg-emerald-950 px-2.5 py-1 text-fluid-micro font-semibold text-emerald-300 border border-emerald-800/50">
+            <span className="rounded-sm bg-emerald-950 px-2.5 py-1 text-fluid-micro font-semibold text-emerald-300 border border-emerald-800/50">
               Shader: Data Matrix
             </span>
           </div>
@@ -220,7 +220,7 @@ export default function IdenticonsMockupPage() {
                 <div className="min-w-0 flex-1 space-y-1">
                   <p className="text-xs font-semibold text-white">{run.store}</p>
                   <p className="font-mono text-fluid-micro text-slate-400">{run.id}</p>
-                  <span className="inline-block rounded-full bg-emerald-950/80 px-2 py-0.5 text-fluid-micro font-semibold text-emerald-400 border border-emerald-800/50">
+                  <span className="inline-block rounded-sm bg-emerald-950/80 px-2 py-0.5 text-fluid-micro font-semibold text-emerald-400 border border-emerald-800/50">
                     {run.status}
                   </span>
                 </div>
@@ -330,7 +330,7 @@ export default function IdenticonsMockupPage() {
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">Hue 1:</span>
                   <span
-                    className="h-3 w-3 rounded-full border border-slate-700"
+                    className="h-3 w-3 rounded-sm border border-slate-700"
                     style={{ backgroundColor: hslToCss(playgroundParams.hue1, 80, 60) }}
                   />
                   <strong className="text-white">{Math.round(playgroundParams.hue1)}°</strong>
@@ -338,7 +338,7 @@ export default function IdenticonsMockupPage() {
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">Hue 2:</span>
                   <span
-                    className="h-3 w-3 rounded-full border border-slate-700"
+                    className="h-3 w-3 rounded-sm border border-slate-700"
                     style={{ backgroundColor: hslToCss(playgroundParams.hue2, 80, 60) }}
                   />
                   <strong className="text-white">{Math.round(playgroundParams.hue2)}°</strong>

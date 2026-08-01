@@ -74,7 +74,7 @@ export function FlipMeter({
           </div>
         </div>
 
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusBg}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusBg}`}>
           {urgencyLevel === "breached" || urgencyLevel === "high" ? (
             <AlertTriangle className="w-3 h-3 text-rose-400" aria-hidden="true" />
           ) : (
@@ -91,9 +91,9 @@ export function FlipMeter({
           <span className="font-mono text-white/50">Flip Limit: {pauseThreshold}/100</span>
         </div>
 
-        <div className="relative h-3.5 w-full rounded-full bg-white/[0.06] overflow-hidden p-0.5 border border-white/[0.08]">
+        <div className="relative h-3.5 w-full rounded-sm bg-white/[0.06] overflow-hidden p-0.5 border border-white/[0.08]">
           <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
+            className="h-full rounded-sm transition-all duration-700 ease-out"
             style={{
               width: `${proximityPct}%`,
               background: barGradient,
@@ -133,7 +133,7 @@ export function FlipMeter({
           <ul className="grid gap-2 sm:grid-cols-2">
             {flipConditions.map((condition, idx) => (
               <li key={idx} className="flex items-start gap-2 text-fluid-xs text-slate-200">
-                <span className="mt-1 size-1.5 rounded-full bg-sky-400 flex-shrink-0" />
+                <span className="mt-1 size-1.5 rounded-sm bg-sky-400 flex-shrink-0" />
                 <span>{condition}</span>
               </li>
             ))}

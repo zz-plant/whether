@@ -78,14 +78,14 @@ export function PageFlowNav({
                 ) : null}
                 <div className="flex items-start gap-3">
                   <div className="flex flex-col items-center gap-2">
-                    <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-fluid-micro font-semibold ${tone.dot}`}>
+                    <span className={`inline-flex h-7 w-7 items-center justify-center rounded-sm border text-fluid-micro font-semibold ${tone.dot}`}>
                       {index + 1}
                     </span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-fluid-xs font-semibold uppercase tracking-[0.16em] text-slate-300">{item.label}</p>
-                      <span className={`rounded-full border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${tone.chip}`}>
+                      <span className={`rounded-sm border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${tone.chip}`}>
                         {status === "active" ? "Current" : status === "next" ? "Next" : "Later"}
                       </span>
                     </div>

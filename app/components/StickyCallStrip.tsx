@@ -94,7 +94,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
         >
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[var(--bg-raised)]/94 px-2 py-1.5 shadow-[0_-4px_16px_rgba(0,0,0,0.26)] backdrop-blur">
             <span className="flex min-w-0 flex-1 items-center gap-1.5 text-fluid-xs font-semibold leading-tight text-white/85">
-              <span className={`inline-flex size-7 items-center justify-center rounded-full text-sm font-bold ${
+              <span className={`inline-flex size-7 items-center justify-center rounded-sm text-sm font-bold ${
                 arrow === "↑" ? "bg-rose-500/20 text-rose-300" : arrow === "↓" ? "bg-emerald-500/20 text-emerald-300" : "bg-sky-500/20 text-sky-300"
               }`}>{arrow}</span>
               <span className="text-white/60">{boldnessScore}/100</span>
@@ -104,7 +104,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
             <a
               href={imageBriefHref}
               download="whether-brief.png"
-              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.08] text-fluid-xs font-medium text-white/60 transition-colors hover:border-white/[0.14] hover:text-white/80 active:scale-[0.97] no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-sm border border-white/[0.08] text-fluid-xs font-medium text-white/60 transition-colors hover:border-white/[0.14] hover:text-white/80 active:scale-[0.97] no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
               aria-label="Download decision card image"
             >
               <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -116,7 +116,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-full border border-white/[0.08] px-2.5 text-fluid-xs font-medium text-white/60 transition-colors hover:border-white/[0.14] hover:text-white/80 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-sm border border-white/[0.08] px-2.5 text-fluid-xs font-medium text-white/60 transition-colors hover:border-white/[0.14] hover:text-white/80 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
               aria-label={isCopied ? "Copied weekly call" : "Copy weekly call"}
             >
               {isCopied ? (

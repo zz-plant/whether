@@ -147,7 +147,7 @@ export const ReturningVisitorDeltaStrip = ({
           <li key={item.label}>
             <a
               href={item.href}
-              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
+              className={`inline-flex min-h-[44px] items-center rounded-sm border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
             >
               {item.label} · {item.tone.label}
             </a>

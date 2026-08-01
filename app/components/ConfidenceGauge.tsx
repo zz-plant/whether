@@ -49,9 +49,9 @@ export function ConfidenceGauge({ percent, label, trend, size = "md" }: Confiden
             </span>
           ) : null}
         </div>
-        <div className={`mt-1 w-full rounded-full bg-slate-800 ${s.bar} overflow-hidden`}>
+        <div className={`mt-1 w-full rounded-sm bg-slate-800 ${s.bar} overflow-hidden`}>
           <div
-            className={`h-full rounded-full transition-[width] duration-500 ${zone.color}`}
+            className={`h-full rounded-sm transition-[width] duration-500 ${zone.color}`}
             style={{ width: `${clamped}%` }}
           />
         </div>
