@@ -125,12 +125,12 @@ export function ThreeWhethersCard({
           return (
             <div
               key={i}
-              className="weather-card flex flex-col justify-between p-5 space-y-4 relative overflow-hidden group hover:border-white/20 transition-all duration-300"
+              className="weather-card flex flex-col justify-between p-5 space-y-4 relative overflow-hidden group hover:border-white/[0.14] transition-all duration-300"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-white/[0.05] border border-white/[0.10] text-slate-200">
+                    <div className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-200">
                       <Icon className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <h4 className="text-sm font-semibold text-white">{item.title}</h4>
@@ -144,11 +144,11 @@ export function ThreeWhethersCard({
                   </span>
                 </div>
 
-                <p className="text-fluid-xs text-white/60 font-medium leading-relaxed">
+                <p className="text-fluid-xs text-white/65 font-medium leading-relaxed">
                   {item.question}
                 </p>
 
-                <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-3 text-fluid-xs text-slate-100 leading-normal space-y-1">
+                <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 text-fluid-xs text-slate-100 leading-normal space-y-1">
                   <p className="font-semibold text-emerald-300/90 text-fluid-micro uppercase tracking-wider">
                     Operating Rule
                   </p>
@@ -156,7 +156,7 @@ export function ThreeWhethersCard({
                 </div>
               </div>
 
-              <div className="border-t border-white/[0.08] pt-3 space-y-2 text-fluid-nano text-white/60">
+              <div className="border-t border-white/[0.06] pt-3 space-y-2 text-fluid-nano text-white/65">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium text-amber-300/80">Trigger:</span>
                   <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>

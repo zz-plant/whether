@@ -63,7 +63,7 @@ export function FreshnessDot({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-[40px] items-center gap-2 px-2.5 py-2 rounded-full border border-white/[0.10] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+        className="inline-flex min-h-[40px] items-center gap-2 px-2.5 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -85,34 +85,34 @@ export function FreshnessDot({
         >
           <div>
             <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase">Data quality</p>
-            <p className="text-fluid-xs text-white/80 mt-1">
+            <p className="text-fluid-xs text-white/65 mt-1">
               {showOfflineBadge ? "Using saved snapshot" : "Live data"}
             </p>
           </div>
 
-          <div className="space-y-1.5 text-fluid-nano border-t border-white/[0.04] pt-2">
+          <div className="space-y-1.5 text-fluid-nano border-t border-white/[0.06] pt-2">
             <div className="flex justify-between">
               <span className="text-white/60">Data date</span>
-              <span className="text-white/70 font-mono">{recordDate ?? "N/A"}</span>
+              <span className="text-white/65 font-mono">{recordDate ?? "N/A"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/60">Refreshed</span>
-              <span className="text-white/70 font-mono">{label}</span>
+              <span className="text-white/65 font-mono">{label}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/60">Source</span>
-              <span className="text-white/70 font-mono">{treasurySource ?? "US Treasury"}</span>
+              <span className="text-white/65 font-mono">{treasurySource ?? "US Treasury"}</span>
             </div>
             {trustStatusLabel ? (
               <div className="flex justify-between">
                 <span className="text-white/60">Trust Rating</span>
-                <span className="text-white/70">{trustStatusLabel}</span>
+                <span className="text-white/65">{trustStatusLabel}</span>
               </div>
             ) : null}
           </div>
 
           {/* Source Health Radar Telemetry */}
-          <div className="border-t border-white/[0.04] pt-2">
+          <div className="border-t border-white/[0.06] pt-2">
             <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase mb-1.5 flex items-center justify-between">
               <span>Source Health Radar</span>
               <span className="text-[10px] text-emerald-400 font-mono">100% SLA</span>
@@ -146,7 +146,7 @@ export function FreshnessDot({
           </div>
 
           {degradedSourceRows.length ? (
-            <div className="border-t border-white/[0.04] pt-2">
+            <div className="border-t border-white/[0.06] pt-2">
               <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase mb-1.5">
                 Degraded feeds
               </p>
@@ -160,7 +160,7 @@ export function FreshnessDot({
               </div>
             </div>
           ) : (
-            <div className="border-t border-white/[0.04] pt-2 text-fluid-nano text-emerald-300/80">
+            <div className="border-t border-white/[0.06] pt-2 text-fluid-nano text-emerald-300/80">
               ✓ All 5 macro feeds nominal.
             </div>
           )}

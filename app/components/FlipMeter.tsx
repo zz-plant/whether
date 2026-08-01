@@ -88,7 +88,7 @@ export function FlipMeter({
 
       {/* Main Barometer Visual */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-fluid-xs text-white/70">
+        <div className="flex items-center justify-between text-fluid-xs text-white/65">
           <span className="font-medium">Capital Tightness ({tightness}/100)</span>
           <span className="font-mono text-white/50">Flip Limit: {pauseThreshold}/100</span>
         </div>
@@ -111,7 +111,7 @@ export function FlipMeter({
 
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-fluid-nano text-white/50 pt-0.5">
           <span>0 (Maximum Liquidity)</span>
-          <span className="font-semibold text-white/70">
+          <span className="font-semibold text-white/65">
             {proximityPct}% to threshold
             {hasProbability ? (
               <span className="ml-2 text-white/50 font-normal">· {transitionProbability}% transition risk</span>
@@ -128,7 +128,7 @@ export function FlipMeter({
 
       {/* Flip Conditions & Macro Drivers */}
       {flipConditions.length > 0 ? (
-        <div className="rounded-lg bg-white/[0.02] border border-white/[0.05] p-3 space-y-2">
+        <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 space-y-2">
           <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/80">
             Reversal Triggers Being Monitored
           </p>

@@ -98,7 +98,7 @@ export function DecisionHero({
       href={treasurySource}
       target="_blank"
       rel="noopener noreferrer"
-      className="underline decoration-white/20 underline-offset-2 hover:text-white/70 hover:decoration-white/40"
+      className="underline decoration-white/20 underline-offset-2 hover:text-white/80 hover:decoration-white/40"
     >
       FRED
     </a>

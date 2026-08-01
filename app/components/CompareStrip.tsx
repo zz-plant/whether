@@ -47,34 +47,34 @@ export function CompareStrip({
           onChange={(e) => setIsComparing(e.target.checked)}
           className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0 pointer-events-none"
         />
-        <span className="relative h-5 w-9 rounded-full border border-white/[0.1] bg-white/[0.05] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
+        <span className="relative h-5 w-9 rounded-full border border-white/[0.08] bg-white/[0.04] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
         <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/65 transition-colors peer-checked:text-sky-200">
           vs. last week
         </span>
       </label>
 
       {isComparing ? (
-        <div className="mt-4 pt-3 border-t border-white/[0.10] space-y-3">
+        <div className="mt-4 pt-3 border-t border-white/[0.08] space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-2.5">
+            <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-2.5">
               <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/50">Last week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2 py-0.5 text-fluid-micro font-medium">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
                   <span className={`size-1.5 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[previous.regime] ?? previous.regime}
                 </span>
               </div>
-              <p className="text-fluid-nano text-white/25 mt-0.5 font-mono">{previous.recordDate}</p>
+              <p className="text-fluid-nano text-white/40 mt-0.5 font-mono">{previous.recordDate}</p>
             </div>
 
-            <div className="rounded-lg bg-white/[0.06] border border-white/[0.08] p-2.5">
-              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/40">This week</p>
+            <div className="rounded-lg bg-white/[0.04] border border-white/[0.08] p-2.5">
+              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/60">This week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-2 py-0.5 text-fluid-micro font-medium">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
                   <span className={`size-1.5 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[currentRegime] ?? currentRegime}
                 </span>
-                <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.06] px-1.5 py-0.5 rounded">
+                <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.04] px-1.5 py-0.5 rounded">
                   {currentTightness} pts
                 </span>
               </div>
@@ -94,7 +94,7 @@ export function CompareStrip({
                 Capital tightness: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.05] px-2 py-0.5 font-medium text-white/60">
+              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-medium text-white/60">
                 Capital tightness: → unchanged
               </span>
             )}

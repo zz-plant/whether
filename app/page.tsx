@@ -38,7 +38,7 @@ import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 const EvidenceTools = dynamic(
   () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
   {
-    ssr: true,
+    ssr: false,
     loading: () => <div className="weather-card h-24 animate-pulse" />,
   },
 );

@@ -56,7 +56,7 @@ export function ScenarioSimulator({
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-fluid-nano font-semibold text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-fluid-nano font-semibold text-white/65 hover:bg-white/[0.06] hover:text-white/80 transition-colors"
           >
             <RefreshCw className="w-3 h-3" aria-hidden="true" />
             Reset Baseline
@@ -67,8 +67,8 @@ export function ScenarioSimulator({
       {/* Toggles Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
         {/* Fed Rate Toggle */}
-        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] p-3">
-          <label className="text-fluid-xs font-semibold text-white/80 block">
+        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
+          <label className="text-fluid-xs font-semibold text-white/65 block">
             Fed Rate Shift ({fedDelta > 0 ? `+${fedDelta * 0.25}%` : `${fedDelta * 0.25}%`})
           </label>
           <input
@@ -88,8 +88,8 @@ export function ScenarioSimulator({
         </div>
 
         {/* CPI Delta Toggle */}
-        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] p-3">
-          <label className="text-fluid-xs font-semibold text-white/80 block">
+        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
+          <label className="text-fluid-xs font-semibold text-white/65 block">
             Inflation Surge ({cpiDelta > 0 ? `+${cpiDelta * 0.5}%` : `${cpiDelta * 0.5}%`})
           </label>
           <input
@@ -109,8 +109,8 @@ export function ScenarioSimulator({
         </div>
 
         {/* VIX Spike Toggle */}
-        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05] p-3">
-          <label className="text-fluid-xs font-semibold text-white/80 block">
+        <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
+          <label className="text-fluid-xs font-semibold text-white/65 block">
             Volatility Surge (VIX +{vixSpike})
           </label>
           <input

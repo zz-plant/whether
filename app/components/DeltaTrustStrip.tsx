@@ -45,8 +45,8 @@ export function DeltaTrustStrip({
           </span>
         </div>
       </div>
-      <div className="border-t border-slate-800/60 pt-2 space-y-1">
-        <div className="flex items-center justify-between text-fluid-nano text-white/25">
+      <div className="border-t border-white/[0.06] pt-2 space-y-1">
+        <div className="flex items-center justify-between text-fluid-nano text-white/40">
           <span>Sources</span>
           <span className="inline-flex items-center gap-2">
             <span className="inline-flex items-center gap-1"><span className="size-1.5 rounded-full bg-emerald-400" />{sourceHealthSummary.liveCount}</span>

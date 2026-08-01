@@ -73,7 +73,7 @@ export function RegimeHistory({ regimes }: Props) {
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href).catch(() => {});
               }}
-              className="text-fluid-nano font-medium text-white/60 hover:text-white/60 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="text-fluid-nano font-medium text-white/60 hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
             >
               Copy link
             </button>
@@ -131,7 +131,7 @@ export function RegimeHistory({ regimes }: Props) {
       <div className="flex justify-between text-fluid-nano text-white/50 mt-1">
         <span>{formatAxisDate(regimes[0].record_date)}</span>
         {regimes.length >= 8 ? (
-          <span className="text-white/20">{formatAxisDate(regimes[Math.floor(regimes.length / 2)].record_date)}</span>
+          <span className="text-white/40">{formatAxisDate(regimes[Math.floor(regimes.length / 2)].record_date)}</span>
         ) : null}
         {isViewingHistory ? (
           <span>Selected</span>
@@ -140,7 +140,7 @@ export function RegimeHistory({ regimes }: Props) {
         )}
       </div>
       {hasEvents ? (
-        <p className="text-fluid-nano text-white/25 mt-0.5">
+        <p className="text-fluid-nano text-white/40 mt-0.5">
           <span className="text-amber-300/60">★</span> = notable event · hover for details
         </p>
       ) : null}
