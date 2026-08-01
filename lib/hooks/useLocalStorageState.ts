@@ -2,18 +2,46 @@
 
 import { useSyncExternalStore, useCallback } from "react";
 
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
+function parseRaw<T>(raw: string, fallback: T): T {
+  if (typeof fallback === "string") return raw as T;
+  if (typeof fallback === "number") return (Number(raw) || fallback) as T;
+  if (typeof fallback === "boolean") return (raw === "true") as T;
   try {
-    const raw = window.localStorage.getItem(key);
-    if (raw === null) return fallback;
-    if (typeof fallback === "string") return raw as T;
-    if (typeof fallback === "number") return (Number(raw) || fallback) as T;
-    if (typeof fallback === "boolean") return (raw === "true") as T;
     return JSON.parse(raw) as T;
   } catch {
     return fallback;
   }
+}
+
+/**
+ * useSyncExternalStore requires getSnapshot to return a referentially stable
+ * value when the store has not changed. JSON.parse(raw) produces a new object
+ * reference on every call, which React interprets as a change and re-renders
+ * indefinitely — surfacing as "Minified React error #185" (max update depth).
+ * Memoize the parsed value keyed by the raw string so the same localStorage
+ * content always returns the same reference.
+ */
+const snapshotCache = new Map<string, { raw: string | null; value: unknown }>();
+
+export function getCachedLocalStorageSnapshot<T>(key: string, raw: string | null, fallback: T): T {
+  const hit = snapshotCache.get(key);
+  if (hit && hit.raw === raw) return hit.value as T;
+
+  const value: T = raw === null ? fallback : parseRaw(raw, fallback);
+  snapshotCache.set(key, { raw, value });
+  return value;
+}
+
+function read<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  let raw: string | null = null;
+  try {
+    raw = window.localStorage.getItem(key);
+  } catch {
+    return fallback;
+  }
+
+  return getCachedLocalStorageSnapshot(key, raw, fallback);
 }
 
 function write<T>(key: string, value: T): void {

@@ -237,7 +237,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.reversalTrigger, /market risk appetite falls to or below 50\.0, from 56\.0 today/i);
+    assert.match(model.reversalTrigger, /market risk appetite falls to or below 50\.0 \(56\.0 today\)/i);
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
