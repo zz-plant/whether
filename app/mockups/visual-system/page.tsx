@@ -23,10 +23,10 @@ export default function VisualSystemMockupPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+              <span className="inline-flex items-center gap-1.5 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
                 <Sparkles className="h-3.5 w-3.5" /> Architectural Visual Language
               </span>
-              <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950 px-2.5 py-1 text-fluid-micro font-medium text-slate-300">
+              <span className="inline-flex items-center rounded-sm border border-slate-700 bg-slate-950 px-2.5 py-1 text-fluid-micro font-medium text-slate-300">
                 4-Tier Hybrid Pipeline
               </span>
             </div>
@@ -61,7 +61,7 @@ export default function VisualSystemMockupPage() {
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-6 text-center">
             <ParametricGraphic seed={seed} mode={mode} renderingTier="svg" size={120} stateValue={metric} />
             <div className="space-y-1">
-              <span className="inline-block rounded-full bg-slate-800 px-2.5 py-0.5 text-fluid-micro font-semibold text-cyan-300">
+              <span className="inline-block rounded-sm bg-slate-800 px-2.5 py-0.5 text-fluid-micro font-semibold text-cyan-300">
                 Layer 1: SVG Geometry
               </span>
               <p className="text-xs text-slate-300 font-semibold">Deterministic SSR Precision</p>
@@ -73,7 +73,7 @@ export default function VisualSystemMockupPage() {
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-6 text-center">
             <ParametricGraphic seed={seed} mode={mode} renderingTier="filter" size={120} stateValue={metric} />
             <div className="space-y-1">
-              <span className="inline-block rounded-full bg-indigo-950 px-2.5 py-0.5 text-fluid-micro font-semibold text-indigo-300">
+              <span className="inline-block rounded-sm bg-indigo-950 px-2.5 py-0.5 text-fluid-micro font-semibold text-indigo-300">
                 Layer 2: SVG Filter Shader
               </span>
               <p className="text-xs text-slate-300 font-semibold">feTurbulence &amp; Displacement</p>
@@ -85,7 +85,7 @@ export default function VisualSystemMockupPage() {
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-6 text-center">
             <ParametricGraphic seed={seed} mode={mode} renderingTier="webgl" size={120} stateValue={metric} />
             <div className="space-y-1">
-              <span className="inline-block rounded-full bg-emerald-950 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-300">
+              <span className="inline-block rounded-sm bg-emerald-950 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-300">
                 Layer 3: WebGL GLSL Shader
               </span>
               <p className="text-xs text-slate-300 font-semibold">Hardware Accelerated Noise</p>
