@@ -201,7 +201,7 @@ export function OperationsExecutionStepper({
                   </div>
                 </div>
                 {isActive && (
-                  <span className="rounded-full border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
+                  <span className="rounded-sm border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
                     Active
                   </span>
                 )}

@@ -59,7 +59,7 @@ export const OperationsWorkflowProgress = () => {
                 <span className="inline-flex items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.2em]">
                   <span className="inline-flex items-center gap-2">
                     <span
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-fluid-micro ${
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-sm border text-fluid-micro ${
                         index === 0
                           ? "border-sky-300/80 bg-sky-500/35 text-sky-50"
                           : "border-slate-600/80 text-slate-300"

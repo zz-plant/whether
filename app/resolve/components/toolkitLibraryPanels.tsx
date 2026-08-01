@@ -89,7 +89,7 @@ export function ToolkitLibraryPanels({
       </form>
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-        <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
+        <span className="rounded-sm border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
           {filteredToolkits.length} result{filteredToolkits.length === 1 ? "" : "s"}
         </span>
         {suggestedToolkitQueries.map((intent) => (

@@ -249,7 +249,7 @@ const ThresholdRail = ({
           aria-hidden="true"
         />
         <span
-          className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border border-slate-950/95 ${currentColorClass}`}
+          className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/95 ${currentColorClass}`}
           style={{ left: `${currentPercent}%` }}
           aria-hidden="true"
         />

@@ -26,7 +26,7 @@ function MobileNavContent({
 }) {
   return (
     <div className="w-full px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
-      <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-700" />
+      <div className="mx-auto mb-4 h-1 w-10 rounded-sm bg-slate-700" />
       <nav className="space-y-1" aria-label="Primary routes">
         {navigationLinks.map((link) => (
           <Link
@@ -66,7 +66,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <button
         type="button"
         onClick={() => setShowMobile(true)}
-        className="flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/60 px-3 py-1.5 text-fluid-xs font-semibold text-slate-300 md:hidden"
+        className="flex min-h-[44px] items-center gap-2 rounded-sm border border-slate-800/60 px-3 py-1.5 text-fluid-xs font-semibold text-slate-300 md:hidden"
         aria-label="Open navigation"
       >
         {activeRouteLabel}
@@ -78,7 +78,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
             key={link.href}
             href={link.href}
             aria-current={link.isActive ? "page" : undefined}
-          className={`rounded-full px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400 ${
+          className={`rounded-sm px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400 ${
             link.isActive
               ? "bg-sky-500/14 text-sky-100"
               : "text-white/60 hover:text-white/70"
@@ -90,7 +90,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         <span className="mx-1 h-4 w-px bg-slate-700/60" aria-hidden="true" />
         <Link
           href="/api-docs"
-          className="rounded-full px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] text-white/60 hover:text-white/70 no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="rounded-sm px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] text-white/60 hover:text-white/70 no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
         >
           API
         </Link>

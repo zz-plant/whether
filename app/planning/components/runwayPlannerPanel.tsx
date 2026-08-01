@@ -123,14 +123,14 @@ This memo aligns our company budget and operating guardrails with the current cl
           <button
             type="button"
             onClick={() => setShowMethodology((current) => !current)}
-            className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600/70 px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 focus:outline-none"
+            className="inline-flex min-h-[44px] items-center rounded-sm border border-slate-600/70 px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 focus:outline-none"
           >
             How is this calculated?
           </button>
           <button
             type="button"
             onClick={() => setShowMemo((current) => !current)}
-            className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1.5 text-xs font-semibold tracking-[0.12em] focus:outline-none ${
+            className={`inline-flex min-h-[44px] items-center rounded-sm border px-3 py-1.5 text-xs font-semibold tracking-[0.12em] focus:outline-none ${
               showMemo
                 ? "border-sky-400/80 bg-sky-500/10 text-sky-100"
                 : "border-slate-600/70 text-slate-200 hover:border-sky-400/70"
@@ -201,7 +201,7 @@ This memo aligns our company budget and operating guardrails with the current cl
         <article className="weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Burn adjustment range</p>
           <p className="mt-2 text-sm text-slate-100">{output.burnAdjustmentRange.summary}</p>
-          <p className={`mt-3 inline-flex rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
+          <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
             Payback strictness: {paybackStrictnessState.label} ({paybackStrictnessLevel}/3)
           </p>
         </article>

@@ -124,7 +124,7 @@ export default function TemplatePage() {
         </div>
 
         <div className="border-t border-slate-700/50 pt-6">
-          <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
+          <Link href="/" className="inline-flex items-center gap-2 rounded-sm border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
             ← Back to weekly brief
           </Link>
         </div>

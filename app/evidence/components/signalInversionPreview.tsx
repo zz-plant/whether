@@ -208,17 +208,17 @@ export function SignalInversionPreview({
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
-          <span className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
+          <span className="rounded-sm border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
             10Y-2Y inverted {monthsInverted10Y2Y} mo
           </span>
-          <span className="rounded-full border border-amber-300/30 bg-amber-500/10 px-2 py-1 text-amber-100">
+          <span className="rounded-sm border border-amber-300/30 bg-amber-500/10 px-2 py-1 text-amber-100">
             2Y-3M inverted {monthsInverted2Y3M} mo
           </span>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
+          <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
             Below zero = inversion pressure
           </span>
           {hasGaps ? (
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
+            <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
               Breaks = missing monthly reads
             </span>
           ) : null}

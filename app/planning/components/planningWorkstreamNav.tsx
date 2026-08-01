@@ -55,7 +55,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
                       {link.label}
                     </span>
                   </span>
-                  <span className="rounded-full border border-slate-700/70 px-2 py-1 text-fluid-micro uppercase tracking-[0.16em] text-slate-300">
+                  <span className="rounded-sm border border-slate-700/70 px-2 py-1 text-fluid-micro uppercase tracking-[0.16em] text-slate-300">
                     {statusLabel}
                   </span>
                 </div>
