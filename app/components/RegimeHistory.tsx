@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { REGIME_COLORS } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
+import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";
 
 type RegimeHistoryEntry = {
   record_date: string;
@@ -24,9 +25,7 @@ function parseYearMonth(dateStr: string): { year: number; month: number } | null
 }
 
 function formatAxisDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.valueOf())) return dateStr;
-  return d.toLocaleDateString("en", { month: "short", year: "2-digit" });
+  return formatMonthYear2DigitFromValue(dateStr);
 }
 
 export function RegimeHistory({ regimes }: Props) {
@@ -52,7 +51,7 @@ export function RegimeHistory({ regimes }: Props) {
 
   const selectedEntry = regimes.find(isSelectedEntry);
   const selectedLabel = selectedEntry
-    ? new Date(selectedEntry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })
+    ? formatMonthYearShortFromValue(selectedEntry.record_date)
     : null;
 
   const hasEvents = regimes.some((entry) => {
@@ -100,7 +99,7 @@ export function RegimeHistory({ regimes }: Props) {
           const event = ym ? findEventAt(ym.year, ym.month) : null;
           const nearest = ym && !event ? findNearestEvent(ym.year, ym.month) : null;
           const tooltipParts = [
-            `${new Date(entry.record_date).toLocaleDateString("en", { month: "short", year: "numeric" })}: ${entry.regime}`,
+            `${formatMonthYearShortFromValue(entry.record_date)}: ${entry.regime}`,
             boldness != null ? `${boldness}/100` : null,
             event ? event.label : null,
             nearest ? `${nearest.monthsDistance === 0 ? "during" : nearest.monthsDistance === 1 ? "1 mo from" : `${nearest.monthsDistance} mo from`} ${nearest.event.label}` : null,

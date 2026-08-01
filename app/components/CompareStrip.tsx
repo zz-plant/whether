@@ -59,7 +59,7 @@ export function CompareStrip({
             <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-2.5">
               <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/50">Last week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
+                <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
                   <span className={`size-1.5 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[previous.regime] ?? previous.regime}
                 </span>
@@ -70,7 +70,7 @@ export function CompareStrip({
             <div className="rounded-lg bg-white/[0.04] border border-white/[0.08] p-2.5">
               <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/60">This week</p>
               <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
+                <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
                   <span className={`size-1.5 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
                   {REGIME_DISPLAY[currentRegime] ?? currentRegime}
                 </span>

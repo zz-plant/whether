@@ -560,7 +560,7 @@ export const DecisionShieldPanel = ({
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Decision verdict</p>
               <div
-                className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
+                className={`mt-3 inline-flex items-center rounded-sm border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
               >
                 {output.verdict}
               </div>

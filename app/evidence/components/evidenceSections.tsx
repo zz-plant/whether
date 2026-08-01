@@ -458,7 +458,7 @@ export const SignalsCurrentScoresSection = ({
                     </div>
                     {meterState ? (
                       <>
-                        <div className="relative mt-3 h-7 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/75" aria-hidden="true">
+                        <div className="relative mt-3 h-7 overflow-hidden rounded-sm border border-slate-800/70 bg-slate-950/75" aria-hidden="true">
                           <span
                             className="absolute inset-y-0 bg-emerald-400/12"
                             style={{ left: meterState.safe.left, width: meterState.safe.width }}
@@ -595,7 +595,7 @@ export const SignalsEvidencePrioritiesSection = ({
       <Collapsible.Root className="weather-surface group p-4">
         <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
           <span>Show the rest</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180">
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180">
             ⌄
           </span>
         </Collapsible.Trigger>

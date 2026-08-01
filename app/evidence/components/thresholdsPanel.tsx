@@ -409,9 +409,9 @@ export const ThresholdsPanel = ({
                 <Popover.Root>
                   <Popover.Trigger
                     type="button"
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                   >
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[9px] text-slate-400">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-[9px] text-slate-400">
                       ?
                     </span>
                     How the watch lines work
@@ -436,7 +436,7 @@ export const ThresholdsPanel = ({
                             <span>Higher numbers delay changes until signals are extreme.</span>
                           </li>
                         </ul>
-                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100">
+                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100">
                           Close
                         </Popover.Close>
                         <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />

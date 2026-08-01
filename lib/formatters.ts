@@ -26,6 +26,12 @@ const monthDayYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+const monthYearShort2DigitUtcFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "2-digit",
+  timeZone: "UTC",
+});
+
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -119,6 +125,12 @@ export const formatSignedDeltaValue = (value: number | null) => {
 export const formatScoreValue = (value: number) => value.toFixed(0);
 
 export const formatMonthYearShortUtc = (date: Date) => monthYearShortUtcFormatter.format(date);
+
+export const formatMonthYearShortFromValue = (value: string) =>
+  formatDateValue(value, monthYearShortUtcFormatter);
+
+export const formatMonthYear2DigitFromValue = (value: string) =>
+  formatDateValue(value, monthYearShort2DigitUtcFormatter);
 
 export const formatConceptPublishedLabel = (year: number, month: number) =>
   formatMonthYearShortUtc(new Date(Date.UTC(year, month - 1, 1)));
