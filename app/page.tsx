@@ -124,14 +124,7 @@ function WeeklyTopFoldContract({
     >
       <div className="space-y-2 lg:col-span-7">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">WEEKLY POSTURE</p>
-          <div className="flex items-center gap-1 rounded-full bg-white/[0.05] p-0.5 border border-white/[0.08] text-[10px] font-mono">
-            <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-bold">ALL</span>
-            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CFO</span>
-            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CPO</span>
-            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">COO</span>
-            <span className="px-1.5 py-0.5 text-white/50 hover:text-white cursor-pointer">CTO</span>
-          </div>
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Weekly Posture</p>
         </div>
         <div className="grid gap-2 text-fluid-micro text-white/65 grid-cols-2 xl:grid-cols-4">
           <span>Posture shift: {weeklySummary.notchShiftLabel}</span>
@@ -144,7 +137,7 @@ function WeeklyTopFoldContract({
 
       <div className="space-y-2 lg:col-span-5">
         <div className="flex items-center gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit queue</p>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit
@@ -156,7 +149,7 @@ function WeeklyTopFoldContract({
           </span>
         </div>
         {revisitQueue.length ? (
-          <ul className="space-y-1.5 text-fluid-micro text-white/60">
+          <ul className="space-y-1.5 text-fluid-micro text-white/50">
             {revisitQueue.map((item) => (
               <li key={item.id}>
                 <span className="font-medium text-white/65">{item.label}:</span>{" "}
@@ -165,15 +158,15 @@ function WeeklyTopFoldContract({
             ))}
           </ul>
         ) : null}
-        <div className="space-y-1 border-t border-white/[0.10] pt-2 text-fluid-micro text-white/60">
+        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/50">
           {guardrailRows.map((row, index) => (
             <p key={index}>
-              <span className="text-white/60">Watch:</span> {compactSentence(row.trigger, 84)}
+              <span className="text-white/50">Watch:</span> {compactSentence(row.trigger, 84)}
             </p>
           ))}
         </div>
         {memoryItems.length ? (
-          <p className="text-fluid-micro text-white/60">{memoryItems.join(" → ")}</p>
+          <p className="text-fluid-micro text-white/50">{memoryItems.join(" → ")}</p>
         ) : null}
       </div>
     </section>
@@ -331,21 +324,16 @@ async function PageContent({
                memoryRegimes={macroTrendline}
              />
 
-              <FlipMeter
-               tightness={tightness}
-               tightnessDelta={tightnessDelta}
-               pauseThreshold={pauseThreshold}
-               flipConditions={flipConditionLabels}
-               signalDirection={signalDirection}
-             />
+             <FlipMeter
+                tightness={tightness}
+                tightnessDelta={tightnessDelta}
+                pauseThreshold={pauseThreshold}
+                flipConditions={flipConditionLabels}
+                signalDirection={signalDirection}
+                transitionProbability={transition.probability}
+              />
 
-            <ScenarioSimulator
-              baseTightness={tightness}
-              baseBoldness={weeklyLeadershipSummary.boldnessScore}
-              pauseThreshold={pauseThreshold}
-            />
-
-            <CompareStrip
+             <CompareStrip
               currentRegime={regime}
               currentTightness={tightness}
               tightnessDelta={tightnessDelta}
@@ -354,19 +342,24 @@ async function PageContent({
             />
           </SwipeableWeek>
  
-           <EvidenceDrawer highlight={toolHighlight}>
-             <ToolsPanel>
-               <EvidenceTools
-                 currentTightness={tightness}
-                 currentRiskAppetite={riskAppetite}
-                 currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
-                 regimes={macroTrendline}
-                 companyStage={operatorContext.companyStage ?? undefined}
-                 tightnessDelta={tightnessDelta}
-                 riskAppetiteDelta={riskAppetiteDelta}
-               />
-             </ToolsPanel>
-           </EvidenceDrawer>
+            <EvidenceDrawer highlight={toolHighlight}>
+              <ToolsPanel>
+                <ScenarioSimulator
+                  baseTightness={tightness}
+                  baseBoldness={weeklyLeadershipSummary.boldnessScore}
+                  pauseThreshold={pauseThreshold}
+                />
+                <EvidenceTools
+                  currentTightness={tightness}
+                  currentRiskAppetite={riskAppetite}
+                  currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+                  regimes={macroTrendline}
+                  companyStage={operatorContext.companyStage ?? undefined}
+                  tightnessDelta={tightnessDelta}
+                  riskAppetiteDelta={riskAppetiteDelta}
+                />
+              </ToolsPanel>
+            </EvidenceDrawer>
  
            <RitualCheck
              recordDate={homepage.reportShell.recordDateLabel}

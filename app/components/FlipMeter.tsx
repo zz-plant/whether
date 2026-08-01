@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
-import { AlertTriangle, ArrowUpRight, ArrowDownRight, ShieldCheck, Gauge } from "lucide-react";
+import { AlertTriangle, ShieldCheck, Gauge } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 
 type FlipMeterProps = {
@@ -10,6 +9,10 @@ type FlipMeterProps = {
   pauseThreshold?: number;
   flipConditions?: string[];
   signalDirection: SignalDirection;
+  /** Regulated regime-transition probability (0-100). When >0 it governs the
+   * urgency tier instead of raw linear proximity to the threshold, so the
+   * visual "near-miss" glow matches the actual odds rather than geometry. */
+  transitionProbability?: number;
 };
 
 export function FlipMeter({
@@ -18,27 +21,46 @@ export function FlipMeter({
   pauseThreshold = 70,
   flipConditions = [],
   signalDirection,
+  transitionProbability = 0,
 }: FlipMeterProps) {
   const proximityPct = Math.min(100, Math.max(0, Math.round((tightness / pauseThreshold) * 100)));
   const isBreached = tightness >= pauseThreshold;
-  const isNearThreshold = !isBreached && proximityPct >= 80;
+  const hasProbability = transitionProbability > 0;
 
-  const statusLabel = isBreached
-    ? "Threshold Breached · Flip Triggered"
-    : isNearThreshold
-    ? "Approaching Threshold · High Sensitivity"
+  // Urgency is governed by the regulated transition probability when available.
+  // Geometric proximity alone is a near-miss signal: a bar at 82% can glow amber
+  // when the real transition odds are ~12%. The probability is the audit number.
+  type UrgencyLevel = "breached" | "high" | "elevated" | "stable";
+  const urgencyLevel: UrgencyLevel = isBreached
+    ? "breached"
+    : hasProbability
+      ? transitionProbability >= 50
+        ? "high"
+        : transitionProbability >= 25
+          ? "elevated"
+          : "stable"
+      : proximityPct >= 80
+        ? "elevated"
+        : "stable";
+
+  const statusLabel =
+    urgencyLevel === "breached" ? "Threshold Breached · Flip Triggered"
+    : urgencyLevel === "high" ? "High Flip Risk · Watch Closely"
+    : urgencyLevel === "elevated" ? "Elevated Flip Risk"
     : "Posture Stable · Clear Distance";
 
-  const statusBg = isBreached
-    ? "bg-rose-500/10 border-rose-500/30 text-rose-300"
-    : isNearThreshold
-    ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+  const statusBg =
+    urgencyLevel === "breached" || urgencyLevel === "high"
+      ? "bg-rose-500/10 border-rose-500/30 text-rose-300"
+    : urgencyLevel === "elevated"
+      ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
     : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
 
-  const barGradient = isBreached
-    ? "linear-gradient(90deg, #f43f5e 0%, #e11d48 100%)"
-    : isNearThreshold
-    ? "linear-gradient(90deg, #10b981 0%, #f59e0b 80%, #f43f5e 100%)"
+  const barGradient =
+    urgencyLevel === "breached"
+      ? "linear-gradient(90deg, #f43f5e 0%, #e11d48 100%)"
+    : urgencyLevel === "high" || urgencyLevel === "elevated"
+      ? "linear-gradient(90deg, #10b981 0%, #f59e0b 80%, #f43f5e 100%)"
     : "linear-gradient(90deg, #10b981 0%, #34d399 100%)";
 
   return (
@@ -55,7 +77,7 @@ export function FlipMeter({
         </div>
 
         <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusBg}`}>
-          {isBreached ? (
+          {urgencyLevel === "breached" || urgencyLevel === "high" ? (
             <AlertTriangle className="w-3 h-3 text-rose-400" aria-hidden="true" />
           ) : (
             <ShieldCheck className="w-3 h-3 text-emerald-400" aria-hidden="true" />
@@ -87,11 +109,21 @@ export function FlipMeter({
           />
         </div>
 
-        <div className="flex justify-between text-fluid-nano text-white/50 pt-0.5">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-fluid-nano text-white/50 pt-0.5">
           <span>0 (Maximum Liquidity)</span>
-          <span className="font-semibold text-white/70">{proximityPct}% to Trigger Limit</span>
+          <span className="font-semibold text-white/70">
+            {proximityPct}% to threshold
+            {hasProbability ? (
+              <span className="ml-2 text-white/50 font-normal">· {transitionProbability}% transition risk</span>
+            ) : null}
+          </span>
           <span>100 (Extreme Tightness)</span>
         </div>
+        {hasProbability && urgencyLevel !== "breached" ? (
+          <p className="text-fluid-nano text-white/40">
+            Urgency reflects {transitionProbability}% regime-transition odds, not just distance to the line.
+          </p>
+        ) : null}
       </div>
 
       {/* Flip Conditions & Macro Drivers */}

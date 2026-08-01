@@ -61,6 +61,28 @@ export function DecisionHero({
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
 
+  // The confidence ring hue reflects posture DIRECTION, not confidence alone.
+  // A HIGH-confidence tightening call must not glow emerald — that would read
+  // as "all clear" (a loss disguised as a win). Confidence still controls the
+  // ring's fill amount (how reliable the reading is); direction controls hue
+  // (whether the posture is good for the operator right now).
+  const ringStroke =
+    signalDirection === "tighten" ? "rgba(253,164,175,0.65)"
+    : signalDirection === "ease" ? "rgba(110,231,183,0.65)"
+    : "rgba(125,211,252,0.6)";
+  const ringGlow =
+    signalDirection === "tighten" ? "drop-shadow(0 0 6px rgba(253,164,175,0.35))"
+    : signalDirection === "ease" ? "drop-shadow(0 0 6px rgba(110,231,183,0.35))"
+    : "drop-shadow(0 0 6px rgba(125,211,252,0.3))";
+  const ringDasharray =
+    confidenceLabel === "HIGH" ? "289 0"
+    : confidenceLabel === "MED" ? "217 72"
+    : "145 144";
+  const ringDirectionLabel =
+    signalDirection === "tighten" ? "tightening"
+    : signalDirection === "ease" ? "easing"
+    : "holding";
+
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
@@ -106,7 +128,7 @@ export function DecisionHero({
             <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
               {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/60">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/50">
               <span>
                  <span className="text-white/50">Capital tightness:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
@@ -136,7 +158,7 @@ export function DecisionHero({
             </span>
             <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
           </div>
-          <p className="text-fluid-micro text-white/55 sm:hidden">
+          <p className="text-fluid-micro text-white/50 sm:hidden">
             Data: {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}
           </p>
         </div>
@@ -150,12 +172,13 @@ export function DecisionHero({
                   <circle
                     cx="50" cy="50" r="46"
                     fill="none"
-                    stroke={confidenceLabel === "HIGH" ? "rgba(110,231,183,0.6)" : confidenceLabel === "MED" ? "rgba(252,211,77,0.6)" : "rgba(253,164,175,0.6)"}
+                    stroke={ringStroke}
                     strokeWidth="5"
-                    strokeDasharray={confidenceLabel === "HIGH" ? "289 0" : confidenceLabel === "MED" ? "217 72" : "145 144"}
+                    strokeDasharray={ringDasharray}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)"
-                    style={{ filter: confidenceLabel === "HIGH" ? "drop-shadow(0 0 6px rgba(110,231,183,0.35))" : confidenceLabel === "MED" ? "drop-shadow(0 0 6px rgba(252,211,77,0.35))" : "drop-shadow(0 0 6px rgba(253,164,175,0.35))" }}
+                    style={{ filter: ringGlow }}
+                    data-direction={ringDirectionLabel}
                   />
                   {[25, 50, 75].map((pct) => {
                     const angle = (pct / 100) * 360 - 90;
@@ -172,12 +195,20 @@ export function DecisionHero({
               </div>
             </SignalWaterfall>
           </div>
+          <div className={`mt-1.5 flex items-center justify-center gap-1.5 sm:justify-end font-display text-lg sm:text-xl font-bold tabular-nums ${
+            boldnessDelta > 0 ? "text-emerald-300"
+            : boldnessDelta < 0 ? "text-rose-300"
+            : "text-slate-400"
+          }`}>
+            <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
+            <span>{boldnessDeltaLabel}</span>
+          </div>
           <div className="mt-2 h-1 w-full max-w-[8rem] mx-auto sm:ml-auto sm:mr-0 rounded-full" style={{ background: "linear-gradient(90deg, rgba(244,63,94,0.3), rgba(251,191,36,0.3), rgba(52,211,153,0.3))" }}>
             <div className="relative h-full">
               <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-2 rounded-full bg-white ring-2 ring-white/20" style={{ left: `${Math.min(100, Math.max(0, boldnessScore))}%` }} />
             </div>
           </div>
-          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60 mt-1">
+          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/50 mt-1">
             Boldness Budget
             <span className="ml-1.5 text-white/50"> /100</span>
           </p>

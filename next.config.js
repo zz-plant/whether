@@ -92,6 +92,13 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
 ];
 
+const homepageCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, s-maxage=300, stale-while-revalidate=600",
+  },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -100,6 +107,10 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/",
+        headers: homepageCacheHeaders,
       },
     ];
   },
