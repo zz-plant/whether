@@ -41,6 +41,13 @@ binding = "WHETHER_DURABLE_KV"
 id = "cb5c7f5947e94592b4127aa25fa8541d"
 preview_id = "d116663399244346bd302324b485e8f3"
 
+# Vinext ISR / data cache (fetch, "use cache", unstable_cache). See vite.config.ts
+# cache.data adapter. Created via `wrangler kv namespace create VINEXT_KV_CACHE`.
+[[kv_namespaces]]
+binding = "VINEXT_KV_CACHE"
+id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+preview_id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+
 [[send_email]]
 name = "EMAIL"
 
@@ -75,3 +82,8 @@ dataset = "whether_telemetry_preview"
 binding = "WHETHER_DURABLE_KV"
 id = "d116663399244346bd302324b485e8f3"
 preview_id = "d116663399244346bd302324b485e8f3"
+
+[[env.preview.kv_namespaces]]
+binding = "VINEXT_KV_CACHE"
+id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+preview_id = "2e843b0be3ef42e2a8a863b5e78b0fc4"

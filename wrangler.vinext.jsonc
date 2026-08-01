@@ -17,6 +17,11 @@
       "binding": "WHETHER_DURABLE_KV",
       "id": "cb5c7f5947e94592b4127aa25fa8541d",
       "preview_id": "d116663399244346bd302324b485e8f3"
+    },
+    {
+      "binding": "VINEXT_KV_CACHE",
+      "id": "2e843b0be3ef42e2a8a863b5e78b0fc4",
+      "preview_id": "2e843b0be3ef42e2a8a863b5e78b0fc4"
     }
   ],
   "vars": {

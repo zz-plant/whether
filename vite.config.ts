@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vinext from "vinext";
+import { kvDataAdapter } from "@vinext/cloudflare/cache/kv-data-adapter";
 import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
@@ -8,7 +9,11 @@ export default defineConfig({
     include: ["use-sync-external-store/shim", "use-sync-external-store/shim/with-selector"],
   },
   plugins: [
-    vinext(),
+    vinext({
+      cache: {
+        data: kvDataAdapter(),
+      },
+    }),
     cloudflare({
       viteEnvironment: {
         name: "rsc",

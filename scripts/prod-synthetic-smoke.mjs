@@ -4,7 +4,7 @@ const baseUrl = (process.argv[2] ?? "https://whether.work").replace(/\/$/, "");
 const strictHtmlChecks = process.env.WHETHER_SMOKE_STRICT_HTML === "1";
 
 const pageChecks = [
-  { path: "/", required: ["weekly brief", "share-ready-artifact", "open weekly plan"] },
+  { path: "/", required: ["weekly brief", "share-ready-artifact", "build this week's plan"] },
   { path: "/evidence", required: ["evidence", "what this means now"] },
   { path: "/planning", required: ["planning", "weekly plan", "decision help"] },
   { path: "/resolve", required: ["resolve", "toolkit-library"] },
@@ -163,8 +163,8 @@ const run = async () => {
     fail(`/api/health status should be ok/degraded/down. Received ${healthPayload.status}`);
   }
 
-  if (!healthPayload.checks?.treasuryData) {
-    fail("/api/health missing checks.treasuryData");
+  if (!healthPayload.dependencies?.reportData) {
+    fail("/api/health missing dependencies.reportData");
   }
 
   console.log("✅ /api/health checks passed");
