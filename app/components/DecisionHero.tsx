@@ -9,6 +9,7 @@ import { DecisionMemoryButton } from "./DecisionMemoryButton";
 type Props = {
   tightness: number;
   tightnessDelta: number;
+  riskAppetite?: number;
   boldnessScore: number;
   boldnessDelta: number;
   boldnessShorthand?: string;
@@ -25,6 +26,10 @@ type Props = {
   treasurySource?: string;
   degradedCount?: number;
   isFallback?: boolean;
+  flipConditions?: string[];
+  transitionProbability?: number;
+  guardrail?: string;
+  reversalTrigger?: string;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -37,6 +42,7 @@ type Props = {
 export function DecisionHero({
   tightness,
   tightnessDelta,
+  riskAppetite,
   boldnessScore,
   boldnessDelta,
   boldnessShorthand,
@@ -53,34 +59,16 @@ export function DecisionHero({
   treasurySource,
   degradedCount,
   isFallback,
+  flipConditions,
+  transitionProbability,
+  guardrail,
+  reversalTrigger,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
-
-  // The confidence ring hue reflects posture DIRECTION, not confidence alone.
-  // A HIGH-confidence tightening call must not glow emerald — that would read
-  // as "all clear" (a loss disguised as a win). Confidence still controls the
-  // ring's fill amount (how reliable the reading is); direction controls hue
-  // (whether the posture is good for the operator right now).
-  const ringStroke =
-    signalDirection === "tighten" ? "rgba(253,164,175,0.65)"
-    : signalDirection === "ease" ? "rgba(110,231,183,0.65)"
-    : "rgba(125,211,252,0.6)";
-  const ringGlow =
-    signalDirection === "tighten" ? "drop-shadow(0 0 6px rgba(253,164,175,0.35))"
-    : signalDirection === "ease" ? "drop-shadow(0 0 6px rgba(110,231,183,0.35))"
-    : "drop-shadow(0 0 6px rgba(125,211,252,0.3))";
-  const ringDasharray =
-    confidenceLabel === "HIGH" ? "289 0"
-    : confidenceLabel === "MED" ? "217 72"
-    : "145 144";
-  const ringDirectionLabel =
-    signalDirection === "tighten" ? "tightening"
-    : signalDirection === "ease" ? "easing"
-    : "holding";
 
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
@@ -140,13 +128,28 @@ export function DecisionHero({
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
             </p>
           </div>
+          {flipConditions && flipConditions.length > 0 ? (
+            <p className="text-fluid-micro text-white/50">
+              <span className="font-semibold uppercase tracking-[0.06em] text-sky-300/80">
+                Flip watch:
+              </span>{" "}
+              {flipConditions.join(" · ")}
+              {transitionProbability && transitionProbability > 0 ? (
+                <span> · {transitionProbability}% transition risk</span>
+              ) : null}
+            </p>
+          ) : null}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <StageSwitcher currentStage={operatorContext.companyStage} />
             <DecisionMemoryButton
               regime={regime}
+              recordDate={recordDate}
               tightness={tightness}
-              riskAppetite={boldnessScore}
+              riskAppetite={riskAppetite}
+              boldnessScore={boldnessScore}
               primaryCall={weeklyCall ?? postureLabel}
+              guardrail={guardrail}
+              reversalTrigger={reversalTrigger}
             />
           </div>
           <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -155,46 +158,23 @@ export function DecisionHero({
               <span className={`size-2 rounded-full ${dataStatusColor} ${isFallback || (degradedCount && degradedCount > 0) ? "motion-safe:animate-pulse" : ""}`} aria-hidden="true" />
               {dataStatus}
             </span>
-            <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
+            <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
           </div>
           <p className="text-fluid-micro text-white/50 sm:hidden">
-            Data: {recordDate}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}
+            Data: {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}
           </p>
         </div>
 
         <div className="sm:text-right">
-          <div className="relative inline-flex items-center justify-center p-3">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
-              {confidenceLabel ? (
-                <>
-                  <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                  <circle
-                    cx="50" cy="50" r="46"
-                    fill="none"
-                    stroke={ringStroke}
-                    strokeWidth="5"
-                    strokeDasharray={ringDasharray}
-                    strokeLinecap="round"
-                    transform="rotate(-90 50 50)"
-                    style={{ filter: ringGlow }}
-                    data-direction={ringDirectionLabel}
-                  />
-                  {[25, 50, 75].map((pct) => {
-                    const angle = (pct / 100) * 360 - 90;
-                    const rad = (angle * Math.PI) / 180;
-                    return <line key={pct} x1={50 + 42 * Math.cos(rad)} y1={50 + 42 * Math.sin(rad)} x2={50 + 50 * Math.cos(rad)} y2={50 + 50 * Math.sin(rad)} stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" strokeLinecap="round" />;
-                  })}
-                </>
-              ) : null}
-            </svg>
-            <SignalWaterfall data={signalData ?? {}}>
-              <div className="relative z-10 font-display text-[clamp(2.75rem,9vw,5.5rem)] font-bold leading-none text-white tabular-nums"
-                style={{ textShadow: "0 0 80px rgba(255,255,255,0.06)" }}>
+          <SignalWaterfall data={signalData ?? {}}>
+            <div className="inline-flex items-baseline justify-center gap-1 sm:justify-end">
+              <span className="font-display text-[clamp(2rem,5vw,3.25rem)] font-bold leading-none text-white tabular-nums">
                 {boldnessScore}
-              </div>
-            </SignalWaterfall>
-          </div>
-          <div className={`mt-1.5 flex items-center justify-center gap-1.5 sm:justify-end font-display text-lg sm:text-xl font-bold tabular-nums ${
+              </span>
+              <span className="text-fluid-xs font-semibold text-white/50">/100</span>
+            </div>
+          </SignalWaterfall>
+          <div className={`mt-1.5 flex items-center justify-center gap-1.5 sm:justify-end font-display text-base sm:text-lg font-bold tabular-nums ${
             boldnessDelta > 0 ? "text-emerald-300"
             : boldnessDelta < 0 ? "text-rose-300"
             : "text-slate-400"
@@ -207,9 +187,8 @@ export function DecisionHero({
               <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-2 rounded-full bg-white ring-2 ring-white/20" style={{ left: `${Math.min(100, Math.max(0, boldnessScore))}%` }} />
             </div>
           </div>
-          <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/50 mt-1">
-            Boldness Budget
-            <span className="ml-1.5 text-white/50"> /100</span>
+          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
+            Boldness budget
           </p>
           <p className="text-fluid-micro text-white/50 mt-0.5">How much room you have to operate</p>
         </div>

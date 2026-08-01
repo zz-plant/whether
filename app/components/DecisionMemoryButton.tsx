@@ -1,60 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, CheckCircle } from "lucide-react";
+import { Bookmark, CheckCircle, AlertCircle } from "lucide-react";
+import { usePersistentClientId } from "./clientIdentity";
+import type { DecisionMemoryEntry } from "../../lib/decisionMemory";
 
 export type DecisionMemoryButtonProps = {
   regime: string;
+  recordDate: string;
   tightness?: number;
+  /** Market risk appetite input score — not the derived boldness budget. */
   riskAppetite?: number;
+  /** Composite budget: 0.7 * riskAppetite + 0.3 * (100 - tightness). */
+  boldnessScore?: number;
   primaryCall?: string;
+  guardrail?: string;
+  reversalTrigger?: string;
   className?: string;
 };
 
+type SaveState = "idle" | "saving" | "saved" | "failed";
+
 export function DecisionMemoryButton({
   regime,
+  recordDate,
   tightness,
   riskAppetite,
+  boldnessScore,
   primaryCall,
+  guardrail,
+  reversalTrigger,
   className = "",
 }: DecisionMemoryButtonProps) {
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const clientId = usePersistentClientId();
 
   const handleSave = async () => {
-    if (saved || saving) return;
-    setSaving(true);
+    if (saveState === "saving" || saveState === "saved") return;
+    if (!clientId || !primaryCall) {
+      setSaveState("failed");
+      setTimeout(() => setSaveState("idle"), 3000);
+      return;
+    }
+
+    setSaveState("saving");
     try {
-      const payload = {
-        id: `mem-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        regime,
-        tightness,
-        riskAppetite,
-        primaryCall,
-      };
-
-      // Persist to localStorage decision memory array
-      const existingStr = localStorage.getItem("whether_decision_memory");
-      const existing = existingStr ? JSON.parse(existingStr) : [];
-      existing.unshift(payload);
-      localStorage.setItem("whether_decision_memory", JSON.stringify(existing.slice(0, 50)));
-
-      // Call API endpoint asynchronously if present
-      fetch("/api/decision-memory", {
+      const response = await fetch("/api/decision-memory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).catch(() => null);
+        body: JSON.stringify({
+          kind: "posture-snapshot",
+          clientId,
+          recordDate,
+          regime,
+          primaryCall,
+          tightness,
+          riskAppetite,
+          boldnessScore,
+          guardrail,
+          reversalTrigger,
+        }),
+      });
 
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      if (!response.ok) {
+        setSaveState("failed");
+        setTimeout(() => setSaveState("idle"), 3000);
+        return;
+      }
+
+      // Mirror the server's entry into the same local cache the planning memory
+      // panel reads, so a saved posture shows up there without a round trip.
+      const { entry } = (await response.json()) as { entry?: DecisionMemoryEntry };
+      if (entry) {
+        try {
+          const entryKey = `whether.decisionMemory:${clientId}`;
+          const existingRaw = window.localStorage.getItem(entryKey);
+          const existing = existingRaw ? (JSON.parse(existingRaw) as DecisionMemoryEntry[]) : [];
+          window.localStorage.setItem(entryKey, JSON.stringify([entry, ...existing].slice(0, 64)));
+        } catch {
+          // A full or unavailable localStorage must not fail the save — the
+          // server already has the entry.
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent("whether-decision-memory-updated"));
+      setSaveState("saved");
+      setTimeout(() => setSaveState("idle"), 3000);
     } catch {
-      // Fallback grace
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } finally {
-      setSaving(false);
+      setSaveState("failed");
+      setTimeout(() => setSaveState("idle"), 3000);
     }
   };
 
@@ -62,19 +96,24 @@ export function DecisionMemoryButton({
     <button
       type="button"
       onClick={handleSave}
-      disabled={saving}
+      disabled={saveState === "saving" || !clientId}
       className={`inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-fluid-nano font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-all active:scale-[0.97] disabled:opacity-50 ${className}`}
       aria-label="Log decision to memory"
     >
-      {saved ? (
+      {saveState === "saved" ? (
         <>
           <CheckCircle size={13} className="text-emerald-400" />
           <span className="text-emerald-300 font-semibold">Logged to Memory</span>
         </>
+      ) : saveState === "failed" ? (
+        <>
+          <AlertCircle size={13} className="text-amber-400" />
+          <span className="text-amber-300 font-semibold">Save failed — retry</span>
+        </>
       ) : (
         <>
           <Bookmark size={13} className="text-sky-400" />
-          <span>{saving ? "Logging..." : "Log to Memory"}</span>
+          <span>{saveState === "saving" ? "Logging..." : "Log to Memory"}</span>
         </>
       )}
     </button>

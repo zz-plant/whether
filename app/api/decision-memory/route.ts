@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import {
   buildDecisionMemoryEntry,
+  buildDecisionMemorySnapshotEntry,
   type DecisionMemoryPayload,
+  type DecisionMemorySnapshotPayload,
   toDecisionMemoryCsv,
 } from "../../../lib/decisionMemory";
 import { getDecisionMemoryRepository } from "../../../lib/storage/decisionMemoryRepository";
@@ -24,6 +26,29 @@ const asDecisionPayload = (value: unknown): DecisionMemoryPayload | null => {
   }
 
   return payload as DecisionMemoryPayload;
+};
+
+/**
+ * The weekly brief logs a standing posture, not a decision-shield verdict, so it
+ * posts a lighter shape than DecisionMemoryPayload.
+ */
+const asSnapshotPayload = (value: unknown): DecisionMemorySnapshotPayload | null => {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const payload = value as Partial<DecisionMemorySnapshotPayload>;
+  if (
+    payload.kind !== "posture-snapshot"
+    || typeof payload.recordDate !== "string"
+    || typeof payload.regime !== "string"
+    || typeof payload.primaryCall !== "string"
+    || payload.primaryCall.trim() === ""
+  ) {
+    return null;
+  }
+
+  return payload as DecisionMemorySnapshotPayload;
 };
 
 export async function GET(request: Request) {
@@ -65,12 +90,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-json", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
 
-  const parsed = asDecisionPayload(payload);
-  if (!parsed) {
+  const snapshot = asSnapshotPayload(payload);
+  const parsed = snapshot ? null : asDecisionPayload(payload);
+  if (!snapshot && !parsed) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-payload", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
 
-  const entry = buildDecisionMemoryEntry(parsed);
+  const entry = snapshot
+    ? buildDecisionMemorySnapshotEntry(snapshot)
+    : buildDecisionMemoryEntry(parsed as DecisionMemoryPayload);
   await repository.append(entry);
   const listed = await repository.list({ limit: 64, clientId: entry.context.clientId });
 

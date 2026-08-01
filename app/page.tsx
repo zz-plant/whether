@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
+import { ActionLink } from "./components/ui/actionLink";
+import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/publishedBriefs";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { DeltaTrustStrip } from "./components/DeltaTrustStrip";
 import { RegimeHistory } from "./components/RegimeHistory";
 import { EvidenceDrawer } from "./components/EvidenceDrawer";
 import { RitualCheck } from "./components/RitualCheck";
 import { ToolsPanel } from "./components/ToolsPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
-import { FlipMeter } from "./components/FlipMeter";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
@@ -21,10 +21,8 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import dynamic from "next/dynamic";
 import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
-import { summarizeSourceHealthCoverage } from "../lib/report/sourceHealth";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import {
-  computeReliabilityScore,
   DIRECTION_ARROW,
   REGIME_DISPLAY,
   buildV2HeroSignalData,
@@ -69,7 +67,27 @@ export default async function Page({
   return (
     <Shell regime={regimeHistory.at(-1)?.regime}>
       <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
+      <CanonicalWeekPermalink />
     </Shell>
+  );
+}
+
+/**
+ * This view changes every week under one URL, so it cannot be cited or indexed as
+ * a dated article. Point at the frozen copy of the week instead.
+ */
+function CanonicalWeekPermalink() {
+  if (!latestPublishedBrief) return null;
+
+  return (
+    <section className="weather-panel flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+      <p className="text-sm text-slate-300">
+        This week is published as a permanent record dated {latestPublishedBrief.recordDateLabel}.
+      </p>
+      <ActionLink href={buildPublishedBriefPath(latestPublishedBrief.slug)} variant="pill">
+        Citable permalink
+      </ActionLink>
+    </section>
   );
 }
 
@@ -111,23 +129,11 @@ function WeeklyTopFoldContract({
   return (
     <section
       data-testid="weekly-top-fold"
-      aria-label="Weekly operating contract"
+      aria-label="Revisit and watch"
       className="weather-card grid gap-4 lg:grid-cols-12"
     >
       <div className="space-y-2 lg:col-span-7">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Weekly Posture</p>
-        </div>
-        <div className="grid gap-2 text-fluid-micro text-white/65 grid-cols-2 xl:grid-cols-4">
-          <span>Posture shift: {weeklySummary.notchShiftLabel}</span>
-          <span>Hiring: {weeklySummary.hiringWindow}</span>
-          <span>Expansion: {weeklySummary.expansionWindow}</span>
-          <span>Fundraising: {weeklySummary.raiseWindow}</span>
-        </div>
-        <p className="text-fluid-micro font-medium text-sky-200/80">{weeklySummary.shorthandLine}</p>
-      </div>
-
-      <div className="space-y-2 lg:col-span-5">
+        <p className="text-fluid-micro text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
         <div className="flex items-center gap-2">
           <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
           <span
@@ -157,6 +163,10 @@ function WeeklyTopFoldContract({
             </p>
           ))}
         </div>
+      </div>
+
+      <div className="space-y-2 lg:col-span-5">
+        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Continuity</p>
         {memoryItems.length ? (
           <p className="text-fluid-micro text-white/50">{memoryItems.join(" → ")}</p>
         ) : null}
@@ -289,17 +299,10 @@ async function PageContent({
     : "hold"
   );
 
-  const reliabilityScore = computeReliabilityScore({
-    confidenceLabel,
-    showOfflineBadge: homepage.reportShell.showOfflineBadge,
-    degradedCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
-  });
-
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
-  const sourceHealthSummary = summarizeSourceHealthCoverage(data.reportData?.sourceHealth);
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
 
   const transition = computeTransitionProbability(regime);
@@ -350,6 +353,7 @@ async function PageContent({
            <DecisionHero
                tightness={tightness}
                tightnessDelta={tightnessDelta}
+               riskAppetite={riskAppetite}
                boldnessScore={weeklyLeadershipSummary.boldnessScore}
                boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
                boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
@@ -365,9 +369,15 @@ async function PageContent({
                trustStatusLabel={homepage.reportShell.trustStatusLabel}
                treasurySource={homepage.reportShell.treasurySource}
                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-               isFallback={homepage.reportShell.showOfflineBadge}
-               signalData={v2HeroSignalData}
-              />
+                isFallback={homepage.reportShell.showOfflineBadge}
+                signalData={v2HeroSignalData}
+                flipConditions={flipConditionLabels}
+                transitionProbability={transition.probability}
+                guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+                  ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+                  : homepage.weeklyDecisionCardModel.decision.guardrail}
+                reversalTrigger={homepage.weeklyDecisionCardModel.decision.reversalTrigger}
+               />
 
             <ThreeWhethersCard
                regime={regime}
@@ -384,15 +394,6 @@ async function PageContent({
                model={homepage.weeklyDecisionCardModel}
                memoryRegimes={macroTrendline}
              />
-
-             <FlipMeter
-                tightness={tightness}
-                tightnessDelta={tightnessDelta}
-                pauseThreshold={pauseThreshold}
-                flipConditions={flipConditionLabels}
-                signalDirection={signalDirection}
-                transitionProbability={transition.probability}
-              />
 
              <CompareStrip
               currentRegime={regime}
@@ -429,14 +430,6 @@ async function PageContent({
         </div>
 
           <div className="space-y-4 lg:col-start-2">
-           <DeltaTrustStrip
-             tightnessDelta={tightnessDelta}
-             riskAppetiteDelta={riskAppetiteDelta}
-             confidenceLabel={confidenceLabel}
-             reliabilityScore={reliabilityScore}
-             sourceHealthSummary={sourceHealthSummary}
-             direction={signalDirection}
-           />
           <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
             <BelowTheFoldHistory
               enrichmentPromise={enrichmentPromise}

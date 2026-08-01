@@ -13,18 +13,24 @@ type DecisionMemoryResponse = {
   count: number;
 };
 
+// Posture snapshots carry no decision triple and no verdict, so those lines are
+// dropped rather than printed as "undefined".
 const buildEntryCopyText = (entry: DecisionMemoryEntry) =>
   [
     "Whether Saved Decisions",
     `Captured: ${formatTimestampUTC(entry.createdAt)}`,
     `Regime: ${entry.regime.label} (${formatDateUTC(entry.context.recordDate)})`,
-    `Decision: ${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`,
-    `Verdict: ${entry.outcome.verdict}`,
+    entry.decision
+      ? `Decision: ${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`
+      : "Decision: Weekly operating posture",
+    entry.outcome.verdict ? `Verdict: ${entry.outcome.verdict}` : null,
     `Summary: ${entry.outcome.summary}`,
-    `Guardrail: ${entry.outcome.guardrail}`,
-    `Reversal trigger: ${entry.outcome.reversalTrigger}`,
+    entry.outcome.guardrail ? `Guardrail: ${entry.outcome.guardrail}` : null,
+    entry.outcome.reversalTrigger ? `Reversal trigger: ${entry.outcome.reversalTrigger}` : null,
     `Sources: ${entry.sources.join(", ") || "None"}`,
-  ].join("\n");
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
 
 export const DecisionMemoryPanel = () => {
   const [entries, setEntries] = useState<DecisionMemoryEntry[]>([]);
@@ -47,14 +53,15 @@ export const DecisionMemoryPanel = () => {
         // Load local storage entries and merge
         const localKey = `whether.decisionMemory:${clientId}`;
         const localRaw = window.localStorage.getItem(localKey);
-        const localEntries = localRaw ? JSON.parse(localRaw) : [];
-        
-        const mergedMap = new Map();
-        localEntries.forEach((entry: any) => mergedMap.set(entry.id, entry));
-        payload.entries.forEach((entry: any) => mergedMap.set(entry.id, entry));
-        
+        const localEntries: DecisionMemoryEntry[] = localRaw ? JSON.parse(localRaw) : [];
+
+        const mergedMap = new Map<string, DecisionMemoryEntry>();
+        localEntries.forEach((entry) => mergedMap.set(entry.id, entry));
+        // Server entries win: they are the authoritative copy of the same id.
+        payload.entries.forEach((entry) => mergedMap.set(entry.id, entry));
+
         const sortedEntries = Array.from(mergedMap.values()).sort(
-          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         
         // Write the merged set back
@@ -120,10 +127,10 @@ export const DecisionMemoryPanel = () => {
       entry.context.clientId,
       entry.context.recordDate,
       entry.regime.label,
-      entry.outcome.verdict,
-      entry.decision.lifecycle,
-      entry.decision.category,
-      entry.decision.action,
+      entry.outcome.verdict ?? "",
+      entry.decision?.lifecycle ?? "",
+      entry.decision?.category ?? "",
+      entry.decision?.action ?? "",
       entry.outcome.summary,
       entry.outcome.guardrail,
       entry.outcome.reversalTrigger,
@@ -204,10 +211,15 @@ export const DecisionMemoryPanel = () => {
                         Captured {formatTimestampUTC(entry.createdAt)}
                       </p>
                       <p className="mt-2 text-sm font-semibold text-slate-100">
-                        {entry.decision.lifecycle} · {entry.decision.category} · {entry.decision.action}
+                        {entry.decision
+                          ? `${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`
+                          : "Weekly operating posture"}
                       </p>
                       <p className="mt-1 text-xs text-sky-200">
-                        {entry.regime.label} regime · verdict: <span className="font-semibold">{entry.outcome.verdict}</span>
+                        {entry.regime.label} regime
+                        {entry.outcome.verdict ? (
+                          <> · verdict: <span className="font-semibold">{entry.outcome.verdict}</span></>
+                        ) : null}
                       </p>
                     </div>
                     <ClipboardActionRow

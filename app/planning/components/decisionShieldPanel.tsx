@@ -21,6 +21,7 @@ import {
   type LifecycleStage,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -265,36 +266,24 @@ export const DecisionShieldPanel = ({
           setMemoryStatus("Failed to save Decision Memory entry.");
           return;
         }
-        
-        try {
-          const entryKey = `whether.decisionMemory:${clientId}`;
-          const currentLocalRaw = window.localStorage.getItem(entryKey);
-          const currentLocal = currentLocalRaw ? JSON.parse(currentLocalRaw) : [];
-          const newEntry = {
-            id: typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`,
-            createdAt: new Date().toISOString(),
-            context: {
-              clientId,
-              recordDate: provenance.recordDateLabel,
-            },
-            decision: { lifecycle, category, action },
-            outcome: {
-              verdict: output.verdict,
-              summary: output.summary,
-              guardrail: output.guardrail,
-              reversalTrigger: output.reversalTrigger,
-            },
-            regime: {
-              label: assessment.regime,
-              scores: assessment.scores,
-              thresholds: assessment.thresholds,
-            },
-            sources: [...new Set(assessment.inputs.map((i) => i.sourceUrl).filter((url): url is string => Boolean(url)))],
-          };
-          const updatedLocal = [newEntry, ...currentLocal].slice(0, 64);
-          window.localStorage.setItem(entryKey, JSON.stringify(updatedLocal));
-        } catch (e) {
-          console.error("Local storage memory save error:", e);
+
+        // Mirror the entry the server actually created. Minting a second id here
+        // would make the same save appear twice once the panel merges by id.
+        const { entry } = (await response.json()) as { entry?: DecisionMemoryEntry };
+        if (entry) {
+          try {
+            const entryKey = `whether.decisionMemory:${clientId}`;
+            const currentLocalRaw = window.localStorage.getItem(entryKey);
+            const currentLocal = currentLocalRaw
+              ? (JSON.parse(currentLocalRaw) as DecisionMemoryEntry[])
+              : [];
+            window.localStorage.setItem(
+              entryKey,
+              JSON.stringify([entry, ...currentLocal].slice(0, 64)),
+            );
+          } catch (e) {
+            console.error("Local storage memory save error:", e);
+          }
         }
 
         window.dispatchEvent(new CustomEvent("whether-decision-memory-updated"));

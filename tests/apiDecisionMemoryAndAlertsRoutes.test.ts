@@ -108,6 +108,124 @@ describe("decision memory and alert routes", () => {
     assert.equal(entries[0]?.context?.clientId, "client-b");
   });
 
+  it("accepts the posture-snapshot payload the weekly brief button sends", async () => {
+    const response = await postDecisionMemoryRoute(
+      new Request("http://localhost/api/decision-memory", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          kind: "posture-snapshot",
+          clientId: "client-hero",
+          recordDate: "2026-02-16",
+          regime: "DEFENSIVE",
+          primaryCall: "Move carefully forward.",
+          tightness: 72,
+          riskAppetite: 52,
+          boldnessScore: 44,
+          guardrail: "tightness crosses 78",
+          reversalTrigger: "tightness drops below 60",
+        }),
+      }),
+    );
+
+    assert.equal(response.status, 200);
+    const body = (await response.json()) as {
+      created?: boolean;
+      entry?: {
+        kind?: string;
+        decision?: unknown;
+        outcome: { verdict?: string; summary: string; guardrail: string; reversalTrigger: string };
+        regime: { label: string; scores: Record<string, number> };
+        context: { clientId: string; recordDate: string };
+      };
+    };
+
+    assert.equal(body.created, true);
+    assert.equal(body.entry?.kind, "posture-snapshot");
+    assert.equal(body.entry?.context.clientId, "client-hero");
+    assert.equal(body.entry?.outcome.summary, "Move carefully forward.");
+    assert.equal(body.entry?.outcome.guardrail, "tightness crosses 78");
+    // A snapshot ran through no verdict engine, so it must not invent a decision or verdict.
+    assert.equal(body.entry?.decision, undefined);
+    assert.equal(body.entry?.outcome.verdict, undefined);
+    // riskAppetite and boldnessScore are distinct metrics and must both survive.
+    assert.equal(body.entry?.regime.scores.riskAppetite, 52);
+    assert.equal(body.entry?.regime.scores.boldnessScore, 44);
+    assert.equal(body.entry?.regime.scores.tightness, 72);
+  });
+
+  it("lists posture snapshots alongside decision entries and exports both to csv", async () => {
+    await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        kind: "posture-snapshot",
+        clientId: "client-mixed",
+        recordDate: "2026-02-16",
+        regime: "DEFENSIVE",
+        primaryCall: "Move carefully forward.",
+      }),
+    }));
+    await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        clientId: "client-mixed",
+        recordDate: "2026-02-16",
+        decision: { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" },
+        outcome: {
+          verdict: "RISKY",
+          summary: "Hiring remains constrained.",
+          guardrail: "Require revenue-backed roles first.",
+          reversalTrigger: "tightness drops below 70",
+        },
+        assessment: {
+          regime: "DEFENSIVE",
+          scores: { tightness: 72, riskAppetite: 52, baseRate: 5.2, curveSlope: 0.2, baseRateUsed: "1M" },
+          thresholds: DEFAULT_THRESHOLDS,
+          inputs: [],
+        },
+      }),
+    }));
+
+    const listed = await getDecisionMemoryRoute(
+      new Request("http://localhost/api/decision-memory?clientId=client-mixed"),
+    );
+    const listedBody = (await listed.json()) as { count: number; entries: Array<{ kind?: string }> };
+    assert.equal(listedBody.count, 2);
+    assert.ok(listedBody.entries.some((entry) => entry.kind === "posture-snapshot"));
+    assert.ok(listedBody.entries.some((entry) => entry.kind === "decision"));
+
+    const csvResponse = await getDecisionMemoryRoute(
+      new Request("http://localhost/api/decision-memory?clientId=client-mixed&format=csv"),
+    );
+    assert.equal(csvResponse.status, 200);
+    const csvBody = await csvResponse.text();
+    assert.match(csvBody, /"kind"/);
+    assert.match(csvBody, /"posture-snapshot"/);
+    // The snapshot row leaves the decision triple and verdict empty rather than fabricating them.
+    assert.match(csvBody, /"posture-snapshot","client-mixed","2026-02-16","DEFENSIVE","","","",""/);
+  });
+
+  it("rejects a posture snapshot missing its primary call", async () => {
+    const response = await postDecisionMemoryRoute(
+      new Request("http://localhost/api/decision-memory", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          kind: "posture-snapshot",
+          recordDate: "2026-02-16",
+          regime: "DEFENSIVE",
+          primaryCall: "   ",
+        }),
+      }),
+    );
+
+    assert.equal(response.status, 400);
+    const body = (await response.json()) as { error?: string };
+    assert.equal(body.error, "invalid-payload");
+  });
+
   it("rejects invalid decision memory payload", async () => {
     const response = await postDecisionMemoryRoute(
       new Request("http://localhost/api/decision-memory", {
