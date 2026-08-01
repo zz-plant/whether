@@ -6,7 +6,6 @@ import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { DeltaTrustStrip } from "./components/DeltaTrustStrip";
-import { ActionCard } from "./components/ActionCard";
 import { RegimeHistory } from "./components/RegimeHistory";
 import { EvidenceDrawer } from "./components/EvidenceDrawer";
 import { RitualCheck } from "./components/RitualCheck";
@@ -15,14 +14,13 @@ import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { FlipMeter } from "./components/FlipMeter";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
-import { ScenarioSimulator } from "./components/ScenarioSimulator";
 import { CompareStrip } from "./components/CompareStrip";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import dynamic from "next/dynamic";
 import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
-import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
+import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
 import { summarizeSourceHealthCoverage } from "../lib/report/sourceHealth";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import {
@@ -32,7 +30,7 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC, formatSignedDelta } from "../lib/formatters";
+import { formatDateUTC } from "../lib/formatters";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 
 const EvidenceTools = dynamic(
@@ -40,6 +38,14 @@ const EvidenceTools = dynamic(
   {
     ssr: false,
     loading: () => <div className="weather-card h-24 animate-pulse" />,
+  },
+);
+
+const ScenarioSimulator = dynamic(
+  () => import("./components/ScenarioSimulator").then((mod) => mod.ScenarioSimulator),
+  {
+    ssr: false,
+    loading: () => <div className="weather-card h-32 animate-pulse" />,
   },
 );
 
@@ -62,21 +68,7 @@ export default async function Page({
 
   return (
     <Shell regime={regimeHistory.at(-1)?.regime}>
-      <Suspense fallback={
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8 animate-pulse">
-          <div className="space-y-6">
-            <div className="weather-card h-40" />
-            <div className="weather-card h-32" />
-            <div className="weather-card h-24" />
-          </div>
-          <div className="space-y-4">
-            <div className="weather-card h-20" />
-            <div className="weather-card h-48" />
-          </div>
-        </div>
-      }>
-        <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
-      </Suspense>
+      <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
     </Shell>
   );
 }
@@ -137,7 +129,7 @@ function WeeklyTopFoldContract({
 
       <div className="space-y-2 lg:col-span-5">
         <div className="flex items-center gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit queue</p>
+          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit
@@ -173,6 +165,83 @@ function WeeklyTopFoldContract({
   );
 }
 
+type RegimeEntry = { record_date: string; regime: string };
+
+type BelowTheFoldEvidenceProps = {
+  enrichmentPromise: Promise<unknown>;
+  highlight: string | undefined;
+  tightness: number;
+  boldnessScore: number;
+  pauseThreshold: number;
+  currentRiskAppetite: number;
+  currentRegime: string;
+  regimes: RegimeEntry[];
+  companyStage: string | undefined;
+  tightnessDelta: number;
+  riskAppetiteDelta: number;
+  recordDate: string;
+  recentRecordDates: string[];
+  activeCadence: AgentCadence;
+  cadenceData: Awaited<ReturnType<typeof buildAgentInterfaceResponse>> | null;
+};
+
+async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
+  await props.enrichmentPromise.catch(() => undefined);
+
+  return (
+    <>
+      <EvidenceDrawer highlight={props.highlight}>
+        <ToolsPanel>
+          <ScenarioSimulator
+            baseTightness={props.tightness}
+            baseBoldness={props.boldnessScore}
+            pauseThreshold={props.pauseThreshold}
+          />
+          <EvidenceTools
+            currentTightness={props.tightness}
+            currentRiskAppetite={props.currentRiskAppetite}
+            currentRegime={props.currentRegime}
+            regimes={props.regimes}
+            companyStage={props.companyStage}
+            tightnessDelta={props.tightnessDelta}
+            riskAppetiteDelta={props.riskAppetiteDelta}
+          />
+        </ToolsPanel>
+      </EvidenceDrawer>
+
+      <RitualCheck
+        recordDate={props.recordDate}
+        recentRecordDates={props.recentRecordDates}
+      />
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-4 mt-4">
+        <Link
+          href="/planning"
+          className="inline-flex items-center gap-2 text-fluid-micro text-sky-300/70 hover:text-sky-300 transition-colors no-underline"
+        >
+          Build this week&apos;s plan →
+        </Link>
+        <SubscribeForm />
+      </div>
+
+      {props.activeCadence !== "weekly" && props.cadenceData ? (
+        <CadenceCallCard cadence={props.activeCadence} data={props.cadenceData} />
+      ) : null}
+    </>
+  );
+}
+
+async function BelowTheFoldHistory({
+  enrichmentPromise,
+  regimes,
+}: {
+  enrichmentPromise: Promise<unknown>;
+  regimes: RegimeEntry[];
+}) {
+  await enrichmentPromise.catch(() => undefined);
+  return <RegimeHistory regimes={regimes} />;
+}
+
 async function PageContent({
   searchParams,
   regimeHistory,
@@ -194,12 +263,10 @@ async function PageContent({
     ]);
   } catch {
     return (
-      <Shell regime="EXPANSION">
-        <div className="text-center py-16 space-y-3">
-          <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
-          <p className="text-white/50 text-fluid-micro">Data may be temporarily unavailable. Please try again shortly.</p>
-        </div>
-      </Shell>
+      <div className="text-center py-16 space-y-3">
+        <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
+        <p className="text-white/50 text-fluid-micro">Data may be temporarily unavailable. Please try again shortly.</p>
+      </div>
     );
   }
 
@@ -244,16 +311,16 @@ async function PageContent({
   const transition = computeTransitionProbability(regime);
   const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
 
-  // guardrailThreshold is string | number depending on the source row; the meter and the
-  // simulator both need a plain number, so coerce once and fall back to the default.
   const guardrailThresholdRaw = homepage.weeklyDecisionCardModel.decision.guardrailThreshold;
   const parsedGuardrailThreshold = typeof guardrailThresholdRaw === "number"
     ? guardrailThresholdRaw
     : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
   const pauseThreshold = Number.isFinite(parsedGuardrailThreshold) ? parsedGuardrailThreshold : 70;
 
+  const enrichmentPromise = homepage.workspaceModelPromise ?? Promise.resolve();
+
   return (
-    <Shell regime={regime}>
+    <>
       <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
       <FreshnessDot
         label={homepage.reportShell.fetchedAtLabel}
@@ -341,46 +408,34 @@ async function PageContent({
               autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
             />
           </SwipeableWeek>
- 
-            <EvidenceDrawer highlight={toolHighlight}>
-              <ToolsPanel>
-                <ScenarioSimulator
-                  baseTightness={tightness}
-                  baseBoldness={weeklyLeadershipSummary.boldnessScore}
-                  pauseThreshold={pauseThreshold}
-                />
-                <EvidenceTools
-                  currentTightness={tightness}
-                  currentRiskAppetite={riskAppetite}
-                  currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
-                  regimes={macroTrendline}
-                  companyStage={operatorContext.companyStage ?? undefined}
-                  tightnessDelta={tightnessDelta}
-                  riskAppetiteDelta={riskAppetiteDelta}
-                />
-              </ToolsPanel>
-            </EvidenceDrawer>
- 
-           <RitualCheck
-             recordDate={homepage.reportShell.recordDateLabel}
-             recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-           />
- 
-           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-4 mt-4">
-              <Link
-                href="/planning"
-                className="inline-flex items-center gap-2 text-fluid-micro text-sky-300/70 hover:text-sky-300 transition-colors no-underline"
-              >
-                Build this week&apos;s plan →
-              </Link>
-              <SubscribeForm />
-            </div>
 
-            {activeCadence !== "weekly" && cadenceData ? (
-              <CadenceCallCard cadence={activeCadence} data={cadenceData} />
-             ) : null}
-          </div>
-  
+          <Suspense fallback={
+            <div className="space-y-6">
+              <div className="weather-card h-20 animate-pulse" />
+              <div className="weather-card h-32 animate-pulse" />
+              <div className="weather-card h-12 animate-pulse" />
+            </div>
+          }>
+            <BelowTheFoldEvidence
+              enrichmentPromise={enrichmentPromise}
+              highlight={toolHighlight}
+              tightness={tightness}
+              boldnessScore={weeklyLeadershipSummary.boldnessScore}
+              pauseThreshold={pauseThreshold}
+              currentRiskAppetite={riskAppetite}
+              currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+              regimes={macroTrendline}
+              companyStage={operatorContext.companyStage ?? undefined}
+              tightnessDelta={tightnessDelta}
+              riskAppetiteDelta={riskAppetiteDelta}
+              recordDate={homepage.reportShell.recordDateLabel}
+              recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
+              activeCadence={activeCadence}
+              cadenceData={cadenceData}
+            />
+          </Suspense>
+        </div>
+
           <div className="space-y-4 lg:col-start-2">
            <DeltaTrustStrip
              tightnessDelta={tightnessDelta}
@@ -390,45 +445,50 @@ async function PageContent({
              sourceHealthSummary={sourceHealthSummary}
              direction={signalDirection}
            />
-            <RegimeHistory regimes={macroTrendline} />
+          <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
+            <BelowTheFoldHistory
+              enrichmentPromise={enrichmentPromise}
+              regimes={macroTrendline}
+            />
+          </Suspense>
          </div>
        </div>
- 
-       <script
-         type="application/ld+json"
-         dangerouslySetInnerHTML={{
-           __html: JSON.stringify({
-             "@context": "https://schema.org",
-             "@type": ["Article", "Report"],
-             "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-             "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-             "about": "US Macro Operating Posture for Startup Leaders",
-             "datePublished": homepage.reportShell.recordDateLabel,
-             "dateModified": homepage.reportShell.fetchedAtLabel,
-             "result": {
-               "posture": postureLabel,
-               "regime": publicRegimeLabel,
-               "confidence": confidenceLabel,
-               "provenance": {
-                 "source": homepage.reportShell.treasurySource ?? "FRED",
-                 "dataDate": homepage.reportShell.recordDateLabel,
-                 "refreshedAt": homepage.reportShell.fetchedAtLabel,
-                 "confidence": confidenceLabel,
-               },
-             },
-         }),
-           }}
-         />
- 
-       <StickyCallStrip
-         call={primaryCall}
-         arrow={DIRECTION_ARROW[signalDirection]}
-         boldnessScore={weeklyLeadershipSummary.boldnessScore}
-         boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-         guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-           ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-           : undefined}
-       />
-     </Shell>
-   );
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": ["Article", "Report"],
+              "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+              "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+              "about": "US Macro Operating Posture for Startup Leaders",
+              "datePublished": homepage.reportShell.recordDateLabel,
+              "dateModified": homepage.reportShell.fetchedAtLabel,
+              "result": {
+                "posture": postureLabel,
+                "regime": publicRegimeLabel,
+                "confidence": confidenceLabel,
+                "provenance": {
+                  "source": homepage.reportShell.treasurySource ?? "FRED",
+                  "dataDate": homepage.reportShell.recordDateLabel,
+                  "refreshedAt": homepage.reportShell.fetchedAtLabel,
+                  "confidence": confidenceLabel,
+                },
+              },
+          }),
+            }}
+          />
+
+        <StickyCallStrip
+          call={primaryCall}
+          arrow={DIRECTION_ARROW[signalDirection]}
+          boldnessScore={weeklyLeadershipSummary.boldnessScore}
+          boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+          guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
+            ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
+            : undefined}
+        />
+    </>
+  );
 }

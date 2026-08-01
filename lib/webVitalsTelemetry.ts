@@ -1,7 +1,6 @@
 export type WebVitalMetricName =
   | "CLS"
   | "FCP"
-  | "FID"
   | "INP"
   | "LCP"
   | "TTFB";
@@ -24,7 +23,6 @@ const isRating = (value: unknown): value is WebVitalMetric["rating"] =>
 const isName = (value: unknown): value is WebVitalMetricName =>
   value === "CLS" ||
   value === "FCP" ||
-  value === "FID" ||
   value === "INP" ||
   value === "LCP" ||
   value === "TTFB";

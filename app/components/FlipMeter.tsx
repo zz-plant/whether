@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertTriangle, ShieldCheck, Gauge } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 

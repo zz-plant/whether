@@ -120,7 +120,7 @@ export async function GET(request: Request) {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           "X-Whether-Embed-Version": "1",
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
+          "Cache-Control": "public, max-age=900, s-maxage=900, stale-while-revalidate=1800",
         },
       });
     }

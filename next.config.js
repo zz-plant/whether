@@ -99,6 +99,34 @@ const homepageCacheHeaders = [
   },
 ];
 
+const shareCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, s-maxage=300, stale-while-revalidate=600",
+  },
+];
+
+const trustCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, s-maxage=900, stale-while-revalidate=1800",
+  },
+];
+
+const evidenceCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, s-maxage=900, stale-while-revalidate=1800",
+  },
+];
+
+const stateCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, s-maxage=3600, stale-while-revalidate=3600",
+  },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -111,6 +139,22 @@ const nextConfig = {
       {
         source: "/",
         headers: homepageCacheHeaders,
+      },
+      {
+        source: "/share",
+        headers: shareCacheHeaders,
+      },
+      {
+        source: "/trust",
+        headers: trustCacheHeaders,
+      },
+      {
+        source: "/evidence",
+        headers: evidenceCacheHeaders,
+      },
+      {
+        source: "/state",
+        headers: stateCacheHeaders,
       },
     ];
   },

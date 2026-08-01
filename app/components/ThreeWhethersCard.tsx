@@ -1,5 +1,3 @@
-"use client";
-
 import { Users, DollarSign, Lock, ArrowUpRight, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 

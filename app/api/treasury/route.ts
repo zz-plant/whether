@@ -3,7 +3,6 @@ import { fetchTreasuryData } from "../../../lib/treasury/treasuryClient";
 import { snapshotData } from "../../../lib/snapshot";
 
 export const runtime = "edge";
-export const revalidate = 86400;
 export const dynamic = "force-dynamic";
 
 export async function GET() {

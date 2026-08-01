@@ -4,7 +4,6 @@ import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
-import { YieldCurvePlot } from "./YieldCurvePlot";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 
 type Props = {
