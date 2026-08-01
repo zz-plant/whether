@@ -116,6 +116,19 @@ export default {
 
     installBindings(env);
 
-    return handler.fetch(request);
+    const response = await handler.fetch(request);
+
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader && /whether-(company-stage|rate-sensitivity|ticker)=/.test(cookieHeader)) {
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "private, no-store");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+
+    return response;
   },
 };

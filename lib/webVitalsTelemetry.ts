@@ -38,13 +38,17 @@ export const isWebVitalMetric = (input: unknown): input is WebVitalMetric => {
     isName(payload.name) &&
     typeof payload.value === "number" &&
     Number.isFinite(payload.value) &&
+    payload.value >= 0 &&
+    payload.value <= 60_000 &&
     isRating(payload.rating) &&
     typeof payload.id === "string" &&
     payload.id.length > 0 &&
     typeof payload.delta === "number" &&
     Number.isFinite(payload.delta) &&
+    Math.abs(payload.delta) <= 60_000 &&
     typeof payload.path === "string" &&
     payload.path.length > 0 &&
+    payload.path.length <= 2048 &&
     typeof payload.navigationType === "string" &&
     payload.navigationType.length > 0
   );
