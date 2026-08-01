@@ -73,7 +73,7 @@
   display: inline-flex;
   min-height: 2rem;
   align-items: center;
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-default);
   background: rgba(20, 23, 28, 0.82);
   padding: 0.35rem 0.75rem;
@@ -102,7 +102,7 @@
   min-width: 1.55rem;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-default);
   background: var(--bg-surface-muted);
   font-size: 0.64rem;
@@ -138,7 +138,7 @@
 }
 
 .weather-ritual-card {
-  border-radius: 1.25rem;
+  border-radius: var(--radius-lg);
   background: var(--bg-surface-muted);
   box-shadow:
     0 8px 16px -12px var(--shadow-light);
@@ -155,7 +155,7 @@
 }
 
 .weather-transmission-segment {
-  border-radius: 1rem;
+  border-radius: var(--radius-md);
   background: rgba(14, 14, 14, 0.25);
 }
 
@@ -168,7 +168,7 @@
 
 .weather-trust-lane {
   border: 1px solid var(--border-faint);
-  border-radius: 1rem;
+  border-radius: var(--radius-md);
   background: var(--bg-surface-muted);
 }
 
@@ -197,7 +197,7 @@
 }
 
 .weather-data-mode {
-  @apply inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.14em];
+  @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.14em];
 }
 
 .weather-data-mode-dynamic {
@@ -254,7 +254,7 @@
 
 /* Chip base — normalizes sizing across all chip-like elements */
 :where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-brief-meta-chip, .weather-nav-card-index, .weather-data-mode) {
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -325,7 +325,7 @@ button .weather-chip:active,
 }
 
 .weather-decision-cell {
-  border-radius: 0.55rem;
+  border-radius: var(--radius-sm);
   padding: 0.6rem 0.7rem;
   font-variant-numeric: tabular-nums;
 }

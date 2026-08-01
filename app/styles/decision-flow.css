@@ -151,7 +151,7 @@ summary:focus-visible {
 }
 
 :where(details) {
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
 }
 
 :where(summary) {
@@ -168,7 +168,7 @@ summary:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  border-radius: 0.95rem;
+  border-radius: var(--radius-md);
   text-decoration: none;
 }
 

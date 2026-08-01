@@ -20,7 +20,7 @@ import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import dynamic from "next/dynamic";
 import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
-import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
+import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
 import { summarizeSourceHealthCoverage } from "../lib/report/sourceHealth";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import {
@@ -131,7 +131,7 @@ function WeeklyTopFoldContract({
         <div className="flex items-center gap-2">
           <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
           <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
+            className={`inline-flex items-center rounded-sm px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit
                 ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
                 : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
@@ -181,8 +181,6 @@ type BelowTheFoldEvidenceProps = {
   riskAppetiteDelta: number;
   recordDate: string;
   recentRecordDates: string[];
-  activeCadence: AgentCadence;
-  cadenceData: Awaited<ReturnType<typeof buildAgentInterfaceResponse>> | null;
 };
 
 async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
@@ -223,10 +221,6 @@ async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         </Link>
         <SubscribeForm />
       </div>
-
-      {props.activeCadence !== "weekly" && props.cadenceData ? (
-        <CadenceCallCard cadence={props.activeCadence} data={props.cadenceData} />
-      ) : null}
     </>
   );
 }
@@ -430,8 +424,6 @@ async function PageContent({
               riskAppetiteDelta={riskAppetiteDelta}
               recordDate={homepage.reportShell.recordDateLabel}
               recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-              activeCadence={activeCadence}
-              cadenceData={cadenceData}
             />
           </Suspense>
         </div>

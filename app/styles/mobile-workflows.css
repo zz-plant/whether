@@ -85,23 +85,23 @@ body::-webkit-scrollbar-thumb:hover,
 
 .cadence-progress {
   accent-color: rgb(56 189 248);
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .cadence-progress::-webkit-progress-bar {
   background: color-mix(in oklab, rgb(15 23 42) 82%, rgb(51 65 85));
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
 }
 
 .cadence-progress::-webkit-progress-value {
   background: linear-gradient(90deg, rgb(14 165 233), rgb(16 185 129));
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
 }
 
 .cadence-progress::-moz-progress-bar {
   background: linear-gradient(90deg, rgb(14 165 233), rgb(16 185 129));
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
 }
 
 .cadence-step-index {

@@ -167,7 +167,7 @@ export default function HistoryPage() {
             <div className="space-y-1">
               <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Selected period</p>
               <p className="text-sm text-slate-100">{selectedMonth}/{selectedYear}</p>
-              <span className={`inline-block rounded-full px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
+              <span className={`inline-block rounded-sm px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
                 regimeForPeriod === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
                 regimeForPeriod === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
                 regimeForPeriod === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :
@@ -219,7 +219,7 @@ export default function HistoryPage() {
                     <td className="py-2.5 pr-4 text-slate-400 whitespace-nowrap">{record.recordDate}</td>
                     <td className="py-2.5 pr-4 text-slate-200">{record.action}</td>
                     <td className="py-2.5 pr-4">
-                      <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-fluid-micro ${
+                      <span className={`rounded-sm px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-fluid-micro ${
                         record.regime === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
                         record.regime === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
                         record.regime === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :

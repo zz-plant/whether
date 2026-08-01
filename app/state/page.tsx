@@ -50,7 +50,7 @@ function ErrorView() {
         </p>
         <Link
           href="/"
-          className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
+          className="inline-block rounded-sm border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
         >
           View the weekly brief →
         </Link>
@@ -106,7 +106,7 @@ function MarketStateView({ state }: { state: MarketState }) {
         <div className="pt-4">
           <Link
             href="/"
-            className="inline-block rounded-full border border-sky-500/30 bg-sky-500/10 px-6 py-3 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
+            className="inline-block rounded-sm border border-sky-500/30 bg-sky-500/10 px-6 py-3 font-semibold text-sky-200 hover:bg-sky-500/20 transition-colors no-underline"
           >
             Get the full weekly brief →
           </Link>

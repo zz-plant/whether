@@ -71,7 +71,7 @@ export default function MockupsIndexPage() {
                   {mockup.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex min-h-[36px] items-center rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300"
+                      className="inline-flex min-h-[36px] items-center rounded-sm border border-slate-700/80 bg-slate-950/70 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300"
                     >
                       {tag}
                     </span>

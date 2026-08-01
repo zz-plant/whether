@@ -88,7 +88,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: 2.25rem;
+  border-radius: var(--radius-lg);
   background:
     linear-gradient(180deg, rgba(7, 18, 38, 0.24) 0%, rgba(8, 27, 47, 0.08) 100%);
   pointer-events: none;
@@ -125,7 +125,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: 2.25rem;
+  border-radius: var(--radius-lg);
   background:
     linear-gradient(180deg, rgba(7, 18, 38, 0.40) 0%, rgba(8, 27, 47, 0.12) 100%);
   pointer-events: none;
@@ -193,7 +193,7 @@
 
 .weather-legal-content :where(section:not(:first-of-type)) {
   border: 1px solid var(--border-default);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-lg);
   padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
   background: rgba(34, 34, 34, 0.55);
   box-shadow:
@@ -245,7 +245,7 @@
   display: inline-flex;
   min-height: 2.5rem;
   align-items: center;
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
   background: rgba(30, 30, 30, 0.60);
   padding: 0.45rem 0.85rem;
@@ -287,7 +287,7 @@
 
 .weather-hub-stat {
   border: 1px solid var(--border-default);
-  border-radius: 1.15rem;
+  border-radius: var(--radius-md);
   padding: 0.95rem 1rem;
   background: rgba(15, 23, 42, 0.46);
   font-variant-numeric: tabular-nums;
@@ -322,7 +322,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 2rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   padding-inline: 0.7rem;
   background: rgba(15, 23, 42, 0.5);
 }
@@ -493,7 +493,7 @@
   align-items: center;
   justify-content: center;
   width: fit-content;
-  border-radius: 9999px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.12);
   padding: 0.2rem 0.6rem;
   font-size: 0.62rem;
