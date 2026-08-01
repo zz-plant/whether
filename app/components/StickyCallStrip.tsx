@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Copy, CopyCheck, ImageIcon } from "lucide-react";
 import { useClipboardCopy } from "./useClipboardCopy";
-import { ShareBriefButton } from "./shareBriefButton";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 
 type Props = {
@@ -34,10 +33,6 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
     let blockingControlInView = false;
 
     const updateStripVisibility = () => {
-      if (window.innerWidth >= 1024) {
-        setShowStrip(false);
-        return;
-      }
       const revealOffset = Math.min(640, window.innerHeight * 0.72);
       setShowStrip(window.scrollY > revealOffset && !blockingControlInView);
     };
@@ -73,7 +68,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
 
   const handleCopy = async () => {
     const text = [
-      `Whether · Boldness Budget ${boldnessScore}/100 (${deltaLabel})`,
+      `Whether · Boldness budget ${boldnessScore}/100 (${deltaLabel})`,
       `${arrow} ${call}`,
       guardrail ? `Watch: ${guardrail}` : null,
       "whether.work",
@@ -90,9 +85,9 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
       {showStrip ? (
         <div
           data-testid="sticky-call-strip"
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 lg:hidden bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
-          <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[var(--bg-raised)]/94 px-2 py-1.5 shadow-[0_-4px_16px_rgba(0,0,0,0.26)] backdrop-blur">
+          <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[var(--bg-raised)]/94 px-2 py-1.5 shadow-[0_-4px_16px_rgba(0,0,0,0.26)] backdrop-blur lg:max-w-md lg:px-3 lg:shadow-[0_8px_28px_rgba(0,0,0,0.35)]">
             <span className="flex min-w-0 flex-1 items-center gap-1.5 text-fluid-xs font-semibold leading-tight text-white/85">
               <span className={`inline-flex size-7 items-center justify-center rounded-sm text-sm font-bold ${
                 arrow === "↑" ? "bg-rose-500/20 text-rose-300" : arrow === "↓" ? "bg-emerald-500/20 text-emerald-300" : "bg-sky-500/20 text-sky-300"
@@ -109,10 +104,6 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
             >
               <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
-            <ShareBriefButton
-              text={[`Whether · Boldness Budget ${boldnessScore}/100 (${deltaLabel})`, `${arrow} ${call}`, guardrail ? `Watch: ${guardrail}` : null, "whether.work"].filter(Boolean).join(" — ")}
-              className="flex-shrink-0"
-            />
             <button
               type="button"
               onClick={handleCopy}

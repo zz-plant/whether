@@ -4,11 +4,16 @@ import type { ReportDynamics } from "./reportData";
 export type ReportSignalDirection = "tightening" | "easing" | "unchanged";
 export type DecisionRiskLabel = "Low" | "Controlled" | "High";
 
+/**
+ * Canonical operator-facing signal names. These match the glossary in
+ * `lib/report/reportCopy.ts` — do not introduce a fourth spelling of the same
+ * four signals.
+ */
 export const deltaLabelBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  tightness: "Capital tightness",
-  riskAppetite: "Risk appetite",
-  baseRate: "Base rate",
-  curveSlope: "Yield curve slope",
+  tightness: "Cash availability",
+  riskAppetite: "Market risk appetite",
+  baseRate: "Fed interest rate",
+  curveSlope: "Recession warning gauge",
 };
 
 export const signalOrder: Array<ReportDynamics["changedSignals"][number]["key"]> = [

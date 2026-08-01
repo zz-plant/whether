@@ -160,21 +160,18 @@ export const buildInterpretationLayer = ({
       sectorKey,
     );
 
-    const baseAction = homeBriefModel.decisionShiftSummary;
-    let sectorAction = baseAction;
-    if (adjusted.postureVariant !== "neutral") {
-      const directionLabel = adjusted.actionBias === "loosen" ? "easing/growth" : "tightening/caution";
-      sectorAction = `${adjusted.adjustedPostureLabel} variant: Shift operating pace to bias ${directionLabel}. ${baseAction}`;
-    } else {
-      sectorAction = `${adjusted.adjustedPostureLabel}: ${baseAction}`;
-    }
+    const paceCopy =
+      adjusted.actionBias === "loosen"
+        ? "Run this sector a step ahead of the base call."
+        : adjusted.actionBias === "tighten"
+          ? "Run this sector a step behind the base call."
+          : "Run this sector at the base call.";
+    const sectorAction = `${adjusted.adjustedPostureLabel}. ${paceCopy}`;
 
     return {
       view,
       label: "Sector view",
-      summary: `Sector posture adjusted for ${adjusted.adjustedPostureLabel}: ${
-        adjusted.actionBias === "hold" ? "Hold baseline calls." : `Bias ${adjusted.actionBias}.`
-      }`,
+      summary: `This sector reads as ${adjusted.adjustedPostureLabel}. ${paceCopy}`,
       bullets: formatBullets([
         boundedLine("Action", sectorAction),
         boundedLine("Trigger", homeBriefModel.guardrail),
@@ -230,23 +227,23 @@ export const buildInterpretationLayer = ({
 
     const isTighteningRegime = assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE";
     const actionPhrase = isTighteningRegime
-      ? `Runway risk ${plan.runwayRisk.level.toUpperCase()}: Tighten burn immediately to match the ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth}m window.`
-      : `Runway risk ${plan.runwayRisk.level.toUpperCase()}: Sustain growth investments within the ${plan.burnAdjustment.ceilingPercent}% ceiling limit.`;
+      ? `Runway risk is ${plan.runwayRisk.level}, so cut burn now to reach the ${plan.raiseTimingRecommendation.startMonth}–${plan.raiseTimingRecommendation.endMonth} month raise window.`
+      : `Runway risk is ${plan.runwayRisk.level}, so keep funding growth up to the ${plan.burnAdjustment.ceilingPercent}% burn ceiling.`;
 
     return {
       view,
       label: "Financial view",
       summary:
-        "Translate this week into bounded runway decisions: pace now, raise window, and burn range.",
+        "This week's call, translated into runway: how fast to spend, when to raise, and how far burn can move.",
       bullets: formatBullets([
         boundedLine("Action", actionPhrase),
         boundedLine(
           "Trigger",
-          `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
+          `Open the raise between month ${plan.raiseTimingRecommendation.startMonth} and ${plan.raiseTimingRecommendation.endMonth}; safe runway is ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months out.`,
         ),
         boundedLine(
           "Reverse",
-          `Use burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%) to move faster or slower.`,
+          `Move burn by ${plan.burnAdjustment.recommendedDeltaPercent}%, anywhere between ${plan.burnAdjustment.floorPercent}% and ${plan.burnAdjustment.ceilingPercent}%.`,
         ),
       ]),
       financialAction: {
@@ -275,27 +272,27 @@ export const buildInterpretationLayer = ({
     const thresholds = assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 };
     const tightnessGap = Math.abs(assessment.scores.tightness - thresholds.tightnessRegime);
     const riskGap = Math.abs(assessment.scores.riskAppetite - thresholds.riskAppetiteRegime);
-    const closestDimension = tightnessGap <= riskGap ? "Tightness" : "Risk Appetite";
+    const closestDimension = tightnessGap <= riskGap ? "Cash availability" : "Market risk appetite";
     const closestScore = tightnessGap <= riskGap ? assessment.scores.tightness : assessment.scores.riskAppetite;
     const closestThreshold = tightnessGap <= riskGap ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
 
     let dynamicMomentum = momentumCopy[forecast.boundaryPressure.momentum];
     if (forecast.boundaryPressure.momentum === "toward-threshold") {
-      dynamicMomentum = `Momentum is accelerating toward the ${closestDimension} boundary (now ${closestScore.toFixed(1)} vs gate ${closestThreshold.toFixed(1)}).`;
+      dynamicMomentum = `${closestDimension} is closing on its boundary — ${closestScore.toFixed(1)} today against a gate of ${closestThreshold.toFixed(1)}.`;
     } else if (forecast.boundaryPressure.momentum === "away-from-threshold") {
-      dynamicMomentum = `Momentum is widening buffer from ${closestDimension} boundary (now ${closestScore.toFixed(1)} vs gate ${closestThreshold.toFixed(1)}).`;
+      dynamicMomentum = `${closestDimension} is pulling away from its boundary — ${closestScore.toFixed(1)} today against a gate of ${closestThreshold.toFixed(1)}.`;
     }
 
     return {
       view,
       label: "Forecast view",
       summary:
-        "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
+        "How likely this call is to flip if the current momentum holds.",
       bullets: formatBullets([
-        boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
+        boundedLine("Action", `Operate for ${topRegime[0]} while the current posture holds — it carries ${topRegime[1]}% of the next-90-day weight.`),
         boundedLine(
           "Trigger",
-          `${forecast.boundaryPressure.distance} points to ${closestDimension} boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toUpperCase()}.`,
+          `${forecast.boundaryPressure.distance} points separate this call from its ${closestDimension.toLowerCase()} boundary, at ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()} crossing risk.`,
         ),
         boundedLine("Reverse", dynamicMomentum),
       ]),

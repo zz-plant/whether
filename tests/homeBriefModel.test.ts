@@ -80,7 +80,7 @@ describe("buildHomeBriefModel", () => {
     assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
-    assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
+    assert.match(model.whyThisCall[0].detail, /nearest trigger is .* points away/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
     assert.equal(typeof model.weeklyMovement.score, "number");
@@ -92,7 +92,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
-    assert.equal(model.regimeSignalIndicators[0]?.label, "Credit conditions");
+    assert.equal(model.regimeSignalIndicators[0]?.label, "Cash availability");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
@@ -151,7 +151,7 @@ describe("buildHomeBriefModel", () => {
     assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
-    assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
+    assert.match(model.whyThisCall[0].detail, /nearest trigger is .* points away/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(model.weeklyMovement.direction, "stable");
     assert.equal(model.weeklyMovement.score, 0);
@@ -177,7 +177,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     const momentumReason = model.whyThisCall.find((reason) => reason.key === "momentum" || reason.label === "Momentum" || reason.label === "What moved this week")?.detail ?? "";
-    assert.match(momentumReason, /Investor sentiment improving this week; improving overall\./);
+    assert.match(momentumReason, /Market risk appetite improved, and the signal set is improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 
@@ -200,7 +200,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: Risk appetite eased \(3\.2\)\.$/);
+    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: market risk appetite strengthened 3\.2 points\.$/);
 
     const worseningRiskAppetite = buildHomeBriefModel({
       fetchedAtLabel: "Updated 2h ago",
@@ -218,7 +218,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: Risk appetite tightened \(-2\.4\)\.$/);
+    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: market risk appetite weakened 2\.4 points\.$/);
   });
 
   it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
@@ -237,7 +237,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.reversalTrigger, /risk appetite falls to or below 50\.0 \(now 56\.0\)/i);
+    assert.match(model.reversalTrigger, /market risk appetite falls to or below 50\.0, from 56\.0 today/i);
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");

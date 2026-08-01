@@ -94,32 +94,31 @@ export const buildSignalConfidenceReason = ({
   nearestThresholdGap: number;
   changedSignals: Array<{ delta: number }>;
 }) => {
-  const boundaryDescriptor =
+  const boundaryClause =
     nearestThresholdGap <= 5
-      ? "regime boundary proximity"
+      ? "This call is sitting on a regime boundary"
       : nearestThresholdGap <= 12
-        ? "moderate boundary distance"
-        : "wide boundary distance";
+        ? "This call has modest room before the nearest boundary"
+        : "This call is well clear of the nearest boundary";
 
   const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
   const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
   const directionalSplit = hasPositiveMoves && hasNegativeMoves;
-  const volatilityDescriptor =
+  const signalClause =
     changedSignals.length === 0
-      ? "stable signal readings"
+      ? "and this week's readings barely moved"
       : directionalSplit || changedSignals.length >= 3
-        ? "volatile macro signals"
-        : "broad agreement across signals";
+        ? "and this week's readings pulled against each other"
+        : "and this week's readings moved together";
 
-  if (confidenceLabel === "LOW") {
-    return `Reason: ${boundaryDescriptor} + ${volatilityDescriptor}`;
-  }
+  const verdict =
+    confidenceLabel === "LOW"
+      ? "Treat it as provisional until another read confirms it."
+      : confidenceLabel === "MED"
+        ? "Plan against it, but hold anything irreversible."
+        : "It is stable enough for this week's approvals.";
 
-  if (confidenceLabel === "MED") {
-    return `Reason: ${boundaryDescriptor} with ${volatilityDescriptor}`;
-  }
-
-  return `Reason: ${volatilityDescriptor}; ${boundaryDescriptor}`;
+  return `${boundaryClause} ${signalClause}. ${verdict}`;
 };
 
 export const buildOperatingStanceLine = ({
@@ -160,6 +159,13 @@ export const buildOperatingStanceLine = ({
   return "Press proven growth lanes and add capacity where demand is already converting.";
 };
 
+const trendMemoLines: Record<string, string> = {
+  Stable: "No material signal shift this week.",
+  Improving: "Conditions loosened this week.",
+  Deteriorating: "Conditions tightened this week.",
+  Mixed: "Signals split this week — some loosened, some tightened.",
+};
+
 export const buildWeeklyMemoLines = ({
   operatingStanceLine,
   trendLabel,
@@ -169,13 +175,11 @@ export const buildWeeklyMemoLines = ({
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
 }) => [
-  trendLabel === "Stable"
-    ? "No material signal shift this week."
-    : `Market conditions are ${trendLabel.toLowerCase()} this week.`,
+  trendMemoLines[trendLabel] ?? trendMemoLines.Stable,
   operatingStanceLine,
   transitionWatch === "ON"
-    ? "Flip watch is on: keep hiring, roadmap, and spend decisions reversible until the next live read."
-    : "Flip watch is off: keep this week's approvals on the current track.",
+    ? "Flip watch is on. Keep hiring, roadmap, and spend decisions reversible until the next live read."
+    : "Flip watch is off. This week's approvals can stay on the current track.",
 ];
 
 export const buildWhyItMattersLine = ({

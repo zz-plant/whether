@@ -8,6 +8,7 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/seo";
+import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,
@@ -177,15 +178,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     headline: page.h1,
     description: page.description,
     keywords: [page.keyword, "board governance", "capital discipline"],
-    author: {
-      "@type": "Organization",
-      name: organizationName,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: organizationName,
-      url: buildCanonicalUrl("/"),
-    },
+    author: buildAuthorSchema(),
+    publisher: buildPublisherSchema(organizationName),
     url: canonicalUrl,
     mainEntityOfPage: canonicalUrl,
     isPartOf: buildCanonicalUrl(page.canonicalPath),

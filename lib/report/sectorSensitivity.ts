@@ -132,7 +132,7 @@ const buildReversalCondition = (
   actionBias: SectorAdjustedPosture["actionBias"],
 ) => {
   if (actionBias === "hold") {
-    return "Keep base operating cadence unless either score crosses its regime threshold by 3+ points.";
+    return "Hold the base cadence unless either score clears its regime threshold by 3 points or more.";
   }
 
   const nearestTightnessGap = Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime);
@@ -141,11 +141,11 @@ const buildReversalCondition = (
 
   if (useTightness) {
     const direction = actionBias === "loosen" ? "rises above" : "falls to or below";
-    return `Reverse overlay bias if tightness ${direction} ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
+    return `Drop the sector tilt if cash availability ${direction} ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
   }
 
   const direction = actionBias === "loosen" ? "falls to or below" : "rises above";
-  return `Reverse overlay bias if risk appetite ${direction} ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
+  return `Drop the sector tilt if market risk appetite ${direction} ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
 };
 
 export const deriveSectorAdjustedPosture = (

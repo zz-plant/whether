@@ -174,7 +174,7 @@ describe("interpretation view panel", () => {
       decisionRules,
     });
 
-    assert.match(layer.bullets[0], /Action: Operate for DEFENSIVE \(0%\) while current posture holds\./);
+    assert.match(layer.bullets[0], /Action: Operate for DEFENSIVE while the current posture holds — it carries 0% of the next-90-day weight\./);
   });
 
   it("keeps interpretation toggle links query-stable and marks active view", () => {
@@ -203,14 +203,14 @@ describe("interpretation view panel", () => {
     const financialHtml = renderToStaticMarkup(<HomeInterpretationPanel layer={financial} searchParams={{}} />);
 
     assert.match(sectorHtml, /Sector view/);
-    assert.match(sectorHtml, /Action: Cloudy\+ variant: Shift operating pace to bias easing\/growth\. Pressure rose compared to last week\./);
+    assert.match(sectorHtml, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
     assert.match(financialHtml, /Financial view/);
     assert.match(financialHtml, /Runway risk/);
-    assert.match(financialHtml, /Trigger: Raise window/);
-    assert.match(financialHtml, /Reverse: Use burn delta/);
+    assert.match(financialHtml, /Trigger: Open the raise between month/);
+    assert.match(financialHtml, /Reverse: Move burn by/);
     assert.match(financialHtml, /Financial action summary/);
     assert.match(sectorHtml, /Trigger: Hold irreversible hiring\./);
-    assert.match(sectorHtml, /Reverse: Reverse overlay bias if tightness rises above 70\.0\./);
+    assert.match(sectorHtml, /Reverse: Drop the sector tilt if cash availability rises above 70\.0\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });

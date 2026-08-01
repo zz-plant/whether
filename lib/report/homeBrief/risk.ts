@@ -1,10 +1,23 @@
-import { deltaLabelBySignal } from "../briefFormatting";
 import { isImprovingSignalDelta } from "../reportData";
 
 type HomeBriefFailureMode = { warning: string };
 type SignalChange = {
   key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
   delta: number;
+};
+
+/**
+ * Each signal gets its own verb pair. A generic "tightened/eased" applied to all
+ * four produces nonsense like "Risk appetite tightened".
+ */
+const signalMoveCopy: Record<SignalChange["key"], { better: string; worse: string }> = {
+  tightness: { better: "cash availability loosened", worse: "cash availability tightened" },
+  riskAppetite: { better: "market risk appetite strengthened", worse: "market risk appetite weakened" },
+  baseRate: { better: "borrowing costs eased", worse: "borrowing costs rose" },
+  curveSlope: {
+    better: "the recession warning gauge steepened",
+    worse: "the recession warning gauge flattened",
+  },
 };
 
 export const buildPrimaryRiskLabel = ({
@@ -23,15 +36,13 @@ export const buildPrimaryRiskLabel = ({
   }
 
   if (!dominantSignal || dominantSignal.delta === 0) {
-    return "Neutral: no dominant directional risk this week.";
+    return "Neutral: nothing moved far enough this week to set the dominant risk.";
   }
 
-  const signalLabel = deltaLabelBySignal[dominantSignal.key];
-  const isImprovingMove = isImprovingSignalDelta(dominantSignal.key, dominantSignal.delta);
+  const move = signalMoveCopy[dominantSignal.key];
+  const magnitude = Math.abs(dominantSignal.delta).toFixed(1);
 
-  if (!isImprovingMove) {
-    return `Downside: ${signalLabel} tightened (${dominantSignal.delta.toFixed(1)}).`;
-  }
-
-  return `Upside: ${signalLabel} eased (${Math.abs(dominantSignal.delta).toFixed(1)}).`;
+  return isImprovingSignalDelta(dominantSignal.key, dominantSignal.delta)
+    ? `Upside: ${move.better} ${magnitude} points.`
+    : `Downside: ${move.worse} ${magnitude} points.`;
 };

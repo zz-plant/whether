@@ -186,8 +186,8 @@ describe("decision shield verdicts", () => {
       action: "DISCOUNT",
     });
 
-    assert.match(output.reversalTrigger, /tightness drops below 70/);
-    assert.match(output.reversalTrigger, /risk appetite falls to or below 50/);
+    assert.match(output.reversalTrigger, /cash availability \(now 75\) drops below 70/);
+    assert.match(output.reversalTrigger, /market risk appetite \(now 60\) falls to or below 50/);
   });
 
 
@@ -249,7 +249,7 @@ describe("decision shield verdicts", () => {
       action: "HIRE",
     });
 
-    assert.match(output.reversalTrigger, /tightness rises above 70 or risk appetite falls to or below 50/);
+    assert.match(output.reversalTrigger, /cash availability \(now 20\) rises above 70, or market risk appetite \(now 80\) falls to or below 50/);
   });
 
   it("applies lifecycle context to tighten discovery-stage verdicts", () => {

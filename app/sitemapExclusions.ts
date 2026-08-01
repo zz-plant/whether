@@ -29,7 +29,6 @@ export const retiredSitemapPaths = [
   "/concepts/focus",
   "/posture",
   "/learn/failure-modes",
-  "/about",
   "/confidence",
   "/archive",
   "/regime-changes",

@@ -46,8 +46,6 @@ export const canonicalSurfaceRedirectPairs = [
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
   // Concepts (all paths) → Trust hub
   ["/concepts/:path*", "/trust"],
-  // About → Trust hub
-  ["/about", "/trust"],
   // Decide redirect stubs
   ["/resolve/team-context", "/planning#ops-monthly-action-summary"],
   // Resources root → Planning

@@ -87,13 +87,13 @@ describe("home route render contract", () => {
     const revisitIndex = routeSource.indexOf(">Revisit<");
     const guardrailIndex = routeSource.indexOf("Watch:");
     const memoryIndex = routeSource.indexOf("memoryItems.join");
-    const trustStripIndex = routeSource.indexOf("<DeltaTrustStrip");
 
     assert.ok(scalarIndex >= 0, "active route exposes the canonical scalar");
     assert.ok(revisitIndex > scalarIndex, "active route exposes the revisit decision state after scalar");
     assert.ok(guardrailIndex > revisitIndex, "active route exposes bounded guardrails after revisit state");
     assert.ok(memoryIndex > guardrailIndex, "active route exposes memory rail after guardrails");
-    assert.ok(trustStripIndex > memoryIndex, "active route keeps the compact trust strip after the decision contract");
+    assert.ok(!routeSource.includes("DeltaTrustStrip"), "trust stays inline in the decision hero, not a duplicate summary card");
+    assert.ok(!routeSource.includes("<FlipMeter"), "flip watch lives in the hero, not a separate barometer card");
   });
 
 });

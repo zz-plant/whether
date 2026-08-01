@@ -9,6 +9,7 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
+import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -96,8 +97,8 @@ export const metadata: Metadata = {
     "weekly market call",
     "operating guardrails"
   ],
-  authors: [{ name: "Whether" }],
-  creator: "Whether",
+  authors: [{ name: publisherAuthor.name, url: `${siteUrl}${publisherProfilePath}` }],
+  creator: publisherAuthor.name,
   publisher: "Whether",
   alternates: {
     canonical: "/"

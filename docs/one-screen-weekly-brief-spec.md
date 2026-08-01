@@ -337,3 +337,14 @@ Drift guardrails:
   - reversal condition discipline (`reversalTriggerDiscipline`).
 - Reversal language should remain trigger-based (clear condition + resume rule), not narrative advice.
 - If mode copy changes, update both the bounded rules source and this contract in the same PR.
+
+## Homepage consolidation notes (2026-08-01)
+
+The homepage now renders one dominant weekly decision block instead of several equal-weight posture cards, per the `lg:grid-cols-12` single-card guardrail.
+
+- **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` and regime-transition probability now render as a compact `Flip watch:` line inside `DecisionHero`. The tightness barometer visual duplicated hero metrics and was cut.
+- **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
+- **Top fold no longer repeats the windows grid.** `WeeklyTopFoldContract` kept `Posture shift`, `Revisit`, `Watch`, and the memory rail, and dropped the `Hiring / Expansion / Fundraising` window grid that duplicated the `ThreeWhethersCard` verdicts.
+- **Bounded rules stay full-width.** Reversal conditions in `ThreeWhethersCard` render unwrapped on their own line instead of truncating at 170px with a hover-only tooltip.
+- **Sticky strip consolidated and cross-viewport.** The mobile bottom bar dropped the redundant native-share button (copy + image download remain) and renders as a bottom-right floating pill on desktop.
+- **Mockup is deduplicated.** `app/mockups/operator-brief` states the action once (the `Do now / Pause if / Re-open when` spine), shows proof inline, and exposes one primary CTA (`Open planning handoff`) with a working `Copy operator brief` secondary.

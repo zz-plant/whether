@@ -135,7 +135,7 @@ describe("buildSlackBrief", () => {
 
     assert.match(brief, /Financial implications:/);
     assert.match(brief, /Runway risk:/);
-    assert.match(brief, /Suggested burn adjustment:/);
+    assert.match(brief, /Burn adjustment:/);
   });
 
   it("uses bounded decision triplets in stable action-trigger-reversal order", () => {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isPostureArchiveSlug } from "../summary/postureArchive";
 
 export const noindexRobots = {
   index: false,
@@ -33,6 +34,12 @@ const indexableResourceArticleSlugSet = new Set<string>(indexableResourceArticle
 
 export const isIndexableResourceArticleSlug = (slug: string) =>
   indexableResourceArticleSlugSet.has(slug);
+
+/**
+ * Posture archive periods are closed historical records. They carry no freshness
+ * risk, so the generated set is indexable in full rather than allowlisted by hand.
+ */
+export const isIndexableArchivePeriodSlug = (slug: string) => isPostureArchiveSlug(slug);
 
 export const indexableResourcePillarSlugs = [
   "capital-discipline-venture-backed-companies",

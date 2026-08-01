@@ -4,8 +4,9 @@
  */
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
+import { joinSentences } from "../report/reportFormatting";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
-import { formatSourceLine } from "./summaryFormatting";
+import { formatConfidenceSentence, formatSourceLine } from "./summaryFormatting";
 
 import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
 
@@ -62,28 +63,28 @@ export const buildMonthlyStructured = ({
   provenance: MonthlySummaryProvenance;
 }): MonthlyStructured => {
   const postureSummary = [
-    `Priority: ${guidance}.`,
-    `Confidence: ${confidence.toLowerCase()} (${intensity.toLowerCase()} signal).`,
+    `The priority this month is to ${guidance}.`,
+    formatConfidenceSentence(confidence, intensity),
     transitionWatch
-      ? "Boundary watch: keep reversals easy."
-      : "Boundary watch: stable.",
+      ? "The call is close to a boundary, so keep reversals cheap."
+      : "The call is clear of its boundaries.",
   ];
   const boundedNextActions = [
-    `Keep the month anchored to ${guidance}.`,
+    `Hold the month to one job: ${guidance}.`,
     transitionWatch
       ? "Keep new commitments reversible until the next read confirms stability."
       : "Keep new commitments inside the current constraints.",
   ];
   const reversalConditions = [
     transitionWatch
-      ? "Re-open broader scope after the next read confirms the regime is still stable."
-      : "Re-open broader bets if regime posture or confidence weakens.",
-    "Re-check the plan when any execution constraint starts to bind.",
+      ? "Re-open broader scope once the next read confirms the regime is still stable."
+      : "Re-open broader bets if the posture or the confidence behind it weakens.",
+    "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);
   const planningLanguage = transitionWatch
-    ? `Plan the month around ${guidance}, but keep scope reversible until the next read confirms stability.`
-    : `Plan the month around ${guidance}, and keep execution inside the current constraints.`;
+    ? `Plan the month to ${guidance} — and keep scope reversible until the next read confirms stability.`
+    : `Plan the month to ${guidance}, and keep execution inside the current constraints.`;
 
   return {
     posture: {
@@ -114,9 +115,14 @@ export const buildMonthlySummary = ({
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? " Evidence is near a regime boundary; hold major scope changes until the next read."
+    ? "Evidence is sitting near a regime boundary, so hold major scope changes until the next read."
     : "";
-  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
+  const summary = joinSentences(
+    `${regimeLabel}: ${assessment.description}`,
+    `The priority this month is to ${guidance}`,
+    formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
+    transitionCue,
+  );
   const title = recordDateLabel
     ? `Monthly action summary — ${recordDateLabel}`
     : "Monthly action summary";

@@ -22,6 +22,11 @@ type ThreeWhethersProps = {
   guardrail?: string;
 };
 
+// Displayed trigger/reversal chips read from these, so the stated bounds can never
+// drift from the verdict logic below.
+const TIGHTEN_AT = { hire: 55, spend: 65, commit: 75 } as const;
+const EASE_BELOW = { hire: 35, spend: 45, commit: 55 } as const;
+
 export function ThreeWhethersCard({
   regime,
   signalDirection,
@@ -30,14 +35,14 @@ export function ThreeWhethersCard({
   actionNow,
   guardrail,
 }: ThreeWhethersProps) {
-  const hiringIsTight = tightness >= 55 || signalDirection === "tighten";
-  const hiringIsEasy = tightness < 35 && signalDirection !== "tighten";
+  const hiringIsTight = tightness >= TIGHTEN_AT.hire || signalDirection === "tighten";
+  const hiringIsEasy = tightness < EASE_BELOW.hire && signalDirection !== "tighten";
 
-  const spendingIsTight = tightness >= 65 || (signalDirection === "tighten" && tightness >= 55);
-  const spendingIsEasy = tightness < 45 && signalDirection !== "tighten";
+  const spendingIsTight = tightness >= TIGHTEN_AT.spend || (signalDirection === "tighten" && tightness >= TIGHTEN_AT.hire);
+  const spendingIsEasy = tightness < EASE_BELOW.spend && signalDirection !== "tighten";
 
-  const committingIsTight = tightness >= 75 && signalDirection === "tighten";
-  const committingIsEasy = tightness < 55 || signalDirection === "ease";
+  const committingIsTight = tightness >= TIGHTEN_AT.commit && signalDirection === "tighten";
+  const committingIsEasy = tightness < EASE_BELOW.commit || signalDirection === "ease";
 
   const hireVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = hiringIsTight ? "TIGHTEN" : hiringIsEasy ? "EXPAND" : "HOLD";
   const spendVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = spendingIsTight ? "TIGHTEN" : spendingIsEasy ? "EXPAND" : "HOLD";
@@ -54,8 +59,8 @@ export function ThreeWhethersCard({
         : hiringIsEasy
         ? "Selectively accelerate key engineering & sales hires."
         : "Maintain existing headcount plan; replace critical backfills only.",
-      threshold: `Tightness ${tightness}/100`,
-      reversalCondition: `Hiring: tightness below 35 and easing trend`,
+      threshold: `tightness ≥ ${TIGHTEN_AT.hire}`,
+      reversalCondition: `tightness < ${EASE_BELOW.hire}, not tightening`,
     },
     {
       title: "Whether to Spend",
@@ -67,8 +72,8 @@ export function ThreeWhethersCard({
         : spendingIsEasy
         ? "Allow paid payback up to 12 months for top-tier channels."
         : "Keep payback targets at 8-10 months; re-evaluate monthly.",
-      threshold: `Capital tightness at ${tightness}/100`,
-      reversalCondition: `Spend: tightness below 45 and cooling inflation`,
+      threshold: `tightness ≥ ${TIGHTEN_AT.spend}`,
+      reversalCondition: `tightness < ${EASE_BELOW.spend}, not tightening`,
     },
     {
       title: "Whether to Commit",
@@ -80,8 +85,8 @@ export function ThreeWhethersCard({
         : committingIsEasy
         ? "Lock multi-year discounts on critical core infrastructure."
         : "Standard 1-year caps; require executive sign-off for >$50k ARR commitments.",
-      threshold: guardrail ?? `Pause if tightness exceeds ${tightness + 5}`,
-      reversalCondition: `Commit: tightness below 55 and risk appetite above 60`,
+      threshold: guardrail ?? `tightness ≥ ${TIGHTEN_AT.commit}, tightening`,
+      reversalCondition: `tightness < ${EASE_BELOW.commit} or easing`,
     },
   ];
 
@@ -156,9 +161,9 @@ export function ThreeWhethersCard({
                   <span className="font-medium text-amber-300/80">Trigger:</span>
                   <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-rose-300/80">Reversal:</span>
-                  <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 truncate max-w-[170px]" title={item.reversalCondition}>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-medium text-rose-300/80 flex-shrink-0">Reversal:</span>
+                  <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 text-right">
                     {item.reversalCondition}
                   </span>
                 </div>

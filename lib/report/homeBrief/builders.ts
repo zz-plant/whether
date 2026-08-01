@@ -22,6 +22,7 @@ import {
 } from "../forecastModel";
 import {
   formatConfidencePlainLabel,
+  joinSentences,
 } from "../reportFormatting";
 import {
   buildDecisionReadinessState,
@@ -100,9 +101,11 @@ const buildBoundaryTriggerText = ({
   current: number;
   direction: BoundaryDirection;
 }) => {
-  const dimensionLabel = dimension === "tightness" ? "tightness" : "risk appetite";
+  // Phrased as a condition, not a statement, because callers prefix it with
+  // "Re-open when:" / "The call flips when:" as well as showing it standalone.
+  const dimensionLabel = dimension === "tightness" ? "Cash availability" : "Market risk appetite";
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `Flip to ${targetRegimeLabel} if ${dimensionLabel} ${condition} ${threshold.toFixed(1)} (now ${current.toFixed(1)}).`;
+  return `${dimensionLabel} ${condition} ${threshold.toFixed(1)} (${current.toFixed(1)} today), which flips the call to ${targetRegimeLabel}.`;
 };
 
 type RevisitDriverSignal = {
@@ -135,20 +138,20 @@ const summarizeSignalDriver = (
   switch (signal.key) {
     case "tightness":
       return signal.delta >= 0
-        ? `Capital tightness rose ${absDelta} points this week.`
-        : `Capital tightness eased ${absDelta} points this week.`;
+        ? `Cash availability tightened ${absDelta} points this week.`
+        : `Cash availability eased ${absDelta} points this week.`;
     case "riskAppetite":
       return signal.delta >= 0
-        ? `Risk appetite improved ${absDelta} points this week.`
-        : `Risk appetite weakened ${absDelta} points this week.`;
+        ? `Market risk appetite improved ${absDelta} points this week.`
+        : `Market risk appetite weakened ${absDelta} points this week.`;
     case "baseRate":
       return signal.delta >= 0
-        ? `Base-rate pressure rose ${absDelta} points this week.`
-        : `Base-rate pressure eased ${absDelta} points this week.`;
+        ? `Borrowing costs rose ${absDelta} points this week.`
+        : `Borrowing costs eased ${absDelta} points this week.`;
     case "curveSlope":
       return signal.delta >= 0
-        ? `Curve slope steepened ${absDelta} points this week.`
-        : `Curve slope flattened ${absDelta} points this week.`;
+        ? `The recession warning gauge steepened ${absDelta} points this week.`
+        : `The recession warning gauge flattened ${absDelta} points this week.`;
     default:
       return "Core inputs moved this week.";
   }
@@ -211,6 +214,20 @@ export const buildFlipRiskMeterState = (
   regimeDistance?: WeeklyDecisionCardViewModel["diagnostics"]["regimeDistance"],
 ): WeeklyDecisionCardViewModel["diagnostics"]["flipRiskMeter"] =>
   buildFlipRiskMeterStateInternal(regimeDistance);
+
+const buildLeadershipShorthandLine = (boldnessDelta: number) => {
+  const magnitude = Math.abs(boldnessDelta);
+
+  if (magnitude === 0) {
+    return "The call is holding steady this week.";
+  }
+
+  const size = magnitude >= 12 ? "sharply " : magnitude >= 4 ? "" : "slightly ";
+
+  return boldnessDelta > 0
+    ? `The call turned ${size}more aggressive this week.`
+    : `The call turned ${size}more defensive this week.`;
+};
 
 export const buildHomeBriefModelInternal = (
   data: HomeReportData,
@@ -524,18 +541,18 @@ export const buildHomeBriefModelInternal = (
     regimeSignalIndicators,
   });
 
-  const actionClause = conciseActionNow
-    ? `${conciseActionNow.charAt(0).toLowerCase()}${conciseActionNow.slice(1)}`
-    : "stay the course";
-  const flipClause = conciseFlipThreshold
-    ? `Flip if ${conciseFlipThreshold.charAt(0).toLowerCase()}${conciseFlipThreshold.slice(1)}`
-    : "";
-  const netConstraintSummary =
+  const pressureLine =
     severityDelta > 0
-      ? `${displayRegime.label}. Pressure is rising, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`
+      ? "Pressure is rising."
       : severityDelta < 0
-        ? `${displayRegime.label}. Pressure eased, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`
-        : `${displayRegime.label}. Conditions held, so ${actionClause}.${flipClause ? ` ${flipClause}.` : ""}`;
+        ? "Pressure eased."
+        : "Conditions held.";
+  const netConstraintSummary = joinSentences(
+    displayRegime.label,
+    pressureLine,
+    conciseActionNow || "Stay the course",
+    conciseFlipThreshold,
+  );
 
   return {
     postureLabel: displayRegime.label,
@@ -545,7 +562,11 @@ export const buildHomeBriefModelInternal = (
     confidenceLabel: postureState?.currentState.confidenceLabel ?? confidenceLabel,
     confidencePercent: postureState?.currentState.confidencePercent ?? confidencePercent,
     signalConfidenceReason: policyOverrideActive
-      ? `${signalConfidenceReason} Policy override active: ${policyOverrideReason ?? "cross-signal disagreement or data gaps"}.`
+      ? joinSentences(
+          signalConfidenceReason,
+          "A policy override is also holding the posture in place",
+          policyOverrideReason ?? "The signals disagree, or too many inputs are missing",
+        )
       : signalConfidenceReason,
     regimeHeader: {
       regime: displayRegime.label,
@@ -595,28 +616,7 @@ export const buildHomeBriefModelInternal = (
       boldnessScore: weeklyLeadershipSummary.boldnessScore,
       boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
       notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
-      shorthandLine:
-        weeklyLeadershipSummary.boldnessDelta === 0
-          ? "The call is holding steady this week."
-          : (() => {
-              const absoluteDelta = Math.abs(weeklyLeadershipSummary.boldnessDelta);
-              const intensity =
-                absoluteDelta >= 12
-                  ? "materially "
-                  : absoluteDelta >= 4
-                    ? ""
-                    : "slightly ";
-
-              if (weeklyLeadershipSummary.boldnessDelta > 0) {
-                return `The call moved ${intensity}more aggressive this week.`;
-              }
-
-              if (weeklyLeadershipSummary.boldnessDelta < 0) {
-                return `The call shifted ${intensity}more defensive this week.`;
-              }
-
-              return "The call is holding steady this week.";
-            })(),
+      shorthandLine: buildLeadershipShorthandLine(weeklyLeadershipSummary.boldnessDelta),
       hiringWindow: weeklyLeadershipSummary.hiringWindow,
       expansionWindow: weeklyLeadershipSummary.expansionWindow,
       raiseWindow: weeklyLeadershipSummary.raiseWindow,

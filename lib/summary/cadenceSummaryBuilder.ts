@@ -1,6 +1,7 @@
 import { buildComplianceStamp } from "../exportNotices";
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
+import { joinSentences } from "../report/reportFormatting";
 import { formatSourceLine } from "./summaryFormatting";
 
 export type CadenceSummaryProvenance = {
@@ -35,9 +36,9 @@ type CadenceSummaryBase = {
   copy: string;
 };
 
-const cadencePrefix: Record<CadenceSummaryName, string> = {
-  quarterly: "This quarter",
-  yearly: "This year",
+const cadenceJobLine: Record<CadenceSummaryName, string> = {
+  quarterly: "The job this quarter is to",
+  yearly: "The job this year is to",
 };
 
 const cadenceTitle: Record<CadenceSummaryName, string> = {
@@ -55,7 +56,11 @@ export const buildCadenceSummary = ({
 }: CadenceSummaryParams): CadenceSummaryBase => {
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = guidanceMap[assessment.regime];
-  const summary = `${cadencePrefix[cadence]}, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
+  const summary = joinSentences(
+    `${regimeLabel} mode`,
+    assessment.description,
+    `${cadenceJobLine[cadence]} ${guidance}`,
+  );
   const title = periodLabel
     ? `${cadenceTitle[cadence]} — ${periodLabel}`
     : cadenceTitle[cadence];

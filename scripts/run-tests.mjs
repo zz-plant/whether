@@ -39,8 +39,29 @@ if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
   process.exit(1);
 }
 
+// Flags that consume the following argv entry as their value, so we do not
+// mistake that value for a test path filter.
+const VALUE_FLAGS = new Set(['-t', '--test-name-pattern', '--timeout', '--reporter', '--reporter-outfile']);
+
+// Bun treats bare (non-flag) args as path filters. If the caller supplied one,
+// appending TEST_ROOT_ARG would widen the run back to the whole suite, so only
+// default to ./tests when no filter was given.
+function hasPathFilter(args) {
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === '--') continue;
+    if (arg.startsWith('-')) {
+      if (VALUE_FLAGS.has(arg)) i += 1;
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 const extraArgs = process.argv.slice(2);
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...extraArgs, TEST_ROOT_ARG], {
+const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, TEST_ROOT_ARG];
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...targetArgs], {
   stdio: 'inherit',
   env: process.env,
 });

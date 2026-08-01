@@ -27,7 +27,8 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
 
 1. **P0 — Thumb-zone sticky decision bar (bottom anchored)** ✅ Implemented
    - Added a mobile-only bottom decision bar with posture confidence and one primary action in thumb reach.
-   - Kept desktop sticky posture card for large screens.
+   - Same strip becomes a compact floating pill on desktop (bottom-right) so the call persists while the brief scrolls.
+   - Actions consolidated to `Copy` + `Download image`; native share was redundant with copy and removed from the bar.
 
 2. **P0 — First-screen rewrite for “decision in 5 seconds” clarity** ✅ Implemented
    - Added a dedicated “Decision in 5 seconds” panel that answers what changed, what to do, and urgency.

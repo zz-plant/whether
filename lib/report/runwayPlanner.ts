@@ -100,6 +100,28 @@ const BURN_RANGE_BY_REGIME: Record<RegimeKey, { min: number; max: number }> = {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const round = (value: number) => Math.round(value * 10) / 10;
 
+const POSTURE_LABELS: Record<PlannerPosture, string> = {
+  RISK_ON: "risk-on",
+  TRANSITION: "transition",
+  SAFETY_MODE: "safety mode",
+};
+
+const STAGE_LABELS: Record<PlannerStage, string> = {
+  seed: "seed-stage",
+  "series-a": "Series A",
+  growth: "growth-stage",
+  public: "public",
+};
+
+const SECTOR_LABELS: Record<PlannerSector, string> = {
+  "b2b-saas": "B2B SaaS",
+  consumer: "consumer",
+  infrastructure: "infrastructure",
+};
+
+/** Strips the `2 · ` ordinal prefix off a knob level label for use in prose. */
+const knobLevelWords = (levelLabel: string) => levelLabel.replace(/^\d+\s*·\s*/, "").toLowerCase();
+
 const strictnessLabel = (level: number) => {
   if (level <= 0) return "Relaxed";
   if (level === 1) return "Cautious";
@@ -300,23 +322,23 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
       level: riskLevel,
       macroRiskBase: round(macroRiskBase),
       macroRiskDownsideFlip: round(macroRiskDownsideFlip),
-      summary: `${riskLevel.toUpperCase()} runway risk now (${round(macroRiskBase)}/100), downside flip ${round(macroRiskDownsideFlip)}/100 if posture shifts to ${downsidePosture}.`,
+      summary: `Runway risk is ${riskLevel} at ${round(macroRiskBase)}/100, and would climb to ${round(macroRiskDownsideFlip)}/100 if the posture slipped to ${POSTURE_LABELS[downsidePosture]}.`,
     },
     safeRunwayBand: {
       minMonths: round(safeBand.minMonths),
       maxMonths: round(safeBand.maxMonths),
-      summary: `Operate with ${round(safeBand.minMonths)}-${round(safeBand.maxMonths)} months of runway for ${input.stage} ${input.sector} teams.`,
+      summary: `A ${STAGE_LABELS[input.stage]} ${SECTOR_LABELS[input.sector]} team should hold ${round(safeBand.minMonths)}–${round(safeBand.maxMonths)} months of runway.`,
     },
     raiseTimingWindow: {
       ...raiseWindow,
       timeToSafeRunwayTargetMonths,
-      summary: `Run raise in ${raiseWindow.startMonth}-${raiseWindow.endMonth} months; target safe runway in ${timeToSafeRunwayTargetMonths} months with approval velocity ${approvalVelocity}.`,
+      summary: `Open the raise between month ${raiseWindow.startMonth} and ${raiseWindow.endMonth}. Safe runway is ${timeToSafeRunwayTargetMonths} months out, with approvals moving at a ${knobLevelWords(approvalVelocity)} pace.`,
     },
     burnAdjustmentRange: {
       recommendedDeltaPercent,
       floorPercent: burnMinPercent,
       ceilingPercent: burnMaxPercent,
-      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness} (${strictnessLabel(paybackStrictnessLevel)}). Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
+      summary: `Move burn by ${recommendedDeltaPercent}%, anywhere between ${burnMinPercent}% and ${burnMaxPercent}%, holding payback ${strictnessLabel(paybackStrictnessLevel).toLowerCase()}. Reverse once two weekly reads hold steady and runway clears ${round(safeBand.minMonths)} months.`,
     },
     decisionKnobs: {
       paybackStrictnessLabel: paybackStrictness,
@@ -349,10 +371,10 @@ export const buildRunwayPlanFromRequest = (
 export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput) =>
   [
     "Financial implications:",
-    `• Runway risk: ${plan.runwayRisk.level.toUpperCase()} (${plan.runwayRisk.score}/100), downside flip ${plan.runwayRisk.macroRiskDownsideFlip}/100.`,
-    `• Safe runway band: ${plan.safeRunwayBand.minMonths}-${plan.safeRunwayBand.maxMonths} months.`,
-    `• Raise timing window: ${plan.raiseTimingWindow.startMonth}-${plan.raiseTimingWindow.endMonth} months (safe target in ${plan.raiseTimingWindow.timeToSafeRunwayTargetMonths} months).`,
-    `• Suggested burn adjustment: ${plan.burnAdjustmentRange.recommendedDeltaPercent}% (range ${plan.burnAdjustmentRange.floorPercent}% to ${plan.burnAdjustmentRange.ceilingPercent}%).`,
+    `• Runway risk: ${plan.runwayRisk.level} at ${plan.runwayRisk.score}/100, rising to ${plan.runwayRisk.macroRiskDownsideFlip}/100 on a downside flip.`,
+    `• Safe runway band: ${plan.safeRunwayBand.minMonths}–${plan.safeRunwayBand.maxMonths} months.`,
+    `• Raise window: month ${plan.raiseTimingWindow.startMonth} to ${plan.raiseTimingWindow.endMonth}, with safe runway ${plan.raiseTimingWindow.timeToSafeRunwayTargetMonths} months out.`,
+    `• Burn adjustment: ${plan.burnAdjustmentRange.recommendedDeltaPercent}%, anywhere between ${plan.burnAdjustmentRange.floorPercent}% and ${plan.burnAdjustmentRange.ceilingPercent}%.`,
     `• Capital-raising guardrail: ${plan.boundedRules.capitalRaising}`,
     `• Burn-discipline guardrail: ${plan.boundedRules.burnDiscipline}`,
   ].join("\n");

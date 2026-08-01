@@ -8,6 +8,7 @@ import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
+import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 
 const REGIME_DISPLAY: Record<string, string> = {
   SCARCITY: "Scarcity",
@@ -237,6 +238,26 @@ export default function HistoryPage() {
           ) : null}
         </section>
       ) : null}
+
+      <section className="weather-panel space-y-4 px-5 py-5">
+        <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Posture by year</h2>
+        <p className="text-sm text-slate-300">
+          What the operating posture was in each closed period, with the regime splits and mid-period reversals behind it.
+        </p>
+        <ul className="flex flex-wrap gap-2">
+          {postureArchiveYears.map((year) => (
+            <li key={year.slug}>
+              <Link
+                href={buildPostureArchivePath(year.slug)}
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 no-underline transition-colors hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                {year.title}
+                <span className="ml-2 text-slate-400">{year.operatorLabel}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </ReportShell>
   );
 }

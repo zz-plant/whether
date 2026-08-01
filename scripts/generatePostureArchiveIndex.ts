@@ -1,0 +1,300 @@
+/**
+ * Posture archive index generator.
+ *
+ * Compresses `data/summary_archive.json` (~4.5MB, 686 entries) into the small
+ * per-period records the static `/history/[period]` routes render. The full
+ * archive stays out of route bundles — see
+ * docs/research/2026-03-09-cloudflare-bundle-composition.md for why that matters.
+ */
+import { writeFile } from "node:fs/promises";
+import { getSummaryArchive, type SummaryArchiveEntry } from "../lib/summary/summaryArchive";
+import { getRegimeOperatorLabel } from "../lib/regimeLabels";
+import type { RegimeKey } from "../lib/regimeEngine";
+import type {
+  PostureArchivePeriod,
+  PostureArchiveRegimeShare,
+  WeeklyBriefRecord,
+} from "../lib/summary/postureArchiveTypes";
+
+const OUTPUT_PATH = new URL("../data/posture_archive_index.json", import.meta.url);
+/** Tiny companion file so client bundles can link the archive without the full index. */
+const YEARS_OUTPUT_PATH = new URL("../data/posture_archive_years.json", import.meta.url);
+/** Frozen dated weekly briefs behind `/brief/[week]`. */
+const WEEKLY_OUTPUT_PATH = new URL("../data/weekly_brief_index.json", import.meta.url);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
+
+const formatDate = (value: string) => {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.valueOf()) ? value : dateFormatter.format(parsed);
+};
+
+const quarterOf = (asOf: string) => Math.floor(new Date(asOf).getUTCMonth() / 3) + 1;
+
+const quarterSlug = (year: number, quarter: number) => `${year}-q${quarter}`;
+
+/** Ordered sample of the finest-grained series that covers a period. */
+type Sample = { asOf: string; regime: RegimeKey };
+
+const collectSamples = (
+  entries: SummaryArchiveEntry[],
+  cadence: "weekly" | "monthly",
+  matches: (entry: SummaryArchiveEntry) => boolean,
+): Sample[] =>
+  entries
+    .filter((entry) => entry.cadence === cadence && matches(entry))
+    .map((entry) => ({ asOf: entry.asOf, regime: entry.summary.regime }))
+    .sort((a, b) => a.asOf.localeCompare(b.asOf));
+
+const buildRegimeMix = (samples: Sample[]): PostureArchiveRegimeShare[] => {
+  const counts = new Map<RegimeKey, number>();
+  for (const sample of samples) {
+    counts.set(sample.regime, (counts.get(sample.regime) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .map(([regime, periods]) => ({
+      regime,
+      label: getRegimeOperatorLabel(regime),
+      periods,
+      share: Math.round((periods / samples.length) * 100),
+    }))
+    .sort((a, b) => b.periods - a.periods);
+};
+
+const buildTransitions = (samples: Sample[]) => {
+  const transitions: PostureArchivePeriod["transitions"] = [];
+
+  for (let index = 1; index < samples.length; index += 1) {
+    const previous = samples[index - 1];
+    const current = samples[index];
+    if (previous.regime === current.regime) continue;
+
+    transitions.push({
+      asOf: current.asOf,
+      dateLabel: formatDate(current.asOf),
+      from: previous.regime,
+      fromLabel: getRegimeOperatorLabel(previous.regime),
+      to: current.regime,
+      toLabel: getRegimeOperatorLabel(current.regime),
+    });
+  }
+
+  return transitions;
+};
+
+const buildRates = (entry: SummaryArchiveEntry) =>
+  entry.summary.inputs.map((input) => ({
+    label: input.label,
+    value: input.value,
+    unit: input.unit,
+    sourceUrl: input.sourceUrl,
+  }));
+
+const buildPeriod = ({
+  entry,
+  slug,
+  kind,
+  title,
+  quarter,
+  samples,
+  sampleCadence,
+}: {
+  entry: SummaryArchiveEntry;
+  slug: string;
+  kind: PostureArchivePeriod["kind"];
+  title: string;
+  quarter?: number;
+  samples: Sample[];
+  sampleCadence: "weekly" | "monthly" | null;
+}): PostureArchivePeriod => ({
+  slug,
+  kind,
+  year: entry.year,
+  quarter,
+  title,
+  asOf: entry.asOf,
+  recordDateLabel: entry.summary.recordDateLabel ?? formatDate(entry.asOf),
+  regime: entry.summary.regime,
+  regimeLabel: entry.summary.regimeLabel,
+  operatorLabel: getRegimeOperatorLabel(entry.summary.regime),
+  headline: entry.summary.summary,
+  guidance: entry.summary.guidance,
+  constraints: entry.summary.constraints,
+  rates: buildRates(entry),
+  sourceLabel: entry.summary.provenance.sourceLabel,
+  sourceUrl: entry.summary.provenance.sourceUrl,
+  statusLabel: entry.summary.provenance.statusLabel,
+  sampleCadence,
+  sampleCount: samples.length,
+  regimeMix: samples.length ? buildRegimeMix(samples) : [],
+  transitions: samples.length ? buildTransitions(samples) : [],
+  children: [],
+  parentSlug: null,
+  previousSlug: null,
+  nextSlug: null,
+});
+
+const generate = () => {
+  const archive = getSummaryArchive();
+
+  if (!archive.length) {
+    throw new Error("Summary archive is empty or failed validation; refusing to write an empty index.");
+  }
+
+  const yearEntries = archive.filter(
+    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "yearly" }> => entry.cadence === "yearly",
+  );
+  const quarterEntries = archive.filter(
+    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "quarterly" }> => entry.cadence === "quarterly",
+  );
+
+  /** Weekly coverage starts in 2018; monthly in 2012. Use the finest series available per period. */
+  const resolveSamples = (matches: (entry: SummaryArchiveEntry) => boolean) => {
+    const weekly = collectSamples(archive, "weekly", matches);
+    if (weekly.length >= 2) return { samples: weekly, cadence: "weekly" as const };
+
+    const monthly = collectSamples(archive, "monthly", matches);
+    if (monthly.length >= 2) return { samples: monthly, cadence: "monthly" as const };
+
+    return { samples: [] as Sample[], cadence: null };
+  };
+
+  const years = yearEntries.map((entry) => {
+    const { samples, cadence } = resolveSamples((candidate) => candidate.year === entry.year);
+    return buildPeriod({
+      entry,
+      slug: String(entry.year),
+      kind: "year",
+      title: String(entry.year),
+      samples,
+      sampleCadence: cadence,
+    });
+  });
+
+  const yearSlugs = new Set(years.map((year) => year.slug));
+
+  const quarters = quarterEntries.map((entry) => {
+    const quarter = entry.quarter || quarterOf(entry.asOf);
+    const { samples, cadence } = resolveSamples(
+      (candidate) => candidate.year === entry.year && quarterOf(candidate.asOf) === quarter,
+    );
+
+    const period = buildPeriod({
+      entry,
+      slug: quarterSlug(entry.year, quarter),
+      kind: "quarter",
+      title: `Q${quarter} ${entry.year}`,
+      quarter,
+      samples,
+      sampleCadence: cadence,
+    });
+
+    // Years without an annual summary (currently 2026) get no page, so those
+    // quarters point back at the archive hub rather than a 404.
+    period.parentSlug = yearSlugs.has(String(entry.year)) ? String(entry.year) : null;
+    return period;
+  });
+
+  for (const year of years) {
+    year.children = quarters
+      .filter((quarter) => quarter.year === year.year)
+      .map((quarter) => ({
+        slug: quarter.slug,
+        title: quarter.title,
+        regime: quarter.regime,
+        operatorLabel: quarter.operatorLabel,
+        guidance: quarter.guidance,
+      }));
+  }
+
+  const linkSiblings = (periods: PostureArchivePeriod[]) => {
+    const ordered = [...periods].sort((a, b) => a.asOf.localeCompare(b.asOf));
+    ordered.forEach((period, index) => {
+      period.previousSlug = ordered[index - 1]?.slug ?? null;
+      period.nextSlug = ordered[index + 1]?.slug ?? null;
+    });
+    return ordered;
+  };
+
+  return [...linkSiblings(years), ...linkSiblings(quarters)];
+};
+
+const weekSlug = (year: number, week: number) => `${year}-w${String(week).padStart(2, "0")}`;
+
+const generateWeeklyBriefs = (): WeeklyBriefRecord[] => {
+  const weeklyEntries = getSummaryArchive()
+    .filter((entry): entry is Extract<SummaryArchiveEntry, { cadence: "weekly" }> => entry.cadence === "weekly")
+    .sort((a, b) => a.asOf.localeCompare(b.asOf));
+
+  const records = weeklyEntries.map((entry, index) => {
+    const { summary } = entry;
+    const structured = summary.structured;
+    const previous = weeklyEntries[index - 1];
+
+    return {
+      slug: weekSlug(entry.year, entry.week),
+      year: entry.year,
+      week: entry.week,
+      asOf: entry.asOf,
+      recordDateLabel: summary.recordDateLabel ?? formatDate(entry.asOf),
+      title: summary.title,
+      headline: summary.summary,
+      regime: summary.regime,
+      regimeLabel: summary.regimeLabel,
+      operatorLabel: getRegimeOperatorLabel(summary.regime),
+      guidance: summary.guidance,
+      confidence: summary.confidence,
+      transitionWatch: summary.transitionWatch,
+      climateLabel: structured.climate.label,
+      climateSummary: structured.climate.summary,
+      recommendedMoves: structured.recommendedMoves,
+      executionPriorities: structured.executionPriorities,
+      watchouts: structured.watchouts,
+      planningLanguage: structured.planningLanguage,
+      executionConstraints: structured.executionConstraints,
+      rates: buildRates(entry),
+      sourceLabel: summary.provenance.sourceLabel,
+      sourceUrl: summary.provenance.sourceUrl,
+      statusLabel: summary.provenance.statusLabel,
+      changedFrom:
+        previous && previous.summary.regime !== summary.regime
+          ? getRegimeOperatorLabel(previous.summary.regime)
+          : null,
+      archivePeriodSlug: quarterSlug(entry.year, quarterOf(entry.asOf)),
+      previousSlug: null as string | null,
+      nextSlug: null as string | null,
+    } satisfies WeeklyBriefRecord;
+  });
+
+  records.forEach((record, index) => {
+    record.previousSlug = records[index - 1]?.slug ?? null;
+    record.nextSlug = records[index + 1]?.slug ?? null;
+  });
+
+  return records;
+};
+
+const periods = generate();
+await writeFile(OUTPUT_PATH, `${JSON.stringify(periods, null, 2)}\n`, "utf8");
+
+const archiveSlugs = new Set(periods.map((period) => period.slug));
+const weeklyBriefs = generateWeeklyBriefs().map((record) => ({
+  ...record,
+  // Drop the cross-link rather than emit a 404 when a quarter has no archive page.
+  archivePeriodSlug:
+    record.archivePeriodSlug && archiveSlugs.has(record.archivePeriodSlug) ? record.archivePeriodSlug : null,
+}));
+await writeFile(WEEKLY_OUTPUT_PATH, `${JSON.stringify(weeklyBriefs)}\n`, "utf8");
+
+const years = periods
+  .filter((period) => period.kind === "year")
+  .sort((a, b) => b.year - a.year)
+  .map((period) => ({ slug: period.slug, title: period.title, operatorLabel: period.operatorLabel }));
+await writeFile(YEARS_OUTPUT_PATH, `${JSON.stringify(years, null, 2)}\n`, "utf8");
+
+const quarterCount = periods.filter((period) => period.kind === "quarter").length;
+console.log(
+  `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly) to data/posture_archive_index.json`,
+);
+console.log(`Wrote ${weeklyBriefs.length} frozen weekly briefs to data/weekly_brief_index.json`);

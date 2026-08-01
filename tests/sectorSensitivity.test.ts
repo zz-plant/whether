@@ -33,7 +33,7 @@ describe("deriveSectorAdjustedPosture", () => {
     assert.equal(output.basePostureLabel, "Cloudy");
     assert.match(output.adjustedPostureLabel, /Cloudy-/);
     assert.equal(output.actionBias, "tighten");
-    assert.match(output.reversalCondition, /Reverse overlay bias/);
+    assert.match(output.reversalCondition, /Drop the sector tilt/);
     assert.ok(output.adjustmentDelta < 0);
   });
 

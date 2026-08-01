@@ -21,8 +21,9 @@ artifacts/agent
 .env.*
 !.env.example
 
-# Playwright MCP artifacts
+# Playwright artifacts
 .playwright-mcp/
+.playwright-cli/
 
 # vinext (Next.js plugin)
 .vinext/
@@ -33,6 +34,11 @@ artifacts/agent
 .codex/
 .agent/
 
-# QA screenshots
+# QA screenshots and snapshot dumps.
+# These are one-off local artifacts, never inputs. Keep the repo root scannable:
+# write new scratch output to a temp dir, not here.
 qa-*.png
 homepage-*.png
+/*.png
+/*.yml
+/opencode.json.bak.*

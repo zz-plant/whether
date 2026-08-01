@@ -71,7 +71,7 @@ describe("cadence summaries", () => {
       periodLabel: "Q1 2026",
     });
 
-    const expectedSummary = `This quarter, operate in ${getRegimeOperatorLabel(assessment.regime)} mode: ${getQuarterlyActionGuidance(assessment.regime)}. ${assessment.description}`;
+    const expectedSummary = `${getRegimeOperatorLabel(assessment.regime)} mode. ${assessment.description} The job this quarter is to ${getQuarterlyActionGuidance(assessment.regime)}.`;
 
     assert.equal(summary.title, "Quarterly action summary — Q1 2026");
     assert.equal(summary.summary, expectedSummary);
@@ -90,7 +90,7 @@ describe("cadence summaries", () => {
       periodLabel: "2026",
     });
 
-    const expectedSummary = `This year, operate in ${getRegimeOperatorLabel(assessment.regime)} mode: ${getYearlyActionGuidance(assessment.regime)}. ${assessment.description}`;
+    const expectedSummary = `${getRegimeOperatorLabel(assessment.regime)} mode. ${assessment.description} The job this year is to ${getYearlyActionGuidance(assessment.regime)}.`;
 
     assert.equal(summary.title, "Yearly action summary — 2026");
     assert.equal(summary.summary, expectedSummary);

@@ -185,13 +185,13 @@ export const computePolicyAssessment = (
   const missingCount = normalizations.filter((entry) => entry.clippedZ === null).length;
   const refusalReasons: string[] = [];
   if (agreement >= POLICY_SPEC_V1.refusal.disagreementThreshold) {
-    refusalReasons.push("Composite disagreement exceeded threshold.");
+    refusalReasons.push("The underlying signals disagree too sharply to move the posture.");
   }
   if (volatility30d >= POLICY_SPEC_V1.refusal.volatilityThreshold) {
-    refusalReasons.push("Composite volatility exceeded threshold.");
+    refusalReasons.push("Signals have swung too hard over the past 30 days to trust a posture change.");
   }
   if (missingCount > POLICY_SPEC_V1.refusal.maxMissingSignalCount) {
-    refusalReasons.push("Data gaps exceed allowed signal count.");
+    refusalReasons.push("Too many inputs are missing to support a posture change.");
   }
 
   const shouldRefuse = refusalReasons.length > 0;

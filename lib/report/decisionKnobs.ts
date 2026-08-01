@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import { REGIME_LABELS } from "../regimePresentation";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 import {
@@ -132,23 +133,34 @@ const weeklyCallByRegime: Record<RegimeKey, string> = {
   EXPANSION: "Growth conditions — scale what's working and keep milestones for new bets.",
 };
 
+const describeSignalQuality = (weakSignalCount: number) => {
+  if (weakSignalCount === 0) {
+    return "Every input is reading clean.";
+  }
+
+  return weakSignalCount === 1
+    ? "One input is still reading weak."
+    : `${weakSignalCount} inputs are still reading weak.`;
+};
+
 const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobContext) => {
-  const thresholdCaution = context.nearestThresholdGap <= 8;
-  const weakSignalLabel = context.weakSignalCount > 0 ? `${context.weakSignalCount} weak signal${context.weakSignalCount > 1 ? "s" : ""}` : "signals are stable";
+  const knob = knobLabels[key];
+  const posture = REGIME_LABELS[context.committedState];
+  const signalQuality = describeSignalQuality(context.weakSignalCount);
 
   if (context.transition.pending) {
-    return `${context.transition.transitionReason} Keep ${key} on committed ${context.committedState.toLowerCase()} settings while ${weakSignalLabel}.`;
+    return `${context.transition.transitionReason} ${knob} holds at its ${posture} setting until that change commits. ${signalQuality}`;
   }
 
   if (context.transition.committed) {
-    return `${context.transition.transitionReason} ${key} now follows committed ${context.committedState.toLowerCase()} posture with ${weakSignalLabel}.`;
+    return `${context.transition.transitionReason} ${knob} now follows the ${posture} setting. ${signalQuality}`;
   }
 
-  if (thresholdCaution) {
-    return `Near-threshold risk keeps ${key} constrained while ${weakSignalLabel}.`;
+  if (context.nearestThresholdGap <= 8) {
+    return `${knob} stays constrained because the call sits within ${context.nearestThresholdGap.toFixed(1)} points of a boundary. ${signalQuality}`;
   }
 
-  return `${key} aligns to committed ${context.committedState.toLowerCase()} posture and ${weakSignalLabel}.`;
+  return `${knob} matches the ${posture} setting with room to spare before the nearest boundary. ${signalQuality}`;
 };
 
 const getPendingBias = (key: DecisionKnob["key"], context: DecisionKnobContext) => {

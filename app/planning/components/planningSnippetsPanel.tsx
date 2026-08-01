@@ -32,7 +32,10 @@ export function PlanningSnippetsPanel({
   statusLabel,
   recordDateLabel,
 }: PlanningSnippetsPanelProps) {
-  const postureReference = statusLabel ? `the current ${statusLabel.toLowerCase()} market setting` : "the current weekly market setting";
+  // Status labels can carry a stage suffix ("Cloudy — Mid"), which reads badly
+  // mid-sentence. Keep only the posture name.
+  const postureName = statusLabel?.split("—")[0]?.trim();
+  const postureReference = postureName ? `${postureName} conditions` : "this week's market conditions";
   const weekReference = recordDateLabel ? `week ending ${recordDateLabel}` : "this week";
   const postureMode = resolvePlanningPostureMode(statusLabel);
 
@@ -43,30 +46,30 @@ export function PlanningSnippetsPanel({
         label: "Weekly engineering note",
         bestUse: "Best for: engineering standup notes",
         text: postureMode === "expansion"
-          ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Move faster on delivery and growth bets that already have real demand, add capacity only where milestones are landing, and keep the current stop lines visible in execution.`
+          ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Push harder on the lanes where demand is already real. Add capacity where milestones are landing, and nowhere else. The stop lines stay visible in execution.`
           : postureMode === "volatile"
-            ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Ship reversible releases with clear checkpoints, keep staffing tied to near-term evidence, and recheck milestone gates in next week's review.`
+            ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Every release ships reversible, with a checkpoint attached. Staffing tracks near-term evidence, and we revisit the milestone gates at next week's review.`
             : postureMode === "scarcity"
-              ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Protect revenue, delivery, and reliability work, hold non-critical expansion, and review fixed-cost changes against the current stop lines every week.`
-              : `Weekly note (${weekReference}): We are operating against ${postureReference}. Prioritize core delivery and reliability commitments, narrow optional scope, and check staffing changes against the current stop lines in next week's review.`,
+              ? `Weekly note (${weekReference}): We are operating against ${postureReference}. Revenue, delivery, and reliability come first. Non-critical expansion is on hold, and every fixed-cost change gets checked against the stop lines before it moves.`
+              : `Weekly note (${weekReference}): We are operating against ${postureReference}. Core delivery and reliability keep their commitments. Optional scope narrows, and staffing changes wait for a stop-line check at next week's review.`,
       },
       {
         id: "staff-update",
         label: "Staff update paragraph",
         bestUse: "Best for: leadership/status updates",
         text: postureMode === "expansion"
-          ? `This week, for ${weekReference}, we are planning against ${postureReference}. Engineering is staying focused on predictable delivery while we move faster in lanes that already show demand. We are adding capacity only where conversion, retention, or payback is already proven, with the stop line kept visible in the plan.`
+          ? `For ${weekReference} we are planning against ${postureReference}. Delivery stays predictable, but we are moving faster wherever demand is already showing up. Capacity goes only to lanes with proven conversion, retention, or payback, and the stop line stays in the plan where everyone can see it.`
           : postureMode === "volatile"
-            ? `This week, for ${weekReference}, we are planning against ${postureReference}. Engineering stays focused on predictable delivery, reliability, and checkpointed execution. We will keep roadmap and hiring changes tied to near-term evidence until next week's update confirms a cleaner read.`
+            ? `For ${weekReference} we are planning against ${postureReference}. Engineering is holding to predictable delivery, reliability, and checkpointed execution. Roadmap and hiring changes stay tied to near-term evidence until next week's update gives us a cleaner read.`
             : postureMode === "scarcity"
-              ? `This week, for ${weekReference}, we are planning against ${postureReference}. Engineering stays focused on predictable delivery, reliability, and cash-critical execution. We will hold non-essential roadmap or hiring expansion until the current stop lines clear.`
-              : `This week, for ${weekReference}, we are planning against ${postureReference}. Engineering stays focused on predictable delivery, reliability, and disciplined headcount use. We will narrow optional roadmap or hiring expansion until the current stop lines clear or next week's update improves the read.`,
+              ? `For ${weekReference} we are planning against ${postureReference}. The work that protects cash — delivery, reliability, revenue — takes priority. Non-essential roadmap and hiring expansion stay on hold until the stop lines clear.`
+              : `For ${weekReference} we are planning against ${postureReference}. Engineering is protecting delivery and reliability while keeping headcount use disciplined. Optional roadmap and hiring expansion stay narrow until the stop lines clear or next week's update improves the read.`,
       },
       {
         id: "risk-register",
         label: "Risk register entry",
         bestUse: "Best for: risk review logs",
-        text: `Risk: Company plan no longer matches ${postureReference}.\nImpact: Missed delivery targets or overspending if conditions change.\nMitigation: Keep the main action aligned to this week's call, keep stop lines visible, and review the plan each week with the latest signals.\nReview schedule: Weekly.`,
+        text: `Risk: The company plan drifts out of step with ${postureReference}.\nImpact: Missed delivery targets, or spend committed against conditions that have already changed.\nMitigation: Hold the main action to this week's call, keep the stop lines visible, and re-read the plan against fresh signals every week.\nReview schedule: Weekly.`,
       },
     ],
     [postureMode, postureReference, weekReference],

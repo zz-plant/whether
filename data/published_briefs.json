@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "2026-w31",
+    "year": 2026,
+    "week": 31,
+    "publishedAt": "2026-07-30T00:00:00.000Z",
+    "recordDate": "2026-07-30",
+    "recordDateLabel": "Jul 30, 2026",
+    "headline": "Guarded Expansion — Late — week of Jul 30, 2026",
+    "summary": "Keep expansion selective: add capacity only in proven demand lanes and keep rollback criteria explicit.",
+    "postureLabel": "Guarded Expansion — Late",
+    "regime": "EXPANSION",
+    "confidenceLabel": "MED",
+    "whatChanged": "Pressure increased by +1.2 this week. Slow new commitments until conditions stabilize.",
+    "actionNow": "Conditions tightening — freeze new commitments and keep spend flexible.",
+    "guardrailThreshold": "Over-engineering before demand proves out",
+    "flipThreshold": "No flip condition is tripped yet. Cash availability flips this call if it climbs above 70.0, from 52.0 today. Market risk appetite flips this call if it falls to or below 50.0, from 58.0 today.",
+    "decisions": [
+      {
+        "area": "hiring",
+        "call": "Selective hiring for revenue-linked and reliability roles.",
+        "doNow": "Prioritize revenue-linked and reliability roles with staged approvals.",
+        "pauseTrigger": "Pause net-new hiring if cash availability tightens above 76 or market risk appetite falls below 44.",
+        "resumeTrigger": "Resume staged approvals when cash availability eases below 66 and market risk appetite is above 54."
+      },
+      {
+        "area": "product-tempo",
+        "call": "Speed up product work tied to activation and retention goals.",
+        "doNow": "Speed up on product bets tied to activation and retention goals.",
+        "pauseTrigger": "Pause long-payback bets if market risk appetite falls below 44 or two consecutive weaker weekly reads print.",
+        "resumeTrigger": "Resume tempo on deferred bets when market risk appetite is above 54 and weekly direction stabilizes or improves."
+      },
+      {
+        "area": "capital-raising",
+        "call": "Raise proactively from leverage while window quality is favorable.",
+        "doNow": "Run an active fundraising process while window quality remains favorable.",
+        "pauseTrigger": "Pause acceleration if market risk appetite falls below 44 or cash availability tightens above 76.",
+        "resumeTrigger": "Resume full process when market risk appetite is above 54 and cash availability eases below 66."
+      },
+      {
+        "area": "burn-discipline",
+        "call": "Keep discretionary spend gated by measurable short-cycle payback.",
+        "doNow": "Gate discretionary spend by measurable short-cycle payback proof.",
+        "pauseTrigger": "Pause discretionary burn expansion if cash availability tightens above 76.",
+        "resumeTrigger": "Resume controlled burn expansion when cash availability eases below 66 and budget payback proof is intact."
+      },
+      {
+        "area": "expansion-bets",
+        "call": "Run reversible expansion bets with explicit rollback criteria and stage gates.",
+        "doNow": "Run expansion in staged tranches with explicit rollback criteria.",
+        "pauseTrigger": "Pause expansion bets if market risk appetite falls below 44 or cash availability tightens above 76.",
+        "resumeTrigger": "Resume in tranches when market risk appetite is above 54 and cash availability eases below 66."
+      }
+    ],
+    "evidence": [
+      {
+        "title": "Capital conditions",
+        "detail": "Tighten approvals and protect runway for fixed-cost commitments.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Market risk appetite",
+        "detail": "Bias toward proof-first launches and smaller bet sizes.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Fed interest rate",
+        "detail": "Shorten payback windows before approving net-new spend.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Recession warning gauge",
+        "detail": "Keep commitments staged while macro risk remains elevated.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      }
+    ],
+    "sourceLabel": "Canonical snapshot (high confidence)",
+    "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+    "freshnessLabel": "Aug 1, 2026 at 1:51 PM UTC",
+    "correction": null
+  }
+]

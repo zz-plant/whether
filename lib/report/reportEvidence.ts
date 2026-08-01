@@ -1,7 +1,7 @@
 import { DEFAULT_THRESHOLDS, buildSignalInfluence, evaluateRegime } from "../regimeEngine";
 import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
-import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
+import { resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { formatConfidencePlainLabel } from "./reportFormatting";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildActionStripItems } from "./operatingCalls";
@@ -56,7 +56,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     threshold,
     direction,
   }: {
-    label: "Tightness" | "Risk appetite";
+    label: "Cash availability" | "Market risk appetite";
     now: number;
     threshold: number;
     direction: "riseAbove" | "fallToOrBelow";
@@ -64,19 +64,19 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     const hasCurrentValue = typeof now === "number" && Number.isFinite(now);
     const alreadyTriggered = hasCurrentValue && (direction === "riseAbove" ? now > threshold : now <= threshold);
     const crossingCopy = direction === "riseAbove"
-      ? `crosses above ${threshold.toFixed(1)}`
+      ? `climbs above ${threshold.toFixed(1)}`
       : `falls to or below ${threshold.toFixed(1)}`;
     const holdCopy = direction === "riseAbove"
-      ? `stays above ${threshold.toFixed(1)}`
-      : `stays at or below ${threshold.toFixed(1)}`;
+      ? `above ${threshold.toFixed(1)}`
+      : `at or below ${threshold.toFixed(1)}`;
 
     if (!hasCurrentValue) {
       return `${label} flips this call if it ${crossingCopy}.`;
     }
 
     return alreadyTriggered
-      ? `${label} is already in the flip zone (${now.toFixed(1)}; ${holdCopy}).`
-      : `${label} flips this call if it ${crossingCopy} (now ${now.toFixed(1)}).`;
+      ? `${label} is already in the flip zone at ${now.toFixed(1)} and only has to stay ${holdCopy}.`
+      : `${label} flips this call if it ${crossingCopy}, from ${now.toFixed(1)} today.`;
   };
 
   const tightnessDirection: "riseAbove" | "fallToOrBelow" =
@@ -90,10 +90,14 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     ? riskNow > riskThreshold
     : riskNow <= riskThreshold;
   const watchPrefix = tightnessTriggered || riskTriggered
-    ? "Flip watch: Already tripped."
-    : "Flip watch:";
+    ? "One flip condition is already tripped."
+    : "No flip condition is tripped yet.";
 
-  return `${watchPrefix} ${crossingText({ label: "Tightness", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection })} ${crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection })}`;
+  return [
+    watchPrefix,
+    crossingText({ label: "Cash availability", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
+    crossingText({ label: "Market risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
+  ].join(" ");
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
@@ -203,11 +207,12 @@ export const buildReportEvidenceItems = ({
           : null;
 
     const supportingBullets = [
-      `Weekly move: ${delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)} vs. prior snapshot.`,
-      `Signal direction: ${directionLabel.toLowerCase()} (${deltaLabelBySignal[key]}).`,
+      delta === 0
+        ? "No measurable move against the prior snapshot."
+        : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${direction === "tightening" ? "tightening" : "easing"} the read.`,
       thresholdDistance === null
-        ? `Current level: ${signalLabels[key]} contributes to this week's call.`
-        : `Distance to regime threshold: ${thresholdDistance.toFixed(1)} points.`,
+        ? `${signalLabels[key]} feeds this week's call but carries no regime threshold of its own.`
+        : `Sits ${thresholdDistance.toFixed(1)} points from the regime threshold.`,
     ];
 
     return {

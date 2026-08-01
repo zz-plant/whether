@@ -1,0 +1,120 @@
+/**
+ * Schema for the compact posture archive index consumed by `/history/[period]`.
+ *
+ * Kept separate from the loader so `scripts/generatePostureArchiveIndex.ts` can
+ * import the contract without importing the generated file it is about to write.
+ */
+import { z } from "zod";
+import type { RegimeKey } from "../regimeEngine";
+
+const RegimeSchema = z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]) as z.ZodType<RegimeKey>;
+
+export const PostureArchiveRegimeShareSchema = z.object({
+  regime: RegimeSchema,
+  label: z.string(),
+  periods: z.number(),
+  share: z.number(),
+});
+
+const PostureArchiveTransitionSchema = z.object({
+  asOf: z.string(),
+  dateLabel: z.string(),
+  from: RegimeSchema,
+  fromLabel: z.string(),
+  to: RegimeSchema,
+  toLabel: z.string(),
+});
+
+const PostureArchiveRateSchema = z.object({
+  label: z.string(),
+  value: z.number().nullable(),
+  unit: z.string(),
+  sourceUrl: z.string().optional(),
+});
+
+const PostureArchiveChildSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  regime: RegimeSchema,
+  operatorLabel: z.string(),
+  guidance: z.string(),
+});
+
+export const PostureArchivePeriodSchema = z.object({
+  slug: z.string(),
+  kind: z.enum(["year", "quarter"]),
+  year: z.number(),
+  quarter: z.number().optional(),
+  title: z.string(),
+  asOf: z.string(),
+  recordDateLabel: z.string(),
+  regime: RegimeSchema,
+  regimeLabel: z.string(),
+  operatorLabel: z.string(),
+  headline: z.string(),
+  guidance: z.string(),
+  // Quarterly and yearly archive entries carry no confidence grade, so the index
+  // deliberately omits one rather than inheriting the schema's default.
+  constraints: z.array(z.string()),
+  rates: z.array(PostureArchiveRateSchema),
+  sourceLabel: z.string(),
+  sourceUrl: z.string().optional(),
+  statusLabel: z.string(),
+  sampleCadence: z.enum(["weekly", "monthly"]).nullable(),
+  sampleCount: z.number(),
+  regimeMix: z.array(PostureArchiveRegimeShareSchema),
+  transitions: z.array(PostureArchiveTransitionSchema),
+  children: z.array(PostureArchiveChildSchema),
+  parentSlug: z.string().nullable(),
+  previousSlug: z.string().nullable(),
+  nextSlug: z.string().nullable(),
+});
+
+export const PostureArchiveIndexSchema = z.array(PostureArchivePeriodSchema);
+
+/**
+ * A single published week, frozen at the date it closed.
+ *
+ * These back `/brief/[week]`, the permanent dated home for each weekly brief.
+ * Discover and News both index articles by publication date, so the live view at
+ * `/` cannot serve that role — its content changes under a stable URL.
+ */
+export const WeeklyBriefRecordSchema = z.object({
+  slug: z.string(),
+  year: z.number(),
+  week: z.number(),
+  asOf: z.string(),
+  recordDateLabel: z.string(),
+  title: z.string(),
+  headline: z.string(),
+  regime: RegimeSchema,
+  regimeLabel: z.string(),
+  operatorLabel: z.string(),
+  guidance: z.string(),
+  confidence: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  transitionWatch: z.boolean(),
+  climateLabel: z.string(),
+  climateSummary: z.array(z.string()),
+  recommendedMoves: z.array(z.string()),
+  executionPriorities: z.array(z.string()),
+  watchouts: z.array(z.string()),
+  planningLanguage: z.string(),
+  executionConstraints: z.array(z.string()),
+  rates: z.array(PostureArchiveRateSchema),
+  sourceLabel: z.string(),
+  sourceUrl: z.string().optional(),
+  statusLabel: z.string(),
+  /** Set when this week's posture differs from the week before it. */
+  changedFrom: z.string().nullable(),
+  archivePeriodSlug: z.string().nullable(),
+  previousSlug: z.string().nullable(),
+  nextSlug: z.string().nullable(),
+});
+
+export const WeeklyBriefIndexSchema = z.array(WeeklyBriefRecordSchema);
+
+export type WeeklyBriefRecord = z.infer<typeof WeeklyBriefRecordSchema>;
+
+export type PostureArchiveRegimeShare = z.infer<typeof PostureArchiveRegimeShareSchema>;
+export type PostureArchiveTransition = z.infer<typeof PostureArchiveTransitionSchema>;
+export type PostureArchivePeriod = z.infer<typeof PostureArchivePeriodSchema>;

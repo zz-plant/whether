@@ -6,6 +6,20 @@ import {
   type DecisionArea,
 } from "./boundedDecisionRules";
 import { businessAreaLabel, businessAreaOrder, type BusinessAreaKey } from "./decisionKnobs";
+import { joinSentences } from "./reportFormatting";
+
+/**
+ * `avoidNow` renders under an "Avoid now" heading, so its entries stay bare
+ * clauses rather than sentences. Semicolons keep two clauses from running
+ * together into one unreadable line.
+ */
+const joinClauses = (...parts: Array<string | undefined | null | false>) => {
+  const clauses = parts
+    .filter((part): part is string => typeof part === "string" && part.trim().length > 0)
+    .map((part) => part.trim().replace(/\.$/, ""));
+
+  return clauses.length > 0 ? `${clauses.join("; ")}.` : "";
+};
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import type { DecisionTransmissionBoundedRule } from "./reportData";
 
@@ -43,8 +57,6 @@ export type RoleAwareOperatingTemplate = {
 
 const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
-
-const isString = (value: string | undefined): value is string => typeof value === "string";
 
 const OPERATING_LEVER_FALLBACK = {
   areaActionNow: "Hold current posture until rules refresh.",
@@ -286,12 +298,15 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
     {
       role: "startup-leadership",
       roleLabel: "Startup leadership",
-      doNow: [hiringRule?.recommendation, productRule?.recommendation, burnRule?.recommendation]
-        .filter(isString)
-        .join(" "),
-      avoidNow: [hiringRule && formatActionStripThresholdText(hiringRule), productRule && formatActionStripThresholdText(productRule)]
-        .filter(isString)
-        .join(" "),
+      doNow: joinSentences(
+        hiringRule?.recommendation,
+        productRule?.recommendation,
+        burnRule?.recommendation,
+      ),
+      avoidNow: joinClauses(
+        hiringRule && formatActionStripThresholdText(hiringRule),
+        productRule && formatActionStripThresholdText(productRule),
+      ),
       flipTrigger: expansionRule
         ? formatActionStripReversalText(expansionRule)
         : hiringRule
@@ -301,12 +316,11 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
     {
       role: "vc-partner",
       roleLabel: "VC partner",
-      doNow: [capitalRule?.recommendation, burnRule?.recommendation]
-        .filter(isString)
-        .join(" "),
-      avoidNow: [capitalRule && formatActionStripThresholdText(capitalRule), expansionRule && formatActionStripThresholdText(expansionRule)]
-        .filter(isString)
-        .join(" "),
+      doNow: joinSentences(capitalRule?.recommendation, burnRule?.recommendation),
+      avoidNow: joinClauses(
+        capitalRule && formatActionStripThresholdText(capitalRule),
+        expansionRule && formatActionStripThresholdText(expansionRule),
+      ),
       flipTrigger: capitalRule
         ? formatActionStripReversalText(capitalRule)
         : expansionRule

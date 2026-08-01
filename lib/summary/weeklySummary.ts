@@ -4,7 +4,9 @@
  */
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
+import { joinSentences } from "../report/reportFormatting";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
+import { formatConfidenceSentence } from "./summaryFormatting";
 
 import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
@@ -194,13 +196,24 @@ export const buildWeeklySummary = ({
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getWeeklyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? " Evidence is near a regime boundary; tighten review cadence before expanding commitments."
+    ? "Evidence is sitting near a regime boundary, so tighten the review cadence before expanding any commitment."
     : "";
   const refusalCue = assessment.policyAssessment.refusal.refused
-    ? ` Policy override active: ${assessment.policyAssessment.refusal.reasons[0] ?? "cross-signal disagreement or missing inputs"}. Keep approvals reversible only until signals reconcile.`
+    ? joinSentences(
+        "A policy override is holding the posture in place",
+        assessment.policyAssessment.refusal.reasons[0]
+          ?? "The signals disagree, or too many inputs are missing",
+        "Keep approvals reversible until they reconcile",
+      )
     : "";
   const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;
-  const summary = `${stagedRegimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}${refusalCue}`;
+  const summary = joinSentences(
+    `${stagedRegimeLabel}: ${assessment.description}`,
+    `The priority this week is to ${guidance}`,
+    formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
+    transitionCue,
+    refusalCue,
+  );
   const title = recordDateLabel
     ? `Weekly action summary — ${recordDateLabel}`
     : "Weekly action summary";

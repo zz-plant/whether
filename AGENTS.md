@@ -37,10 +37,15 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Build: `bun run build`
 - Full checks: `bun run check`
 - Lint: `bun run lint`
-- Tests: `bun run test`
+- Tests: `bun run test` (full suite, ~50s)
 - CI: `.github/workflows/ci.yml` — runs lint, typecheck, test on push/PR to main
 
-Use targeted tests when possible before running full checks.
+Use targeted tests when possible before running full checks:
+
+- `bun run test tests/homeBriefModel.test.ts` — one file (~0.2s)
+- `bun run test -t "reversal trigger"` — filter by test name across the suite
+
+Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check` (~90s) for pre-merge.
 
 ## Architectural invariants
 

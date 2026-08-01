@@ -1,7 +1,7 @@
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
 import { REGIME_SHORT_LABELS } from "../../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivity";
-import { regimeSignalLabelByKey } from "../reportFormatting";
+import { joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
 import { isImprovingSignalDelta } from "../reportData";
 import type {
   BoundaryDirection,
@@ -129,6 +129,25 @@ const getMacroSeriesDelta = (
   return { latest, delta };
 };
 
+const sectorActionBiasCopy = {
+  loosen: "Run a step ahead of the base call.",
+  tighten: "Run a step behind the base call.",
+  hold: "Hold the base call as written.",
+} as const;
+
+const describeSectorOverlay = (
+  overlay: ReturnType<typeof deriveSectorAdjustedPosture>,
+): string => {
+  const bias = sectorActionBiasCopy[overlay.actionBias];
+
+  if (overlay.adjustmentStrength === "none") {
+    return `${overlay.adjustedPostureLabel}, with no meaningful sector tilt. ${bias}`;
+  }
+
+  const tilt = overlay.adjustmentDelta > 0 ? "upside" : "downside";
+  return `${overlay.adjustedPostureLabel}, a ${overlay.adjustmentStrength} ${tilt} tilt against the base posture. ${bias}`;
+};
+
 export const buildMacroOverlay = (
   macroSeries: HomeReportData["macroSeries"],
   assessment: HomeReportData["assessment"],
@@ -161,22 +180,26 @@ export const buildMacroOverlay = (
     },
     {
       label: `Sector sensitivity (${sectorLabel})`,
-      detail:
-        sectorOverlay.adjustmentStrength === "none"
-          ? `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.postureVariant}); action bias: ${sectorOverlay.actionBias}.`
-          : `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.adjustmentStrength} ${sectorOverlay.adjustmentDelta > 0 ? "upside" : "downside"} tilt, ${sectorOverlay.postureVariant}); action bias: ${sectorOverlay.actionBias}.`,
+      detail: describeSectorOverlay(sectorOverlay),
     },
   ];
 };
 
 const describeSignalDirection = (
   signal: SignalChange,
-): "improving" | "deteriorating" | "held" => {
+): "improved" | "deteriorated" | "held flat" => {
   if (signal.delta === 0) {
-    return "held";
+    return "held flat";
   }
 
-  return isImprovingSignalDelta(signal.key, signal.delta) ? "improving" : "deteriorating";
+  return isImprovingSignalDelta(signal.key, signal.delta) ? "improved" : "deteriorated";
+};
+
+const overallDirectionCopy: Record<string, string> = {
+  improving: "the signal set is improving overall",
+  deteriorating: "the signal set is deteriorating overall",
+  mixed: "the signal set is split overall",
+  stable: "the signal set is otherwise flat",
 };
 
 export const buildWhyThisCall = ({
@@ -191,31 +214,35 @@ export const buildWhyThisCall = ({
   transitionWatch: "ON" | "OFF";
 }): WhyThisCallItem[] => {
   const nearestGap = Math.min(tightnessGap, riskGap);
-  const boundaryLabel =
-    nearestGap <= 5 ? "near threshold" : nearestGap <= 12 ? "within monitor range" : "well outside threshold";
+  const boundaryCopy =
+    nearestGap <= 5
+      ? "close enough to trip on a single bad read"
+      : nearestGap <= 12
+        ? "close enough to be worth watching weekly"
+        : "far enough that a single week will not move it";
   const changedSignal = reportDynamics?.changedSignals[0];
 
   return [
     {
       key: "distance-to-regime-change",
       label: "Distance to regime change",
-      detail: `Nearest regime change trigger is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
+      detail: `The nearest trigger is ${nearestGap.toFixed(1)} points away — ${boundaryCopy}.`,
     },
     {
       key: "momentum",
       label: "What moved this week",
       detail:
-        reportDynamics?.changedSignals.length
-          ? `${regimeSignalLabelByKey[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
-          : "No material signal move this week; posture is driven by current levels and threshold distance.",
+        changedSignal
+          ? `${regimeSignalLabelByKey[changedSignal.key]} ${describeSignalDirection(changedSignal)}, and ${overallDirectionCopy[reportDynamics?.directionLabel ?? "stable"]}.`
+          : "Nothing moved materially. This week's posture comes from where the signals already sit, not from new motion.",
     },
     {
       key: "signal-reliability",
       label: "Confidence",
       detail:
         transitionWatch === "ON"
-          ? "Transition watch is ON; check next release before irreversible commitments."
-          : "Transition watch is OFF; signal set is stable for near-term planning.",
+          ? "Transition watch is on. Wait for the next release before committing anything you cannot undo."
+          : "Transition watch is off. The signal set is steady enough for near-term planning.",
     },
   ];
 };
@@ -328,9 +355,11 @@ export const buildStartRouteDeltaBlock = ({
     items.push({
       id: "top-driver" as const,
       label: "Top driver change",
-      detail: topDriverEvidence?.immediateImplication
-        ? `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}. ${topDriverEvidence.immediateImplication}`
-        : `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}; trend is ${trendLabel.toLowerCase()}.`,
+      detail: joinSentences(
+        `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}`,
+        topDriverEvidence?.immediateImplication
+          ?? `That leaves ${overallDirectionCopy[trendLabel.toLowerCase()] ?? "the signal set otherwise flat"}`,
+      ),
       href: "/evidence" as const,
     });
   }
@@ -338,9 +367,11 @@ export const buildStartRouteDeltaBlock = ({
   items.push({
     id: "trigger-risk" as const,
     label: "Trigger / risk change",
-    detail: topFailureMode
-      ? `${topFailureMode} Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`
-      : `Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`,
+    detail: joinSentences(
+      topFailureMode,
+      `The guardrail to hold is: ${guardrail}`,
+      `The call flips when: ${reversalTrigger}`,
+    ),
     href: "/planning" as const,
   });
 

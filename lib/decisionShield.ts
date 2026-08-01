@@ -4,6 +4,7 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 import { REGIME_REVERSAL_DAYS } from "./regimeEngine";
+import { REGIME_LABELS } from "./regimePresentation";
 import {
   DECISION_ACTION_LABELS,
   DECISION_GUARDRAILS,
@@ -33,6 +34,19 @@ export type DecisionAction =
 export type DecisionVerdict = "SAFE" | "RISKY" | "DANGEROUS";
 
 const VERDICT_ORDER: DecisionVerdict[] = ["SAFE", "RISKY", "DANGEROUS"];
+
+const VERDICT_COPY: Record<DecisionVerdict, string> = {
+  SAFE: "a safe call",
+  RISKY: "a risky call",
+  DANGEROUS: "a dangerous call",
+};
+
+const LIFECYCLE_COPY: Record<LifecycleStage, string> = {
+  DISCOVERY: "discovery-stage",
+  GROWTH: "growth-stage",
+  SCALE: "scaling",
+  MATURE: "mature",
+};
 
 export interface DecisionInput {
   lifecycle: LifecycleStage;
@@ -90,23 +104,23 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
   const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
   const { baseRateTightness } = assessment.thresholds;
-  const rateDirection = baseRate > baseRateTightness ? "above" : "below";
-  const rateImpact = baseRate > baseRateTightness ? "capital is expensive" : "capital is moderate";
 
   bullets.push(
-    `Base rate: ${baseRate.toFixed(2)}% is ${rateDirection} ${baseRateTightness}%, so ${rateImpact}.`
+    baseRate > baseRateTightness
+      ? `The Fed rate is ${baseRate.toFixed(2)}%, above the ${baseRateTightness}% line where capital gets expensive.`
+      : `The Fed rate is ${baseRate.toFixed(2)}%, below the ${baseRateTightness}% line, so the cost of capital is manageable.`
   );
 
   if (curveSlope === null) {
-    bullets.push("Curve slope: unavailable, so inversion risk is unconfirmed.");
+    bullets.push("The recession warning gauge is unavailable this week, so inversion risk is unconfirmed.");
   } else if (curveSlope < 0) {
-    bullets.push(`Curve slope: inverted (${curveSlope.toFixed(2)}%), signaling caution.`);
+    bullets.push(`The yield curve is inverted at ${curveSlope.toFixed(2)}%, which historically argues for caution.`);
   } else {
-    bullets.push(`Curve slope: positive (${curveSlope.toFixed(2)}%), supporting risk taking.`);
+    bullets.push(`The yield curve is positive at ${curveSlope.toFixed(2)}%, which leaves room for risk-taking.`);
   }
 
   bullets.push(
-    `Tightness ${tightness} vs risk appetite ${riskAppetite} keeps conditions in ${assessment.regime.toLowerCase()}.`
+    `Cash availability at ${tightness} against market risk appetite at ${riskAppetite} holds conditions in ${REGIME_LABELS[assessment.regime]}.`
   );
 
   return bullets;
@@ -114,20 +128,23 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
 
 const buildReversalTrigger = (assessment: RegimeAssessment) => {
   const { tightnessRegime, riskAppetiteRegime } = assessment.thresholds;
+  const cash = `cash availability (now ${assessment.scores.tightness})`;
+  const risk = `market risk appetite (now ${assessment.scores.riskAppetite})`;
+  const hold = `for ${REGIME_REVERSAL_DAYS} straight days`;
 
   if (assessment.regime === "SCARCITY") {
-    return `Revisit when tightness drops below ${tightnessRegime} and risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+    return `Revisit once ${cash} drops below ${tightnessRegime} and ${risk} rises above ${riskAppetiteRegime} ${hold}.`;
   }
 
   if (assessment.regime === "DEFENSIVE") {
-    return `Revisit when tightness drops below ${tightnessRegime} or risk appetite falls to or below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+    return `Revisit once ${cash} drops below ${tightnessRegime}, or ${risk} falls to or below ${riskAppetiteRegime} ${hold}.`;
   }
 
   if (assessment.regime === "VOLATILE") {
-    return `Revisit when tightness rises above ${tightnessRegime} or risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+    return `Revisit once ${cash} rises above ${tightnessRegime}, or ${risk} rises above ${riskAppetiteRegime} ${hold}.`;
   }
 
-  return `Revisit when tightness rises above ${tightnessRegime} or risk appetite falls to or below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  return `Revisit once ${cash} rises above ${tightnessRegime}, or ${risk} falls to or below ${riskAppetiteRegime} ${hold}.`;
 };
 
 export const evaluateDecision = (
@@ -141,7 +158,7 @@ export const evaluateDecision = (
 
   return {
     verdict,
-    summary: `Decision verdict: ${actionLabel} is ${verdict.toLowerCase()} for a ${input.lifecycle.toLowerCase()} team in ${assessment.regime.toLowerCase()} conditions, based on current signals.`,
+    summary: `On this week's signals, ${actionLabel.toLowerCase()} is ${VERDICT_COPY[verdict]} for a ${LIFECYCLE_COPY[input.lifecycle]} team in ${REGIME_LABELS[assessment.regime]} conditions.`,
     bullets,
     guardrail: DECISION_GUARDRAILS[input.action],
     reversalTrigger: buildReversalTrigger(assessment),

@@ -11,6 +11,8 @@ import {
   indexableResourceArticleSlugs,
   indexableResourcePillarSlugs,
 } from "../lib/seo/indexationPolicy";
+import { buildPostureArchivePath, getPostureArchivePeriods } from "../lib/summary/postureArchive";
+import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes only the curated indexable routes", async () => {
@@ -104,5 +106,57 @@ describe("sitemap", () => {
     assert.ok(!urls.has(`${siteUrl}/evidence/capital-tightness-watch/hiring`));
     assert.ok(!urls.has(`${siteUrl}/should-we-hire-engineers-right-now`));
     assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
+  });
+
+  it("keeps closed archive periods indexed regardless of live-payload eligibility", async () => {
+    const periods = getPostureArchivePeriods();
+    assert.ok(periods.length > 0);
+
+    for (const eligible of [true, false]) {
+      const entries = await sitemap({ programmaticEligible: eligible });
+      const urls = new Set(entries.map((entry) => entry.url));
+
+      for (const period of periods) {
+        assert.ok(
+          urls.has(`${siteUrl}${buildPostureArchivePath(period.slug)}`),
+          `archive period ${period.slug} missing when programmaticEligible=${eligible}`,
+        );
+      }
+    }
+  });
+
+  it("indexes published weeks and the publisher identity pages Discover requires", async () => {
+    const briefs = getPublishedBriefs();
+    assert.ok(briefs.length > 0);
+
+    for (const eligible of [true, false]) {
+      const entries = await sitemap({ programmaticEligible: eligible });
+      const entryByUrl = new Map(entries.map((entry) => [entry.url, entry]));
+
+      assert.ok(entryByUrl.has(`${siteUrl}/about`));
+      assert.ok(entryByUrl.has(`${siteUrl}/contact`));
+
+      for (const brief of briefs) {
+        const entry = entryByUrl.get(`${siteUrl}${buildPublishedBriefPath(brief.slug)}`);
+        assert.ok(entry, `published week ${brief.slug} missing when programmaticEligible=${eligible}`);
+        assert.ok(entry?.lastModified instanceof Date);
+        assert.equal((entry?.lastModified as Date).toISOString(), new Date(brief.publishedAt).toISOString());
+      }
+    }
+  });
+
+  it("dates archive periods to the period they close and ranks years above quarters", async () => {
+    const entries = await sitemap({ programmaticEligible: true });
+    const entryByUrl = new Map(entries.map((entry) => [entry.url, entry]));
+
+    for (const period of getPostureArchivePeriods()) {
+      const entry = entryByUrl.get(`${siteUrl}${buildPostureArchivePath(period.slug)}`);
+      assert.ok(entry?.lastModified instanceof Date);
+      assert.equal(entry?.lastModified?.toISOString(), new Date(period.asOf).toISOString());
+    }
+
+    const year = entryByUrl.get(`${siteUrl}/history/2022`);
+    const quarter = entryByUrl.get(`${siteUrl}/history/2022-q2`);
+    assert.ok((year?.priority ?? 0) > (quarter?.priority ?? 1));
   });
 });

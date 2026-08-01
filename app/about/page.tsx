@@ -1,0 +1,103 @@
+import type { Metadata } from "next";
+import { ActionLink } from "../components/ui/actionLink";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import {
+  buildBreadcrumbList,
+  buildCanonicalUrl,
+  buildPageMetadata,
+  organizationName,
+  serializeJsonLd,
+} from "../../lib/seo";
+import {
+  buildAuthorSchema,
+  publisherAuthor,
+  publisherContactPath,
+  publisherProfilePath,
+} from "../../lib/publisher";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "About Whether",
+  description:
+    "Who writes Whether, what the weekly operating brief is, and what it is built from.",
+  path: publisherProfilePath,
+  imageAlt: "About Whether",
+});
+
+export default function AboutPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        url: buildCanonicalUrl(publisherProfilePath),
+        name: "About Whether",
+        publisher: { "@type": "Organization", name: organizationName, url: buildCanonicalUrl("/") },
+      },
+      {
+        ...buildAuthorSchema(),
+        description: publisherAuthor.bio,
+        worksFor: { "@type": "Organization", name: organizationName, url: buildCanonicalUrl("/") },
+      },
+      buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherProfilePath, label: "About" }])),
+    ],
+  };
+
+  return (
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
+        <p className="text-sm text-slate-300">
+          Whether turns public macro signals into a weekly operating posture for startup and product leaders. Each
+          week it answers three things: what should change right now, how sure we are, and what would flip the call.
+        </p>
+        <p className="text-sm text-slate-300">
+          It is not a macro blog and not a prediction engine. Every call is bounded — an action, the threshold that
+          triggers it, and the condition that reverses it — so a team can act on it and revisit it later without
+          re-litigating the reasoning.
+        </p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Who writes it</h2>
+        <p className="text-sm text-slate-300">
+          <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
+        </p>
+        <p className="text-sm text-slate-300">{publisherAuthor.bio}</p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
+        <p className="text-sm text-slate-300">
+          Whether reads public US Treasury yield curve data via FRED and scores it into one of four operating
+          regimes. The scoring formulas, source list, refresh cadence, and stated limitations are published in full.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <ActionLink href="/trust" variant="pill">
+            Sources and formulas
+          </ActionLink>
+          <ActionLink href="/history" variant="pill">
+            Every past posture
+          </ActionLink>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Corrections and questions</h2>
+        <p className="text-sm text-slate-300">
+          Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so
+          and it gets a correction note rather than a silent edit.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <ActionLink href={publisherContactPath} variant="primary">
+            Contact
+          </ActionLink>
+          <ActionLink href="/" variant="pill">
+            This week&apos;s brief
+          </ActionLink>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -389,22 +389,22 @@ describe("buildFlipThreshold", () => {
     }) as ReturnType<typeof evaluateRegime>;
 
   it("returns a future crossing for scarcity regimes", () => {
-    assert.match(buildFlipThreshold(makeAssessment("SCARCITY")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("SCARCITY")), /flip condition is (already tripped|tripped yet)/);
     assert.match(buildFlipThreshold(makeAssessment("SCARCITY")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for defensive regimes", () => {
-    assert.match(buildFlipThreshold(makeAssessment("DEFENSIVE")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("DEFENSIVE")), /flip condition is (already tripped|tripped yet)/);
     assert.match(buildFlipThreshold(makeAssessment("DEFENSIVE")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for volatile regimes", () => {
-    assert.match(buildFlipThreshold(makeAssessment("VOLATILE")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("VOLATILE")), /flip condition is (already tripped|tripped yet)/);
     assert.match(buildFlipThreshold(makeAssessment("VOLATILE")), /already in the flip zone|flips this call if it/i);
   });
 
   it("returns a future crossing for expansion regimes", () => {
-    assert.match(buildFlipThreshold(makeAssessment("EXPANSION")), /Flip watch:/);
+    assert.match(buildFlipThreshold(makeAssessment("EXPANSION")), /flip condition is (already tripped|tripped yet)/);
     assert.match(buildFlipThreshold(makeAssessment("EXPANSION")), /already in the flip zone|flips this call if it/i);
   });
 });

@@ -7,6 +7,7 @@ import {
   parseDensityMode,
   parseViewportMode,
 } from "../components/mockupShell";
+import { CopyOperatorBriefButton } from "../components/copyOperatorBriefButton";
 
 export const metadata: Metadata = {
   title: "Mockup — Operator-First Weekly Brief",
@@ -29,7 +30,6 @@ const weeklyCall = {
     "The next read confirms improving stability without a renewed caution signal.",
   readiness: "Act with caution",
   readinessDetail: "Good enough for weekly planning. Keep new fixed-cost commitments reversible.",
-  shareableLine: "Reopen selective hiring, not broad expansion.",
 } as const;
 
 const backdropItems = [
@@ -49,18 +49,15 @@ const proofItems = [
     value:
       "Add targeted capacity where it improves near-term delivery or revenue, but keep broad fixed-cost expansion on hold.",
   },
-  {
-    label: "Proof verdict",
-    value:
-      "Safe enough to act this week. If the next read weakens, roll back to strict hiring controls.",
-  },
 ] as const;
 
-const operatorBriefBullets = [
-  "Add only hires tied to shipped roadmap or near-term revenue.",
-  "Keep payback expectations tight on new roadmap bets.",
-  "Wait on category expansions until the stability read improves again.",
-] as const;
+const copyBriefText = [
+  `Whether · ${weeklyCall.readiness}`,
+  weeklyCall.currentCall,
+  `${publicDecisionLabels.action}: ${weeklyCall.actionNow}`,
+  `${publicDecisionLabels.threshold}: ${weeklyCall.pauseIf}`,
+  `${publicDecisionLabels.reversal}: ${weeklyCall.changeCourseIf}`,
+].join("\n");
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
@@ -121,14 +118,14 @@ export default async function OperatorBriefMockupPage({
             <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
               Default lens: Product / Eng
             </span>
-            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-amber-50">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-emerald-300/35 bg-emerald-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-emerald-50">
               Decision readiness: {weeklyCall.readiness}
             </span>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)]">
             <div className="rounded-lg border border-slate-700/70 bg-slate-900/72 p-5">
-              <SectionLabel>{publicDecisionLabels.call}</SectionLabel>
+              <SectionLabel>Weekly operating call</SectionLabel>
               <h1
                 className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]"
                 style={{ fontFamily: "var(--weather-font-display)" }}
@@ -138,28 +135,10 @@ export default async function OperatorBriefMockupPage({
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
                 {weeklyCall.whatChanged}
               </p>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-4">
-                  <SectionLabel>{publicDecisionLabels.action}</SectionLabel>
-                  <p className="mt-2 text-base font-semibold text-emerald-50">
-                    {weeklyCall.actionNow}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 p-4">
-                  <SectionLabel>Shareable line</SectionLabel>
-                  <p className="mt-2 text-base font-semibold text-white">
-                    {weeklyCall.shareableLine}
-                  </p>
-                </div>
-              </div>
             </div>
 
             <aside className="rounded-lg border border-slate-700/70 bg-slate-900/68 p-4">
               <SectionLabel>Trust</SectionLabel>
-              <p className="mt-2 text-lg font-semibold text-emerald-50">
-                {weeklyCall.readiness}
-              </p>
               <p className="mt-2 text-sm leading-6 text-slate-200">
                 {weeklyCall.readinessDetail}
               </p>
@@ -198,6 +177,21 @@ export default async function OperatorBriefMockupPage({
             />
           </div>
 
+          <section className="rounded-lg border border-slate-700/70 bg-slate-950/58 px-4 py-4 sm:px-5">
+            <SectionLabel>Why this call</SectionLabel>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {proofItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-md border border-slate-700/70 bg-slate-950/65 p-4"
+                >
+                  <SectionLabel>{item.label}</SectionLabel>
+                  <p className="mt-2 text-sm leading-6 text-slate-200">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Link
               href="/planning#ops-monthly-action-summary"
@@ -205,86 +199,7 @@ export default async function OperatorBriefMockupPage({
             >
               Open planning handoff
             </Link>
-            <button
-              type="button"
-              className="weather-pill inline-flex min-h-[46px] items-center justify-center rounded px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
-            >
-              Copy operator brief
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <details className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-4 py-4 sm:px-5">
-        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3">
-          <div>
-            <SectionLabel>Why this call</SectionLabel>
-            <p className="mt-2 text-lg font-semibold text-white">
-              Open only after the direction is clear.
-            </p>
-          </div>
-          <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-            Proof
-          </span>
-        </summary>
-
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {proofItems.map((item) => (
-            <div key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/65 p-4">
-              <SectionLabel>{item.label}</SectionLabel>
-              <p className="mt-2 text-sm leading-6 text-slate-200">{item.value}</p>
-            </div>
-          ))}
-        </div>
-      </details>
-
-      <section className="rounded-lg border border-slate-700/70 bg-slate-950/58 px-4 py-4 sm:px-5">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(16rem,0.9fr)]">
-          <div className="rounded-lg border border-cyan-300/20 bg-[linear-gradient(180deg,rgba(14,23,42,0.88),rgba(2,6,23,0.95))] p-5 shadow-[0_24px_60px_-42px_rgba(34,211,238,0.45)]">
-            <SectionLabel>Recommended artifact</SectionLabel>
-            <h2
-              className="mt-3 text-2xl font-semibold text-white"
-              style={{ fontFamily: "var(--weather-font-display)" }}
-            >
-              Operator brief
-            </h2>
-            <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-200">
-              {operatorBriefBullets.map((item) => (
-                <li key={item} className="flex gap-2">
-                  <span className="text-cyan-200">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-4">
-              <SectionLabel>Artifact rule</SectionLabel>
-              <p className="mt-2 text-sm leading-6 text-slate-200">
-                Keep one routine path visible first. Use the same recommendation and guardrails in every format.
-              </p>
-            </div>
-
-            <details className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-4">
-              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3">
-                <div>
-                  <SectionLabel>More formats</SectionLabel>
-                  <p className="mt-2 text-sm font-semibold text-white">Only after the main brief is chosen.</p>
-                </div>
-                <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-                  Optional
-                </span>
-              </summary>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex min-h-[42px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                  Explainer brief
-                </span>
-                <span className="inline-flex min-h-[42px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                  Board note
-                </span>
-              </div>
-            </details>
+            <CopyOperatorBriefButton text={copyBriefText} />
           </div>
         </div>
       </section>

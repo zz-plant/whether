@@ -5,11 +5,42 @@
 import { ImageResponse } from "next/og";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { renderReportOgImage } from "./reportImageTemplate";
+import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
+import { getPostureArchivePeriods } from "../../../lib/summary/postureArchive";
+import type { RegimeKey } from "../../../lib/regimeEngine";
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 
-type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides";
+type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart";
+
+/** Templates rendered as static SVG, i.e. every one that is not data-driven. */
+type StaticOgTemplate = Exclude<OgTemplate, "report" | "brief-chart">;
+
+const regimeKeys = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
+
+const readRegime = (searchParams: URLSearchParams): RegimeKey => {
+  const value = searchParams.get("regime")?.trim().toUpperCase();
+  return regimeKeys.find((key) => key === value) ?? "VOLATILE";
+};
+
+/**
+ * Posture timeline for the chart-forward social image, newest last.
+ * Built from the quarterly archive so the bars show real history, not filler.
+ */
+const buildPostureTimelinePoints = (): BriefChartPoint[] =>
+  getPostureArchivePeriods()
+    .filter((period) => period.kind === "quarter")
+    .sort((a, b) => a.asOf.localeCompare(b.asOf))
+    .map((period) => {
+      const dominant = period.regimeMix[0];
+      return {
+        label: period.title,
+        regime: period.regime,
+        // Bar height reads as posture conviction: how much of the quarter held one call.
+        intensity: dominant ? Math.max(0.35, dominant.share / 100) : 0.5,
+      };
+    });
 
 const escapeText = (value: string) =>
   value
@@ -63,13 +94,14 @@ const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
     case "method":
     case "solutions":
     case "guides":
+    case "brief-chart":
       return template;
     default:
       return "report";
   }
 };
 
-const templateAccent: Record<Exclude<OgTemplate, "report">, string> = {
+const templateAccent: Record<StaticOgTemplate, string> = {
   operations: "#22d3ee",
   signals: "#38bdf8",
   method: "#a78bfa",
@@ -77,7 +109,7 @@ const templateAccent: Record<Exclude<OgTemplate, "report">, string> = {
   guides: "#f59e0b",
 };
 
-const templatePanelCopy: Record<Exclude<OgTemplate, "report">, {
+const templatePanelCopy: Record<StaticOgTemplate, {
   label: string;
   title: string;
   body: string;
@@ -116,7 +148,7 @@ const renderStaticTemplate = ({
   subtitle,
   kicker,
 }: {
-  template: Exclude<OgTemplate, "report">;
+  template: StaticOgTemplate;
   eyebrow: string;
   title: string;
   subtitle: string;
@@ -200,6 +232,22 @@ export const revalidate = 300;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const template = readTemplate(searchParams);
+
+  if (template === "brief-chart") {
+    const image = new ImageResponse(
+      renderBriefChartOgImage({
+        posture: readParam(searchParams, "posture", "Weekly operating posture", 34),
+        weekLabel: readParam(searchParams, "week", "", 16),
+        regime: readRegime(searchParams),
+        points: buildPostureTimelinePoints(),
+      }),
+      { width: OG_WIDTH, height: OG_HEIGHT },
+    );
+
+    image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
+
+    return image;
+  }
 
   if (template !== "report") {
     const title = readParam(searchParams, "title", "Whether — Capital Posture Governance", 72);

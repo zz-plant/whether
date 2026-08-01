@@ -13,6 +13,7 @@ import { DataProvenanceStrip, type DataProvenance } from "../../components/dataP
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ActionLink } from "../../components/ui/actionLink";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { REGIME_LABELS } from "../../../lib/regimePresentation";
 import {
   formatDateLabel,
   formatMonthInput,
@@ -249,7 +250,7 @@ export const TimeMachinePanel = ({
             {showHistoricalCallout ? (
               <div className="weather-surface mt-4 rounded-lg p-3">
                 <p className="type-label text-slate-400">
-                  Operational implication · {historicalRegime?.toLowerCase()}
+                  Operational implication · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
                 </p>
                 <p className="mt-2 text-sm text-slate-200">{historicalSummary}</p>
               </div>

@@ -48,12 +48,10 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
   const latestRegime = data[data.length - 1].regime;
   const prevRegime = data[data.length - 2].regime;
   const changed = latestRegime !== prevRegime;
-  const directionLabel = changed
-    ? `Shifted to ${latestRegime.charAt(0) + latestRegime.slice(1).toLowerCase()}`
-    : `${latestRegime.charAt(0) + latestRegime.slice(1).toLowerCase()} holding`;
-
-  const latestLog = logEntries.length >= 2 ? logEntries[logEntries.length - 1] : null;
-  const momentumLabel = latestLog ? directionLabel : directionLabel;
+  const latestRegimeLabel = REGIME_DISPLAY[latestRegime] ?? latestRegime;
+  const momentumLabel = changed
+    ? `Shifted to ${latestRegimeLabel}`
+    : `${latestRegimeLabel} holding`;
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
@@ -82,7 +80,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
                 <div
                   className={`w-3 rounded-t-sm transition-[height,background-color] ${REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"}`}
                   style={{ height: `${height}%` }}
-                  title={`${entry.record_date}: ${entry.regime}`}
+                  title={`${entry.record_date}: ${REGIME_DISPLAY[entry.regime] ?? entry.regime}`}
                 />
                 <span className={`text-fluid-nano font-semibold leading-none ${REGIME_TEXT_COLORS[entry.regime] ?? "text-slate-400"}`}>
                   {REGIME_DISPLAY[entry.regime] ?? entry.regime}

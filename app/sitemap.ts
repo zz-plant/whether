@@ -11,9 +11,12 @@ import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
 import {
   isIndexableAnswerSlug,
+  isIndexableArchivePeriodSlug,
   isIndexableResourceArticleSlug,
   isIndexableResourcePillarSlug,
 } from "../lib/seo/indexationPolicy";
+import { buildPostureArchivePath, getPostureArchivePeriods } from "../lib/summary/postureArchive";
+import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -113,6 +116,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/template", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
+    { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
+    { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
     { path: "/feed.xml", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 },
   ];
@@ -153,6 +158,26 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: 0.58,
     }));
 
+  // Published weeks are frozen dated articles. Like archive periods they carry no
+  // freshness risk, so the live-payload gate does not apply to them.
+  const publishedBriefEntries: SitemapEntryDescriptor[] = getPublishedBriefs().map((brief) => ({
+    path: buildPublishedBriefPath(brief.slug),
+    lastModified: resolveLastModified(brief.publishedAt),
+    changeFrequency: "yearly",
+    priority: 0.7,
+  }));
+
+  // Archive periods are closed records, so they are exempt from the programmatic
+  // freshness gate that governs live-posture pages.
+  const archivePeriodEntries: SitemapEntryDescriptor[] = getPostureArchivePeriods()
+    .filter((period) => isIndexableArchivePeriodSlug(period.slug))
+    .map((period) => ({
+      path: buildPostureArchivePath(period.slug),
+      lastModified: resolveLastModified(period.asOf),
+      changeFrequency: "yearly",
+      priority: period.kind === "year" ? 0.62 : 0.55,
+    }));
+
   const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible
     ? await Promise.all(
       signalScenarioRoutes.map(async (clusterRoute) => {
@@ -182,6 +207,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
     ...signalsClusterEntries,
+    ...archivePeriodEntries,
+    ...publishedBriefEntries,
   ]
     .filter((entry) => !isRetiredSitemapPath(entry.path))
     .map(buildEntry);

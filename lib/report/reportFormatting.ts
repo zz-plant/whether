@@ -2,6 +2,7 @@ import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue } from "../formatters";
+import { REGIME_LABELS } from "../regimePresentation";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
@@ -25,11 +26,12 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   reversal: "Reverse only after threshold recovery",
 };
 
+/** Same canonical names as `deltaLabelBySignal` and the glossary in `reportCopy.ts`. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Credit conditions",
-  riskAppetite: "Investor sentiment",
+  tightness: "Cash availability",
+  riskAppetite: "Market risk appetite",
   baseRate: "Fed interest rate",
-  curveSlope: "Recession risk",
+  curveSlope: "Recession warning gauge",
 };
 
 export const buildRegimeAlert = (
@@ -54,18 +56,19 @@ export const buildRegimeAlert = (
 
   if (wasTight !== isTight) {
     reasons.push(
-      `Cash availability moved ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
+      `Cash availability crossed ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
     );
   }
   if (wasBrave !== isBrave) {
     reasons.push(
-      `Market risk appetite moved ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
+      `Market risk appetite crossed ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
     );
   }
   if (reasons.length === 0) {
     reasons.push(
-      `Capital posture shifted as cash availability (${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)}) ` +
-        `and market risk appetite (${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}) moved across boundaries.`
+      `Cash availability moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
+        `and market risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
+        "carrying the posture across a boundary."
     );
   }
 
@@ -76,7 +79,7 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `Operating stance moved from ${previous.regime} to ${current.regime}.`,
+    summary: `The operating stance moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
   };
 };
 
@@ -124,6 +127,26 @@ export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" =>
 
   return delta > 0 ? "↑" : "↓";
 };
+
+/**
+ * Normalizes a generated fragment into a standalone sentence: capitalized, with
+ * terminal punctuation. Use this instead of splicing fragments into a carrier
+ * sentence — lowercasing a clause and gluing it after "so …" produces
+ * ungrammatical output whenever the fragment is itself a full sentence.
+ */
+export const toSentence = (value: string | undefined | null): string => {
+  const normalized = (value ?? "").replace(/\s+/g, " ").trim();
+  if (!normalized) {
+    return "";
+  }
+
+  const capitalized = `${normalized.charAt(0).toUpperCase()}${normalized.slice(1)}`;
+  return /[.!?…]$/.test(capitalized) ? capitalized : `${capitalized}.`;
+};
+
+/** Joins already-complete sentences, dropping empties. */
+export const joinSentences = (...parts: Array<string | undefined | null>): string =>
+  parts.map(toSentence).filter((part) => part.length > 0).join(" ");
 
 export const extractCompactClause = (value: string, fallback: string): string => {
   const normalized = value.trim();

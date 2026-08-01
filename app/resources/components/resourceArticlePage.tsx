@@ -7,6 +7,7 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/seo";
+import { buildAuthorSchema } from "../../../lib/publisher";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
@@ -143,7 +144,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
     "@type": "Article",
     headline: article.title,
     description: article.description,
-    author: { "@type": "Organization", name: organizationName },
+    author: buildAuthorSchema(),
     publisher: { "@type": "Organization", name: organizationName },
     mainEntityOfPage: canonicalUrl,
     url: canonicalUrl,
