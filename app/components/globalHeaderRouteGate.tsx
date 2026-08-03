@@ -7,49 +7,28 @@ import {
   isReportShellRoute,
   normalizePathname,
   resolveGlobalHeaderRouteLabel,
+  resolveReportHeaderNextStep,
 } from "../../lib/navigation/globalHeader";
+import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
+import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { CadenceSelector, ViewSelector } from "./cadenceSelector";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 
-export const reportHeaderNextStep = (pathname: string) => {
-  if (pathname === "/" || pathname === "/v2") {
-    return { href: "/evidence", label: "Evidence" };
+// On the brief, the utility slot points at the toolkit library; on any other
+// hub it links back to that hub's root using its canonical IA label.
+export const resolveReportHeaderUtilityAction = (pathname: string) => {
+  if (pathname === "/") {
+    return { href: "/resolve#toolkit-library", label: "Toolkits" };
   }
 
-  if (pathname.startsWith("/evidence")) {
-    return { href: "/planning", label: "Planning" };
-  }
-
-  if (pathname.startsWith("/planning")) {
-    return { href: "/resolve", label: "Resolve" };
-  }
-
-  if (pathname.startsWith("/resolve")) {
-    return { href: "/trust", label: "Readiness" };
-  }
-
-  if (pathname.startsWith("/trust")) {
-    return { href: "/", label: "Brief" };
-  }
-
-  return null;
+  const activeLayer = primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));
+  return activeLayer
+    ? { href: activeLayer.href, label: activeLayer.navLabel ?? activeLayer.label }
+    : { href: "/", label: "Home" };
 };
-
-export const resolveReportHeaderUtilityAction = (pathname: string) =>
-  pathname === "/" || pathname === "/v2"
-    ? { href: "/resolve#toolkit-library", label: "Toolkits" }
-    : pathname.startsWith("/evidence")
-      ? { href: "/evidence", label: "Evidence" }
-      : pathname.startsWith("/planning")
-        ? { href: "/planning", label: "Plan" }
-        : pathname.startsWith("/resolve")
-          ? { href: "/resolve", label: "Resolve" }
-          : pathname.startsWith("/trust")
-            ? { href: "/trust", label: "Readiness" }
-            : { href: "/", label: "Home" };
 
 type GlobalHeaderRouteGateProps = {
   initialPathname?: string;
@@ -64,9 +43,9 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   }, [currentPathname]);
 
   const isReportRoute = isReportShellRoute(pathname);
-  const isHomeBrief = pathname === "/" || pathname === "/v2";
+  const isHomeBrief = pathname === "/";
   const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
-  const reportHeaderAction = reportHeaderNextStep(pathname);
+  const reportHeaderAction = resolveReportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
 
   return (

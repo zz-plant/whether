@@ -1,11 +1,10 @@
 import {
   navigationLayers,
-  navigationLayerByKey,
   primaryNavigationLayers,
+  reportShellPaths,
   type NavigationLayer,
 } from "./informationArchitecture";
 import { pathMatchesLink } from "./pathMatching";
-import { reportShellCorePaths } from "../report/reportNavigation";
 
 const fallbackLabel = "Page";
 
@@ -14,51 +13,38 @@ export const normalizePathname = (pathname: string) =>
 
 export const isReportShellRoute = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
-  return reportShellCorePaths.some((route) => pathMatchesLink(route, normalizedPathname));
+  return reportShellPaths.some((route) => pathMatchesLink(route, normalizedPathname));
 };
 
-export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
+// Prefer the most specific layer when hrefs nest (e.g. /history/compare under
+// /history).
+const findActiveLayer = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
-  const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname));
+  return [...navigationLayers]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((layer) => pathMatchesLink(layer.href, normalizedPathname));
+};
+
+const findActivePrimaryLayer = (pathname: string) =>
+  primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, normalizePathname(pathname)));
+
+export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
+  const activeLayer = findActiveLayer(pathname);
   return activeLayer ? activeLayer.navLabel ?? activeLayer.label : fallbackLabel;
 };
 
-export const resolveGlobalHeaderTagline = (pathname: string) => {
-  const normalizedPathname = normalizePathname(pathname);
-
-  if (pathMatchesLink("/", normalizedPathname) || pathMatchesLink("/v2", normalizedPathname)) {
-    return {
-      title: "Weekly planning brief for hiring, spending, and growth pace.",
-      description: "Start here for this week's brief, what to do now, and what would change it.",
-    } as const;
-  }
-
-  const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname));
+// Next step in the operator loop: walks primaryNavigationLayers in IA order
+// and cycles back to the brief after the last hub.
+export const resolveReportHeaderNextStep = (pathname: string) => {
+  const activeLayer = findActivePrimaryLayer(pathname);
 
   if (!activeLayer) {
-    return {
-      title: fallbackLabel,
-      description: null,
-    } as const;
+    return null;
   }
 
-  const parentLayer = activeLayer.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
-  const actionDescriptionByKey: Partial<Record<NavigationLayer["key"], string>> = {
-    "weekly-brief": "See this week's brief, what to do now, and what would change it.",
-    signals: "See what changed and what to watch.",
-    planning: "Approve or hold hiring, spend, roadmap, and what to share.",
-    resolve: "Close one open question.",
-    trust: "Check freshness, confidence, and sources.",
-    history: "See trends and historical snapshots.",
-  };
-
-  return {
-    title: activeLayer.navLabel ?? activeLayer.label,
-    description:
-      activeLayer.tier === "supporting" && parentLayer
-        ? `${actionDescriptionByKey[activeLayer.key] ?? activeLayer.description} See ${parentLayer.label} for the broader set of options.`
-        : (actionDescriptionByKey[activeLayer.key] ?? activeLayer.description),
-  } as const;
+  const activeIndex = primaryNavigationLayers.indexOf(activeLayer);
+  const nextLayer = primaryNavigationLayers[(activeIndex + 1) % primaryNavigationLayers.length];
+  return { href: nextLayer.href, label: nextLayer.navLabel ?? nextLayer.label } as const;
 };
 
 export type GlobalHeaderNavigationLink = NavigationLayer & { isActive: boolean };

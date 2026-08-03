@@ -24,7 +24,7 @@ describe("ui capture helpers", () => {
     assert.deepEqual(targets.map((target: { id: string }) => target.id), ["operator-brief-mobile"]);
   });
 
-  it("waits for streamed capture readiness on v2 before screenshots", async () => {
+  it("waits for streamed capture readiness on the homepage brief before screenshots", async () => {
     const calls: Array<{ selector: string; timeout: number }> = [];
     const page = {
       waitForSelector: async (selector: string, options: { timeout: number }) => {
@@ -33,9 +33,9 @@ describe("ui capture helpers", () => {
     };
 
     const waited = await waitForCaptureReady(page, {
-      id: "v2",
-      label: "V2",
-      path: "/v2?screenshot=1",
+      id: "home-brief",
+      label: "Home brief",
+      path: "/?screenshot=1",
       viewport: { width: 1440, height: 1000 },
     });
 
