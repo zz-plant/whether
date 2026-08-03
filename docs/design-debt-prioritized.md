@@ -31,6 +31,7 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
    - **UI evidence:** Header hubs are `Weekly Capital Posture Brief`, `Evidence appendix`, `Operations`, `Resources`, `Reference`.
    - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/evidence`, `/resolve`, `/toolkits`, `/learn`, `/trust`.
    - **Recommendation:** Align global navigation taxonomy with IA boundaries and make the homepage weekly path prominence explicit.
+   - **Status (2026-08-02):** Largely resolved. Nav order, labels, next-step cues, and report-shell routes now all derive from `lib/navigation/informationArchitecture.ts`; the desktop header shows all five primary hubs (it previously filtered to Brief + Plan via a stale step list).
 
 3. **Theme toggle has stale accessibility labeling and weak mode semantics.**
    - **Why it matters:** Assistive tech users hear an aria label that does not describe current state or next action accurately once toggled.

@@ -220,9 +220,11 @@ export const ensureBaseUrlReachable = async (baseUrl) => {
   );
 };
 
+// The homepage brief streams; captures of "/" wait for the share artifact to
+// hydrate before screenshotting.
 const isStreamedCapturePath = (targetPath) => {
   try {
-    return new URL(targetPath, "http://capture.local").pathname === "/v2";
+    return new URL(targetPath, "http://capture.local").pathname === "/";
   } catch {
     return false;
   }

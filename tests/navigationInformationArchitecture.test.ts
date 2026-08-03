@@ -1,37 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
-  navigationGroupLabels,
   navigationLayers,
+  navigationLayerByKey,
   navigationLabelByPath,
   primaryNavigationLayers,
-  primaryNavigationSurfaceCount,
-  resolveNavigationRouteCue,
-  resolvePrimaryNavigationSurfaceCue,
-  supportingNavigationLayers,
+  reportShellPaths,
 } from "../lib/navigation/informationArchitecture";
-import { primaryNavigation } from "../lib/navigation/primaryNavigation";
 
 describe("navigation information architecture", () => {
-  it("keeps primary navigation aligned to primary IA layers only", () => {
-    assert.equal(primaryNavigation.length, primaryNavigationLayers.length);
-
-    for (const layer of primaryNavigationLayers) {
-      const link = primaryNavigation.find((item) => item.href === layer.href);
-      assert.ok(link);
-      assert.equal(link?.label, layer.navLabel ?? layer.label);
-      assert.equal(link?.description, layer.description);
-    }
-  });
-
-  it("defines passive group labels from IA as single source of truth", () => {
-    assert.equal(navigationGroupLabels.core, "This week");
-    assert.equal(navigationGroupLabels.workflow, "Decide");
-    assert.equal(navigationGroupLabels.reference, "Check");
-
-    for (const layer of navigationLayers) {
-      assert.ok(navigationGroupLabels[layer.group]);
-    }
+  it("orders primary layers by the operator loop", () => {
+    assert.deepEqual(
+      primaryNavigationLayers.map((layer) => layer.href),
+      ["/", "/evidence", "/planning", "/resolve", "/trust"],
+    );
   });
 
   it("keeps one layer for each IA boundary and route", () => {
@@ -48,15 +30,22 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/trust"], "Readiness");
   });
 
-  it("exposes primary surface progress cues and route cues for navigation copy", () => {
-    assert.equal(primaryNavigationSurfaceCount, 5);
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/"), "Start here");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/evidence"), "Evidence");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/planning"), "Plan");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/resolve"), "Resolve");
-    assert.equal(resolvePrimaryNavigationSurfaceCue("/trust"), null);
-    assert.equal(resolveNavigationRouteCue("/"), "Weekly Brief");
-    assert.equal(resolveNavigationRouteCue("/evidence"), "/evidence");
+  it("derives report shell paths from the IA layers", () => {
+    assert.deepEqual(
+      reportShellPaths,
+      navigationLayers.map((layer) => layer.href),
+    );
+  });
+
+  it("nests supporting layers under an existing parent", () => {
+    for (const layer of navigationLayers) {
+      if (layer.tier === "supporting") {
+        assert.ok(layer.parentKey, `${layer.key} must declare a parent`);
+        assert.ok(navigationLayerByKey[layer.parentKey!], `${layer.key} parent must exist`);
+      } else {
+        assert.equal(layer.parentKey, undefined);
+      }
+    }
   });
 
   it("keeps canonical route transitions for Decide and Method", () => {

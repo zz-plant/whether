@@ -1,5 +1,10 @@
 # Information architecture proposal
 
+> **Implementation note (2026-08-02):** the primary IA below is implemented in
+> `lib/navigation/informationArchitecture.ts`, which is the single source of truth for
+> hub order, labels, header next-step cues, and report-shell route detection. Change the
+> loop there, not in header components.
+
 ## Goal
 Align navigation to the operator loop so leaders can move from posture to decision to execution without competing top-level choices.
 

@@ -482,8 +482,7 @@ These are the safest places to extend the system without blurring the architectu
 - `tests/summaryArchiveMigration.test.ts` - Archive migration validation
 
 ### Integration Tests
-- Playwright snapshots in `output/playwright/`
-- UI capture scripts in `scripts/ui-capture.mjs`
+- UI capture scripts in `scripts/ui-capture.mjs` (screenshots land in a temp dir, not the repo)
 
 ---
 

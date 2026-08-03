@@ -46,9 +46,9 @@ reading the set. Product specs live in `docs/`.
 
 ## Repo gotchas
 
-- **Root is noisy.** Assorted one-off `*.png` / `*.yml` QA dumps sit at the repo root and in
-  `output/`, `scratch/`, `.playwright-cli/`. They are stale artifacts, not inputs — don't infer
-  current behavior from them. Write new scratch output to a temp dir, not the repo root.
+- **Keep the root clean.** One-off QA dumps (`*.png` / `*.yml`, `output/`, `scratch/`,
+  `.playwright-cli/`) are gitignored and were purged in Aug 2026 — don't recreate them. Write
+  scratch output to a temp dir, not the repo root.
 - **Architectural invariants** (read deadlines, cron not self-fetching, materialized history) are
   listed in AGENTS.md and are load-bearing. Don't relax them casually.
 - **UI work** has dedicated skills: `whether-ui-loop` (screenshot iteration) and

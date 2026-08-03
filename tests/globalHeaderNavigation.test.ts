@@ -5,6 +5,7 @@ import {
   normalizePathname,
   resolveGlobalHeaderNavigationLinks,
   resolveGlobalHeaderRouteLabel,
+  resolveReportHeaderNextStep,
 } from "../lib/navigation/globalHeader";
 
 describe("global header navigation helpers", () => {
@@ -27,6 +28,16 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Readiness");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
+  });
+
+  it("walks the operator loop for next-step cues and cycles back to the brief", () => {
+    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/evidence", label: "Evidence" });
+    assert.deepEqual(resolveReportHeaderNextStep("/evidence/thresholds"), { href: "/planning", label: "Plan" });
+    assert.deepEqual(resolveReportHeaderNextStep("/planning"), { href: "/resolve", label: "Resolve" });
+    assert.deepEqual(resolveReportHeaderNextStep("/resolve"), { href: "/trust", label: "Readiness" });
+    assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Brief" });
+    assert.equal(resolveReportHeaderNextStep("/history"), null);
+    assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
   });
 
   it("marks only one primary link active for nested paths", () => {

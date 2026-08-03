@@ -15,8 +15,6 @@ type GlobalHeaderNavClientProps = {
   pathname?: string;
 };
 
-const STEP_ORDER = ["/", "/planning", "/#evidence"];
-
 function MobileNavContent({
   navigationLinks,
   onClose,
@@ -55,10 +53,6 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
     () => resolveGlobalHeaderNavigationLinks(resolvedPathname),
     [resolvedPathname],
   );
-  const displayLinks = useMemo(
-    () => navigationLinks.filter((link) => STEP_ORDER.includes(link.href)),
-    [navigationLinks],
-  );
   const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
 
   return (
@@ -73,7 +67,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       </button>
 
       <nav aria-label="Primary" className="hidden md:flex items-center gap-0.5">
-        {displayLinks.map((link) => (
+        {navigationLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}

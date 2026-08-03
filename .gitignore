@@ -42,3 +42,7 @@ homepage-*.png
 /*.png
 /*.yml
 /opencode.json.bak.*
+
+# One-off QA capture dumps (stale artifacts, not inputs)
+output/
+scratch/
