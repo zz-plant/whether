@@ -14,6 +14,7 @@ import {
 import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
 import {
   buildPublishedBriefPath,
+  findAdjacentPublishedBriefs,
   findPublishedBrief,
   publishedBriefStaticParams,
   type PublishedBrief,
@@ -83,6 +84,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   if (!brief) notFound();
 
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -210,6 +212,21 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </p>
         </footer>
       </article>
+
+      {previous || next ? (
+        <nav aria-label="Adjacent weeks" className="flex flex-wrap gap-2">
+          {previous ? (
+            <ActionLink href={buildPublishedBriefPath(previous.slug)} variant="ghost">
+              ← Week of {previous.recordDateLabel}
+            </ActionLink>
+          ) : null}
+          {next ? (
+            <ActionLink href={buildPublishedBriefPath(next.slug)} variant="ghost">
+              Week of {next.recordDateLabel} →
+            </ActionLink>
+          ) : null}
+        </nav>
+      ) : null}
 
       <nav aria-label="Brief navigation" className="flex flex-wrap gap-2">
         <ActionLink href="/" variant="primary">

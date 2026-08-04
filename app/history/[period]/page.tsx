@@ -13,7 +13,12 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/seo";
-import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
+import {
+  buildAuthorSchema,
+  buildPublisherSchema,
+  publisherAuthor,
+  publisherProfilePath,
+} from "../../../lib/publisher";
 import {
   buildPostureArchivePath,
   findPostureArchivePeriod,
@@ -124,7 +129,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       <section className="weather-panel space-y-4 px-6 py-6">
         <div className="flex flex-wrap items-center gap-2">
           <Tag tone={regimeTone[period.regime]}>{period.operatorLabel}</Tag>
-          <Tag tone="slate">{period.regimeLabel}</Tag>
           <Tag tone="slate">{period.statusLabel}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
@@ -133,6 +137,17 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">Standing guidance:</span> {period.guidance}
+        </p>
+        <p className="text-xs text-slate-400">
+          By{" "}
+          <a
+            href={publisherProfilePath}
+            className="text-sky-300 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            rel="author"
+          >
+            {publisherAuthor.name}
+          </a>{" "}
+          · <time dateTime={period.asOf}>{period.recordDateLabel}</time>
         </p>
         <p className="text-xs text-slate-400">
           Closed period ending {period.recordDateLabel}. This record does not change.

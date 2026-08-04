@@ -43,7 +43,7 @@ export default function ContactPage() {
       <section className="weather-panel space-y-4 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Contact</h1>
         <p className="text-sm text-slate-300">
-          Whether is written and maintained by {publisherAuthor.name}, {publisherAuthor.role.toLowerCase()}.
+          Whether is written and maintained by {publisherAuthor.name} — {publisherAuthor.role}.
         </p>
         <p className="text-sm text-slate-300">
           Email:{" "}

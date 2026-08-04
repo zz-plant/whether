@@ -10,17 +10,11 @@ import { writeFile } from "node:fs/promises";
 import { getSummaryArchive, type SummaryArchiveEntry } from "../lib/summary/summaryArchive";
 import { getRegimeOperatorLabel } from "../lib/regimeLabels";
 import type { RegimeKey } from "../lib/regimeEngine";
-import type {
-  PostureArchivePeriod,
-  PostureArchiveRegimeShare,
-  WeeklyBriefRecord,
-} from "../lib/summary/postureArchiveTypes";
+import type { PostureArchivePeriod, PostureArchiveRegimeShare } from "../lib/summary/postureArchiveTypes";
 
 const OUTPUT_PATH = new URL("../data/posture_archive_index.json", import.meta.url);
 /** Tiny companion file so client bundles can link the archive without the full index. */
 const YEARS_OUTPUT_PATH = new URL("../data/posture_archive_years.json", import.meta.url);
-/** Frozen dated weekly briefs behind `/brief/[week]`. */
-const WEEKLY_OUTPUT_PATH = new URL("../data/weekly_brief_index.json", import.meta.url);
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
 
@@ -30,6 +24,15 @@ const formatDate = (value: string) => {
 };
 
 const quarterOf = (asOf: string) => Math.floor(new Date(asOf).getUTCMonth() / 3) + 1;
+
+/**
+ * Older archive entries were generated with the presentation regime label
+ * ("Growth Mode") where the copy template already appended "mode", leaving
+ * "Growth Mode mode" in 80 of 81 stored summaries. The stored data is not
+ * regenerated (that would require refetching the full FRED history), so the
+ * duplication is collapsed here at index time.
+ */
+const normalizeModeWording = (value: string) => value.replace(/\bMode mode\b/g, "Mode");
 
 const quarterSlug = (year: number, quarter: number) => `${year}-q${quarter}`;
 
@@ -118,7 +121,7 @@ const buildPeriod = ({
   regime: entry.summary.regime,
   regimeLabel: entry.summary.regimeLabel,
   operatorLabel: getRegimeOperatorLabel(entry.summary.regime),
-  headline: entry.summary.summary,
+  headline: normalizeModeWording(entry.summary.summary),
   guidance: entry.summary.guidance,
   constraints: entry.summary.constraints,
   rates: buildRates(entry),
@@ -220,72 +223,8 @@ const generate = () => {
   return [...linkSiblings(years), ...linkSiblings(quarters)];
 };
 
-const weekSlug = (year: number, week: number) => `${year}-w${String(week).padStart(2, "0")}`;
-
-const generateWeeklyBriefs = (): WeeklyBriefRecord[] => {
-  const weeklyEntries = getSummaryArchive()
-    .filter((entry): entry is Extract<SummaryArchiveEntry, { cadence: "weekly" }> => entry.cadence === "weekly")
-    .sort((a, b) => a.asOf.localeCompare(b.asOf));
-
-  const records = weeklyEntries.map((entry, index) => {
-    const { summary } = entry;
-    const structured = summary.structured;
-    const previous = weeklyEntries[index - 1];
-
-    return {
-      slug: weekSlug(entry.year, entry.week),
-      year: entry.year,
-      week: entry.week,
-      asOf: entry.asOf,
-      recordDateLabel: summary.recordDateLabel ?? formatDate(entry.asOf),
-      title: summary.title,
-      headline: summary.summary,
-      regime: summary.regime,
-      regimeLabel: summary.regimeLabel,
-      operatorLabel: getRegimeOperatorLabel(summary.regime),
-      guidance: summary.guidance,
-      confidence: summary.confidence,
-      transitionWatch: summary.transitionWatch,
-      climateLabel: structured.climate.label,
-      climateSummary: structured.climate.summary,
-      recommendedMoves: structured.recommendedMoves,
-      executionPriorities: structured.executionPriorities,
-      watchouts: structured.watchouts,
-      planningLanguage: structured.planningLanguage,
-      executionConstraints: structured.executionConstraints,
-      rates: buildRates(entry),
-      sourceLabel: summary.provenance.sourceLabel,
-      sourceUrl: summary.provenance.sourceUrl,
-      statusLabel: summary.provenance.statusLabel,
-      changedFrom:
-        previous && previous.summary.regime !== summary.regime
-          ? getRegimeOperatorLabel(previous.summary.regime)
-          : null,
-      archivePeriodSlug: quarterSlug(entry.year, quarterOf(entry.asOf)),
-      previousSlug: null as string | null,
-      nextSlug: null as string | null,
-    } satisfies WeeklyBriefRecord;
-  });
-
-  records.forEach((record, index) => {
-    record.previousSlug = records[index - 1]?.slug ?? null;
-    record.nextSlug = records[index + 1]?.slug ?? null;
-  });
-
-  return records;
-};
-
 const periods = generate();
 await writeFile(OUTPUT_PATH, `${JSON.stringify(periods, null, 2)}\n`, "utf8");
-
-const archiveSlugs = new Set(periods.map((period) => period.slug));
-const weeklyBriefs = generateWeeklyBriefs().map((record) => ({
-  ...record,
-  // Drop the cross-link rather than emit a 404 when a quarter has no archive page.
-  archivePeriodSlug:
-    record.archivePeriodSlug && archiveSlugs.has(record.archivePeriodSlug) ? record.archivePeriodSlug : null,
-}));
-await writeFile(WEEKLY_OUTPUT_PATH, `${JSON.stringify(weeklyBriefs)}\n`, "utf8");
 
 const years = periods
   .filter((period) => period.kind === "year")
@@ -297,4 +236,3 @@ const quarterCount = periods.filter((period) => period.kind === "quarter").lengt
 console.log(
   `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly) to data/posture_archive_index.json`,
 );
-console.log(`Wrote ${weeklyBriefs.length} frozen weekly briefs to data/weekly_brief_index.json`);

@@ -72,49 +72,6 @@ export const PostureArchivePeriodSchema = z.object({
 
 export const PostureArchiveIndexSchema = z.array(PostureArchivePeriodSchema);
 
-/**
- * A single published week, frozen at the date it closed.
- *
- * These back `/brief/[week]`, the permanent dated home for each weekly brief.
- * Discover and News both index articles by publication date, so the live view at
- * `/` cannot serve that role — its content changes under a stable URL.
- */
-export const WeeklyBriefRecordSchema = z.object({
-  slug: z.string(),
-  year: z.number(),
-  week: z.number(),
-  asOf: z.string(),
-  recordDateLabel: z.string(),
-  title: z.string(),
-  headline: z.string(),
-  regime: RegimeSchema,
-  regimeLabel: z.string(),
-  operatorLabel: z.string(),
-  guidance: z.string(),
-  confidence: z.enum(["LOW", "MEDIUM", "HIGH"]),
-  transitionWatch: z.boolean(),
-  climateLabel: z.string(),
-  climateSummary: z.array(z.string()),
-  recommendedMoves: z.array(z.string()),
-  executionPriorities: z.array(z.string()),
-  watchouts: z.array(z.string()),
-  planningLanguage: z.string(),
-  executionConstraints: z.array(z.string()),
-  rates: z.array(PostureArchiveRateSchema),
-  sourceLabel: z.string(),
-  sourceUrl: z.string().optional(),
-  statusLabel: z.string(),
-  /** Set when this week's posture differs from the week before it. */
-  changedFrom: z.string().nullable(),
-  archivePeriodSlug: z.string().nullable(),
-  previousSlug: z.string().nullable(),
-  nextSlug: z.string().nullable(),
-});
-
-export const WeeklyBriefIndexSchema = z.array(WeeklyBriefRecordSchema);
-
-export type WeeklyBriefRecord = z.infer<typeof WeeklyBriefRecordSchema>;
-
 export type PostureArchiveRegimeShare = z.infer<typeof PostureArchiveRegimeShareSchema>;
 export type PostureArchiveTransition = z.infer<typeof PostureArchiveTransitionSchema>;
 export type PostureArchivePeriod = z.infer<typeof PostureArchivePeriodSchema>;

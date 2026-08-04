@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   buildPublishedBriefPath,
   buildPublishedBriefSlug,
+  findAdjacentPublishedBriefs,
   findPublishedBrief,
   getPublishedBriefs,
   isPublishedBriefSlug,
@@ -81,5 +82,24 @@ describe("published briefs", () => {
 
   it("builds brief paths under /brief", () => {
     assert.equal(buildPublishedBriefPath("2026-w31"), "/brief/2026-w31");
+  });
+
+  it("walks adjacent weeks in reading order, oldest first", () => {
+    const chronological = [...briefs].reverse();
+
+    chronological.forEach((brief, index) => {
+      const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
+      assert.equal(previous?.slug, chronological[index - 1]?.slug);
+      assert.equal(next?.slug, chronological[index + 1]?.slug);
+    });
+
+    const oldest = chronological[0];
+    const newest = chronological[chronological.length - 1];
+    assert.equal(findAdjacentPublishedBriefs(oldest.slug).previous, undefined);
+    assert.equal(findAdjacentPublishedBriefs(newest.slug).next, undefined);
+  });
+
+  it("returns no neighbours for an unknown week rather than the ends of the list", () => {
+    assert.deepEqual(findAdjacentPublishedBriefs("1999-w01"), { previous: undefined, next: undefined });
   });
 });

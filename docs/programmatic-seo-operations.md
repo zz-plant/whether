@@ -108,10 +108,43 @@ Selection rule:
 - Expand a cluster only when it can map to the bounded-decision contract above.
 - If intent cannot produce an action + threshold + reversal condition, merge it into an existing page instead of launching new URLs.
 
+## Distinctness audit: count distinct bodies before generating URLs
+
+Before generating one page per record from any dataset, group the candidate page
+bodies by whatever drives them and count how many are actually distinct. A record
+count is not a page count.
+
+**Worked example (Aug 2026).** `data/summary_archive.json` holds 432 weekly
+summaries spanning 2018–2026, which looks like 432 publishable weekly briefs. It
+is not. Every rendered field — `climate`, `recommendedMoves`,
+`executionPriorities`, `watchouts`, `planningLanguage`, `executionConstraints`,
+`guidance` — is a pure function of `regime`, and only three regimes ever occur in
+that range. Across 432 weeks there are **3 distinct bodies**. The only per-week
+variation is the date and four rate values.
+
+Publishing that as 432 URLs would have been the textbook thin-template pattern,
+and the resulting sitewide quality signal would have dragged down the pages that
+do carry distinct content.
+
+What was built instead:
+
+- **Aggregates, not records.** `/history/[period]` publishes 81 pages (16 yearly,
+  65 quarterly) that *derive* content the individual records do not contain —
+  regime mix, posture transitions inside the period, and sample counts. Each page
+  is distinct because the aggregation is distinct, not because the source rows are.
+- **Frozen live briefs, not simulated history.** `/brief/[week]` freezes the live
+  weekly brief, whose per-week content (decision deltas, numeric thresholds,
+  evidence) genuinely varies. The corpus grows one real page per week via
+  `bun run brief:freeze` rather than being backfilled from templates.
+
+Rule: **if N records collapse to K distinct bodies, you have at most K pages —
+aggregate the rest or don't ship them.** Run the count before writing the route.
+
 ## Review checklist for each new programmatic page
 
 Ship only when all checks pass:
 
+0. **Distinctness:** the generating dataset was grouped and counted, and the page count does not exceed the number of distinct bodies (see the distinctness audit above).
 1. **Decision transmission:** operator can answer "what should I do this week?" in under 60 seconds.
 2. **Bounded rule:** page contains action, trigger, and reversal condition.
 3. **Trust compactness:** freshness/provenance/confidence/fallback are visible in-line or one click away.
@@ -128,10 +161,14 @@ Failure policy:
 ```bash
 bun run seo:answers:launch-readiness
 bun run seo:weekly-runbook
+bun run brief:freeze
+bun run archive:index
 ```
 
 ## Notes
 
 - `seo:answers:launch-readiness` fails if any answer page cannot pass baseline completeness/trust/uniqueness checks.
-- `seo:weekly-runbook` generates payload artifacts and the refresh queue/status artifacts in one command.
+- `seo:weekly-runbook` generates payload artifacts and the refresh queue/status artifacts in one command, and freezes the current week's brief.
+- `brief:freeze` appends the current ISO week to `data/published_briefs.json`. It refuses to run on a degraded snapshot and never rewrites an existing week without `--force`, because a published brief that silently changes is not citable.
+- `archive:index` regenerates the `/history/[period]` period index from the summary archive. Run it after the summary archive changes.
 - Refresh queue records include `merge-or-prune-candidate` when high-intent pages underperform conversion targets for multiple evaluations.

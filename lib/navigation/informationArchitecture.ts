@@ -107,3 +107,22 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
   acc[layer.href] = layer.label;
   return acc;
 }, {});
+
+/**
+ * Published content and publication-identity routes.
+ *
+ * These are deliberately not navigation layers — they sit outside the operator
+ * loop and must not appear in nav ordering or next-step cues. They still need a
+ * header label, so they resolve here rather than falling back to "Page".
+ * Matched by prefix, longest first.
+ */
+export const contentRouteLabels: ReadonlyArray<{ prefix: string; label: string }> = [
+  { prefix: "/brief", label: "Published Brief" },
+  { prefix: "/about", label: "About" },
+  { prefix: "/contact", label: "Contact" },
+];
+
+export const resolveContentRouteLabel = (pathname: string) =>
+  [...contentRouteLabels]
+    .sort((a, b) => b.prefix.length - a.prefix.length)
+    .find((entry) => pathname === entry.prefix || pathname.startsWith(`${entry.prefix}/`))?.label ?? null;

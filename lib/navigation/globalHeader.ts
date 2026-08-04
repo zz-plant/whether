@@ -2,6 +2,7 @@ import {
   navigationLayers,
   primaryNavigationLayers,
   reportShellPaths,
+  resolveContentRouteLabel,
   type NavigationLayer,
 } from "./informationArchitecture";
 import { pathMatchesLink } from "./pathMatching";
@@ -30,7 +31,12 @@ const findActivePrimaryLayer = (pathname: string) =>
 
 export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   const activeLayer = findActiveLayer(pathname);
-  return activeLayer ? activeLayer.navLabel ?? activeLayer.label : fallbackLabel;
+
+  if (activeLayer) {
+    return activeLayer.navLabel ?? activeLayer.label;
+  }
+
+  return resolveContentRouteLabel(normalizePathname(pathname)) ?? fallbackLabel;
 };
 
 // Next step in the operator loop: walks primaryNavigationLayers in IA order

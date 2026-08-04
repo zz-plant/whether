@@ -83,6 +83,18 @@ export const publishedBriefStaticParams = briefs.map((brief) => ({ week: brief.s
 
 export const latestPublishedBrief = briefs[0];
 
+/** Adjacent published weeks, in reading order (older -> newer). */
+export const findAdjacentPublishedBriefs = (slug: string) => {
+  const chronological = [...briefs].reverse();
+  const index = chronological.findIndex((brief) => brief.slug === slug);
+
+  if (index === -1) {
+    return { previous: undefined, next: undefined };
+  }
+
+  return { previous: chronological[index - 1], next: chronological[index + 1] };
+};
+
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
