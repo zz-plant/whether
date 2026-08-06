@@ -117,7 +117,7 @@ export function ActionCard({
           </div>
           <div className="h-2 w-full rounded-full overflow-hidden relative" style={{ background: "linear-gradient(90deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.12) 60%, rgba(251,191,36,0.18) 85%, rgba(244,63,94,0.18) 100%)" }}>
             <div className={`h-full rounded-full ${pauseColor} transition-[width,background-color] duration-500`} style={{ width: `${Math.min(100, (tightness / numericThreshold) * 100)}%` }} />
-            <div className="absolute top-0 h-full w-[2px] bg-white/50" title="Threshold limit" style={{ right: 0 }} />
+            <div className="absolute top-0 h-full w-[2px] bg-white/50" aria-hidden="true" style={{ right: 0 }} />
           </div>
           <div className="flex justify-between text-fluid-nano text-white/50 font-mono">
             <span>Tightness {tightness}</span>

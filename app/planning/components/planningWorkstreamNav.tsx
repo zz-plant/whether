@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
-import { CircleTargetIcon } from "../../components/uiIcons";
+import { CircleTargetIcon, HistoryIcon, TrendUpIcon } from "../../components/uiIcons";
 import {
   operationsWorkstreamLinks,
   type OperationsWorkstreamLink,
@@ -15,6 +15,8 @@ const navItemStyles =
 
 const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
   "Weekly plan": <CircleTargetIcon className="h-3.5 w-3.5" />,
+  "Financial strategy": <TrendUpIcon className="h-3.5 w-3.5" />,
+  "Decision memory": <HistoryIcon className="h-3.5 w-3.5" />,
 };
 
 const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>

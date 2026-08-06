@@ -32,6 +32,7 @@ export default function HistoryPage() {
   const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [selectedYear, setSelectedYear] = useState(urlYear);
   const [selectedMonth, setSelectedMonth] = useState(urlMonth);
+  const [activeTimelineEntry, setActiveTimelineEntry] = useState<string | null>(null);
 
   useEffect(() => {
     const data = getTimeMachineMonthsByYear();
@@ -84,10 +85,20 @@ export default function HistoryPage() {
       }}
     >
       <section className="weather-panel space-y-5 px-5 py-5">
-        <h1 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h1>
-        <p className="text-sm text-slate-300">
-          Tightness and risk appetite over the last 12 available periods.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h1>
+            <p className="text-sm text-slate-300">
+              Tightness and risk appetite over the last 12 available periods.
+            </p>
+          </div>
+          <Link
+            href="/history/compare"
+            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 no-underline transition-colors hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          >
+            Compare two periods &rarr;
+          </Link>
+        </div>
 
         {regimeSeries.length > 0 ? (
           <div className="space-y-1.5">
@@ -97,20 +108,28 @@ export default function HistoryPage() {
                 const isSelected = entry.year === selectedYear && entry.month === selectedMonth;
                 const color = REGIME_COLORS[entry.regime] ?? "bg-slate-600";
                 const monthLabel = new Date(entry.year, entry.month - 1).toLocaleString("en", { month: "short" });
+                const entryLabel = `${monthLabel} ${entry.year}: ${entry.regime}`;
                 return (
                   <button
                     key={`${entry.year}-${entry.month}`}
                     type="button"
                     onClick={() => navigateTo(entry.year, entry.month)}
-                    title={`${monthLabel} ${entry.year}: ${entry.regime}`}
-                    className={`h-8 w-8 rounded-md transition-transform hover:scale-110 ${color} ${
+                    onMouseEnter={() => setActiveTimelineEntry(entryLabel)}
+                    onMouseLeave={() => setActiveTimelineEntry(null)}
+                    onFocus={() => setActiveTimelineEntry(entryLabel)}
+                    onBlur={() => setActiveTimelineEntry(null)}
+                    title={entryLabel}
+                    className={`h-8 w-8 rounded-md transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${color} ${
                       isSelected ? "ring-2 ring-white ring-offset-1 ring-offset-slate-950 scale-110" : "opacity-80 hover:opacity-100"
                     }`}
-                    aria-label={`${monthLabel} ${entry.year}: ${entry.regime}`}
+                    aria-label={entryLabel}
                   />
                 );
               })}
             </div>
+            <p className="min-h-[1.25em] text-fluid-micro text-slate-300" aria-hidden="true">
+              {activeTimelineEntry ?? " "}
+            </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-fluid-micro text-slate-400">
               {Object.entries(REGIME_COLORS).map(([regime, color]) => (
                   <span key={regime} className="inline-flex items-center gap-1">

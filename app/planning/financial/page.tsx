@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
+import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 
 export const runtime = "edge";
@@ -101,6 +103,9 @@ export default async function FinancialStrategyPage({
             recordDateLabel={recordDateLabel}
           />
         </div>
+        <Suspense fallback={null}>
+          <OperationsWorkstreamNav currentPath="/planning/financial" />
+        </Suspense>
       </div>
     </ReportShell>
   );

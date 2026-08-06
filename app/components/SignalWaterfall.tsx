@@ -39,7 +39,9 @@ export function SignalWaterfall({
       tabIndex={hasData ? 0 : undefined}
       aria-haspopup="true"
       aria-expanded={show}
-      className="relative inline-block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-md select-none"
+      className={`relative inline-block rounded-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 ${
+        hasData ? "cursor-pointer border-b border-dashed border-white/25 transition-colors hover:border-white/50" : ""
+      }`}
       onClick={() => hasData && setShow((s) => !s)}
       onKeyDown={(e) => {
         if (!hasData) return;

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 
 type MonthEntry = { recordDate: string; month: number; year: number };
@@ -59,6 +60,35 @@ export function SwipeableWeek({
     }
   }, [serverMonths]);
 
+  const now = new Date();
+  const activeMonth = currentMonth ?? (now.getMonth() + 1);
+  const activeYear = currentYear ?? now.getFullYear();
+
+  const sortedMonths = useMemo(
+    () => [...months].sort((a, b) => new Date(b.recordDate).getTime() - new Date(a.recordDate).getTime()),
+    [months],
+  );
+  const currentIndex = useMemo(
+    () => sortedMonths.findIndex((m) => m.month === activeMonth && m.year === activeYear),
+    [sortedMonths, activeMonth, activeYear],
+  );
+
+  const navigateToMonth = useCallback((target: MonthEntry | undefined) => {
+    if (!target) return;
+    router.push(`/?month=${target.month}&year=${target.year}`, { scroll: false });
+  }, [router]);
+
+  const canGoToPrevious = currentIndex > 0;
+  const canGoToLatest = currentIndex !== 0;
+
+  const goToPrevious = useCallback(() => {
+    if (currentIndex > 0) navigateToMonth(sortedMonths[currentIndex - 1]);
+  }, [currentIndex, sortedMonths, navigateToMonth]);
+
+  const goToLatest = useCallback(() => {
+    navigateToMonth(sortedMonths[0]);
+  }, [sortedMonths, navigateToMonth]);
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStart.current = { x: touch.clientX, y: touch.clientY };
@@ -71,59 +101,25 @@ export function SwipeableWeek({
     const dy = touch.clientY - touchStart.current.y;
 
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 2) {
-      const now = new Date();
-      const activeMonth = currentMonth ?? (now.getMonth() + 1);
-      const activeYear = currentYear ?? now.getFullYear();
-
-      const sorted = [...months].sort((a, b) =>
-        new Date(b.recordDate).getTime() - new Date(a.recordDate).getTime()
-      );
-
-      const currentIndex = sorted.findIndex(
-        (m) => m.month === activeMonth && m.year === activeYear
-      );
-
-      let targetMonth: MonthEntry | undefined;
-      if (dx > 0 && currentIndex > 0) {
-        targetMonth = sorted[currentIndex - 1];
-      } else if (dx < 0) {
-        targetMonth = sorted[0];
-      }
-
-      if (targetMonth) {
-        router.push(`/?month=${targetMonth.month}&year=${targetMonth.year}`, { scroll: false });
+      if (dx > 0) {
+        goToPrevious();
+      } else {
+        goToLatest();
       }
     }
     touchStart.current = null;
-  }, [months, router, currentMonth, currentYear]);
+  }, [goToPrevious, goToLatest]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
 
-    const now = new Date();
-    const activeMonth = currentMonth ?? (now.getMonth() + 1);
-    const activeYear = currentYear ?? now.getFullYear();
-
-    const sorted = [...months].sort(
-      (a, b) => new Date(b.recordDate).getTime() - new Date(a.recordDate).getTime(),
-    );
-
-    const currentIndex = sorted.findIndex(
-      (m) => m.month === activeMonth && m.year === activeYear,
-    );
-
-    let targetMonth: MonthEntry | undefined;
-    if (event.key === "ArrowLeft" && currentIndex > 0) {
-      targetMonth = sorted[currentIndex - 1];
-    } else if (event.key === "ArrowRight") {
-      targetMonth = sorted[0];
+    if (event.key === "ArrowLeft") {
+      goToPrevious();
+    } else {
+      goToLatest();
     }
-
-    if (targetMonth) {
-      router.push(`/?month=${targetMonth.month}&year=${targetMonth.year}`, { scroll: false });
-    }
-  }, [months, router, currentMonth, currentYear]);
+  }, [goToPrevious, goToLatest]);
 
   return (
     <div
@@ -136,12 +132,32 @@ export function SwipeableWeek({
       aria-label="Swipe left for current week, right for previous weeks. Use the left and right arrow keys to browse past weeks."
     >
       {months.length > 0 ? (
-        <div className="mb-1 flex items-center justify-center gap-1" aria-hidden="true">
-          {months.slice(-6).map((m, i, arr) => {
-            const isActive = (currentMonth ?? new Date().getMonth() + 1) === m.month && (currentYear ?? new Date().getFullYear()) === m.year;
-            const isLast = i === arr.length - 1;
-            return <span key={`${m.month}-${m.year}`} className={`h-1 rounded-full transition-all ${isActive ? "w-4 bg-sky-400/60" : isLast ? "w-1.5 bg-white/30" : "w-1.5 bg-white/15"}`} />;
-          })}
+        <div className="mb-1 flex items-center justify-center gap-1">
+          <button
+            type="button"
+            onClick={goToPrevious}
+            disabled={!canGoToPrevious}
+            aria-label="Previous week"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 disabled:pointer-events-none disabled:opacity-25"
+          >
+            <ChevronLeft className="size-4" aria-hidden="true" />
+          </button>
+          <div className="flex items-center gap-1" aria-hidden="true">
+            {months.slice(-6).map((m, i, arr) => {
+              const isActive = activeMonth === m.month && activeYear === m.year;
+              const isLast = i === arr.length - 1;
+              return <span key={`${m.month}-${m.year}`} className={`h-1 rounded-full transition-all ${isActive ? "w-4 bg-sky-400/60" : isLast ? "w-1.5 bg-white/30" : "w-1.5 bg-white/15"}`} />;
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={goToLatest}
+            disabled={!canGoToLatest}
+            aria-label="Current week"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 disabled:pointer-events-none disabled:opacity-25"
+          >
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </button>
         </div>
       ) : null}
       {children}

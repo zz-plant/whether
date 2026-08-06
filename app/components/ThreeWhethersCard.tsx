@@ -20,6 +20,7 @@ type ThreeWhethersProps = {
   boldnessScore: number;
   actionNow?: string;
   guardrail?: string;
+  shareLines?: string[];
 };
 
 // Displayed trigger/reversal chips read from these, so the stated bounds can never
@@ -34,6 +35,7 @@ export function ThreeWhethersCard({
   boldnessScore,
   actionNow,
   guardrail,
+  shareLines,
 }: ThreeWhethersProps) {
   const hiringIsTight = tightness >= TIGHTEN_AT.hire || signalDirection === "tighten";
   const hiringIsEasy = tightness < EASE_BELOW.hire && signalDirection !== "tighten";
@@ -115,7 +117,7 @@ export function ThreeWhethersCard({
           </h3>
         </div>
         <div className="flex items-center gap-3">
-          <ShareBriefButton text={briefText} showLabel />
+          <ShareBriefButton text={briefText} lines={shareLines} showLabel />
         </div>
       </div>
 

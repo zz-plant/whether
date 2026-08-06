@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { buildDiagnosticsExpansionHref } from "../app/evidence/page";
 import { buildActionsExpansionHref } from "../app/planning/page";
-import { getVisibleActionLaneItems } from "../app/components/appendixSections";
+import { getVisibleActionLaneItems } from "../app/components/appendix/playbookPanel";
 
 describe("expansion controls rendering", () => {
   it("persists /evidence expansion state through query params", () => {
@@ -20,7 +20,7 @@ describe("expansion controls rendering", () => {
 
   it("renders PlaybookPanel collapsed by default behind disclosure", () => {
     const html = renderToStaticMarkup(
-      require("react").createElement(require("../app/components/appendixSections").PlaybookPanel, {
+      require("react").createElement(require("../app/components/appendix/playbookPanel").PlaybookPanel, {
         playbook: null,
         stopItems: ["Stop 1", "Stop 2", "Stop 3", "Stop 4"],
         startItems: ["Start 1", "Start 2", "Start 3", "Start 4"],

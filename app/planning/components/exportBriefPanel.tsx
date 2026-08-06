@@ -430,7 +430,7 @@ export const ExportBriefPanel = ({
           </div>
         ) : null}
 
-        <details className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
+        <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
             Quick share formats
           </summary>
@@ -461,7 +461,7 @@ export const ExportBriefPanel = ({
           </div>
         </details>
 
-        <details className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
+        <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
             Board and governance formats
           </summary>
@@ -491,7 +491,7 @@ export const ExportBriefPanel = ({
           </div>
         </details>
 
-        <details className="mt-4 rounded-lg border border-amber-300/25 bg-amber-500/8 p-4">
+        <details className="weather-auto-chevron mt-4 rounded-lg border border-amber-300/25 bg-amber-500/8 p-4">
           <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">
             Company-specific exception
           </summary>

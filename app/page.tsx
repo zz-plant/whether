@@ -316,6 +316,22 @@ async function PageContent({
 
   const enrichmentPromise = homepage.workspaceModelPromise ?? Promise.resolve();
 
+  const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
+    ? `tightness crosses ${parsedGuardrailThreshold}`
+    : undefined;
+  const guardrailLabel = numericGuardrailLabel
+    ?? homepage.weeklyDecisionCardModel.decision.guardrail
+    ?? (typeof guardrailThresholdRaw === "string" ? guardrailThresholdRaw : undefined);
+  const reversalTriggerLabel = homepage.weeklyDecisionCardModel.decision.reversalTrigger;
+  const briefShareLines = [
+    homepage.weeklyDecisionCardModel.decision.actionNowShort
+      ? `Do now: ${homepage.weeklyDecisionCardModel.decision.actionNowShort}`
+      : null,
+    guardrailLabel ? `Guardrail: ${guardrailLabel}` : null,
+    reversalTriggerLabel ? `Reversal: ${reversalTriggerLabel}` : null,
+    flipConditionLabels.length > 0 ? `Flip watch: ${flipConditionLabels.join("; ")}` : null,
+  ].filter((line): line is string => Boolean(line));
+
   return (
     <>
       <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
@@ -373,10 +389,9 @@ async function PageContent({
                 signalData={v2HeroSignalData}
                 flipConditions={flipConditionLabels}
                 transitionProbability={transition.probability}
-                guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-                  ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-                  : homepage.weeklyDecisionCardModel.decision.guardrail}
-                reversalTrigger={homepage.weeklyDecisionCardModel.decision.reversalTrigger}
+                guardrail={guardrailLabel}
+                reversalTrigger={reversalTriggerLabel}
+                shareLines={briefShareLines}
                />
 
             <ThreeWhethersCard
@@ -385,9 +400,8 @@ async function PageContent({
                tightness={tightness}
                boldnessScore={weeklyLeadershipSummary.boldnessScore}
                actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-               guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-                 ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-                 : undefined}
+               guardrail={numericGuardrailLabel}
+               shareLines={briefShareLines}
              />
 
             <WeeklyTopFoldContract

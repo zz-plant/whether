@@ -162,29 +162,31 @@ summary:focus-visible {
   display: none;
 }
 
-:where(.weather-auto-chevron > [role="button"]) {
+:where(.weather-auto-chevron > summary) {
   display: flex;
   min-height: 44px;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   border-radius: var(--radius-md);
+  list-style: none;
   text-decoration: none;
 }
 
-:where(.weather-auto-chevron > [role="button"])::after {
+:where(.weather-auto-chevron > summary)::after {
   content: "▾";
+  display: inline-block;
   color: rgb(148 163 184);
   font-size: 0.95rem;
   line-height: 1;
   transition: transform 0.2s ease;
 }
 
-:where(.weather-auto-chevron[data-panel-open] > [role="button"])::after {
+:where(.weather-auto-chevron[open] > summary)::after {
   transform: rotate(180deg);
 }
 
-:where(.weather-auto-chevron[data-panel-open] > [role="button"]) {
+:where(.weather-auto-chevron[open] > summary) {
   margin-bottom: 0.9rem;
 }
 

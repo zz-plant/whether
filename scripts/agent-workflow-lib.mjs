@@ -212,14 +212,14 @@ const TASK_PROFILES = [
     ],
     targets: [
       "app/page.tsx",
-      "app/components/weeklyDecisionCard.tsx",
+      "app/components/DecisionHero.tsx",
       "lib/report/homeBriefModel.ts",
       "lib/report/decisionKnobs.ts",
     ],
     checks: [
       "bun run lint",
       "bun run test tests/homeBriefModel.test.ts",
-      "bun run test tests/weeklyDecisionCardDecisionTransmissionContract.test.tsx",
+      "bun run test tests/homeRouteDecisionTransmissionContract.test.tsx",
     ],
   },
 ];

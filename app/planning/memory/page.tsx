@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
+import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 
 export const runtime = "edge";
@@ -94,6 +96,9 @@ export default async function DecisionMemoryPage({
         <div id="ops-decision-memory">
           <DecisionMemoryPanel />
         </div>
+        <Suspense fallback={null}>
+          <OperationsWorkstreamNav currentPath="/planning/memory" />
+        </Suspense>
       </div>
     </ReportShell>
   );

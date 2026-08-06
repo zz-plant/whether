@@ -1,30 +1,23 @@
 # `app/components/weekly-card` agent guide
 
-This directory owns the canonical weekly brief presentation layer.
+This directory used to hold the canonical weekly-card presentation layer. The homepage top fold
+now renders directly from `app/page.tsx` (`DecisionHero`, `ThreeWhethersCard`, the weekly top-fold
+contract section), and the unused card tree was deleted in Aug 2026. What remains here:
 
-Use this guide when editing the homepage top fold, weekly decision card hierarchy, bounded-rule presentation, or supporting disclosures that appear inside the main weekly brief.
+- `DiagnosticsSection.tsx` — signal diagnostics disclosure, rendered on `/evidence`
+- `decisionSupport.ts` — role-aware decision-support copy used by `/api/weekly` and `/api/monthly`
+- `shared/`, `types.ts` — presentation helpers and view-model types for the above
 
-## What this directory owns
+Do not add new homepage presentation here; extend `app/page.tsx` and `app/components/home/*`
+instead (see `app/components/home/AGENTS.md`).
 
-- Presentation of the canonical weekly call on `/`
-- Top-fold hierarchy and scan order
-- Screenshot-safe compaction of decision content
-- Disclosure boundaries between first-scan content and supporting detail
-
-## What this directory must not own
-
-- Canonical posture, trust, or threshold semantics
-- Export-specific behavior
-- Alternate workflow routing logic that belongs to home orchestration
-- Long-form explanatory copy that belongs in `/evidence` or `/trust`
-
-## Non-negotiable contract
+## Non-negotiable contract (now enforced on `app/page.tsx`)
 
 Preserve the one-screen weekly brief contract from `docs/one-screen-weekly-brief-spec.md`:
-- one dominant weekly decision card
+- one dominant weekly decision block
 - action-first scan path
 - compact trust/readiness
-- bounded `What changed` / `Pause if` / `Change course if` semantics
+- bounded `What changed` / guardrail / reversal semantics
 - screenshot-safe hierarchy at common desktop widths and usable mobile compression
 
 If something must be cut for space, cut in this order:
@@ -38,32 +31,11 @@ Do not cut:
 - bounded guardrail / flip logic
 - compact trust/readiness verdict
 
-## Canonical inputs
-
-Treat these as upstream:
-- `lib/report/homeBriefModel.ts`
-- `lib/report/reportFormatting.ts`
-- `lib/report/trustStatus.ts`
-- `lib/report/decisionTransmissionCopy.ts`
-
-The weekly card renders those contracts. It should not redefine them.
-
-## Working rules
-
-- Keep the operator-facing call visible once. Avoid duplicate call summaries in adjacent blocks.
-- The top strip is metadata, not a second decision block.
-- Supportive sections should explain the current call, not compete with it.
-- Use disclosures for continuity, trajectory, confidence detail, and rationale that are not required in the first scan.
-- Mobile compaction should preserve actionability first; do not let equal-weight card grids flatten the hierarchy.
-- If a new block cannot justify its place in a screenshot, it probably belongs below the fold or on another route.
-
 ## Tests and docs to update
 
-When hierarchy, ordering, or weekly-card labels change, update:
-- `tests/weeklyDecisionCardLayout.test.tsx`
-- `tests/weeklyDecisionCardSections.test.tsx`
-- `tests/weeklyDecisionCardDecisionTransmissionContract.test.tsx`
-- `tests/homeWeeklyComposition.test.tsx` when homepage composition changes
+When the homepage top fold or these surviving pieces change, update:
+- `tests/homeRouteDecisionTransmissionContract.test.tsx`
+- `tests/weeklyCardSectionDiagnostics.test.tsx`
 - `docs/one-screen-weekly-brief-spec.md`
 - `docs/feature-specs-current.md`
 

@@ -14,6 +14,8 @@ function fallbackCopy(text: string): void {
 type Props = {
   title?: string;
   text: string;
+  /** Labeled decision bullets ("Do now: …", "Pause if: …") appended below the operating call. */
+  lines?: string[];
   url?: string;
   className?: string;
   showLabel?: boolean;
@@ -22,6 +24,7 @@ type Props = {
 export function ShareBriefButton({
   title = "Whether Weekly Brief",
   text,
+  lines,
   url = typeof window !== "undefined" ? window.location.href : "",
   className = "",
   showLabel = false,
@@ -30,18 +33,19 @@ export function ShareBriefButton({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = useCallback(() => {
-    const payload = { title, text, url };
+    const bulletBlock = lines && lines.length > 0 ? `\n${lines.map((line) => `• ${line}`).join("\n")}` : "";
+    const payload = { title, text: `${text}${bulletBlock}`, url };
     const canNativeShare = typeof navigator !== "undefined" && "canShare" in navigator && navigator.canShare(payload);
     if (canNativeShare) {
       void navigator.share(payload);
       return;
     }
-    const formattedSlackBrief = `*Whether Weekly Brief*\n> *Operating Call:* ${text}\n\n*Full Weekly Brief:* ${url || "https://whether.work"}`;
+    const formattedSlackBrief = `*Whether Weekly Brief*\n> *Operating Call:* ${text}${bulletBlock}\n\n*Full Weekly Brief:* ${url || "https://whether.work"}`;
     fallbackCopy(formattedSlackBrief);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setDidCopy(true);
     timeoutRef.current = setTimeout(() => setDidCopy(false), 2000);
-  }, [title, text, url]);
+  }, [title, text, lines, url]);
 
   return (
     <button

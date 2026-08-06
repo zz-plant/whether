@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Link as LinkIcon, Check } from "lucide-react";
 import { REGIME_COLORS } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
 import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";
+import { useClipboardCopy } from "./useClipboardCopy";
 
 type RegimeHistoryEntry = {
   record_date: string;
@@ -34,6 +36,9 @@ export function RegimeHistory({ regimes }: Props) {
   const selectedMonth = searchParams?.get("month");
   const selectedYear = searchParams?.get("year");
   const isViewingHistory = Boolean(selectedMonth && selectedYear);
+  const [activeDetail, setActiveDetail] = useState<string | null>(null);
+  const { status: copyStatus, copyToClipboard } = useClipboardCopy();
+  const isLinkCopied = copyStatus === "copied";
 
   const handleSelect = useCallback((entry: { record_date: string }) => {
     const ym = parseYearMonth(entry.record_date);
@@ -69,12 +74,21 @@ export function RegimeHistory({ regimes }: Props) {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href).catch(() => {});
-              }}
-              className="text-fluid-nano font-medium text-white/60 hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+              onClick={() => void copyToClipboard(window.location.href, "History link")}
+              className="inline-flex items-center gap-1 text-fluid-nano font-medium text-white/60 hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+              aria-label={isLinkCopied ? "Link copied" : "Copy link"}
             >
-              Copy link
+              {isLinkCopied ? (
+                <>
+                  <Check className="size-3" aria-hidden="true" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="size-3" aria-hidden="true" />
+                  Copy link
+                </>
+              )}
             </button>
             <Link
               href="/"
@@ -104,14 +118,19 @@ export function RegimeHistory({ regimes }: Props) {
             event ? event.label : null,
             nearest ? `${nearest.monthsDistance === 0 ? "during" : nearest.monthsDistance === 1 ? "1 mo from" : `${nearest.monthsDistance} mo from`} ${nearest.event.label}` : null,
           ].filter(Boolean);
+          const detailText = tooltipParts.join(" · ");
           return (
             <button
                       key={entry.record_date}
               type="button"
               onClick={() => handleSelect(entry)}
+              onMouseEnter={() => setActiveDetail(detailText)}
+              onMouseLeave={() => setActiveDetail(null)}
+              onFocus={() => setActiveDetail(detailText)}
+              onBlur={() => setActiveDetail(null)}
               className="group relative flex h-14 min-h-11 min-w-[1.25rem] flex-1 cursor-pointer items-end justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-              aria-label={tooltipParts.join(" · ")}
-              title={tooltipParts.join(" · ")}
+              aria-label={detailText}
+              title={detailText}
             >
               {event ? (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[7px] leading-none text-amber-300/70" aria-hidden="true">★</span>
@@ -138,9 +157,13 @@ export function RegimeHistory({ regimes }: Props) {
           <span>{formatAxisDate(regimes[regimes.length - 1].record_date)}</span>
         )}
       </div>
-      {hasEvents ? (
-        <p className="text-fluid-nano text-white/40 mt-0.5">
-          <span className="text-amber-300/60">★</span> = notable event · hover for details
+      {hasEvents || activeDetail ? (
+        <p className="text-fluid-nano text-white/40 mt-0.5 truncate">
+          {activeDetail ? (
+            <span className="text-white/60" aria-hidden="true">{activeDetail}</span>
+          ) : (
+            <><span className="text-amber-300/60">★</span> = notable event · hover or focus a bar for details</>
+          )}
         </p>
       ) : null}
     </div>

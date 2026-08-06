@@ -22,7 +22,7 @@ pair while iterating; save `bun run check` for pre-merge.
 
 Canonical modules — extend these before creating new ones:
 
-- **Weekly brief / homepage** — `app/page.tsx`, `app/components/weeklyDecisionCard.tsx`,
+- **Weekly brief / homepage** — `app/page.tsx`, `app/components/DecisionHero.tsx`,
   `lib/report/homeBriefModel.ts`, `lib/report/reportData.ts`, `lib/report/decisionKnobs.ts`
 - **Bounded rules / playbooks** — `lib/playbook.ts`, `lib/report/operatingCalls.ts`,
   `lib/thresholds.ts`, `lib/regimeEngine.ts`

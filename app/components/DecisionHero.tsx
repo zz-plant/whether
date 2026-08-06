@@ -30,6 +30,7 @@ type Props = {
   transitionProbability?: number;
   guardrail?: string;
   reversalTrigger?: string;
+  shareLines?: string[];
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -63,6 +64,7 @@ export function DecisionHero({
   transitionProbability,
   guardrail,
   reversalTrigger,
+  shareLines,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -128,6 +130,23 @@ export function DecisionHero({
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
             </p>
           </div>
+          {guardrail || reversalTrigger ? (
+            <p className="text-fluid-micro text-white/50">
+              {guardrail ? (
+                <span>
+                  <span className="font-semibold uppercase tracking-[0.06em] text-amber-300/80">Guardrail:</span>{" "}
+                  {guardrail}
+                </span>
+              ) : null}
+              {guardrail && reversalTrigger ? <span aria-hidden="true"> · </span> : null}
+              {reversalTrigger ? (
+                <span>
+                  <span className="font-semibold uppercase tracking-[0.06em] text-rose-300/80">Reversal:</span>{" "}
+                  {reversalTrigger}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
           {flipConditions && flipConditions.length > 0 ? (
             <p className="text-fluid-micro text-white/50">
               <span className="font-semibold uppercase tracking-[0.06em] text-sky-300/80">
@@ -153,8 +172,12 @@ export function DecisionHero({
             />
           </div>
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} showLabel />
-            <span title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}>
+            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
+            <span
+              title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"}
+              aria-label={isFallback ? "Data status: all data from snapshot" : degradedCount && degradedCount > 0 ? `Data status: ${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "Data status: all sources live"}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}
+            >
               <span className={`size-2 rounded-full ${dataStatusColor} ${isFallback || (degradedCount && degradedCount > 0) ? "motion-safe:animate-pulse" : ""}`} aria-hidden="true" />
               {dataStatus}
             </span>

@@ -38,8 +38,8 @@ Prefer editing these sources before changing consumers:
 - `lib/report/decisionKnobs.ts`
 
 Typical downstream renderers:
-- `app/components/weeklyCallModePanel.tsx`
-- `app/components/weekly-card/*`
+- `app/page.tsx` (top fold: `DecisionHero`, `ThreeWhethersCard`)
+- `app/components/weekly-card/DiagnosticsSection.tsx`
 - `app/components/home/*`
 - `app/planning/components/*`
 
