@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ApiDocsPage() {
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <PageShell backdropVariant="default">
       <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API & Agent Tools</h1>
         <p className="text-sm text-slate-300">

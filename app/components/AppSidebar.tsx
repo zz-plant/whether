@@ -7,9 +7,11 @@ import type { Route } from "next";
 import type { ReportSectionLink } from "./reportShellNavigation";
 
 const WORKFLOW_ROUTES = [
-  { href: "/" as Route, label: "Decide" },
+  { href: "/" as Route, label: "Brief" },
+  { href: "/evidence" as Route, label: "Evidence" },
   { href: "/planning" as Route, label: "Plan" },
-  { href: "/evidence" as Route, label: "Deepen" },
+  { href: "/resolve" as Route, label: "Resolve" },
+  { href: "/trust" as Route, label: "Readiness" },
 ] as const;
 
 function OutlineItem({

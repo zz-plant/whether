@@ -198,12 +198,16 @@ export default function RootLayout({
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8">
           <div className="mx-auto max-w-4xl space-y-4">
             <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-fluid-sm text-[var(--footer-link)]">
-              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</Link>
+              <Link href="/" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Brief</Link>
+              <Link href="/evidence" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Evidence</Link>
+              <Link href="/planning" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Plan</Link>
+              <Link href="/resolve" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resolve</Link>
+              <Link href="/trust" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Readiness</Link>
               <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
               <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>
-              <Link href="/planning" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resources</Link>
               <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</Link>
               <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">API</Link>
+              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</Link>
               <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">RSS</a>
             </nav>
             <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">

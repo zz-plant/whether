@@ -25,7 +25,6 @@ export function PageShell({
   regime,
   structuredData,
   ambientMode = "standard",
-  showFooter = false,
   className = "",
   backdropVariant = "default",
 }: PageShellProps) {
@@ -48,12 +47,6 @@ export function PageShell({
       <div className="tv-rail-safe relative z-10 mx-auto w-full max-w-[96rem] pb-[calc(env(safe-area-inset-bottom)+8rem)] pt-[calc(env(safe-area-inset-top)+0.5rem)] px-[var(--weather-shell-pad-inline)] sm:pb-8 sm:pt-4">
         {children}
       </div>
-
-      {showFooter ? (
-        <footer className="mx-auto mt-8 w-full max-w-[96rem] border-t border-white/[0.04] px-[var(--weather-shell-pad-inline)] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400 sm:pb-8">
-          {INTERNAL_USE_LABEL && <p>{INTERNAL_USE_LABEL}</p>}
-        </footer>
-      ) : null}
     </main>
   );
 }

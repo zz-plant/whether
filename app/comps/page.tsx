@@ -26,7 +26,7 @@ export default function CompsPage() {
   }, []);
 
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <PageShell backdropVariant="default">
       <article className="weather-panel space-y-6 px-5 py-5">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">
           Public SaaS Valuation Multiples

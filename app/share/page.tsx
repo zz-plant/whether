@@ -68,7 +68,7 @@ export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
 
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <PageShell backdropVariant="default">
       <section className="weather-panel space-y-5 px-5 py-5">
         <div className="max-w-3xl space-y-3">
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">

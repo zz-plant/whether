@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function TemplatePage() {
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <PageShell backdropVariant="default">
       <article className="weather-panel space-y-8 px-5 py-5 max-w-2xl">
         <div className="space-y-3">
           <h1 className="text-fluid-xl font-semibold text-slate-100">Bounded Decision Template</h1>
@@ -59,7 +59,7 @@ export default function TemplatePage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="weather-button-primary px-5 py-2.5 text-xs font-semibold rounded-lg"
+            className="weather-button-primary min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
           >
             Print this page
           </button>
@@ -89,7 +89,7 @@ export default function TemplatePage() {
               ].join("\n");
               navigator.clipboard.writeText(text);
             }}
-            className="weather-button px-5 py-2.5 text-xs font-semibold rounded-lg"
+            className="weather-button min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
           >
             Copy as text
           </button>
@@ -100,34 +100,23 @@ export default function TemplatePage() {
           <br />Inspired by the bounded decision framework used in Whether&apos;s weekly brief.
         </p>
 
-        <div className="border-t border-slate-700/50 pt-6 space-y-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
-              <p className="text-xs text-slate-300">See this week&apos;s posture and decisions</p>
+        <section className="space-y-4 border-t border-slate-700/50 pt-6">
+          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next steps</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href="/" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">Weekly brief →</p>
+              <p className="text-xs text-slate-300">See current posture and decisions</p>
             </Link>
-            <Link href="/threshold" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">The framework</p>
+            <Link href="/threshold" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">The framework →</p>
               <p className="text-xs text-slate-300">Why bounded decisions work</p>
             </Link>
-          </div>
-        </div>
-        <div className="border-t border-slate-700/50 pt-6 space-y-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">Current brief</p>
-              <p className="text-xs text-slate-300">See a live bounded decision in practice</p>
+            <Link href="/planning" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">Planning →</p>
+              <p className="text-xs text-slate-300">Turn posture into team approvals</p>
             </Link>
           </div>
-        </div>
-
-        <div className="border-t border-slate-700/50 pt-6">
-          <Link href="/" className="inline-flex items-center gap-2 rounded-sm border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-            ← Back to weekly brief
-          </Link>
-        </div>
+        </section>
       </article>
     </PageShell>
   );

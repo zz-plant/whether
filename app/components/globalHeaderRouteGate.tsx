@@ -102,22 +102,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
         </div>
 
-        {isReportRoute ? (
-          <>
-            {isHomeBrief ? (
-              <div className="flex items-center gap-2 border-t border-white/[0.05] px-3 py-1.5 lg:hidden">
-                <GlobalHeaderNavClient pathname={pathname} />
-                <div className="ml-auto flex min-w-0 items-center gap-1.5 overflow-x-auto sm:hidden">
-                  <CadenceSelector />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5 lg:hidden">
-                <GlobalHeaderNavClient pathname={pathname} />
-              </div>
-            )}
-          </>
-        ) : null}
+        <div className="flex items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5">
+          <GlobalHeaderNavClient pathname={pathname} />
+          {isHomeBrief ? (
+            <div className="ml-auto flex min-w-0 items-center gap-1.5 overflow-x-auto sm:hidden">
+              <CadenceSelector />
+            </div>
+          ) : null}
+        </div>
       </div>
     </GlobalHeaderScrollWrapper>
   );

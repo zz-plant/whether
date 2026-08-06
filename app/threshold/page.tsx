@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function ThresholdPage() {
   return (
-    <PageShell backdropVariant="default" showFooter>
+    <PageShell backdropVariant="default">
       <article className="weather-panel space-y-8 px-5 py-5 max-w-3xl">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">Bounded Decisions</h1>
         <p className="text-sm text-slate-300 leading-relaxed">
@@ -65,39 +65,23 @@ export default function ThresholdPage() {
           </p>
         </section>
 
-        <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">← Weekly brief</p>
-              <p className="text-xs text-slate-300">See this week&apos;s posture and decisions</p>
+        <section className="space-y-4 border-t border-slate-700/50 pt-6">
+          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next steps</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href="/" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">Weekly brief →</p>
+              <p className="text-xs text-slate-300">See current posture and operating decisions</p>
             </Link>
-            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">Current regime</p>
-              <p className="text-xs text-slate-300">See the current macro regime and bounded decision</p>
+            <Link href="/trust" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">Readiness & Method →</p>
+              <p className="text-xs text-slate-300">How thresholds and scores are derived</p>
             </Link>
-          </div>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Related</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">Current regime</p>
-              <p className="text-xs text-slate-300">See the current macro regime and bounded decision</p>
-            </Link>
-            <Link href="/trust" className="weather-surface block no-underline px-4 py-3 space-y-1">
-              <p className="text-xs font-semibold text-sky-200">Methodology</p>
-              <p className="text-xs text-slate-300">How scores and thresholds are determined</p>
+            <Link href="/planning" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+              <p className="text-xs font-semibold text-sky-200">Planning →</p>
+              <p className="text-xs text-slate-300">Turn posture into team approvals</p>
             </Link>
           </div>
         </section>
-
-        <div className="border-t border-slate-700/50 pt-6">
-          <Link href="/" className="inline-flex items-center gap-2 rounded-sm border border-slate-700/60 px-4 py-2 text-fluid-micro font-medium text-slate-400 hover:border-sky-500/40 hover:text-sky-200 transition-colors no-underline">
-            ← Back to weekly brief
-          </Link>
-        </div>
       </article>
     </PageShell>
   );
