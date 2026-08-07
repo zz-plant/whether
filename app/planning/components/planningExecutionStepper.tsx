@@ -206,9 +206,11 @@ export function OperationsExecutionStepper({
                   </span>
                 )}
               </div>
-              <div className="mt-4">
-                {step.children}
-              </div>
+              {isActive && (
+                <div className="mt-4">
+                  {step.children}
+                </div>
+              )}
             </section>
           );
         })}
