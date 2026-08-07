@@ -18,6 +18,7 @@ export function StageSwitcher({
   currentStage?: string | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [confirmationStage, setConfirmationStage] = useState<string | null>(null);
   const router = useRouter();
   const menuId = useId();
   const labelId = useId();
@@ -26,6 +27,7 @@ export function StageSwitcher({
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const handleSelect = (key: string) => {
+    const stageName = COMPANY_STAGES.find(s => s.key === key)?.label ?? key;
     // eslint-disable-next-line react-hooks/immutability
     document.cookie = `whether-company-stage=${key};path=/;max-age=31536000`;
     try {
@@ -33,7 +35,9 @@ export function StageSwitcher({
     } catch {
       // Fallback
     }
+    setConfirmationStage(stageName);
     setOpen(false);
+    setTimeout(() => setConfirmationStage(null), 2000);
     router.refresh();
   };
 
@@ -63,14 +67,15 @@ export function StageSwitcher({
   };
 
   return (
-    <div
-      className="relative inline-block"
-      onBlur={(e) => {
-        if (open && e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
-          setOpen(false);
-        }
-      }}
-    >
+    <div className="relative inline-block">
+      <div
+        className="relative inline-block"
+        onBlur={(e) => {
+          if (open && e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
+            setOpen(false);
+          }
+        }}
+      >
       <button
         ref={buttonRef}
         type="button"
@@ -143,6 +148,12 @@ export function StageSwitcher({
           </div>
         </>
       ) : null}
+      </div>
+      {confirmationStage && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-fluid-nano font-medium whitespace-nowrap animate-in fade-in slide-in-from-top-2 duration-200">
+          ✓ Guardrails updated for {confirmationStage}
+        </div>
+      )}
     </div>
   );
 }

@@ -51,9 +51,9 @@ export function ShareBriefButton({
     <button
       type="button"
       onClick={handleClick}
-      title="Copies Slack-ready markdown brief"
+      title="Copy brief to clipboard or share"
       className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-semibold text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
-      aria-label="Share brief"
+      aria-label="Copy brief"
     >
       {didCopy ? (
         <Check aria-hidden="true" size={16} strokeWidth={2} className="text-emerald-300" />

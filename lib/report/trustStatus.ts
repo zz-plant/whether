@@ -476,26 +476,26 @@ export const buildTrustStatus = ({
   const label = historicalSelection
     ? "Historical snapshot"
     : isFallback
-      ? "Using last verified snapshot"
+      ? "Using cached data"
       : policyRefusalActive
-        ? "Live, but policy override active"
+        ? "Live data, but signals unstable"
       : "Live • Treasury verified";
 
   const detail = historicalSelection
-    ? `Retrospective only.${historicalMacroCoverageDetail}`
+    ? `Retrospective only — not for live decisions.${historicalMacroCoverageDetail}`
     : isFallback
-      ? `Pause big bets until live data resumes.${fallbackReason ? ` (${fallbackReason})` : ""}`
+      ? `Data sources are delayed. Stage decisions, don't commit until live data returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyRefusalActive
-        ? `Live data available, but policy signals are too noisy to change posture. Keep big bets paused.${policyRefusalReasons[0] ? ` (${policyRefusalReasons[0]})` : ""}`
-      : "Proceed with normal approvals.";
+        ? `Live data is available, but recent signals are too contradictory to recommend a posture change. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
+      : "All signals aligned. Proceed with normal approvals.";
 
   const action = historicalSelection
-    ? `${historicalAction} Clears when: switch to current data before changing pace.`
+    ? `${historicalAction} Clears when: switch to current live data before changing spending pace.`
     : isFallback
-      ? `${fallbackAction} Clears when: resume normal approvals after one live update.`
+      ? `${fallbackAction} Clears when: live data updates and verifies across all sources.`
       : policyRefusalActive
-        ? `Keep posture changes reversible until the policy override clears. Clears when: resume normal approvals once policy signals reconcile.`
-      : `${stableAction} Clears when: return to standard cadence once confidence recovers.`;
+        ? `Keep approvals reversible. Clears when: signals reconcile and the contradictions resolve.`
+      : `${stableAction} Clears when: confidence remains above LOW or transition risk drops.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

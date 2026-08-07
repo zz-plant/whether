@@ -48,7 +48,7 @@ export function ScenarioSimulator({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white tracking-tight">Macro Scenario Simulator</h3>
-            <p className="text-fluid-micro text-white/50">Test macro shocks & verify whether the posture call flips</p>
+            <p className="text-fluid-micro text-white/50">Hypothetical test only—not a live posture change. Coefficients are simplified for illustration.</p>
           </div>
         </div>
 
@@ -138,12 +138,12 @@ export function ScenarioSimulator({
       }`}>
         <div className="space-y-0.5">
           <span className="text-fluid-nano font-semibold uppercase tracking-wider opacity-80">
-            Simulated Operating Result
+            If this macro scenario occurred
           </span>
           <p className="text-lg font-bold">
             {isFlipped
-              ? "FLIP TRIGGERED: Posture switches to TIGHTEN / DEFENSIVE"
-              : "POSTURE HOLDS: Current operational guidance remains valid"}
+              ? "Tightness would trigger a PAUSE on expansive commitments"
+              : "Current operational guidance would remain valid"}
           </p>
         </div>
 

@@ -91,7 +91,7 @@ export function CompareStrip({
               <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium ${
                 tightnessDelta > 0 ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"
               }`}>
-                Capital tightness: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts
+                Capital tightness: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts {Math.abs(tightnessDelta) >= 3 ? "· notable shift" : ""}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-medium text-white/60">

@@ -17,7 +17,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Readiness — freshness, confidence, and sources",
   description:
-    "Whether is decision-support software, not an authority. Check source freshness, confidence, and methodology before acting on irreversible decisions.",
+    "Check source freshness, confidence, and methodology before acting on irreversible decisions.",
   path: "/trust",
   imageAlt: "Whether trust hub",
 });

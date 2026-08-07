@@ -100,6 +100,7 @@ export function RegimeHistory({ regimes }: Props) {
         ) : null}
       </div>
 
+      <p className="text-fluid-nano text-white/40 mb-2">Boldness score over time</p>
       <div className="relative flex h-14 items-end gap-1 overflow-x-auto">
         <div className="absolute left-0 right-0 top-1/2 h-px bg-white/[0.06]" aria-hidden="true" />
         {regimes.map((entry, i) => {

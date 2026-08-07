@@ -130,33 +130,31 @@ export function DecisionHero({
               <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
             </p>
           </div>
-          {guardrail || reversalTrigger ? (
-            <p className="text-fluid-micro text-white/50">
+          {guardrail || reversalTrigger || (flipConditions && flipConditions.length > 0) ? (
+            <div className="space-y-1.5 pt-1 text-fluid-micro">
+              <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">Watch this week</p>
               {guardrail ? (
-                <span>
-                  <span className="font-semibold uppercase tracking-[0.06em] text-amber-300/80">Guardrail:</span>{" "}
+                <p className="text-white/50">
+                  <span className="font-semibold text-amber-300/80">Guardrail:</span>{" "}
                   {guardrail}
-                </span>
+                </p>
               ) : null}
-              {guardrail && reversalTrigger ? <span aria-hidden="true"> · </span> : null}
               {reversalTrigger ? (
-                <span>
-                  <span className="font-semibold uppercase tracking-[0.06em] text-rose-300/80">Reversal:</span>{" "}
+                <p className="text-white/50">
+                  <span className="font-semibold text-rose-300/80">Reversal:</span>{" "}
                   {reversalTrigger}
-                </span>
+                </p>
               ) : null}
-            </p>
-          ) : null}
-          {flipConditions && flipConditions.length > 0 ? (
-            <p className="text-fluid-micro text-white/50">
-              <span className="font-semibold uppercase tracking-[0.06em] text-sky-300/80">
-                Flip watch:
-              </span>{" "}
-              {flipConditions.join(" · ")}
-              {transitionProbability && transitionProbability > 0 ? (
-                <span> · {transitionProbability}% transition risk</span>
+              {flipConditions && flipConditions.length > 0 ? (
+                <p className="text-white/50">
+                  <span className="font-semibold text-sky-300/80">Transition risk:</span>{" "}
+                  {flipConditions.join(" · ")}
+                  {transitionProbability && transitionProbability > 0 ? (
+                    <span> ({transitionProbability}% probability)</span>
+                  ) : null}
+                </p>
               ) : null}
-            </p>
+            </div>
           ) : null}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <StageSwitcher currentStage={operatorContext.companyStage} />
@@ -213,7 +211,7 @@ export function DecisionHero({
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="text-fluid-micro text-white/50 mt-0.5">How much room you have to operate</p>
+          <p className="text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, & commit</p>
         </div>
       </div>
     </section>

@@ -70,7 +70,7 @@ export function FreshnessDot({
       >
         <span className={`inline-flex items-center gap-1 rounded-full ${statusColor} px-1.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.06em]`}>
           <span className="size-1.5 rounded-full bg-current motion-safe:animate-pulse" aria-hidden="true" />
-          {showOfflineBadge ? "Snapshot" : hasDegraded ? "Cached" : "Live"}
+          {showOfflineBadge ? "Snapshot" : hasDegraded ? "Degraded" : "Live"}
         </span>
         <span>Data as of {label}</span>
       </button>
@@ -84,9 +84,13 @@ export function FreshnessDot({
           className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left overscroll-contain"
         >
           <div>
-            <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase">Data quality</p>
+            <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase">Data status</p>
             <p className="text-fluid-xs text-white/65 mt-1">
-              {showOfflineBadge ? "Using saved snapshot" : "Live data"}
+              {showOfflineBadge
+                ? "Using saved snapshot — not for live approvals."
+                : hasDegraded
+                ? "Some sources are delayed or cached — stage decisions until all sources are current."
+                : "All sources live and current."}
             </p>
           </div>
 

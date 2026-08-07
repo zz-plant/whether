@@ -52,16 +52,16 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
     <GlobalHeaderScrollWrapper>
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]/95">
         <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3 sm:py-2">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex items-center gap-2">
             <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
-            <span className="hidden truncate text-fluid-micro font-medium tracking-[0.04em] text-[var(--app-text-muted)] min-[360px]:inline sm:text-fluid-xs">
+            <span className="hidden text-fluid-micro font-medium tracking-[0.04em] text-[var(--app-text-muted)] min-[360px]:inline sm:text-fluid-xs">
               {isHomeBrief ? "Weekly Brief" : routeLabel}
             </span>
           </div>
 
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
+          <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
             {isReportRoute ? (
               <>
                 {isHomeBrief ? (

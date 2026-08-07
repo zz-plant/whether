@@ -267,9 +267,26 @@ async function PageContent({
     ]);
   } catch {
     return (
-      <div className="text-center py-16 space-y-3">
-        <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
-        <p className="text-white/50 text-fluid-micro">Data may be temporarily unavailable. Please try again shortly.</p>
+      <div className="text-center py-16 space-y-4">
+        <div className="space-y-2">
+          <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
+          <p className="text-white/50 text-fluid-micro">Data sources are temporarily unavailable or delayed.</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 text-emerald-300 hover:bg-emerald-500/15 transition-colors text-sm font-medium"
+          >
+            Retry now
+          </button>
+          <Link
+            href="/trust"
+            className="inline-flex items-center gap-2 text-sky-300/70 hover:text-sky-300 text-sm font-medium transition-colors"
+          >
+            Check data status →
+          </Link>
+        </div>
       </div>
     );
   }

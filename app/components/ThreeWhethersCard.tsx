@@ -61,8 +61,8 @@ export function ThreeWhethersCard({
         : hiringIsEasy
         ? "Selectively accelerate key engineering & sales hires."
         : "Maintain existing headcount plan; replace critical backfills only.",
-      threshold: `tightness ≥ ${TIGHTEN_AT.hire}`,
-      reversalCondition: `tightness < ${EASE_BELOW.hire}, not tightening`,
+      threshold: `Tighten: tightness ≥ ${TIGHTEN_AT.hire}`,
+      reversalCondition: `Ease: tightness drops below ${EASE_BELOW.hire}`,
     },
     {
       title: "Whether to Spend",
@@ -74,8 +74,8 @@ export function ThreeWhethersCard({
         : spendingIsEasy
         ? "Allow paid payback up to 12 months for top-tier channels."
         : "Keep payback targets at 8-10 months; re-evaluate monthly.",
-      threshold: `tightness ≥ ${TIGHTEN_AT.spend}`,
-      reversalCondition: `tightness < ${EASE_BELOW.spend}, not tightening`,
+      threshold: `Tighten: tightness ≥ ${TIGHTEN_AT.spend}`,
+      reversalCondition: `Ease: tightness drops below ${EASE_BELOW.spend}`,
     },
     {
       title: "Whether to Commit",
@@ -87,8 +87,8 @@ export function ThreeWhethersCard({
         : committingIsEasy
         ? "Lock multi-year discounts on critical core infrastructure."
         : "Standard 1-year caps; require executive sign-off for >$50k ARR commitments.",
-      threshold: guardrail ?? `tightness ≥ ${TIGHTEN_AT.commit}, tightening`,
-      reversalCondition: `tightness < ${EASE_BELOW.commit} or easing`,
+      threshold: guardrail ?? `Pause: tightness ≥ ${TIGHTEN_AT.commit} and tightening`,
+      reversalCondition: `Resume: tightness drops below ${EASE_BELOW.commit} or easing`,
     },
   ];
 

@@ -137,7 +137,7 @@ export function SwipeableWeek({
             type="button"
             onClick={goToPrevious}
             disabled={!canGoToPrevious}
-            aria-label="Previous week"
+            aria-label="Previous month"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 disabled:pointer-events-none disabled:opacity-25"
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
@@ -153,7 +153,7 @@ export function SwipeableWeek({
             type="button"
             onClick={goToLatest}
             disabled={!canGoToLatest}
-            aria-label="Current week"
+            aria-label="Current month"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 disabled:pointer-events-none disabled:opacity-25"
           >
             <ChevronRight className="size-4" aria-hidden="true" />

@@ -204,7 +204,7 @@ export const SignalsDecisionSummarySection = ({
     className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
     aria-label="Decision summary"
   >
-    <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+    <p className="weather-surface flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
       {decisionDeltaLabel}
     </p>
     <article className="weather-surface space-y-3 p-4">
