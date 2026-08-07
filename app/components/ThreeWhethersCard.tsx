@@ -1,8 +1,6 @@
 import { Users, DollarSign, Lock, ArrowUpRight, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 
-import { ShareBriefButton } from "./shareBriefButton";
-
 type DecisionItem = {
   title: string;
   icon: typeof Users;
@@ -14,13 +12,9 @@ type DecisionItem = {
 };
 
 type ThreeWhethersProps = {
-  regime: string;
   signalDirection: SignalDirection;
   tightness: number;
-  boldnessScore: number;
-  actionNow?: string;
   guardrail?: string;
-  shareLines?: string[];
 };
 
 // Displayed trigger/reversal chips read from these, so the stated bounds can never
@@ -29,13 +23,9 @@ const TIGHTEN_AT = { hire: 55, spend: 65, commit: 75 } as const;
 const EASE_BELOW = { hire: 35, spend: 45, commit: 55 } as const;
 
 export function ThreeWhethersCard({
-  regime,
   signalDirection,
   tightness,
-  boldnessScore,
-  actionNow,
   guardrail,
-  shareLines,
 }: ThreeWhethersProps) {
   const hiringIsTight = tightness >= TIGHTEN_AT.hire || signalDirection === "tighten";
   const hiringIsEasy = tightness < EASE_BELOW.hire && signalDirection !== "tighten";
@@ -103,22 +93,15 @@ export function ThreeWhethersCard({
     }
   };
 
-  const briefText = actionNow ?? `${regime} regime: tightness ${tightness}/100, boldness budget ${boldnessScore}/100. ${hireVerdict === "TIGHTEN" ? "Hold headcount, tighten spend, avoid commitments." : hireVerdict === "EXPAND" ? "Consider expanding headcount and commitments." : "Maintain planned operational tempo."}`;
-
   return (
     <section className="space-y-4" aria-labelledby="three-whethers-heading">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-emerald-400">
-            Bounded Operating Rules
-          </p>
-          <h3 id="three-whethers-heading" className="text-xl font-semibold text-white tracking-tight">
-            The 3 Operational &quot;Whethers&quot;
-          </h3>
-        </div>
-        <div className="flex items-center gap-3">
-          <ShareBriefButton text={briefText} lines={shareLines} showLabel />
-        </div>
+      <div>
+        <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-emerald-400">
+          Bounded Operating Rules
+        </p>
+        <h3 id="three-whethers-heading" className="text-xl font-semibold text-white tracking-tight">
+          The 3 Operational &quot;Whethers&quot;
+        </h3>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

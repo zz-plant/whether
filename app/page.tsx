@@ -113,29 +113,15 @@ function WeeklyTopFoldContract({
   const memoryItems = rawItems.map((label) => REGIME_DISPLAY[label] ?? label ?? "—");
   const shouldRevisit = model.decision.revisitDecisions;
   const revisitQueue = model.decision.revisitQueue.slice(0, 3);
-  const guardrailRows = [
-    {
-      trigger: model.decision.guardrailThreshold ?? model.decision.guardrail,
-      consequence: model.decision.actionNowShort ?? model.decision.immediateDecision,
-      reversal: model.decision.reversalTrigger,
-    },
-    {
-      trigger: model.decision.flipThreshold ?? model.decision.compactFlipConditionLabels?.[0] ?? model.diagnostics.flipRiskMeter.triggerLabel,
-      consequence: model.decision.netConstraintSummary,
-      reversal: model.decision.canonicalDecisionCopy?.flipTrigger ?? model.decision.reversalTrigger,
-    },
-  ].filter((row) => row.trigger && row.consequence && row.reversal).slice(0, 1);
 
   return (
     <section
       data-testid="weekly-top-fold"
-      aria-label="Revisit and watch"
+      aria-label="Revisit queue"
       className="weather-card grid gap-4 lg:grid-cols-12"
     >
       <div className="space-y-2 lg:col-span-7">
-        <p className="text-fluid-micro text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
         <div className="flex items-center gap-2">
-          <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Revisit</p>
           <span
             className={`inline-flex items-center rounded-sm px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
               shouldRevisit
@@ -145,6 +131,7 @@ function WeeklyTopFoldContract({
           >
             {shouldRevisit ? "REVISIT" : "ON TRACK"}
           </span>
+          <p className="text-fluid-micro text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
         </div>
         {revisitQueue.length ? (
           <ul className="space-y-1.5 text-fluid-micro text-white/50">
@@ -156,13 +143,6 @@ function WeeklyTopFoldContract({
             ))}
           </ul>
         ) : null}
-        <div className="space-y-1 border-t border-white/[0.06] pt-2 text-fluid-micro text-white/50">
-          {guardrailRows.map((row, index) => (
-            <p key={index}>
-              <span className="text-white/50">Watch:</span> {compactSentence(row.trigger, 84)}
-            </p>
-          ))}
-        </div>
       </div>
 
       <div className="space-y-2 lg:col-span-5">
@@ -412,13 +392,9 @@ async function PageContent({
                />
 
             <ThreeWhethersCard
-               regime={regime}
                signalDirection={signalDirection}
                tightness={tightness}
-               boldnessScore={weeklyLeadershipSummary.boldnessScore}
-               actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
                guardrail={numericGuardrailLabel}
-               shareLines={briefShareLines}
              />
 
             <WeeklyTopFoldContract

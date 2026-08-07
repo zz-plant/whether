@@ -345,6 +345,29 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` and regime-transition probability now render as a compact `Flip watch:` line inside `DecisionHero`. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **Top fold no longer repeats the windows grid.** `WeeklyTopFoldContract` kept `Posture shift`, `Revisit`, `Watch`, and the memory rail, and dropped the `Hiring / Expansion / Fundraising` window grid that duplicated the `ThreeWhethersCard` verdicts.
+
+## Declutter pass (2026-08-07)
+
+Removed four duplications on `/` found by screenshot review. The rule applied: when two surfaces state the
+same thing, the earlier one keeps it.
+
+- **One `Copy Brief` on the page.** `ShareBriefButton` rendered in both `DecisionHero` and
+  `ThreeWhethersCard` — two buttons with the same `aria-label` about 260px apart. The
+  `ThreeWhethersCard` copy was dropped; the hero button is the canonical one-tap action, the header
+  `Export` menu remains the format picker, and `StickyCallStrip` remains the on-scroll persistence of
+  the same call. `ThreeWhethersCard` lost its now-unused `regime` / `boldnessScore` / `actionNow` /
+  `shareLines` props.
+- **Top-fold `Watch:` row removed.** It restated `decision.guardrail` verbatim (truncated to 84 chars)
+  under the heading `Watch:`, while `DecisionHero` already renders that same string as `Guardrail:`
+  inside a block titled `Watch this week` — so it supersedes the 2026-08-01 note above, which kept
+  `Watch` when the hero did not yet carry it. `guardrailRows` in `app/page.tsx` went with it.
+- **`Revisit` heading dropped.** The heading sat beside a status badge that renders `REVISIT` /
+  `ON TRACK`, so the amber state read `Revisit REVISIT`. The badge alone carries the state; the
+  section `aria-label` is now `Revisit queue` rather than `Revisit and watch`.
+- **Global header is opaque.** `globalHeaderRouteGate` used `bg-[var(--bg-body)]/95` with no
+  `backdrop-blur`, so page text stayed legible through the sticky header while scrolling. Now
+  `bg-[var(--bg-body)]`. Translucent overlays elsewhere (`StickyCallStrip`) pair opacity with
+  `backdrop-blur`; the header did not.
 - **Bounded rules stay full-width.** Reversal conditions in `ThreeWhethersCard` render unwrapped on their own line instead of truncating at 170px with a hover-only tooltip.
 - **Sticky strip consolidated and cross-viewport.** The mobile bottom bar dropped the redundant native-share button (copy + image download remain) and renders as a bottom-right floating pill on desktop.
 - **Mockup is deduplicated.** `app/mockups/operator-brief` states the action once (the `Do now / Pause if / Re-open when` spine), shows proof inline, and exposes one primary CTA (`Open planning handoff`) with a working `Copy operator brief` secondary.
