@@ -77,7 +77,7 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
           />
           <circle cx="40" cy="34" r="2" fill={strokeColor} />
         </svg>
-        <div>
+        <div title={`Based on ${avgDuration}-week historical pattern. A regime is a specific combination of credit availability and investor risk appetite. Transitions happen when market conditions shift — watch this % when you're at decision boundaries.`}>
           <p className={`text-lg font-bold ${color}`}>{probability}%</p>
           <p className="text-xs text-slate-400">
             chance of transitioning from {currentRegime} to {likelyNext} within {avgDuration} weeks

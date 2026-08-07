@@ -14,6 +14,7 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((isOpen) => !isOpen)}
+        title="Simulator: test macro shocks. Signals: U.S. market drivers. Trendline: regime history. Shift risk: transition probability."
         className={`flex min-h-12 w-full cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-xs font-semibold tracking-[0.04em] text-white/65 transition-colors select-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 ${highlight ? "border-l-2 border-l-sky-400/40" : ""}`}
       >
         <div className="flex flex-wrap items-center gap-2 min-w-0">
@@ -27,7 +28,7 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
               Expand
             </span>
           )}
-          <span className="hidden sm:inline text-[0.65rem] text-white/50 truncate">
+          <span className="text-[0.65rem] text-white/50 truncate">
             Simulator · Signals · Trendline · Shift risk
           </span>
         </div>

@@ -220,6 +220,9 @@ export const ThresholdsPanel = ({
   };
 
   const handleReset = () => {
+    if (!confirm("Reset all thresholds to defaults? Your custom watch-line settings will be replaced.")) {
+      return;
+    }
     const defaultDraft = buildDraft(appliedDefaults);
     setDraft(defaultDraft);
     setErrors({});

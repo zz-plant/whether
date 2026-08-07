@@ -87,6 +87,7 @@ export function StageSwitcher({
             window.setTimeout(() => focusItem(selectedIndex), 0);
           }
         }}
+        title="Your company stage personalizes hiring freeze thresholds, spend limits, and commitment guardrails. Stage changes update these guardrails on the planning page."
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={open ? menuId : undefined}

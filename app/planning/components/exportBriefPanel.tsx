@@ -304,7 +304,7 @@ export const ExportBriefPanel = ({
     isClipboardTargetDisabled(target, { status, activeTarget });
 
   const handlePrint = () => {
-    if (fallbackActive && !window.confirm("Cached snapshot active. Confirm export before sharing this brief.")) {
+    if (fallbackActive && !window.confirm("Cached snapshot active: U.S. market data is stale. Are you sure? Stale data can mislead decisions about hiring or spending.")) {
       return;
     }
     window.print();
@@ -455,7 +455,7 @@ export const ExportBriefPanel = ({
             </div>
             {fallbackActive ? (
               <p className="text-fluid-micro leading-5 text-amber-200">
-                Cached snapshot active: confirm irreversible sharing actions before circulating this package.
+                Cached snapshot active: U.S. market data is stale. Stage decisions only. Do not lock hiring, spending, or vendor commitments until live data returns.
               </p>
             ) : null}
           </div>
@@ -485,7 +485,7 @@ export const ExportBriefPanel = ({
             </div>
             {fallbackActive ? (
               <p className="text-fluid-micro leading-5 text-amber-200">
-                Cached snapshot active: confirm irreversible sharing actions before circulating this package.
+                Cached snapshot active: U.S. market data is stale. Stage decisions only. Do not lock hiring, spending, or vendor commitments until live data returns.
               </p>
             ) : null}
           </div>

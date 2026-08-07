@@ -40,7 +40,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
   if (!hydrated || data.length < 2) {
     return (
       <p className="text-fluid-xs text-slate-400 text-center">
-        Macro trendline will appear once sufficient data is available.
+        Trendline appears once 2+ weeks of history is available. Check back next week.
       </p>
     );
   }

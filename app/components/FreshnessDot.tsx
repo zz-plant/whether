@@ -123,8 +123,8 @@ export function FreshnessDot({
               <div className="space-y-1">
                 {degradedSourceRows.map((row, index) => (
                   <div key={index} className="flex justify-between text-fluid-nano">
-                    <span className="text-white/60 truncate max-w-[12rem]">{row.sourceName}</span>
-                    <span className="text-amber-300/80 font-mono text-fluid-nano">{row.freshnessStatus}</span>
+                    <span className="text-white/60 truncate max-w-[12rem]" title={row.sourceName}>{row.sourceName}</span>
+                    <span className="text-amber-300/80 font-mono text-fluid-nano" title={`${row.sourceName}: ${row.freshnessStatus}`}>{row.freshnessStatus}</span>
                   </div>
                 ))}
               </div>

@@ -17,8 +17,8 @@ export default function Error({
 
   const minifiedMatch = error.message?.match(MINIFIED_RE);
   const displayMessage = minifiedMatch
-    ? "The weekly brief could not be displayed. The data pipeline may have returned an unexpected result."
-    : error.message || "The weekly brief could not be displayed. The data pipeline may have returned an unexpected result.";
+    ? "The page encountered a rendering error. Try refreshing your browser. If this persists, check the trust page to see if data sources are available."
+    : error.message || "The page encountered an unexpected error. Try refreshing. If the problem continues, data sources may be temporarily unavailable.";
 
   return (
     <div className="weather-shell flex min-h-[40vh] items-center justify-center px-4 py-16">

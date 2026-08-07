@@ -78,11 +78,11 @@ export const DecisionMemoryPanel = () => {
             const localEntries = JSON.parse(localRaw);
             setEntries(localEntries);
           } catch {
-            setStatusMessage("Unable to load saved decisions right now.");
+            setStatusMessage("Your decision history couldn't load — browser cache may be corrupted. Clear browser data and refresh.");
             setEntries([]);
           }
         } else {
-          setStatusMessage("Unable to load saved decisions right now.");
+          setStatusMessage("No saved decisions yet. Start by saving a decision from the weekly brief.");
           setEntries([]);
         }
       });
@@ -195,7 +195,7 @@ export const DecisionMemoryPanel = () => {
         ) : entries.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
-              No saved decisions yet. Save a decision check result to start the history.
+              No saved decisions yet. Go to the weekly brief and click &quot;Save decision to history&quot; (next to &quot;Log to Memory&quot;) to start tracking your operating postures.
             </p>
           </div>
         ) : (

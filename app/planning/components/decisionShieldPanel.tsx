@@ -202,8 +202,13 @@ export const DecisionShieldPanel = ({
   };
 
   const handlePresetDelete = (presetId: string) => {
-    setPresets((prev) => prev.filter((item) => item.id !== presetId));
-    setPresetStatus("Preset removed.");
+    const presetToDelete = presets.find((p) => p.id === presetId);
+    if (!presetToDelete) return;
+
+    if (confirm(`Delete preset "${presetToDelete.name}"? This cannot be undone.`)) {
+      setPresets((prev) => prev.filter((item) => item.id !== presetId));
+      setPresetStatus(`Preset "${presetToDelete.name}" deleted.`);
+    }
   };
 
   const handlePresetBlur = () => {
@@ -572,7 +577,10 @@ export const DecisionShieldPanel = ({
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
+              <div className="flex items-center gap-2">
+                <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
+                <span title="Pause new hiring, long-term commitments, and major spend increases if this threshold is crossed." className="text-slate-400 cursor-help text-sm">ⓘ</span>
+              </div>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="weather-surface p-4">

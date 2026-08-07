@@ -167,6 +167,46 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
+  {
+    value: "regime-types",
+    term: "The 4 regimes",
+    summary: "EXPANSION (credit available, investors optimistic—scale proven bets) · SCARCITY (credit tight, investors cautious—preserve cash) · DEFENSIVE (credit tight, investors willing to fund) · VOLATILE (credit available, investors cautious—conditions can shift quickly)",
+    why: "Why it matters: each regime sets a different operating forecast. Know which one you're in to make trade-offs.",
+    usedInLabel: "Weekly brief",
+    usedInHref: "/",
+  },
+  {
+    value: "signals-breakdown",
+    term: "Treasury signals vs Macro signals",
+    summary: "Treasury: forward-looking U.S. government bond market. Macro: employment, inflation, consumer spending. When they disagree, one is leading or markets aren't pricing something in.",
+    why: "Why it matters: signal disagreement tells you which signal to trust more—usually the one supported by real-time company metrics.",
+    usedInLabel: "Evidence view",
+    usedInHref: "/evidence",
+  },
+  {
+    value: "stop-line",
+    term: "Stop line (guardrail trigger)",
+    summary: "A specific threshold that, if crossed, pauses a category of decisions (hiring, spending, long-term commitments) until conditions improve.",
+    why: "Why it matters: stop lines let you operate without constant re-litigation—you know the exact boundary where you shift to caution.",
+    usedInLabel: "Planning page",
+    usedInHref: "/planning",
+  },
+  {
+    value: "cached-snapshot",
+    term: "Cached snapshot (stale data mode)",
+    summary: "When live data sources are temporarily unavailable, the report uses the last verified snapshot with a prominent warning. Safe for staged decisions, not for irreversible commitments.",
+    why: "Why it matters: stale U.S. market data can mislead urgent spending or hiring decisions. Always check the freshness badge before committing.",
+    usedInLabel: "Weekly brief",
+    usedInHref: "/",
+  },
+  {
+    value: "boldness-score",
+    term: "Boldness budget",
+    summary: "Inverse of tightness: how much room you have to hire, spend, and make long-term commitments. Calculated as (risk appetite × 0.7) + (100 - tightness) × 0.3.",
+    why: "Why it matters: boldness tells you how aggressively you can operate at a glance—higher budget means more expansion room, lower means conserve.",
+    usedInLabel: "Weekly brief",
+    usedInHref: "/",
+  },
 ];
 
 export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
