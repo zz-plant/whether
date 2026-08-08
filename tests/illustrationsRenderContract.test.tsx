@@ -6,6 +6,7 @@ import { PostureDial } from "../app/components/illustrations/PostureDial";
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
 import { RegimeGlyph } from "../app/components/illustrations/RegimeGlyph";
 import { AttributionFan } from "../app/components/illustrations/AttributionFan";
+import { DeltaGlyph } from "../app/components/illustrations/DeltaGlyph";
 import type { RegimeKey } from "../lib/types";
 
 /** A paint attribute holding a bare custom-property name renders nothing in the browser. */
@@ -98,6 +99,38 @@ describe("RegimeGlyph", () => {
       assert.match(html, /y1="26"/, `${regime} is missing the shared horizon`);
       assert.match(html, /<title id="g-[A-Z]+-title">.+<\/title>/, `${regime} has no title`);
     }
+  });
+});
+
+describe("DeltaGlyph", () => {
+  it("states the direction of travel in words", () => {
+    const rose = renderToStaticMarkup(
+      <DeltaGlyph idPrefix="d1" previous={40} current={54} min={0} max={100} label="Capital tightness" />,
+    );
+    assertNoNaN(rose);
+    assertTokensWrapped(rose);
+    assert.match(rose, /Rose from 40 to 54\./);
+
+    const fell = renderToStaticMarkup(
+      <DeltaGlyph idPrefix="d2" previous={54} current={40} min={0} max={100} label="Capital tightness" />,
+    );
+    assert.match(fell, /Fell from 54 to 40\./);
+    assert.match(fell, /var\(--accent-success\)/);
+  });
+
+  it("renders nothing for an inverted domain or non-finite input", () => {
+    assert.equal(
+      renderToStaticMarkup(
+        <DeltaGlyph idPrefix="d3" previous={1} current={2} min={10} max={0} label="x" />,
+      ),
+      "",
+    );
+    assert.equal(
+      renderToStaticMarkup(
+        <DeltaGlyph idPrefix="d4" previous={Number.NaN} current={2} min={0} max={10} label="x" />,
+      ),
+      "",
+    );
   });
 });
 
