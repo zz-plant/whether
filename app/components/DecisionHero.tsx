@@ -5,6 +5,7 @@ import { SignalWaterfall } from "./SignalWaterfall";
 import { PostureDial } from "./illustrations/PostureDial";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
+import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import type { RegimeKey } from "../../lib/types";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
@@ -145,8 +146,20 @@ export function DecisionHero({
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
-                <span className={DIRECTION_COLOR[signalDirection]}>
-                  {tightnessDeltaMetadataLabel}
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block w-12 shrink-0" aria-hidden="true">
+                    <DeltaGlyph
+                      idPrefix="hero-tightness-delta"
+                      previous={tightness - tightnessDelta}
+                      current={tightness}
+                      min={0}
+                      max={100}
+                      label="Capital tightness"
+                    />
+                  </span>
+                  <span className={DIRECTION_COLOR[signalDirection]}>
+                    {tightnessDeltaMetadataLabel}
+                  </span>
                 </span>
               ) : null}
               <span className="inline-flex items-center gap-1.5">
