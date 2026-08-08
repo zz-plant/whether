@@ -44,7 +44,12 @@ type Props = {
   };
 };
 
-const REGIME_GLYPH_KEYS: RegimeKey[] = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"];
+const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
+
+// Narrowing rather than `value as RegimeKey`: regime arrives as a plain string,
+// so an assertion would let an unrecognised value through to the glyph lookup.
+const isRegimeKey = (value: string): value is RegimeKey =>
+  REGIME_GLYPH_KEYS.some((key) => key === value);
 
 export function DecisionHero({
   tightness,
@@ -84,9 +89,8 @@ export function DecisionHero({
   // Tightness is reported 0-100; the dial reads -1 (loosen) to +1 (tighten).
   const dialValue = tightness / 50 - 1;
   const dialPrevious = tightnessDelta !== 0 ? (tightness - tightnessDelta) / 50 - 1 : undefined;
-  const regimeKey = REGIME_GLYPH_KEYS.includes(regime.toUpperCase() as RegimeKey)
-    ? (regime.toUpperCase() as RegimeKey)
-    : null;
+  const upperRegime = regime.toUpperCase();
+  const regimeKey = isRegimeKey(upperRegime) ? upperRegime : null;
   const tightnessThreshold = signalData?.tightnessThreshold;
 
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
@@ -159,7 +163,7 @@ export function DecisionHero({
             <div className="space-y-1.5 pt-1 text-fluid-micro">
               <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">Watch this week</p>
               {typeof tightnessThreshold === "number" ? (
-                <div className="w-[7.5rem] py-1">
+                <div className="w-[6rem] py-1">
                   <ThresholdLadder
                     idPrefix="hero-tightness"
                     min={0}
