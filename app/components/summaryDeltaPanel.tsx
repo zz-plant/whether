@@ -2,7 +2,7 @@
  * Summary delta panel comparing weekly and monthly action guidance.
  * Uses SummaryCard styling to keep the delta lane consistent with copy-ready cards.
  */
-import Link from "next/link";
+import { ActionLink } from "./ui/actionLink";
 import type { MonthlySummary } from "../../lib/summary/monthlySummary";
 import type { WeeklySummary } from "../../lib/summary/weeklySummary";
 import { buildSummaryDelta } from "../../lib/summary/summaryDelta";
@@ -25,12 +25,9 @@ export const SummaryDeltaPanel = ({
             Weekly-to-monthly shifts in regime posture, constraints, and data freshness.
           </p>
         </div>
-        <Link
-          href="/api/summary-delta"
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-        >
+        <ActionLink href="/api/summary-delta" variant="ghost">
           View delta API
-        </Link>
+        </ActionLink>
       </div>
       <ul className="mt-4 space-y-2 text-sm text-slate-300">
         {delta.bullets.map((bullet) => (

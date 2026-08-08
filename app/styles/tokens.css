@@ -134,6 +134,13 @@
   --app-border: rgba(226, 232, 240, 0.085);
   --app-border-strong: rgba(226, 232, 240, 0.14);
 
+  /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
+     Must stay theme-aware: a fixed dark tint washes out the light surface. */
+  --atmosphere-expansion: rgba(6, 78, 59, 0.40);
+  --atmosphere-defensive: rgba(69, 39, 3, 0.30);
+  --atmosphere-scarcity: rgba(76, 5, 25, 0.40);
+  --atmosphere-volatile: rgba(8, 47, 73, 0.30);
+
   /* Shadows — kiki: crisp, hard-edged, low spread */
   --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.22);
   --shadow-sm: 0 3px 8px rgba(0, 0, 0, 0.26);
@@ -272,6 +279,14 @@ html[data-screenshot="true"] body {
 }
 
 @theme inline {
+  /* Slate text scale bound to theme text roles so text-slate-* adapts to light/dark.
+     Replaces the former per-theme !important class patches. */
+  --color-slate-50: var(--app-text);
+  --color-slate-100: var(--app-text);
+  --color-slate-200: var(--app-text-secondary);
+  --color-slate-300: var(--app-text-secondary);
+  --color-slate-400: var(--app-text-muted);
+  --color-slate-500: var(--app-text-muted);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -374,6 +389,12 @@ html[data-theme="light"] {
   --app-border: rgba(0, 0, 0, 0.08);
   --app-border-strong: rgba(0, 0, 0, 0.15);
 
+  /* Light-surface posture tint: same hues, held to a wash so text keeps contrast. */
+  --atmosphere-expansion: rgba(16, 185, 129, 0.10);
+  --atmosphere-defensive: rgba(217, 119, 6, 0.10);
+  --atmosphere-scarcity: rgba(225, 29, 72, 0.09);
+  --atmosphere-volatile: rgba(2, 132, 199, 0.09);
+
   --accent-action: #0284c7;
   --accent-info: #2563eb;
   --accent-success: #059669;
@@ -430,13 +451,7 @@ html[data-theme="light"] {
 [data-theme="light"] .text-white\/25 { color: #5b6b80 !important; }
 [data-theme="light"] .text-white\/20 { color: #5b6b80 !important; }
 
-/* Slate text scales are authored for a dark surface, where 50–300 read as
-   near-white. Without a light-mode counterpart they stay near-white on white;
-   these four classes account for ~1,400 usages across the app. */
-[data-theme="light"] .text-slate-50 { color: #1a1a1a !important; }
-[data-theme="light"] .text-slate-100 { color: #1a1a1a !important; }
-[data-theme="light"] .text-slate-200 { color: #263141 !important; }
-[data-theme="light"] .text-slate-300 { color: #334155 !important; }
+/* Slate text is bound to theme text roles via @theme inline in this file */
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
 [data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }

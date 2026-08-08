@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ReportShell } from "../components/reportShell";
+import { ActionLink } from "../components/ui/actionLink";
+import { ButtonLink } from "../components/ui/buttonLink";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { RegimeStats } from "../components/history/RegimeStats";
@@ -92,12 +94,12 @@ export default function HistoryPage() {
               Tightness and risk appetite over the last 12 available periods.
             </p>
           </div>
-          <Link
+          <ActionLink
             href="/history/compare"
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 no-underline transition-colors hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            variant="pill"
           >
             Compare two periods &rarr;
-          </Link>
+          </ActionLink>
         </div>
 
         {regimeSeries.length > 0 ? (
@@ -195,12 +197,13 @@ export default function HistoryPage() {
               }`}>{regimeForPeriod}</span>
             </div>
             <div className="pt-2 border-t border-slate-800/60">
-              <Link
+              <ButtonLink
                 href={`/?month=${selectedMonth}&year=${selectedYear}`}
-                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] no-underline w-full sm:w-auto"
+                variant="primary"
+                className="w-full sm:w-auto"
               >
                 View Weekly Brief for this period &rarr;
-              </Link>
+              </ButtonLink>
             </div>
           </div>
         ) : null}
@@ -266,13 +269,13 @@ export default function HistoryPage() {
         <ul className="flex flex-wrap gap-2">
           {postureArchiveYears.map((year) => (
             <li key={year.slug}>
-              <Link
+              <ActionLink
                 href={buildPostureArchivePath(year.slug)}
-                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 no-underline transition-colors hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                variant="pill"
               >
                 {year.title}
                 <span className="ml-2 text-slate-400">{year.operatorLabel}</span>
-              </Link>
+              </ActionLink>
             </li>
           ))}
         </ul>

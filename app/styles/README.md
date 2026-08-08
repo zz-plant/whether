@@ -2,10 +2,9 @@
 
 `app/globals.css` is the application entrypoint. It loads styles in this order:
 
-1. `tokens.css` — Tailwind integration, design tokens, and global base styles.
+1. `tokens.css` — Tailwind integration, design tokens, theme roles, and global base styles.
 2. `layout.css` — compatibility entrypoint for page shells, grids, homepage flow, print, and reveal behavior.
 3. `components.css` — compatibility entrypoint for surfaces, controls, typography, feedback, and workflow components.
-4. `theme-variants.css` — theme-specific overrides that must remain last in the cascade.
 
 The two compatibility entrypoints contain imports only. Add a rule to the narrowest responsibility-based module instead of growing those files directly. Preserve their import order unless a cascade change is intentional and visually verified.
 

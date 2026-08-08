@@ -77,14 +77,20 @@ export function Shell({
   }
 
   const regimeLower = (regime ?? "").toLowerCase();
-  const atmosphereGradient = regimeLower === "expansion" ? "from-emerald-950/40 via-slate-950 to-slate-950"
-    : regimeLower === "defensive" ? "from-amber-950/30 via-slate-950 to-slate-950"
-    : regimeLower === "scarcity" ? "from-rose-950/40 via-slate-950 to-slate-950"
-    : regimeLower === "volatile" ? "from-sky-950/30 via-slate-950 to-slate-950"
+  // Tint tokens are theme-aware and fade to transparent, so --bg-body stays the
+  // base surface. Hardcoding the old via/to-slate-950 stops painted the light
+  // theme with a near-black wash.
+  const atmosphereTint = regimeLower === "expansion" ? "var(--atmosphere-expansion)"
+    : regimeLower === "defensive" ? "var(--atmosphere-defensive)"
+    : regimeLower === "scarcity" ? "var(--atmosphere-scarcity)"
+    : regimeLower === "volatile" ? "var(--atmosphere-volatile)"
     : "";
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all ${atmosphereGradient ? `bg-gradient-to-b ${atmosphereGradient}` : ""}`}>
+    <div
+      className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
+      style={atmosphereTint ? { backgroundImage: `linear-gradient(to bottom, ${atmosphereTint} 0%, transparent 60%)` } : undefined}
+    >
       {isFocusMode ? (
         <div className="fixed top-3 right-3 z-50 flex items-center gap-2 rounded-full border border-sky-500/40 bg-slate-900/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
           <span className="inline-block size-2 rounded-full bg-sky-400 animate-ping" />

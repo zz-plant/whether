@@ -19,8 +19,9 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "stable");
     assert.match(result.trustStatusLabel, /Live • Treasury verified/);
-    assert.equal(result.trustStatusDetail, "Proceed with normal approvals.");
-    assert.match(result.trustStatusAction, /Clears when: return to standard cadence/);
+    assert.equal(result.trustStatusDetail, "All signals aligned. Proceed with normal approvals.");
+    assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
+    assert.match(result.trustStatusAction, /Clears when: confidence remains above LOW or transition risk drops/);
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
@@ -38,11 +39,11 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(result.trustStatusTone, "warning");
-    assert.match(result.trustStatusLabel, /Using last verified snapshot/);
-    assert.match(result.trustStatusDetail, /Pause big bets until live data resumes/);
+    assert.match(result.trustStatusLabel, /Using cached data/);
+    assert.match(result.trustStatusDetail, /Data sources are delayed/);
     assert.match(result.trustStatusDetail, /Treasury API timeout/);
     assert.match(result.trustStatusAction, /Use cached read for pacing/);
-    assert.match(result.trustStatusAction, /Clears when: resume normal approvals/);
+    assert.match(result.trustStatusAction, /Clears when: live data updates and verifies across all sources/);
     assert.equal(result.outageType, "feed-unavailable");
     assert.equal(result.outageSeverity, "critical");
     assert.equal(result.outageExitGate.metCount, 1);
@@ -61,8 +62,27 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Historical snapshot/);
     assert.match(result.trustStatusDetail, /Retrospective only/);
     assert.match(result.trustStatusAction, /Use this view for retrospective review/);
-    assert.match(result.trustStatusAction, /Clears when: switch to current data/);
+    assert.match(result.trustStatusAction, /Clears when: switch to current live data/);
     assert.equal(result.outageType, "historical-snapshot");
+  });
+
+  it("returns policy-refusal trust copy that holds approvals and surfaces the reason", () => {
+    const result = buildTrustStatus({
+      historicalSelection: false,
+      isFallback: false,
+      historicalAction: "unused",
+      fallbackAction: "unused",
+      stableAction: "unused",
+      policyRefusalActive: true,
+      policyRefusalReasons: ["Composite disagreement exceeded threshold."],
+    });
+
+    assert.equal(result.trustStatusTone, "warning");
+    assert.match(result.trustStatusLabel, /Live data, but signals unstable/);
+    assert.match(result.trustStatusDetail, /too contradictory to recommend a posture change/);
+    assert.match(result.trustStatusDetail, /Reason: Composite disagreement exceeded threshold\./);
+    assert.match(result.trustStatusAction, /Keep approvals reversible\./);
+    assert.match(result.trustStatusAction, /Clears when: signals reconcile and the contradictions resolve/);
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {

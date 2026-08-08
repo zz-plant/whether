@@ -101,30 +101,6 @@
   line-height: 1.7;
 }
 
-:root:not([data-theme="light"]) :where(.text-slate-50, .text-slate-100) {
-  color: rgb(248 250 252) !important;
-}
-
-:root:not([data-theme="light"]) :where(.text-slate-200) {
-  color: rgb(232 238 247) !important;
-}
-
-:root:not([data-theme="light"]) :where(.text-slate-300) {
-  color: rgb(204 214 228) !important;
-}
-
-:root:not([data-theme="light"]) :where(.text-slate-400) {
-  color: rgb(158 172 191) !important;
-}
-
-:root:not([data-theme="light"]) :where(.text-slate-500) {
-  color: rgb(148 163 184) !important;
-}
-
-:root:not([data-theme="light"]) :where(.text-slate-600) {
-  color: rgb(119 134 154) !important;
-}
-
 :where(.weather-panel pre, .weather-surface pre) {
   color: rgb(213 222 236);
   background:

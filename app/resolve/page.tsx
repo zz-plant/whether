@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Details } from "../components/details";
+import { ButtonLink } from "../components/ui/buttonLink";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -144,9 +145,9 @@ export default async function DecidePage({
               <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
             </div>
-            <Link href={recommendedPath.href} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            <ButtonLink href={recommendedPath.href} variant="primary">
               {recommendedPath.cta}
-            </Link>
+            </ButtonLink>
           </article>
 
           <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">

@@ -163,14 +163,14 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="weather-button flex-1 px-3 py-2 text-xs font-semibold"
+                className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "plain" ? "Copied!" : "Plain text"}
               </button>
               <button
                 type="button"
                 onClick={copySlackText}
-                className="weather-button flex-1 px-3 py-2 text-xs font-semibold"
+                className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "slack" ? "Copied!" : "Slack format"}
               </button>
@@ -181,7 +181,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 onClick={() => {
                   copyToClipboard(window.location.href, "link");
                 }}
-                className="weather-button w-full px-3 py-2 text-xs font-semibold"
+                className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "link" ? "Link copied!" : "Copy page link"}
               </button>
@@ -194,7 +194,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                   const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
                   copyToClipboard(text, "section");
                 }}
-                className="weather-button w-full px-3 py-2 text-xs font-semibold"
+                className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "section" ? "Copied!" : "Decision card"}
               </button>
