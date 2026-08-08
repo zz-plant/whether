@@ -157,13 +157,67 @@
   --atmosphere-scarcity: rgba(76, 5, 25, 0.40);
   --atmosphere-volatile: rgba(8, 47, 73, 0.30);
 
-  /* Shadows — kiki: crisp, hard-edged, low spread */
-  --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.22);
-  --shadow-sm: 0 3px 8px rgba(0, 0, 0, 0.26);
-  --shadow-mid: 0 4px 12px rgba(0, 0, 0, 0.32);
-  --shadow-md: 0 5px 16px rgba(0, 0, 0, 0.36);
-  --shadow-lg: 0 6px 22px rgba(0, 0, 0, 0.42);
-  --shadow-heavy: 0 8px 28px rgba(0, 0, 0, 0.50);
+  /* Elevation ------------------------------------------------------------
+     Two token families, deliberately not interchangeable:
+
+       --shadow-color-*  a COLOR. Goes in the color slot of a longhand shadow.
+       --elev-* / --shadow-*  a COMPLETE shadow. Goes after `box-shadow:`.
+
+     Mixing them is what broke 13 call sites before this: writing
+     `0 8px 16px -12px var(--shadow-mid)` expanded to seven lengths, which is
+     invalid, so the browser dropped the whole declaration and those surfaces
+     rendered flat. If you need custom geometry, pair it with a *-color token.
+
+     --shadow-scale is the resolution knob. Elevation is a depth cue read at a
+     viewing distance, so it cannot be a fixed pixel value: on a phone a card is
+     near-full-bleed and held close, where a 36px blur reads as a grey smudge
+     around the edge; on a 1600px display the same card floats in whitespace and
+     that blur reads as no separation at all. Everything below is expressed in
+     --sh units so one multiplier moves the whole ladder coherently. */
+  --shadow-scale: 1;
+  --sh: calc(1px * var(--shadow-scale));
+
+  --shadow-color-faint: rgba(0, 0, 0, 0.16);
+  --shadow-color-soft: rgba(0, 0, 0, 0.28);
+  --shadow-color-mid: rgba(0, 0, 0, 0.44);
+  --shadow-color-deep: rgba(0, 0, 0, 0.62);
+
+  /* Each step is contact (tight, defines the edge) + ambient (wide, defines
+     the height). Contact carries most of the read at small sizes, which is why
+     the ladder stays legible when --shadow-scale drops on phones. */
+  --elev-1: 0 calc(1 * var(--sh)) calc(2 * var(--sh)) calc(-1 * var(--sh)) var(--shadow-color-soft),
+            0 calc(2 * var(--sh)) calc(6 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-faint);
+  --elev-2: 0 calc(2 * var(--sh)) calc(4 * var(--sh)) calc(-2 * var(--sh)) var(--shadow-color-soft),
+            0 calc(8 * var(--sh)) calc(18 * var(--sh)) calc(-10 * var(--sh)) var(--shadow-color-faint);
+  --elev-3: 0 calc(3 * var(--sh)) calc(6 * var(--sh)) calc(-3 * var(--sh)) var(--shadow-color-soft),
+            0 calc(16 * var(--sh)) calc(32 * var(--sh)) calc(-16 * var(--sh)) var(--shadow-color-mid);
+  --elev-4: 0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft),
+            0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid);
+  --elev-5: 0 calc(6 * var(--sh)) calc(13 * var(--sh)) calc(-6 * var(--sh)) var(--shadow-color-mid),
+            0 calc(36 * var(--sh)) calc(68 * var(--sh)) calc(-32 * var(--sh)) var(--shadow-color-deep);
+
+  /* Top-edge specular. Dark theme only — on the light theme the surfaces are
+     already near-white, so a white inset just muddies the border. */
+  --edge-highlight: rgba(255, 255, 255, 0.07);
+  --edge-highlight-faint: rgba(255, 255, 255, 0.04);
+
+  /* Focus halo. Sits behind the 2px solid outline as a soft second ring — the
+     previous `0 0 0 4px var(--accent-info)` was fully opaque, so on a dense grid
+     it read as a filled block rather than a ring and swallowed adjacent borders. */
+  --focus-halo: 0 0 0 calc(4 * var(--sh)) var(--accent-border-soft);
+
+  /* Accent glows. Spread scales with the same knob so a focus ring or a hover
+     halo keeps its proportion to the shadow it sits inside. */
+  --glow-soft: 0 0 calc(16 * var(--sh)) var(--accent-glow);
+  --glow-strong: 0 0 calc(24 * var(--sh)) var(--accent-strong);
+
+  /* Legacy aliases. Complete values only — never put these in a color slot. */
+  --shadow-light: var(--elev-1);
+  --shadow-sm: var(--elev-1);
+  --shadow-mid: var(--elev-2);
+  --shadow-md: var(--elev-2);
+  --shadow-lg: var(--elev-3);
+  --shadow-heavy: var(--elev-4);
 
   /* Accent colors — reserved by function */
   --accent-action: #38bdf8;
@@ -232,6 +286,24 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* Elevation vs. viewport. The ladder is authored at the 640-1279px reference
+   (--shadow-scale: 1). Phones get a tighter ladder because cards are edge-to-edge
+   and there is no whitespace for an ambient shadow to land in — an unscaled one
+   just darkens the gutter. Wide displays get a longer one because the same card
+   sits in open space, where the reference shadow reads as no lift at all. */
+@media (max-width: 639px) {
+  :root { --shadow-scale: 0.78; }
+}
+
+@media (min-width: 1280px) {
+  :root { --shadow-scale: 1.14; }
+}
+
+@media (min-width: 1536px) {
+  :root { --shadow-scale: 1.28; }
+}
+
 
 body {
   font-family: var(--font-sans);
@@ -470,12 +542,19 @@ html[data-theme="light"] {
   --white-overlay-subtle: rgba(0, 0, 0, 0.015);
   --white-overlay-faint: rgba(0, 0, 0, 0.008);
 
-  --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-mid: 0 3px 8px rgba(0, 0, 0, 0.10);
-  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 5px 14px rgba(0, 0, 0, 0.14);
-  --shadow-heavy: 0 6px 18px rgba(0, 0, 0, 0.16);
+  /* Only the shadow COLORS flip — the --elev-* geometry is shared, so a card is
+     the same height in both themes and only the ink changes. Light shadows need
+     roughly a quarter of the dark alpha: on #f8fafc the eye reads a 0.28 shadow
+     as a dirty smear, while on #08090b it barely separates the card at all.
+     A blue-black rather than neutral black keeps it from looking like soot. */
+  --shadow-color-faint: rgba(15, 23, 42, 0.04);
+  --shadow-color-soft: rgba(15, 23, 42, 0.07);
+  --shadow-color-mid: rgba(15, 23, 42, 0.11);
+  --shadow-color-deep: rgba(15, 23, 42, 0.16);
+
+  /* A white top edge on a white card is invisible at best and a seam at worst. */
+  --edge-highlight: rgba(255, 255, 255, 0);
+  --edge-highlight-faint: rgba(255, 255, 255, 0);
 
   /* shadcn light mode overrides */
   --background: oklch(0.985 0 0);
@@ -603,3 +682,23 @@ html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !imp
    keyboard affordance, so it tracks the theme rather than the palette. */
 html[data-theme="light"] [class*="outline-sky-"]:focus-visible { outline-color: #0369a1 !important; }
 html[data-theme="light"] [class*="ring-sky-"]:focus-visible { --tw-ring-color: #0369a1 !important; }
+
+/* Retina resolves the tight contact layer honestly; on 1x displays it rounds to
+   a hard 1px line and reads as a second border, so soften it there. Borders move
+   the other way: a 1px hairline at 0.045 alpha survives subpixel antialiasing on
+   a 2x panel but drops below the visible floor at 1x, so the faint tiers step up
+   rather than disappear. Widths stay at 1px in both cases — scaling a border
+   changes the box model and would shift layout, unlike a shadow. */
+@media (max-resolution: 1.5dppx) {
+  :root {
+    --shadow-color-soft: rgba(0, 0, 0, 0.22);
+    --shadow-color-mid: rgba(0, 0, 0, 0.36);
+    --border-faint: rgba(226, 232, 240, 0.075);
+    --border-subtle: rgba(226, 232, 240, 0.095);
+  }
+
+  html[data-theme="light"] {
+    --border-faint: rgba(0, 0, 0, 0.055);
+    --border-subtle: rgba(0, 0, 0, 0.07);
+  }
+}
