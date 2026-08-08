@@ -155,18 +155,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="font-sans">
       <head>
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* One request, not two: both families were separate render-blocking
-            stylesheets. Kept in CSS rather than next/font/google — Vinext marks
-            that adapter only partially supported (still CDN-loaded, not
-            self-hosted at build time), and this repo already removed it once
-            for that reason. */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
-        />
+        {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
+            so there is no fonts.googleapis.com stylesheet in the critical path
+            and no preconnect to a third-party host. Only the two faces that
+            render above the fold are preloaded. Fraunces 600, not 700: the hero
+            headline is font-semibold, so 700 is never requested on first paint
+            and preloading it just burned a round-trip. The remaining weights
+            load from the same origin when the stylesheet asks for them. */}
+        <link rel="preload" href="/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/ibm-plex-sans-400.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/planning" />
