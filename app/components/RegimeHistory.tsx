@@ -27,7 +27,9 @@ function parseYearMonth(dateStr: string): { year: number; month: number } | null
 }
 
 function formatAxisDate(dateStr: string): string {
-  return formatMonthYear2DigitFromValue(dateStr);
+  // "Jun 24" scans as a day of the month, which made a multi-year axis read as
+  // three dates in one month (and out of order). "Jun '24" reads as the year.
+  return formatMonthYear2DigitFromValue(dateStr).replace(/\s(\d{2})$/, " '$1");
 }
 
 export function RegimeHistory({ regimes }: Props) {
@@ -100,7 +102,8 @@ export function RegimeHistory({ regimes }: Props) {
         ) : null}
       </div>
 
-      <p className="text-fluid-nano text-white/40 mb-2">Boldness score over time</p>
+      {/* Carries the scale rather than restating the heading above it. */}
+      <p className="text-fluid-nano text-white/40 mb-2">Boldness score · 0–100</p>
       <div className="relative flex h-14 items-end gap-1 overflow-x-auto">
         <div className="absolute left-0 right-0 top-1/2 h-px bg-white/[0.06]" aria-hidden="true" />
         {regimes.map((entry, i) => {

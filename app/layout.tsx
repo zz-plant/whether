@@ -157,10 +157,16 @@ export default function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* One request, not two: both families were separate render-blocking
+            stylesheets. Kept in CSS rather than next/font/google — Vinext marks
+            that adapter only partially supported (still CDN-loaded, not
+            self-hosted at build time), and this repo already removed it once
+            for that reason. */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+        />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/planning" />

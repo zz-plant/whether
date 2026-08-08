@@ -120,7 +120,10 @@ Whether’s core loop is **signals → posture → decision → artifact**. Inco
 - ✅ Method hero stats now use report-style stat cards and normalized labels/order (`Posture`, `Signals updated`, `Record date`).
 - ✅ Global header controls now follow consistent mobile width behavior for Search + theme toggle.
 - ✅ Method now uses `ReportShell` directly for full top-shell parity (header, trust rail, command bar, nav, and section index behavior aligned with report surfaces).
+- ✅ (2026-08-08) **#5 typography scale.** `typography.css` aliased `.text-fluid-xs` to `--fs-micro`, so the two most-used steps in the app (401 usages combined) rendered at the same size and small text had no hierarchy. `xs` now has its own step and the `lg`/`xl`/`2xl` end was widened — the ladder is 11/12/13/14/15/17/20/24px instead of collapsing into 11–20px. The `--fs-*` scale and the `--text-fluid-*` copy in `@theme` are now mirrored, with a note that they must stay in step.
+- ✅ (2026-08-08) **#8 card corner radius.** `--radius-*` was defined twice — a hand-authored 2/3/4/6px scale in `:root` and a `calc(var(--radius) * n)` chain in `@theme inline`. The utilities took the second, so all 538 `rounded-*` usages landed between 2.4px and 7.2px (and `rounded-3xl` resolved to 0px). Both definitions now share one 2/4/6/8/12px scale, so the steps are actually distinguishable while staying angular.
 - ⏳ Remaining high-priority work: replace remaining `HubSection` blocks on Method with report-native section wrappers if we want complete visual grammar parity inside body content.
+- ⏳ **#3 navigation paradigms** is still open and is the one item here that is a product decision rather than a styling fix: the global header carries two full bands (109px) because the cadence chips, lens chips, and primary nav all live in it. Container padding was tightened, but collapsing the bands means deciding whether the lens chips belong in global chrome at all.
 
 ## Reference code areas
 

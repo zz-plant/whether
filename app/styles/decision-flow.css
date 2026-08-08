@@ -147,7 +147,7 @@ summary:focus-visible {
 .weather-meta-list__item:not(:last-child)::after {
   content: "·";
   margin-left: 0.35rem;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--app-text-muted);
 }
 
 :where(details) {

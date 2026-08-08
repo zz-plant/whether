@@ -2,6 +2,10 @@ import type { OperatorContext } from "../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
 import { SignalWaterfall } from "./SignalWaterfall";
+import { PostureDial } from "./illustrations/PostureDial";
+import { RegimeGlyph } from "./illustrations/RegimeGlyph";
+import { ThresholdLadder } from "./illustrations/ThresholdLadder";
+import type { RegimeKey } from "../../lib/types";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
@@ -40,6 +44,8 @@ type Props = {
   };
 };
 
+const REGIME_GLYPH_KEYS: RegimeKey[] = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"];
+
 export function DecisionHero({
   tightness,
   tightnessDelta,
@@ -75,6 +81,14 @@ export function DecisionHero({
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
+  // Tightness is reported 0-100; the dial reads -1 (loosen) to +1 (tighten).
+  const dialValue = tightness / 50 - 1;
+  const dialPrevious = tightnessDelta !== 0 ? (tightness - tightnessDelta) / 50 - 1 : undefined;
+  const regimeKey = REGIME_GLYPH_KEYS.includes(regime.toUpperCase() as RegimeKey)
+    ? (regime.toUpperCase() as RegimeKey)
+    : null;
+  const tightnessThreshold = signalData?.tightnessThreshold;
+
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
@@ -100,7 +114,11 @@ export function DecisionHero({
 
   return (
     <section className="space-y-4" aria-labelledby="weekly-call-title">
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+      {/* items-start, not items-end: the left column runs ~600px tall while the
+          score block is ~120px, so bottom-aligning it stranded the number at the
+          foot of the hero and left a large void beside the headline. Pairing the
+          headline with its score at the top closes the gap and reads like one unit. */}
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">
             <p className={`text-fluid-nano font-semibold uppercase tracking-[0.12em] ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
@@ -127,12 +145,31 @@ export function DecisionHero({
                   {tightnessDeltaMetadataLabel}
                 </span>
               ) : null}
-              <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
+              <span className="inline-flex items-center gap-1.5">
+                {regimeKey ? (
+                  <span className="inline-block w-4 shrink-0" aria-hidden="true">
+                    <RegimeGlyph idPrefix="hero-regime" regime={regimeKey} />
+                  </span>
+                ) : null}
+                <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
+              </span>
             </p>
           </div>
           {guardrail || reversalTrigger || (flipConditions && flipConditions.length > 0) ? (
             <div className="space-y-1.5 pt-1 text-fluid-micro">
               <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">Watch this week</p>
+              {typeof tightnessThreshold === "number" ? (
+                <div className="w-[7.5rem] py-1">
+                  <ThresholdLadder
+                    idPrefix="hero-tightness"
+                    min={0}
+                    max={100}
+                    current={tightness}
+                    trigger={tightnessThreshold}
+                    signalLabel="Capital tightness"
+                  />
+                </div>
+              ) : null}
               {guardrail ? (
                 <p className="text-white/50">
                   <span className="font-semibold text-amber-300/80">Guardrail:</span>{" "}
@@ -203,15 +240,20 @@ export function DecisionHero({
             <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
             <span>{boldnessDeltaLabel}</span>
           </div>
-          <div className="mt-2 h-1 w-full max-w-[8rem] mx-auto sm:ml-auto sm:mr-0 rounded-full" style={{ background: "linear-gradient(90deg, rgba(244,63,94,0.3), rgba(251,191,36,0.3), rgba(52,211,153,0.3))" }}>
-            <div className="relative h-full">
-              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-2 rounded-full bg-white ring-2 ring-white/20" style={{ left: `${Math.min(100, Math.max(0, boldnessScore))}%` }} />
-            </div>
-          </div>
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, & commit</p>
+          <p className="text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, &amp; commit</p>
+          {/* Replaces a hardcoded-rgba gradient track: this is theme-aware and carries
+              last week's reading, so the delta is visible rather than implied. */}
+          <div className="mt-3 w-full max-w-[10rem] mx-auto sm:ml-auto sm:mr-0">
+            <PostureDial
+              idPrefix="hero-posture"
+              value={dialValue}
+              previous={dialPrevious}
+              label={postureLabel}
+            />
+          </div>
         </div>
       </div>
     </section>

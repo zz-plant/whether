@@ -60,7 +60,9 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: none;
-  color: rgb(148 163 184 / 0.90);
+  /* Was a hardcoded slate-400, which is a dark-theme value: on the light
+     surface the kicker measured 2.08:1. The role token tracks the theme. */
+  color: var(--app-text-muted);
 }
 
 .weather-brief-meta-rail {

@@ -86,60 +86,6 @@ export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABEL
 export const getRegimeWeatherIcon = (regime: RegimeKey) => REGIME_WEATHER_ICONS[regime];
 export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_RATIONALES[regime];
 
-export type RegimeBannerTone = {
-  shell: string;
-  legendPanel: string;
-  activePill: string;
-  metrics: string;
-  calloutSurface: string;
-  meterTrack: string;
-  meterFill: string;
-  weatherHint: string;
-};
-
-export const REGIME_BANNER_TOKENS: Record<RegimeKey, RegimeBannerTone> = {
-  SCARCITY: {
-    shell: "border-rose-400/65 bg-gradient-to-br from-rose-950/70 via-slate-950/95 to-slate-950 text-rose-50",
-    legendPanel: "border-rose-400/30 bg-slate-950/75",
-    activePill: "border-rose-300/85 bg-rose-400/20 text-rose-50 shadow-[0_0_0_1px_rgba(251,113,133,0.25)]",
-    metrics: "text-rose-100",
-    calloutSurface: "border-rose-300/30 bg-rose-950/22",
-    meterTrack: "bg-rose-950/55",
-    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.2)]",
-    weatherHint: "text-rose-100",
-  },
-  DEFENSIVE: {
-    shell: "border-amber-400/65 bg-gradient-to-br from-amber-900/45 via-slate-950/95 to-slate-950 text-amber-50",
-    legendPanel: "border-amber-300/25 bg-slate-950/75",
-    activePill: "border-amber-300/85 bg-amber-300/20 text-amber-50 shadow-[0_0_0_1px_rgba(252,211,77,0.22)]",
-    metrics: "text-amber-100",
-    calloutSurface: "border-amber-300/28 bg-amber-950/20",
-    meterTrack: "bg-amber-950/45",
-    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.2)]",
-    weatherHint: "text-amber-100",
-  },
-  VOLATILE: {
-    shell: "border-sky-400/65 bg-gradient-to-br from-sky-900/45 via-slate-950/95 to-slate-950 text-sky-50",
-    legendPanel: "border-sky-300/25 bg-slate-950/75",
-    activePill: "border-sky-300/85 bg-sky-400/20 text-sky-50 shadow-[0_0_0_1px_rgba(125,211,252,0.25)]",
-    metrics: "text-sky-100",
-    calloutSurface: "border-sky-300/28 bg-sky-950/22",
-    meterTrack: "bg-sky-950/48",
-    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.22)]",
-    weatherHint: "text-sky-100",
-  },
-  EXPANSION: {
-    shell: "border-emerald-400/65 bg-gradient-to-br from-emerald-900/45 via-slate-950/95 to-slate-950 text-emerald-50",
-    legendPanel: "border-emerald-300/25 bg-slate-950/75",
-    activePill: "border-emerald-300/85 bg-emerald-300/20 text-emerald-50 shadow-[0_0_0_1px_rgba(110,231,183,0.24)]",
-    metrics: "text-emerald-100",
-    calloutSurface: "border-emerald-300/30 bg-emerald-950/20",
-    meterTrack: "bg-emerald-950/45",
-    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.22)]",
-    weatherHint: "text-emerald-100",
-  },
-};
-
 export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {
   EXPANSION: 0,
   VOLATILE: 1,

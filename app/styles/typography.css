@@ -90,7 +90,7 @@
 
 .text-fluid-nano { font-size: var(--fs-nano); }
 .text-fluid-micro { font-size: var(--fs-micro); }
-.text-fluid-xs { font-size: var(--fs-micro); }
+.text-fluid-xs { font-size: var(--fs-xs); }
 .text-fluid-sm { font-size: var(--fs-sm); }
 .text-fluid-base { font-size: var(--fs-base); }
 .text-fluid-lg { font-size: var(--fs-lg); }

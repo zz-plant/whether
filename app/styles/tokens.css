@@ -6,13 +6,16 @@
 
 @theme {
   --color-slate-950: #101114;
-  --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
+  /* Mirrors the --fs-* ladder in :root. The .text-fluid-* classes in
+     typography.css shadow these utilities, so the two must stay in step. */
   --text-fluid-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
-  --text-fluid-sm: clamp(0.8125rem, 0.7rem + 0.4vw, 0.9375rem);
+  --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
+  --text-fluid-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
+  --text-fluid-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);
   --text-fluid-base: clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem);
-  --text-fluid-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
-  --text-fluid-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
-  --text-fluid-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
+  --text-fluid-lg: clamp(1.0625rem, 0.9rem + 0.7vw, 1.25rem);
+  --text-fluid-xl: clamp(1.25rem, 1rem + 1.1vw, 1.625rem);
+  --text-fluid-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
   --color-semantic-tightening-fg: #fca5a5;
   --color-semantic-tightening-border: #f87171;
   --color-semantic-tightening-bg: #3f1a1a;
@@ -87,13 +90,20 @@
   --footer-legal-hover: #ffffff;
 
   /* Type scale */
+  /* nano/micro are the dense operator end (badges, metadata) and are unchanged.
+     xs gets its own step: typography.css aliased .text-fluid-xs to --fs-micro,
+     so the two most-used tokens in the app (401 usages) rendered identically
+     and the page had no small-text hierarchy at all. The top of the scale is
+     widened because lg/xl/2xl previously spanned only 16-20px, which left
+     headings reading as body copy. */
   --fs-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
   --fs-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
-  --fs-sm: clamp(0.8125rem, 0.7rem + 0.4vw, 0.9375rem);
-  --fs-base: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
-  --fs-lg: clamp(1rem, 0.85rem + 0.6vw, 1.125rem);
-  --fs-xl: clamp(1.125rem, 0.9rem + 0.9vw, 1.375rem);
-  --fs-2xl: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);
+  --fs-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
+  --fs-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);
+  --fs-base: clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem);
+  --fs-lg: clamp(1.0625rem, 0.9rem + 0.7vw, 1.25rem);
+  --fs-xl: clamp(1.25rem, 1rem + 1.1vw, 1.625rem);
+  --fs-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
 
   /* Spacing */
   --space-xs: 4px;
@@ -103,11 +113,17 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* Border radius — kiki: sharp, angular */
+  /* Border radius — kiki: sharp, angular.
+     Still sharp, but the steps have to be tellable apart: the previous
+     2/3/4/6px scale put every tier inside a 4px band, so 538 rounded-*
+     usages all looked identical. Keep these in lockstep with the radius
+     values in the @theme inline block below, which is what generates the
+     rounded-* utilities — the two drifted apart and produced two scales. */
   --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 4px;
-  --radius-xl: 6px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
   --radius-full: 9999px;
 
   /* Surfaces */
@@ -320,13 +336,16 @@ html[data-screenshot="true"] body {
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Generates the rounded-* utilities. Mirrors the :root scale above; the
+     old calc(var(--radius) * n) chain derived everything from 0.25rem and
+     collapsed sm..2xl into 2.4-7.2px, with rounded-3xl resolving to 0px. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+  --radius-4xl: 20px;
 }
 
 .dark {
@@ -385,7 +404,9 @@ html[data-theme="light"] {
   --app-nested: #e2e8f0;
   --app-text: #0f172a;
   --app-text-secondary: #334155;
-  --app-text-muted: #64748b;
+  /* slate-600, not slate-500: muted text is the target of text-slate-400/500 and
+     at 12-13px slate-500 lands at 3.9-4.5:1 on --bg-body, just under AA. */
+  --app-text-muted: #475569;
   --app-border: rgba(0, 0, 0, 0.08);
   --app-border-strong: rgba(0, 0, 0, 0.15);
 
@@ -395,11 +416,59 @@ html[data-theme="light"] {
   --atmosphere-scarcity: rgba(225, 29, 72, 0.09);
   --atmosphere-volatile: rgba(2, 132, 199, 0.09);
 
-  --accent-action: #0284c7;
-  --accent-info: #2563eb;
-  --accent-success: #059669;
-  --accent-warning: #d97706;
-  --accent-danger: #dc2626;
+  /* 700-level so accent-tinted labels and badges clear 4.5:1 on --bg-body. */
+  --accent-action: #0369a1;
+  --accent-info: #1d4ed8;
+  --accent-success: #047857;
+  --accent-warning: #b45309;
+  --accent-danger: #b91c1c;
+
+  /* Semantic / decision / trust families were dark-only, so every chip, badge
+     and decision label painted a dark-tuned pastel (#86efac, #6ee7b7) onto
+     --bg-body and landed near 1.5:1. Foregrounds are 700-level to clear 4.5:1
+     there; borders sit at 400/500 and backgrounds at 50/100 because consumers
+     mix the bg token down to ~12% before painting. */
+  --color-semantic-tightening-fg: #b91c1c;
+  --color-semantic-tightening-border: #ef4444;
+  --color-semantic-tightening-bg: #fee2e2;
+  --color-semantic-easing-fg: #047857;
+  --color-semantic-easing-border: #10b981;
+  --color-semantic-easing-bg: #d1fae5;
+  --color-semantic-unchanged-fg: #334155;
+  --color-semantic-unchanged-border: #94a3b8;
+  --color-semantic-unchanged-bg: #e2e8f0;
+  --color-semantic-caution-fg: #b45309;
+  --color-semantic-caution-border: #f59e0b;
+  --color-semantic-caution-bg: #fef3c7;
+  --color-semantic-reversal-fg: #be123c;
+  --color-semantic-reversal-border: #f43f5e;
+  --color-semantic-reversal-bg: #ffe4e6;
+
+  --color-decision-do: #047857;
+  --color-decision-do-bg: rgba(4, 120, 87, 0.08);
+  --color-decision-pause: #be123c;
+  --color-decision-pause-bg: rgba(190, 18, 60, 0.08);
+  --color-decision-watch: #b45309;
+  --color-decision-watch-bg: rgba(180, 83, 9, 0.08);
+  --color-decision-flip: #0369a1;
+  --color-decision-flip-bg: rgba(3, 105, 161, 0.08);
+
+  --color-trust-high: #047857;
+  --color-trust-medium: #b45309;
+  --color-trust-low: #be123c;
+
+  /* Accent tints and the CTA treatment were dark-only, so the primary button
+     kept a bright cyan gradient and a glow tuned for a near-black page. */
+  --accent-strong: rgba(3, 105, 161, 0.45);
+  --accent-border: rgba(3, 105, 161, 0.30);
+  --accent-border-soft: rgba(3, 105, 161, 0.14);
+  --accent-glow: rgba(3, 105, 161, 0.05);
+  --accent-glow-faint: rgba(3, 105, 161, 0.025);
+  --cta-gradient: linear-gradient(180deg, #0284c7, #0369a1);
+  --cta-shadow: 0 4px 10px -8px rgba(3, 105, 161, 0.45);
+  --cta-shadow-hover: 0 6px 14px -8px rgba(3, 105, 161, 0.55);
+  --white-overlay-subtle: rgba(0, 0, 0, 0.015);
+  --white-overlay-faint: rgba(0, 0, 0, 0.008);
 
   --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.06);
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -429,27 +498,24 @@ html[data-theme="light"] {
   --ring: oklch(0.205 0 0);
 }
 
-/* Light mode: remap opacity-based v2 styles to dark equivalents.
-   Every step below is measured against the lightest surface (--bg-body #faf8f5)
-   and the darkest common panel (#e2e8f0); all clear WCAG AA 4.5:1 for body text.
-   Any `text-white/NN` step used in the app must appear here — an unmapped step
-   stays literally white and renders invisible on a light surface. */
-[data-theme="light"] body { color: #1a1a1a; }
-[data-theme="light"] .text-white { color: #1a1a1a !important; }
-[data-theme="light"] .text-white\/90 { color: #1a1a1a !important; }
-[data-theme="light"] .text-white\/85 { color: #232323 !important; }
-[data-theme="light"] .text-white\/80 { color: #2a2a2a !important; }
-[data-theme="light"] .text-white\/75 { color: #263141 !important; }
-[data-theme="light"] .text-white\/70 { color: #1e293b !important; }
-[data-theme="light"] .text-white\/68 { color: #2b3a4d !important; }
-[data-theme="light"] .text-white\/65 { color: #2b3a4d !important; }
-[data-theme="light"] .text-white\/60 { color: #334155 !important; }
-[data-theme="light"] .text-white\/55 { color: #3d4a5f !important; }
-[data-theme="light"] .text-white\/50 { color: #475569 !important; }
-/* #64748b measured 4.49:1 on #faf8f5 — just under AA, so the muted floor moves up. */
-[data-theme="light"] .text-white\/40 { color: #526077 !important; }
-[data-theme="light"] .text-white\/25 { color: #5b6b80 !important; }
-[data-theme="light"] .text-white\/20 { color: #5b6b80 !important; }
+/* Light mode: remap opacity-based v2 styles onto the three text roles.
+   154 usages spread across 12 alpha steps used to be mapped one line at a time,
+   and an unmapped step stays literally white — invisible on a light surface.
+   Matching the class attribute at a boundary removes that failure mode: any
+   alpha lands on a role, so a new text-white/NN can never render blank.
+
+   /75 and up is primary text, /50-/70 is secondary, below /50 is muted.
+   The muted floor is --app-text-muted (#475569) because #64748b measured
+   4.49:1 on #faf8f5 — just under AA. */
+[data-theme="light"] body { color: var(--app-text); }
+[data-theme="light"] [class^="text-white"], [data-theme="light"] [class*=" text-white"] { color: var(--app-text-muted) !important; }
+[data-theme="light"] [class^="text-white/5"], [data-theme="light"] [class*=" text-white/5"],
+[data-theme="light"] [class^="text-white/6"], [data-theme="light"] [class*=" text-white/6"],
+[data-theme="light"] [class^="text-white/7"], [data-theme="light"] [class*=" text-white/7"] { color: var(--app-text-secondary) !important; }
+[data-theme="light"] [class^="text-white/75"], [data-theme="light"] [class*=" text-white/75"],
+[data-theme="light"] [class^="text-white/8"], [data-theme="light"] [class*=" text-white/8"],
+[data-theme="light"] [class^="text-white/9"], [data-theme="light"] [class*=" text-white/9"],
+[data-theme="light"] [class$="text-white"], [data-theme="light"] [class*="text-white "] { color: var(--app-text) !important; }
 
 /* Slate text is bound to theme text roles via @theme inline in this file */
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
@@ -464,27 +530,76 @@ html[data-theme="light"] .regime-compass-dot { stroke: #fff; }
 html[data-theme="light"] .weather-input,
 html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
 html[data-theme="light"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
-html[data-theme="light"] .weather-button-primary { color: #0a1628; }
-html[data-theme="light"] .bg-slate-950\/40 { background: rgba(0,0,0,0.03) !important; }
-html[data-theme="light"] .bg-slate-950 { background: var(--bg-body) !important; }
-html[data-theme="light"] .bg-slate-800\/50 { background: rgba(0,0,0,0.05) !important; }
-html[data-theme="light"] .text-amber-200,
-html[data-theme="light"] .text-amber-200\/80 { color: #b45309 !important; }
-html[data-theme="light"] .text-emerald-200 { color: #047857 !important; }
-html[data-theme="light"] .text-sky-200 { color: #0369a1 !important; }
+/* White, not navy: the light CTA gradient is a saturated blue (see
+   --cta-gradient above), so dark-on-blue would sit near 1.5:1. */
+html[data-theme="light"] .weather-button-primary { color: #ffffff; }
+/* controls.css hardcodes a dark gradient on these; without a light counterpart
+   the pill kept a near-black background while text-slate-100 flipped to dark,
+   so the /evidence header chip rendered dark-on-dark. background-image must be
+   cleared explicitly -- the shorthand alone loses to the later stylesheet. */
+html[data-theme="light"] .weather-pill,
+html[data-theme="light"] .weather-pill-muted,
+html[data-theme="light"] .weather-tab {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background-color: var(--bg-panel);
+  background-image: none;
+  box-shadow: var(--shadow-light);
+}
+/* Dark nested surfaces (bg-slate-800/900/950 at any alpha) inverted to a light
+   tint. Enumerating single alphas missed bg-slate-950/45, which composited to a
+   mid-grey card that swallowed its own label text on /evidence. Anchored to a
+   class boundary so hover:/focus: variants keep their own treatment.
+   background-color only: the regime shells in lib/regimePresentation.ts carry a
+   gradient via background-image and must stay dark in both themes. */
+html[data-theme="light"] [class^="bg-slate-950"], html[data-theme="light"] [class*=" bg-slate-950"],
+html[data-theme="light"] [class^="bg-slate-900"], html[data-theme="light"] [class*=" bg-slate-900"] { background-color: rgba(0,0,0,0.035) !important; }
+html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(0,0,0,0.05) !important; }
+html[data-theme="light"] [class^="border-slate-800"], html[data-theme="light"] [class*=" border-slate-800"],
+html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: rgba(0,0,0,0.10) !important; }
+/* Light mode: keep decision-semantic hues legible on the light surface.
+   These labels ("Guardrail:", "Trigger:", "HOLD", "REVISIT") render at 12-13px,
+   so they need 4.5:1, and the 50-500 shades only reach 1.6-3.9 on --bg-body.
+   The whole light end of each hue therefore collapses onto the 700 shade.
 
-/* Light mode: preserve saturation for decision-semantic colors */
-/* Without these overrides, emerald/amber/sky/rose /80 and /60 variants appeared desaturated */
-html[data-theme="light"] .text-emerald-300 { color: #059669 !important; }
-html[data-theme="light"] .text-emerald-300\/80 { color: rgba(5,150,105,0.9) !important; }
-html[data-theme="light"] .text-emerald-400 { color: #10b981 !important; }
-html[data-theme="light"] .text-amber-300 { color: #d97706 !important; }
-html[data-theme="light"] .text-amber-300\/80 { color: rgba(217,119,6,0.9) !important; }
-html[data-theme="light"] .text-amber-300\/50 { color: rgba(217,119,6,0.7) !important; }
-html[data-theme="light"] .text-sky-300 { color: #0284c7 !important; }
-html[data-theme="light"] .text-sky-300\/80 { color: rgba(2,132,199,0.9) !important; }
-html[data-theme="light"] .text-sky-300\/40 { color: rgba(2,132,199,0.6) !important; }
-html[data-theme="light"] .text-rose-300 { color: #dc2626 !important; }
-html[data-theme="light"] .text-rose-300\/80 { color: rgba(220,38,38,0.9) !important; }
-html[data-theme="light"] .text-rose-400 { color: #ef4444 !important; }
-html[data-theme="light"] .text-rose-400\/80 { color: rgba(239,68,68,0.9) !important; }
+   Matching on the class attribute rather than naming each shade/alpha pair:
+   the enumerated form silently missed /60 and the -100 shades, which is how
+   "54/100 - low" and the active nav pills ended up near-white on near-white.
+   Selectors are anchored to a class boundary (^= or *=" ") so variant-prefixed
+   classes like hover:text-sky-100 fall through to the :hover rules below and
+   keep a distinct state instead of being flattened to the base color.
+
+   Shades 100-400 only. text-<hue>-50 is deliberately excluded: it is used as
+   light text on the dark regime shells in lib/regimePresentation.ts, which stay
+   dark in both themes. text-<hue>-500 has no usages, so nothing needs it. */
+html[data-theme="light"] [class^="text-emerald-1"], html[data-theme="light"] [class*=" text-emerald-1"],
+html[data-theme="light"] [class^="text-emerald-2"], html[data-theme="light"] [class*=" text-emerald-2"],
+html[data-theme="light"] [class^="text-emerald-3"], html[data-theme="light"] [class*=" text-emerald-3"],
+html[data-theme="light"] [class^="text-emerald-4"], html[data-theme="light"] [class*=" text-emerald-4"] { color: #047857 !important; }
+
+html[data-theme="light"] [class^="text-amber-1"], html[data-theme="light"] [class*=" text-amber-1"],
+html[data-theme="light"] [class^="text-amber-2"], html[data-theme="light"] [class*=" text-amber-2"],
+html[data-theme="light"] [class^="text-amber-3"], html[data-theme="light"] [class*=" text-amber-3"],
+html[data-theme="light"] [class^="text-amber-4"], html[data-theme="light"] [class*=" text-amber-4"] { color: #b45309 !important; }
+
+html[data-theme="light"] [class^="text-sky-1"], html[data-theme="light"] [class*=" text-sky-1"],
+html[data-theme="light"] [class^="text-sky-2"], html[data-theme="light"] [class*=" text-sky-2"],
+html[data-theme="light"] [class^="text-sky-3"], html[data-theme="light"] [class*=" text-sky-3"],
+html[data-theme="light"] [class^="text-sky-4"], html[data-theme="light"] [class*=" text-sky-4"] { color: #0369a1 !important; }
+
+html[data-theme="light"] [class^="text-rose-1"], html[data-theme="light"] [class*=" text-rose-1"],
+html[data-theme="light"] [class^="text-rose-2"], html[data-theme="light"] [class*=" text-rose-2"],
+html[data-theme="light"] [class^="text-rose-3"], html[data-theme="light"] [class*=" text-rose-3"],
+html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class*=" text-rose-4"] { color: #b91c1c !important; }
+
+/* Hover lands one step darker so the state stays readable as a change. */
+html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !important; }
+html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #92400e !important; }
+html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #075985 !important; }
+html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
+
+/* Focus rings are authored as sky-200/300/400 (51 usages) — bright cyan that
+   reads on the dark surface and washes out on white. The ring is the primary
+   keyboard affordance, so it tracks the theme rather than the palette. */
+html[data-theme="light"] [class*="outline-sky-"]:focus-visible { outline-color: #0369a1 !important; }
+html[data-theme="light"] [class*="ring-sky-"]:focus-visible { --tw-ring-color: #0369a1 !important; }

@@ -31,13 +31,13 @@ Sections VIII and XI are the ones most often violated by accident, because they'
 
 `app/components/ui/` holds `actionLink.tsx`, `buttonLink.tsx`, and `tag.tsx`. These already encode the 44px target, `touch-action`, and focus-visible behavior. A new one-off `className` chain on a bare `<a>` will silently drop all three. Use `className` overrides for layout positioning only — `mt-auto`, `justify-center`, icon gaps — never to strip a focus affordance.
 
-Design tokens live in `app/styles/tokens.css` (fluid type scale `--text-fluid-*`, semantic posture colors `--color-semantic-*`). Theme overrides live in `app/styles/theme-variants.css`, keyed on `html[data-theme-variant]`. Any new color must come from a token, because a hardcoded hex will look correct in dark mode and break in Paper Light.
+Design tokens live in `app/styles/tokens.css` (fluid type scale `--text-fluid-*`, semantic posture colors `--color-semantic-*`). Theme overrides live in the `html[data-theme="light"]` block of the same `tokens.css` (there is no `theme-variants.css`). Any new color must come from a token, because a hardcoded hex will look correct in dark mode and break in light. A token added to the dark `:root` block also needs a light override there, or it renders a dark-tuned pastel on `--bg-body`.
 
 ## Five areas the repo doc doesn't cover
 
 These come from the Web Interface Guidelines and matter specifically for this codebase. The code handles some of them partially already — the point is that nothing currently *checks*.
 
-**Theming.** Every variant in `theme-variants.css` must set `color-scheme` so form controls, scrollbars, and native selects follow the theme. `<select>` needs explicit styling; it does not inherit. When adding a variant, verify the theme-color meta in `app/layout.tsx` still matches.
+**Theming.** Every theme block in `tokens.css` must set `color-scheme` so form controls, scrollbars, and native selects follow the theme. `<select>` needs explicit styling; it does not inherit. When adding a variant, verify the theme-color meta in `app/layout.tsx` still matches.
 
 **Hydration safety.** This app is server-rendered through vinext, and it renders time-sensitive content — freshness dots, relative timestamps, "as of" labels. Anything derived from `Date.now()` or `localStorage` during render will mismatch between server and client. Compute it in an effect after mount, or pass a server-stamped value down. An input must also be consistently controlled or uncontrolled across the hydration boundary.
 

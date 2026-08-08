@@ -40,7 +40,7 @@ export function Shell({
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)]">
-        <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-6 sm:py-8">
+        <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
             <div className="space-y-6 min-w-0">
               <div className="weather-card">
@@ -78,8 +78,8 @@ export function Shell({
 
   const regimeLower = (regime ?? "").toLowerCase();
   // Tint tokens are theme-aware and fade to transparent, so --bg-body stays the
-  // base surface. Hardcoding the old via/to-slate-950 stops painted the light
-  // theme with a near-black wash.
+  // base surface. The previous via-slate-950/to-slate-950 stops were a fixed
+  // near-black, which painted the light theme with a grey wash.
   const atmosphereTint = regimeLower === "expansion" ? "var(--atmosphere-expansion)"
     : regimeLower === "defensive" ? "var(--atmosphere-defensive)"
     : regimeLower === "scarcity" ? "var(--atmosphere-scarcity)"
@@ -113,7 +113,10 @@ export function Shell({
         className={`mx-auto transition-all ${
           isFocusMode
             ? "max-w-[64rem] px-6 py-12 shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl bg-slate-950/90 my-6"
-            : "max-w-[72rem] px-4 py-6 sm:py-8"
+            // The sticky header is already 109px of chrome across two bordered
+            // bands, so the old py-6/sm:py-8 pushed the first real element about
+            // 157px down the page before anything was readable.
+            : "max-w-[72rem] px-4 py-4 sm:py-5"
         }`}
       >
         {children}
