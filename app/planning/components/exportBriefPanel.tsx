@@ -373,7 +373,7 @@ export const ExportBriefPanel = ({
             />
           </div>
           <details className="weather-auto-chevron mt-3 border-t border-slate-800/60 pt-3">
-            <summary className="cursor-pointer list-none text-fluid-xs font-medium text-slate-400 hover:text-slate-300">
+            <summary data-chevron className="cursor-pointer list-none text-fluid-xs font-medium text-slate-400 hover:text-slate-300">
               More formats
             </summary>
             <div className="mt-3 flex flex-wrap gap-3">
@@ -431,7 +431,7 @@ export const ExportBriefPanel = ({
         ) : null}
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
-          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
+          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
             Quick share formats
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
@@ -462,7 +462,7 @@ export const ExportBriefPanel = ({
         </details>
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
-          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
+          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
             Board and governance formats
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
@@ -492,7 +492,7 @@ export const ExportBriefPanel = ({
         </details>
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-amber-300/25 bg-amber-500/8 p-4">
-          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">
+          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">
             Company-specific exception
           </summary>
           <div className="mt-4 space-y-3 border-t border-amber-300/20 pt-4">

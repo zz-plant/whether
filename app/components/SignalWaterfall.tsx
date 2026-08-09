@@ -37,7 +37,7 @@ export function SignalWaterfall({
       ref={containerRef}
       role="button"
       tabIndex={hasData ? 0 : undefined}
-      aria-haspopup="true"
+      aria-haspopup="dialog"
       aria-expanded={show}
       className={`relative inline-block rounded-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 ${
         hasData ? "cursor-pointer border-b border-dashed border-white/25 transition-colors hover:border-white/50" : ""

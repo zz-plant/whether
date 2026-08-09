@@ -150,11 +150,12 @@ export default function HistoryPage() {
               <select
                 value={selectedYear}
                 onChange={(e) => { setSelectedYear(Number(e.target.value)); setSelectedMonth(0); }}
-                className="min-h-[44px] rounded-md border border-slate-800/60 bg-slate-950/80 px-3 py-2 text-xs font-medium text-slate-200 focus:border-sky-400/60 focus:outline-none"
+                className="min-h-[44px] rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-xs font-medium text-[var(--app-text)] focus:border-sky-400/60 focus:outline-none"
+                style={{ colorScheme: "light dark" }}
                 aria-label="Select year"
               >
                 {years.map((year) => (
-                  <option key={year} value={year} className="bg-slate-950">{year}</option>
+                  <option key={year} value={year}>{year}</option>
                 ))}
               </select>
             </div>

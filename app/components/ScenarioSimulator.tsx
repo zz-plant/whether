@@ -68,8 +68,11 @@ export function ScenarioSimulator({
       <div className="grid gap-4 sm:grid-cols-3">
         {/* Fed Rate Toggle */}
         <div className="space-y-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] p-3">
-          <label className="text-fluid-xs font-semibold text-white/65 block" title="Fed Rate shift impacts tightness score. +50bps = +2.5 points tightness (pts = score points).">
+          <label className="text-fluid-xs font-semibold text-white/65 block">
             Fed Rate Shift ({fedDelta > 0 ? `+${fedDelta * 0.25}%` : `${fedDelta * 0.25}%`})
+            <span className="mt-0.5 block font-normal text-white/50">
+              +50bps moves tightness by +2.5 pts (score points).
+            </span>
           </label>
           <input
             type="range"

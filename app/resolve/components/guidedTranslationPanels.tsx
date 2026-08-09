@@ -229,7 +229,7 @@ export function GuidedTranslationPanels({
       </div>
 
       <details className="weather-panel weather-auto-chevron space-y-3 px-5 py-5">
-        <summary className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+        <summary data-chevron className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
           {showStageLibrary ? "Browse the other stages" : `Open the other stages (${stageGuides.length})`}
         </summary>
         <div className="mt-4 space-y-4">

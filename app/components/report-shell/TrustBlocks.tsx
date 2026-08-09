@@ -211,7 +211,7 @@ export function HeroTrustProvenanceBlock({
       </div>
 
       <details className="weather-auto-chevron weather-transmission-segment rounded-md px-3 py-2">
-          <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <summary data-chevron className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
             Source board
           </summary>
           <div className="mt-2">

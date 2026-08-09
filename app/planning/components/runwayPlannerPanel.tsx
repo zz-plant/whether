@@ -165,7 +165,12 @@ This memo aligns our company budget and operating guardrails with the current cl
         </label>
         <label className="weather-surface p-3 text-sm text-slate-200">
           Sector
-          <select className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" value={sector} onChange={(event) => setSector(event.target.value as PlannerSector)}>
+          <select
+            className="mt-2 min-h-[44px] w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-[var(--app-text)]"
+            style={{ colorScheme: "light dark" }}
+            value={sector}
+            onChange={(event) => setSector(event.target.value as PlannerSector)}
+          >
             {sectorOptions.map((option) => (
               <option key={option} value={option}>
                 {option}

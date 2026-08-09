@@ -295,3 +295,30 @@
     min-height: 36px;
   }
 }
+
+/* Disclosure affordance for <summary> that opts out of the native marker with
+   `list-none`. Without this the control reads as a static heading. Sites that
+   draw their own chevron (see app/trust/page.tsx) simply omit `data-chevron`. */
+summary[data-chevron] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+summary[data-chevron]::after {
+  content: "▾";
+  color: var(--app-text-muted);
+  transition: transform 150ms ease;
+}
+
+details[open] > summary[data-chevron]::after {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  summary[data-chevron]::after {
+    transition: none;
+  }
+}
