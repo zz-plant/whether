@@ -114,7 +114,7 @@ export function GlobalHeaderActionsClient() {
       </button>
 
       <Link
-        href="/resolve"
+        href="/search"
         className="hidden sm:inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center rounded-sm border border-slate-800/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-colors"
         aria-label="Search"
       >

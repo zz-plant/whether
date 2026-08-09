@@ -81,6 +81,7 @@ Those four lines now come from one shared weekly-call contract rather than route
 The weekly brief sequence now favors `Boldness Budget -> current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
 The homepage global header now keeps the weekly brief calmer: it shows the direct next paths first, while the broader workspace chooser on `/` is tucked behind a collapsed `Browse workspaces` control rather than rendering as an always-open rail.
 The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
+The collapsed `Route this week's call` disclosure groups the downstream paths into Plan (capital posture, ship call), Resolve (by role, toolkits), Rule (blank decision form, reversal checklist), and Compare (past epochs, full archive), keeping them one expand away from the leading plan card.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/evidence` and `/trust` instead of reproducing those workflows inline.

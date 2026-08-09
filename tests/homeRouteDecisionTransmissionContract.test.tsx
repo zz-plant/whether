@@ -34,4 +34,36 @@ describe("home route render contract", () => {
     assert.ok(heroSource.includes("<ShareBriefButton"), "decision hero owns the canonical copy action");
     assert.ok(!rulesSource.includes("ShareBriefButton"), "bounded rules card must not duplicate the hero copy action");
   });
+
+  it("routes the lower home handoff through a collapsed disclosure to the operator-loop surfaces", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    const railSource = readFileSync("app/components/DecisionRouteRail.tsx", "utf8");
+
+    assert.ok(routeSource.includes("<DecisionRouteRail"), "home route mounts the route-handoff disclosure");
+    assert.ok(railSource.includes("hidden={!open}"), "route handoff is a collapsed disclosure, not an always-open rail");
+
+    for (const target of [
+      "/planning/financial",
+      "/planning/ship-checklist",
+      "/resolve",
+      "/resolve#toolkit-library",
+      "/template",
+      "/resources/reversal-trigger-checklist",
+      "/history/compare",
+      "/history",
+    ]) {
+      assert.ok(railSource.includes(`"${target}"`), `route handoff surfaces ${target}`);
+    }
+
+    assert.ok(!railSource.includes("<ShareBriefButton"), "route handoff must not add a copy action");
+  });
+
+  it("points the header search icon at the /search command surface, not the resolve hub", () => {
+    const actionsSource = readFileSync("app/components/globalHeaderActionsClient.tsx", "utf8");
+    const labelIndex = actionsSource.indexOf('aria-label="Search"');
+    const searchIconBlock = actionsSource.slice(Math.max(0, labelIndex - 400), labelIndex + 40);
+
+    assert.ok(searchIconBlock.includes('href="/search"'), "header search icon targets the command surface");
+    assert.ok(!searchIconBlock.includes('href="/resolve"'), "header search icon no longer hides behind the resolve hub");
+  });
 });

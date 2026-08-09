@@ -12,6 +12,7 @@ import { EvidenceDrawer } from "./components/EvidenceDrawer";
 import { RitualCheck } from "./components/RitualCheck";
 import { ToolsPanel } from "./components/ToolsPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
+import { DecisionRouteRail } from "./components/DecisionRouteRail";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
@@ -202,14 +203,14 @@ async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         recentRecordDates={props.recentRecordDates}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-4 mt-4">
-        <Link
-          href="/planning"
-          className="inline-flex items-center gap-2 text-fluid-micro text-sky-300/70 hover:text-sky-300 transition-colors no-underline"
-        >
-          Build this week&apos;s plan →
-        </Link>
-        <SubscribeForm />
+      <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <ActionLink href="/planning" variant="inline">
+            Build this week&apos;s plan →
+          </ActionLink>
+          <SubscribeForm />
+        </div>
+        <DecisionRouteRail />
       </div>
     </>
   );
