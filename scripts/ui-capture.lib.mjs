@@ -244,6 +244,41 @@ export const waitForCaptureReady = async (page, target) => {
   return true;
 };
 
+const LAYOUT_SETTLE_TIMEOUT_MS = 6000;
+const LAYOUT_SETTLE_POLL_MS = 150;
+
+/**
+ * `load` fires before client hydration, and several routes render different
+ * content once hydrated — `/planning` drops to just the active step, which made
+ * captures ~2.7x taller than the page any user sees. Wait for the document to
+ * stop changing height so the screenshot matches the hydrated layout.
+ */
+export const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEOUT_MS) => {
+  const deadline = Date.now() + timeoutMs;
+
+  try {
+    await page.waitForLoadState("networkidle", { timeout: timeoutMs });
+  } catch {
+    // Long-lived connections mean networkidle may never arrive; the height poll
+    // below is the real settle signal.
+  }
+
+  let previous = -1;
+  let stableReads = 0;
+  while (Date.now() < deadline) {
+    const height = await page.evaluate(() => document.body.scrollHeight);
+    if (height === previous) {
+      stableReads += 1;
+      if (stableReads >= 2) return height;
+    } else {
+      stableReads = 0;
+      previous = height;
+    }
+    await page.waitForTimeout(LAYOUT_SETTLE_POLL_MS);
+  }
+  return previous;
+};
+
 export const captureTargets = async ({ baseUrl, outDir, targets }) => {
   await mkdir(outDir, { recursive: true });
 
@@ -259,6 +294,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
       console.log(`Capturing ${target.id} -> ${outputPath}`);
       await page.goto(url, { waitUntil: "load" });
       await waitForCaptureReady(page, target);
+      await waitForLayoutSettled(page);
       await page.screenshot({
         path: outputPath,
         fullPage: target.fullPage ?? true,
