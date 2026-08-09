@@ -15,7 +15,7 @@ import type { RegimeKey } from "../regimeEngine";
 // ── Indicator-level plain-English translations ──
 
 export type SignalPlainEnglish = {
-  /** Human-readable label. e.g., "Cash availability" instead of "Capital tightness" */
+  /** Human-readable label. e.g., "Cash availability" for the tightness axis. */
   plainLabel: string;
   /** One-line summary of what this indicator captures. */
   whatItMeasures: string;
@@ -42,7 +42,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
       "Money is flowing — you can invest in growth, hire ahead of revenue, and lengthen payback timelines.",
     midMeans:
       "Money is balanced — invest with milestones and keep options open.",
-    jargonTerm: "Capital tightness",
+    jargonTerm: "Cash availability",
     operatorPrompt: "If I needed to raise or borrow money this month, how hard would it be?",
   },
   riskAppetite: {

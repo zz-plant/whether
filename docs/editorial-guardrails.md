@@ -77,3 +77,18 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   (`lib/report/reportCopy.ts`): imperative forms on screens (Do now / Pause if / Change
   course if), noun slots in exports (Action / Threshold / Reversal). Consume the export
   instead of hardcoding slot words in new components.
+- **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
+  brief"). "Report" stays internal (function names, keys, docs). User-visible,
+  shareable, and metadata surfaces must not print "Whether Report".
+- **Axis names use a two-form rule** (full name / short name) per signal key: Cash
+  availability / Tightness; Risk appetite / Appetite; Yield curve slope / Yield curve.
+  Pick one canonical form per slot (full in the hero, threshold ladder, exports, and SEO;
+  short in inline metrics); never a third spelling. A lone "Tightness" or "Appetite"
+  always expands to its full axis name, and the tightness watch line is always
+  "Cash availability watch".
+- **The call has three bounded-state markers**: certainty (input confidence), flip, and
+  transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
+  "transition" is the forecast-outcome change (stuck forecast indicators). If they
+  diverge, flip describes the call reversal, transition describes forecast changes.
+- **Confidence is "Confidence", not "Call certainty"** on screens and gauges. "Certainty"
+  is retired; do not reintroduce it as a user-facing label.

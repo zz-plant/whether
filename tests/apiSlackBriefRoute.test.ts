@@ -26,6 +26,6 @@ describe("/api/brief/slack", () => {
     assert.equal(typeof body.recordDate, "string");
     assert.equal(typeof body.generatedAt, "string");
     assert.equal(typeof body.brief, "string");
-    assert.match(body.brief, /Whether Report Brief/);
+    assert.match(body.brief, /Whether Weekly Brief/);
   });
 });
