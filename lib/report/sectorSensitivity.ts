@@ -145,7 +145,7 @@ const buildReversalCondition = (
   }
 
   const direction = actionBias === "loosen" ? "falls to or below" : "rises above";
-  return `Drop the sector tilt if market risk appetite ${direction} ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
+  return `Drop the sector tilt if risk appetite ${direction} ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
 };
 
 export const deriveSectorAdjustedPosture = (

@@ -79,7 +79,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     lowMeans:
       "Recession warning active — the yield curve is inverted or flat. Favor short-payback projects and keep options open.",
     midMeans:
-      "Curve is neutral/flat — don't rely on this signal alone; also check cash availability and market risk appetite.",
+      "Curve is neutral/flat — don't rely on this signal alone; also check cash availability and risk appetite.",
     jargonTerm: "Yield curve slope",
     operatorPrompt: "If I'm planning a 12+ month project, does this signal support that timeline?",
   },

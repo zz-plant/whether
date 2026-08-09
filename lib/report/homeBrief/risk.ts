@@ -12,7 +12,7 @@ type SignalChange = {
  */
 const signalMoveCopy: Record<SignalChange["key"], { better: string; worse: string }> = {
   tightness: { better: "cash availability loosened", worse: "cash availability tightened" },
-  riskAppetite: { better: "market risk appetite strengthened", worse: "market risk appetite weakened" },
+  riskAppetite: { better: "risk appetite strengthened", worse: "risk appetite weakened" },
   baseRate: { better: "borrowing costs eased", worse: "borrowing costs rose" },
   curveSlope: {
     better: "the recession warning gauge steepened",

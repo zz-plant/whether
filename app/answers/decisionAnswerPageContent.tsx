@@ -86,7 +86,7 @@ export async function DecisionAnswerPageContent({
 
   const thresholdTrigger =
     page.thresholdFocus === "tightness"
-      ? `Trigger tighter mode if capital tightness rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`
+      ? `Trigger tighter mode if cash availability rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`
       : page.thresholdFocus === "risk"
         ? `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}.`
         : `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;

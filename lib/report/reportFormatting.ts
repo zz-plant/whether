@@ -67,7 +67,7 @@ export const buildRegimeAlert = (
   if (reasons.length === 0) {
     reasons.push(
       `Cash availability moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
-        `and market risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
+        `and risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
         "carrying the posture across a boundary."
     );
   }

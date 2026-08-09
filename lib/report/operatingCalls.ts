@@ -161,7 +161,7 @@ const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" 
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(
-    /(cash availability|market risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
+    /(cash availability|risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
   );
 
   return Array.from(matches, (match) => ({

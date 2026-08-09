@@ -200,7 +200,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: market risk appetite strengthened 3\.2 points\.$/);
+    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: Risk appetite strengthened 3\.2 points\.$/);
 
     const worseningRiskAppetite = buildHomeBriefModel({
       fetchedAtLabel: "Updated 2h ago",
@@ -218,7 +218,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: market risk appetite weakened 2\.4 points\.$/);
+    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: Risk appetite weakened 2\.4 points\.$/);
   });
 
   it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
@@ -237,7 +237,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.reversalTrigger, /market risk appetite falls to or below 50\.0 \(56\.0 today\)/i);
+    assert.match(model.reversalTrigger, /(R|r)isk appetite falls to or below 50\.0 \(56\.0 today\)/i);
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
@@ -500,7 +500,7 @@ describe("buildHomeBriefModel", () => {
     assert.ok(capitalRow);
     assert.match(capitalRow?.cells.flip.text ?? "", /cash availability\s*</i);
     assert.match(capitalRow?.cells.flip.text ?? "", /and/i);
-    assert.match(capitalRow?.cells.flip.text ?? "", /market risk appetite\s*>/i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
   });
 
   it("preserves decimal flip thresholds in matrix scan copy", () => {

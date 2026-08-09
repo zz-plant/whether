@@ -161,7 +161,7 @@ export const loadHomeSharePreview = async (
     description,
     url: buildCanonicalUrl(sharePath),
     imageUrl,
-    imageAlt: `${statusLabel} weekly Whether report card for ${weekLabel}`,
+    imageAlt: `${statusLabel} Whether weekly brief card for ${weekLabel}`,
     eyebrow: reportData.historicalSelection ? "Whether Historical Brief" : "Whether Weekly Brief",
     audienceLabel,
     weekLabel,

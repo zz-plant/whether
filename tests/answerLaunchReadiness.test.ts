@@ -37,7 +37,7 @@ const buildLiveInputs = ({
         label: "BBB credit spread",
         value: 180,
         unit: "bps",
-        explanation: "Credit spreads proxy capital tightness for operating posture.",
+        explanation: "Credit spreads proxy cash availability for operating posture.",
         sourceLabel: "Federal Reserve Economic Data (FRED)",
         sourceUrl: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
         formulaUrl: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
