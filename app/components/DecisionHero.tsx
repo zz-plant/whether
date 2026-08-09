@@ -249,7 +249,9 @@ export function DecisionHero({
               <span className="text-fluid-xs font-semibold text-white/50">/100</span>
             </div>
           </SignalWaterfall>
-          <div className={`mt-1.5 flex items-center justify-center gap-1.5 sm:justify-end font-display text-base sm:text-lg font-bold tabular-nums ${
+          {/* Hidden on mobile: the headline block already states the same delta
+              ("Holding · no change vs last week") a short scroll above. */}
+          <div className={`mt-1.5 hidden sm:flex items-center justify-center gap-1.5 sm:justify-end font-display text-base sm:text-lg font-bold tabular-nums ${
             boldnessDelta > 0 ? "text-emerald-300"
             : boldnessDelta < 0 ? "text-rose-300"
             : "text-slate-400"
@@ -260,7 +262,7 @@ export function DecisionHero({
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, &amp; commit</p>
+          <p className="hidden sm:block text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, &amp; commit</p>
           {/* Replaces a hardcoded-rgba gradient track: this is theme-aware and carries
               last week's reading, so the delta is visible rather than implied. */}
           <div className="mt-3 w-full max-w-[10rem] mx-auto sm:ml-auto sm:mr-0">

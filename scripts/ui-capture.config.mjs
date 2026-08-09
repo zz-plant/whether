@@ -1,4 +1,38 @@
+const MOBILE = { width: 430, height: 932 };
+const DESKTOP = { width: 1600, height: 1400 };
+
+/**
+ * The live operator routes. These are the surfaces the product is judged on, so
+ * layout work needs before/after evidence for them — the mockup targets below
+ * only cover staged concepts under /mockups.
+ */
+const liveRoutes = [
+  { slug: "home", label: "Weekly brief (/)", path: "/" },
+  { slug: "evidence", label: "Evidence", path: "/evidence" },
+  { slug: "planning", label: "Planning", path: "/planning" },
+  { slug: "resolve", label: "Resolve", path: "/resolve" },
+  { slug: "trust", label: "Trust", path: "/trust" },
+];
+
+const liveTargets = liveRoutes.flatMap(({ slug, label, path }) => [
+  {
+    id: `${slug}-mobile`,
+    label: `${label} / mobile`,
+    path,
+    viewport: MOBILE,
+    fullPage: true,
+  },
+  {
+    id: `${slug}-desktop`,
+    label: `${label} / desktop`,
+    path,
+    viewport: DESKTOP,
+    fullPage: true,
+  },
+]);
+
 export const uiCaptureTargets = [
+  ...liveTargets,
   {
     id: "mockups-index-desktop",
     label: "Mockups index / desktop",
