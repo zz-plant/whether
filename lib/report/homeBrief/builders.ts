@@ -103,7 +103,7 @@ const buildBoundaryTriggerText = ({
 }) => {
   // Phrased as a condition, not a statement, because callers prefix it with
   // "Re-open when:" / "The call flips when:" as well as showing it standalone.
-  const dimensionLabel = dimension === "tightness" ? "Cash availability" : "Market risk appetite";
+  const dimensionLabel = dimension === "tightness" ? "Cash availability" : "Risk appetite";
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
   return `${dimensionLabel} ${condition} ${threshold.toFixed(1)} (${current.toFixed(1)} today), which flips the call to ${targetRegimeLabel}.`;
 };
@@ -142,8 +142,8 @@ const summarizeSignalDriver = (
         : `Cash availability eased ${absDelta} points this week.`;
     case "riskAppetite":
       return signal.delta >= 0
-        ? `Market risk appetite improved ${absDelta} points this week.`
-        : `Market risk appetite weakened ${absDelta} points this week.`;
+        ? `Risk appetite improved ${absDelta} points this week.`
+        : `Risk appetite weakened ${absDelta} points this week.`;
     case "baseRate":
       return signal.delta >= 0
         ? `Borrowing costs rose ${absDelta} points this week.`

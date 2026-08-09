@@ -75,12 +75,12 @@ function MarketStateView({ state }: { state: MarketState }) {
 
         <div className="flex flex-wrap justify-center gap-4 pt-2">
           <ScoreCard
-            label="Credit conditions"
+            label="Cash availability"
             value={state.tightness}
             delta={state.tightnessDelta}
           />
           <ScoreCard
-            label="Investor sentiment"
+            label="Risk appetite"
             value={state.riskAppetite}
             delta={state.riskAppetiteDelta}
           />

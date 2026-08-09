@@ -47,7 +47,7 @@ export function RegimeCompass({
       viewBox="0 0 220 180"
       className="w-full max-w-[20rem] h-auto"
       role="img"
-      aria-label={`Posture quadrant: ${regimeKey ? `${regimeKey} regime` : "Unknown"}. Credit conditions ${tightness}/100, investor sentiment ${riskAppetite}/100. ${regimeKey === "EXPANSION" ? "Credit is available, investors are optimistic — scale proven bets." : regimeKey === "SCARCITY" ? "Credit is tight, investors are cautious — preserve cash." : regimeKey === "DEFENSIVE" ? "Credit is tight but investors are willing to fund." : regimeKey === "VOLATILE" ? "Credit is available but investors are cautious — conditions can shift quickly." : ""}`}
+      aria-label={`Posture quadrant: ${regimeKey ? `${regimeKey} regime` : "Unknown"}. Cash availability ${tightness}/100, risk appetite ${riskAppetite}/100. ${regimeKey === "EXPANSION" ? "Credit is available, investors are optimistic — scale proven bets." : regimeKey === "SCARCITY" ? "Credit is tight, investors are cautious — preserve cash." : regimeKey === "DEFENSIVE" ? "Credit is tight but investors are willing to fund." : regimeKey === "VOLATILE" ? "Credit is available but investors are cautious — conditions can shift quickly." : ""}`}
     >
       {/* Background fill per quadrant */}
       {/* Bottom-left: VOLATILE — low tightness, low risk appetite */}

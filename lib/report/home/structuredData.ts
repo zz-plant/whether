@@ -28,7 +28,7 @@ export const buildHomeStructuredData = () => ({
     {
       "@type": "CollectionPage",
       "@id": `${siteUrl}/#webpage`,
-      name: "Whether Report — Weekly Brief",
+      name: "Whether Weekly Brief",
       url: siteUrl,
       description: defaultSiteDescription,
       inLanguage: "en",

@@ -234,6 +234,6 @@ export const buildAgentPrompt = (
     "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
     "5) A short list of questions to confirm with the PM before acting.",
     "",
-    `Context: Whether Report for ${treasury.record_date} (${assessment.regime}).`,
+    `Context: Whether Weekly Brief for ${treasury.record_date} (${assessment.regime}).`,
   ].join("\n");
 };

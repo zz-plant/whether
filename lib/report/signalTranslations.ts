@@ -46,7 +46,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     operatorPrompt: "If I needed to raise or borrow money this month, how hard would it be?",
   },
   riskAppetite: {
-    plainLabel: "Market risk appetite",
+    plainLabel: "Risk appetite",
     whatItMeasures:
       "How willing U.S. investors and buyers are to take risks on new products, hires, and growth bets.",
     highMeans:
@@ -215,7 +215,7 @@ export const buildOperatorContextSummary = (
     "",
     `Cash availability is ${tightnessBand} (score ${context.tightness}). ${signalPlainEnglish.tightness[tightnessBand === "high" ? "highMeans" : tightnessBand === "low" ? "lowMeans" : "midMeans"]}`,
     "",
-    `Market risk appetite is ${riskBand} (score ${context.riskAppetite}). ${signalPlainEnglish.riskAppetite[riskBand === "high" ? "highMeans" : riskBand === "low" ? "lowMeans" : "midMeans"]}`,
+    `Risk appetite is ${riskBand} (score ${context.riskAppetite}). ${signalPlainEnglish.riskAppetite[riskBand === "high" ? "highMeans" : riskBand === "low" ? "lowMeans" : "midMeans"]}`,
     "",
     regimeEntry.whatItMeans,
     "",
@@ -240,7 +240,6 @@ export type TermSubstitution = {
 
 export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
   { pattern: /\bCapital tightness\b/gi, replacement: "Cash availability" },
-  { pattern: /\bRisk appetite\b/gi, replacement: "Market risk appetite" },
   { pattern: /\bYield curve slope\b/gi, replacement: "Recession warning gauge" },
   { pattern: /\bBase rate\b/gi, replacement: "Fed interest rate" },
   { pattern: /\bSCARCITY\b/g, replacement: "Freezing" },
@@ -272,7 +271,7 @@ export const applyPlainEnglishSubstitutions = (text: string): string => {
 
 export const SIGNAL_WHY_MATTERS: Record<RegimeSignalKey, string> = {
   tightness: "Cash availability determines whether you conserve or invest.",
-  riskAppetite: "Market risk appetite tells you how bold your roadmap can be this week.",
+  riskAppetite: "Risk appetite tells you how bold your roadmap can be this week.",
   baseRate: "The Fed rate affects your cost of capital and burn planning.",
   curveSlope: "The recession gauge tells you whether long-horizon bets are safe.",
 };

@@ -177,7 +177,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     const momentumReason = model.whyThisCall.find((reason) => reason.key === "momentum" || reason.label === "Momentum" || reason.label === "What moved this week")?.detail ?? "";
-    assert.match(momentumReason, /Market risk appetite improved, and the signal set is improving overall\./);
+    assert.match(momentumReason, /Risk appetite improved, and the signal set is improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 

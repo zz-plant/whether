@@ -1,5 +1,5 @@
 /**
- * Shared loader for Whether Report pages.
+ * Shared loader for Whether Weekly Brief pages.
  * Centralizes Treasury data fetching and formatting for multi-page layouts.
  *
  * Loop stage owner: signals.

@@ -11,7 +11,7 @@ export type DecisionRiskLabel = "Low" | "Controlled" | "High";
  */
 export const deltaLabelBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
   tightness: "Cash availability",
-  riskAppetite: "Market risk appetite",
+  riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
 };

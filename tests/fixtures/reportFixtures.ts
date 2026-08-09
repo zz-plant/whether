@@ -199,7 +199,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     weeklyRecordDate: "2026-03-01",
     weeklyRecordDateLabel: "Week ending Mar 1, 2026",
     reportDynamics: {
-      changedSignals: [{ key: "tightness", label: "Capital tightness", delta: 2 }],
+      changedSignals: [{ key: "tightness", label: "Cash availability", delta: 2 }],
       anomalySignals: [],
       totalSignalChanges: 1,
       regimeChanged: false,

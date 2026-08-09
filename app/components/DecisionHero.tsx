@@ -143,7 +143,7 @@ export function DecisionHero({
             </p>
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/50">
               <span>
-                 <span className="text-white/50">Capital tightness:</span>{" "}
+                 <span className="text-white/50">Cash availability:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
@@ -155,7 +155,7 @@ export function DecisionHero({
                       current={tightness}
                       min={0}
                       max={100}
-                      label="Capital tightness"
+                      label="Cash availability"
                     />
                   </span>
                   <span className={DIRECTION_COLOR[signalDirection]}>
@@ -184,7 +184,7 @@ export function DecisionHero({
                     max={100}
                     current={tightness}
                     trigger={tightnessThreshold}
-                    signalLabel="Capital tightness"
+                    signalLabel="Cash availability"
                   />
                 </div>
               ) : null}

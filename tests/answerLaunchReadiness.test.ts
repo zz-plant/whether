@@ -11,7 +11,7 @@ const buildLiveInputs = ({
   reportEvidenceItems = [
     {
       key: "tightness" as const,
-      title: "Capital tightness moved above the operating threshold",
+      title: "Cash availability moved above the operating threshold",
       supportingBullets: ["Tightness rose 2 points week over week."],
       confidenceLabel: "HIGH",
       directionLabel: "Tightening" as const,

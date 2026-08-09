@@ -190,7 +190,7 @@ export const buildSignalInfluence = ({
   },
   {
     key: "riskAppetite",
-    label: "Market risk appetite",
+    label: "Risk appetite",
     influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
     unavailable: false,
   },
@@ -312,11 +312,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentRiskThreshold,
     up: {
       code: "risk-appetite-upshift",
-      message: `Market risk appetite crossed above ${currentRiskThreshold}.`,
+      message: `Risk appetite crossed above ${currentRiskThreshold}.`,
     },
     down: {
       code: "risk-appetite-downshift",
-      message: `Market risk appetite fell below ${currentRiskThreshold}.`,
+      message: `Risk appetite fell below ${currentRiskThreshold}.`,
     },
   });
 

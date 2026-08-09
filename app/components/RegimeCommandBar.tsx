@@ -313,7 +313,7 @@ export const RegimeCommandBar = ({
                 </span>
               ) : null}
               <span className={`rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1 ${confidenceToneClass[resolvedConfidenceLabel]}`}>
-                Call certainty {resolvedConfidenceLabel} {Math.round(resolvedConfidencePercent)}%
+                Confidence {resolvedConfidenceLabel} {Math.round(resolvedConfidencePercent)}%
               </span>
             </div>
           </div>

@@ -105,14 +105,14 @@ describe("RegimeGlyph", () => {
 describe("DeltaGlyph", () => {
   it("states the direction of travel in words", () => {
     const rose = renderToStaticMarkup(
-      <DeltaGlyph idPrefix="d1" previous={40} current={54} min={0} max={100} label="Capital tightness" />,
+      <DeltaGlyph idPrefix="d1" previous={40} current={54} min={0} max={100} label="Cash availability" />,
     );
     assertNoNaN(rose);
     assertTokensWrapped(rose);
     assert.match(rose, /Rose from 40 to 54\./);
 
     const fell = renderToStaticMarkup(
-      <DeltaGlyph idPrefix="d2" previous={54} current={40} min={0} max={100} label="Capital tightness" />,
+      <DeltaGlyph idPrefix="d2" previous={54} current={40} min={0} max={100} label="Cash availability" />,
     );
     assert.match(fell, /Fell from 54 to 40\./);
     assert.match(fell, /var\(--accent-success\)/);

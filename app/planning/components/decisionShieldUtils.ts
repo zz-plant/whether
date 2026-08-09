@@ -58,7 +58,7 @@ export const buildShareText = (
   output: DecisionOutput
 ) => {
   const lines = [
-    "Decision Shield — Whether Report",
+    "Decision Shield — Whether Weekly Brief",
     `Posture context: ${formatRegimeLabel(assessment.regime)}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,

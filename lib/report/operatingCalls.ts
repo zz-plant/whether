@@ -157,7 +157,7 @@ export type DecisionLaneState = {
 const stateLabelByStep = ["Closed", "Guarded", "Staged", "Open"] as const;
 const progressByStep = [12, 38, 70, 92] as const;
 
-const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Market risk appetite" : "Cash availability");
+const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Cash availability");
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(

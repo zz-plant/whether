@@ -89,7 +89,7 @@ describe("agent handoff contract", () => {
       decisionSupport: {
         reportDynamics: {
           changedSignals: [
-            { key: "tightness", label: "Capital tightness", delta: 2 },
+            { key: "tightness", label: "Cash availability", delta: 2 },
             { key: "riskAppetite", label: "Risk appetite", delta: -3 },
           ],
           directionLabel: "deteriorating",

@@ -88,7 +88,7 @@ const buildIssueTrackerMarkdownBrief = (
     : `Source: ${treasury.source}`;
 
   return [
-    `${heading2}Whether Report — ${treasury.record_date}`,
+    `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
     `${format === "wiki" ? "*Posture:*" : "**Posture:**"} ${postureLabel}`,
     ...(postureLabel !== assessment.regime
       ? [`${format === "wiki" ? "*Regime:*" : "**Regime:**"} ${assessment.regime}`]
@@ -286,7 +286,7 @@ export const ExportBriefPanel = ({
     () => buildAgentPrompt(assessment, treasury),
     [assessment, treasury]
   );
-  const mailSubject = encodeURIComponent(`Whether Report — ${treasury.record_date}`);
+  const mailSubject = encodeURIComponent(`Whether Weekly Brief — ${treasury.record_date}`);
   const mailBody = encodeURIComponent(briefing);
 
   const handleCopy = async (text: string, label: string) => {

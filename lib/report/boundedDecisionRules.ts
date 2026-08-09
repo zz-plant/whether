@@ -127,7 +127,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       resumeTrigger: `Resume staged approvals when cash availability eases below ${fmt(tightnessResume)} and market risk appetite is above ${fmt(riskResume)}.`,
       flipConditions: [
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Market risk appetite > ${fmt(riskResume)}` },
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
       ],
       rationale: "Protect delivery capacity without locking in irreversible fixed-cost growth.",
     },
@@ -146,7 +146,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       pauseTrigger: `Pause long-payback bets if market risk appetite falls below ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
       resumeTrigger: `Resume tempo on deferred bets when market risk appetite is above ${fmt(riskResume)} and weekly direction stabilizes or improves.`,
       flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Market risk appetite > ${fmt(riskResume)}` },
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
       ],
       rationale: "Keep cycle-time high where evidence is strong; cap downside from speculative scope.",
     },
@@ -165,7 +165,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       pauseTrigger: `Pause acceleration if market risk appetite falls below ${fmt(riskPause)} or cash availability tightens above ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume full process when market risk appetite is above ${fmt(riskResume)} and cash availability eases below ${fmt(tightnessResume)}.`,
       flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Market risk appetite > ${fmt(riskResume)}` },
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
       ],
       rationale: "Timing the process around signal windows improves optionality and reduces forced terms.",
@@ -198,7 +198,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       pauseTrigger: `Pause expansion bets if market risk appetite falls below ${fmt(riskPause)} or cash availability tightens above ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume in tranches when market risk appetite is above ${fmt(riskResume)} and cash availability eases below ${fmt(tightnessResume)}.`,
       flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Market risk appetite > ${fmt(riskResume)}` },
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
         { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
       ],
       rationale: "Expansion should scale with validated window strength, not optimism.",

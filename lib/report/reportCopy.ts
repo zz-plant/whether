@@ -111,7 +111,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "risk-appetite",
-    term: "Market risk appetite",
+    term: "Risk appetite",
     summary:
       "How willing U.S. investors and buyers are to take risks on new products, hires, and growth bets.",
     why: "Why it matters: market appetite sets how bold your roadmap and hiring plan can be this week.",

@@ -270,7 +270,7 @@ export const buildSlackBrief = (
   const postureLabel = modeled.postureWithStageLabel ?? formatRegimeLabel(assessment.regime);
 
   return [
-    `Whether Report Brief — ${treasury.record_date}`,
+    `Whether Weekly Brief — ${treasury.record_date}`,
     `Posture: ${postureLabel}`,
     `Market pressure: ${assessment.scores.tightness} | Expansion support: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
@@ -320,7 +320,7 @@ export const buildConstraintHeadlines = (
   const constraints = assessment.constraints.map((item) => `• ${item}`);
 
   return [
-    `Whether Report Headlines — ${treasury.record_date}`,
+    `Whether Weekly Brief Headlines — ${treasury.record_date}`,
     headline,
     "",
     "Operating limits:",
@@ -337,7 +337,7 @@ export const buildCallCitation = (
   treasury: TreasuryData,
   options?: ExportLayerOptions,
 ) => [
-  `Whether Report Brief — ${treasury.record_date}`,
+  `Whether Weekly Brief — ${treasury.record_date}`,
   `Posture: ${options?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,

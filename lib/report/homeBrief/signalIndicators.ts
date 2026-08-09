@@ -259,7 +259,7 @@ const buildInputInfluenceDescription = ({
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong expansion support" : "Expansion support",
-          effectDetail: `Market risk appetite is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the watch line at ${riskLine}; the call can carry larger reversible bets.`,
+          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the watch line at ${riskLine}; the call can carry larger reversible bets.`,
           watchLabel: `Watch line ${riskLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${gap.toFixed(1)} pts above watch line`,
@@ -270,7 +270,7 @@ const buildInputInfluenceDescription = ({
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Risk-off pressure" : "Capping risk-taking",
-          effectDetail: `Market risk appetite is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the watch line at ${riskLine}; bet size and expansion appetite stay capped.`,
+          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the watch line at ${riskLine}; bet size and expansion appetite stay capped.`,
           watchLabel: `Watch line ${riskLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below watch line`,

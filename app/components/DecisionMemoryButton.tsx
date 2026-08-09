@@ -9,7 +9,7 @@ export type DecisionMemoryButtonProps = {
   regime: string;
   recordDate: string;
   tightness?: number;
-  /** Market risk appetite input score — not the derived boldness budget. */
+  /** Risk appetite input score — not the derived boldness budget. */
   riskAppetite?: number;
   /** Composite budget: 0.7 * riskAppetite + 0.3 * (100 - tightness). */
   boldnessScore?: number;

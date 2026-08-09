@@ -77,7 +77,7 @@ export const buildSignalsPageModel = async (
       {
         "@type": "WebPage",
         "@id": `${siteUrl}/evidence#webpage`,
-        name: "Whether Report — Evidence",
+        name: "Whether Weekly Brief — Evidence",
         url: `${siteUrl}/evidence`,
         description:
           "Evidence appendix for the weekly brief: drivers, thresholds, timestamps, and historical replay.",

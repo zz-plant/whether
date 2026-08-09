@@ -56,7 +56,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     threshold,
     direction,
   }: {
-    label: "Cash availability" | "Market risk appetite";
+    label: "Cash availability" | "Risk appetite";
     now: number;
     threshold: number;
     direction: "riseAbove" | "fallToOrBelow";
@@ -96,7 +96,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
   return [
     watchPrefix,
     crossingText({ label: "Cash availability", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
-    crossingText({ label: "Market risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
+    crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
   ].join(" ");
 };
 
@@ -133,14 +133,14 @@ const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =
 
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
   tightness: "Cash availability",
-  riskAppetite: "Market risk appetite",
+  riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
 };
 
 const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
   tightness: "Capital conditions",
-  riskAppetite: "Market risk appetite",
+  riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
 };

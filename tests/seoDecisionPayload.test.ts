@@ -27,7 +27,7 @@ const baseInput = {
       scope: "Fundraising",
       pauseTrigger: "Pause acceleration if market risk appetite falls below 44 or cash availability tightens above 76.",
       resumeTrigger: "Resume full process when market risk appetite > 54 and cash availability < 66.",
-      flipConditions: [{ metric: "riskAppetite" as const, operator: ">" as const, value: 54, label: "Market risk appetite > 54" }],
+      flipConditions: [{ metric: "riskAppetite" as const, operator: ">" as const, value: 54, label: "Risk appetite > 54" }],
       rationale: "Preserve optionality",
     },
   ],

@@ -87,7 +87,7 @@ export async function buildPlanningPageModel(
     "@graph": [
       {
         "@type": "WebPage",
-        name: "Whether Report — Planning",
+        name: "Whether Weekly Brief — Planning",
         url: `${siteUrl}/planning`,
         description:
           "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",

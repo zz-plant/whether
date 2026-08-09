@@ -24,10 +24,10 @@ describe("bounded decision rule formatting", () => {
   it("keeps decimal thresholds intact when compacting reversal copy", () => {
     assert.equal(
       extractCompactClause(
-        "Cash availability < 0.0 and Market risk appetite > 54. Resume staged approvals next refresh.",
+        "Cash availability < 0.0 and Risk appetite > 54. Resume staged approvals next refresh.",
         "fallback",
       ),
-      "Cash availability < 0.0 and Market risk appetite > 54",
+      "Cash availability < 0.0 and Risk appetite > 54",
     );
 
     const rules = buildCanonicalBoundedDecisionRules({

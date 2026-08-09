@@ -1,5 +1,5 @@
 /**
- * Shared report shell layout for Whether Report pages.
+ * Shared report shell layout for Whether Weekly Brief pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  *
  * Uses PageShell for the outer container structure so hub and report pages

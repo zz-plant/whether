@@ -29,7 +29,7 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 /** Same canonical names as `deltaLabelBySignal` and the glossary in `reportCopy.ts`. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
   tightness: "Cash availability",
-  riskAppetite: "Market risk appetite",
+  riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
 };
@@ -61,7 +61,7 @@ export const buildRegimeAlert = (
   }
   if (wasBrave !== isBrave) {
     reasons.push(
-      `Market risk appetite crossed ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
+      `Risk appetite crossed ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
     );
   }
   if (reasons.length === 0) {

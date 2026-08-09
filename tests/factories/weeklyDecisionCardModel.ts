@@ -26,7 +26,7 @@ export const buildWeeklyDecisionCardModel = (
     regimeHeader: {
       regime: "DEFENSIVE",
       confidence: "Medium (mixed signal reliability)",
-      primaryRisk: "Downside: Capital tightness tightened (1.0).",
+      primaryRisk: "Downside: Cash availability tightened (1.0).",
     },
     trendLabel: "Improving",
     confidenceHistory: [
@@ -218,7 +218,7 @@ export const buildWeeklyDecisionCardModel = (
         id: "hiring",
         label: "Hiring",
         action: "Limit hiring to backfills and mission-critical roles tied to delivery risk",
-        reason: "Capital tightness rose 1 point this week. Recheck fixed-cost approvals before opening net-new headcount.",
+        reason: "Cash availability rose 1 point this week. Recheck fixed-cost approvals before opening net-new headcount.",
         flipCondition: "staged approvals when tightness < 66 and risk appetite > 54",
       },
       {
@@ -232,7 +232,7 @@ export const buildWeeklyDecisionCardModel = (
         id: "capital-raising",
         label: "Capital raising",
         action: "Prepare raise materials and launch planning early to preserve process control",
-        reason: "Capital tightness rose 1 point this week. Refresh raise timing assumptions before leadership treats the window as unchanged.",
+        reason: "Cash availability rose 1 point this week. Refresh raise timing assumptions before leadership treats the window as unchanged.",
         flipCondition: "full process when risk appetite > 54 and tightness < 66",
       },
     ],
@@ -266,7 +266,7 @@ export const buildWeeklyDecisionCardModel = (
   },
   diagnostics: {
     regimeSignalIndicators: [
-      { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
+      { key: "tightness", label: "Cash availability", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
       { key: "riskAppetite", label: "Risk appetite", valueLabel: "52", rawValue: 52, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [56, 54, 53, 52], isFallback: false },
       { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
       { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.4, -0.3, -0.2], isFallback: false },
@@ -274,7 +274,7 @@ export const buildWeeklyDecisionCardModel = (
     inputInfluence: [
       {
         key: "tightness",
-        label: "Capital tightness",
+        label: "Cash availability",
         valueLabel: "64",
         currentValue: 64,
         pressureLabel: "Room to loosen",
@@ -366,7 +366,7 @@ export const buildWeeklyDecisionCardModel = (
       triggerLabel: "Tightness above 70.0.",
     },
     regimeVelocity: { status: "insufficient_history", from: "Expansion", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },
-    whyThisCall: [{ label: "Momentum", detail: "Capital tightness tightened this week." }],
+    whyThisCall: [{ label: "Momentum", detail: "Cash availability tightened this week." }],
     evidenceItems: [{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }],
     failureModes: [],
     ...overrides.diagnostics,
@@ -408,7 +408,7 @@ export const buildWeeklyDecisionCardModel = (
     fallbackCopy: "",
     items: [
       { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/resolve" },
-      { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/evidence" },
+      { id: "top-driver", label: "Top driver change", detail: "Cash availability tightened.", href: "/evidence" },
       { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/planning" },
     ],
     ...overrides.sinceLastReview,
