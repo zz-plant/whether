@@ -200,7 +200,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: Risk appetite strengthened 3\.2 points\.$/);
+    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: risk appetite strengthened 3\.2 points\.$/);
 
     const worseningRiskAppetite = buildHomeBriefModel({
       fetchedAtLabel: "Updated 2h ago",
@@ -218,7 +218,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: Risk appetite weakened 2\.4 points\.$/);
+    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: risk appetite weakened 2\.4 points\.$/);
   });
 
   it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
