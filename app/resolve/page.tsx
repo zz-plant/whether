@@ -26,8 +26,8 @@ const featuredStakeholderSlugs = [
 ] as const;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Get help with one decision",
-  description: "Help for one open question.",
+  title: "Resolve a Decision — By Role, Situation, or Toolkit",
+  description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
   path: "/resolve",
   imageAlt: "Whether decision tools",
   imagePath: "/social/resolve.svg",
@@ -72,7 +72,7 @@ export default async function DecidePage({
         href: `/resolve/${recommendedSituation.slug}` as Route,
         kicker: "Best next step",
         title: `Start with ${recommendedSituation.title}`,
-        detail: "Go straight to the path that fits the question.",
+        detail: "Go straight to the decision that fits.",
         cta: "Open focused path",
       };
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
@@ -96,17 +96,17 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       treasurySource={reportData.treasury.source}
       trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="The narrowest path that answers the question."
-      trustStatusAction="Return to Planning after the question is answered."
+      trustStatusDetail="One decision, closed with a bounded rule."
+      trustStatusAction="Return to Planning after the decision is closed."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve"
       currentPath="/resolve"
-      pageSummary="Resolve one open question without reopening the whole weekly brief."
+      pageSummary="Answer one decision without re-reading the whole brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
       sectionLinks={sectionLinks.slice(0, 2)}
       heroVariant="compact"
       sidebarVariant="hidden"
-      primaryCta={{ href: "#unresolved-question-router", label: "Start with the recommended path" }}
+      primaryCta={{ href: "#unresolved-question-router", label: "Open the recommended decision" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/planning",
@@ -114,7 +114,7 @@ export default async function DecidePage({
       }}
       decisionBanner={{
         label: "Help options",
-        decision: "Close one remaining question, then return to planning.",
+        decision: "Close the last open decision, then return to planning.",
         horizon: "This week",
         confidence: homeBriefModel.confidenceLabel,
         effectiveDate: reportData.recordDateLabel,
@@ -122,12 +122,12 @@ export default async function DecidePage({
       }}
       commandBar={{
         regime: reportData.assessment.regime,
-        call: "Use this page to close the last open question.",
+        call: "Work one decision at a time.",
         doNow: [
           liveCall.action,
           shouldStartWithChecker
             ? "Run one decision check before opening broader help."
-            : "Open the path that matches the question.",
+            : "Open the decision that matches the situation.",
         ],
         flipConditions: [liveCall.guardrail, liveCall.flip],
         updatedAt: reportData.fetchedAtLabel,
@@ -136,8 +136,8 @@ export default async function DecidePage({
       >
         <OperatorWorkflowRouteTracker />
       <section id="unresolved-question-router" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What still needs help?</p>
-        <p className="text-sm text-slate-300">Start with the best next step.</p>
+        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Which decision is still open?</p>
+        <p className="text-sm text-slate-300">Start with the recommended next step.</p>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <article className="weather-surface space-y-4 px-4 py-4">
             <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{recommendedPath.kicker}</p>
@@ -153,12 +153,12 @@ export default async function DecidePage({
           <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Alternative paths</p>
-              <p className="text-sm text-slate-300">If the recommended next step doesn&apos;t fit your current question.</p>
+              <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
             </div>
             <div className="space-y-4">
               <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
-                <p className="mt-1 text-fluid-xs text-slate-300">For a yes-or-no question.</p>
+                <p className="mt-1 text-fluid-xs text-slate-300">A direct yes-or-no decision.</p>
                 <div className="mt-3 space-y-2">
                   {recommendedAnswerPages.map((page) => (
                     <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-surface block space-y-1">
@@ -173,7 +173,7 @@ export default async function DecidePage({
                 className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
-                <p className="mt-1 text-fluid-xs text-slate-300">For role-specific or company-stage views.</p>
+                <p className="mt-1 text-fluid-xs text-slate-300">For a role or company-stage lens.</p>
                 <div className="mt-3 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (
                     <Link

@@ -137,7 +137,7 @@ export async function buildTrustPageModel() {
       description: "Check evidence",
     },
     decisionBanner: {
-      label: "Readiness",
+      label: "Trust",
       decision: "Is this week's brief ready to use, or only useful for comparison?",
       horizon: "This week",
       confidence: trustSummary,

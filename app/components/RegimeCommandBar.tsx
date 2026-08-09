@@ -394,7 +394,7 @@ export const RegimeCommandBar = ({
           {trustChecklist?.items.length ? (
             <div className="border-t border-slate-800/70 pt-3">
               <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-violet-200">
-                {trustChecklist.label ?? "Readiness check"}
+                {trustChecklist.label ?? "Trust check"}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
                 {trustChecklist.items.slice(0, 2).map((item) => (

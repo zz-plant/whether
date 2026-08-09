@@ -26,7 +26,7 @@ export default function HistoryPage() {
   const searchParams = useSearchParams();
   const { history } = useDecisionHistory();
 
-  useEffect(() => { document.title = "Historical trends — Whether"; }, []);
+  useEffect(() => { document.title = "Posture archive — Whether"; }, []);
 
   const urlMonth = Number(searchParams?.get("month")) || 0;
   const urlYear = Number(searchParams?.get("year")) || 0;

@@ -15,7 +15,7 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Readiness — freshness, confidence, and sources",
+  title: "Trust — freshness, confidence, and what would flip the call",
   description:
     "Check source freshness, confidence, and methodology before acting on irreversible decisions.",
   path: "/trust",
@@ -186,7 +186,7 @@ export default async function MethodPage() {
 
   return (
     <ReportShell {...reportShellProps}>
-      <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and decision readiness.">
+      <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
         <div className={`weather-hub-card rounded-lg px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
           <div className="flex items-center gap-3">
             <span className={`flex h-3 w-3 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />

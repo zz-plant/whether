@@ -236,12 +236,12 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   },
   {
     href: "/trust",
-    label: "Readiness",
+    label: "Trust",
     description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
     href: "/trust#beginner-glossary",
-    label: "Readiness & glossary",
+    label: "Trust & glossary",
     description: "Open trust details and plain-English definitions of U.S. market terms.",
   },
 ];
@@ -259,7 +259,7 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   },
   {
     href: "/trust#beginner-glossary",
-    label: "Readiness & glossary",
+    label: "Trust & glossary",
     description: "Review trust status, confidence limits, and the plain-English U.S. market glossary in one place.",
   },
 ];

@@ -350,8 +350,8 @@ export const resolveTrustReadinessCopy = ({
     headline: tone === "historical"
       ? "Historical snapshot"
       : tone === "warning"
-        ? "Readiness constrained"
-        : "Readiness clear",
+        ? "Trust constrained"
+        : "Trust clear",
   };
 };
 

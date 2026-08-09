@@ -24,11 +24,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Why the weekly brief changed",
+  title: "Why the Weekly Brief Changed",
   description:
     "Why the weekly brief changed: what moved, why it matters, and what would make the recommendation change.",
   path: "/evidence",
-  imageAlt: "Whether Report evidence overview",
+  imageAlt: "Why the weekly brief changed — evidence overview",
   imagePath: "/social/evidence.svg",
 });
 
@@ -51,9 +51,9 @@ export default async function SignalsPage({
       trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Why the forecast shifted"
+      pageTitle="Why the weekly brief changed"
       currentPath="/evidence"
-      pageSummary="What moved, why it matters, and what would shift the forecast."
+      pageSummary="What moved, why it matters, and what would flip the call."
       pageSummaryLink={{
         href: "#decision-summary",
         label: "Summary ↓",
@@ -64,7 +64,7 @@ export default async function SignalsPage({
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/planning",
-        description: "Set this week's operating rules",
+        description: "Set guardrails for this week's plan",
       }}
       decisionBanner={{
         label: "Evidence",

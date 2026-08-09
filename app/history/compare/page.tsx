@@ -10,7 +10,7 @@ import { DateSelector, type DateOption } from "./DateSelector";
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Compare Epochs",
+  title: "Compare Epochs — Side-by-Side Signal Diffs",
   description: "Side-by-side comparison of historical macro regimes, boldness scores, and playbook rules.",
   path: "/history/compare",
   imageAlt: "Whether historical compare tool",

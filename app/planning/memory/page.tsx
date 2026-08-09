@@ -10,7 +10,7 @@ import { operationsSectionLinks } from "../../../lib/navigation/planningNavigati
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Decision Memory Ledger",
+  title: "Decision Memory Ledger — What We Decided and Why",
   description: "Immutable board-ready record of all macro posture decisions and overrides.",
   path: "/planning/memory",
   imageAlt: "Whether decision memory view",

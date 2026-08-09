@@ -27,7 +27,7 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/evidence"], "Evidence");
     assert.equal(navigationLabelByPath["/planning"], "Plan");
     assert.equal(navigationLabelByPath["/resolve"], "Resolve");
-    assert.equal(navigationLabelByPath["/trust"], "Readiness");
+    assert.equal(navigationLabelByPath["/trust"], "Trust");
   });
 
   it("derives report shell paths from the IA layers", () => {

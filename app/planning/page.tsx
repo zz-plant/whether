@@ -13,7 +13,7 @@ export { buildActionsExpansionHref } from "./planningPageModel";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Planning",
+  title: "Planning — Guardrails, Runway, and the Team Brief",
   description:
     "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
   path: "/planning",

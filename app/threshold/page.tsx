@@ -73,7 +73,7 @@ export default function ThresholdPage() {
               <p className="text-xs text-slate-300">See current posture and operating decisions</p>
             </Link>
             <Link href="/trust" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
-              <p className="text-xs font-semibold text-sky-200">Readiness & Method →</p>
+              <p className="text-xs font-semibold text-sky-200">Trust & Method →</p>
               <p className="text-xs text-slate-300">How thresholds and scores are derived</p>
             </Link>
             <Link href="/planning" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">

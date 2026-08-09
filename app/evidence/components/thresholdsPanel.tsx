@@ -258,9 +258,9 @@ export const ThresholdsPanel = ({
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Watch-line settings"
-          title="Adjust when the environment label changes"
+          title="Adjust when the regime label changes"
           titleId="thresholds-title"
-          description="These values decide when the environment label changes. They stay in the URL so shared links match."
+          description="These values decide when the regime label changes. They stay in the URL so shared links match."
           aside={
             <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-200">
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}

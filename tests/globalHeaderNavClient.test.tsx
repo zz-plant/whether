@@ -13,7 +13,7 @@ describe("GlobalHeaderNavClient", () => {
     assert.ok(html.includes("Evidence"), "renders Evidence link");
     assert.ok(html.includes("Plan"), "renders Plan link");
     assert.ok(html.includes("Resolve"), "renders Resolve link");
-    assert.ok(html.includes("Readiness"), "renders Readiness link");
+    assert.ok(html.includes("Trust"), "renders Trust link");
     assert.ok(html.includes("API"), "renders API link");
   });
 

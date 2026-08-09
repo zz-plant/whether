@@ -205,7 +205,7 @@ export default function RootLayout({
               <Link href="/evidence" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Evidence</Link>
               <Link href="/planning" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Plan</Link>
               <Link href="/resolve" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resolve</Link>
-              <Link href="/trust" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Readiness</Link>
+              <Link href="/trust" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Trust</Link>
               <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
               <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>
               <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</Link>

@@ -12,9 +12,9 @@ import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPan
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Search — route the next workflow step",
+  title: "Search Whether Guidance",
   description:
-    "Use search as a command surface: route into Evidence, Planning, Decision Tools, or Trust instead of browsing the full corpus.",
+    "Route a question to Evidence, Planning, Resolve, or Trust instead of browsing the full site.",
   path: "/search",
   imageAlt: "Whether search",
 });

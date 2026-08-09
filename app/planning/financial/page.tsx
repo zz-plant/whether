@@ -10,7 +10,7 @@ import { operationsSectionLinks } from "../../../lib/navigation/planningNavigati
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Financial Strategy",
+  title: "Financial Strategy — Capital Posture This Week",
   description: "CFO and financial operating guardrails aligned with current interest rates and credit conditions.",
   path: "/planning/financial",
   imageAlt: "Whether financial strategy view",

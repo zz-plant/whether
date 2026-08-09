@@ -11,7 +11,7 @@ const WORKFLOW_ROUTES = [
   { href: "/evidence" as Route, label: "Evidence" },
   { href: "/planning" as Route, label: "Plan" },
   { href: "/resolve" as Route, label: "Resolve" },
-  { href: "/trust" as Route, label: "Readiness" },
+  { href: "/trust" as Route, label: "Trust" },
 ] as const;
 
 function OutlineItem({
