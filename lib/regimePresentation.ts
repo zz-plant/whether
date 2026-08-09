@@ -35,12 +35,10 @@ export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
   EXPANSION: "Sunny",
 };
 
-export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Uncertain",
-  EXPANSION: "Expansion",
-};
+// Public/display label = the brand weather vocabulary. Every user-facing surface
+// (hero, state page, history archive, share image, JSON-LD) renders the same regime
+// name. Aliased to REGIME_WEATHER_LABELS so the two can never drift apart.
+export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_WEATHER_LABELS;
 
 export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
 // Used by RegimeBadgeIcon in regimeIcons.tsx — icon name must match the component prop type.

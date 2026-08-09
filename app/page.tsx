@@ -23,6 +23,7 @@ import dynamic from "next/dynamic";
 import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
   DIRECTION_ARROW,
   REGIME_DISPLAY,
@@ -323,11 +324,13 @@ async function PageContent({
   const reversalTriggerLabel = homepage.weeklyDecisionCardModel.decision.reversalTrigger;
   const briefShareLines = [
     homepage.weeklyDecisionCardModel.decision.actionNowShort
-      ? `Do now: ${homepage.weeklyDecisionCardModel.decision.actionNowShort}`
+      ? `${DECISION_CONTRACT_LABELS.action.doNow}: ${homepage.weeklyDecisionCardModel.decision.actionNowShort}`
       : null,
-    guardrailLabel ? `Guardrail: ${guardrailLabel}` : null,
-    reversalTriggerLabel ? `Reversal: ${reversalTriggerLabel}` : null,
-    flipConditionLabels.length > 0 ? `Flip watch: ${flipConditionLabels.join("; ")}` : null,
+    guardrailLabel ? `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${guardrailLabel}` : null,
+    reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${reversalTriggerLabel}` : null,
+    flipConditionLabels.length > 0
+      ? `${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${flipConditionLabels.join("; ")}`
+      : null,
   ].filter((line): line is string => Boolean(line));
 
   return (

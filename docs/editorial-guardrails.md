@@ -50,3 +50,30 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - Include the primary keyword in slug, H1, title tag, and meta description.
 - Use clear H2/H3 hierarchy that maps to board-level operating questions.
 - Add internal links to canonical parent topic and key supporting artifacts.
+
+## Decision vocabulary (single source)
+- **Regime names render as weather everywhere visible**: Freezing / Cloudy / Stormy / Sunny.
+  Source is `lib/regimePresentation.ts` (`REGIME_WEATHER_LABELS`, aliased by
+  `REGIME_PUBLIC_LABELS`). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
+  internal — they are engine terms, not display copy. Compass quadrant axes and the
+  forecast "possible paths" strip are the two defined exceptions (axis labels and
+  forecast-outcome labels, below).
+- **Operating-posture descriptions are a distinct layer, not regime names**:
+  Contraction, Transitional Mixed, Guarded Expansion, Expansion (`getRegimeDisplayLabel`).
+  They describe the current stance; the regime name above stays separate.
+- **Forecast-outcome labels are a distinct typed layer**, not regime names:
+  Expansion / Mixed / Scarcity / Defensive (`lib/report/forecastModel.ts`
+  `ForecastRegimeLabel`). Used for the forward estimate and the diagnostics
+  "Possible paths" strip. Do not reuse them as current-regime names.
+- **The stance object is the call**: "the call", with "weekly operating call" on first
+  mention in cold surfaces (shares, metadata, answer pages). "Posture" stays the label for
+  the operating stance; do not mint recommendation/verdict as user-facing stance synonyms
+  ("verdict" is internal; answers use "Bounded calls").
+- **The forward-look noun is forecast** ("why the forecast shifted", the forecast cone).
+  Do not add synonyms (outlook/conditions) for the forward estimate. The command bar's
+  "{regime} outlook" chip is a pass-through descriptor of current conditions, not a
+  forecast synonym.
+- **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
+  (`lib/report/reportCopy.ts`): imperative forms on screens (Do now / Pause if / Change
+  course if), noun slots in exports (Action / Threshold / Reversal). Consume the export
+  instead of hardcoding slot words in new components.

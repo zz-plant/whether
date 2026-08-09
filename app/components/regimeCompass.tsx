@@ -13,7 +13,7 @@ type RegimeCompassProps = {
 const REGIME_QUADRANTS: Record<string, { label: string; cx: number; cy: number }> = {
   SCARCITY: { label: "Scarcity", cx: 0.8, cy: 0.2 },
   DEFENSIVE: { label: "Defensive", cx: 0.8, cy: 0.8 },
-  VOLATILE: { label: "Uncertain", cx: 0.2, cy: 0.2 },
+  VOLATILE: { label: "Volatile", cx: 0.2, cy: 0.2 },
   EXPANSION: { label: "Expansion", cx: 0.2, cy: 0.8 },
 };
 

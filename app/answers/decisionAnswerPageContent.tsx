@@ -146,7 +146,7 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Bounded recommendations">
+        <SecondaryPageSection title="Bounded calls">
           <div className="grid gap-3 sm:grid-cols-2">
             {mappedRules.map((rule) => (
               <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">

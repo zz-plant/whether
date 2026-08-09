@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../seo";
 import type { MarketState } from "../marketStateModel";
-
-const REGIME_LABELS: Record<string, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
-  EXPANSION: "Expansion",
-};
+import { getRegimePublicLabel } from "../regimePresentation";
 
 export async function buildMarketMetadata(
   state: MarketState
 ): Promise<Metadata> {
-  const regimeLabel = REGIME_LABELS[state.regime] ?? state.regime;
+  const regimeLabel = getRegimePublicLabel(state.regime);
 
   return buildPageMetadata({
     title: `US Market Regime: ${regimeLabel} — Whether Weekly Brief`,

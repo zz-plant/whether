@@ -26,6 +26,37 @@ export type GlossaryUsageNote = {
 
 export type HighlightBullet = { text: string };
 
+// Single vocabulary for the bounded-decision contract (action / threshold /
+// reversal). UI surfaces read the imperative forms (Do now, Pause if, Change
+// course if); exports and metadata use the noun slots (Action, Threshold,
+// Reversal). Consume these instead of hardcoding slot labels in components.
+export const DECISION_CONTRACT_LABELS = {
+  slot: {
+    action: "Action",
+    threshold: "Threshold",
+    reversal: "Reversal",
+  },
+  action: {
+    doNow: "Do now",
+    actionNow: "Action now",
+  },
+  threshold: {
+    guardrail: "Guardrail",
+    trigger: "Trigger",
+    pauseIf: "Pause if",
+  },
+  reversal: {
+    reversal: "Reversal",
+    changeCourseIf: "Change course if",
+    clearsWhen: "Clears when",
+  },
+  watch: {
+    flipWatch: "Flip watch",
+    watchThisWeek: "Watch this week",
+    watchNext: "Watch next",
+  },
+} as const;
+
 export const PRIMARY_AUDIENCE_LABEL = "U.S. market starting point";
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";

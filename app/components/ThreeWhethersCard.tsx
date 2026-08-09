@@ -1,5 +1,6 @@
 import { Users, DollarSign, Lock, ArrowUpRight, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
 type DecisionItem = {
   title: string;
@@ -143,11 +144,11 @@ export function ThreeWhethersCard({
 
               <div className="border-t border-white/[0.06] pt-3 space-y-2 text-fluid-nano text-white/65">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-amber-300/80">Trigger:</span>
+                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>
                   <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>
                 </div>
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium text-rose-300/80 flex-shrink-0">Reversal:</span>
+                  <span className="font-medium text-rose-300/80 flex-shrink-0">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>
                   <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 text-right">
                     {item.reversalCondition}
                   </span>

@@ -48,10 +48,10 @@ describe("regime presentation labels", () => {
       recordDate: "June 7, 2026",
     });
 
-    assert.equal(getRegimePublicLabel("VOLATILE"), "Uncertain");
+    assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
     assert.equal(REGIME_DISPLAY.VOLATILE, getRegimePublicLabel("VOLATILE"));
-    assert.match(collectText(image), /Uncertain · Transitional Mixed/);
-    assert.doesNotMatch(collectText(image), /Volatile · Transitional Mixed/);
+    assert.match(collectText(image), /Stormy · Transitional Mixed/);
+    assert.doesNotMatch(collectText(image), /Uncertain · Transitional Mixed/);
   });
 
 

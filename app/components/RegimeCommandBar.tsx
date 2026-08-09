@@ -1,6 +1,7 @@
 import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { FORECAST_CONE_HIGH, FORECAST_CONE_MEDIUM, FORECAST_CONE_LOW } from "../../lib/regimeEngineCore";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import type { Route } from "../../lib/navigation/routeType";
 
 export type RegimeCommandBarProps = {
@@ -23,25 +24,25 @@ export type RegimeCommandBarProps = {
 
 const regimeStyleByKey: Record<RegimeKey, { label: string; toneClass: string; pointClass: string; markerClass: string }> = {
   SCARCITY: {
-    label: "Scarcity",
+    label: "Freezing",
     toneClass: "border-rose-400/60 bg-rose-500/10 text-rose-100",
     pointClass: "fill-rose-300",
     markerClass: "bg-rose-300",
   },
   DEFENSIVE: {
-    label: "Defensive",
+    label: "Cloudy",
     toneClass: "border-amber-300/70 bg-amber-300/10 text-amber-100",
     pointClass: "fill-amber-200",
     markerClass: "bg-amber-200",
   },
   VOLATILE: {
-    label: "Uncertain",
+    label: "Stormy",
     toneClass: "border-sky-300/70 bg-sky-300/10 text-sky-100",
     pointClass: "fill-sky-300",
     markerClass: "bg-sky-300",
   },
   EXPANSION: {
-    label: "Expansion",
+    label: "Sunny",
     toneClass: "border-emerald-300/70 bg-emerald-300/10 text-emerald-100",
     pointClass: "fill-emerald-300",
     markerClass: "bg-emerald-300",
@@ -381,7 +382,7 @@ export const RegimeCommandBar = ({
             </div>
           ) : null}
           <div className="border-t border-slate-800/70 pt-3">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-emerald-200">Do now</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-emerald-200">{DECISION_CONTRACT_LABELS.action.doNow}</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {doNow.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">
@@ -407,7 +408,7 @@ export const RegimeCommandBar = ({
             </div>
           ) : null}
           <div className="border-t border-slate-800/70 pt-3">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-sky-200">Watch next</p>
+            <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-sky-200">{DECISION_CONTRACT_LABELS.watch.watchNext}</p>
             <ul className="mt-2 space-y-1.5 text-sm text-slate-100">
               {flipConditions.slice(0, 2).map((item) => (
                 <li key={item} className="flex items-start gap-2">

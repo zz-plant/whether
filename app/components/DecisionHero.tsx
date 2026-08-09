@@ -1,6 +1,7 @@
 import type { OperatorContext } from "../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { PostureDial } from "./illustrations/PostureDial";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
@@ -133,7 +134,7 @@ export function DecisionHero({
           </div>
           {showActionNow ? (
             <p className="text-fluid-sm font-medium text-slate-100">
-              <span className="text-emerald-300/80">Do now:</span> {actionNow}
+              <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
             </p>
           ) : null}
           <div className="space-y-2 text-fluid-xs text-white/65">
@@ -174,7 +175,7 @@ export function DecisionHero({
           </div>
           {guardrail || reversalTrigger || (flipConditions && flipConditions.length > 0) ? (
             <div className="space-y-1.5 pt-1 text-fluid-micro">
-              <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">Watch this week</p>
+              <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
               {typeof tightnessThreshold === "number" ? (
                 <div className="w-[6rem] py-1">
                   <ThresholdLadder
@@ -189,19 +190,19 @@ export function DecisionHero({
               ) : null}
               {guardrail ? (
                 <p className="text-white/50">
-                  <span className="font-semibold text-amber-300/80">Guardrail:</span>{" "}
+                  <span className="font-semibold text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
                   {guardrail}
                 </p>
               ) : null}
               {reversalTrigger ? (
                 <p className="text-white/50">
-                  <span className="font-semibold text-rose-300/80">Reversal:</span>{" "}
+                  <span className="font-semibold text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
                   {reversalTrigger}
                 </p>
               ) : null}
               {flipConditions && flipConditions.length > 0 ? (
                 <p className="text-white/50">
-                  <span className="font-semibold text-sky-300/80">Transition risk:</span>{" "}
+                  <span className="font-semibold text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</span>{" "}
                   {flipConditions.join(" · ")}
                   {transitionProbability && transitionProbability > 0 ? (
                     <span> ({transitionProbability}% probability)</span>

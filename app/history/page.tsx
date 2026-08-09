@@ -11,13 +11,7 @@ import { useDecisionHistory } from "../components/home/useDecisionHistory";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-
-const REGIME_DISPLAY: Record<string, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Uncertain",
-  EXPANSION: "Expansion",
-};
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 type Coverage = Record<number, number[]>;
 
@@ -136,7 +130,7 @@ export default function HistoryPage() {
               {Object.entries(REGIME_COLORS).map(([regime, color]) => (
                   <span key={regime} className="inline-flex items-center gap-1">
                     <span className={`inline-block h-2.5 w-2.5 rounded-md ${color}`} aria-hidden="true" />
-                    {REGIME_DISPLAY[regime] ?? regime}
+                    {getRegimePublicLabel(regime)}
                   </span>
               ))}
             </div>

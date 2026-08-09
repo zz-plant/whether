@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { Route } from "next";
 import type { ReportSectionLink } from "./reportShellNavigation";
 
 const WORKFLOW_ROUTES = [
-  { href: "/" as Route, label: "Brief" },
-  { href: "/evidence" as Route, label: "Evidence" },
-  { href: "/planning" as Route, label: "Plan" },
-  { href: "/resolve" as Route, label: "Resolve" },
-  { href: "/trust" as Route, label: "Trust" },
+  { href: "/", label: "Brief" },
+  { href: "/evidence", label: "Evidence" },
+  { href: "/planning", label: "Plan" },
+  { href: "/resolve", label: "Resolve" },
+  { href: "/trust", label: "Trust" },
 ] as const;
 
 function OutlineItem({

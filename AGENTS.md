@@ -136,6 +136,7 @@ When writing product copy, specs, or PR notes, use these definitions:
 - **Trust should be compact**: show provenance/confidence/freshness/fallback in-line or one click away; avoid long method exposition on primary screens.
 - **New-system overhead**: added maintenance cost across code paths, mental model complexity, and docs/testing burden.
 - **Thin SEO page**: any page missing current posture, immediate implication, citeable summary, or link-back to the weekly brief.
+- **Decision vocabulary is a single source**: regime names (weather), the call, forecast, and bounded-decision slot labels each have one defined vocabulary — see `docs/editorial-guardrails.md` → Decision vocabulary. Do not mint synonyms on new surfaces.
 
 ## Hard product rules
 

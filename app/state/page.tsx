@@ -7,13 +7,7 @@ import {
   buildMarketMetadata,
   buildMarketFallbackMetadata,
 } from "../../lib/seo/marketMetadata";
-
-const REGIME_LABELS: Record<string, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Uncertain",
-  EXPANSION: "Expansion",
-};
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 export const runtime = "edge";
 export const revalidate = 3600;
@@ -60,7 +54,7 @@ function ErrorView() {
 }
 
 function MarketStateView({ state }: { state: MarketState }) {
-  const regimeDisplay = REGIME_LABELS[state.regime] ?? state.regime;
+  const regimeDisplay = getRegimePublicLabel(state.regime);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
