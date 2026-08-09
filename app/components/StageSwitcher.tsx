@@ -110,9 +110,8 @@ export function StageSwitcher({
           <div
             id={menuId}
             className="absolute left-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-lg border border-white/[0.14] bg-[color-mix(in_srgb,var(--bg-raised)_94%,white_6%)] p-1.5 shadow-[0_18px_55px_rgba(0,0,0,0.55)] backdrop-blur-xl"
-            role="menu"
-            aria-label="Company stage"
           >
+            <div role="menu" aria-label="Company stage">
             {COMPANY_STAGES.map((s) => (
               <button
                 key={s.key}
@@ -146,6 +145,13 @@ export function StageSwitcher({
                 {currentStage === s.key ? <Check aria-hidden="true" className="size-4 text-sky-300" /> : null}
               </button>
             ))}
+            </div>
+            {/* The consequence of switching was only in a title tooltip on the
+                trigger. It belongs here, where the choice is actually made. */}
+            <p className="mt-1.5 border-t border-white/[0.08] px-2.5 pt-2 text-fluid-nano leading-snug text-white/55">
+              Stage sets your hiring, spend, and commitment guardrails. Changing it updates them on
+              the planning page.
+            </p>
           </div>
         </>
       ) : null}

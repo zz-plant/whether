@@ -14,7 +14,6 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((isOpen) => !isOpen)}
-        title="Simulator: test macro shocks. Signals: U.S. market drivers. Trendline: regime history. Shift risk: transition probability."
         className={`flex min-h-12 w-full cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-xs font-semibold tracking-[0.04em] text-white/65 transition-colors select-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 ${highlight ? "border-l-2 border-l-sky-400/40" : ""}`}
       >
         <div className="flex flex-wrap items-center gap-2 min-w-0">
@@ -39,6 +38,12 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
       </button>
       <div id={panelId} hidden={!open}>
         <div className="px-4 pb-4 space-y-4">
+          {/* Was a title tooltip on the toggle, so these four terms had no
+              definition on touch. Shown on open, where the choice is made. */}
+          <p className="text-fluid-nano text-white/50">
+            Simulator tests macro shocks · Signals covers U.S. market drivers · Trendline is regime
+            history · Shift risk is transition probability.
+          </p>
           {children}
         </div>
       </div>
