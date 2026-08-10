@@ -56,4 +56,20 @@ describe("navigation information architecture", () => {
     assert.equal(resolveLayer?.href.startsWith("#"), false);
     assert.equal(trustLayer?.href.startsWith("#"), false);
   });
+
+  it("matches primary route aliases consistently for active nav state", () => {
+    const { pathMatchesLink } = require("../lib/navigation/pathMatching");
+
+    assert.ok(pathMatchesLink("/signals", "/signals"));
+    assert.ok(pathMatchesLink("/signals", "/evidence"));
+    assert.ok(pathMatchesLink("/signals", "/evidence/capital-tightness-watch"));
+
+    assert.ok(pathMatchesLink("/operate", "/operate"));
+    assert.ok(pathMatchesLink("/operate", "/planning"));
+    assert.ok(pathMatchesLink("/operate", "/planning/financial"));
+
+    assert.ok(pathMatchesLink("/answer", "/answer"));
+    assert.ok(pathMatchesLink("/answer", "/resolve"));
+    assert.ok(pathMatchesLink("/answer", "/answers"));
+  });
 });
