@@ -8,9 +8,9 @@ const DESKTOP = { width: 1600, height: 1400 };
  */
 const liveRoutes = [
   { slug: "home", label: "Weekly brief (/)", path: "/" },
-  { slug: "evidence", label: "Evidence", path: "/evidence" },
-  { slug: "planning", label: "Planning", path: "/planning" },
-  { slug: "resolve", label: "Resolve", path: "/resolve" },
+  { slug: "evidence", label: "Evidence", path: "/signals" },
+  { slug: "planning", label: "Planning", path: "/operate" },
+  { slug: "resolve", label: "Resolve", path: "/answer" },
   { slug: "trust", label: "Trust", path: "/trust" },
 ];
 

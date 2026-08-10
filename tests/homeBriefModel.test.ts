@@ -275,9 +275,9 @@ describe("buildHomeBriefModel", () => {
       stopItems: ["Guardrail"],
       historicalSelection: { month: 2, year: 2026, banner: "Historical" },
       regimeSeries: [
-        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Stabilizing" },
-        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Tighten" },
-        { year: 2026, month: 3, recordDate: "2026-03-31", regime: "SCARCITY", summary: "Not selected" },
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Stabilizing", tightness: 50, riskAppetite: 50 },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Tighten", tightness: 50, riskAppetite: 50 },
+        { year: 2026, month: 3, recordDate: "2026-03-31", regime: "SCARCITY", summary: "Not selected", tightness: 50, riskAppetite: 50 },
       ],
       reportDynamics: {
         directionLabel: "stable",
@@ -574,8 +574,8 @@ describe("buildHomeBriefModel", () => {
         immediateImplication: "Tighten approvals for fixed-cost plans.",
       }],
       regimeSeries: [
-        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Earlier" },
-        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current" },
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Earlier", tightness: 50, riskAppetite: 50 },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current", tightness: 50, riskAppetite: 50 },
       ],
     });
 
@@ -601,8 +601,8 @@ describe("buildHomeBriefModel", () => {
         anomalySignals: [],
       },
       regimeSeries: [
-        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "DEFENSIVE", summary: "Earlier" },
-        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current" },
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "DEFENSIVE", summary: "Earlier", tightness: 50, riskAppetite: 50 },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current", tightness: 50, riskAppetite: 50 },
       ],
     });
 

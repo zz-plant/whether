@@ -40,6 +40,14 @@ export default function HistoryPage() {
   }, []);
 
   const regimeSeries = useMemo(() => getTimeMachineRegimeSeries(), []);
+  const tightnessTrend = useMemo(
+    () => regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness })),
+    [regimeSeries],
+  );
+  const riskAppetiteTrend = useMemo(
+    () => regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite })),
+    [regimeSeries],
+  );
 
   const REGIME_COLORS: Record<string, string> = {
     EXPANSION: "bg-emerald-500",
@@ -206,14 +214,8 @@ export default function HistoryPage() {
         <RegimeStats />
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Tightness</p>
-            <HistoricalTrendChart metric="tightness" label="Tightness" color="#f87171" />
-          </div>
-          <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Risk appetite</p>
-            <HistoricalTrendChart metric="riskAppetite" label="Risk appetite" color="#34d399" />
-          </div>
+          <HistoricalTrendChart label="Tightness" color="#f87171" points={tightnessTrend} />
+          <HistoricalTrendChart label="Risk appetite" color="#34d399" points={riskAppetiteTrend} />
         </div>
       </section>
 

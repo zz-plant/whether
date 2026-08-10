@@ -8,6 +8,7 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { DomainContextSection } from "./components/domainContextSection";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
+import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import {
   SignalsAdvancedControlsSection,
   SignalsCurrentScoresSection,
@@ -39,6 +40,13 @@ export default async function SignalsPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const model = await buildSignalsPageModel(resolvedSearchParams);
+  const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-12);
+  const tightnessTrend = monthlyRegimeHistory
+    .filter((entry) => typeof entry.tightness === "number")
+    .map((entry) => ({ date: entry.record_date, value: entry.tightness as number }));
+  const riskAppetiteTrend = monthlyRegimeHistory
+    .filter((entry) => typeof entry.riskAppetite === "number")
+    .map((entry) => ({ date: entry.record_date, value: entry.riskAppetite as number }));
 
   return (
     <ReportShell
@@ -121,8 +129,8 @@ export default async function SignalsPage({
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trends</p>
         <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart metric="tightness" label="Tightness" color="#f87171" />
-          <HistoricalTrendChart metric="riskAppetite" label="Risk appetite" color="#34d399" />
+          <HistoricalTrendChart label="Tightness" color="#f87171" points={tightnessTrend} />
+          <HistoricalTrendChart label="Risk appetite" color="#34d399" points={riskAppetiteTrend} />
         </div>
       </div>
 

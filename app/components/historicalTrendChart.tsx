@@ -1,49 +1,13 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 type TrendPoint = { date: string; value: number };
 
 type HistoricalTrendChartProps = {
-  metric: "tightness" | "riskAppetite";
   label: string;
   color: string;
+  points: TrendPoint[];
 };
 
-export function HistoricalTrendChart({ metric, label, color }: HistoricalTrendChartProps) {
-  const [points, setPoints] = useState<TrendPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    import("../../lib/timeMachine/timeMachineCache")
-      .then((mod) => {
-        const snapshots = mod.getTimeMachineSnapshots();
-        const data: TrendPoint[] = [];
-        for (const snap of snapshots) {
-          const scores = snap as unknown as { scores?: Record<string, number> };
-          const value = scores.scores?.[metric];
-          if (value !== undefined && value !== null) {
-            data.push({ date: `${snap.month}/${snap.year}`, value });
-          }
-        }
-        [...data].sort((a, b) => {
-          const [am, ay] = a.date.split("/").map(Number);
-          const [bm, by] = b.date.split("/").map(Number);
-          return ay - by || am - bm;
-        });
-        if (active) {
-          setPoints(data.slice(-12));
-          setLoading(false);
-        }
-      })
-      .catch(() => { if (active) { setFailed(true); setLoading(false); } });
-    return () => { active = false; };
-  }, [metric]);
-
-  if (loading) return <div className="h-12 rounded bg-slate-800/30 animate-pulse" />;
-  if (failed || points.length < 2) return null;
+export function HistoricalTrendChart({ label, color, points }: HistoricalTrendChartProps) {
+  if (points.length < 2) return null;
 
   const values = points.map((p) => p.value);
   const min = Math.min(...values);

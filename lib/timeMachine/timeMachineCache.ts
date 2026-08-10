@@ -189,6 +189,8 @@ export type TimeMachineRegimeEntry = {
   recordDate: string;
   regime: ReturnType<typeof evaluateRegime>["regime"];
   summary: string;
+  tightness: number;
+  riskAppetite: number;
 };
 
 const timeMachineRegimeSeriesCache = new Map<string, TimeMachineRegimeEntry[]>();
@@ -259,6 +261,8 @@ export const getTimeMachineRegimeSeries = (
       recordDate: snapshot.record_date,
       regime: assessment.regime,
       summary: assessment.description,
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
     };
   });
   setRegimeSeriesCache(cacheKey, series);

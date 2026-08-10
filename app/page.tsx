@@ -456,7 +456,7 @@ async function PageContent({
           </Suspense>
         </div>
 
-          <div className="space-y-4 lg:col-start-2">
+          <div className="space-y-4 lg:col-start-2 lg:sticky lg:top-24 lg:self-start">
           <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
             <BelowTheFoldHistory
               regimes={macroTrendline}

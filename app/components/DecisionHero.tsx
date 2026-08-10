@@ -258,14 +258,11 @@ export function DecisionHero({
                 <text x="110" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Risk</text>
                 <text x="10" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Calm</text>
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`text-[10px] font-bold tabular-nums ${tightness > 60 ? "text-rose-300" : tightness > 40 ? "text-amber-300" : "text-emerald-300"}`}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none gap-[1px]">
+                <span className={`text-[9px] font-bold tabular-nums ${tightness > 60 ? "text-rose-300" : tightness > 40 ? "text-amber-300" : "text-emerald-300"}`}>
                   {tightness}
                 </span>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <span className={`text-[10px] font-bold tabular-nums ${(riskAppetite ?? 50) >= 65 ? "text-emerald-300" : (riskAppetite ?? 50) >= 45 ? "text-amber-300" : "text-rose-300"}`}>
-
+                <span className={`text-[9px] font-bold tabular-nums ${(riskAppetite ?? 50) >= 65 ? "text-emerald-300" : (riskAppetite ?? 50) >= 45 ? "text-amber-300" : "text-rose-300"}`}>
                   {riskAppetite ?? "—"}
                 </span>
               </div>
@@ -284,7 +281,6 @@ export function DecisionHero({
               )}
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-slate-400">{regimeBounds.label}</span>
               <span className="text-[9px] text-slate-400">threshold {regimeBounds.threshold}</span>
               <span className={`text-[9px] font-medium ${counterColor}`}>
                 {pointsToPause} pts to pause
