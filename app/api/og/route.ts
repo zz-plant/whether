@@ -3,6 +3,7 @@
  * Supports specialized templates for report, operations, signals, solutions, and guides.
  */
 import { ImageResponse } from "next/og";
+import { loadOgFonts } from "./ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
@@ -78,6 +79,12 @@ export const revalidate = 300;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const template = readTemplate(searchParams);
+  const fonts = await loadOgFonts(request.url);
+  const imageOptions = {
+    width: OG_WIDTH,
+    height: OG_HEIGHT,
+    ...(fonts ? { fonts } : {}),
+  };
 
   if (template === "brief-chart") {
     const image = new ImageResponse(
@@ -87,7 +94,7 @@ export async function GET(request: Request) {
         regime: readRegime(searchParams),
         points: buildPostureTimelinePoints(),
       }),
-      { width: OG_WIDTH, height: OG_HEIGHT },
+      imageOptions,
     );
 
     image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
@@ -113,7 +120,7 @@ export async function GET(request: Request) {
 
     const image = new ImageResponse(
       renderStaticOgImage({ template, eyebrow, title, subtitle, kicker }),
-      { width: OG_WIDTH, height: OG_HEIGHT },
+      imageOptions,
     );
 
     image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
@@ -127,10 +134,7 @@ export async function GET(request: Request) {
     sector: searchParams.get("sector") ?? undefined,
     view: searchParams.get("view") ?? undefined,
   });
-  const image = new ImageResponse(renderReportOgImage(preview), {
-    width: OG_WIDTH,
-    height: OG_HEIGHT,
-  });
+  const image = new ImageResponse(renderReportOgImage(preview), imageOptions);
 
   image.headers.set(
     "Cache-Control",

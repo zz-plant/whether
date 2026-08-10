@@ -114,7 +114,7 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
  */
 export const utilityLinks = [
   {
-    href: "/framework",
+    href: "/threshold",
     label: "Framework",
     description: "Thresholds, vocabulary, reversal logic",
   },

@@ -16,6 +16,7 @@ import { DecisionRouteRail } from "./components/DecisionRouteRail";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
+import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
@@ -362,6 +363,7 @@ async function PageContent({
           <span className="text-amber-300/50">Stage decisions but don&apos;t commit until live data returns.</span>
         </div>
       ) : null}
+      <FirstVisitExplainer />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
         <div className="space-y-8 min-w-0">
           <SwipeableWeek

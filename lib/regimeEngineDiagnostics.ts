@@ -33,6 +33,24 @@ const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
 const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
 const TWO_WEAK_READS_WARNING_COUNT = 2;
 
+/**
+ * Read-only view of the stress-adjustment constants for the public formula
+ * reference (/trust#formula-reference), so the page renders the values the
+ * engine actually uses instead of retyped copies.
+ */
+export const MACRO_ADJUSTMENT_CONSTANTS = {
+  hySpreadStressThreshold: HY_SPREAD_STRESS_THRESHOLD,
+  hySpreadTightnessCap: HY_SPREAD_TIGHTNESS_CAP,
+  chicagoFciTighteningThreshold: CHICAGO_FCI_TIGHTENING_THRESHOLD,
+  chicagoFciTightnessCap: CHICAGO_FCI_TIGHTNESS_CAP,
+  vixShockThreshold: VIX_SHOCK_THRESHOLD,
+  vixRiskAppetiteCap: VIX_RISK_APPETITE_CAP,
+  vcVelocitySlowdownThreshold: VC_VELOCITY_SLOWDOWN_THRESHOLD,
+  vcVelocityRiskAppetiteCap: VC_VELOCITY_RISK_APPETITE_CAP,
+  layoffPressureThreshold: LAYOFF_PRESSURE_THRESHOLD,
+  layoffRiskAppetiteCap: LAYOFF_RISK_APPETITE_CAP,
+} as const;
+
 const getMacroValue = (series: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   series.find((entry) => entry.id === id)?.value ?? null;
 

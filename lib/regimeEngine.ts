@@ -29,6 +29,7 @@ import { computePolicyAssessment } from "./regimeEnginePolicy";
 
 export * from "./regimeEngineCore";
 export {
+  MACRO_ADJUSTMENT_CONSTANTS,
   applyMacroAdjustments,
   buildSignalInfluence,
   buildRegimeChangeReasons,

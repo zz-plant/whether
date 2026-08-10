@@ -40,6 +40,11 @@ export const canonicalSurfaceRedirectPairs = [
   ["/confidence", "/trust#confidence-limits"],
   // Decision answer root → Decide hub
   ["/answers", "/resolve#direct-answers"],
+  // Nav-label aliases — the header/footer say Evidence/Plan/Resolve but the
+  // filesystem routes are /signals, /operate, /answer. People retype the labels.
+  ["/evidence", "/signals"],
+  ["/resolve", "/answer"],
+  ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
   ["/learn", "/trust"],
   ["/learn/failure-modes", "/trust#revisit-call"],

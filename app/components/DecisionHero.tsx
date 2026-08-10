@@ -163,7 +163,7 @@ export function DecisionHero({
             <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
             <h2
               id="weekly-call-title"
-              className="max-w-3xl text-pretty font-display text-display leading-tight text-white sm:text-[2.8rem]"
+              className="max-w-3xl text-pretty font-display text-display leading-[1.15] text-white"
             >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>

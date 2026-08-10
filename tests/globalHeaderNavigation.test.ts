@@ -31,20 +31,20 @@ describe("global header navigation helpers", () => {
   });
 
   it("labels utility routes without adding them to the operator loop", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/framework"), "Framework");
+    assert.equal(resolveGlobalHeaderRouteLabel("/threshold"), "Framework");
     assert.equal(resolveGlobalHeaderRouteLabel("/template"), "Template");
     assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API Docs");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");
     assert.equal(resolveGlobalHeaderRouteLabel("/about/"), "About");
 
     // Utility routes must not leak into nav ordering or next-step cues.
-    assert.equal(resolveReportHeaderNextStep("/framework"), null);
+    assert.equal(resolveReportHeaderNextStep("/threshold"), null);
     assert.equal(resolveReportHeaderNextStep("/about"), null);
     assert.equal(isReportShellRoute("/about"), false);
   });
 
   it("does not match a utility label on an unrelated path that merely shares a prefix", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/frameworkish"), "Page");
+    assert.equal(resolveGlobalHeaderRouteLabel("/thresholdish"), "Page");
     assert.equal(resolveGlobalHeaderRouteLabel("/templating"), "Page");
   });
 

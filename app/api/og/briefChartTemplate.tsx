@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_TEXT, OG_TEXT_MUTED } from "./ogTheme";
 
 /**
  * Chart-forward social image for a published weekly brief.
@@ -28,9 +29,9 @@ const frameStyle: CSSProperties = {
   width: "100%",
   height: "100%",
   padding: "56px 64px",
-  background: "linear-gradient(145deg, #030712 0%, #0f172a 55%, #111827 100%)",
-  color: "#f8fafc",
-  fontFamily: "ui-sans-serif, system-ui, sans-serif",
+  background: OG_BG,
+  color: OG_TEXT,
+  fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`,
 };
 
 export const renderBriefChartOgImage = ({
@@ -50,17 +51,17 @@ export const renderBriefChartOgImage = ({
   return (
     <div style={frameStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ display: "flex", width: 14, height: 14, borderRadius: 999, background: accent }} />
-        <div style={{ display: "flex", fontSize: 26, fontWeight: 700, letterSpacing: "0.14em", color: "#94a3b8" }}>
+        <GlyphMotif tone={accent} size={34} />
+        <div style={{ display: "flex", fontSize: 26, fontWeight: 600, letterSpacing: "0.14em", color: OG_TEXT_MUTED }}>
           WHETHER
         </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 24 }}>
-        <div style={{ display: "flex", fontSize: 64, fontWeight: 800, color: accent, lineHeight: 1.05 }}>
+        <div style={{ display: "flex", fontSize: 62, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, color: accent, lineHeight: 1.05 }}>
           {posture}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: "#cbd5f5", marginTop: 10 }}>{weekLabel}</div>
+        <div style={{ display: "flex", fontSize: 30, color: "#cbd5e1", marginTop: 10 }}>{weekLabel}</div>
       </div>
 
       <div

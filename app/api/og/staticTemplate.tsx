@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
+import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_BORDER } from "./ogTheme";
 
 /**
  * Lens social images for the non-report routes.
@@ -56,9 +57,9 @@ const frameStyle: CSSProperties = {
   width: "100%",
   height: "100%",
   padding: "60px 64px",
-  background: "linear-gradient(145deg, #020617 0%, #0b1220 45%, #111827 100%)",
-  color: "#f8fafc",
-  fontFamily: "ui-sans-serif, system-ui, sans-serif",
+  background: OG_BG,
+  color: OG_TEXT,
+  fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`,
 };
 
 export const renderStaticOgImage = ({
@@ -80,8 +81,8 @@ export const renderStaticOgImage = ({
   return (
     <div style={frameStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ display: "flex", width: 14, height: 14, borderRadius: 999, background: accent }} />
-        <div style={{ display: "flex", fontSize: 24, fontWeight: 700, letterSpacing: "0.16em", color: "#94a3b8" }}>
+        <GlyphMotif tone={accent} size={34} />
+        <div style={{ display: "flex", fontSize: 24, fontWeight: 600, letterSpacing: "0.16em", color: OG_TEXT_MUTED }}>
           {eyebrow.toUpperCase()}
         </div>
       </div>
@@ -90,10 +91,10 @@ export const renderStaticOgImage = ({
 
       <div style={{ display: "flex", flex: 1, gap: 40, marginTop: 36 }}>
         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-          <div style={{ display: "flex", fontSize: 60, fontWeight: 800, lineHeight: 1.08, color: "#f8fafc" }}>
+          <div style={{ display: "flex", fontSize: 58, fontWeight: 600, lineHeight: 1.08, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, color: OG_TEXT }}>
             {title}
           </div>
-          <div style={{ display: "flex", fontSize: 28, lineHeight: 1.35, color: "#cbd5f5", marginTop: 22 }}>
+          <div style={{ display: "flex", fontSize: 28, lineHeight: 1.35, color: "#cbd5e1", marginTop: 22 }}>
             {subtitle}
           </div>
         </div>
@@ -104,12 +105,12 @@ export const renderStaticOgImage = ({
             flexDirection: "column",
             width: 380,
             padding: "28px 30px",
-            borderRadius: 20,
-            border: `1px solid ${accent}55`,
-            background: "rgba(15, 23, 42, 0.72)",
+            borderRadius: 8,
+            border: `1px solid ${OG_BORDER}`,
+            background: OG_PANEL,
           }}
         >
-          <div style={{ display: "flex", fontSize: 20, fontWeight: 700, letterSpacing: "0.12em", color: accent }}>
+          <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: accent }}>
             {panel.label}
           </div>
           <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#f8fafc", marginTop: 14 }}>

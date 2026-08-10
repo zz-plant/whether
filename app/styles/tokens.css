@@ -48,7 +48,13 @@
   --color-trust-low: #fda4af;
 
   /* Text role tokens */
-  --text-display: clamp(2.5rem, 7vw, 6.5rem);
+  /* Display is capped near 3.4rem: the weekly-call headline is a full sentence,
+     and the old 7vw/6.5rem ceiling set it at ~100px on desktop, wrapping it to
+     seven lines and pushing the whole brief below the fold. (The inline
+     sm:text-[2.8rem] cap on the h2 never applied — this file is unlayered, so
+     .text-display beat the layered Tailwind utility.) 2-3 lines at 54px keeps
+     the drama and keeps the brief on one screen. */
+  --text-display: clamp(2.125rem, 1.5rem + 2.2vw, 3.375rem);
   --text-heading: clamp(1.25rem, 1rem + 1.4vw, 2.15rem);
   --text-label: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
   --text-caption: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);

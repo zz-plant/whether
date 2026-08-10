@@ -40,16 +40,6 @@ export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
 // name. Aliased to REGIME_WEATHER_LABELS so the two can never drift apart.
 export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_WEATHER_LABELS;
 
-export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
-// Used by RegimeBadgeIcon in regimeIcons.tsx — icon name must match the component prop type.
-
-export const REGIME_WEATHER_ICONS: Record<RegimeKey, RegimeWeatherIcon> = {
-  SCARCITY: "snowflake",
-  DEFENSIVE: "cloud",
-  VOLATILE: "storm",
-  EXPANSION: "sun",
-};
-
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
   SCARCITY: "Everything costs more to move, so protect heat, conserve cash, and avoid one-way commitments.",
   DEFENSIVE: "Conditions are workable but muted, so stay selective and keep efficiency layers on.",
@@ -69,7 +59,6 @@ export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   label: REGIME_LEGEND_LABELS[regime],
   weather: REGIME_WEATHER_LABELS[regime],
   weatherRationale: REGIME_WEATHER_RATIONALES[regime],
-  weatherIcon: REGIME_WEATHER_ICONS[regime],
   ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
 
@@ -81,7 +70,6 @@ export const getRegimePublicLabel = (regime: RegimeKey | string) =>
   isRegimeKey(regime) ? REGIME_PUBLIC_LABELS[regime] : regime;
 
 export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];
-export const getRegimeWeatherIcon = (regime: RegimeKey) => REGIME_WEATHER_ICONS[regime];
 export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_RATIONALES[regime];
 
 export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {

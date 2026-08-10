@@ -221,6 +221,8 @@ export default function RootLayout({
               <Link href="/acceptable-use-policy" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</Link>
               <Link href="/terms-of-service" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Terms</Link>
               <span aria-hidden="true">·</span>
+              <a href="https://github.com/zz-plant/whether" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">GitHub</a>
+              <span aria-hidden="true">·</span>
               <span className="min-h-[44px] inline-flex items-center">Built by <a href="https://kanav.net" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline ml-1" target="_blank" rel="noreferrer">Kanav Jain</a></span>
               <span aria-hidden="true">·</span>
               <a href="https://nextconsensus.com" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">Next Consensus</a>

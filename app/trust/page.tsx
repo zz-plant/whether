@@ -9,6 +9,7 @@ import {
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
+import { FormulaReference } from "./formulaReference";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -118,27 +119,6 @@ export default async function MethodPage() {
               <Link href="#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Revisit triggers</Link>
             </div>
           </article>
-        </div>
-      </ReportSection>
-
-      <ReportSection
-        id="formula-reference"
-        title="Formula reference"
-        description="How this score is built."
-      >
-        <div className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
-          <p className="text-sm text-slate-200">
-            The scoring logic, stop lines, and change triggers behind this week&rsquo;s recommendation.
-          </p>
-          <ul className="space-y-2 text-sm text-slate-300">
-            <li>• Read formulas alongside current confidence and freshness labels before irreversible decisions.</li>
-            <li>• Check that the change trigger and stop line match the weekly brief.</li>
-            <li>• Note the reversal condition before reopening fixed-cost approvals.</li>
-          </ul>
-          <div className="flex flex-wrap gap-2 text-xs">
-            <Link href="#confidence-limits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Confidence limits</Link>
-            <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Source health</Link>
-          </div>
         </div>
       </ReportSection>
 
@@ -264,6 +244,8 @@ export default async function MethodPage() {
           </p>
         </div>
       </ReportSection>
+
+      <FormulaReference />
 
       {!isFallback && warnings.length === 0 ? (
         <details className="group mt-6 rounded-xl border border-white/[0.10] bg-slate-950/20 px-5 py-4">

@@ -42,6 +42,7 @@
         "typescript": "6.0.2",
         "vinext": "0.2.1",
         "vite": "^8.1.0",
+        "wawoff2": "^2.0.1",
         "wrangler": "^4.103.0",
       },
     },
@@ -1516,6 +1517,8 @@
     "vitefu": ["vitefu@1.1.3", "", { "peerDependencies": { "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" }, "optionalPeers": ["vite"] }, "sha512-ub4okH7Z5KLjb6hDyjqrGXqWtWvoYdU3IGm/NorpgHncKoLTCfRIbvlhBm7r0YstIaQRYlp4yEbFqDcKSzXSSg=="],
 
     "watchpack": ["watchpack@2.5.1", "", { "dependencies": { "glob-to-regexp": "^0.4.1", "graceful-fs": "^4.1.2" } }, "sha512-Zn5uXdcFNIA1+1Ei5McRd+iRzfhENPCe7LeABkJtNulSxjma+l7ltNx55BWZkRlwRnpOgHqxnjyaDgJnNXnqzg=="],
+
+    "wawoff2": ["wawoff2@2.0.1", "", { "dependencies": { "argparse": "^2.0.1" }, "bin": { "woff2_compress.js": "bin/woff2_compress.js", "woff2_decompress.js": "bin/woff2_decompress.js" } }, "sha512-r0CEmvpH63r4T15ebFqeOjGqU4+EgTx4I510NtK35EMciSdcTxCw3Byy3JnBonz7iyIFZ0AbVo0bbFpEVuhCYA=="],
 
     "web-haptics": ["web-haptics@0.0.6", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18", "svelte": ">=4", "vue": ">=3" }, "optionalPeers": ["react", "react-dom", "svelte", "vue"] }, "sha512-eCzcf1LDi20+Fr0x9V3OkX92k0gxEQXaHajmhXHitsnk6SxPeshv8TBtBRqxyst8HI1uf2FyFVE7QS3jo1gkrw=="],
 

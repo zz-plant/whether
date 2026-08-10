@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
 import { REGIME_DISPLAY } from "../app/viewModel";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
-import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
+import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
 
 const collectText = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === "boolean") {
@@ -75,19 +75,6 @@ describe("regime presentation labels", () => {
     assert.match(getRegimeWeatherRationale("DEFENSIVE"), /stay selective/i);
     assert.match(getRegimeWeatherRationale("VOLATILE"), /windows open and close quickly/i);
     assert.match(getRegimeWeatherRationale("EXPANSION"), /move faster/i);
-  });
-
-  it("maps each regime to a weather icon key", () => {
-    assert.equal(getRegimeWeatherIcon("SCARCITY"), "snowflake");
-    assert.equal(getRegimeWeatherIcon("DEFENSIVE"), "cloud");
-    assert.equal(getRegimeWeatherIcon("VOLATILE"), "storm");
-    assert.equal(getRegimeWeatherIcon("EXPANSION"), "sun");
-
-    const legend = getOrderedRegimeLegend();
-    assert.equal(legend[0]?.weatherIcon, "snowflake");
-    assert.equal(legend[1]?.weatherIcon, "cloud");
-    assert.equal(legend[2]?.weatherIcon, "storm");
-    assert.equal(legend[3]?.weatherIcon, "sun");
   });
 
   it("adds guarded modifier to expansion when diagnostics are fragile", () => {

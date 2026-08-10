@@ -14,7 +14,7 @@ import { AppSidebar } from "./AppSidebar";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import { ReportCta } from "./reportCta";
-import { RegimeIconType } from "./regimeIcons";
+import type { RegimeIconType } from "./pageShell";
 import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { InternalAwareLink } from "./report-shell/InternalAwareLink";
