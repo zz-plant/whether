@@ -327,12 +327,11 @@ export async function buildPlanningPageModel(
             title: "Weekly plan",
             description: "What to approve, hold, or revisit this cycle.",
             hashAliases: ["ops-monthly-action-summary-panel"],
+            // Label + description are omitted: the step header directly above already renders them.
             children: h(ReportSection, {
               variant: "split",
               id: "ops-monthly-action-summary-panel",
-              label: "Plan",
               title: "Weekly plan",
-              description: "What to approve, hold, or revisit this cycle.",
               children: h(Fragment, null,
               h("section", { className: "weather-surface space-y-4 px-4 py-4" },
                 h("div", { className: "space-y-2" },
@@ -445,9 +444,7 @@ export async function buildPlanningPageModel(
             hashAliases: ["ops-playbook-panel"],
             children: h(ReportSection, { variant: "split",
               id: "ops-playbook-panel",
-              label: "Rules",
               title: "Approve or hold moves",
-              description: "Do, don't, and limit rules for new commitments.",
               children: h(Fragment, null,
               h("div", { className: "flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3" },
                 h("p", { className: "text-xs text-slate-300" }, showAllActionLanes ? "Full rule list." : "Top 3 rules per area."),
@@ -491,9 +488,7 @@ export async function buildPlanningPageModel(
             hashAliases: ["ops-finance-strategy-panel"],
             children: h(ReportSection, { variant: "split",
               id: "ops-finance-strategy-panel",
-              label: "Verify",
               title: "Finance strategy",
-              description: "Budget direction and cash timing for the quarter.",
               children: h(Fragment, null,
               h(FinanceStrategyPanel, {
                 regime: assessment.regime,
