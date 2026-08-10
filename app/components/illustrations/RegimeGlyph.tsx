@@ -1,3 +1,5 @@
+"use client";
+
 import type { RegimeKey } from "../../../lib/types";
 import { getRegimeOperatorLabel } from "../../../lib/regimeLabels";
 import { useState, useEffect } from "react";

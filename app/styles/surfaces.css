@@ -468,6 +468,17 @@ button .weather-chip:active,
   }
 }
 
+/* One-screen guarantee: compact the decision card on shorter viewports */
+@media (max-height: 880px) {
+  .weather-decision-card .weather-section-stage {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .weather-decision-card .weather-section-stage + .weather-section-stage {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 120px;
+  }
+
   .weather-decision-card dt {
     font-size: 0.6rem;
   }

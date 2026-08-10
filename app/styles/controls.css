@@ -195,7 +195,9 @@ input:not([type="range"]) {
 .weather-hub-link-card:focus-visible,
 summary[data-chevron]:focus-visible,
 summary.list-none:focus-visible {
-  @apply weather-focus-ring;
+  outline: 2px solid var(--accent-action);
+  outline-offset: 2px;
+  box-shadow: var(--focus-halo);
 }
 
 @media (hover: hover) and (pointer: fine) {

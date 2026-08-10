@@ -71,7 +71,7 @@ export function ActionCard({
   const pauseColor = tightness >= numericThreshold ? "bg-rose-500 motion-safe:animate-pulse" : tightness >= numericThreshold - 5 ? "bg-amber-500 motion-safe:animate-pulse" : "bg-emerald-500";
 
   return (
-    <div className="weather-surface relative overflow-hidden rounded-xl border-white/[0.10] px-5 py-5" data-sticky-strip-hide>
+    <div className="weather-surface relative overflow-hidden rounded-xl border border-white/[0.1] p-5" data-sticky-strip-hide>
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${direction === "tighten" ? "bg-rose-400/40" : direction === "ease" ? "bg-emerald-400/40" : "bg-sky-400/40"}`} />
       <div className="flex items-center justify-between gap-3 mb-4">
         <p className="text-xs font-semibold tracking-[0.06em] text-white/60">
