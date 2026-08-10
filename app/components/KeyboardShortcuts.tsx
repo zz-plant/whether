@@ -18,6 +18,13 @@ export function KeyboardShortcuts() {
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        document.dispatchEvent(new CustomEvent("whether-open-command-palette"));
+        return;
+      }
+
       if (e.metaKey || e.ctrlKey || e.altKey) return;
 
       if (e.key === "?") {

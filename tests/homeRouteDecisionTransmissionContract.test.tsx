@@ -58,12 +58,12 @@ describe("home route render contract", () => {
     assert.ok(!railSource.includes("<ShareBriefButton"), "route handoff must not add a copy action");
   });
 
-  it("points the header search icon at the /search command surface, not the resolve hub", () => {
+it("opens the command palette from the header search button", () => {
     const actionsSource = readFileSync("app/components/globalHeaderActionsClient.tsx", "utf8");
-    const labelIndex = actionsSource.indexOf('aria-label="Search"');
-    const searchIconBlock = actionsSource.slice(Math.max(0, labelIndex - 400), labelIndex + 40);
+    const paletteSource = readFileSync("app/components/commandPalette.tsx", "utf8");
 
-    assert.ok(searchIconBlock.includes('href="/search"'), "header search icon targets the command surface");
-    assert.ok(!searchIconBlock.includes('href="/resolve"'), "header search icon no longer hides behind the resolve hub");
+    assert.ok(actionsSource.includes('aria-label="Search"'), "header has a search button");
+    assert.ok(actionsSource.includes("setShowPalette(true)"), "search button opens the command palette");
+    assert.ok(paletteSource.includes("aria-label=\"Command palette\""), "command palette is accessible");
   });
 });

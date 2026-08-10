@@ -2,6 +2,8 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
+import { GlobalCommandPalette } from "./components/globalCommandPalette";
+import { GlobalShareRail } from "./components/globalShareRail";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
@@ -195,6 +197,8 @@ export default function RootLayout({
             Skip to content
           </a>
           <GlobalHeader />
+          <GlobalCommandPalette />
+          <GlobalShareRail />
           <ScreenshotDetector />
           {children}
         </ToastProviderRoot>
