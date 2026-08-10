@@ -132,7 +132,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "The baseline cost of money set by the Federal Reserve. Higher means borrowing costs more.",
     why: "Why it matters: the base rate affects your cost of capital, burn planning, and debt decisions.",
     usedInLabel: "Signal diagnostics",
-    usedInHref: "/evidence",
+    usedInHref: "/signals",
   },
   {
     value: "regime",
@@ -172,7 +172,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "A decision with a clear action, a threshold to pause, and a condition to reverse. Unlike generic advice, it tells you exactly when to stop and go.",
     why: "Why it matters: bounded rules remove ambiguity—you know what to do, what to watch, and when to change.",
     usedInLabel: "Planning page",
-    usedInHref: "/planning",
+    usedInHref: "/operate",
   },
   {
     value: "fallback-mode",
@@ -212,7 +212,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "Treasury: forward-looking U.S. government bond market. Macro: employment, inflation, consumer spending. When they disagree, one is leading or markets aren't pricing something in.",
     why: "Why it matters: signal disagreement tells you which signal to trust more—usually the one supported by real-time company metrics.",
     usedInLabel: "Evidence view",
-    usedInHref: "/evidence",
+    usedInHref: "/signals",
   },
   {
     value: "stop-line",
@@ -220,7 +220,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     summary: "A specific threshold that, if crossed, pauses a category of decisions (hiring, spending, long-term commitments) until conditions improve.",
     why: "Why it matters: stop lines let you operate without constant re-litigation—you know the exact boundary where you shift to caution.",
     usedInLabel: "Planning page",
-    usedInHref: "/planning",
+    usedInHref: "/operate",
   },
   {
     value: "cached-snapshot",
@@ -261,7 +261,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
 
 export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
-    href: "/planning",
+    href: "/operate",
     label: "Planning",
     description: "Use these diagnostics to set guardrails, prioritize work, and make trade-offs.",
   },
@@ -284,7 +284,7 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     description: "Use the live weekly recommendation before opening deeper evidence or execution paths.",
   },
   {
-    href: "/planning",
+    href: "/operate",
     label: "Planning",
     description: "Turn the current market backdrop into concrete execution guidance.",
   },

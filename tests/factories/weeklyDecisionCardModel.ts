@@ -407,9 +407,9 @@ export const buildWeeklyDecisionCardModel = (
     hasMeaningfulDelta: true,
     fallbackCopy: "",
     items: [
-      { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/resolve" },
-      { id: "top-driver", label: "Top driver change", detail: "Cash availability tightened.", href: "/evidence" },
-      { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/planning" },
+      { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/answer" },
+      { id: "top-driver", label: "Top driver change", detail: "Cash availability tightened.", href: "/signals" },
+      { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/operate" },
     ],
     ...overrides.sinceLastReview,
   },

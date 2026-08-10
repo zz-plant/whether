@@ -21,7 +21,7 @@ export default function DecisionShieldOverviewPage() {
           Decision Shield is the governance bridge between macro posture signals and real operating choices. Use it to enforce
           thresholds, classify reversibility risk, and preserve audit-ready decision memory.
         </p>
-        <Link href="/planning" className="weather-button inline-flex items-center justify-center" data-conversion-event="demo/contact">
+        <Link href="/operate" className="weather-button inline-flex items-center justify-center" data-conversion-event="demo/contact">
           Open Decision Shield in Planning
         </Link>
       </section>

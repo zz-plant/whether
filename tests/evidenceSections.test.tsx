@@ -4,7 +4,7 @@ import { describe, it } from "bun:test";
 
 describe("SignalsModeSwitcherSection", () => {
   it("uses custom radio buttons without Base UI's extra native radio inputs", () => {
-    const source = readFileSync(new URL("../app/evidence/components/evidenceSections.tsx", import.meta.url), "utf8");
+    const source = readFileSync(new URL("../app/signals/components/evidenceSections.tsx", import.meta.url), "utf8");
 
     assert.match(source, /role="radiogroup"/);
     assert.match(source, /role="radio"/);

@@ -45,7 +45,7 @@ describe("home route render contract", () => {
     for (const target of [
       "/planning/financial",
       "/planning/ship-checklist",
-      "/resolve",
+      "/answer",
       "/resolve#toolkit-library",
       "/template",
       "/resources/reversal-trigger-checklist",

@@ -16,7 +16,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Planning — Guardrails, Runway, and the Team Brief",
   description:
     "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
-  path: "/planning",
+  path: "/operate",
   imageAlt: "Whether planning view",
   imagePath: "/social/planning.svg",
 });
@@ -31,7 +31,7 @@ export default async function OperationsPage({
     <ReportShell model={reportShellModel}>
       {children}
       <Suspense fallback={null}>
-        <OperationsWorkstreamNav currentPath="/planning" />
+        <OperationsWorkstreamNav currentPath="/operate" />
       </Suspense>
     </ReportShell>
   );

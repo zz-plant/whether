@@ -68,7 +68,7 @@ export function ToolkitLibraryPanels({
         </p>
       </div>
 
-      <form action="/resolve" className="flex flex-col gap-3 sm:flex-row">
+      <form action="/answer" className="flex flex-col gap-3 sm:flex-row">
         <label htmlFor="decide-toolkit-search-input" className="sr-only">Search tools by task</label>
         <input
           id="decide-toolkit-search-input"

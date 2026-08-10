@@ -1,6 +1,6 @@
 import type { ArtifactMode, LiteracyAssistMode } from "./literacyAssist";
 
-export type OperatorWorkflowRoute = "/" | "/evidence" | "/planning" | "/resolve";
+export type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/answer";
 export type AssistPanelOpenSource = "click" | "query" | "stored_preference";
 
 export type OperatorWorkflowEvent =
@@ -26,7 +26,7 @@ export const OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT = "/api/telemetry/operator-wor
 export const operatorWorkflowRouteStorageKey = "whether.operatorWorkflow.lastPath";
 
 export const isOperatorWorkflowRoute = (value: string): value is OperatorWorkflowRoute =>
-  value === "/" || value === "/evidence" || value === "/planning" || value === "/resolve";
+  value === "/" || value === "/signals" || value === "/operate" || value === "/answer";
 
 export const isOperatorWorkflowEvent = (input: unknown): input is OperatorWorkflowEvent => {
   if (!input || typeof input !== "object") {

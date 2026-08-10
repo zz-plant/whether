@@ -116,30 +116,25 @@ function WeeklyTopFoldContract({
   const shouldRevisit = model.decision.revisitDecisions;
   const revisitQueue = model.decision.revisitQueue.slice(0, 3);
 
-  return (
+   return (
     <section
       data-testid="weekly-top-fold"
       aria-label="Revisit queue"
-      className="weather-card grid gap-4 lg:grid-cols-12"
+      className="weather-section-border grid gap-4 lg:grid-cols-12 lg:items-start"
     >
       <div className="space-y-2 lg:col-span-7">
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex items-center rounded-sm px-2 py-0.5 text-fluid-nano font-bold tracking-[0.06em] uppercase ${
-              shouldRevisit
-                ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
-                : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
-            }`}
-          >
-            {shouldRevisit ? "REVISIT" : "ON TRACK"}
+          <span className="weather-dot weather-dot--degraded">
+            <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+            {shouldRevisit ? "Revisit" : "On track"}
           </span>
-          <p className="text-fluid-micro text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
+          <p className="text-fluid-sm text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
         </div>
         {revisitQueue.length ? (
-          <ul className="space-y-1.5 text-fluid-micro text-white/50">
+          <ul className="space-y-1.5 text-fluid-sm text-white/65">
             {revisitQueue.map((item) => (
               <li key={item.id}>
-                <span className="font-medium text-white/65">{item.label}:</span>{" "}
+                <span className="font-medium text-white/80">{item.label}:</span>{" "}
                 {compactSentence(item.action, 96)}
               </li>
             ))}
@@ -147,10 +142,9 @@ function WeeklyTopFoldContract({
         ) : null}
       </div>
 
-      <div className="space-y-2 lg:col-span-5">
-        <p className="text-fluid-nano font-semibold tracking-[0.08em] text-white/60 uppercase">Continuity</p>
+      <div className="lg:col-span-5 lg:text-right">
         {memoryItems.length ? (
-          <p className="text-fluid-micro text-white/50">{memoryItems.join(" → ")}</p>
+          <p className="text-fluid-sm text-white/50">{memoryItems.join(" → ")}</p>
         ) : null}
       </div>
     </section>
@@ -206,7 +200,7 @@ async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
 
       <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <ActionLink href="/planning" variant="inline">
+          <ActionLink href="/operate" variant="inline">
             Build this week&apos;s plan →
           </ActionLink>
           <SubscribeForm />
@@ -258,16 +252,13 @@ async function PageContent({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 text-emerald-300 hover:bg-emerald-500/15 transition-colors text-sm font-medium"
+            className="weather-button inline-flex items-center gap-2 px-4 py-2 text-emerald-300 text-sm font-medium"
           >
             Retry now
           </button>
-          <Link
-            href="/trust"
-            className="inline-flex items-center gap-2 text-sky-300/70 hover:text-sky-300 text-sm font-medium transition-colors"
-          >
+          <ActionLink href="/trust" variant="inline">
             Check data status →
-          </Link>
+          </ActionLink>
         </div>
       </div>
     );
@@ -351,7 +342,7 @@ async function PageContent({
         </div>
       ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
-        <div className="space-y-6 min-w-0">
+        <div className="space-y-8 min-w-0">
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}

@@ -7,8 +7,6 @@ export const retiredSitemapPaths = [
   "/onboarding",
   "/reference",
   "/formulas",
-  "/evidence",
-  "/operate",
   "/templates",
   "/toolkit",
   "/toolkits",

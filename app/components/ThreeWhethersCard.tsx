@@ -1,11 +1,10 @@
-import { Users, DollarSign, Lock, ArrowUpRight, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
+import { Users, DollarSign, Lock } from "lucide-react";
 import type { SignalDirection } from "../viewModel";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
 type DecisionItem = {
   title: string;
   icon: typeof Users;
-  question: string;
   verdict: "TIGHTEN" | "HOLD" | "EXPAND";
   recommendation: string;
   threshold: string;
@@ -22,6 +21,18 @@ type ThreeWhethersProps = {
 // drift from the verdict logic below.
 const TIGHTEN_AT = { hire: 55, spend: 65, commit: 75 } as const;
 const EASE_BELOW = { hire: 35, spend: 45, commit: 55 } as const;
+
+const VERDICT_COLORS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
+  TIGHTEN: "text-rose-400",
+  HOLD: "text-amber-400",
+  EXPAND: "text-emerald-400",
+};
+
+const VERDICT_BARS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
+  TIGHTEN: "bg-rose-400",
+  HOLD: "bg-amber-400",
+  EXPAND: "bg-emerald-400",
+};
 
 export function ThreeWhethersCard({
   signalDirection,
@@ -45,7 +56,6 @@ export function ThreeWhethersCard({
     {
       title: "Whether to Hire",
       icon: Users,
-      question: "Should headcount & engineering capacity expand?",
       verdict: hireVerdict,
       recommendation: hiringIsTight
         ? "Freeze non-revenue hires; focus capacity on core revenue-generating engineering."
@@ -58,7 +68,6 @@ export function ThreeWhethersCard({
     {
       title: "Whether to Spend",
       icon: DollarSign,
-      question: "Should marketing & CAC payback periods loosen?",
       verdict: spendVerdict,
       recommendation: spendingIsTight
         ? "Cap paid acquisition payback at 6 months max; audit discretionary software spend."
@@ -71,7 +80,6 @@ export function ThreeWhethersCard({
     {
       title: "Whether to Commit",
       icon: Lock,
-      question: "Should long-term vendor contracts & capital be locked?",
       verdict: commitVerdict,
       recommendation: committingIsTight
         ? "Avoid multi-year vendor commitments; negotiate month-to-month or annual flex options."
@@ -83,75 +91,38 @@ export function ThreeWhethersCard({
     },
   ];
 
-  const getBadgeStyle = (verdict: "TIGHTEN" | "HOLD" | "EXPAND") => {
-    switch (verdict) {
-      case "TIGHTEN":
-        return "bg-rose-500/10 border-rose-500/30 text-rose-300";
-      case "EXPAND":
-        return "bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
-      case "HOLD":
-        return "bg-amber-500/10 border-amber-500/30 text-amber-300";
-    }
-  };
-
   return (
-    <section className="space-y-4" aria-labelledby="three-whethers-heading">
-      <div>
-        <p className="text-fluid-nano font-semibold uppercase tracking-[0.12em] text-emerald-400">
-          Bounded Operating Rules
-        </p>
-        <h3 id="three-whethers-heading" className="text-xl font-semibold text-white tracking-tight">
-          The 3 Operational &quot;Whethers&quot;
-        </h3>
-      </div>
+    <section className="weather-section" aria-labelledby="three-whethers-heading">
+      <h3 id="three-whethers-heading" className="type-section text-white">
+        The 3 Operational &quot;Whethers&quot;
+      </h3>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-3">
         {decisions.map((item, i) => {
           const Icon = item.icon;
           return (
-            <div
-              key={i}
-              className="weather-card flex flex-col justify-between p-5 space-y-4 relative overflow-hidden group hover:border-white/[0.14] transition-all duration-300"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-200">
-                      <Icon className="w-4 h-4" aria-hidden="true" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                  </div>
-                  <span
-                    className={`rounded-full border px-2.5 py-0.5 text-fluid-nano font-bold uppercase tracking-wider ${getBadgeStyle(
-                      item.verdict
-                    )}`}
-                  >
-                    {item.verdict}
-                  </span>
+            <div key={i} className="relative pl-5 space-y-3">
+              <div className={`absolute top-0 left-0 h-full w-0.5 ${VERDICT_BARS[item.verdict]}`} />
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-white/[0.04] text-slate-300">
+                  <Icon className="w-4 h-4" aria-hidden="true" />
                 </div>
-
-                <p className="text-fluid-xs text-white/65 font-medium leading-relaxed">
-                  {item.question}
-                </p>
-
-                <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 text-fluid-xs text-slate-100 leading-normal space-y-1">
-                  <p className="font-semibold text-emerald-300/90 text-fluid-micro uppercase tracking-wider">
-                    Operating Rule
-                  </p>
-                  <p>{item.recommendation}</p>
-                </div>
+                <h4 className="text-sm font-semibold text-white">{item.title}</h4>
+                <span className={`ml-auto text-xs font-bold ${VERDICT_COLORS[item.verdict]}`}>
+                  {item.verdict}
+                </span>
               </div>
 
-              <div className="border-t border-white/[0.06] pt-3 space-y-2 text-fluid-nano text-white/65">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
-                  <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>
+              <p className="text-sm text-white/70">{item.recommendation}</p>
+
+              <div className="space-y-1.5">
+                <div className="flex gap-2">
+                  <span className="font-medium text-white/50">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
+                  <code className="font-mono text-amber-200/80 text-xs">{item.threshold}</code>
                 </div>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium text-rose-300/80 flex-shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
-                  <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 text-right">
-                    {item.reversalCondition}
-                  </span>
+                <div className="flex gap-2">
+                  <span className="font-medium text-white/50">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
+                  <code className="font-mono text-rose-200/80 text-xs">{item.reversalCondition}</code>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { resolveSearchCommandHref } from "../app/search/page";
-import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resolve/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/answer/components/toolkitLibraryPanels";
 import { resolveReportHeaderUtilityAction } from "../app/components/globalHeaderRouteGate";
 import { searchIndex } from "../lib/search/searchIndex";
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
 
 const WORKFLOW_ROUTES = [
   { href: "/", label: "Brief" },
-  { href: "/evidence", label: "Evidence" },
-  { href: "/planning", label: "Plan" },
-  { href: "/resolve", label: "Resolve" },
+  { href: "/signals", label: "Evidence" },
+  { href: "/operate", label: "Plan" },
+  { href: "/answer", label: "Resolve" },
   { href: "/trust", label: "Trust" },
 ] as const;
 
@@ -127,6 +127,28 @@ type AppSidebarProps = {
 };
 
 export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: AppSidebarProps) {
+  const sidebarRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<Element | null>(null);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      triggerRef.current = document.activeElement;
+      sidebarRef.current?.focus();
+    } else if (triggerRef.current && triggerRef.current instanceof HTMLElement) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onMobileClose?.();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [mobileOpen, onMobileClose]);
+
   return (
     <>
       <aside className="hidden lg:flex lg:h-full lg:flex-col">
@@ -134,12 +156,21 @@ export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: App
       </aside>
 
       {mobileOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Sidebar navigation"
+        >
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onMobileClose}
           />
-          <aside className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-lg">
+          <aside
+            ref={sidebarRef}
+            tabIndex={-1}
+            className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-lg"
+          >
             <SidebarContent sectionLinks={sectionLinks} onClose={onMobileClose} />
           </aside>
         </div>

@@ -99,27 +99,41 @@ export function ParametricIdenticon({
     }
   };
 
+  const accessibleLabel = title || `Parametric Identicon for ${seed}`;
+
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 transition-[transform,box-shadow,ring-color] duration-300 cursor-pointer hover:scale-[1.03] hover:ring-cyan-500/50 hover:shadow-cyan-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${className}`}
+        style={{ width: size, height: size }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={onClick}
+        aria-label={accessibleLabel}
+      >
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ width: size, height: size }}
+        />
+        <SVGIdenticonGeometry params={params} size={size} useCase={useCase} />
+      </button>
+    );
+  }
+
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 transition-all duration-300 ${
-        interactive ? "cursor-pointer hover:scale-[1.03] hover:ring-cyan-500/50 hover:shadow-cyan-500/20" : ""
-      } ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 ${className}`}
       style={{ width: size, height: size }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      title={title || `Parametric Identicon for ${seed}`}
       role="img"
-      aria-label={title || `Parametric Identicon for ${seed}`}
+      aria-label={accessibleLabel}
     >
-      {/* Background WebGL Shader Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full object-cover"
         style={{ width: size, height: size }}
       />
-
-      {/* SVG Foreground Geometry */}
       <SVGIdenticonGeometry params={params} size={size} useCase={useCase} />
     </div>
   );

@@ -104,10 +104,10 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
-    { path: "/evidence", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
-    { path: "/resolve", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
+    { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
+    { path: "/answer", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
-    { path: "/planning", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
+    { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/embed", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -181,7 +181,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible
     ? await Promise.all(
       signalScenarioRoutes.map(async (clusterRoute) => {
-        const path = `/evidence/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}` as const;
+        const path = `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}` as const;
         if (!(await isSignalScenarioIndexable(path))) {
           return null;
         }

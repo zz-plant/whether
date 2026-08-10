@@ -40,7 +40,7 @@ export function SubscribeForm() {
 
   if (status === "success") {
     return (
-      <div className="weather-card flex flex-col items-center justify-center py-6 text-center space-y-2">
+      <div className="weather-section-border flex flex-col items-center justify-center py-6 text-center space-y-2">
         <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
           <Check className="size-5" aria-hidden="true" />
         </span>
@@ -51,10 +51,10 @@ export function SubscribeForm() {
   }
 
   return (
-    <div className="weather-card space-y-3">
+    <div className="weather-section-border space-y-3">
       <div>
-        <p className="text-fluid-xs font-semibold tracking-[0.04em] text-white/70">Get the weekly brief</p>
-        <p className="text-fluid-micro text-white/60 mt-1">Weekly operating call + evidence, every Monday.</p>
+        <p className="text-fluid-sm font-medium text-white">Get the weekly brief</p>
+        <p className="text-fluid-xs text-white/60 mt-0.5">Weekly operating call + evidence, every Monday.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">

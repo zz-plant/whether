@@ -28,7 +28,7 @@ const featuredStakeholderSlugs = [
 export const metadata: Metadata = buildPageMetadata({
   title: "Resolve a Decision — By Role, Situation, or Toolkit",
   description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
-  path: "/resolve",
+  path: "/answer",
   imageAlt: "Whether decision tools",
   imagePath: "/social/resolve.svg",
 });
@@ -43,12 +43,12 @@ export default async function DecidePage({
     ...buildBreadcrumbList(
       createBreadcrumbTrail([
         { path: "/" },
-        { path: "/resolve" },
+        { path: "/answer" },
       ]),
     ),
   };
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/answer" });
   const { homeBriefModel } = snapshot;
   const recommendedSituation = homeBriefModel.weeklyMovement.direction === "tightening"
     ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
@@ -100,7 +100,7 @@ export default async function DecidePage({
       trustStatusAction="Return to Planning after the decision is closed."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve"
-      currentPath="/resolve"
+      currentPath="/answer"
       pageSummary="Answer one decision without re-reading the whole brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
       sectionLinks={sectionLinks.slice(0, 2)}
@@ -109,7 +109,7 @@ export default async function DecidePage({
       primaryCta={{ href: "#unresolved-question-router", label: "Open the recommended decision" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
-        href: "/planning",
+        href: "/operate",
         description: "Return to Planning next",
       }}
       decisionBanner={{

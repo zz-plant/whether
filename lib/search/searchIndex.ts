@@ -2,7 +2,7 @@ import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCat
 
 export type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
-export type SearchPrimaryHub = "/evidence" | "/planning" | "/resolve" | "/trust";
+export type SearchPrimaryHub = "/signals" | "/operate" | "/answer" | "/trust";
 
 export type SearchEntity = {
   id: string;
@@ -32,10 +32,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "check",
     routePriority: 4,
-    recommendedHubHref: "/evidence",
+    recommendedHubHref: "/signals",
     recommendedHubLabel: "Evidence",
     title: "Check what changed and why",
-    href: "/evidence",
+    href: "/signals",
     summary: "Review macro evidence, thresholds, and the context behind current posture.",
     intentLabel: "Check what changed",
     keywords: ["signals", "evidence", "thresholds", "regime", "macro"],
@@ -58,10 +58,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "check",
     routePriority: 4,
-    recommendedHubHref: "/evidence",
+    recommendedHubHref: "/signals",
     recommendedHubLabel: "Evidence",
     title: "Audit evidence and provenance",
-    href: "/evidence",
+    href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
     intentLabel: "Audit provenance",
     keywords: ["evidence", "provenance", "sources", "trust"],
@@ -71,7 +71,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
+    recommendedHubHref: "/answer",
     recommendedHubLabel: "Decision Tools",
     title: "Translate the call inside Decision Tools",
     href: "/resolve#guided-translation",
@@ -84,7 +84,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
+    recommendedHubHref: "/answer",
     recommendedHubLabel: "Decision Tools",
     title: "Get a direct answer",
     href: "/resolve#direct-answers",
@@ -97,7 +97,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "approve",
     routePriority: 1,
-    recommendedHubHref: "/planning",
+    recommendedHubHref: "/operate",
     recommendedHubLabel: "Planning",
     title: "Prepare a board-ready artifact",
     href: "/planning#ops-export-briefs",
@@ -110,7 +110,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "risk",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
+    recommendedHubHref: "/answer",
     recommendedHubLabel: "Decision Tools",
     title: "Translate framework language into a decision",
     href: "/resolve#guided-translation",
@@ -123,7 +123,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
+    recommendedHubHref: "/answer",
     recommendedHubLabel: "Decision Tools",
     title: "Search the toolkit shortlist",
     href: "/resolve#toolkit-library",
@@ -154,7 +154,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
     type: "toolkit",
     job: "resolve",
     routePriority: 2,
-    recommendedHubHref: "/resolve",
+    recommendedHubHref: "/answer",
     recommendedHubLabel: "Decision Tools",
     title: toolkit.title,
     href: `/toolkits/${toolkit.slug}`,

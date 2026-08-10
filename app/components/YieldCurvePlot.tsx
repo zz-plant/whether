@@ -77,7 +77,7 @@ export function YieldCurvePlot({
   const areaD = `${d} L ${coords[coords.length - 1].x} ${height - paddingY} L ${coords[0].x} ${height - paddingY} Z`;
 
   const isInverted = safeSlope < 0;
-  const strokeColor = isInverted ? "#f43f5e" : "#10b981"; // Rose if inverted, emerald if normal
+  const strokeColor = isInverted ? "var(--color-semantic-tightening-border)" : "var(--color-semantic-easing-border)"; // Rose if inverted, emerald if normal
   const gradientId = `yieldGradient-${isInverted ? "inverted" : "normal"}`;
 
   return (
@@ -149,7 +149,7 @@ export function YieldCurvePlot({
                   cx={c.x}
                   cy={c.y}
                   r={isHovered ? "5" : "3"}
-                  fill={isHovered ? strokeColor : "var(--bg-raised, #0f172a)"}
+                   fill={isHovered ? strokeColor : "var(--bg-raised)"}
                   stroke={strokeColor}
                   strokeWidth={isHovered ? "2.5" : "1.5"}
                   className="transition-all duration-200"

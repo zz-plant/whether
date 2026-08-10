@@ -35,7 +35,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "signals",
-    href: "/evidence",
+    href: "/signals",
     label: "Evidence",
     navLabel: "Evidence",
     description: "See what changed, what drove it, and the thresholds worth watching.",
@@ -44,7 +44,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "planning",
-    href: "/planning",
+    href: "/operate",
     label: "Plan",
     navLabel: "Plan",
     description: "Turn this week's brief into decisions on hiring, spend, roadmap, and what to share.",
@@ -53,7 +53,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "resolve",
-    href: "/resolve",
+    href: "/answer",
     label: "Resolve",
     navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",

@@ -5,7 +5,7 @@ export default function Loading() {
     <RouteLoadingShell
       label="Loading planning"
       description="Preparing this week’s operating brief and decision tools."
-      currentPath="/planning"
+      currentPath="/operate"
       pageTitle="Planning"
     />
   );

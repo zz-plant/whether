@@ -168,8 +168,8 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/ibm-plex-sans-400.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
-        <link rel="prefetch" href="/planning" />
-        <link rel="prefetch" href="/evidence" />
+        <link rel="prefetch" href="/operate" />
+        <link rel="prefetch" href="/signals" />
         <link rel="alternate" hrefLang="x-default" href={siteUrl} />
         {/* Agent discovery: machine-readable alternates for browser-based AI agents */}
         <link rel="alternate" type="text/markdown" href={BRIEF_MD_URL} title="Whether Weekly Brief (Markdown)" />
@@ -206,9 +206,9 @@ export default function RootLayout({
           <div className="mx-auto max-w-4xl space-y-4">
             <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-fluid-sm text-[var(--footer-link)]">
               <Link href="/" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Brief</Link>
-              <Link href="/evidence" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Evidence</Link>
-              <Link href="/planning" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Plan</Link>
-              <Link href="/resolve" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resolve</Link>
+              <Link href="/signals" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Evidence</Link>
+              <Link href="/operate" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Plan</Link>
+              <Link href="/answer" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resolve</Link>
               <Link href="/trust" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Trust</Link>
               <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
               <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>

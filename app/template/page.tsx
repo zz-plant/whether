@@ -111,7 +111,7 @@ export default function TemplatePage() {
               <p className="text-xs font-semibold text-sky-200">The framework →</p>
               <p className="text-xs text-slate-300">Why bounded decisions work</p>
             </Link>
-            <Link href="/planning" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
+            <Link href="/operate" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
               <p className="text-xs font-semibold text-sky-200">Planning →</p>
               <p className="text-xs text-slate-300">Turn posture into team approvals</p>
             </Link>

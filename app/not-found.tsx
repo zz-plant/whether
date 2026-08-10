@@ -11,9 +11,9 @@ export default function NotFound() {
         actions={(
           <>
             <ButtonLink href="/" variant="primary">Weekly Brief</ButtonLink>
-            <ButtonLink href="/evidence" variant="ghost">Evidence</ButtonLink>
-            <ButtonLink href="/planning" variant="ghost">Planning</ButtonLink>
-            <ButtonLink href="/resolve" variant="ghost">Decision Tools</ButtonLink>
+            <ButtonLink href="/signals" variant="ghost">Evidence</ButtonLink>
+            <ButtonLink href="/operate" variant="ghost">Planning</ButtonLink>
+            <ButtonLink href="/answer" variant="ghost">Decision Tools</ButtonLink>
             <ButtonLink href="/trust" variant="ghost">Trust</ButtonLink>
           </>
         )}

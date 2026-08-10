@@ -6,7 +6,7 @@ import {
   resolveOperationsExecutionStepReturnLabel,
   resolveOperationsExecutionStepId,
   resolveOperationsExecutionStepIdFromLocation,
-} from "../app/planning/components/planningExecutionStepper";
+} from "../app/operate/components/planningExecutionStepper";
 
 describe("resolveOperationsExecutionStepId", () => {
   const steps = [

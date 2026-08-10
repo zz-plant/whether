@@ -146,7 +146,7 @@ export function SwipeableWeek({
             {months.slice(-6).map((m, i, arr) => {
               const isActive = activeMonth === m.month && activeYear === m.year;
               const isLast = i === arr.length - 1;
-              return <span key={`${m.month}-${m.year}`} className={`h-1 rounded-full transition-all ${isActive ? "w-4 bg-sky-400/60" : isLast ? "w-1.5 bg-white/30" : "w-1.5 bg-white/15"}`} />;
+              return <span key={`${m.month}-${m.year}`} className={`h-1 w-3 rounded-full transition-[transform,background-color] duration-200 ${isActive ? "scale-[1.25] bg-sky-400/60" : isLast ? "scale-100 bg-white/30" : "scale-100 bg-white/15"}`} />;
             })}
           </div>
           <button

@@ -25,7 +25,7 @@ describe("/api/telemetry/premium-funnel", () => {
         body: JSON.stringify({
           type: "premium_intent",
           source: "export_brief",
-          path: "/planning",
+          path: "/operate",
           ctaId: "copy_slack_brief",
           occurredAt: new Date().toISOString(),
         }),

@@ -59,7 +59,7 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
 
   const arcRotation = (probability / 100) * 180;
   const color = probability > 50 ? "text-amber-200" : probability > 25 ? "text-sky-200" : "text-emerald-200";
-  const strokeColor = probability > 50 ? "#fcd34d" : probability > 25 ? "#7dd3fc" : "#6ee7b7";
+  const strokeColor = probability > 50 ? "var(--color-semantic-caution-border)" : probability > 25 ? "var(--accent-action)" : "var(--color-semantic-easing-border)";
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/30 px-5 py-4">

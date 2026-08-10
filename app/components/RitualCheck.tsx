@@ -55,7 +55,7 @@ export function RitualCheck({
   if (!recordDate) return null;
 
   return (
-    <div className="weather-card flex items-center justify-between" data-sticky-strip-hide>
+    <div className="weather-section-border flex items-center justify-between" data-sticky-strip-hide>
       <button
         type="button"
         onClick={handleToggle}

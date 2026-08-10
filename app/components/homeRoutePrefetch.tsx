@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const PREFETCH_PATHS = ["/planning", "/evidence", "/trust", "/resolve"] as const;
+const PREFETCH_PATHS = ["/operate", "/signals", "/trust", "/answer"] as const;
 
 type NavigatorConnection = {
   saveData?: boolean;

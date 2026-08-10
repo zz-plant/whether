@@ -105,13 +105,13 @@ export async function buildPlanningPageModel(
       buildBreadcrumbList(
         createBreadcrumbTrail([
           { path: "/" },
-          { path: "/planning" },
+          { path: "/operate" },
         ]),
       ),
     ],
   };
 
-  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/planning" });
+  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const reportResult = weeklySnapshotResult.reportResult;
   const reportData = weeklySnapshotResult.reportData;
   const { snapshot } = weeklySnapshotResult;
@@ -136,7 +136,7 @@ export async function buildPlanningPageModel(
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
   const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/planning", previousHistoricalSelection)
+    ? buildTimeMachineHref("/operate", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = "/evidence?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
@@ -243,7 +243,7 @@ export async function buildPlanningPageModel(
       },
       page: {
         pageTitle: "Planning",
-        currentPath: "/planning",
+        currentPath: "/operate",
         pageSummary: "Prepare for this week's conditions: set guardrails, check runway, brief the team.",
         pageSummaryLink: { href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" },
         sectionLinks: operationsSectionLinks.plan,
@@ -297,7 +297,7 @@ export async function buildPlanningPageModel(
         historicalBanner: historicalSelection
           ? h(HistoricalBanner, {
             banner: historicalSelection.banner,
-            liveHref: "/planning",
+            liveHref: "/operate",
             previousHref: previousHistoricalHref,
             timeMachineHref: historicalTimeMachineHref,
           })
@@ -546,7 +546,7 @@ export async function buildPlanningPageModel(
           h("p", { className: "text-sm text-slate-300" }, "Open decision help when one specific question still needs an answer after this review."),
         ),
         h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "/resolve", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
+          h(Link, { href: "/answer", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
           h(Link, { href: "/planning#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
         ),
       ),

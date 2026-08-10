@@ -108,12 +108,12 @@ export const buildSignalsPageModel = async (
         url: siteUrl,
       },
       buildBreadcrumbList(
-        createBreadcrumbTrail([{ path: "/" }, { path: "/evidence" }]),
+        createBreadcrumbTrail([{ path: "/" }, { path: "/signals" }]),
       ),
     ],
   };
 
-  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/evidence" });
+  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/signals" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
@@ -143,7 +143,7 @@ export const buildSignalsPageModel = async (
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
   const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/evidence", previousHistoricalSelection)
+    ? buildTimeMachineHref("/signals", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = "/evidence?advanced=1#time-machine";
   const showAdvanced = resolvedSearchParams?.advanced === "1";

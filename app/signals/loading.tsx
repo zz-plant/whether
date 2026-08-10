@@ -5,7 +5,7 @@ export default function Loading() {
     <RouteLoadingShell
       label="Loading evidence"
       description="Checking what changed and why the forecast shifted."
-      currentPath="/evidence"
+      currentPath="/signals"
       pageTitle="Evidence"
     />
   );

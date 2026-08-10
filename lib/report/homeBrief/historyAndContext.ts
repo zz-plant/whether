@@ -347,7 +347,7 @@ export const buildStartRouteDeltaBlock = ({
       id: "posture-shift" as const,
       label: "Posture shift",
       detail: `Posture moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check decision posture before committing irreversible work.`,
-      href: "/resolve" as const,
+      href: "/answer" as const,
     });
   }
 
@@ -360,7 +360,7 @@ export const buildStartRouteDeltaBlock = ({
         topDriverEvidence?.immediateImplication
           ?? `That leaves ${overallDirectionCopy[trendLabel.toLowerCase()] ?? "the signal set otherwise flat"}`,
       ),
-      href: "/evidence" as const,
+      href: "/signals" as const,
     });
   }
 
@@ -372,7 +372,7 @@ export const buildStartRouteDeltaBlock = ({
       `The guardrail to hold is: ${guardrail}`,
       `The call flips when: ${reversalTrigger}`,
     ),
-    href: "/planning" as const,
+    href: "/operate" as const,
   });
 
   return {

@@ -51,7 +51,7 @@ const buildHrefFromParams = (
 };
 
 export const buildSignalsHref = ({
-  pathname = "/evidence",
+  pathname = "/signals",
   searchParams,
   remove = [],
   set = {},

@@ -7,7 +7,7 @@ import {
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
-import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../answer/components/toolkitLibraryPanels";
 
 export const runtime = "edge";
 

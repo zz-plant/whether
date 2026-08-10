@@ -23,7 +23,7 @@ export const downloadableResources = {
       conversionEvent: "download",
     },
     secondaryCta: {
-      href: "/planning",
+      href: "/operate",
       label: "Open guided version in Planning",
       conversionEvent: "request",
     },

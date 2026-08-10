@@ -42,7 +42,7 @@ export function CompareStrip({
   if (!previous) return null;
 
   return (
-    <div className="weather-card">
+    <div className="weather-section-border">
       <label className="relative inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-lg px-1 pr-2 transition-colors focus-within:bg-white/[0.03] focus-within:ring-2 focus-within:ring-sky-400/60 hover:bg-white/[0.03]">
         <input
           type="checkbox"
@@ -52,79 +52,69 @@ export function CompareStrip({
           className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0 pointer-events-none"
         />
         <span className="relative h-5 w-9 rounded-full border border-white/[0.08] bg-white/[0.04] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
-        <span className="text-fluid-micro font-medium tracking-[0.04em] text-white/65 transition-colors peer-checked:text-sky-200">
-          vs. last week
+        <span className="text-fluid-sm font-medium text-white/65 transition-colors peer-checked:text-sky-200">
+          Compare to last week
         </span>
       </label>
 
       {isComparing ? (
-        <div className="mt-4 pt-3 border-t border-white/[0.08] space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-2.5">
-              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/50">Last week</p>
-              <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
-                  <span className={`size-1.5 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
-                  {REGIME_DISPLAY[previous.regime] ?? previous.regime}
-                </span>
-              </div>
-              <p className="text-fluid-nano text-white/40 mt-0.5 font-mono">{previous.recordDate}</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <p className="text-fluid-nano text-white/40">Previous</p>
+            <div className="flex items-center gap-2">
+              <span className={`size-2 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
+              <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[previous.regime] ?? previous.regime}</span>
             </div>
-
-            <div className="rounded-lg bg-white/[0.04] border border-white/[0.08] p-2.5">
-              <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-sky-300/60">This week</p>
-              <div className="mt-1 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
-                  <span className={`size-1.5 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
-                  {REGIME_DISPLAY[currentRegime] ?? currentRegime}
-                </span>
-                <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.04] px-1.5 py-0.5 rounded">
-                  {currentTightness} pts
-                </span>
-              </div>
-              {typeof riskAppetite === "number" ? (
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
-                    <span className="size-1.5 rounded-full bg-emerald-400/60" />
-                    Risk appetite
-                  </span>
-                  <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.04] px-1.5 py-0.5 rounded">
-                    {riskAppetite}/100
-                  </span>
-                </div>
-              ) : null}
-            </div>
+            <p className="text-fluid-nano text-white/40">{previous.recordDate}</p>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-fluid-micro">
-            {previous.regime !== currentRegime ? (
-              <span className="inline-flex items-center gap-1.5 rounded bg-sky-500/10 px-2 py-0.5 font-medium text-sky-300">
-                Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
+          <div className="space-y-1">
+            <p className="text-fluid-nano text-white/40">Current</p>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <span className={`size-2 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
+                <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[currentRegime] ?? currentRegime}</span>
               </span>
-            ) : null}
-            {tightnessDelta != null && tightnessDelta !== 0 ? (
-              <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium ${
-                tightnessDelta > 0 ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"
-              }`}>
-                Cash availability: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts {Math.abs(tightnessDelta) >= 3 ? "· notable shift" : ""}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-medium text-white/60">
-                Cash availability: → unchanged
-              </span>
-            )}
-            {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
-              <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium ${
-                riskAppetiteDelta > 0 ? "bg-emerald-500/10 text-emerald-300" : "bg-rose-500/10 text-rose-300"
-              }`}>
-                Risk appetite: {riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(riskAppetiteDelta).toFixed(1)} pts {Math.abs(riskAppetiteDelta) >= 3 ? "· notable shift" : ""}
-              </span>
-            ) : typeof riskAppetite === "number" ? (
-              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-medium text-white/60">
-                Risk appetite: → unchanged
-              </span>
+              <span className="text-fluid-nano text-white/50 font-mono">{currentTightness} pts</span>
+            </div>
+            {typeof riskAppetite === "number" ? (
+              <div className="flex items-center justify-between mt-1">
+                <span className="flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-emerald-400/60" />
+                  <span className="text-fluid-sm text-white/70 font-medium">Risk appetite</span>
+                </span>
+                <span className="text-fluid-nano text-white/50 font-mono">{riskAppetite}/100</span>
+              </div>
             ) : null}
           </div>
+        </div>
+      ) : null}
+
+      {isComparing ? (
+        <div className="mt-4 flex flex-wrap gap-2 text-fluid-xs">
+          {previous.regime !== currentRegime ? (
+            <span className="inline-flex items-center gap-1.5 rounded bg-sky-500/10 px-2 py-0.5 text-sky-300">
+              Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
+            </span>
+          ) : null}
+          {tightnessDelta != null && tightnessDelta !== 0 ? (
+            <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 ${tightnessDelta > 0 ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"}`}>
+              Cash availability: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts {Math.abs(tightnessDelta) >= 3 ? "· notable shift" : ""}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 text-white/60">
+              Cash availability: → unchanged
+            </span>
+          )}
+          {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
+            <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 ${riskAppetiteDelta > 0 ? "bg-emerald-500/10 text-emerald-300" : "bg-rose-500/10 text-rose-300"}`}>
+              Risk appetite: {riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(riskAppetiteDelta).toFixed(1)} pts {Math.abs(riskAppetiteDelta) >= 3 ? "· notable shift" : ""}
+            </span>
+          ) : typeof riskAppetite === "number" ? (
+            <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 text-white/60">
+              Risk appetite: → unchanged
+            </span>
+          ) : null}
         </div>
       ) : null}
     </div>

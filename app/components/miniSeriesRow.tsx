@@ -76,7 +76,7 @@ export const MiniSeriesRow = ({
 }: MiniSeriesRowProps) => {
   const parsed = parseSeries(series, sharedDomain);
   const isOutlier = zScore !== null && Math.abs(zScore) >= 1.5;
-  const lineColor = isOutlier ? "#f43f5e" : "#94a3b8";
+  const lineColor = isOutlier ? "var(--color-semantic-tightening-border)" : "var(--app-text-muted)";
   const sparkDelta = parsed ? parsed.latest.value - parsed.previous.value : 0;
   const directionLabel = sparkDelta > 0 ? "up" : sparkDelta < 0 ? "down" : "flat";
   const rowSummary = `${name}. Latest ${latestValue}. Trend ${directionLabel}. Updated ${updatedAt}. ${insight}`;
@@ -97,9 +97,9 @@ export const MiniSeriesRow = ({
         {parsed ? (
           <svg viewBox={`0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`} className="h-16 w-full" aria-hidden="true" preserveAspectRatio="none">
             <path d={parsed.path} fill="none" stroke={lineColor} strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
-            <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={parsed.toY(parsed.median)} y2={parsed.toY(parsed.median)} stroke="#475569" strokeDasharray="3 3" strokeWidth="1" />
+            <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={parsed.toY(parsed.median)} y2={parsed.toY(parsed.median)} stroke="var(--app-text-muted)" strokeDasharray="3 3" strokeWidth="1" />
             <text x={SPARK_WIDTH - PADDING} y={parsed.toY(parsed.median) - 2} textAnchor="end" className="fill-slate-500 text-fluid-nano">Median</text>
-            <circle cx={parsed.latest.x} cy={parsed.latest.y} r="2" fill="#e2e8f0" />
+            <circle cx={parsed.latest.x} cy={parsed.latest.y} r="2" fill="var(--app-text-secondary)" />
             {thresholds.map((threshold) => {
               if (threshold.value < parsed.min || threshold.value > parsed.max) {
                 return null;
@@ -107,7 +107,7 @@ export const MiniSeriesRow = ({
               const y = parsed.toY(threshold.value);
               return (
                 <g key={threshold.label}>
-                  <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={y} y2={y} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
+                   <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={y} y2={y} stroke="var(--app-text-muted)" strokeDasharray="2 2" strokeWidth="1" />
                   <text x={SPARK_WIDTH - PADDING} y={y - 2} textAnchor="end" className="fill-slate-400 text-fluid-nano">{threshold.label}</text>
                 </g>
               );

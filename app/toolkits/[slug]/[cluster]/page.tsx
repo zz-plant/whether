@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { findToolkitDefinition } from "../../../../lib/decisionDomainCatalog";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
-import { findSignalsCluster } from "../../../evidence/clusterRoutes";
+import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitCanonicalClusterStaticParams } from "../../clusterRoutes";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../../lib/seo/indexationPolicy";

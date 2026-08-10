@@ -12,7 +12,7 @@
 }
 
 .weather-surface {
-  @apply rounded-xl border transition-all duration-200;
+  @apply rounded-xl border;
   border-color: var(--border-strong);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
@@ -26,8 +26,9 @@
 }
 
 .weather-card {
-  @apply rounded-xl border px-4 py-3.5 transition-all duration-200;
+  @apply rounded-xl border px-4 py-3.5;
   border-color: var(--border-default);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
     color-mix(in srgb, var(--bg-body) 38%, transparent);

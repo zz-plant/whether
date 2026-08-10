@@ -8,26 +8,22 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
   const panelId = useId();
 
   return (
-    <section className="group weather-card overflow-hidden" aria-label="Evidence and scenarios">
+    <section className="group weather-section-border overflow-hidden" aria-label="Evidence and scenarios">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((isOpen) => !isOpen)}
-        className={`flex min-h-12 w-full cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-xs font-semibold tracking-[0.04em] text-white/65 transition-colors select-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 ${highlight ? "border-l-2 border-l-sky-400/40" : ""}`}
+        className={`flex w-full min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-white/80 transition-colors select-none hover:bg-white/[0.04] hover:text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 ${highlight ? "border-l-2 border-l-sky-400/40" : ""}`}
       >
         <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <span className="text-white/80">Evidence &amp; scenarios</span>
+          <span>Evidence &amp; scenarios</span>
           {highlight ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-0.5 text-fluid-nano font-semibold tracking-wider text-sky-300 uppercase motion-safe:animate-pulse">
-              ★ Active target: {highlight}
+            <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-0.5 text-fluid-nano font-semibold tracking-wider text-sky-300">
+              ★ {highlight}
             </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.10] bg-white/[0.06] px-2 py-0.5 text-fluid-nano font-medium text-white/60">
-              Expand
-            </span>
-          )}
-          <span className="text-[0.65rem] text-white/50 truncate">
+          ) : null}
+          <span className="text-[0.65rem] text-white/40 truncate">
             Simulator · Signals · Trendline · Shift risk
           </span>
         </div>

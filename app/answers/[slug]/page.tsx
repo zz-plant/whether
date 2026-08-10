@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
       ...buildPageMetadata({
         title: "Operator answer moved",
         description: "This long-tail answer has been retired from the active answer set. Use Decision Tools for the canonical direct-answer flow.",
-        path: "/resolve",
+        path: "/answer",
         imageAlt: "Whether decision tools",
         imagePath: "/social/resolve.svg",
       }),

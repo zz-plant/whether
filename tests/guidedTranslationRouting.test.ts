@@ -6,7 +6,7 @@ import {
   buildGuidedTranslationHref,
   GuidedTranslationPanels,
   resolveGuidedTranslationState,
-} from "../app/resolve/components/guidedTranslationPanels";
+} from "../app/answer/components/guidedTranslationPanels";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
 describe("guided translation routing", () => {

@@ -12,7 +12,7 @@ describe("navigation information architecture", () => {
   it("orders primary layers by the operator loop", () => {
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.href),
-      ["/", "/evidence", "/planning", "/resolve", "/trust"],
+      ["/", "/signals", "/operate", "/answer", "/trust"],
     );
   });
 
@@ -24,9 +24,9 @@ describe("navigation information architecture", () => {
     assert.equal(labels.size, navigationLayers.length);
 
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/evidence"], "Evidence");
-    assert.equal(navigationLabelByPath["/planning"], "Plan");
-    assert.equal(navigationLabelByPath["/resolve"], "Resolve");
+    assert.equal(navigationLabelByPath["/signals"], "Evidence");
+    assert.equal(navigationLabelByPath["/operate"], "Plan");
+    assert.equal(navigationLabelByPath["/answer"], "Resolve");
     assert.equal(navigationLabelByPath["/trust"], "Trust");
   });
 
@@ -51,7 +51,7 @@ describe("navigation information architecture", () => {
   it("keeps canonical route transitions for Decide and Method", () => {
     const resolveLayer = navigationLayers.find((layer) => layer.key === "resolve");
     const trustLayer = navigationLayers.find((layer) => layer.key === "trust");
-    assert.equal(resolveLayer?.href, "/resolve");
+    assert.equal(resolveLayer?.href, "/answer");
     assert.equal(trustLayer?.href, "/trust");
     assert.equal(resolveLayer?.href.startsWith("#"), false);
     assert.equal(trustLayer?.href.startsWith("#"), false);

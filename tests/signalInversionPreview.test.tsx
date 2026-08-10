@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SignalInversionPreview } from "../app/evidence/components/signalInversionPreview";
+import { SignalInversionPreview } from "../app/signals/components/signalInversionPreview";
 
 describe("SignalInversionPreview", () => {
   it("renders the default inversion timeline summary for implication mode", () => {

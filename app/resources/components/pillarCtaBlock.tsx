@@ -16,7 +16,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
       <p className="text-sm text-slate-200">{body}</p>
       <div className="flex flex-wrap gap-3">
         <ActionLink
-          href="/planning"
+          href="/operate"
           variant="pill"
           className="text-sm"
           data-conversion-event="demo/contact"

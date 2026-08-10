@@ -88,7 +88,7 @@
   font-size: var(--fs-base);
 }
 
-.text-fluid-nano { font-size: var(--fs-nano); }
+ .text-fluid-nano { font-size: var(--fs-nano); }
 .text-fluid-micro { font-size: var(--fs-micro); }
 .text-fluid-xs { font-size: var(--fs-xs); }
 .text-fluid-sm { font-size: var(--fs-sm); }
@@ -96,6 +96,8 @@
 .text-fluid-lg { font-size: var(--fs-lg); }
 .text-fluid-xl { font-size: var(--fs-xl); }
 .text-fluid-2xl { font-size: var(--fs-2xl); }
+.text-display { font-size: var(--text-display); }
+.text-heading { font-size: var(--text-heading); }
 
 :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   line-height: 1.7;

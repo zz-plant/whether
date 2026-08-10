@@ -25,8 +25,8 @@ describe("sitemap", () => {
 
     assert.equal(urls.size, entries.length);
     assert.ok(urls.has(siteUrl));
-    assert.ok(urls.has(`${siteUrl}/resolve`));
-    assert.ok(urls.has(`${siteUrl}/planning`));
+    assert.ok(urls.has(`${siteUrl}/answer`));
+    assert.ok(urls.has(`${siteUrl}/operate`));
     assert.ok(!urls.has(`${siteUrl}/toolkits`));
     assert.ok(!urls.has(`${siteUrl}/answers`));
     assert.ok(!urls.has(`${siteUrl}/posture`));
@@ -89,11 +89,11 @@ describe("sitemap", () => {
     const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
 
     assert.ok(
-      (priorityByUrl.get(`${siteUrl}/resolve`) ?? 0) >
+      (priorityByUrl.get(`${siteUrl}/answer`) ?? 0) >
         (priorityByUrl.get(`${siteUrl}/answers/${indexableAnswerSlugs[0]}`) ?? 1),
     );
     assert.ok(
-      (priorityByUrl.get(`${siteUrl}/planning`) ?? 0) >
+      (priorityByUrl.get(`${siteUrl}/operate`) ?? 0) >
         (priorityByUrl.get(`${siteUrl}/resources/capital-discipline-venture-backed-companies`) ?? 1),
     );
   });
@@ -103,7 +103,7 @@ describe("sitemap", () => {
     const urls = new Set(entries.map((entry) => entry.url));
 
     assert.ok(!urls.has(`${siteUrl}/answers/should-we-hire-engineers-right-now`));
-    assert.ok(!urls.has(`${siteUrl}/evidence/capital-tightness-watch/hiring`));
+    assert.ok(!urls.has(`${siteUrl}/signals/capital-tightness-watch/hiring`));
     assert.ok(!urls.has(`${siteUrl}/should-we-hire-engineers-right-now`));
     assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
   });

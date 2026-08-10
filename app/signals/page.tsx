@@ -27,7 +27,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Why the Weekly Brief Changed",
   description:
     "Why the weekly brief changed: what moved, why it matters, and what would make the recommendation change.",
-  path: "/evidence",
+  path: "/signals",
   imageAlt: "Why the weekly brief changed — evidence overview",
   imagePath: "/social/evidence.svg",
 });
@@ -52,7 +52,7 @@ export default async function SignalsPage({
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
       pageTitle="Why the weekly brief changed"
-      currentPath="/evidence"
+      currentPath="/signals"
       pageSummary="What moved, why it matters, and what would flip the call."
       pageSummaryLink={{
         href: "#decision-summary",
@@ -63,7 +63,7 @@ export default async function SignalsPage({
       primaryCta={{ href: "#decision-summary", label: "What changed" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
-        href: "/planning",
+        href: "/operate",
         description: "Set guardrails for this week's plan",
       }}
       decisionBanner={{
@@ -93,7 +93,7 @@ export default async function SignalsPage({
         model.historicalSelection ? (
           <HistoricalBanner
             banner={model.historicalSelection.banner}
-            liveHref="/evidence"
+            liveHref="/signals"
             previousHref={model.previousHistoricalHref}
             timeMachineHref={model.historicalTimeMachineHref}
           />

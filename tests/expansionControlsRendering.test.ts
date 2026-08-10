@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { buildDiagnosticsExpansionHref } from "../app/evidence/page";
-import { buildActionsExpansionHref } from "../app/planning/page";
+import { buildDiagnosticsExpansionHref } from "../app/signals/page";
+import { buildActionsExpansionHref } from "../app/operate/page";
 import { getVisibleActionLaneItems } from "../app/components/appendix/playbookPanel";
 
 describe("expansion controls rendering", () => {

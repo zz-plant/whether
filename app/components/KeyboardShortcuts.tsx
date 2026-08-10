@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { HelpModal } from "./home/HelpModal";
 
 const SHORTCUTS: Record<string, string> = {
-  "e": "/evidence",
-  "p": "/planning",
+  "e": "/signals",
+  "p": "/operate",
   "h": "/history",
   "t": "/trust",
-  "r": "/resolve",
+  "r": "/answer",
   "/": "/search",
 };
 

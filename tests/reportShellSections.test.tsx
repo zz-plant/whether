@@ -100,7 +100,7 @@ describe("ReportShell extracted sections", () => {
         recordDateLabel="Mar 5"
         primaryCta={{ href: "#weekly", label: "Start" }}
         secondaryCta={{ href: "#evidence", label: "Evidence" }}
-        exportCta={{ href: "/planning", label: "Export" }}
+        exportCta={{ href: "/operate", label: "Export" }}
         statusLabel="DEFENSIVE"
         trustStatusLabel="HIGH"
         fetchedAtLabel="Mar 6"
@@ -186,7 +186,7 @@ describe("ReportShell extracted sections", () => {
         trustStatusDetail="Stable feed"
         trustStatusAction="Proceed with planning."
         trustStatusTone="stable"
-        currentPath="/evidence"
+        currentPath="/signals"
         primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
         secondaryCta={{ href: "#thresholds", label: "See thresholds" }}
       >

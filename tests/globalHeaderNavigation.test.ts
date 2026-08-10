@@ -10,22 +10,22 @@ import {
 
 describe("global header navigation helpers", () => {
   it("normalizes trailing slash paths", () => {
-    assert.equal(normalizePathname("/evidence/"), "/evidence");
+    assert.equal(normalizePathname("/signals/"), "/signals");
     assert.equal(normalizePathname("/"), "/");
   });
 
   it("derives report-shell visibility from canonical route list", () => {
     assert.equal(isReportShellRoute("/"), true);
-    assert.equal(isReportShellRoute("/evidence/overview"), true);
-    assert.equal(isReportShellRoute("/planning/plan"), true);
-    assert.equal(isReportShellRoute("/resolve"), true);
+    assert.equal(isReportShellRoute("/signals/overview"), true);
+    assert.equal(isReportShellRoute("/operate/plan"), true);
+    assert.equal(isReportShellRoute("/answer"), true);
     assert.equal(isReportShellRoute("/trust"), true);
   });
 
   it("uses canonical IA labels for condensed report route context", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/evidence/thresholds"), "Evidence");
-    assert.equal(resolveGlobalHeaderRouteLabel("/planning/cli"), "Plan");
-    assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Signals");
+    assert.equal(resolveGlobalHeaderRouteLabel("/operate/cli"), "Operate");
+    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Answer");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Trust");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
@@ -49,19 +49,19 @@ describe("global header navigation helpers", () => {
   });
 
   it("walks the operator loop for next-step cues and cycles back to the brief", () => {
-    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/evidence", label: "Evidence" });
-    assert.deepEqual(resolveReportHeaderNextStep("/evidence/thresholds"), { href: "/planning", label: "Plan" });
-    assert.deepEqual(resolveReportHeaderNextStep("/planning"), { href: "/resolve", label: "Resolve" });
-    assert.deepEqual(resolveReportHeaderNextStep("/resolve"), { href: "/trust", label: "Trust" });
+    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/signals", label: "Signals" });
+    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/operate", label: "Operate" });
+    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/answer", label: "Answer" });
+    assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/trust", label: "Trust" });
     assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Brief" });
     assert.equal(resolveReportHeaderNextStep("/history"), null);
     assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
   });
 
   it("marks only one primary link active for nested paths", () => {
-    const activeLinks = resolveGlobalHeaderNavigationLinks("/resolve/use-cases").filter((link) => link.isActive);
+    const activeLinks = resolveGlobalHeaderNavigationLinks("/answer/use-cases").filter((link) => link.isActive);
 
     assert.equal(activeLinks.length, 1);
-    assert.equal(activeLinks[0]?.href, "/resolve");
+    assert.equal(activeLinks[0]?.href, "/answer");
   });
 });

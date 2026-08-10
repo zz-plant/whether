@@ -109,9 +109,8 @@ export function DecisionHero({
     ? `${riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}${Math.abs(riskAppetiteDelta).toFixed(1)} pts${Math.abs(riskAppetiteDelta) >= 3 ? " · notable" : ""}`
     : "";
 
+  const isDegradedData = isFallback || (degradedCount && degradedCount > 0);
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
-  const dataStatusColor = isFallback ? "text-amber-300" : degradedCount && degradedCount > 0 ? "text-amber-300" : "text-emerald-300";
-  const dataStatusBg = isFallback ? "bg-amber-500/10 border-amber-500/20" : degradedCount && degradedCount > 0 ? "bg-amber-500/10 border-amber-500/20" : "bg-emerald-500/10 border-emerald-500/20";
 
   const isTreasuryUrl = treasurySource?.startsWith("http");
   const sourceNode = isTreasuryUrl ? (
@@ -131,16 +130,15 @@ export function DecisionHero({
   const showActionNow = actionNow && actionNow.trim() !== normalizedCall && actionNow.trim() !== "";
 
   return (
-    <section className="space-y-4" aria-labelledby="weekly-call-title">
-      {/* items-start, not items-end: the left column runs ~600px tall while the
-          score block is ~120px, so bottom-aligning it stranded the number at the
-          foot of the hero and left a large void beside the headline. Pairing the
-          headline with its score at the top closes the gap and reads like one unit. */}
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+    <section className="weather-section" aria-labelledby="weekly-call-title">
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">
-            <p className={`text-fluid-nano font-semibold uppercase tracking-[0.12em] ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
-            <h2 id="weekly-call-title" className="max-w-3xl text-pretty font-display text-[2rem] font-semibold leading-[1.05] text-white sm:text-[2.4rem]">
+            <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
+            <h2
+              id="weekly-call-title"
+              className="max-w-3xl text-pretty font-display text-display leading-tight text-white sm:text-[2.8rem]"
+            >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
           </div>
@@ -149,13 +147,13 @@ export function DecisionHero({
               <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
             </p>
           ) : null}
-          <div className="space-y-2 text-fluid-xs text-white/65">
+          <div className="space-y-2.5 text-fluid-xs text-white/60">
             <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
               {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
             </p>
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/50">
+            <p className="flex flex-wrap gap-x-3 gap-y-1 text-white/40">
               <span>
-                 <span className="text-white/50">Cash availability:</span>{" "}
+                <span>Cash availability:</span>{" "}
                 <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
               </span>
               {tightnessDelta !== 0 ? (
@@ -178,7 +176,7 @@ export function DecisionHero({
               {typeof riskAppetite === "number" ? (
                 <>
                   <span>
-                    <span className="text-white/50">Risk appetite:</span>{" "}
+                    <span> Risk appetite:</span>{" "}
                     <span className={riskAppetiteLevelColor}>{riskAppetite}/100 · {riskAppetiteLevel.toLowerCase()}</span>
                   </span>
                   {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
@@ -211,8 +209,8 @@ export function DecisionHero({
             </p>
           </div>
           {guardrail || reversalTrigger || (flipConditions && flipConditions.length > 0) ? (
-            <div className="space-y-1.5 pt-1 text-fluid-micro">
-              <p className="text-white/40 uppercase tracking-[0.06em] text-fluid-nano">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
+            <div className="space-y-1.5 pt-1 text-fluid-sm">
+              <p className="text-white/35 font-medium">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
               {typeof tightnessThreshold === "number" ? (
                 <div className="w-[6rem] py-1">
                   <ThresholdLadder
@@ -226,20 +224,20 @@ export function DecisionHero({
                 </div>
               ) : null}
               {guardrail ? (
-                <p className="text-white/50">
-                  <span className="font-semibold text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
+                <p className="text-white/60">
+                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
                   {guardrail}
                 </p>
               ) : null}
               {reversalTrigger ? (
-                <p className="text-white/50">
-                  <span className="font-semibold text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
+                <p className="text-white/60">
+                  <span className="font-medium text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
                   {reversalTrigger}
                 </p>
               ) : null}
               {flipConditions && flipConditions.length > 0 ? (
-                <p className="text-white/50">
-                  <span className="font-semibold text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</span>{" "}
+                <p className="text-white/60">
+                  <span className="font-medium text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</span>{" "}
                   {flipConditions.join(" · ")}
                   {transitionProbability && transitionProbability > 0 ? (
                     <span> ({transitionProbability}% probability)</span>
@@ -263,33 +261,24 @@ export function DecisionHero({
           </div>
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
-            <span
-              title={isFallback ? "All data from snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "All sources live"}
-              aria-label={isFallback ? "Data status: all data from snapshot" : degradedCount && degradedCount > 0 ? `Data status: ${degradedCount} source group${degradedCount === 1 ? "" : "s"} running on cached data` : "Data status: all sources live"}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${dataStatusBg} ${dataStatusColor}`}
-            >
-              <span className={`size-2 rounded-full ${dataStatusColor} ${isFallback || (degradedCount && degradedCount > 0) ? "motion-safe:animate-pulse" : ""}`} aria-hidden="true" />
-              {dataStatus}
+            <span className="inline-flex items-center gap-1.5">
+              <span className={`size-2 rounded-full ${isDegradedData ? "bg-amber-400/80 motion-safe:animate-pulse" : "bg-emerald-400/80"}`} aria-hidden="true" />
+              <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
             </span>
             <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
           </div>
-          <p className="text-fluid-micro text-white/50 sm:hidden">
-            Data: {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}
-          </p>
         </div>
 
-        <div className="sm:text-right">
+        <div className="">
           <SignalWaterfall data={signalData ?? {}}>
-            <div className="inline-flex items-baseline justify-center gap-1 sm:justify-end">
-              <span className="font-display text-[clamp(2rem,5vw,3.25rem)] font-bold leading-none text-white tabular-nums">
+            <div className="inline-flex items-baseline justify-center gap-1">
+              <span className="font-display text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">
                 {boldnessScore}
               </span>
-              <span className="text-fluid-xs font-semibold text-white/50">/100</span>
+              <span className="text-fluid-xs font-semibold text-white/40">/100</span>
             </div>
           </SignalWaterfall>
-          {/* Hidden on mobile: the headline block already states the same delta
-              ("Holding · no change vs last week") a short scroll above. */}
-          <div className={`mt-1.5 hidden sm:flex items-center justify-center gap-1.5 sm:justify-end font-display text-base sm:text-lg font-bold tabular-nums ${
+          <div className={`mt-2 flex items-center justify-center gap-1.5 font-display text-base font-bold tabular-nums ${
             boldnessDelta > 0 ? "text-emerald-300"
             : boldnessDelta < 0 ? "text-rose-300"
             : "text-slate-400"
@@ -297,13 +286,11 @@ export function DecisionHero({
             <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
             <span>{boldnessDeltaLabel}</span>
           </div>
-<p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
+          <p className="text-fluid-xs font-medium text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="hidden sm:block text-fluid-micro text-white/50 mt-0.5">Room to hire, spend, & commit — 70% risk appetite + 30% cash availability</p>
-          {/* Replaces a hardcoded-rgba gradient track: this is theme-aware and carries
-              last week's reading, so the delta is visible rather than implied. */}
-          <div className="mt-3 w-full max-w-[10rem] mx-auto sm:ml-auto sm:mr-0">
+          <p className="text-fluid-xs text-white/45 mt-0.5">70% risk appetite + 30% cash availability</p>
+          <div className="mt-3 w-full max-w-[10rem] mx-auto">
             <PostureDial
               idPrefix="hero-posture"
               value={dialValue}

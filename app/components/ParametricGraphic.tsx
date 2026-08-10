@@ -39,7 +39,7 @@ export function ParametricGraphic({
   if (renderingTier === "svg" || renderingTier === "filter") {
     return (
       <div
-        className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 transition-all ${
+        className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 transition-[transform,box-shadow] ${
           interactive ? "hover:scale-[1.03]" : ""
         } ${className}`}
         style={{ width: size, height: size }}

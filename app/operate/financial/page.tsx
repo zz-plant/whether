@@ -3,31 +3,33 @@ import { Suspense } from "react";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
+import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decision Memory Ledger — What We Decided and Why",
-  description: "Immutable board-ready record of all macro posture decisions and overrides.",
-  path: "/planning/memory",
-  imageAlt: "Whether decision memory view",
+  title: "Financial Strategy — Capital Posture This Week",
+  description: "CFO and financial operating guardrails aligned with current interest rates and credit conditions.",
+  path: "/planning/financial",
+  imageAlt: "Whether financial strategy view",
   imagePath: "/social/planning.svg",
 });
 
-export default async function DecisionMemoryPage({
+export default async function FinancialStrategyPage({
   searchParams,
 }: {
   searchParams?: Promise<any>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/planning" });
+  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const reportData = weeklySnapshotResult.reportData;
   const { snapshot } = weeklySnapshotResult;
   const {
     assessment,
+    sensors,
+    macroSeries,
     recordDateLabel,
     fetchedAtLabel,
     statusLabel,
@@ -54,9 +56,9 @@ export default async function DecisionMemoryPage({
           treasurySource: treasury.source,
         },
         page: {
-          pageTitle: "Decision Memory",
-          currentPath: "/planning/memory",
-          pageSummary: "Review saved weekly posture decisions, override notes, and print board-ready exports.",
+          pageTitle: "Financial Strategy",
+          currentPath: "/planning/financial",
+          pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
           sectionLinks: operationsSectionLinks.plan,
         },
         trust: {
@@ -67,17 +69,17 @@ export default async function DecisionMemoryPage({
           showOfflineBadge: isFallback && !reportData.historicalSelection,
         },
         actions: {
-          primaryCta: { href: "/planning", label: "Operations Checklists" },
+          primaryCta: { href: "/operate", label: "Operations Checklists" },
           secondaryCta: { href: "/", label: "Weekly Brief" },
         },
         payloads: {
           decisionBanner: {
-            label: "Audit Ledger",
-            decision: "Check previous posture commitments, download audit logs, and justify overrides to the board.",
-            horizon: "Historical Archive",
+            label: "CFO Align",
+            decision: "Set capital allocation discipline, test runway limits, and export aligned board updates.",
+            horizon: "This quarter",
             confidence: trustStatusLabel,
             effectiveDate: recordDateLabel,
-            evidenceHref: "#ops-decision-memory",
+            evidenceHref: "#ops-runway-planner",
           },
           commandBar: {
             regime: assessment.regime,
@@ -91,13 +93,18 @@ export default async function DecisionMemoryPage({
     >
       <div className="space-y-4">
         <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400">
-          This audit ledger displays saved operating postures and overrides, stamped with exact macro signals at evaluation time. Use it to maintain governance compliance.
+          This financial workspace lets you run scenario planning based on your startup stage and sector sensitivity, and export macro-aligned budget planning memos for your board.
         </p>
-        <div id="ops-decision-memory">
-          <DecisionMemoryPanel />
+        <div id="ops-runway-planner">
+          <RunwayPlannerPanel
+            assessment={assessment}
+            sensors={sensors}
+            macroSeries={macroSeries}
+            recordDateLabel={recordDateLabel}
+          />
         </div>
         <Suspense fallback={null}>
-          <OperationsWorkstreamNav currentPath="/planning/memory" />
+          <OperationsWorkstreamNav currentPath="/planning/financial" />
         </Suspense>
       </div>
     </ReportShell>

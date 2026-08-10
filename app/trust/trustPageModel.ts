@@ -133,7 +133,7 @@ export async function buildTrustPageModel() {
     primaryCta: { href: "#trust-snapshot", label: "Check trust snapshot" },
     secondaryCta: { href: "/", label: "Weekly Brief" },
     nextStep: {
-      href: "/evidence",
+      href: "/signals",
       description: "Check evidence",
     },
     decisionBanner: {

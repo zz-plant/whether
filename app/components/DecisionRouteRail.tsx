@@ -15,7 +15,7 @@ const routeGroups = [
   {
     label: "Resolve",
     links: [
-      { href: "/resolve", label: "By role" },
+      { href: "/answer", label: "By role" },
       { href: "/resolve#toolkit-library", label: "Toolkits" },
     ],
   },
@@ -43,17 +43,17 @@ export function DecisionRouteRail() {
   const panelId = useId();
 
   return (
-    <section className="group weather-card overflow-hidden" aria-label="Route this week's call">
+    <section className="group weather-section-border overflow-hidden" aria-label="Route this week's call">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((isOpen) => !isOpen)}
-        className="flex min-h-12 w-full cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-xs font-semibold tracking-[0.04em] text-white/65 transition-colors select-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0"
+        className="flex w-full min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-white/70 transition-colors select-none hover:bg-white/[0.04] hover:text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0"
       >
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="text-white/80">Route this week&apos;s call</span>
-          <span className="truncate text-[0.65rem] text-white/50">Plan · Resolve · Rule · Compare</span>
+          <span>Route this week&apos;s call</span>
+          <span className="truncate text-[0.65rem] text-white/40">Plan · Resolve · Rule · Compare</span>
         </div>
         <ChevronRight
           className={`h-5 w-5 shrink-0 transition-transform group-hover:text-white/60 ${open ? "rotate-90" : ""} text-white/50`}
@@ -65,16 +65,13 @@ export function DecisionRouteRail() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
             {routeGroups.map((group) => (
               <div key={group.label} className="space-y-1">
-                <p className="text-fluid-micro font-semibold uppercase tracking-[0.06em] text-white/40">
-                  {group.label}
-                </p>
                 <ul className="space-y-0.5">
                   {group.links.map((link) => (
                     <li key={link.href}>
                       <ActionLink
                         href={link.href}
                         variant="inline"
-                        className="normal-case tracking-normal text-fluid-micro text-sky-300/75 hover:text-sky-200"
+                        className="normal-case tracking-normal text-fluid-sm text-sky-300/75 hover:text-sky-200"
                       >
                         {link.label}
                       </ActionLink>

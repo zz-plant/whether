@@ -9,7 +9,7 @@ export type OperationsWorkstreamLink = {
 
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
-    href: "/planning",
+    href: "/operate",
     label: "Weekly plan",
     description: "Default: review the weekly plan before you change team pace, spend, or priorities.",
   },

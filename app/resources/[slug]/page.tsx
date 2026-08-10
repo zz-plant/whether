@@ -41,7 +41,7 @@ import {
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 
 type Params = { slug: string };
-const RESOURCES_RETURN_HREF = "/planning" as const;
+const RESOURCES_RETURN_HREF = "/operate" as const;
 const RESOURCES_RETURN_LABEL = "Return to Planning";
 
 export const revalidate = 21600;
