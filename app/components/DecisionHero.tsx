@@ -11,6 +11,9 @@ import type { RegimeKey } from "../../lib/types";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
+import { RegimeCommandBar } from "../components/RegimeCommandBar";
+import { buildFlipConditionsWithoutTriggerDuplication } from "../../lib/report/canonicalDecisionCopy";
+import { formatNumberWithUnit } from "../../lib/formatters";
 
 type Props = {
   tightness: number;
