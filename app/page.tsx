@@ -21,7 +21,7 @@ import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import dynamic from "next/dynamic";
 import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
-import { buildAgentInterfaceResponse, isAgentCadence } from "../lib/agentInterface";
+import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
@@ -37,7 +37,16 @@ const EvidenceTools = dynamic(
   () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
   {
     ssr: false,
-    loading: () => <div className="weather-card h-24 animate-pulse" />,
+    loading: () => (
+      <div className="weather-card h-64 animate-pulse space-y-4 p-5">
+        <div className="h-5 w-40 rounded bg-white/10" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-20 rounded bg-white/5" />
+          <div className="h-20 rounded bg-white/5" />
+        </div>
+        <div className="h-10 w-full rounded bg-white/10" />
+      </div>
+    ),
   },
 );
 
@@ -45,7 +54,16 @@ const ScenarioSimulator = dynamic(
   () => import("./components/ScenarioSimulator").then((mod) => mod.ScenarioSimulator),
   {
     ssr: false,
-    loading: () => <div className="weather-card h-32 animate-pulse" />,
+    loading: () => (
+      <div className="weather-card h-72 animate-pulse space-y-4 p-5">
+        <div className="flex items-center justify-between">
+          <div className="h-5 w-48 rounded bg-white/10" />
+          <div className="h-4 w-20 rounded bg-white/5" />
+        </div>
+        <div className="h-24 w-full rounded bg-white/5" />
+        <div className="h-12 w-full rounded bg-white/10" />
+      </div>
+    ),
   },
 );
 
@@ -154,7 +172,6 @@ function WeeklyTopFoldContract({
 type RegimeEntry = { record_date: string; regime: string };
 
 type BelowTheFoldEvidenceProps = {
-  enrichmentPromise: Promise<unknown>;
   highlight: string | undefined;
   tightness: number;
   boldnessScore: number;
@@ -169,9 +186,7 @@ type BelowTheFoldEvidenceProps = {
   recentRecordDates: string[];
 };
 
-async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
-  await props.enrichmentPromise.catch(() => undefined);
-
+function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   return (
     <>
       <EvidenceDrawer highlight={props.highlight}>
@@ -211,15 +226,18 @@ async function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   );
 }
 
-async function BelowTheFoldHistory({
-  enrichmentPromise,
+function BelowTheFoldHistory({
   regimes,
 }: {
-  enrichmentPromise: Promise<unknown>;
   regimes: RegimeEntry[];
 }) {
-  await enrichmentPromise.catch(() => undefined);
   return <RegimeHistory regimes={regimes} />;
+}
+
+async function AsyncCadenceSection({ cadence }: { cadence: Exclude<AgentCadence, "weekly"> }) {
+  const cadenceData = await buildAgentInterfaceResponse(cadence).catch(() => null);
+  if (!cadenceData) return null;
+  return <CadenceCallCard cadence={cadence} data={cadenceData} />;
 }
 
 async function PageContent({
@@ -232,23 +250,17 @@ async function PageContent({
   const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
-  let cadenceData: Awaited<ReturnType<typeof buildAgentInterfaceResponse>> | null = null;
 
   try {
-    [data, cadenceData] = await Promise.all([
-      loadHomePageAssembly(searchParams),
-      activeCadence !== "weekly"
-        ? buildAgentInterfaceResponse(activeCadence).catch(() => null)
-        : Promise.resolve(null),
-    ]);
+    data = await loadHomePageAssembly(searchParams);
   } catch {
     return (
-      <div className="text-center py-16 space-y-4">
+      <div className="weather-card my-8 mx-auto max-w-xl text-center py-14 space-y-4">
         <div className="space-y-2">
-          <p className="text-white/60 text-sm">Couldn&apos;t load this week&apos;s brief.</p>
+          <p className="text-white/80 font-medium text-base">Couldn&apos;t load this week&apos;s brief.</p>
           <p className="text-white/50 text-fluid-micro">Data sources are temporarily unavailable or delayed.</p>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <button
             type="button"
             onClick={() => window.location.reload()}
@@ -304,8 +316,6 @@ async function PageContent({
     : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
   const pauseThreshold = Number.isFinite(parsedGuardrailThreshold) ? parsedGuardrailThreshold : 70;
 
-  const enrichmentPromise = homepage.workspaceModelPromise ?? Promise.resolve();
-
   const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
     ? `Cash availability crosses ${parsedGuardrailThreshold}`
     : undefined;
@@ -355,10 +365,12 @@ async function PageContent({
               };
             })}
           >
-            {activeCadence !== "weekly" && cadenceData ? (
-              <CadenceCallCard cadence={activeCadence} data={cadenceData} />
+            {activeCadence !== "weekly" ? (
+              <Suspense fallback={<div className="weather-card h-28 animate-pulse" />}>
+                <AsyncCadenceSection cadence={activeCadence} />
+              </Suspense>
             ) : null}
-<DecisionHero
+            <DecisionHero
                 tightness={tightness}
                 tightnessDelta={tightnessDelta}
                 riskAppetite={riskAppetite}
@@ -398,7 +410,7 @@ async function PageContent({
                memoryRegimes={macroTrendline}
              />
 
-<CompareStrip
+            <CompareStrip
                currentRegime={regime}
                currentTightness={tightness}
                tightnessDelta={tightnessDelta}
@@ -417,7 +429,6 @@ async function PageContent({
             </div>
           }>
             <BelowTheFoldEvidence
-              enrichmentPromise={enrichmentPromise}
               highlight={toolHighlight}
               tightness={tightness}
               boldnessScore={weeklyLeadershipSummary.boldnessScore}
@@ -437,7 +448,6 @@ async function PageContent({
           <div className="space-y-4 lg:col-start-2">
           <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
             <BelowTheFoldHistory
-              enrichmentPromise={enrichmentPromise}
               regimes={macroTrendline}
             />
           </Suspense>
