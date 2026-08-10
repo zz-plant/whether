@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
-import { Search, CornerRightUp, Maximize2, Download, History as HistoryIcon } from "lucide-react";
+import { Search, CornerRightUp, Maximize2, Download, Archive } from "lucide-react";
 import { primaryNavigationLayers, navigationLayers } from "../../lib/navigation/informationArchitecture";
 
 type CommandItem = {
@@ -20,15 +20,15 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const toggleFocusMode = () => {
+  const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
     onClose();
-  };
+  }, [onClose]);
 
-  const navigateTo = (href: string) => {
+  const navigateTo = useCallback((href: string) => {
     router.push(href);
     onClose();
-  };
+  }, [router, onClose]);
 
   const commands: CommandItem[] = useMemo(() => {
     const navCommands: CommandItem[] = navigationLayers.map((layer) => ({
@@ -64,7 +64,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         id: "history",
         label: "View history",
         description: "Browse past briefs and compare epochs",
-        icon: HistoryIcon,
+        icon: Archive,
         action: () => navigateTo("/history"),
         shortcut: "H",
       },
