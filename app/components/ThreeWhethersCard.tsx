@@ -101,7 +101,10 @@ export function ThreeWhethersCard({
         {decisions.map((item, i) => {
           const Icon = item.icon;
           return (
-            <div key={i} className="relative pl-5 space-y-3">
+            <div
+              key={i}
+              className="relative pl-5 space-y-3"
+            >
               <div className={`absolute top-0 left-0 h-full w-0.5 ${VERDICT_BARS[item.verdict]}`} />
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded bg-white/[0.04] text-slate-300">
@@ -115,14 +118,14 @@ export function ThreeWhethersCard({
 
               <p className="text-sm text-white/70">{item.recommendation}</p>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 text-xs text-white/50">
                 <div className="flex gap-2">
-                  <span className="font-medium text-white/50">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
-                  <code className="font-mono text-amber-200/80 text-xs">{item.threshold}</code>
+                  <span className="font-medium text-white/55">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
+                  <code className="font-mono text-amber-200/80">{item.threshold}</code>
                 </div>
                 <div className="flex gap-2">
-                  <span className="font-medium text-white/50">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
-                  <code className="font-mono text-rose-200/80 text-xs">{item.reversalCondition}</code>
+                  <span className="font-medium text-white/55">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
+                  <code className="font-mono text-rose-200/80">{item.reversalCondition}</code>
                 </div>
               </div>
             </div>

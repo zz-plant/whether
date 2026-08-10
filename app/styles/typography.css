@@ -73,14 +73,14 @@
   letter-spacing: 0;
 }
 
-.type-label {
-  @apply font-semibold tracking-[0.08em] leading-none uppercase;
-  font-size: var(--fs-micro);
-}
+/* Unified label primitive — use for all section/section-header metadata labels.
+   Replaces type-kicker, weather-label, weather-brief-kicker, and weather-hub-stat-label. */
 
-.type-kicker {
-  @apply font-semibold tracking-[0.08em] text-slate-400;
-  font-size: var(--fs-micro);
+.type-label {
+  @apply font-medium text-slate-400;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 .type-data {
@@ -94,12 +94,12 @@
 .text-fluid-sm { font-size: var(--fs-sm); }
 .text-fluid-base { font-size: var(--fs-base); }
 .text-fluid-lg { font-size: var(--fs-lg); }
-.text-fluid-xl { font-size: var(--fs-xl); }
-.text-fluid-2xl { font-size: var(--fs-2xl); }
+ .text-fluid-xl { font-size: var(--fs-xl); }
+ .text-fluid-2xl { font-size: var(--fs-2xl); }
 .text-display { font-size: var(--text-display); }
 .text-heading { font-size: var(--text-heading); }
 
-:where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
+ :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   line-height: 1.7;
 }
 

@@ -39,12 +39,50 @@
     inset 0 1px 0 var(--edge-highlight-faint);
 }
 
-.weather-card:hover {
+ .weather-card:hover {
   border-color: rgba(125, 211, 252, 0.22);
   box-shadow:
     var(--elev-3),
     var(--glow-soft),
     inset 0 1px 0 var(--edge-highlight);
+}
+
+/* New surface system: typographic hierarchy over container hierarchy.
+   Sections replace stacked cards — pure spacing + optional top border.
+   Labels replace uppercase kickers with sentence case.
+   Dots replace rounded-full badge pills.
+   Bars replace verdict badges with left color bars. */
+
+.weather-section {
+  @apply w-full;
+}
+
+.weather-section + .weather-section {
+  @apply mt-8;
+}
+
+.weather-section-border {
+  @apply w-full border-t;
+  border-color: var(--border-subtle);
+  padding-top: var(--space-xl);
+}
+
+.weather-label {
+  @apply text-xs font-medium text-slate-400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.weather-dot {
+  @apply inline-flex items-center gap-1.5;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  text-transform: none;
+  color: var(--app-text-secondary);
+}
+
+.weather-bar {
+  @apply absolute top-0 bottom-0 left-0 w-0.5;
 }
 
 .weather-brief-shell {
