@@ -1036,5 +1036,17 @@
     "regime": "EXPANSION",
     "tightness": 40,
     "riskAppetite": 59
+  },
+  {
+    "record_date": "2026-06-30",
+    "regime": "EXPANSION",
+    "tightness": 36,
+    "riskAppetite": 52
+  },
+  {
+    "record_date": "2026-07-31",
+    "regime": "EXPANSION",
+    "tightness": 50,
+    "riskAppetite": 59
   }
 ]
