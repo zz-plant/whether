@@ -7,16 +7,18 @@ describe("home route render contract", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
 
     assert.match(routeSource, /data-testid="weekly-top-fold"/);
-    assert.match(routeSource, /lg:grid-cols-12/);
+    assert.match(routeSource, /md:grid-cols-12/);
     assert.match(routeSource, /lg:grid-cols-\[1fr_18rem\]/);
 
-    const revisitIndex = routeSource.indexOf('shouldRevisit ? "Revisit"');
-    const scalarIndex = routeSource.indexOf("Posture shift:");
+    // Top-fold order since the "Refactor top-fold" redesign: posture delta scalar,
+    // then the memory trajectory trail (left column), then the revisit-queue state (right column).
+    const scalarIndex = routeSource.indexOf("weeklySummary.notchShiftLabel");
     const memoryIndex = routeSource.indexOf("memoryItems.join");
+    const revisitIndex = routeSource.indexOf('shouldRevisit ? "Revisit active"');
 
-    assert.ok(revisitIndex >= 0, "active route exposes the revisit decision state");
-    assert.ok(scalarIndex > revisitIndex, "active route exposes the canonical scalar after revisit state");
-    assert.ok(memoryIndex > scalarIndex, "active route exposes memory rail after the scalar");
+    assert.ok(scalarIndex >= 0, "active route exposes the canonical posture-delta scalar");
+    assert.ok(memoryIndex > scalarIndex, "active route exposes the memory trail after the scalar");
+    assert.ok(revisitIndex > memoryIndex, "active route exposes the revisit decision state after the memory trail");
     assert.ok(!routeSource.includes("DeltaTrustStrip"), "trust stays inline in the decision hero, not a duplicate summary card");
     assert.ok(!routeSource.includes("<FlipMeter"), "flip watch lives in the hero, not a separate barometer card");
 
