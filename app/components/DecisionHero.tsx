@@ -14,6 +14,7 @@ import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { RegimeCommandBar } from "../components/RegimeCommandBar";
 import { buildFlipConditionsWithoutTriggerDuplication } from "../../lib/report/canonicalDecisionCopy";
 import { formatNumberWithUnit } from "../../lib/formatters";
+import { Tag } from "./ui/tag";
 
 type Props = {
   tightness: number;
@@ -26,6 +27,7 @@ type Props = {
   weeklyCall?: string;
   actionNow?: string;
   regime: string;
+  previousRegime?: string;
   postureLabel: string;
   signalDirection: SignalDirection;
   recordDate: string;
@@ -119,7 +121,8 @@ export function DecisionHero({
    const compassX = tightness / 100;
    const compassY = 1 - (riskAppetite ?? 50) / 100;
 
-   const regimeBounds = REGIME_BOUNDARIES[regime.toUpperCase() as RegimeKey] ?? REGIME_BOUNDARIES.EXPANSION;
+   const upperRegime = regime.toUpperCase();
+   const regimeBounds = isRegimeKey(upperRegime) ? REGIME_BOUNDARIES[upperRegime] : REGIME_BOUNDARIES.EXPANSION;
   const flipDist = tightness < regimeBounds.threshold
     ? Math.abs(tightness - regimeBounds.threshold)
     : Math.abs((riskAppetite ?? 50) - (regimeBounds.threshold - 10));

@@ -10,7 +10,7 @@ describe("home route render contract", () => {
     assert.match(routeSource, /lg:grid-cols-12/);
     assert.match(routeSource, /lg:grid-cols-\[1fr_18rem\]/);
 
-    const revisitIndex = routeSource.indexOf('shouldRevisit ? "REVISIT"');
+    const revisitIndex = routeSource.indexOf('shouldRevisit ? "Revisit"');
     const scalarIndex = routeSource.indexOf("Posture shift:");
     const memoryIndex = routeSource.indexOf("memoryItems.join");
 

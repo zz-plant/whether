@@ -222,6 +222,44 @@ const TASK_PROFILES = [
       "bun run test tests/homeRouteDecisionTransmissionContract.test.tsx",
     ],
   },
+  {
+    id: "feature-audit",
+    label: "Feature audit",
+    rationale: "The task is to audit an existing feature for compliance, completeness, or technical debt.",
+    keywords: ["audit", "feature-audit", "compliance", "analysis", "review"],
+    docs: [
+      "AGENTS.md",
+      "docs/agents/README.md",
+      "docs/agents/engineering-principles.md",
+    ],
+    targets: [
+      "app/page.tsx",
+      "lib/report/reportData.ts",
+    ],
+    checks: [
+      "bun run lint",
+      "bun run typecheck",
+    ],
+  },
+  {
+    id: "bugfix",
+    label: "Bugfix",
+    rationale: "The task is to fix a specific bug or regression.",
+    keywords: ["bug", "fix", "bugfix", "issue", "patch", "regression"],
+    docs: [
+      "AGENTS.md",
+      "docs/agents/README.md",
+      "docs/agents/quality-and-pr.md",
+    ],
+    targets: [
+      "tests/",
+      "lib/",
+    ],
+    checks: [
+      "bun run test",
+      "bun run lint",
+    ],
+  },
 ];
 
 const DEFAULT_PROFILE = {
@@ -882,19 +920,30 @@ export function formatRouteReport(route, meta = {}) {
     lines.push(`Matched keywords: ${route.matchedKeywords.join(", ")}`);
   }
 
-  lines.push("", "Read first:");
-  for (const doc of route.docs) {
-    lines.push(`- ${doc}`);
+  const readAnchors = unique([
+    ...(route.docs || []),
+    ...(route.targets || []).slice(0, 2),
+  ]).slice(0, 5);
+
+  if (readAnchors.length > 0) {
+    lines.push("", "Read Anchors:");
+    for (const anchor of readAnchors) {
+      lines.push(`- ${anchor}`);
+    }
   }
 
-  lines.push("", "Start with:");
-  for (const target of route.targets) {
-    lines.push(`- ${target}`);
+  if (route.targets?.length > 0) {
+    lines.push("", "Work Targets:");
+    for (const target of route.targets) {
+      lines.push(`- ${target}`);
+    }
   }
 
-  lines.push("", "Minimum verification:");
-  for (const check of route.checks) {
-    lines.push(`- ${check}`);
+  if (route.checks?.length > 0) {
+    lines.push("", "Verification Commands:");
+    for (const check of route.checks) {
+      lines.push(`- ${check}`);
+    }
   }
 
   return lines.join("\n");

@@ -23,7 +23,7 @@ describe("time machine selection helpers", () => {
   it("appends month/year params to handoff links", () => {
     assert.equal(
       buildTimeMachineHref("/operate", { month: 3, year: 2023 }),
-      "/planning?month=3&year=2023"
+      "/operate?month=3&year=2023"
     );
   });
 

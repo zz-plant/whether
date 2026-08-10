@@ -6,8 +6,8 @@ describe("isReportShellRoute", () => {
   it("keeps reduced mode on core report paths and nested report routes", () => {
     assert.equal(isReportShellRoute("/"), true);
     assert.equal(isReportShellRoute("/signals"), true);
-    assert.equal(isReportShellRoute("/evidence/time-machine"), true);
-    assert.equal(isReportShellRoute("/planning/cli"), true);
+    assert.equal(isReportShellRoute("/history"), true);
+    assert.equal(isReportShellRoute("/operate/cli"), true);
   });
 
   it("preserves the full header on non-report routes", () => {

@@ -35,13 +35,13 @@ describe("PostureDial", () => {
       <PostureDial idPrefix="d2" value={0.6} previous={0.1} label="Tighten" />,
     );
     assert.match(tightened, /Moved toward tighten since last week\./);
-    assert.match(tightened, /stroke="var\(--accent-danger\)"/);
+    assert.match(tightened, /stroke="var\(--color-semantic-tightening-fg\)"/);
 
     const loosened = renderToStaticMarkup(
       <PostureDial idPrefix="d3" value={-0.6} previous={0.1} label="Loosen" />,
     );
     assert.match(loosened, /Moved toward loosen since last week\./);
-    assert.match(loosened, /stroke="var\(--accent-success\)"/);
+    assert.match(loosened, /stroke="var\(--color-semantic-easing-fg\)"/);
   });
 
   it("clamps out-of-range and non-finite values", () => {

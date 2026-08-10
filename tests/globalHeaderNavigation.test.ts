@@ -23,9 +23,9 @@ describe("global header navigation helpers", () => {
   });
 
   it("uses canonical IA labels for condensed report route context", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Signals");
-    assert.equal(resolveGlobalHeaderRouteLabel("/operate/cli"), "Operate");
-    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Answer");
+    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
+    assert.equal(resolveGlobalHeaderRouteLabel("/operate/cli"), "Plan");
+    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Resolve");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Trust");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
@@ -49,9 +49,9 @@ describe("global header navigation helpers", () => {
   });
 
   it("walks the operator loop for next-step cues and cycles back to the brief", () => {
-    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/signals", label: "Signals" });
-    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/operate", label: "Operate" });
-    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/answer", label: "Answer" });
+    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/signals", label: "Evidence" });
+    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/operate", label: "Plan" });
+    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/answer", label: "Resolve" });
     assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/trust", label: "Trust" });
     assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Brief" });
     assert.equal(resolveReportHeaderNextStep("/history"), null);

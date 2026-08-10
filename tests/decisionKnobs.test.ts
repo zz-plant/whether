@@ -67,7 +67,7 @@ describe("buildWeeklyLockCommitment", () => {
       freshnessDegraded: false,
     });
 
-    assert.equal(commitment.currentCall, "Focus on efficiency — new commitments should pay back within 12 months.");
+    assert.equal(commitment.currentCall, "Focus on efficiency: Limit new commitments to 12-month payback. Pause if risk < 40; resume when > 50.");
     assert.equal(commitment.flipConditions.length, 3);
     assert.match(commitment.flipConditions[0], /Tightness ≤ 66/);
     assert.match(commitment.flipConditions[1], /Risk appetite ≥ 49/);

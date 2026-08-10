@@ -153,6 +153,41 @@ const run = async () => {
 
   console.log("✅ /api/weekly schema checks passed");
 
+  const agentRequiredKeys = [
+    "cadence",
+    "summary",
+    "agentHandoff",
+    "links",
+    "generatedAt",
+    "version",
+  ];
+
+  const agentResponse = curl(`${baseUrl}/api/agent?cadence=weekly`);
+  if (agentResponse.status !== 200) {
+    fail(`/api/agent returned ${agentResponse.status} (expected 200)`);
+  }
+
+  const agentPayload = JSON.parse(agentResponse.body);
+  for (const key of agentRequiredKeys) {
+    if (!(key in agentPayload)) {
+      fail(`/api/agent missing required key: ${key}`);
+    }
+  }
+
+  if (agentPayload.agentHandoff.payload.skills.length === 0) {
+    fail("/api/agent agentHandoff.payload.skills is empty");
+  }
+
+  if (agentPayload.agentHandoff.prompt.length === 0) {
+    fail("/api/agent agentHandoff.prompt is empty");
+  }
+
+  if (Number.isNaN(Date.parse(agentPayload.generatedAt))) {
+    fail("/api/agent generatedAt is not a valid timestamp");
+  }
+
+  console.log("✅ /api/agent schema checks passed");
+
   const healthResponse = curl(`${baseUrl}/api/health`);
   if (![200, 503].includes(healthResponse.status)) {
     fail(`/api/health returned ${healthResponse.status} (expected 200 or 503)`);

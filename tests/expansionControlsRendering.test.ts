@@ -9,7 +9,7 @@ describe("expansion controls rendering", () => {
   it("persists /evidence expansion state through query params", () => {
     const href = buildDiagnosticsExpansionHref({ focus: "growth", year: "2025", month: "2" }, true);
 
-    assert.equal(href, "/evidence?focus=growth&year=2025&month=2&diagnostics=all#signal-diagnostics");
+    assert.equal(href, "/signals?focus=growth&year=2025&month=2&diagnostics=all#signal-diagnostics");
   });
 
   it("persists /planning expansion state through query params", () => {
