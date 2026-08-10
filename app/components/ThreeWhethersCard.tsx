@@ -52,9 +52,10 @@ export function ThreeWhethersCard({
   const spendVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = spendingIsTight ? "TIGHTEN" : spendingIsEasy ? "EXPAND" : "HOLD";
   const commitVerdict: "TIGHTEN" | "HOLD" | "EXPAND" = committingIsTight ? "TIGHTEN" : committingIsEasy ? "EXPAND" : "HOLD";
 
-  const decisions: DecisionItem[] = [
+  const decisions: (DecisionItem & { category: string })[] = [
     {
       title: "Whether to Hire",
+      category: "REV CAPACITIES",
       icon: Users,
       verdict: hireVerdict,
       recommendation: hiringIsTight
@@ -67,6 +68,7 @@ export function ThreeWhethersCard({
     },
     {
       title: "Whether to Spend",
+      category: "CAPITAL ALLOCATION",
       icon: DollarSign,
       verdict: spendVerdict,
       recommendation: spendingIsTight
@@ -79,6 +81,7 @@ export function ThreeWhethersCard({
     },
     {
       title: "Whether to Commit",
+      category: "CONTRACT COMMITMENTS",
       icon: Lock,
       verdict: commitVerdict,
       recommendation: committingIsTight
@@ -117,7 +120,10 @@ export function ThreeWhethersCard({
                     <div className="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 text-sky-400 shadow-inner">
                       <Icon className="w-4 h-4" aria-hidden="true" />
                     </div>
-                    <h4 className="text-sm font-semibold text-white tracking-tight">{item.title}</h4>
+                    <div>
+                      <span className="block text-[10px] font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">{item.category}</span>
+                      <h4 className="text-sm font-semibold text-white tracking-tight">{item.title}</h4>
+                    </div>
                   </div>
                   <span className={`px-2.5 py-0.5 rounded-full text-fluid-nano font-mono font-bold border ${VERDICT_COLORS[item.verdict]}`}>
                     {item.verdict}

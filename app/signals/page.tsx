@@ -118,13 +118,6 @@ export default async function SignalsPage({
         topDiagnosticCallouts={model.topDiagnosticCallouts}
       />
 
-      <SignalsModeSwitcherSection
-        activeSignalsView={model.activeSignalsView}
-        searchParams={resolvedSearchParams}
-      />
-
-      <DomainContextSection regime={model.assessment.regime} />
-
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trends</p>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -132,6 +125,13 @@ export default async function SignalsPage({
           <HistoricalTrendChart metric="riskAppetite" label="Risk appetite" color="#34d399" />
         </div>
       </div>
+
+      <DomainContextSection regime={model.assessment.regime} />
+
+      <SignalsModeSwitcherSection
+        activeSignalsView={model.activeSignalsView}
+        searchParams={resolvedSearchParams}
+      />
 
       {model.activeSignalsView === "implication" ? (
         <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />

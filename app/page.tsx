@@ -137,33 +137,44 @@ function WeeklyTopFoldContract({
    return (
     <section
       data-testid="weekly-top-fold"
-      aria-label="Revisit queue"
-      className="weather-section-border grid gap-4 lg:grid-cols-12 lg:items-start"
+      aria-label="Weekly posture delta and revisit queue"
+      className="weather-section-border rounded-xl border border-slate-800/70 bg-slate-950/40 p-4 grid gap-4 md:grid-cols-12 md:items-start backdrop-blur-sm"
     >
-      <div className="space-y-2 lg:col-span-7">
-        <div className="flex items-center gap-2">
-          <span className="weather-dot weather-dot--degraded">
-            <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
-            {shouldRevisit ? "Revisit" : "On track"}
-          </span>
-          <p className="text-fluid-sm text-white/50">Posture shift: {weeklySummary.notchShiftLabel}</p>
+      <div className="space-y-2 md:col-span-6">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-fluid-micro font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">Weekly Posture Delta</p>
+          <span className="text-fluid-micro font-medium text-sky-300/90">{weeklySummary.notchShiftLabel}</span>
         </div>
-        {revisitQueue.length ? (
-          <ul className="space-y-1.5 text-fluid-sm text-white/65">
-            {revisitQueue.map((item) => (
-              <li key={item.id}>
-                <span className="font-medium text-white/80">{item.label}:</span>{" "}
-                {compactSentence(item.action, 96)}
-              </li>
-            ))}
-          </ul>
+        {memoryItems.length ? (
+          <div className="rounded-md border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-fluid-xs text-white/60">
+            <span className="block text-[10px] font-mono uppercase text-slate-400 mb-0.5">4-Month Trajectory</span>
+            <span className="font-mono text-slate-200">{memoryItems.join(" → ")}</span>
+          </div>
         ) : null}
       </div>
 
-      <div className="lg:col-span-5 lg:text-right">
-        {memoryItems.length ? (
-          <p className="text-fluid-sm text-white/50">{memoryItems.join(" → ")}</p>
-        ) : null}
+      <div className="space-y-2 md:col-span-6 border-t border-slate-800/60 pt-3 md:border-t-0 md:border-l md:pt-0 md:pl-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-fluid-micro font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">Revisit Queue</p>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-fluid-micro font-mono font-semibold ${
+            shouldRevisit ? "border border-amber-500/40 bg-amber-500/10 text-amber-300" : "border border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+          }`}>
+            <span className={`size-1.5 rounded-full ${shouldRevisit ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
+            {shouldRevisit ? "Revisit active" : "Plan on track"}
+          </span>
+        </div>
+        {revisitQueue.length ? (
+          <ul className="space-y-1.5 text-fluid-xs text-white/70">
+            {revisitQueue.map((item) => (
+              <li key={item.id} className="flex items-start gap-1.5">
+                <span className="font-semibold text-slate-200 shrink-0">{item.label}:</span>
+                <span className="text-slate-300">{compactSentence(item.action, 84)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-fluid-xs text-slate-400 italic">No decisions require re-checking this week.</p>
+        )}
       </div>
     </section>
   );
@@ -399,15 +410,15 @@ async function PageContent({
                 shareLines={briefShareLines}
                />
 
+            <WeeklyTopFoldContract
+               model={homepage.weeklyDecisionCardModel}
+               memoryRegimes={macroTrendline}
+             />
+
             <ThreeWhethersCard
                signalDirection={signalDirection}
                tightness={tightness}
                guardrail={numericGuardrailLabel}
-             />
-
-            <WeeklyTopFoldContract
-               model={homepage.weeklyDecisionCardModel}
-               memoryRegimes={macroTrendline}
              />
 
             <CompareStrip
