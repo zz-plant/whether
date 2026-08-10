@@ -327,9 +327,10 @@ export async function buildPlanningPageModel(
             title: "Weekly plan",
             description: "What to approve, hold, or revisit this cycle.",
             hashAliases: ["ops-monthly-action-summary-panel"],
-            // Label + description are omitted: the step header directly above already renders them.
+            // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
               variant: "split",
+              hideHeader: true,
               id: "ops-monthly-action-summary-panel",
               title: "Weekly plan",
               children: h(Fragment, null,
@@ -486,7 +487,9 @@ export async function buildPlanningPageModel(
             title: "Finance strategy",
             description: "Budget direction and cash timing for the quarter.",
             hashAliases: ["ops-finance-strategy-panel"],
+            // The step header above and FinanceStrategyPanel's own header both state this already.
             children: h(ReportSection, { variant: "split",
+              hideHeader: true,
               id: "ops-finance-strategy-panel",
               title: "Finance strategy",
               children: h(Fragment, null,

@@ -86,3 +86,10 @@
 - NEVER: restate the same posture, trust, or route-state information in multiple stacked cards before the first task block.
 - MUST: treat support-path navigation as secondary. It should help the user leave the page when needed, not compete visually with the current page’s primary decision or action.
 - MUST: on mobile, avoid stacked shell layers that force the user through repeated state summaries before they reach the page content.
+- MUST: when a `ReportSection` is nested inside a surface that already states its label, title, and
+  description — a stepper step, an accordion row — pass `hideHeader` instead of repeating them. It
+  keeps the `id` anchor and renders the heading `sr-only` so `aria-labelledby` still resolves. Only
+  give the nested section a visible header when its title is *more specific* than the enclosing one
+  (e.g. step "Test a decision" → section "Is this move safe right now?").
+- NEVER: repeat a section's full description in both a checklist/index entry and that section's own
+  header. The index carries titles; the section carries the description.

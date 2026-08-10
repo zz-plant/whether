@@ -149,7 +149,6 @@ export function OperationsExecutionStepper({
                       {step.label}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-fluid-xs text-slate-400">{step.description}</p>
                 </a>
               </li>
             );

@@ -510,17 +510,13 @@ export const SignalsNeedMoreProofSection = ({
   searchParams?: Record<string, string | undefined>;
 }) => (
   <section className="weather-panel space-y-3 px-6 py-5">
+    {/* The Depth switcher near the top already explains the short-vs-deep choice — this is
+        the same switch repeated at the end of the page, so it carries the action only. */}
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        Need more detail?
-      </p>
-      <h2 className="text-lg font-semibold text-slate-100">
-        Open the deeper evidence only if the outlook still needs proof.
-      </h2>
+      <h2 className="text-lg font-semibold text-slate-100">Need more detail?</h2>
       <p className="text-sm text-slate-300">
-        The deeper view adds diagnostics, historical replay, threshold tuning, and advanced filters.
-         Use it when someone asks why this moved, whether a past regime looked similar, or what
-         would make the outlook wrong.
+        Use the deeper view when someone asks why this moved, whether a past regime looked similar,
+        or what would make the outlook wrong.
       </p>
     </div>
       <a

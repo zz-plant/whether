@@ -215,7 +215,7 @@ export default async function MethodPage() {
                 <span className={`flex h-2.5 w-2.5 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
                 <p className="text-sm font-semibold text-slate-100">Sources</p>
               </div>
-              <span className="text-fluid-xs text-slate-400">{sourceCoverage}</span>
+              {/* No coverage summary here: it concatenated the same two status labels the list itemizes. */}
             </div>
             <ul className="mt-1.5 space-y-0.5 text-xs text-slate-400">
               <li>Treasury: {reportData.treasuryProvenance.statusLabel}</li>

@@ -8,6 +8,12 @@ type ReportSectionProps = {
   variant?: "unified" | "split";
   label?: string;
   headingLevel?: "h2" | "h3" | "h4";
+  /**
+   * Hide the visible header when an enclosing surface (e.g. a stepper step) already
+   * states this section's label, title, and description. The heading is still rendered
+   * for screen readers so `aria-labelledby` and the `id` anchor keep working.
+   */
+  hideHeader?: boolean;
 };
 
 export function ReportSection({
@@ -18,6 +24,7 @@ export function ReportSection({
   variant = "unified",
   label,
   headingLevel,
+  hideHeader = false,
 }: ReportSectionProps) {
   const headingId = `section-${id}-heading`;
   const HeadingTag = headingLevel || (variant === "unified" ? "h2" : "h4");
@@ -25,6 +32,11 @@ export function ReportSection({
   if (variant === "split") {
     return (
       <section id={id} className="space-y-4 scroll-mt-28" aria-labelledby={headingId}>
+        {hideHeader ? (
+          <HeadingTag id={headingId} className="sr-only">
+            {title}
+          </HeadingTag>
+        ) : (
         <div className="weather-panel relative overflow-hidden px-5 py-4">
           <span
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
@@ -44,6 +56,7 @@ export function ReportSection({
             </p>
           ) : null}
         </div>
+        )}
         <div className="rounded border border-slate-800/55 bg-slate-950/35 p-4 shadow-[0_18px_34px_-28px_rgba(2,6,23,0.75)] sm:p-5">
           <div className="space-y-6">{children}</div>
         </div>
