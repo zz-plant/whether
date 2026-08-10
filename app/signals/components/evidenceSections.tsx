@@ -386,12 +386,12 @@ export const SignalsDecisionSummarySection = ({
               </p>
               <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
               <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-              <p className="mt-2 text-xs text-slate-300">
-                The scorecards below show the watch line behind it.
-              </p>
             </li>
           ))}
         </ul>
+        <p className="text-xs text-slate-300">
+          The scorecards below show the watch line behind each mover.
+        </p>
       </article>
     </div>
   </section>

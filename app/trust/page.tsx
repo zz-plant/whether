@@ -259,7 +259,8 @@ export default async function MethodPage() {
           )}
 
           <p className="text-xs leading-5 text-slate-400 px-1">
-            Whether is decision-support software, not an authority. Verify source data and combine it with company-specific metrics before acting on irreversible decisions. {PRIMARY_AUDIENCE_SUMMARY}
+            {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
+            {PRIMARY_AUDIENCE_SUMMARY} Verify source data and combine it with company-specific metrics before acting on irreversible decisions.
           </p>
         </div>
       </ReportSection>
