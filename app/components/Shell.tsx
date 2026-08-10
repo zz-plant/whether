@@ -110,7 +110,7 @@ export function Shell({
 
       <main
         id="main-content"
-        className={`mx-auto transition-all ${
+        className={`mx-auto transition-all weather-page-enter ${
           isFocusMode
             ? "max-w-[64rem] px-6 py-12 shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl bg-slate-950/90 my-6"
             // The sticky header is already 109px of chrome across two bordered
