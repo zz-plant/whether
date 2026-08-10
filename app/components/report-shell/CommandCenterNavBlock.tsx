@@ -122,7 +122,7 @@ export function CommandCenterNavBlock({
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <p className="weather-brief-kicker">{briefKicker}</p>
+            <p className="type-label text-slate-400">{briefKicker}</p>
             <p className="text-fluid-micro leading-4 text-slate-400">{introMetaLine}</p>
             <h1 className={headingClassName}>{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
