@@ -194,10 +194,10 @@ input:not([type="range"]) {
 .weather-cta:focus-visible,
 .weather-icon-chip:focus-visible,
 .weather-route-card:focus-visible,
-.weather-hub-link-card:focus-visible {
-  outline: 2px solid var(--accent-action);
-  outline-offset: 2px;
-  box-shadow: var(--focus-halo);
+.weather-hub-link-card:focus-visible,
+summary[data-chevron]:focus-visible,
+summary.list-none:focus-visible {
+  @apply weather-focus-ring;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -344,4 +344,15 @@ details[open] > summary[data-chevron]::after {
   summary[data-chevron]::after {
     transition: none;
   }
+}
+
+/* Interactive Primitives */
+.weather-focus-ring:focus-visible {
+  outline: 2px solid var(--accent-action);
+  outline-offset: 2px;
+  box-shadow: var(--focus-halo);
+}
+
+.weather-press-scale:active {
+  transform: translateY(1px);
 }

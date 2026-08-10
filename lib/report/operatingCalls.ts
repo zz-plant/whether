@@ -59,9 +59,9 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
 const OPERATING_LEVER_FALLBACK = {
-  areaActionNow: "Hold current posture until rules refresh.",
-  triggerThreshold: "Tighten if confidence and threshold signals worsen.",
-  reversalCondition: "Loosen when threshold conditions recover and hold.",
+  areaActionNow: "Maintain current operating posture.",
+  triggerThreshold: "Pause if tightness exceeds 60 or risk appetite falls below 40.",
+  reversalCondition: "Resume expansion when tightness drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
 
 const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Unavailable — review thresholds manually.";

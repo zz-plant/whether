@@ -3,8 +3,8 @@ import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, fo
 import type { SignalDirection } from "../viewModel";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { SignalWaterfall } from "./SignalWaterfall";
-import { PostureDial } from "./illustrations/PostureDial";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
+import { PostureDial } from "./illustrations/PostureDial";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import type { RegimeKey } from "../../lib/types";
@@ -51,11 +51,22 @@ type Props = {
 };
 
 const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
-
-// Narrowing rather than `value as RegimeKey`: regime arrives as a plain string,
-// so an assertion would let an unrecognised value through to the glyph lookup.
 const isRegimeKey = (value: string): value is RegimeKey =>
   REGIME_GLYPH_KEYS.some((key) => key === value);
+
+const REGIME_BOUNDARIES: Record<RegimeKey, { label: string; threshold: number; color: string }> = {
+  SCARCITY: { label: "Scarcity", threshold: 75, color: "rose" },
+  DEFENSIVE: { label: "Defensive", threshold: 65, color: "amber" },
+  VOLATILE: { label: "Volatile", threshold: 55, color: "sky" },
+  EXPANSION: { label: "Expansion", threshold: 45, color: "emerald" },
+};
+
+const formatCompactTrust = (label: string | undefined, degradedCount?: number, showOfflineBadge?: boolean) => {
+  if (label) return label;
+  if (showOfflineBadge) return "Snapshot";
+  if (degradedCount && degradedCount > 0) return `${degradedCount} cached`;
+  return "Live";
+};
 
 export function DecisionHero({
   tightness,
@@ -94,23 +105,32 @@ export function DecisionHero({
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
-  // Tightness is reported 0-100; the dial reads -1 (loosen) to +1 (tighten).
-  const dialValue = tightness / 50 - 1;
-  const dialPrevious = tightnessDelta !== 0 ? (tightness - tightnessDelta) / 50 - 1 : undefined;
-  const upperRegime = regime.toUpperCase();
-  const regimeKey = isRegimeKey(upperRegime) ? upperRegime : null;
-  const tightnessThreshold = signalData?.tightnessThreshold;
 
-  // Risk appetite levels: Bold (≥65), Steady (≥45), Cautious (<45)
-  const riskAppetiteLevel = typeof riskAppetite === "number"
-    ? riskAppetite >= 65 ? "Bold" : riskAppetite >= 45 ? "Steady" : "Cautious"
-    : "";
-  const riskAppetiteLevelColor = typeof riskAppetite === "number"
-    ? riskAppetite >= 65 ? "text-emerald-300/60" : riskAppetite >= 45 ? "text-amber-300/60" : "text-rose-300/60"
-    : "";
-  const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0
-    ? `${riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}${Math.abs(riskAppetiteDelta).toFixed(1)} pts${Math.abs(riskAppetiteDelta) >= 3 ? " · notable" : ""}`
-    : "";
+   const dialValue = tightness;
+   const dialPrevious = tightness - tightnessDelta;
+   const regimeKey = isRegimeKey(regime) ? regime : undefined;
+
+   const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "Low" : riskAppetite >= 45 ? "Moderate" : "High") : undefined;
+   const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-rose-300" : riskAppetite >= 45 ? "text-amber-300" : "text-emerald-300") : undefined;
+   const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
+   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
+
+   // Posture compass: tightness (x-axis) vs risk appetite (y-axis) with regime boundaries.
+   const compassX = tightness / 100;
+   const compassY = 1 - (riskAppetite ?? 50) / 100;
+
+   const regimeBounds = REGIME_BOUNDARIES[regime.toUpperCase() as RegimeKey] ?? REGIME_BOUNDARIES.EXPANSION;
+  const flipDist = tightness < regimeBounds.threshold
+    ? Math.abs(tightness - regimeBounds.threshold)
+    : Math.abs((riskAppetite ?? 50) - (regimeBounds.threshold - 10));
+  const flipDistLabel = flipDist < 10 ? "Near" : flipDist < 20 ? "Approaching" : "Distant";
+
+  const pointsToPause = Math.max(0, Math.round(regimeBounds.threshold - tightness));
+  const counterColor = pointsToPause <= 10
+    ? "text-rose-300"
+    : pointsToPause <= 20
+      ? "text-amber-300"
+      : "text-emerald-300";
 
   const isDegradedData = isFallback || (degradedCount && degradedCount > 0);
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
@@ -180,7 +200,7 @@ export function DecisionHero({
                 <>
                   <span>
                     <span> Risk appetite:</span>{" "}
-                    <span className={riskAppetiteLevelColor}>{riskAppetite}/100 · {riskAppetiteLevel.toLowerCase()}</span>
+                     <span className={riskAppetiteLevelColor ?? ""}>{riskAppetite}/100 · {riskAppetiteLevel?.toLowerCase() ?? ""}</span>
                   </span>
                   {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
                     <span className="inline-flex items-center gap-1.5">
@@ -211,7 +231,66 @@ export function DecisionHero({
               </span>
             </p>
           </div>
-          {guardrail || reversalTrigger || (flipConditions && flipConditions.length > 0) ? (
+
+          {/* Posture compass: tightness vs risk appetite relative to regime boundaries */}
+          <div className="flex items-center gap-2 pt-1" aria-label="Posture compass">
+            <div className="relative w-12 h-12">
+              <svg viewBox="0 0 120 120" className="w-full h-full" aria-hidden="true">
+                <defs>
+                   <linearGradient id="compass-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                     <stop offset="0%" style={{ stopColor: "var(--bg-panel)" }} />
+                     <stop offset="100%" style={{ stopColor: "var(--bg-raised)" }} />
+                   </linearGradient>
+                </defs>
+                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border-default)" strokeWidth="1" />
+                <circle cx="60" cy="60" r="35" fill="none" stroke="var(--border-default)" strokeWidth="0.5" />
+                <circle cx="60" cy="60" r="20" fill="none" stroke="var(--border-default)" strokeWidth="0.5" />
+                <circle cx="60" cy="60" r="5" fill="var(--bg-panel)" stroke="var(--border-strong)" strokeWidth="1.5" />
+
+                <line x1="60" y1="10" x2="60" y2="110" stroke="var(--border-default)" strokeWidth="0.5" />
+                <line x1="10" y1="60" x2="110" y2="60" stroke="var(--border-default)" strokeWidth="0.5" />
+
+                <text x="60" y="9" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Tight</text>
+                <text x="60" y="111" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Loose</text>
+                <text x="110" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Risk</text>
+                <text x="10" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Calm</text>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={`text-[10px] font-bold tabular-nums ${tightness > 60 ? "text-rose-300" : tightness > 40 ? "text-amber-300" : "text-emerald-300"}`}>
+                  {tightness}
+                </span>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                 <span className={`text-[10px] font-bold tabular-nums ${(riskAppetite ?? 50) >= 65 ? "text-emerald-300" : (riskAppetite ?? 50) >= 45 ? "text-amber-300" : "text-rose-300"}`}>
+
+                  {riskAppetite ?? "—"}
+                </span>
+              </div>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-slate-400">
+                {regimeBounds.label}
+              </div>
+              {/* Flip distance indicator */}
+              {flipDistLabel !== "Distant" && (
+                <div className="absolute top-0 left-0 right-0 text-center">
+                  <span className={`text-[8px] font-semibold ${
+                    flipDist <= 10 ? "text-rose-300" : flipDist <= 20 ? "text-amber-300" : "text-emerald-300"
+                  }`}>
+                    {flipDistLabel}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] text-slate-400">{regimeBounds.label}</span>
+              <span className="text-[9px] text-slate-400">threshold {regimeBounds.threshold}</span>
+              <span className={`text-[9px] font-medium ${counterColor}`}>
+                {pointsToPause} pts to pause
+              </span>
+            </div>
+          </div>
+
+          {/* Flip watch with live probability */}
+          {flipConditions && flipConditions.length > 0 ? (
             <div className="space-y-1.5 pt-1 text-fluid-sm">
               <p className="text-white/35 font-medium">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
               {typeof tightnessThreshold === "number" ? (
@@ -249,6 +328,23 @@ export function DecisionHero({
               ) : null}
             </div>
           ) : null}
+
+          {/* Live counter: points to pause with color transition */}
+           {pointsToPause > 0 ? (
+
+            <div className="flex items-center gap-2 pt-1">
+              <span className={`text-[10px] font-semibold ${counterColor}`}>
+                {pointsToPause} pts to pause
+              </span>
+              <span className="text-[8px] text-slate-400">{flipDistLabel}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[10px] text-emerald-300 font-semibold">10 pts to pause</span>
+              <span className="text-[8px] text-slate-400">threshold at safe margin</span>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <StageSwitcher currentStage={operatorContext.companyStage} />
             <DecisionMemoryButton
@@ -306,3 +402,38 @@ export function DecisionHero({
     </section>
   );
 }
+
+// Compose a compact trust badge from a live signal (used on hero) and
+// on the trust page, with a "data as of" + confidence line.
+// The trust badge stays compact — one line showing freshness, confidence,
+// and source mode, not a separate summary card.
+const CompactTrustBadge = ({
+  confidenceLabel,
+  trustStatusLabel,
+  sourceNode,
+  recordDate,
+  showOfflineBadge,
+  degradedCount,
+}: {
+  confidenceLabel?: string;
+  trustStatusLabel?: string;
+  sourceNode?: string;
+  recordDate?: string;
+  showOfflineBadge?: boolean;
+  degradedCount?: number;
+}) => {
+  const statusLine = formatCompactTrust(trustStatusLabel, degradedCount, showOfflineBadge);
+  return (
+    <span className="inline-flex items-center gap-1.5 text-fluid-micro">
+      <span className={`size-1.5 rounded-full ${confidenceLabel === "HIGH" ? "bg-emerald-400/80" : confidenceLabel === "MED" ? "bg-amber-400/80" : "bg-rose-400/80"}`} aria-hidden="true" />
+      <span className={confidenceLabel === "HIGH" ? "text-emerald-300" : confidenceLabel === "MED" ? "text-amber-300" : "text-rose-300"}>
+        {confidenceLabel}
+      </span>
+      <span className="text-white/40">·</span>
+      <span className="text-white/50">{sourceNode ?? "FRED"}</span>
+      <span className="text-white/40">·</span>
+      <span className="text-white/50">{recordDate}</span>
+      {statusLine ? <span className="text-white/50">· {statusLine}</span> : null}
+    </span>
+  );
+};

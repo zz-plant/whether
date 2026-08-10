@@ -1,3 +1,5 @@
+import type { RegimeKey } from "../../../lib/types";
+
 export type PostureDialProps = {
   idPrefix: string;
   /** -1 = fully loosen, 0 = neutral, +1 = fully tighten. */
@@ -6,6 +8,8 @@ export type PostureDialProps = {
   previous?: number;
   /** Short posture word rendered under the dial, e.g. "Tighten". */
   label: string;
+  /** The current macro regime. */
+  regime?: RegimeKey;
   className?: string;
 };
 
@@ -17,7 +21,14 @@ const pointAt = (v: number, r: number) => {
   return { x: 100 + r * Math.cos(t), y: 100 - r * Math.sin(t) };
 };
 
-export function PostureDial({ idPrefix, value, previous, label, className }: PostureDialProps) {
+const REGIME_COLORS: Record<RegimeKey, string> = {
+  EXPANSION: "var(--accent-success)",
+  DEFENSIVE: "var(--accent-warning)",
+  SCARCITY: "var(--accent-danger)",
+  VOLATILE: "var(--accent-info)",
+};
+
+export function PostureDial({ idPrefix, value, previous, label, regime, className }: PostureDialProps) {
   const current = clamp(value);
   const prior = previous === undefined ? undefined : clamp(previous);
 
@@ -30,12 +41,22 @@ export function PostureDial({ idPrefix, value, previous, label, className }: Pos
 
   const needleColor =
     current > 0.02
-      ? "var(--accent-danger)"
+      ? "var(--color-semantic-tightening-fg)"
       : current < -0.02
-        ? "var(--accent-success)"
-        : "var(--accent-info)";
+        ? "var(--color-semantic-easing-fg)"
+        : "var(--color-semantic-unchanged-fg)";
+
   const needleFrom = pointAt(current, 24);
   const needleTo = pointAt(current, 84);
+
+  const bandStroke =
+    delta > 0
+      ? "var(--color-semantic-tightening-fg)"
+      : delta < 0
+        ? "var(--color-semantic-easing-fg)"
+        : "var(--color-semantic-unchanged-fg)";
+
+  const baseStroke = regime ? REGIME_COLORS[regime] : "var(--border-default)";
 
   const desc =
     prior === undefined
@@ -63,16 +84,17 @@ export function PostureDial({ idPrefix, value, previous, label, className }: Pos
       <path
         d="M 22 100 A 78 78 0 0 1 178 100"
         fill="none"
-        stroke="var(--border-default)"
+        stroke={baseStroke}
         strokeWidth={10}
         strokeLinecap="round"
+        strokeOpacity={regime ? 0.4 : 1}
       />
 
       {hasDelta && bandStart && bandEnd ? (
         <path
           d={`M ${bandStart.x} ${bandStart.y} A 78 78 0 0 1 ${bandEnd.x} ${bandEnd.y}`}
           fill="none"
-          stroke={delta > 0 ? "var(--accent-danger)" : "var(--accent-success)"}
+          stroke={bandStroke}
           strokeWidth={10}
           strokeOpacity={0.35}
           strokeLinecap="butt"

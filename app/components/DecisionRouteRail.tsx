@@ -44,22 +44,23 @@ export function DecisionRouteRail() {
 
   return (
     <section className="group weather-section-border overflow-hidden" aria-label="Route this week's call">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((isOpen) => !isOpen)}
-        className="flex w-full min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-white/70 transition-colors select-none hover:bg-white/[0.04] hover:text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0"
-      >
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span>Route this week&apos;s call</span>
-          <span className="truncate text-[0.65rem] text-white/40">Plan · Resolve · Rule · Compare</span>
-        </div>
-        <ChevronRight
-          className={`h-5 w-5 shrink-0 transition-transform group-hover:text-white/60 ${open ? "rotate-90" : ""} text-white/50`}
-          aria-hidden="true"
-        />
-      </button>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={() => setOpen((isOpen) => !isOpen)}
+          className="flex w-full min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-white/70 transition-colors select-none hover:bg-white/[0.04] hover:text-white/90 weather-focus-ring weather-press-scale"
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <span className="text-white/60">Route this week&apos;s call</span>
+            <span className="truncate text-[0.65rem] text-white/40">Plan · Resolve · Rule · Compare</span>
+          </div>
+          <ChevronRight
+            className={`h-5 w-5 shrink-0 transition-transform group-hover:text-white/60 ${open ? "rotate-90" : ""} text-white/50`}
+            aria-hidden="true"
+          />
+        </button>
+
       <div id={panelId} hidden={!open}>
         <div className="px-4 pb-4">
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">

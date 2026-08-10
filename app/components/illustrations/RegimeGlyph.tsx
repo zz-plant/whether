@@ -1,5 +1,6 @@
 import type { RegimeKey } from "../../../lib/types";
 import { getRegimeOperatorLabel } from "../../../lib/regimeLabels";
+import { useState, useEffect } from "react";
 
 export type RegimeGlyphProps = {
   idPrefix: string;
@@ -54,13 +55,22 @@ const GLYPHS: Record<RegimeKey, GlyphSpec> = {
 
 export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
   const spec = GLYPHS[regime];
+  const [opacity, setOpacity] = useState(1);
+
+  // Fade the glyph in/out on regime change (350ms transition).
+  useEffect(() => {
+    setOpacity(0);
+    const timer = setTimeout(() => setOpacity(1), 150);
+    return () => clearTimeout(timer);
+  }, [regime]);
+
   if (!spec) return null;
 
   return (
     <svg
       viewBox="0 0 32 32"
       width="100%"
-      style={{ height: "auto" }}
+      style={{ height: "auto", transition: "opacity 350ms ease" }}
       role="img"
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
@@ -89,6 +99,7 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
           strokeWidth={2}
           strokeLinecap="round"
           fill="none"
+          opacity={opacity}
         />
       ))}
 
@@ -100,6 +111,7 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
+          opacity={opacity}
         />
       ) : null}
     </svg>
