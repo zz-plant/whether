@@ -160,39 +160,45 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <button
         type="button"
         onClick={() => setShowMobile(true)}
-        className="flex min-h-[44px] items-center gap-2 rounded-md border border-slate-800/80 bg-slate-900/60 px-3 py-1.5 text-fluid-xs font-semibold text-slate-200 transition-colors hover:border-slate-700 hover:text-white md:hidden focus-visible:outline-2 focus-visible:outline-sky-400"
+        className="flex min-h-[44px] items-center gap-2 rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-bold text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.2)] md:hidden focus-visible:outline-2 focus-visible:outline-sky-400"
         aria-label="Open navigation"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
-        {activeRouteLabel}
+        <span className="h-2 w-2 rounded-full bg-sky-400 animate-pulse" aria-hidden="true" />
+        <span>{activeRouteLabel}</span>
       </button>
 
-      <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
+      <nav aria-label="Primary" className="hidden md:flex items-center gap-1.5">
         {navigationLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             aria-current={link.isActive ? "page" : undefined}
-            className={`rounded-lg px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+            className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-all duration-150 flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-sky-400 ${
               link.isActive
-                ? "bg-sky-500/15 text-sky-100 font-semibold border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.15)]"
-                : "text-slate-300 border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
+                ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50 shadow-[0_0_16px_rgba(56,189,248,0.25)]"
+                : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
             }`}
           >
-            {link.label}
+            {link.isActive ? (
+              <span className="size-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]" aria-hidden="true" />
+            ) : null}
+            <span>{link.label}</span>
           </Link>
         ))}
         <span className="mx-1 h-4 w-px bg-slate-800" aria-hidden="true" />
         <Link
           href="/api-docs"
           aria-current={isApiActive ? "page" : undefined}
-          className={`rounded-lg px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+          className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-all duration-150 flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-sky-400 ${
             isApiActive
-              ? "bg-sky-500/15 text-sky-100 font-semibold border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.15)]"
-              : "text-slate-300 border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
+              ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50 shadow-[0_0_16px_rgba(56,189,248,0.25)]"
+              : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
           }`}
         >
-          API
+          {isApiActive ? (
+            <span className="size-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]" aria-hidden="true" />
+          ) : null}
+          <span>API</span>
         </Link>
       </nav>
 
