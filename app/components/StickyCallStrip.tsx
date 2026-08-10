@@ -11,10 +11,10 @@ type Props = {
   arrow: string;
   boldnessScore: number;
   boldnessDelta: number;
-  guardrail?: string;
+  shareLines?: string[];
 };
 
-export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, guardrail }: Props) {
+export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, shareLines }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
@@ -70,7 +70,7 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, gua
     const text = [
       `Whether · Boldness budget ${boldnessScore}/100 (${deltaLabel})`,
       `${arrow} ${call}`,
-      guardrail ? `Watch: ${guardrail}` : null,
+      ...(shareLines ?? []),
       "whether.work",
     ].filter(Boolean).join(" — ");
     await copyToClipboard(text, "Weekly call");

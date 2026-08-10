@@ -316,7 +316,7 @@ async function PageContent({
   const enrichmentPromise = homepage.workspaceModelPromise ?? Promise.resolve();
 
   const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
-    ? `tightness crosses ${parsedGuardrailThreshold}`
+    ? `Cash availability crosses ${parsedGuardrailThreshold}`
     : undefined;
   const guardrailLabel = numericGuardrailLabel
     ?? homepage.weeklyDecisionCardModel.decision.guardrail
@@ -367,11 +367,12 @@ async function PageContent({
             {activeCadence !== "weekly" && cadenceData ? (
               <CadenceCallCard cadence={activeCadence} data={cadenceData} />
             ) : null}
-           <DecisionHero
-               tightness={tightness}
-               tightnessDelta={tightnessDelta}
-               riskAppetite={riskAppetite}
-               boldnessScore={weeklyLeadershipSummary.boldnessScore}
+<DecisionHero
+                tightness={tightness}
+                tightnessDelta={tightnessDelta}
+                riskAppetite={riskAppetite}
+                riskAppetiteDelta={riskAppetiteDelta}
+                boldnessScore={weeklyLeadershipSummary.boldnessScore}
                boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
                boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
                weeklyCall={primaryCall}
@@ -406,13 +407,15 @@ async function PageContent({
                memoryRegimes={macroTrendline}
              />
 
-             <CompareStrip
-              currentRegime={regime}
-              currentTightness={tightness}
-              tightnessDelta={tightnessDelta}
-              serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-              autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
-            />
+<CompareStrip
+               currentRegime={regime}
+               currentTightness={tightness}
+               tightnessDelta={tightnessDelta}
+               riskAppetite={riskAppetite}
+               riskAppetiteDelta={riskAppetiteDelta}
+               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+               autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
+             />
           </SwipeableWeek>
 
           <Suspense fallback={
@@ -481,9 +484,7 @@ async function PageContent({
           arrow={DIRECTION_ARROW[signalDirection]}
           boldnessScore={weeklyLeadershipSummary.boldnessScore}
           boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-          guardrail={homepage.weeklyDecisionCardModel.decision.guardrailThreshold
-            ? `tightness crosses ${homepage.weeklyDecisionCardModel.decision.guardrailThreshold}`
-            : undefined}
+          shareLines={briefShareLines}
         />
     </>
   );

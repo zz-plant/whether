@@ -8,12 +8,16 @@ export function CompareStrip({
   currentRegime,
   currentTightness,
   tightnessDelta,
+  riskAppetite,
+  riskAppetiteDelta,
   serverPrevious,
   autoExpand = false,
 }: {
   currentRegime: string;
   currentTightness: number;
   tightnessDelta?: number;
+  riskAppetite?: number;
+  riskAppetiteDelta?: number;
   serverPrevious?: { regime: string; recordDate: string } | null;
   autoExpand?: boolean;
 }) {
@@ -78,6 +82,17 @@ export function CompareStrip({
                   {currentTightness} pts
                 </span>
               </div>
+              {typeof riskAppetite === "number" ? (
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-fluid-micro font-medium">
+                    <span className="size-1.5 rounded-full bg-emerald-400/60" />
+                    Risk appetite
+                  </span>
+                  <span className="text-fluid-nano text-white/65 font-mono bg-white/[0.04] px-1.5 py-0.5 rounded">
+                    {riskAppetite}/100
+                  </span>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -98,6 +113,17 @@ export function CompareStrip({
                 Cash availability: → unchanged
               </span>
             )}
+            {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
+              <span className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium ${
+                riskAppetiteDelta > 0 ? "bg-emerald-500/10 text-emerald-300" : "bg-rose-500/10 text-rose-300"
+              }`}>
+                Risk appetite: {riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(riskAppetiteDelta).toFixed(1)} pts {Math.abs(riskAppetiteDelta) >= 3 ? "· notable shift" : ""}
+              </span>
+            ) : typeof riskAppetite === "number" ? (
+              <span className="inline-flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-medium text-white/60">
+                Risk appetite: → unchanged
+              </span>
+            ) : null}
           </div>
         </div>
       ) : null}

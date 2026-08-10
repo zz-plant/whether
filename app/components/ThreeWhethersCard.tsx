@@ -52,8 +52,8 @@ export function ThreeWhethersCard({
         : hiringIsEasy
         ? "Selectively accelerate key engineering & sales hires."
         : "Maintain existing headcount plan; replace critical backfills only.",
-      threshold: `Tighten: tightness ≥ ${TIGHTEN_AT.hire}`,
-      reversalCondition: `Ease: tightness drops below ${EASE_BELOW.hire}`,
+      threshold: `Tighten: cash availability ≥ ${TIGHTEN_AT.hire}`,
+      reversalCondition: `Ease: cash availability drops below ${EASE_BELOW.hire}`,
     },
     {
       title: "Whether to Spend",
@@ -65,8 +65,8 @@ export function ThreeWhethersCard({
         : spendingIsEasy
         ? "Allow paid payback up to 12 months for top-tier channels."
         : "Keep payback targets at 8-10 months; re-evaluate monthly.",
-      threshold: `Tighten: tightness ≥ ${TIGHTEN_AT.spend}`,
-      reversalCondition: `Ease: tightness drops below ${EASE_BELOW.spend}`,
+      threshold: `Tighten: cash availability ≥ ${TIGHTEN_AT.spend}`,
+      reversalCondition: `Ease: cash availability drops below ${EASE_BELOW.spend}`,
     },
     {
       title: "Whether to Commit",
@@ -78,8 +78,8 @@ export function ThreeWhethersCard({
         : committingIsEasy
         ? "Lock multi-year discounts on critical core infrastructure."
         : "Standard 1-year caps; require executive sign-off for >$50k ARR commitments.",
-      threshold: guardrail ?? `Pause: tightness ≥ ${TIGHTEN_AT.commit} and tightening`,
-      reversalCondition: `Resume: tightness drops below ${EASE_BELOW.commit} or easing`,
+      threshold: guardrail ?? `Pause: cash availability ≥ ${TIGHTEN_AT.commit} and tightening`,
+      reversalCondition: `Resume: cash availability drops below ${EASE_BELOW.commit} or easing`,
     },
   ];
 
@@ -144,11 +144,11 @@ export function ThreeWhethersCard({
 
               <div className="border-t border-white/[0.06] pt-3 space-y-2 text-fluid-nano text-white/65">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>
+                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
                   <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-amber-200/90">{item.threshold}</span>
                 </div>
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium text-rose-300/80 flex-shrink-0">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>
+                  <span className="font-medium text-rose-300/80 flex-shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
                   <span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-rose-200/90 text-right">
                     {item.reversalCondition}
                   </span>

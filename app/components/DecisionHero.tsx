@@ -16,6 +16,7 @@ type Props = {
   tightness: number;
   tightnessDelta: number;
   riskAppetite?: number;
+  riskAppetiteDelta?: number;
   boldnessScore: number;
   boldnessDelta: number;
   boldnessShorthand?: string;
@@ -57,6 +58,7 @@ export function DecisionHero({
   tightness,
   tightnessDelta,
   riskAppetite,
+  riskAppetiteDelta,
   boldnessScore,
   boldnessDelta,
   boldnessShorthand,
@@ -88,6 +90,7 @@ export function DecisionHero({
   const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
   const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
+  const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
   // Tightness is reported 0-100; the dial reads -1 (loosen) to +1 (tighten).
   const dialValue = tightness / 50 - 1;
   const dialPrevious = tightnessDelta !== 0 ? (tightness - tightnessDelta) / 50 - 1 : undefined;
@@ -95,7 +98,16 @@ export function DecisionHero({
   const regimeKey = isRegimeKey(upperRegime) ? upperRegime : null;
   const tightnessThreshold = signalData?.tightnessThreshold;
 
-  const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
+  // Risk appetite levels: Bold (≥65), Steady (≥45), Cautious (<45)
+  const riskAppetiteLevel = typeof riskAppetite === "number"
+    ? riskAppetite >= 65 ? "Bold" : riskAppetite >= 45 ? "Steady" : "Cautious"
+    : "";
+  const riskAppetiteLevelColor = typeof riskAppetite === "number"
+    ? riskAppetite >= 65 ? "text-emerald-300/60" : riskAppetite >= 45 ? "text-amber-300/60" : "text-rose-300/60"
+    : "";
+  const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0
+    ? `${riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}${Math.abs(riskAppetiteDelta).toFixed(1)} pts${Math.abs(riskAppetiteDelta) >= 3 ? " · notable" : ""}`
+    : "";
 
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
   const dataStatusColor = isFallback ? "text-amber-300" : degradedCount && degradedCount > 0 ? "text-amber-300" : "text-emerald-300";
@@ -162,6 +174,31 @@ export function DecisionHero({
                     {tightnessDeltaMetadataLabel}
                   </span>
                 </span>
+              ) : null}
+              {typeof riskAppetite === "number" ? (
+                <>
+                  <span>
+                    <span className="text-white/50">Risk appetite:</span>{" "}
+                    <span className={riskAppetiteLevelColor}>{riskAppetite}/100 · {riskAppetiteLevel.toLowerCase()}</span>
+                  </span>
+                  {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block w-12 shrink-0" aria-hidden="true">
+                        <DeltaGlyph
+                          idPrefix="hero-risk-appetite-delta"
+                          previous={riskAppetite - riskAppetiteDelta}
+                          current={riskAppetite}
+                          min={0}
+                          max={100}
+                          label="Risk appetite"
+                        />
+                      </span>
+                      <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>
+                        {riskAppetiteDeltaLabel}
+                      </span>
+                    </span>
+                  ) : null}
+                </>
               ) : null}
               <span className="inline-flex items-center gap-1.5">
                 {regimeKey ? (
@@ -260,10 +297,10 @@ export function DecisionHero({
             <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
             <span>{boldnessDeltaLabel}</span>
           </div>
-          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
+<p className="text-fluid-micro font-semibold tracking-[0.04em] text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="hidden sm:block text-fluid-micro text-white/50 mt-0.5">Inverse of tightness: room to hire, spend, &amp; commit</p>
+          <p className="hidden sm:block text-fluid-micro text-white/50 mt-0.5">Room to hire, spend, & commit — 70% risk appetite + 30% cash availability</p>
           {/* Replaces a hardcoded-rgba gradient track: this is theme-aware and carries
               last week's reading, so the delta is visible rather than implied. */}
           <div className="mt-3 w-full max-w-[10rem] mx-auto sm:ml-auto sm:mr-0">
