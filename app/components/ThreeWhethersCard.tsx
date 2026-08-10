@@ -93,39 +93,48 @@ export function ThreeWhethersCard({
 
   return (
     <section className="weather-section" aria-labelledby="three-whethers-heading">
-      <h3 id="three-whethers-heading" className="type-section text-white">
-        The 3 Operational &quot;Whethers&quot;
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 id="three-whethers-heading" className="type-section text-white font-semibold tracking-tight">
+          The 3 Operational &quot;Whethers&quot;
+        </h3>
+        <span className="text-fluid-nano font-mono text-slate-400 uppercase tracking-wider">
+          Bounded Rules
+        </span>
+      </div>
 
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {decisions.map((item, i) => {
           const Icon = item.icon;
           return (
             <div
               key={i}
-              className="relative pl-5 space-y-3"
+              className="relative overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/60 p-4 shadow-lg backdrop-blur-md hover:border-slate-700/80 transition-all duration-200 flex flex-col justify-between space-y-3"
             >
-              <div className={`absolute top-0 left-0 h-full w-0.5 ${VERDICT_BARS[item.verdict]}`} />
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-white/[0.04] text-slate-300">
-                  <Icon className="w-4 h-4" aria-hidden="true" />
+              <div className={`absolute top-0 left-0 h-full w-1 ${VERDICT_BARS[item.verdict]}`} />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 text-sky-400 shadow-inner">
+                      <Icon className="w-4 h-4" aria-hidden="true" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-white tracking-tight">{item.title}</h4>
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-fluid-nano font-mono font-bold border ${VERDICT_COLORS[item.verdict]}`}>
+                    {item.verdict}
+                  </span>
                 </div>
-                <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                <span className={`ml-auto text-xs font-bold ${VERDICT_COLORS[item.verdict]}`}>
-                  {item.verdict}
-                </span>
+
+                <p className="text-fluid-xs text-slate-200 leading-relaxed font-normal">{item.recommendation}</p>
               </div>
 
-              <p className="text-sm text-white/70">{item.recommendation}</p>
-
-              <div className="space-y-1.5 text-xs text-white/50">
-                <div className="flex gap-2">
-                  <span className="font-medium text-white/55">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
-                  <code className="font-mono text-amber-200/80">{item.threshold}</code>
+              <div className="pt-2 border-t border-slate-800/60 space-y-2 text-fluid-nano text-slate-300">
+                <div className="flex items-start gap-2 bg-slate-950/40 p-2 rounded-md border border-slate-800/50">
+                  <span className="font-semibold text-slate-300 shrink-0">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
+                  <code className="font-mono text-amber-300/90 break-words">{item.threshold}</code>
                 </div>
-                <div className="flex gap-2">
-                  <span className="font-medium text-white/55">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
-                  <code className="font-mono text-rose-200/80">{item.reversalCondition}</code>
+                <div className="flex items-start gap-2 bg-slate-950/40 p-2 rounded-md border border-slate-800/50">
+                  <span className="font-semibold text-slate-300 shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
+                  <code className="font-mono text-rose-300/90 break-words">{item.reversalCondition}</code>
                 </div>
               </div>
             </div>

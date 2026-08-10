@@ -43,38 +43,45 @@ export function DecisionRouteRail() {
   const panelId = useId();
 
   return (
-    <section className="group weather-section-border overflow-hidden" aria-label="Route this week's call">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((isOpen) => !isOpen)}
-          className="flex w-full min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-white/70 transition-colors select-none hover:bg-white/[0.04] hover:text-white/90 weather-focus-ring weather-press-scale"
-        >
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <span className="text-white/60">Route this week&apos;s call</span>
-            <span className="truncate text-[0.65rem] text-white/40">Plan · Resolve · Rule · Compare</span>
-          </div>
+    <section className="group rounded-xl border border-slate-800/80 bg-slate-900/50 shadow-md backdrop-blur-md overflow-hidden transition-all duration-200" aria-label="Route this week's call">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((isOpen) => !isOpen)}
+        className="flex w-full min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-3.5 text-left text-fluid-xs font-medium text-slate-200 transition-colors hover:bg-slate-800/40 select-none weather-focus-ring weather-press-scale"
+      >
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="font-semibold text-white">Route this week&apos;s call</span>
+          <span className="hidden sm:inline-block h-3 w-px bg-slate-700/60" aria-hidden="true" />
+          <span className="truncate text-fluid-nano text-slate-400 font-mono">Plan · Resolve · Rule · Compare</span>
+        </div>
+        <div className="flex items-center gap-2 text-slate-400 group-hover:text-white transition-colors">
+          <span className="text-fluid-nano font-mono uppercase tracking-wider">{open ? "Hide paths" : "Explore 8 paths"}</span>
           <ChevronRight
-            className={`h-5 w-5 shrink-0 transition-transform group-hover:text-white/60 ${open ? "rotate-90" : ""} text-white/50`}
+            className={`h-4 w-4 shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-sky-400" : ""}`}
             aria-hidden="true"
           />
-        </button>
+        </div>
+      </button>
 
       <div id={panelId} hidden={!open}>
-        <div className="px-4 pb-4">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+        <div className="px-4 pb-4 pt-1 border-t border-slate-800/60">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {routeGroups.map((group) => (
-              <div key={group.label} className="space-y-1">
-                <ul className="space-y-0.5">
+              <div key={group.label} className="rounded-lg border border-slate-800/60 bg-slate-950/40 p-3 space-y-2">
+                <span className="text-fluid-nano font-mono font-bold text-sky-400 uppercase tracking-wider block border-b border-slate-800/60 pb-1">
+                  {group.label}
+                </span>
+                <ul className="space-y-1.5">
                   {group.links.map((link) => (
                     <li key={link.href}>
                       <ActionLink
                         href={link.href}
                         variant="inline"
-                        className="normal-case tracking-normal text-fluid-sm text-sky-300/75 hover:text-sky-200"
+                        className="normal-case tracking-normal text-fluid-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1"
                       >
-                        {link.label}
+                        <span>{link.label}</span>
                       </ActionLink>
                     </li>
                   ))}

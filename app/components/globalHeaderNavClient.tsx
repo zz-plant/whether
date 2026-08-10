@@ -167,29 +167,29 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         {activeRouteLabel}
       </button>
 
-      <nav aria-label="Primary" className="hidden md:flex items-center gap-0.5">
+      <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
         {navigationLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             aria-current={link.isActive ? "page" : undefined}
-            className={`rounded-md px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400 ${
+            className={`rounded-lg px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
               link.isActive
-                ? "bg-sky-500/14 text-sky-100 font-semibold"
-                : "text-slate-300 hover:bg-slate-800/40 hover:text-slate-100"
+                ? "bg-sky-500/15 text-sky-100 font-semibold border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.15)]"
+                : "text-slate-300 border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
             }`}
           >
             {link.label}
           </Link>
         ))}
-        <span className="mx-1 h-4 w-px bg-slate-700/60" aria-hidden="true" />
+        <span className="mx-1 h-4 w-px bg-slate-800" aria-hidden="true" />
         <Link
           href="/api-docs"
           aria-current={isApiActive ? "page" : undefined}
-          className={`rounded-md px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400 ${
+          className={`rounded-lg px-3 py-1.5 text-fluid-xs font-medium tracking-[0.02em] no-underline transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
             isApiActive
-              ? "bg-sky-500/14 text-sky-100 font-semibold"
-              : "text-slate-300 hover:bg-slate-800/40 hover:text-slate-100"
+              ? "bg-sky-500/15 text-sky-100 font-semibold border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.15)]"
+              : "text-slate-300 border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
           }`}
         >
           API

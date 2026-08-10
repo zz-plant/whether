@@ -156,7 +156,7 @@ export function DecisionHero({
   const showActionNow = actionNow && actionNow.trim() !== normalizedCall && actionNow.trim() !== "";
 
   return (
-    <section className="weather-section" aria-labelledby="weekly-call-title">
+    <section className="weather-card relative overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 sm:p-7 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl hover:border-slate-700/80 transition-all duration-300" aria-labelledby="weekly-call-title">
       <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">

@@ -108,48 +108,49 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Popup className="fixed z-50 top-[15vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl overflow-hidden" aria-label="Command palette">
-          <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <Search className="text-slate-400 shrink-0" size={18} aria-hidden="true" />
+        <Dialog.Popup className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-slate-800/80 bg-slate-950/95 shadow-2xl shadow-black/80 backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
+          <div className="flex items-center gap-3 border-b border-slate-800/80 px-4 py-3.5 bg-slate-900/40">
+            <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search pages, actions..."
-              className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none"
+              placeholder="Search pages, actions, tools..."
+              className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none font-medium"
               autoFocus
               aria-label="Search commands"
             />
-            <kbd className="text-[10px] text-slate-500 font-mono border border-slate-700 rounded px-1.5 py-0.5">ESC</kbd>
+            <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900 rounded-md px-2 py-0.5 shadow-inner">ESC</kbd>
           </div>
           <nav aria-label="Command results" className="max-h-80 overflow-y-auto py-2">
             {filtered.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-slate-500">No results</p>
+              <p className="px-4 py-8 text-center text-sm text-slate-500 font-medium">No matching commands</p>
             ) : (
-              <ul className="space-y-0.5">
+              <ul className="space-y-1 px-1.5">
                 {filtered.map((cmd, i) => {
                   const Icon = cmd.icon;
+                  const isSelected = i === selectedIndex;
                   return (
                     <li key={cmd.id}>
                       <button
                         type="button"
                         onClick={cmd.action}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                          i === selectedIndex
-                            ? "bg-sky-500/14 text-sky-100"
-                            : "text-slate-300 hover:bg-white/[0.06]"
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all duration-150 ${
+                          isSelected
+                            ? "bg-sky-500/15 text-sky-100 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.12)] font-semibold"
+                            : "text-slate-300 border border-transparent hover:bg-slate-800/50 hover:text-white"
                         }`}
-                        aria-current={i === selectedIndex ? "true" : undefined}
+                        aria-current={isSelected ? "true" : undefined}
                       >
-                        <Icon size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
+                        <Icon size={16} className={`shrink-0 ${isSelected ? "text-sky-400" : "text-slate-400"}`} aria-hidden="true" />
                         <span className="flex-1 min-w-0">
                           <span className="block text-sm font-medium truncate">{cmd.label}</span>
                           {cmd.description ? (
-                            <span className="block text-xs text-slate-500 truncate">{cmd.description}</span>
+                            <span className="block text-xs text-slate-400/80 truncate font-normal">{cmd.description}</span>
                           ) : null}
                         </span>
                         {cmd.shortcut ? (
-                          <kbd className="text-[10px] text-slate-500 font-mono border border-slate-700/60 rounded px-1.5 py-0.5 shrink-0">
+                          <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900/80 rounded-md px-2 py-0.5 shrink-0 shadow-inner">
                             {cmd.shortcut}
                           </kbd>
                         ) : null}
@@ -160,10 +161,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               </ul>
             )}
           </nav>
-          <div className="border-t border-white/10 px-4 py-2 flex items-center gap-4 text-[10px] text-slate-500">
-            <span className="flex items-center gap-1"><kbd className="font-mono border border-slate-700 rounded px-1">↑↓</kbd> navigate</span>
-            <span className="flex items-center gap-1"><kbd className="font-mono border border-slate-700 rounded px-1">↵</kbd> select</span>
-            <span className="flex items-center gap-1"><kbd className="font-mono border border-slate-700 rounded px-1">esc</kbd> close</span>
+          <div className="border-t border-slate-800/80 px-4 py-2.5 bg-slate-900/40 flex items-center gap-4 text-[10px] text-slate-400 font-medium">
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">↑↓</kbd> navigate</span>
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">↵</kbd> select</span>
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">esc</kbd> close</span>
           </div>
         </Dialog.Popup>
       </Dialog.Portal>

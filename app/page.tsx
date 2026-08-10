@@ -82,9 +82,9 @@ function CanonicalWeekPermalink() {
   if (!latestPublishedBrief) return null;
 
   return (
-    <section className="weather-panel flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-      <p className="text-sm text-slate-300">
-        This week is published as a permanent record dated {latestPublishedBrief.recordDateLabel}.
+    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 shadow-md">
+      <p className="text-fluid-xs text-slate-300">
+        This week is published as a permanent record dated <span className="font-medium text-white">{latestPublishedBrief.recordDateLabel}</span>.
       </p>
       <ActionLink href={buildPublishedBriefPath(latestPublishedBrief.slug)} variant="pill">
         Citable permalink
