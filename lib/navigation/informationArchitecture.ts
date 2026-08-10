@@ -109,20 +109,30 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
 }, {});
 
 /**
- * Published content and publication-identity routes.
- *
- * These are deliberately not navigation layers — they sit outside the operator
- * loop and must not appear in nav ordering or next-step cues. They still need a
- * header label, so they resolve here rather than falling back to "Page".
- * Matched by prefix, longest first.
+ * Utility links — framework, template, API docs, about.
+ * These sit outside the operator loop. Single source for mobile sheet, footer, header dropdown.
  */
-export const contentRouteLabels: ReadonlyArray<{ prefix: string; label: string }> = [
-  { prefix: "/brief", label: "Published Brief" },
-  { prefix: "/about", label: "About" },
-  { prefix: "/contact", label: "Contact" },
-];
+export const utilityLinks = [
+  {
+    href: "/framework",
+    label: "Framework",
+    description: "Thresholds, vocabulary, reversal logic",
+  },
+  {
+    href: "/template",
+    label: "Template",
+    description: "Blank bounded-decision form",
+  },
+  {
+    href: "/api-docs",
+    label: "API Docs",
+    description: "Integration reference",
+  },
+  {
+    href: "/about",
+    label: "About",
+    description: "Product philosophy & team",
+  },
+] as const;
 
-export const resolveContentRouteLabel = (pathname: string) =>
-  [...contentRouteLabels]
-    .sort((a, b) => b.prefix.length - a.prefix.length)
-    .find((entry) => pathname === entry.prefix || pathname.startsWith(`${entry.prefix}/`))?.label ?? null;
+export type UtilityLink = typeof utilityLinks[number];

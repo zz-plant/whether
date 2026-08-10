@@ -30,21 +30,22 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
 
-  it("labels published content routes without adding them to the operator loop", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/brief/2026-w31"), "Published Brief");
+  it("labels utility routes without adding them to the operator loop", () => {
+    assert.equal(resolveGlobalHeaderRouteLabel("/framework"), "Framework");
+    assert.equal(resolveGlobalHeaderRouteLabel("/template"), "Template");
+    assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API Docs");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");
-    assert.equal(resolveGlobalHeaderRouteLabel("/contact"), "Contact");
     assert.equal(resolveGlobalHeaderRouteLabel("/about/"), "About");
 
-    // Content routes must not leak into nav ordering or next-step cues.
-    assert.equal(resolveReportHeaderNextStep("/brief/2026-w31"), null);
+    // Utility routes must not leak into nav ordering or next-step cues.
+    assert.equal(resolveReportHeaderNextStep("/framework"), null);
     assert.equal(resolveReportHeaderNextStep("/about"), null);
     assert.equal(isReportShellRoute("/about"), false);
   });
 
-  it("does not match a content label on an unrelated path that merely shares a prefix", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/aboutus"), "Page");
-    assert.equal(resolveGlobalHeaderRouteLabel("/briefing"), "Page");
+  it("does not match a utility label on an unrelated path that merely shares a prefix", () => {
+    assert.equal(resolveGlobalHeaderRouteLabel("/frameworkish"), "Page");
+    assert.equal(resolveGlobalHeaderRouteLabel("/templating"), "Page");
   });
 
   it("walks the operator loop for next-step cues and cycles back to the brief", () => {

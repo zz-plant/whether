@@ -2,7 +2,7 @@ import {
   navigationLayers,
   primaryNavigationLayers,
   reportShellPaths,
-  resolveContentRouteLabel,
+  utilityLinks,
   type NavigationLayer,
 } from "./informationArchitecture";
 import { pathMatchesLink } from "./pathMatching";
@@ -29,6 +29,12 @@ const findActiveLayer = (pathname: string) => {
 const findActivePrimaryLayer = (pathname: string) =>
   primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, normalizePathname(pathname)));
 
+// Resolve route label from utility links (framework, template, api-docs, about, etc.)
+const resolveUtilityRouteLabel = (pathname: string) => {
+  const normalizedPathname = normalizePathname(pathname);
+  return utilityLinks.find((link) => pathMatchesLink(link.href, normalizedPathname))?.label ?? null;
+};
+
 export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   const activeLayer = findActiveLayer(pathname);
 
@@ -36,7 +42,7 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
     return activeLayer.navLabel ?? activeLayer.label;
   }
 
-  return resolveContentRouteLabel(normalizePathname(pathname)) ?? fallbackLabel;
+  return resolveUtilityRouteLabel(normalizePathname(pathname)) ?? fallbackLabel;
 };
 
 // Next step in the operator loop: walks primaryNavigationLayers in IA order

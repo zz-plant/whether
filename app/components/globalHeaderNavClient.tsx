@@ -11,28 +11,62 @@ import {
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import {
+  navigationLayers,
+  utilityLinks,
+  type UtilityLink,
+} from "../../lib/navigation/informationArchitecture";
 
-type GlobalHeaderNavClientProps = {
-  pathname?: string;
-};
-
-const RESOURCE_LINKS = [
-  { href: "/api-docs", label: "API Docs" },
-  { href: "/threshold", label: "Framework" },
-  { href: "/template", label: "Template" },
-  { href: "/search", label: "Search" },
-  { href: "/about", label: "About" },
-] as const;
-
-export function MobileNavContent({
-  navigationLinks,
-  currentPathname,
-  onClose,
-}: {
+type MobileNavContentProps = {
   navigationLinks: GlobalHeaderNavigationLink[];
   currentPathname: string;
   onClose: () => void;
+};
+
+function SupportingLayerItem({
+  link,
+  currentPathname,
+  onClose,
+  depth,
+}: {
+  link: typeof navigationLayers[number];
+  currentPathname: string;
+  onClose: () => void;
+  depth: number;
 }) {
+  const isActive = pathMatchesLink(link.href, currentPathname);
+  const children = navigationLayers.filter((l) => l.parentKey === link.key);
+
+  return (
+    <>
+      <Link
+        key={link.href}
+        href={link.href}
+        aria-current={isActive ? "page" : undefined}
+        onClick={onClose}
+        className={`flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium no-underline transition-colors ${
+          isActive
+            ? "bg-sky-500/14 text-sky-100 font-semibold"
+            : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
+        }`}
+        style={{ paddingLeft: `${1 + depth * 0.75}rem` }}
+      >
+        {link.navLabel ?? link.label}
+      </Link>
+      {children.map((child) => (
+        <SupportingLayerItem
+          key={child.href}
+          link={child}
+          currentPathname={currentPathname}
+          onClose={onClose}
+          depth={depth + 1}
+        />
+      ))}
+    </>
+  );
+}
+
+export function MobileNavContent({ navigationLinks, currentPathname, onClose }: MobileNavContentProps) {
   return (
     <div className="w-full px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
       <div className="mx-auto mb-3 h-1 w-10 rounded-sm bg-slate-700" />
@@ -42,21 +76,36 @@ export function MobileNavContent({
             Operator Loop
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={link.isActive ? "page" : undefined}
-                onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
-                  link.isActive
-                    ? "bg-sky-500/14 text-sky-100 font-semibold"
-                    : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navigationLinks.map((link) => {
+              const isActive = link.isActive;
+              const supportingChildren = navigationLayers.filter((l) => l.parentKey === link.key);
+
+              return (
+                <div key={link.href}>
+                  <Link
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
+                      isActive
+                        ? "bg-sky-500/14 text-sky-100 font-semibold"
+                        : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                  {supportingChildren.map((child) => (
+                    <SupportingLayerItem
+                      key={child.href}
+                      link={child}
+                      currentPathname={currentPathname}
+                      onClose={onClose}
+                      depth={1}
+                    />
+                  ))}
+                </div>
+              );
+            })}
           </nav>
         </div>
 
@@ -65,7 +114,7 @@ export function MobileNavContent({
             Resources & Framework
           </p>
           <nav className="space-y-0.5" aria-label="Resources and documentation">
-            {RESOURCE_LINKS.map((link) => {
+            {utilityLinks.map((link: UtilityLink) => {
               const isActive = pathMatchesLink(link.href, currentPathname);
               return (
                 <Link
@@ -89,6 +138,10 @@ export function MobileNavContent({
     </div>
   );
 }
+
+type GlobalHeaderNavClientProps = {
+  pathname?: string;
+};
 
 export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
