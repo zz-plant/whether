@@ -346,6 +346,26 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **Top fold no longer repeats the windows grid.** `WeeklyTopFoldContract` kept `Posture shift`, `Revisit`, `Watch`, and the memory rail, and dropped the `Hiring / Expansion / Fundraising` window grid that duplicated the `ThreeWhethersCard` verdicts.
 
+## Layout pass (2026-08-10)
+
+Restructured `/` around scan speed and CTA hierarchy; desktop page height dropped ~570px.
+
+- **Hero metadata is cells, not prose.** The wrap-dependent metadata sentence (cash availability,
+  risk appetite, deltas, regime in one flowing `<p>`) became three fixed signal cells with the delta
+  glyph inside each cell. The 48px posture compass — 6px axis labels, unreadable at rendered size,
+  duplicating the ThresholdLadder — was cut; its `pts to pause` counter moved into the
+  `Watch this week` box header.
+- **Bounded conditions own one box.** ThresholdLadder + `Guardrail` / `Reversal` / `Flip watch` rows
+  render as a single bordered `<dl>` block instead of loose paragraphs. The block now renders when any
+  bound exists (previously gated on flip conditions only).
+- **One primary CTA in the handoff.** `Build this week's plan →` is now the `primary` ActionLink
+  variant paired with `Mark reviewed`; `SubscribeForm` and the citable-permalink card moved to the
+  right rail under `Conditions over time`, filling the previously empty sticky column. Hero action
+  rows merged into one (Copy Brief first, per DD-005), trust line beneath.
+- **Verdict badges carry state.** `ThreeWhethersCard` HOLD/TIGHTEN/EXPAND chips gained semantic
+  fills/borders; `Pause if: Tighten:` double prefixes stripped from bound strings; box-in-box footer
+  flattened to a `<dl>`. Top-fold contract rebalanced to 5/7 columns (revisit queue gets the room).
+
 ## Declutter pass (2026-08-07)
 
 Removed four duplications on `/` found by screenshot review. The rule applied: when two surfaces state the
