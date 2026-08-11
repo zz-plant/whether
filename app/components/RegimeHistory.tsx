@@ -3,7 +3,8 @@
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Link as LinkIcon, Check, Star } from "lucide-react";
+import { Link as LinkIcon, Check } from "lucide-react";
+import { Star } from "lucide-react";
 import { REGIME_COLORS, REGIME_DISPLAY } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
 import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";

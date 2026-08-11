@@ -5,7 +5,7 @@ type HistoricalTrendChartProps = {
   color: string;
   points: TrendPoint[];
   /**
-   * Which direction reads as good. Tightness-style scores rise when conditions
+   * Direction that counts favorably. Tightness-style scores rise when conditions
    * worsen (default); appetite-style scores rise when conditions improve.
    */
   increaseIsPositive?: boolean;

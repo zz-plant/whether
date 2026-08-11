@@ -16,7 +16,7 @@ type ScoreCardProps = {
   /** Optional suffix shown after the value (e.g. "/100") */
   suffix?: string;
   /**
-   * Which direction reads as good. Tightness-style scores rise when conditions
+   * Direction that counts favorably. Tightness-style scores rise when conditions
    * worsen (default); appetite-style scores rise when conditions improve.
    */
   increaseIsPositive?: boolean;

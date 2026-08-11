@@ -305,13 +305,12 @@ export function DecisionHero({
           </div>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <span className="inline-flex items-center gap-1.5">
-              {/* Shape carries the state alongside color: circle = live feed, square = static snapshot. */}
-              {isFallback ? (
+              {/* Shape carries the state alongside color: circle = fully live feed, square =
+                  static input present (snapshot or cached/degraded sources). */}
+              {isDegradedData ? (
                 <StatusStaticIcon className="size-2 text-amber-300/90" />
               ) : (
-                <StatusLiveIcon
-                  className={`size-2 ${isDegradedData ? "text-amber-300/90" : "text-emerald-300/90 motion-safe:animate-pulse"}`}
-                />
+                <StatusLiveIcon className="size-2 text-emerald-300/90 motion-safe:animate-pulse" />
               )}
               <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
             </span>

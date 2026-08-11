@@ -69,13 +69,13 @@ export function FreshnessDot({
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
       >
-        {/* Shape carries the state alongside color: circle = live feed, square = static
-            snapshot — and the pulse means "live", not "problem". */}
+        {/* Shape carries the state alongside color: circle = fully live feed, square = static
+            input present (snapshot or cached/degraded sources) — and the pulse means "live". */}
         <span className={`inline-flex items-center gap-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusColor}`}>
-          {showOfflineBadge ? (
+          {showOfflineBadge || hasDegraded ? (
             <StatusStaticIcon className="size-1.5" />
           ) : (
-            <StatusLiveIcon className={`size-1.5 ${hasDegraded ? "" : "motion-safe:animate-pulse"}`} />
+            <StatusLiveIcon className="size-1.5 motion-safe:animate-pulse" />
           )}
           {showOfflineBadge ? "Snapshot" : hasDegraded ? "Degraded" : "Live"}
         </span>
