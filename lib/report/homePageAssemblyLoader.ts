@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
 import { assembleHomePage } from "./homePageAssembler";
-import { buildAgentInterfaceResponse, isAgentCadence } from "../agentInterface";
-import { parseOperatorContextFromCookies } from "./operatorContext";
-import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import type { HomePageSearchParams } from "./homeMetadata";
+import { parseOperatorContextFromCookies } from "./operatorContext";
 
+// Cadence data intentionally does NOT load here: the homepage renders it behind
+// Suspense (`AsyncCadenceSection`), so fetching it on this blocking path would
+// defeat the streaming boundary and duplicate the posture-state work.
 export async function loadHomePageAssembly(
   searchParams?: HomePageSearchParams,
 ) {
@@ -12,28 +13,15 @@ export async function loadHomePageAssembly(
   const cookieHeader = cookieStore.toString();
   const operatorContext = parseOperatorContextFromCookies(cookieHeader);
 
-  const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence)
-    ? searchParams.cadence
-    : "weekly";
-
   const homepage = await assembleHomePage({ searchParams, operatorContext });
-
-  const cadenceData = activeCadence !== "weekly"
-    ? await buildAgentInterfaceResponse(activeCadence).catch(() => null)
-    : null;
 
   const reportData = homepage.reportResult.ok
     ? homepage.reportResult.data
     : homepage.reportResult.fallback;
 
-  const regimeHistory = getMonthlyRegimeHistory();
-
   return {
     homepage,
-    cadenceData,
-    activeCadence,
     reportData,
-    regimeHistory,
     operatorContext,
   };
 }

@@ -51,14 +51,26 @@ export const withRetry = async <T>(
   throw lastError;
 };
 
-export const buildFredSeriesUrl = (seriesId: string): string =>
-  `${FRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`;
+export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: string): string => {
+  const base = `${FRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`;
+  return observationStartDate ? `${base}&cosd=${encodeURIComponent(observationStartDate)}` : base;
+};
+
+// Without `cosd`, fredgraph.csv returns the full series history (decades of daily
+// rows, hundreds of KB per series). Every consumer needs a bounded window, so
+// callers pass a lookback and we request only that range.
+export const observationStartDateForLookback = (lookbackDays: number): string => {
+  const start = new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000);
+  return start.toISOString().slice(0, 10);
+};
 
 export interface FetchFredCsvOptions {
   timeoutMs?: number;
   revalidateSeconds?: number;
   attempts?: number;
   backoffMs?: number;
+  /** Only request observations from this many days back. Omit for full history. */
+  lookbackDays?: number;
 }
 
 export const fetchFredCsv = async (
@@ -82,7 +94,10 @@ export const fetchFredCsv = async (
       async () => {
         const response = await fetchWithTimeout(
           fetcher,
-          buildFredSeriesUrl(seriesId),
+          buildFredSeriesUrl(
+            seriesId,
+            options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays) : undefined,
+          ),
           {
             headers: FRED_FETCH_HEADERS,
             next: { revalidate: revalidateSeconds },
@@ -144,17 +159,18 @@ export const computeYearOverYearPoints = (
   seriesId?: string,
 ): { date: string; value: number }[] => {
   const sorted = [...rows].sort((a, b) => a.date.localeCompare(b.date));
+  const valueByDate = new Map(sorted.map((point) => [point.date, point.value]));
   const result = sorted.flatMap((point) => {
     const pointDate = new Date(point.date + "T00:00:00.000Z");
     if (Number.isNaN(pointDate.getTime())) return [];
     const priorYear = new Date(pointDate);
     priorYear.setUTCFullYear(priorYear.getUTCFullYear() - 1);
     const priorKey = priorYear.toISOString().slice(0, 10);
-    const priorPoint = sorted.find((p) => p.date === priorKey);
-    if (!priorPoint || priorPoint.value === 0) return [];
+    const priorValue = valueByDate.get(priorKey);
+    if (priorValue === undefined || priorValue === 0) return [];
     return [{
       date: point.date,
-      value: ((point.value - priorPoint.value) / priorPoint.value) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
+      value: ((point.value - priorValue) / priorValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
     }];
   });
   if (result.length === 0) {

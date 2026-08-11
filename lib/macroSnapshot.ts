@@ -100,8 +100,14 @@ const trimHistoryToRecentWindow = (points: SeriesHistoryPoint[]) => {
   });
 };
 
+// The rendered window is RECENT_HISTORY_WINDOW_DAYS; fetch that plus margin for
+// publication lag rather than the series' full multi-decade history. YoY series
+// additionally need the prior-year observation for every point in the window.
+const HISTORY_FETCH_LOOKBACK_DAYS = RECENT_HISTORY_WINDOW_DAYS + 90;
+const YOY_FETCH_LOOKBACK_DAYS = RECENT_HISTORY_WINDOW_DAYS + 460;
+
 const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId);
+  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: HISTORY_FETCH_LOOKBACK_DAYS });
   const parsedHistory = trimHistoryToRecentWindow(parseFredCsvRows(csv));
   const latest = parsedHistory.at(-1);
 
@@ -117,7 +123,7 @@ const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) =>
 };
 
 const readFredYearOverYearPoints = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId);
+  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: YOY_FETCH_LOOKBACK_DAYS });
   const yoyHistory = trimHistoryToRecentWindow(
     computeYearOverYearPoints(parseFredCsvRows(csv), seriesId),
   );

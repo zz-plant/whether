@@ -213,9 +213,22 @@ const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
   return null;
 };
 
+// Only the latest common observation date is consumed, so bound the default
+// FRED requests to a recent window instead of the series' full history
+// (hundreds of KB per series without `cosd`). Custom endpoints keep whatever
+// range parameters the caller encoded.
+const SERIES_LOOKBACK_DAYS = 90;
+
+const withRecentObservationWindow = (endpoint: string) => {
+  const url = new URL(endpoint);
+  const start = new Date(Date.now() - SERIES_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
+  url.searchParams.set("cosd", start.toISOString().slice(0, 10));
+  return url.toString();
+};
+
 const buildSeriesEndpoint = (baseEndpoint: string | undefined, seriesId: string, fallback: string) => {
   if (!baseEndpoint) {
-    return fallback;
+    return withRecentObservationWindow(fallback);
   }
 
   const url = new URL(baseEndpoint);

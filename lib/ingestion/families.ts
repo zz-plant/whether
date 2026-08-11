@@ -4,13 +4,19 @@ import type { SignalEntitySnapshot, SignalFamily } from "./types";
 
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
 
+// Latest-value reads need only the newest observation; 90 days covers the
+// sparsest (monthly) series with margin. YoY needs the exact prior-year row,
+// so it fetches 430 days to include it plus publication lag.
+const LATEST_VALUE_LOOKBACK_DAYS = 90;
+const YEAR_OVER_YEAR_LOOKBACK_DAYS = 430;
+
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId);
+  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: LATEST_VALUE_LOOKBACK_DAYS });
   return findLatestFredRow(csv);
 };
 
 const readFredLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId);
+  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: YEAR_OVER_YEAR_LOOKBACK_DAYS });
   return computeLatestYearOverYear(parseFredCsvRows(csv), seriesId);
 };
 
