@@ -214,8 +214,8 @@ export default function HistoryPage() {
         <RegimeStats />
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Tightness" color="#f87171" points={tightnessTrend} />
-          <HistoricalTrendChart label="Risk appetite" color="#34d399" points={riskAppetiteTrend} />
+          <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
+          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
         </div>
       </section>
 

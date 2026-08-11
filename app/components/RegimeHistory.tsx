@@ -4,7 +4,8 @@ import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Link as LinkIcon, Check } from "lucide-react";
-import { REGIME_COLORS } from "../viewModel";
+import { Star } from "lucide-react";
+import { REGIME_COLORS, REGIME_DISPLAY } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
 import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
@@ -65,6 +66,12 @@ export function RegimeHistory({ regimes }: Props) {
     const ym = parseYearMonth(entry.record_date);
     return ym ? findEventAt(ym.year, ym.month) !== null : false;
   });
+
+  // Bar hue is the only channel carrying the regime, so it needs a text key —
+  // tooltips don't survive screenshots. Only regimes present in the window.
+  const presentRegimes = Array.from(new Set(regimes.map((entry) => entry.regime))).filter(
+    (regime) => REGIME_COLORS[regime],
+  );
 
   return (
     <div className="weather-card">
@@ -137,13 +144,13 @@ export function RegimeHistory({ regimes }: Props) {
               title={detailText}
             >
               {event ? (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[7px] leading-none text-amber-300/70" aria-hidden="true">★</span>
+                <Star className="absolute top-0 left-1/2 size-2.5 -translate-x-1/2 fill-current text-amber-300/80" aria-hidden="true" />
               ) : null}
               <span
                 aria-hidden="true"
-                className={`block w-full rounded-t-sm transition-[opacity] group-hover:opacity-80 ${
+                className={`block w-full rounded-t-sm transition-[opacity] group-hover:opacity-100 ${
                   REGIME_COLORS[entry.regime] ?? "bg-slate-500/40"
-                } ${isCurrent ? "ring-2 ring-white/40" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-60"}`}
+                } ${isCurrent ? "ring-2 ring-white/40" : ""} ${selected ? "ring-2 ring-sky-400/80 opacity-100" : "opacity-70"}`}
                 style={{ height: barHeight }}
               />
             </button>
@@ -161,12 +168,25 @@ export function RegimeHistory({ regimes }: Props) {
           <span>{formatAxisDate(regimes[regimes.length - 1].record_date)}</span>
         )}
       </div>
+      {presentRegimes.length > 0 ? (
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-nano text-white/50">
+          {presentRegimes.map((regime) => (
+            <span key={regime} className="inline-flex items-center gap-1">
+              <span className={`size-2 rounded-[2px] ${REGIME_COLORS[regime]}`} aria-hidden="true" />
+              {REGIME_DISPLAY[regime] ?? regime}
+            </span>
+          ))}
+        </div>
+      ) : null}
       {hasEvents || activeDetail ? (
         <p className="text-fluid-nano text-white/40 mt-0.5 truncate">
           {activeDetail ? (
             <span className="text-white/60" aria-hidden="true">{activeDetail}</span>
           ) : (
-            <><span className="text-amber-300/60">★</span> = notable event · hover or focus a bar for details</>
+            <>
+              <Star className="inline size-2.5 fill-current text-amber-300/80 align-[-0.1em]" aria-hidden="true" />
+              {" "}= notable event · hover or focus a bar for details
+            </>
           )}
         </p>
       ) : null}

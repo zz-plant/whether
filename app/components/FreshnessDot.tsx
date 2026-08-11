@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, useEffect, useRef } from "react";
+import { CheckIcon, StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
 export type FreshnessDotProps = {
   label: string;
@@ -52,10 +53,10 @@ export function FreshnessDot({
 
   const hasDegraded = degradedSourceRows.length > 0;
   const statusColor = showOfflineBadge
-    ? "bg-rose-400/80"
+    ? "text-rose-300"
     : hasDegraded
-    ? "bg-amber-400/80"
-    : "bg-emerald-400/80";
+    ? "text-amber-300"
+    : "text-emerald-300";
 
   return (
     <div ref={containerRef} className="relative flex flex-col items-center justify-center py-1.5">
@@ -68,8 +69,14 @@ export function FreshnessDot({
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
       >
-        <span className={`inline-flex items-center gap-1 rounded-full ${statusColor} px-1.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.06em]`}>
-          <span className="size-1.5 rounded-full bg-current motion-safe:animate-pulse" aria-hidden="true" />
+        {/* Shape carries the state alongside color: circle = fully live feed, square = static
+            input present (snapshot or cached/degraded sources) — and the pulse means "live". */}
+        <span className={`inline-flex items-center gap-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusColor}`}>
+          {showOfflineBadge || hasDegraded ? (
+            <StatusStaticIcon className="size-1.5" />
+          ) : (
+            <StatusLiveIcon className="size-1.5 motion-safe:animate-pulse" />
+          )}
           {showOfflineBadge ? "Snapshot" : hasDegraded ? "Degraded" : "Live"}
         </span>
         <span>Data as of {label}</span>
@@ -130,8 +137,9 @@ export function FreshnessDot({
               </div>
             </div>
           ) : (
-            <div className="border-t border-white/[0.06] pt-2 text-fluid-nano text-emerald-300/80">
-              ✓ All 5 macro feeds nominal.
+            <div className="flex items-center gap-1.5 border-t border-white/[0.06] pt-2 text-fluid-nano text-emerald-300/80">
+              <CheckIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
+              All macro feeds nominal.
             </div>
           )}
         </div>

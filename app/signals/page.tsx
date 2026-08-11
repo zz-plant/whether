@@ -129,8 +129,8 @@ export default async function SignalsPage({
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Trends</p>
         <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Tightness" color="#f87171" points={tightnessTrend} />
-          <HistoricalTrendChart label="Risk appetite" color="#34d399" points={riskAppetiteTrend} />
+          <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
+          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
         </div>
       </div>
 

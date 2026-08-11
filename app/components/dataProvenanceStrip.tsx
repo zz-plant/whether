@@ -17,12 +17,15 @@ export type DataProvenance = {
   statusLabel: string;
 };
 
+// Chip color tracks the confidence tier the label states (high = emerald,
+// medium = amber, low = rose) so the hue is monotonic in trust. Live-vs-static
+// is carried separately by the data-mode chip's circle/square icon.
 const statusStyles = {
   "Live (high confidence)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
-  "Archived snapshot (high)": "border-sky-300/55 bg-sky-400/10 text-sky-100",
+  "Archived snapshot (high)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
   "Previously cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
-  "Fallback active (low)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
-  "Modeled estimate (low)": "border-slate-600/70 bg-slate-800/40 text-slate-200",
+  "Fallback active (low)": "border-rose-400/50 bg-rose-500/10 text-rose-200",
+  "Modeled estimate (low)": "border-rose-400/50 bg-rose-500/10 text-rose-200",
 } as const;
 
 const statusDescriptions = {
@@ -138,13 +141,12 @@ export const DataProvenanceStrip = ({
             <span aria-hidden="true">{dataModeIcon}</span>
             <span>{dataMode.label}</span>
           </span>
-          <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
-          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/75 bg-slate-900/70 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-100">
+          <span className="inline-flex items-center rounded-sm border border-slate-700/75 bg-slate-900/70 px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-slate-100">
             Confidence {confidencePct}%
           </span>
           <Popover.Root>
             <Popover.Trigger
-              className={`weather-chip min-h-[44px] rounded-full border px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
+              className={`weather-chip min-h-[44px] border px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
                 statusStyle ?? "border-slate-700 text-slate-200"
               }`}
             >
@@ -187,18 +189,16 @@ export const DataProvenanceStrip = ({
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-400 uppercase tracking-[0.14em]">{label}</span>
-        <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
         <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
           <span aria-hidden="true">{dataModeIcon}</span>
           <span>{dataMode.label}</span>
         </span>
-        <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
-        <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs uppercase tracking-[0.12em] text-slate-200">
+        <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs uppercase tracking-[0.12em] text-slate-200">
           Confidence {confidencePct}%
         </span>
         <Popover.Root>
           <Popover.Trigger
-            className={`weather-chip inline-flex min-h-[44px] items-center rounded-full border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
+            className={`weather-chip inline-flex min-h-[44px] items-center border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
               statusStyle ?? "border-slate-700 text-slate-200"
             }`}
           >

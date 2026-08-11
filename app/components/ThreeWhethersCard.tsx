@@ -23,9 +23,9 @@ const TIGHTEN_AT = { hire: 55, spend: 65, commit: 75 } as const;
 const EASE_BELOW = { hire: 35, spend: 45, commit: 55 } as const;
 
 const VERDICT_COLORS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
-  TIGHTEN: "border-rose-500/40 bg-rose-500/10 text-rose-300",
-  HOLD: "border-amber-500/40 bg-amber-500/10 text-amber-300",
-  EXPAND: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+  TIGHTEN: "weather-chip-rose",
+  HOLD: "weather-chip-amber",
+  EXPAND: "weather-chip-emerald",
 };
 
 const VERDICT_BARS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
@@ -111,9 +111,9 @@ export function ThreeWhethersCard({
           return (
             <div
               key={i}
-              className="relative overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/60 p-4 shadow-lg backdrop-blur-md hover:border-slate-700/80 transition-all duration-200 flex flex-col justify-between space-y-3"
+              className="weather-card relative overflow-hidden flex flex-col justify-between space-y-3"
             >
-              <div className={`absolute top-0 left-0 h-full w-1 ${VERDICT_BARS[item.verdict]}`} />
+              <div className={`weather-bar ${VERDICT_BARS[item.verdict]}`} aria-hidden="true" />
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5">
@@ -125,7 +125,7 @@ export function ThreeWhethersCard({
                       <h4 className="text-sm font-semibold text-white tracking-tight">{item.title}</h4>
                     </div>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-fluid-micro font-mono font-bold tracking-wide border ${VERDICT_COLORS[item.verdict]}`}>
+                  <span className={`weather-chip font-mono ${VERDICT_COLORS[item.verdict]}`}>
                     {item.verdict}
                   </span>
                 </div>

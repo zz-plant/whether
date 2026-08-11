@@ -83,6 +83,7 @@ function MarketStateView({ state }: { state: MarketState }) {
             label="Risk appetite"
             value={state.riskAppetite}
             delta={state.riskAppetiteDelta}
+            increaseIsPositive
           />
         </div>
 
