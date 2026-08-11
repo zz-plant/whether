@@ -23,9 +23,9 @@ const TIGHTEN_AT = { hire: 55, spend: 65, commit: 75 } as const;
 const EASE_BELOW = { hire: 35, spend: 45, commit: 55 } as const;
 
 const VERDICT_COLORS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
-  TIGHTEN: "text-rose-400",
-  HOLD: "text-amber-400",
-  EXPAND: "text-emerald-400",
+  TIGHTEN: "border-rose-500/40 bg-rose-500/10 text-rose-300",
+  HOLD: "border-amber-500/40 bg-amber-500/10 text-amber-300",
+  EXPAND: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
 };
 
 const VERDICT_BARS: Record<"TIGHTEN" | "HOLD" | "EXPAND", string> = {
@@ -63,8 +63,8 @@ export function ThreeWhethersCard({
         : hiringIsEasy
         ? "Selectively accelerate key engineering & sales hires."
         : "Maintain existing headcount plan; replace critical backfills only.",
-      threshold: `Tighten: cash availability ≥ ${TIGHTEN_AT.hire}`,
-      reversalCondition: `Ease: cash availability drops below ${EASE_BELOW.hire}`,
+      threshold: `Cash availability ≥ ${TIGHTEN_AT.hire}`,
+      reversalCondition: `Cash availability drops below ${EASE_BELOW.hire}`,
     },
     {
       title: "Whether to Spend",
@@ -76,8 +76,8 @@ export function ThreeWhethersCard({
         : spendingIsEasy
         ? "Allow paid payback up to 12 months for top-tier channels."
         : "Keep payback targets at 8-10 months; re-evaluate monthly.",
-      threshold: `Tighten: cash availability ≥ ${TIGHTEN_AT.spend}`,
-      reversalCondition: `Ease: cash availability drops below ${EASE_BELOW.spend}`,
+      threshold: `Cash availability ≥ ${TIGHTEN_AT.spend}`,
+      reversalCondition: `Cash availability drops below ${EASE_BELOW.spend}`,
     },
     {
       title: "Whether to Commit",
@@ -89,8 +89,8 @@ export function ThreeWhethersCard({
         : committingIsEasy
         ? "Lock multi-year discounts on critical core infrastructure."
         : "Standard 1-year caps; require executive sign-off for >$50k ARR commitments.",
-      threshold: guardrail ?? `Pause: cash availability ≥ ${TIGHTEN_AT.commit} and tightening`,
-      reversalCondition: `Resume: cash availability drops below ${EASE_BELOW.commit} or easing`,
+      threshold: guardrail ?? `Cash availability ≥ ${TIGHTEN_AT.commit} and tightening`,
+      reversalCondition: `Cash availability drops below ${EASE_BELOW.commit} or easing`,
     },
   ];
 
@@ -125,7 +125,7 @@ export function ThreeWhethersCard({
                       <h4 className="text-sm font-semibold text-white tracking-tight">{item.title}</h4>
                     </div>
                   </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-fluid-nano font-mono font-bold border ${VERDICT_COLORS[item.verdict]}`}>
+                  <span className={`px-2.5 py-1 rounded-full text-fluid-micro font-mono font-bold tracking-wide border ${VERDICT_COLORS[item.verdict]}`}>
                     {item.verdict}
                   </span>
                 </div>
@@ -133,16 +133,16 @@ export function ThreeWhethersCard({
                 <p className="text-fluid-xs text-slate-200 leading-relaxed font-normal">{item.recommendation}</p>
               </div>
 
-              <div className="pt-2 border-t border-slate-800/60 space-y-2 text-fluid-nano text-slate-300">
-                <div className="flex items-start gap-2 bg-slate-950/40 p-2 rounded-md border border-slate-800/50">
-                  <span className="font-semibold text-slate-300 shrink-0">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>
-                  <code className="font-mono text-amber-300/90 break-words">{item.threshold}</code>
+              <dl className="pt-2.5 border-t border-slate-800/60 space-y-1.5 text-fluid-nano text-slate-300">
+                <div className="flex items-start gap-2">
+                  <dt className="font-semibold text-slate-400 shrink-0">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
+                  <dd><code className="font-mono text-amber-300/90 break-words">{item.threshold}</code></dd>
                 </div>
-                <div className="flex items-start gap-2 bg-slate-950/40 p-2 rounded-md border border-slate-800/50">
-                  <span className="font-semibold text-slate-300 shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</span>
-                  <code className="font-mono text-rose-300/90 break-words">{item.reversalCondition}</code>
+                <div className="flex items-start gap-2">
+                  <dt className="font-semibold text-slate-400 shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt>
+                  <dd><code className="font-mono text-rose-300/90 break-words">{item.reversalCondition}</code></dd>
                 </div>
-              </div>
+              </dl>
             </div>
           );
         })}
