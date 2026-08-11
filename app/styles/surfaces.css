@@ -362,6 +362,12 @@ button .weather-chip:active,
   color: var(--color-semantic-unchanged-fg);
 }
 
+.weather-chip-rose {
+  border-color: color-mix(in srgb, var(--color-semantic-tightening-border) 25%, transparent);
+  background: color-mix(in srgb, var(--color-semantic-tightening-bg) 12%, transparent);
+  color: var(--color-semantic-tightening-fg);
+}
+
 .weather-chip-slate {
   border-color: var(--border-strong);
   background: rgba(15, 23, 42, 0.35);

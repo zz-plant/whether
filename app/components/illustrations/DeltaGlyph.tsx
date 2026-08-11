@@ -8,6 +8,11 @@ export type DeltaGlyphProps = {
   max: number;
   /** Metric name, for the accessible title. */
   label: string;
+  /**
+   * Which direction reads as good. Tightness-style scores rise when conditions
+   * worsen (default); appetite-style scores rise when conditions improve.
+   */
+  increaseIsPositive?: boolean;
   className?: string;
 };
 
@@ -25,6 +30,7 @@ export function DeltaGlyph({
   min,
   max,
   label,
+  increaseIsPositive = false,
   className,
 }: DeltaGlyphProps) {
   if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return null;
@@ -35,12 +41,13 @@ export function DeltaGlyph({
   const xCurr = xFor(current);
   const delta = current - previous;
 
+  const improved = increaseIsPositive ? delta > 0 : delta < 0;
   const color =
     Math.abs(delta) < 0.001
-      ? "var(--accent-info)"
-      : delta > 0
-        ? "var(--accent-danger)"
-        : "var(--accent-success)";
+      ? "var(--color-semantic-unchanged-fg)"
+      : improved
+        ? "var(--accent-success)"
+        : "var(--accent-danger)";
 
   const desc =
     Math.abs(delta) < 0.001

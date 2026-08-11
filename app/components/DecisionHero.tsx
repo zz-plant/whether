@@ -11,6 +11,7 @@ import type { RegimeKey } from "../../lib/types";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
+import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
 type Props = {
   tightness: number;
@@ -104,12 +105,15 @@ export function DecisionHero({
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
-   const dialValue = tightness;
-   const dialPrevious = tightness - tightnessDelta;
+   // PostureDial reads -1 (loosen) .. +1 (tighten); tightness is 0-100.
+   const toDialScale = (v: number) => (v - 50) / 50;
+   const dialValue = toDialScale(tightness);
+   const dialPrevious = toDialScale(tightness - tightnessDelta);
    const regimeKey = isRegimeKey(regime) ? regime : undefined;
 
-   const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "Low" : riskAppetite >= 45 ? "Moderate" : "High") : undefined;
-   const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-rose-300" : riskAppetite >= 45 ? "text-amber-300" : "text-emerald-300") : undefined;
+   // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
+   const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "High" : riskAppetite >= 45 ? "Moderate" : "Low") : undefined;
+   const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-emerald-300" : riskAppetite >= 45 ? "text-amber-300" : "text-rose-300") : undefined;
    const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
    const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
 
@@ -144,7 +148,7 @@ export function DecisionHero({
   const showActionNow = actionNow && actionNow.trim() !== normalizedCall && actionNow.trim() !== "";
 
   return (
-    <section className="weather-card relative overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 sm:p-7 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl hover:border-slate-700/80 transition-all duration-300" aria-labelledby="weekly-call-title">
+    <section className="weather-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
       <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-1">
@@ -209,6 +213,7 @@ export function DecisionHero({
                         min={0}
                         max={100}
                         label="Risk appetite"
+                        increaseIsPositive
                       />
                     </span>
                     <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>{riskAppetiteDeltaLabel}</span>
@@ -300,7 +305,14 @@ export function DecisionHero({
           </div>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <span className="inline-flex items-center gap-1.5">
-              <span className={`size-2 rounded-full ${isDegradedData ? "bg-amber-400/80 motion-safe:animate-pulse" : "bg-emerald-400/80"}`} aria-hidden="true" />
+              {/* Shape carries the state alongside color: circle = live feed, square = static snapshot. */}
+              {isFallback ? (
+                <StatusStaticIcon className="size-2 text-amber-300/90" />
+              ) : (
+                <StatusLiveIcon
+                  className={`size-2 ${isDegradedData ? "text-amber-300/90" : "text-emerald-300/90 motion-safe:animate-pulse"}`}
+                />
+              )}
               <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
             </span>
             <span className="hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
@@ -334,6 +346,7 @@ export function DecisionHero({
               value={dialValue}
               previous={dialPrevious}
               label={postureLabel}
+              regime={regimeKey}
             />
           </div>
         </div>

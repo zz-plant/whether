@@ -4,9 +4,14 @@ type HistoricalTrendChartProps = {
   label: string;
   color: string;
   points: TrendPoint[];
+  /**
+   * Which direction reads as good. Tightness-style scores rise when conditions
+   * worsen (default); appetite-style scores rise when conditions improve.
+   */
+  increaseIsPositive?: boolean;
 };
 
-export function HistoricalTrendChart({ label, color, points }: HistoricalTrendChartProps) {
+export function HistoricalTrendChart({ label, color, points, increaseIsPositive = false }: HistoricalTrendChartProps) {
   if (points.length < 2) return null;
 
   const values = points.map((p) => p.value);
@@ -24,6 +29,10 @@ export function HistoricalTrendChart({ label, color, points }: HistoricalTrendCh
 
   const currentVal = points[points.length - 1].value;
   const firstVal = points[0].value;
+  const delta = currentVal - firstVal;
+  const improved = increaseIsPositive ? delta > 0 : delta < 0;
+  const deltaArrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
+  const deltaColor = delta === 0 ? "text-slate-400" : improved ? "text-emerald-200" : "text-amber-200";
 
   return (
     <div className="flex flex-col gap-1">
@@ -31,8 +40,8 @@ export function HistoricalTrendChart({ label, color, points }: HistoricalTrendCh
         <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">{label}</span>
         <span className="text-fluid-xs font-semibold tabular-nums text-slate-300">
           {currentVal}
-          <span className={currentVal > firstVal ? "text-amber-200 ml-1" : "text-emerald-200 ml-1"}>
-            {currentVal > firstVal ? "↑" : "↓"}{Math.abs(currentVal - firstVal).toFixed(0)}
+          <span className={`${deltaColor} ml-1`}>
+            {deltaArrow}{Math.abs(delta).toFixed(0)}
           </span>
         </span>
       </div>

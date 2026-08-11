@@ -15,17 +15,19 @@ type ScoreCardProps = {
   variant?: ScoreVariant;
   /** Optional suffix shown after the value (e.g. "/100") */
   suffix?: string;
+  /**
+   * Which direction reads as good. Tightness-style scores rise when conditions
+   * worsen (default); appetite-style scores rise when conditions improve.
+   */
+  increaseIsPositive?: boolean;
   /** Optional children rendered below the score (e.g. "vs last week: +3") */
   children?: ReactNode;
 };
 
-/** Delta direction: positive = metric moving up, negative = metric moving down.
- *  Credit conditions: up = tighter = amber (bad). Investor sentiment: up = easier = emerald (good). */
-const deltaColor = (label: string, delta: number) => {
+const deltaColor = (delta: number, increaseIsPositive: boolean) => {
   if (delta === 0) return "text-slate-400";
-  const isTightness = label.toLowerCase().includes("credit");
-  if (delta > 0) return isTightness ? "text-amber-200" : "text-emerald-200";
-  return isTightness ? "text-emerald-200" : "text-amber-200";
+  const improved = increaseIsPositive ? delta > 0 : delta < 0;
+  return improved ? "text-emerald-200" : "text-amber-200";
 };
 
 const scoreColor = (value: number) => {
@@ -34,7 +36,8 @@ const scoreColor = (value: number) => {
   return "border-rose-400/50";
 };
 
-const deltaArrow = (delta: number) => (delta > 0 ? "↑" : delta < 0 ? "↓" : "—");
+// "→" for unchanged, matching the delta glyphs on the weekly brief (DecisionHero, CompareStrip).
+const deltaArrow = (delta: number) => (delta > 0 ? "↑" : delta < 0 ? "↓" : "→");
 
 export function ScoreCard({
   label,
@@ -43,6 +46,7 @@ export function ScoreCard({
   tooltip,
   variant = "card",
   suffix,
+  increaseIsPositive = false,
   children,
 }: ScoreCardProps) {
   if (variant === "large") {
@@ -54,7 +58,7 @@ export function ScoreCard({
         </p>
         <p className="text-2xl font-bold tabular-nums text-slate-100">
           {value}
-          <span className={`text-lg ml-1 ${deltaColor(label, delta)}`}>
+          <span className={`text-lg ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
             {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
           </span>
         </p>
@@ -72,7 +76,7 @@ export function ScoreCard({
         <p className="font-semibold tabular-nums text-slate-100" title={tooltip}>
           {value}
           {suffix}
-          <span className={`ml-1 ${deltaColor(label, delta)}`}>
+          <span className={`ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
             {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
           </span>
         </p>
@@ -91,7 +95,7 @@ export function ScoreCard({
       <p className="text-2xl font-bold tabular-nums text-slate-100">
         {value}
         {suffix}
-        <span className={`text-lg ml-1 ${deltaColor(label, delta)}`}>
+        <span className={`text-lg ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
           {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
         </span>
       </p>
