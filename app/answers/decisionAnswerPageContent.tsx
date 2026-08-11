@@ -177,9 +177,9 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title="Continue decision flow">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/" variant="pill">Weekly brief</ButtonLink>
-            <ButtonLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ButtonLink>
+            <ButtonLink href="/answer#unresolved-question-router" variant="pill">Decision Tools</ButtonLink>
             <ButtonLink href="/operate" variant="pill">Operating guardrails</ButtonLink>
-            <ButtonLink href="/resolve#direct-answers" variant="pill">More direct answers</ButtonLink>
+            <ButtonLink href="/answer#direct-answers" variant="pill">More direct answers</ButtonLink>
             {relatedPages.map((related) => (
               <ButtonLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ButtonLink>
             ))}

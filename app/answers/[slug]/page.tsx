@@ -104,7 +104,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
   const { slug } = await params;
   if (isRetiredAnswerSlug(slug)) {
-    permanentRedirect("/resolve#direct-answers");
+    permanentRedirect("/answer#direct-answers");
   }
 
   return <DecisionAnswerPageContent slug={slug} route={highValueStaticAnswerSlugs.includes(slug) ? "/answers/[slug]" : "/answers/[slug]:isr"} />;

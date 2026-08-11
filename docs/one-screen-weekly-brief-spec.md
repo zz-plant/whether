@@ -421,3 +421,21 @@ same thing, the earlier one keeps it.
 - **Bounded rules stay full-width.** Reversal conditions in `ThreeWhethersCard` render unwrapped on their own line instead of truncating at 170px with a hover-only tooltip.
 - **Sticky strip consolidated and cross-viewport.** The mobile bottom bar dropped the redundant native-share button (copy + image download remain) and renders as a bottom-right floating pill on desktop.
 - **Mockup is deduplicated.** `app/mockups/operator-brief` states the action once (the `Do now / Pause if / Re-open when` spine), shows proof inline, and exposes one primary CTA (`Open planning handoff`) with a working `Copy operator brief` secondary.
+
+## Contrast & mobile compression pass (2026-08-11)
+
+- **Dark-theme legibility tokens raised (DD-006 completed).** `--app-text-muted` `#94a3b8 → #a7b3c4`
+  and `--app-text-secondary` `#cbd5e1 → #d7dee8` — these are the majority inks on the page (574
+  `text-slate-400/500` call sites alias to muted). Border alphas stepped up
+  (`subtle 0.065 → 0.10`, `default 0.085 → 0.13`, `strong 0.14 → 0.19`) and the surface ladder
+  widened (`panel #13161b`, `surface #181b21`, `raised #1f232a` over an unchanged `#08090b` body) so
+  cards separate by luminance again instead of relying on sub-threshold hairlines. A dark-theme
+  remap floors `text-white/30–55` at the muted role (the /40 tier measured ~3.7:1, under AA);
+  `/25` and below stay decorative. Light theme unaffected — it keeps its own earlier remap.
+- **Mobile signal readout collapses (DD-004).** The hero's three-cell readout renders twice behind a
+  CSS split: a static grid on ≥640px, and on <640px a native `<details>` whose summary is one
+  tappable line carrying all three values (`Cash availability 52 · Risk appetite 59 · Sunny`,
+  ≥44px target, explicit chevron). Pure CSS on purpose: `<details>` toggles without JS and neither
+  viewport shifts layout after hydration (an effect-driven open was tried and rejected for
+  desktop pop-in). Glyph SVG ids are suffixed per render to stay unique. Nothing in the do-not-cut
+  list moved; the collapse hides only deltas and descriptors (~115px of hero height at 430w).

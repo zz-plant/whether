@@ -147,6 +147,90 @@ export function DecisionHero({
   const normalizedCall = (weeklyCall ?? "").trim();
   const showActionNow = actionNow && actionNow.trim() !== normalizedCall && actionNow.trim() !== "";
 
+  // Mobile-collapsed signal readout (DD-004): the summary line keeps all three
+  // values visible, so collapsing hides only deltas and descriptors.
+  const signalReadoutSummary = [
+    `Cash availability ${tightness}`,
+    typeof riskAppetite === "number" ? `Risk appetite ${riskAppetite}` : null,
+    regimeDisplay,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  // Rendered twice (static desktop grid + mobile disclosure) so the collapse is
+  // pure CSS — no client effect, no hydration pop-in, works without JS. The
+  // idSuffix keeps the glyphs' SVG ids unique across the two renders; only one
+  // copy is ever displayed.
+  const renderSignalCells = (idSuffix: string) => (
+    <>
+      <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
+        <p className="text-fluid-nano text-white/40">Cash availability</p>
+        <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
+          {tightness}
+          <span className="font-normal text-white/35">/100</span>{" "}
+          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
+        </p>
+        {tightnessDelta !== 0 ? (
+          <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
+            <span className="inline-block w-10 shrink-0" aria-hidden="true">
+              <DeltaGlyph
+                idPrefix={`hero-tightness-delta-${idSuffix}`}
+                previous={tightness - tightnessDelta}
+                current={tightness}
+                min={0}
+                max={100}
+                label="Cash availability"
+              />
+            </span>
+            <span className={DIRECTION_COLOR[signalDirection]}>{tightnessDeltaMetadataLabel}</span>
+          </p>
+        ) : null}
+      </div>
+
+      {typeof riskAppetite === "number" ? (
+        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
+          <p className="text-fluid-nano text-white/40">Risk appetite</p>
+          <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
+            {riskAppetite}
+            <span className="font-normal text-white/35">/100</span>{" "}
+            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel?.toLowerCase() ?? ""}</span>
+          </p>
+          {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
+            <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
+              <span className="inline-block w-10 shrink-0" aria-hidden="true">
+                <DeltaGlyph
+                  idPrefix={`hero-risk-appetite-delta-${idSuffix}`}
+                  previous={riskAppetite - riskAppetiteDelta}
+                  current={riskAppetite}
+                  min={0}
+                  max={100}
+                  label="Risk appetite"
+                  increaseIsPositive
+                />
+              </span>
+              <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>{riskAppetiteDeltaLabel}</span>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="col-span-2 rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 sm:col-span-1">
+        <p className="text-fluid-nano text-white/40">Conditions</p>
+        <p className="flex items-center gap-1.5 text-fluid-sm font-semibold text-white/85">
+          {regimeKey ? (
+            <span className="inline-block w-4 shrink-0" aria-hidden="true">
+              <RegimeGlyph idPrefix={`hero-regime-${idSuffix}`} regime={regimeKey} />
+            </span>
+          ) : null}
+          {regimeDisplay}
+        </p>
+        {REGIME_DESCRIPTOR[regime] ? (
+          <p className="mt-0.5 text-fluid-nano text-white/45">{REGIME_DESCRIPTOR[regime]}</p>
+        ) : null}
+      </div>
+    </>
+  );
+
   return (
     <section className="weather-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
       <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
@@ -169,74 +253,24 @@ export function DecisionHero({
             {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
           </p>
 
-          {/* Signal readout: fixed cells instead of a wrap-dependent metadata sentence */}
-          <div className="grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
-            <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-              <p className="text-fluid-nano text-white/40">Cash availability</p>
-              <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
-                {tightness}
-                <span className="font-normal text-white/35">/100</span>{" "}
-                <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
-              </p>
-              {tightnessDelta !== 0 ? (
-                <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-                  <span className="inline-block w-10 shrink-0" aria-hidden="true">
-                    <DeltaGlyph
-                      idPrefix="hero-tightness-delta"
-                      previous={tightness - tightnessDelta}
-                      current={tightness}
-                      min={0}
-                      max={100}
-                      label="Cash availability"
-                    />
-                  </span>
-                  <span className={DIRECTION_COLOR[signalDirection]}>{tightnessDeltaMetadataLabel}</span>
-                </p>
-              ) : null}
-            </div>
-
-            {typeof riskAppetite === "number" ? (
-              <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-                <p className="text-fluid-nano text-white/40">Risk appetite</p>
-                <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
-                  {riskAppetite}
-                  <span className="font-normal text-white/35">/100</span>{" "}
-                  <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel?.toLowerCase() ?? ""}</span>
-                </p>
-                {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
-                  <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-                    <span className="inline-block w-10 shrink-0" aria-hidden="true">
-                      <DeltaGlyph
-                        idPrefix="hero-risk-appetite-delta"
-                        previous={riskAppetite - riskAppetiteDelta}
-                        current={riskAppetite}
-                        min={0}
-                        max={100}
-                        label="Risk appetite"
-                        increaseIsPositive
-                      />
-                    </span>
-                    <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>{riskAppetiteDeltaLabel}</span>
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-
-            <div className="col-span-2 rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 sm:col-span-1">
-              <p className="text-fluid-nano text-white/40">Conditions</p>
-              <p className="flex items-center gap-1.5 text-fluid-sm font-semibold text-white/85">
-                {regimeKey ? (
-                  <span className="inline-block w-4 shrink-0" aria-hidden="true">
-                    <RegimeGlyph idPrefix="hero-regime" regime={regimeKey} />
-                  </span>
-                ) : null}
-                {regimeDisplay}
-              </p>
-              {REGIME_DESCRIPTOR[regime] ? (
-                <p className="mt-0.5 text-fluid-nano text-white/45">{REGIME_DESCRIPTOR[regime]}</p>
-              ) : null}
-            </div>
+          {/* Signal readout: fixed cells instead of a wrap-dependent metadata sentence.
+              Collapsed to the one-line summary on mobile (DD-004); auto-open on sm+. */}
+          {/* Desktop: static cells, no JS involved. */}
+          <div className="hidden max-w-xl grid-cols-2 gap-2 sm:grid sm:grid-cols-3" role="group" aria-label="Signal readout">
+            {renderSignalCells("desktop")}
           </div>
+
+          {/* Mobile: native disclosure, collapsed by default (DD-004). Pure CSS
+              split — <details> toggles without JS and neither viewport shifts
+              layout after hydration. */}
+          <details className="group sm:hidden">
+            <summary className="flex min-h-11 cursor-pointer select-none items-center rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/85 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
+              {signalReadoutSummary}
+            </summary>
+            <div className="mt-2 grid grid-cols-2 gap-2" role="group" aria-label="Signal readout">
+              {renderSignalCells("mobile")}
+            </div>
+          </details>
 
           {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
           {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (

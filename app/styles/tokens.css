@@ -132,29 +132,41 @@
   --radius-2xl: 12px;
   --radius-full: 9999px;
 
-  /* Surfaces */
+  /* Surfaces — the ladder has to be wide enough to read as depth. The previous
+     stack (#111316 → #15171b → #1a1d22 over #08090b) spanned ~3% luminance, so
+     cards separated only by their hairline borders and the page read flat.
+     Body stays put; each panel tier steps up roughly twice as far. (DD-006) */
   --bg-body: #08090b;
-  --bg-panel: #111316;
-  --bg-surface: #15171b;
-  --bg-surface-muted: rgba(18, 20, 24, 0.76);
-  --bg-raised: #1a1d22;
+  --bg-panel: #13161b;
+  --bg-surface: #181b21;
+  --bg-surface-muted: rgba(22, 25, 31, 0.78);
+  --bg-raised: #1f232a;
   --bg-nested: #0d0f12;
-  --bg-nested-light: rgba(255, 255, 255, 0.035);
+  --bg-nested-light: rgba(255, 255, 255, 0.05);
 
-  /* Borders */
-  --border-faint: rgba(226, 232, 240, 0.045);
-  --border-subtle: rgba(226, 232, 240, 0.065);
-  --border-default: rgba(226, 232, 240, 0.085);
-  --border-strong: rgba(226, 232, 240, 0.14);
+  /* Borders — at the old 0.045-0.085 alphas a card edge was below the visible
+     threshold on most panels, which forced every separation onto luminance the
+     surfaces above don't have. Faint stays decorative; subtle and up must
+     actually be seen. (DD-006) */
+  --border-faint: rgba(226, 232, 240, 0.06);
+  --border-subtle: rgba(226, 232, 240, 0.10);
+  --border-default: rgba(226, 232, 240, 0.13);
+  --border-strong: rgba(226, 232, 240, 0.19);
 
-  --app-surface: #15171b;
-  --app-raised: #1a1d22;
+  --app-surface: #181b21;
+  --app-raised: #1f232a;
   --app-nested: #0d0f12;
   --app-text: #f4f7fb;
-  --app-text-secondary: #cbd5e1;
-  --app-text-muted: #94a3b8;
-  --app-border: rgba(226, 232, 240, 0.085);
-  --app-border-strong: rgba(226, 232, 240, 0.14);
+  /* Secondary/muted are the two most-rendered inks on the page: slate-400/500
+     both alias to --app-text-muted (574 call sites). slate-400 (#94a3b8) passes
+     AA on #08090b but as the *majority* text color it read uniformly dim, which
+     is the DD-006 complaint. Muted now sits between slate-400 and slate-300;
+     secondary between slate-300 and slate-200, so the three roles stay
+     distinguishable. */
+  --app-text-secondary: #d7dee8;
+  --app-text-muted: #a7b3c4;
+  --app-border: rgba(226, 232, 240, 0.13);
+  --app-border-strong: rgba(226, 232, 240, 0.19);
 
   /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
      Must stay theme-aware: a fixed dark tint washes out the light surface. */
@@ -601,6 +613,20 @@ html[data-theme="light"] {
 [data-theme="light"] [class^="text-white/8"], [data-theme="light"] [class*=" text-white/8"],
 [data-theme="light"] [class^="text-white/9"], [data-theme="light"] [class*=" text-white/9"],
 [data-theme="light"] [class$="text-white"], [data-theme="light"] [class*="text-white "] { color: var(--app-text) !important; }
+
+/* Dark mode: floor the low-opacity text-white steps. The /30-/55 tiers land at
+   3.1-4.9:1 on the panel surfaces — /40 (16 usages) fails AA outright — and
+   they are exactly the timestamps/helper text the DD-006 audit flagged as
+   effortful. Remapped to the muted role (≈ white at 63% here) rather than
+   edited per call site so a new low-alpha class can never reintroduce the
+   failure. /25 and below are excluded: those are decorative (separators,
+   watermarks), not text meant to be read. Same class-boundary anchoring as the
+   light block above, so hover:/focus: variants keep their own treatment. */
+html:not([data-theme="light"]) [class^="text-white/3"], html:not([data-theme="light"]) [class*=" text-white/3"],
+html:not([data-theme="light"]) [class^="text-white/4"], html:not([data-theme="light"]) [class*=" text-white/4"],
+html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="light"]) [class*=" text-white/5"] {
+  color: var(--app-text-muted) !important;
+}
 
 /* Slate text is bound to theme text roles via @theme inline in this file */
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }

@@ -28,7 +28,7 @@ export function buildGuidedTranslationHref(params?: GuidedTranslationSearchParam
   }
 
   const search = query.toString();
-  return search ? `/resolve?${search}#guided-translation` : "/resolve#guided-translation";
+  return search ? `/answer?${search}#guided-translation` : "/answer#guided-translation";
 }
 
 export function resolveGuidedTranslationState(params?: GuidedTranslationSearchParams) {

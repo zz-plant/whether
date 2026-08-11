@@ -27,8 +27,8 @@ describe("search command routing", () => {
 
 describe("toolkit library routing", () => {
   it("builds decide toolkit shortlist URLs", () => {
-    assert.equal(buildToolkitLibraryHref(), "/resolve#toolkit-library");
-    assert.equal(buildToolkitLibraryHref("rollback"), "/resolve?toolkitQuery=rollback#toolkit-library");
+    assert.equal(buildToolkitLibraryHref(), "/answer#toolkit-library");
+    assert.equal(buildToolkitLibraryHref("rollback"), "/answer?toolkitQuery=rollback#toolkit-library");
   });
 
   it("defaults to a routed shortlist and filters when a query is present", () => {

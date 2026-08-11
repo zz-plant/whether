@@ -21,7 +21,7 @@ import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 // hub it links back to that hub's root using its canonical IA label.
 export const resolveReportHeaderUtilityAction = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/resolve#toolkit-library", label: "Toolkits" };
+    return { href: "/answer#toolkit-library", label: "Toolkits" };
   }
 
   const activeLayer = primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));

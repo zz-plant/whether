@@ -48,7 +48,7 @@ describe("home route render contract", () => {
       "/planning/financial",
       "/planning/ship-checklist",
       "/answer",
-      "/resolve#toolkit-library",
+      "/answer#toolkit-library",
       "/template",
       "/resources/reversal-trigger-checklist",
       "/history/compare",

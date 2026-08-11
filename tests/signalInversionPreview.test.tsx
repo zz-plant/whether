@@ -17,7 +17,7 @@ describe("SignalInversionPreview", () => {
       />,
     );
 
-    assert.match(html, /Inversion timeline before you open the full appendix\./);
+    assert.match(html, /Inversion timeline before you open the deeper evidence\./);
     assert.match(html, /10Y-2Y and 2Y-3M inversion timeline preview/);
     assert.match(html, /Curve context/);
     assert.match(html, /Nov 2025/);

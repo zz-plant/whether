@@ -16,7 +16,7 @@ const routeGroups = [
     label: "Resolve",
     links: [
       { href: "/answer", label: "By role" },
-      { href: "/resolve#toolkit-library", label: "Toolkits" },
+      { href: "/answer#toolkit-library", label: "Toolkits" },
     ],
   },
   {

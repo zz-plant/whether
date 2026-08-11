@@ -11,18 +11,18 @@ import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
 describe("guided translation routing", () => {
   it("routes guide selections into the canonical decide translation anchor", () => {
-    assert.equal(buildGuidedTranslationHref(), "/resolve#guided-translation");
+    assert.equal(buildGuidedTranslationHref(), "/answer#guided-translation");
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "founders-ceos" }),
-      "/resolve?stakeholder=founders-ceos#guided-translation",
+      "/answer?stakeholder=founders-ceos#guided-translation",
     );
     assert.equal(
       buildGuidedTranslationHref({ stage: "series-a", library: "stages" }),
-      "/resolve?stage=series-a&library=stages#guided-translation",
+      "/answer?stage=series-a&library=stages#guided-translation",
     );
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "heads-of-product", stage: "series-b" }),
-      "/resolve?stakeholder=heads-of-product&stage=series-b#guided-translation",
+      "/answer?stakeholder=heads-of-product&stage=series-b#guided-translation",
     );
   });
 

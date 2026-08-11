@@ -150,7 +150,7 @@ export function SignalInversionPreview({
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
-          Inversion timeline before you open the full appendix.
+          Inversion timeline before you open the deeper evidence.
         </h2>
         <p className="text-sm text-slate-300">
           Default view keeps the last 12 monthly spread reads visible so you can see whether inversion pressure is easing or deepening before opening detail mode.

@@ -80,7 +80,7 @@ export const buildSignalsPageModel = async (
         name: "Whether Weekly Brief — Evidence",
         url: `${siteUrl}/evidence`,
         description:
-          "Evidence appendix for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
+          "Evidence for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",

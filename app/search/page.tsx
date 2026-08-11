@@ -43,7 +43,7 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   if (commandJob === "resolve") {
     return results.some((entry) => entry.type === "toolkit")
       ? buildToolkitLibraryHref(query)
-      : "/resolve#unresolved-question-router";
+      : "/answer#unresolved-question-router";
   }
 
   if (commandJob === "risk") {
@@ -100,5 +100,5 @@ export default async function SearchPage({
     : matchingResults;
   const commandHref = resolveSearchCommandHref(query, results, activeJob);
 
-  permanentRedirect(commandHref ?? "/resolve#unresolved-question-router");
+  permanentRedirect(commandHref ?? "/answer#unresolved-question-router");
 }
