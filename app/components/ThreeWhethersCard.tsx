@@ -98,7 +98,7 @@ export function ThreeWhethersCard({
     <section className="weather-section" aria-labelledby="three-whethers-heading">
       <div className="flex items-center justify-between mb-4">
         <h3 id="three-whethers-heading" className="type-section text-white font-semibold tracking-tight">
-          The 3 Operational &quot;Whethers&quot;
+          The 3 Operational &ldquo;Whethers&rdquo;
         </h3>
         <span className="text-fluid-nano font-mono text-slate-400 uppercase tracking-wider">
           Bounded Rules

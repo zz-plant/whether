@@ -117,16 +117,8 @@ export function DecisionHero({
    const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
    const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
 
-   // Posture compass: tightness (x-axis) vs risk appetite (y-axis) with regime boundaries.
-   const compassX = tightness / 100;
-   const compassY = 1 - (riskAppetite ?? 50) / 100;
-
    const upperRegime = regime.toUpperCase();
    const regimeBounds = isRegimeKey(upperRegime) ? REGIME_BOUNDARIES[upperRegime] : REGIME_BOUNDARIES.EXPANSION;
-  const flipDist = tightness < regimeBounds.threshold
-    ? Math.abs(tightness - regimeBounds.threshold)
-    : Math.abs((riskAppetite ?? 50) - (regimeBounds.threshold - 10));
-  const flipDistLabel = flipDist < 10 ? "Near" : flipDist < 20 ? "Approaching" : "Distant";
 
   const pointsToPause = Math.max(0, Math.round(regimeBounds.threshold - tightness));
   const counterColor = pointsToPause <= 10
@@ -173,18 +165,22 @@ export function DecisionHero({
               <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
             </p>
           ) : null}
-          <div className="space-y-2.5 text-fluid-xs text-white/60">
-            <p className={`font-medium ${DIRECTION_COLOR[signalDirection]}`}>
-              {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
-            </p>
-            <p className="flex flex-wrap gap-x-3 gap-y-1 text-white/40">
-              <span>
-                <span>Cash availability:</span>{" "}
-                <span className={tightnessLevelColor}>{tightness}/100 · {tightnessLevel.toLowerCase()}</span>
-              </span>
+          <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>
+            {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
+          </p>
+
+          {/* Signal readout: fixed cells instead of a wrap-dependent metadata sentence */}
+          <div className="grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
+            <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
+              <p className="text-fluid-nano text-white/40">Cash availability</p>
+              <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
+                {tightness}
+                <span className="font-normal text-white/35">/100</span>{" "}
+                <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
+              </p>
               {tightnessDelta !== 0 ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block w-12 shrink-0" aria-hidden="true">
+                <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
+                  <span className="inline-block w-10 shrink-0" aria-hidden="true">
                     <DeltaGlyph
                       idPrefix="hero-tightness-delta"
                       previous={tightness - tightnessDelta}
@@ -194,106 +190,66 @@ export function DecisionHero({
                       label="Cash availability"
                     />
                   </span>
-                  <span className={DIRECTION_COLOR[signalDirection]}>
-                    {tightnessDeltaMetadataLabel}
-                  </span>
-                </span>
+                  <span className={DIRECTION_COLOR[signalDirection]}>{tightnessDeltaMetadataLabel}</span>
+                </p>
               ) : null}
-              {typeof riskAppetite === "number" ? (
-                <>
-                  <span>
-                    <span> Risk appetite:</span>{" "}
-                     <span className={riskAppetiteLevelColor ?? ""}>{riskAppetite}/100 · {riskAppetiteLevel?.toLowerCase() ?? ""}</span>
-                  </span>
-                  {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="inline-block w-12 shrink-0" aria-hidden="true">
-                        <DeltaGlyph
-                          idPrefix="hero-risk-appetite-delta"
-                          previous={riskAppetite - riskAppetiteDelta}
-                          current={riskAppetite}
-                          min={0}
-                          max={100}
-                          label="Risk appetite"
-                        />
-                      </span>
-                      <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>
-                        {riskAppetiteDeltaLabel}
-                      </span>
+            </div>
+
+            {typeof riskAppetite === "number" ? (
+              <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
+                <p className="text-fluid-nano text-white/40">Risk appetite</p>
+                <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
+                  {riskAppetite}
+                  <span className="font-normal text-white/35">/100</span>{" "}
+                  <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel?.toLowerCase() ?? ""}</span>
+                </p>
+                {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
+                  <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
+                    <span className="inline-block w-10 shrink-0" aria-hidden="true">
+                      <DeltaGlyph
+                        idPrefix="hero-risk-appetite-delta"
+                        previous={riskAppetite - riskAppetiteDelta}
+                        current={riskAppetite}
+                        min={0}
+                        max={100}
+                        label="Risk appetite"
+                      />
                     </span>
-                  ) : null}
-                </>
-              ) : null}
-              <span className="inline-flex items-center gap-1.5">
+                    <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>{riskAppetiteDeltaLabel}</span>
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="col-span-2 rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 sm:col-span-1">
+              <p className="text-fluid-nano text-white/40">Conditions</p>
+              <p className="flex items-center gap-1.5 text-fluid-sm font-semibold text-white/85">
                 {regimeKey ? (
                   <span className="inline-block w-4 shrink-0" aria-hidden="true">
                     <RegimeGlyph idPrefix="hero-regime" regime={regimeKey} />
                   </span>
                 ) : null}
-                <span>{regimeDisplay}{REGIME_DESCRIPTOR[regime] ? ` · ${REGIME_DESCRIPTOR[regime]}` : ""}</span>
-              </span>
-            </p>
-          </div>
-
-          {/* Posture compass: tightness vs risk appetite relative to regime boundaries */}
-          <div className="flex items-center gap-2 pt-1" aria-label="Posture compass">
-            <div className="relative w-12 h-12">
-              <svg viewBox="0 0 120 120" className="w-full h-full" aria-hidden="true">
-                <defs>
-                   <linearGradient id="compass-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                     <stop offset="0%" style={{ stopColor: "var(--bg-panel)" }} />
-                     <stop offset="100%" style={{ stopColor: "var(--bg-raised)" }} />
-                   </linearGradient>
-                </defs>
-                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border-default)" strokeWidth="1" />
-                <circle cx="60" cy="60" r="35" fill="none" stroke="var(--border-default)" strokeWidth="0.5" />
-                <circle cx="60" cy="60" r="20" fill="none" stroke="var(--border-default)" strokeWidth="0.5" />
-                <circle cx="60" cy="60" r="5" fill="var(--bg-panel)" stroke="var(--border-strong)" strokeWidth="1.5" />
-
-                <line x1="60" y1="10" x2="60" y2="110" stroke="var(--border-default)" strokeWidth="0.5" />
-                <line x1="10" y1="60" x2="110" y2="60" stroke="var(--border-default)" strokeWidth="0.5" />
-
-                <text x="60" y="9" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Tight</text>
-                <text x="60" y="111" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Loose</text>
-                <text x="110" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Risk</text>
-                <text x="10" y="60" textAnchor="middle" fill="var(--app-text-muted)" fontSize="6">Calm</text>
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none gap-[1px]">
-                <span className={`text-[9px] font-bold tabular-nums ${tightness > 60 ? "text-rose-300" : tightness > 40 ? "text-amber-300" : "text-emerald-300"}`}>
-                  {tightness}
-                </span>
-                <span className={`text-[9px] font-bold tabular-nums ${(riskAppetite ?? 50) >= 65 ? "text-emerald-300" : (riskAppetite ?? 50) >= 45 ? "text-amber-300" : "text-rose-300"}`}>
-                  {riskAppetite ?? "—"}
-                </span>
-              </div>
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-slate-400">
-                {regimeBounds.label}
-              </div>
-              {/* Flip distance indicator */}
-              {flipDistLabel !== "Distant" && (
-                <div className="absolute top-0 left-0 right-0 text-center">
-                  <span className={`text-[8px] font-semibold ${
-                    flipDist <= 10 ? "text-rose-300" : flipDist <= 20 ? "text-amber-300" : "text-emerald-300"
-                  }`}>
-                    {flipDistLabel}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-slate-400">threshold {regimeBounds.threshold}</span>
-              <span className={`text-[9px] font-medium ${counterColor}`}>
-                {pointsToPause} pts to pause
-              </span>
+                {regimeDisplay}
+              </p>
+              {REGIME_DESCRIPTOR[regime] ? (
+                <p className="mt-0.5 text-fluid-nano text-white/45">{REGIME_DESCRIPTOR[regime]}</p>
+              ) : null}
             </div>
           </div>
 
-          {/* Flip watch with live probability */}
-          {flipConditions && flipConditions.length > 0 ? (
-            <div className="space-y-1.5 pt-1 text-fluid-sm">
-              <p className="text-white/35 font-medium">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
+          {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
+          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
+            <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-fluid-nano font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
+                </p>
+                <span className={`text-fluid-nano font-medium tabular-nums ${counterColor}`}>
+                  {pointsToPause} pts to pause
+                </span>
+              </div>
               {typeof tightnessThreshold === "number" ? (
-                <div className="w-[6rem] py-1">
+                <div className="w-full max-w-[20rem]">
                   <ThresholdLadder
                     idPrefix="hero-tightness"
                     min={0}
@@ -304,47 +260,36 @@ export function DecisionHero({
                   />
                 </div>
               ) : null}
-              {guardrail ? (
-                <p className="text-white/60">
-                  <span className="font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
-                  {guardrail}
-                </p>
-              ) : null}
-              {reversalTrigger ? (
-                <p className="text-white/60">
-                  <span className="font-medium text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
-                  {reversalTrigger}
-                </p>
-              ) : null}
-              {flipConditions && flipConditions.length > 0 ? (
-                <p className="text-white/60">
-                  <span className="font-medium text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</span>{" "}
-                  {flipConditions.join(" · ")}
-                  {transitionProbability && transitionProbability > 0 ? (
-                    <span> ({transitionProbability}% probability)</span>
-                  ) : null}
-                </p>
-              ) : null}
+              <dl className="space-y-1.5 text-fluid-xs">
+                {guardrail ? (
+                  <div className="flex gap-2">
+                    <dt className="shrink-0 font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
+                    <dd className="text-white/60">{guardrail}</dd>
+                  </div>
+                ) : null}
+                {reversalTrigger ? (
+                  <div className="flex gap-2">
+                    <dt className="shrink-0 font-medium text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</dt>
+                    <dd className="text-white/60">{reversalTrigger}</dd>
+                  </div>
+                ) : null}
+                {flipConditions && flipConditions.length > 0 ? (
+                  <div className="flex gap-2">
+                    <dt className="shrink-0 font-medium text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</dt>
+                    <dd className="text-white/60">
+                      {flipConditions.join(" · ")}
+                      {transitionProbability && transitionProbability > 0 ? (
+                        <span> ({transitionProbability}% probability)</span>
+                      ) : null}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
             </div>
           ) : null}
 
-          {/* Live counter: points to pause with color transition */}
-           {pointsToPause > 0 ? (
-
-            <div className="flex items-center gap-2 pt-1">
-              <span className={`text-[10px] font-semibold ${counterColor}`}>
-                {pointsToPause} pts to pause
-              </span>
-              <span className="text-[8px] text-slate-400">{flipDistLabel}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-[10px] text-emerald-300 font-semibold">10 pts to pause</span>
-              <span className="text-[8px] text-slate-400">threshold at safe margin</span>
-            </div>
-          )}
-
           <div className="flex flex-wrap items-center gap-3 pt-1">
+            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <StageSwitcher currentStage={operatorContext.companyStage} />
             <DecisionMemoryButton
               regime={regime}
@@ -357,14 +302,13 @@ export function DecisionHero({
               reversalTrigger={reversalTrigger}
             />
           </div>
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <span className="inline-flex items-center gap-1.5">
               <span className={`size-2 rounded-full ${isDegradedData ? "bg-amber-400/80 motion-safe:animate-pulse" : "bg-emerald-400/80"}`} aria-hidden="true" />
               <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
             </span>
-            <span className="text-fluid-micro text-white/50 hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
-          </div>
+            <span className="hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
+          </p>
         </div>
 
         <div className="">

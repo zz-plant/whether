@@ -88,7 +88,6 @@ export default async function Page({
   return (
     <Shell regime={regimeHistory.at(-1)?.regime}>
       <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
-      <CanonicalWeekPermalink />
     </Shell>
   );
 }
@@ -101,7 +100,7 @@ function CanonicalWeekPermalink() {
   if (!latestPublishedBrief) return null;
 
   return (
-    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 shadow-md">
+    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md space-y-2.5 px-4 py-3.5 shadow-md">
       <p className="text-fluid-xs text-slate-300">
         This week is published as a permanent record dated <span className="font-medium text-white">{latestPublishedBrief.recordDateLabel}</span>.
       </p>
@@ -220,17 +219,15 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         </ToolsPanel>
       </EvidenceDrawer>
 
-      <RitualCheck
-        recordDate={props.recordDate}
-        recentRecordDates={props.recentRecordDates}
-      />
-
       <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <ActionLink href="/operate" variant="inline">
+          <ActionLink href="/operate" variant="primary">
             Build this week&apos;s plan →
           </ActionLink>
-          <SubscribeForm />
+          <RitualCheck
+            recordDate={props.recordDate}
+            recentRecordDates={props.recentRecordDates}
+          />
         </div>
         <DecisionRouteRail />
       </div>
@@ -464,6 +461,8 @@ async function PageContent({
               regimes={macroTrendline}
             />
           </Suspense>
+          <SubscribeForm />
+          <CanonicalWeekPermalink />
          </div>
        </div>
 
