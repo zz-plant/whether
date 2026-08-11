@@ -4,10 +4,17 @@ import { getRegimeContext, getRegimeProjection } from "../../../lib/report/regim
 import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlow";
 import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
 import { fetchSaaSValuations } from "../../../lib/saasMultiples";
+import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 
 export const runtime = "edge";
 
-/* MCP tools for AI agents:
+/* Two transports share this route:
+
+   1. MCP streamable HTTP (JSON-RPC 2.0): POST /api/mcp with an `initialize` /
+      `tools/list` / `tools/call` message — standard MCP clients connect here.
+      See lib/mcp/httpMcpServer.ts.
+
+   2. Legacy `?tool=` REST API, kept for existing integrations:
    GET /api/mcp?tool=get_brief[&cadence=weekly] — current brief
    GET /api/mcp?tool=get_context&regime=DEFENSIVE — regime duration + trajectory
    GET /api/mcp?tool=get_projection&regime=DEFENSIVE&tightness=74&riskAppetite=32&tightnessDelta=4&riskAppetiteDelta=-2 — scenario projection
@@ -21,6 +28,12 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const tool = searchParams.get("tool");
+
+    /* MCP clients open a server SSE stream with GET + Accept: text/event-stream.
+       This server has no server-initiated messages, so it declines per spec. */
+    if (!tool && isMcpStreamOpenRequest(request)) {
+      return new Response(null, { status: 405, headers: { allow: "POST" } });
+    }
 
     if (tool === "get_actions") {
       return NextResponse.json({
@@ -37,6 +50,11 @@ export async function GET(request: Request) {
           full_brief: "https://whether.work",
           history: "https://whether.work/history",
           trust: "https://whether.work/trust",
+        },
+        mcp: {
+          transport: "streamable-http",
+          endpoint: "https://whether.work/api/mcp",
+          note: "POST JSON-RPC 2.0 (initialize / tools/list / tools/call) to this URL with no ?tool param.",
         },
       });
     }
@@ -110,6 +128,11 @@ export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const tool = searchParams.get("tool");
+
+    /* No ?tool param → MCP streamable-HTTP transport (JSON-RPC 2.0). */
+    if (!tool) {
+      return handleMcpRequest(request);
+    }
 
     if (tool === "subscribe") {
       const body = await request.json().catch(() => ({}));

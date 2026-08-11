@@ -80,19 +80,22 @@ export default {
       console.error("[cron] ingest failed", ingestResult.error);
     }
 
-    if (isDailyIngestion) {
-      /* Daily cron: ingestion only, no email or alerts */
-      return;
-    }
-
     const secret = env.WHETHER_CRON_SECRET;
     const headers: Record<string, string> = {};
     if (secret) headers["Authorization"] = `Bearer ${secret}`;
 
     const site = env.SITE_URL || "https://whether.work";
 
-    /* Weekly cron: send briefs, check regime change, deliver alerts */
-    await runCronStep("email/send-weekly", `${site}/api/email/send-weekly`, headers);
+    /* Both crons evaluate bounded-rule tripwires against the fresh signals, so a
+       regime flip or threshold crossing pushes the day it lands instead of waiting
+       for Monday. Both endpoints are transition-based (KV last-known state), so
+       daily runs stay silent unless something actually crossed. The brief email
+       remains weekly-only — the cadence promise is weekly; only rule firings
+       break cadence. */
+    if (!isDailyIngestion) {
+      await runCronStep("email/send-weekly", `${site}/api/email/send-weekly`, headers);
+    }
+
     await runCronStep("check-regime-change", `${site}/api/check-regime-change`, headers);
     await runCronStep("alert-deliveries", `${site}/api/alert-deliveries`, headers);
   },
