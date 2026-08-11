@@ -437,6 +437,23 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 ### 6.6 Open Graph
 - `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).
 
+### 6.7 Agent access (MCP)
+- `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
+  protocol 2025-06-18): `initialize`, `ping`, `tools/list`, `tools/call` over
+  `application/json` responses. Tool registry lives in `lib/mcp/httpMcpServer.ts`
+  (get_brief, get_context, get_projection, get_comps, get_signals). Standard MCP clients
+  can mount `https://whether.work/api/mcp` directly.
+- `GET/POST /api/mcp?tool=…` — legacy REST tool API, kept for existing integrations.
+- `bun run mcp:whether` — local stdio MCP server (separate tool set, official SDK).
+
+### 6.8 Alert cadence (2026-08-11)
+Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
+`/api/check-regime-change` and `/api/alert-deliveries` in addition to the Monday run, so a
+regime flip or threshold crossing pushes the day it lands instead of waiting up to six days.
+Both endpoints are transition-based (KV last-known state: `regime:*`, `alert:state`), so
+daily runs stay silent unless something actually crossed. The brief email remains
+weekly-only — the cadence promise is weekly; only rule firings break cadence.
+
 ## 7) Non-goals (as enforced in UI copy)
 - The UI is framed as operational guidance, not financial advice.
 - Evidence is deterministic and traceable; no predictive ML output is used.
