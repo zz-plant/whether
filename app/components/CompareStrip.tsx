@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { REGIME_DISPLAY, REGIME_COLORS } from "../viewModel";
 
@@ -23,6 +24,7 @@ export function CompareStrip({
 }) {
   const [isComparing, setIsComparing] = useState(autoExpand);
   const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(null);
+  const panelId = useId();
 
   useEffect(() => {
     try {
@@ -43,22 +45,24 @@ export function CompareStrip({
 
   return (
     <div className="weather-section-border">
-      <label className="relative inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-lg px-1 pr-2 transition-colors focus-within:bg-white/[0.03] focus-within:ring-2 focus-within:ring-sky-400/60 hover:bg-white/[0.03]">
-        <input
-          type="checkbox"
-          name="compare-previous"
-          checked={isComparing}
-          onChange={(e) => setIsComparing(e.target.checked)}
-          className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0 pointer-events-none"
+      {/* Reveals static content, so it's a disclosure like the evidence drawer —
+          a switch here implied a persistent setting. */}
+      <button
+        type="button"
+        aria-expanded={isComparing}
+        aria-controls={panelId}
+        onClick={() => setIsComparing((value) => !value)}
+        className="inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-lg px-1 pr-2 text-fluid-sm font-medium text-white/65 transition-colors hover:bg-white/[0.03] hover:text-white weather-focus-ring weather-press-scale"
+      >
+        <ChevronRight
+          className={`size-4 shrink-0 transition-transform duration-200 ${isComparing ? "rotate-90 text-sky-400" : "text-white/40"}`}
+          aria-hidden="true"
         />
-        <span className="relative h-5 w-9 rounded-full border border-white/[0.08] bg-white/[0.04] transition-colors peer-checked:border-sky-500/40 peer-checked:bg-sky-500/20 peer-focus-visible:ring-2 peer-focus-visible:ring-sky-400/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/45 after:transition-transform peer-checked:after:translate-x-4 peer-checked:after:bg-sky-300" />
-        <span className="text-fluid-sm font-medium text-white/65 transition-colors peer-checked:text-sky-200">
-          Compare to last week
-        </span>
-      </label>
+        <span className={isComparing ? "text-sky-200" : undefined}>Compare to last week</span>
+      </button>
 
       {isComparing ? (
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div id={panelId} className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
             <p className="text-fluid-nano text-white/40">Previous</p>
             <div className="flex items-center gap-2">

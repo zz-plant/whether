@@ -346,6 +346,36 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **Top fold no longer repeats the windows grid.** `WeeklyTopFoldContract` kept `Posture shift`, `Revisit`, `Watch`, and the memory rail, and dropped the `Hiring / Expansion / Fundraising` window grid that duplicated the `ThreeWhethersCard` verdicts.
 
+## Controls & nav pass (2026-08-11)
+
+Compressed the shell chrome and unified control vocabulary on `/`.
+
+- **View switcher is a select, not five segments.** Interpretation views are an optional
+  translation layer; `ViewSelector` now renders as one compact `View: … ▾` select that highlights
+  only when a non-default view is active. It also gained a home on the sub-`lg` cadence rail
+  (previously mobile users could never reach views).
+- **One header band on `lg+` home.** Brand · nav · cadence · view · icons in a single row;
+  below `lg`, cadence + view drop to a second rail; below `md` the nav collapses to the drawer
+  trigger. Report sub-routes keep the two-band layout with the next-step CTA.
+- **Nav de-glowed.** Active links lost the glow shadow and status dot (filled state carries it);
+  the mobile drawer trigger swapped its pulsing dot + glow for a menu icon — it read as a status
+  chip, not a button. No perpetual motion remains in the header.
+- **Week browser is labeled.** The carousel dots above the hero now sit beside a
+  `Mon YYYY · current` label, so the browsed position is named instead of implied.
+- **Hero control row unified.** `StageSwitcher` joined the rounded-full quiet-pill family
+  (label tightened to `Stage`, drop shadow removed); `DecisionMemoryButton` gained the 44px
+  target size and matching text scale.
+- **Compare is a disclosure.** The `Compare to last week` switch became a chevron disclosure
+  matching the evidence drawer — it reveals static content, so a toggle implied persistent
+  state it doesn't have.
+- **History icon fixed.** The header's `History & export` action used a person icon (promising
+  account/profile); now a history glyph.
+- **Week-browser chevrons corrected.** `sortedMonths` is newest-first, but `goToPrevious`
+  stepped toward index 0 — so `‹ Previous month` navigated *newer*, and on the live (no
+  `?month`) view the back chevron was dead while the forward one was live. The default view now
+  maps to index 0: back steps older (`effectiveIndex + 1`), forward is disabled at current, and
+  returning forward pushes `/` (the live brief) instead of the latest month's permalink.
+
 ## Layout pass (2026-08-10)
 
 Restructured `/` around scan speed and CTA hierarchy; desktop page height dropped ~570px.

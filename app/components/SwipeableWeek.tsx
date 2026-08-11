@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
+import { formatMonthYearShortFromValue } from "../../lib/formatters";
 
 type MonthEntry = { recordDate: string; month: number; year: number };
 
@@ -78,16 +79,20 @@ export function SwipeableWeek({
     router.push(`/?month=${target.month}&year=${target.year}`, { scroll: false });
   }, [router]);
 
-  const canGoToPrevious = currentIndex > 0;
-  const canGoToLatest = currentIndex !== 0;
+  // The default (no ?month) view is the live week, i.e. the newest entry.
+  // sortedMonths is newest-first, so "previous" moves to a HIGHER index.
+  const effectiveIndex = currentIndex >= 0 ? currentIndex : 0;
+  const canGoToPrevious = effectiveIndex < sortedMonths.length - 1;
+  const canGoToLatest = effectiveIndex > 0;
 
   const goToPrevious = useCallback(() => {
-    if (currentIndex > 0) navigateToMonth(sortedMonths[currentIndex - 1]);
-  }, [currentIndex, sortedMonths, navigateToMonth]);
+    if (effectiveIndex < sortedMonths.length - 1) navigateToMonth(sortedMonths[effectiveIndex + 1]);
+  }, [effectiveIndex, sortedMonths, navigateToMonth]);
 
   const goToLatest = useCallback(() => {
-    navigateToMonth(sortedMonths[0]);
-  }, [sortedMonths, navigateToMonth]);
+    // Return to the canonical live brief rather than the latest month's permalink.
+    router.push("/", { scroll: false });
+  }, [router]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
@@ -142,7 +147,16 @@ export function SwipeableWeek({
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
           </button>
-          <div className="flex items-center gap-1" aria-hidden="true">
+          {/* The browsed position, named — bare dots read as mystery UI */}
+          <span className="text-fluid-micro font-medium tabular-nums text-white/55">
+            {(() => {
+              const active = sortedMonths[effectiveIndex];
+              if (!active) return null;
+              const label = formatMonthYearShortFromValue(active.recordDate);
+              return effectiveIndex > 0 ? label : `${label} · current`;
+            })()}
+          </span>
+          <div className="ml-1 flex items-center gap-1" aria-hidden="true">
             {months.slice(-6).map((m, i, arr) => {
               const isActive = activeMonth === m.month && activeYear === m.year;
               const isLast = i === arr.length - 1;

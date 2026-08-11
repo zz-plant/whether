@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Settings, User } from "lucide-react";
+import { History, Search, Settings } from "lucide-react";
 import { SettingsPanel } from "./settingsPanel";
 import { ProfileSheet } from "./profileSheet";
 import { CommandPalette } from "./commandPalette";
@@ -29,7 +29,7 @@ export function GlobalHeaderActionsClient() {
         aria-label="History & export"
         title="History & export"
       >
-        <User aria-hidden="true" size={16} strokeWidth={1.8} />
+        <History aria-hidden="true" size={16} strokeWidth={1.8} />
       </button>
       <button
         type="button"

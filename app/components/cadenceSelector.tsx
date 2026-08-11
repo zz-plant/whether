@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -130,13 +131,44 @@ export function CadenceSelector() {
   );
 }
 
+// Interpretation views are an optional translation layer (see the one-screen brief
+// spec) — a compact select instead of five always-visible segments keeps the header
+// from competing with the weekly call.
 export function ViewSelector() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname() ?? "/";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const current = mounted ? (searchParams?.get("view") ?? "default") : "default";
+  const isNonDefault = current !== "default";
+
   return (
-    <SegmentControl
-      options={VIEWS}
-      paramName="view"
-      defaultKey="default"
-      ariaLabel="View"
-    />
+    <label className="relative inline-flex items-center">
+      <span className="sr-only">Interpretation view</span>
+      <select
+        value={current}
+        onChange={(event) => {
+          const href = buildHref(pathname, searchParams, "view", event.target.value, "default");
+          router.replace(href, { scroll: false });
+        }}
+        className={`min-h-[44px] sm:min-h-9 cursor-pointer appearance-none rounded-sm border bg-[var(--bg-nested)] py-1.5 pl-3 pr-8 text-fluid-micro font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+          isNonDefault
+            ? "border-sky-500/40 text-sky-100"
+            : "border-white/[0.10] text-slate-400 hover:text-slate-200"
+        }`}
+      >
+        {VIEWS.map((option) => (
+          <option key={option.key} value={option.key}>
+            {option.key === "default" ? "View: Default" : `View: ${option.label}`}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className={`pointer-events-none absolute right-2.5 size-3.5 ${isNonDefault ? "text-sky-300" : "text-slate-500"}`}
+      />
+    </label>
   );
 }
