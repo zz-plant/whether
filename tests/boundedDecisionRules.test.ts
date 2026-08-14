@@ -6,7 +6,9 @@ import {
   extractCompactClause,
   formatBoundedDecisionReverse,
   formatBoundedDecisionTriplet,
+  formatSharedFlipCorridor,
 } from "../lib/report/boundedDecisionRules";
+import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
 describe("bounded decision rule formatting", () => {
@@ -159,4 +161,45 @@ it("builds growth and public stage adjustments", () => {
 
   assert.equal(publicAdjustment.mode, "public");
   assert.match(publicAdjustment.thresholdEmphasis, /earnings durability/i);
+});
+
+describe("shared flip corridor", () => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: "EXPANSION",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 60, riskAppetite: 52 },
+  });
+
+  it("states the corridor once when every lever clears on the same lines", () => {
+    const corridor = formatSharedFlipCorridor(rules);
+
+    // Every area's flipConditions are built from the same tightnessResume /
+    // riskResume pair, so the whole ledger collapses to two lines.
+    assert.ok(corridor, "expected a corridor when the rules share their clear conditions");
+    assert.equal(corridor?.split(" · ").length, 2);
+    assert.match(corridor ?? "", /Cash availability </);
+    assert.match(corridor ?? "", /Risk appetite >/);
+  });
+
+  it("declines to claim a shared corridor when the rules diverge", () => {
+    // One distinct condition per rule is not a shared corridor; saying otherwise
+    // would invent a relationship the model does not actually encode.
+    const diverging: BoundedDecisionRule[] = rules.slice(0, 2).map((rule, index) => ({
+      ...rule,
+      flipConditions: [
+        {
+          metric: "tightness",
+          operator: "<",
+          value: 10 + index,
+          label: `Cash availability < ${10 + index}`,
+        },
+      ],
+    }));
+
+    assert.equal(formatSharedFlipCorridor(diverging), null);
+  });
+
+  it("returns null when there are too few rules to share anything", () => {
+    assert.equal(formatSharedFlipCorridor(rules.slice(0, 1)), null);
+  });
 });

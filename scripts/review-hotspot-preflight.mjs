@@ -100,13 +100,20 @@ function addedTypeAssertions(diffRange) {
     const code = line.slice(1);
     // Strip comments before matching to avoid false positives
     const codeWithoutComments = stripBlockComments(code).replace(/\/\/.*/g, "");
-    const nonTypeAssertionPrepostions = /\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(codeWithoutComments);
+    // Same class of false positive the block-comment strip fixed, one level in:
+    // quoted prose ("treats the window as unchanged") tripped the matcher. A type
+    // assertion cannot occur inside a string literal, so blank those out too.
+    // Template literals are left alone — `${...}` can hold real code.
+    const codeWithoutStrings = codeWithoutComments
+      .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+      .replace(/"(?:[^"\\]|\\.)*"/g, '""');
+    const nonTypeAssertionPrepostions = /\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(codeWithoutStrings);
     if (nonTypeAssertionPrepostions) {
       // English prose false positives ("as of", "as in", etc.)
       continue;
     }
-    const hasAssertion = /\sas\s+[A-Za-z_$<{\(]/.test(codeWithoutComments);
-    const safePattern = /\sas\s+const\b/.test(codeWithoutComments);
+    const hasAssertion = /\sas\s+[A-Za-z_$<{\(]/.test(codeWithoutStrings);
+    const safePattern = /\sas\s+const\b/.test(codeWithoutStrings);
 
     if (hasAssertion && !safePattern) {
       offenders.push(code.trim());

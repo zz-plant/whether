@@ -57,6 +57,14 @@ export const DECISION_CONTRACT_LABELS = {
   },
 } as const;
 
+/**
+ * A flat week is the common case and a useful answer in itself: it means the
+ * standing calls survive another week. State the consequence rather than
+ * repeating the delta, which the score block already carries.
+ */
+export const STEADY_WEEK_LABEL = "No change";
+export const STEADY_WEEK_CONSEQUENCE = "Last week's calls stand.";
+
 export const PRIMARY_AUDIENCE_LABEL = "U.S. market starting point";
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";

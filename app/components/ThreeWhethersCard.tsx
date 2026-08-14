@@ -8,7 +8,13 @@ const STATE_TONE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, stri
   Open: "text-semantic-easing-fg",
 };
 
-export function ThreeWhethersCard({ items }: { items: ActionStripItem[] }) {
+export function ThreeWhethersCard({
+  items,
+  sharedFlipCorridor,
+}: {
+  items: ActionStripItem[];
+  sharedFlipCorridor?: string | null;
+}) {
   const decisions = items.slice(0, 3);
   if (decisions.length === 0) return null;
 
@@ -20,6 +26,17 @@ export function ThreeWhethersCard({ items }: { items: ActionStripItem[] }) {
         </h3>
         <span className="text-fluid-nano font-mono uppercase tracking-wider text-slate-400">Canonical rules</span>
       </div>
+
+      {/* Every row's clear-condition is drawn from the same pair of lines, so the
+          rows below repeat two numbers three times. Stating the corridor once here
+          turns that repetition into the actual finding: these levers flip together,
+          which is a fact about the week rather than about any one lever. */}
+      {sharedFlipCorridor ? (
+        <p className="mb-3 text-fluid-nano text-slate-300">
+          <span className="font-semibold text-slate-400">All three clear on the same lines:</span>{" "}
+          <span className="font-mono text-semantic-easing-fg">{sharedFlipCorridor}</span>
+        </p>
+      ) : null}
 
       {/* A ledger, not a card grid: these are standing rules with a current state,
           so they read down a shared column of conditions rather than as three

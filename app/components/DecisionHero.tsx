@@ -226,24 +226,35 @@ export function DecisionHero({
 
   return (
     <section className="weather-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
-      <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
-        <div className="min-w-0 space-y-3">
-          <div className="space-y-1">
-            <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
-            <h2
-              id="weekly-call-title"
-              className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
-            >
-              {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
-            </h2>
-          </div>
+      {/* Three siblings, not two columns of one. Stacked, the score used to land
+          after the whole left column — guardrails, flip watch and all — which put
+          it off-screen at 375px, so the call and the number it is scored by never
+          shared a viewport. Mobile orders them call → score → detail; sm+ restores
+          the original two-column grid with the score spanning both rows. */}
+      <div className="flex flex-col gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
+        <div className="order-1 min-w-0 space-y-1 sm:col-start-1 sm:row-start-1">
+          <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
+          <h2
+            id="weekly-call-title"
+            className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
+          >
+            {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
+          </h2>
+        </div>
+
+        <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-start-1 sm:row-start-2">
           {showActionNow ? (
             <p className="text-fluid-sm font-medium text-slate-100">
               <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
             </p>
           ) : null}
+          {/* On a flat week the delta label reads "no change vs last week", which the
+              score block below already states next to the number it describes. The
+              direction word alone carries it here; the delta returns when it moves. */}
           <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>
-            {DIRECTION_LABEL[signalDirection]} · {boldnessDeltaLabel}
+            {boldnessDelta === 0
+              ? DIRECTION_LABEL[signalDirection]
+              : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
           </p>
 
           {/* Signal readout: fixed cells instead of a wrap-dependent metadata sentence.
@@ -345,7 +356,7 @@ export function DecisionHero({
           </p>
         </div>
 
-        <div className="">
+        <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1 sm:row-span-2">
           <SignalWaterfall data={signalData ?? {}}>
             <div className="inline-flex items-baseline justify-center gap-1">
               <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">

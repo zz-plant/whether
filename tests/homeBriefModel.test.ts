@@ -4,6 +4,8 @@ import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from
 import { getWeeklyPostureHistory } from "../lib/summary/weeklyPostureHistory";
 import { REGIME_SHORT_LABELS } from "../lib/regimePresentation";
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 describe("buildHomeBriefModel", () => {
   it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
@@ -69,6 +71,20 @@ describe("buildHomeBriefModel", () => {
     assert.ok(Array.isArray(model.revisitQueue));
     assert.ok(model.revisitQueue.length > 0);
     assert.match(model.revisitQueue[0]?.reason ?? "", /this week/i);
+    // The queue renders `recheck` per area and hoists a shared `driver`, so both
+    // halves must survive separately rather than only as the composed sentence.
+    assert.ok((model.revisitQueue[0]?.recheck ?? "").length > 0);
+    assert.match(model.revisitQueue[0]?.reason ?? "", new RegExp(escapeRegExp(model.revisitQueue[0]!.recheck)));
+    for (const item of model.revisitQueue) {
+      if (item.driver) {
+        assert.match(item.reason, new RegExp(escapeRegExp(item.driver)));
+      }
+    }
+    // steadyWeek is what the homepage branches on; it must agree with the notch label.
+    assert.equal(
+      model.weeklyLeadershipSummary.steadyWeek,
+      model.weeklyLeadershipSummary.notchShiftLabel === "+0 notch",
+    );
     assert.match(model.decisionReadiness.label, /Act|Act with caution|Hold/);
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);

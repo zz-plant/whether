@@ -142,6 +142,9 @@ export const buildWeeklyLeadershipBriefModel = ({
     hiringTrend,
     confidenceLabel: treasury.isLive ? "High" : "Medium",
     inputsComplete: assessment.inputs?.every((input) => input.value !== null) ?? true,
+    // Keep `steadyWeek` and `notchShiftLabel` derived from the same threshold so
+    // the "nothing moved" copy and the notch counter can never disagree.
+    steadyWeek: Math.abs(boldnessDelta) <= 1,
     notchShiftLabel:
       boldnessDelta > 1
         ? `+${Math.max(1, Math.round(boldnessDelta / 3))} notch`

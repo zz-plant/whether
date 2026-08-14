@@ -208,6 +208,30 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
   return areaOrder.map((area) => rulesByArea[area]);
 };
 
+/**
+ * Every lever's flip conditions are built from the same `tightnessResume` /
+ * `riskResume` pair, so a reader scanning three rows sees the same two numbers
+ * three times and reads them as per-lever coincidence rather than one shared
+ * corridor. Surface the corridor once, but only when the rules genuinely share
+ * it: if the distinct conditions ever stop being fewer than the rules that use
+ * them, this returns null rather than overstating the relationship.
+ */
+export const formatSharedFlipCorridor = (rules: BoundedDecisionRule[]): string | null => {
+  const rulesWithConditions = rules.filter((rule) => rule.flipConditions.length > 0);
+  if (rulesWithConditions.length < 2) return null;
+
+  const distinct = new Map<string, string>();
+  for (const rule of rulesWithConditions) {
+    for (const condition of rule.flipConditions) {
+      distinct.set(`${condition.metric}${condition.operator}${condition.value}`, condition.label);
+    }
+  }
+
+  if (distinct.size >= rulesWithConditions.length) return null;
+
+  return [...distinct.values()].join(" · ");
+};
+
 export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
   formatBoundedDecisionThreshold(rule);
 

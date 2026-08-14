@@ -3,6 +3,7 @@ import {
   decisionAreaLabel,
   formatBoundedDecisionAction,
   formatBoundedDecisionReverse,
+  formatSharedFlipCorridor,
 } from "../boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../operatingCalls";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
@@ -199,12 +200,16 @@ const buildRevisitQueue = ({
     }
 
     const driver = driverByArea.get(area);
+    const driverSentence = driver ? summarizeSignalDriver(driver) : null;
+    const recheck = revisitReasonByArea[area];
 
     return [{
       id: area,
       label: decisionAreaLabel(area),
       action: formatBoundedDecisionAction(rule),
-      reason: `${driver ? `${summarizeSignalDriver(driver)} ` : ""}${revisitReasonByArea[area]}`,
+      driver: driverSentence,
+      recheck,
+      reason: `${driverSentence ? `${driverSentence} ` : ""}${recheck}`,
       flipCondition: formatBoundedDecisionReverse(rule),
     }];
   });
@@ -493,6 +498,7 @@ export const buildHomeBriefModelInternal = (
     riskAppetite: assessment.scores.riskAppetite,
   };
   const actionStripItems = buildActionStripItems(decisionRules, currentScores);
+  const sharedFlipCorridor = formatSharedFlipCorridor(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
   const conciseActionNow = policyOverrideActive
@@ -607,6 +613,7 @@ export const buildHomeBriefModelInternal = (
     startupVariantPolicy,
     decisionMatrix,
     actionStripItems,
+    sharedFlipCorridor,
     roleAwareTemplates,
     executiveOperationalStance,
     revisitDecisions,
@@ -615,6 +622,7 @@ export const buildHomeBriefModelInternal = (
     weeklyLeadershipSummary: {
       boldnessScore: weeklyLeadershipSummary.boldnessScore,
       boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
+      steadyWeek: weeklyLeadershipSummary.steadyWeek,
       notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
       shorthandLine: buildLeadershipShorthandLine(weeklyLeadershipSummary.boldnessDelta),
       hiringWindow: weeklyLeadershipSummary.hiringWindow,
@@ -742,6 +750,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionMatrix: homeBriefModel.decisionMatrix,
       startupVariantPolicy: homeBriefModel.startupVariantPolicy,
       actionStripItems: homeBriefModel.actionStripItems,
+      sharedFlipCorridor: homeBriefModel.sharedFlipCorridor,
       roleAwareTemplates: homeBriefModel.roleAwareTemplates,
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,
       revisitDecisions: homeBriefModel.revisitDecisions,

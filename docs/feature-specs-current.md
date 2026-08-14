@@ -68,7 +68,9 @@ The weekly-call module now also surfaces a compact weekly scalar block before th
 - one-line net delta shorthand.
 The canonical weekly-call block now also includes:
 - a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
-- a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened,
+- a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened, carrying why each lane is queued rather than restating the bounded action the ledger below already prints verbatim,
+- a plain-language steady-week state (`No change` / `Last week’s calls stand.`) driven by `weeklyLeadershipSummary.steadyWeek`, replacing the repetition of “no change vs last week” across the delta widgets,
+- a shared flip corridor stated once above the bounded-decision ledger when every lane clears on the same conditions, so correlated levers read as correlated,
 - a delta-only brief in the share rail for repeat readers who only need the weekly change, reopen items, and current hold / reopen lines.
 The current homepage hierarchy now makes the action lane dominant: `Do this now` leads the top fold, `What changed` supports it, and `Recheck now` plus readiness/trust sit in a smaller secondary lane rather than competing as equal-width cards.
 The artifact rail now follows a routine-first hierarchy:

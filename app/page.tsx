@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
+import { STEADY_WEEK_CONSEQUENCE, STEADY_WEEK_LABEL } from "../lib/report/reportCopy";
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/publishedBriefs";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
@@ -132,8 +133,14 @@ function WeeklyTopFoldContract({
   const memoryFallbackItems = memoryRegimes.slice(-4).map((item) => item.regime);
   const rawItems = (memoryRailItems.length >= 4 ? memoryRailItems : memoryFallbackItems).slice(-4);
   const memoryItems = rawItems.map((label) => REGIME_DISPLAY[label] ?? label ?? "—");
+  const isSteadyWeek = weeklySummary.steadyWeek;
   const shouldRevisit = model.decision.revisitDecisions;
   const revisitQueue = model.decision.revisitQueue.slice(0, 3);
+  // One signal can queue up to three areas, so the driver sentence is identical
+  // across items more often than not. Hoist it when it is shared; otherwise each
+  // item carries its own composed reason.
+  const revisitDrivers = [...new Set(revisitQueue.map((item) => item.driver).filter(Boolean))];
+  const sharedDriver = revisitDrivers.length === 1 ? revisitDrivers[0] : null;
 
    return (
     <section
@@ -144,8 +151,13 @@ function WeeklyTopFoldContract({
       <div className="space-y-2 md:col-span-5">
         <div className="flex items-center justify-between gap-2">
           <p className="text-fluid-micro font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">Weekly Posture Delta</p>
-          <span className="text-fluid-micro font-medium text-sky-300/90">{weeklySummary.notchShiftLabel}</span>
+          <span className="text-fluid-micro font-medium text-sky-300/90">
+            {isSteadyWeek ? STEADY_WEEK_LABEL : weeklySummary.notchShiftLabel}
+          </span>
         </div>
+        {isSteadyWeek ? (
+          <p className="text-fluid-xs text-slate-300">{STEADY_WEEK_CONSEQUENCE}</p>
+        ) : null}
         {memoryItems.length ? (
           <div className="rounded-md border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-fluid-xs text-white/60">
             <span className="block text-[10px] font-mono uppercase text-slate-400 mb-0.5">Last 4 weeks · posture</span>
@@ -165,14 +177,21 @@ function WeeklyTopFoldContract({
           </span>
         </div>
         {revisitQueue.length ? (
-          <ul className="space-y-1.5 text-fluid-xs text-white/70">
-            {revisitQueue.map((item) => (
-              <li key={item.id} className="flex items-start gap-1.5">
-                <span className="font-semibold text-slate-200 shrink-0">{item.label}:</span>
-                <span className="text-slate-300">{compactSentence(item.action, 84)}</span>
-              </li>
-            ))}
-          </ul>
+          <>
+            {sharedDriver ? (
+              <p className="text-fluid-xs text-slate-300">{compactSentence(sharedDriver, 96)}</p>
+            ) : null}
+            <ul className="space-y-1.5 text-fluid-xs text-white/70">
+              {revisitQueue.map((item) => (
+                <li key={item.id} className="flex items-start gap-1.5">
+                  <span className="font-semibold text-slate-200 shrink-0">{item.label}:</span>
+                  <span className="text-slate-300">
+                    {compactSentence(sharedDriver ? item.recheck : item.reason, 96)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
         ) : (
           <p className="text-fluid-xs text-slate-400 italic">No decisions require re-checking this week.</p>
         )}
@@ -398,6 +417,7 @@ async function PageContent({
 
             <ThreeWhethersCard
                items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
+               sharedFlipCorridor={homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor}
              />
 
             <CompareStrip

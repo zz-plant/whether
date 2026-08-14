@@ -260,6 +260,12 @@ export type StartRouteDeltaBlock = {
 export type WeeklyLeadershipSummary = {
   boldnessScore: number;
   boldnessDelta: number;
+  /**
+   * True when the week did not move the posture enough to shift a notch — the
+   * same threshold that produces a `+0 notch` label. Renderers use this to
+   * state "nothing changed" once instead of repeating it per delta widget.
+   */
+  steadyWeek: boolean;
   notchShiftLabel: string;
   shorthandLine: string;
   hiringWindow: string;
@@ -272,6 +278,15 @@ export type RevisitQueueItem = {
   id: BoundedDecisionRule["area"];
   label: string;
   action: string;
+  /**
+   * The signal move that put this area in the queue, as its own sentence. One
+   * signal maps to up to three areas (`signalAreaPriority`), so renderers that
+   * list several items should hoist a shared driver rather than repeat it.
+   */
+  driver: string | null;
+  /** Area-specific instruction. Unique per item, unlike `driver`. */
+  recheck: string;
+  /** `driver` and `recheck` composed, for single-item and export contexts. */
   reason: string;
   flipCondition: string;
 };
@@ -324,6 +339,8 @@ export type WeeklyDecisionCardViewModel = {
     decisionMatrix?: DecisionMatrixPayload;
     startupVariantPolicy: StartupVariantPolicy;
     actionStripItems?: ActionStripItem[];
+    /** The clear-condition corridor every lever shares, stated once. Null when they diverge. */
+    sharedFlipCorridor?: string | null;
     roleAwareTemplates: RoleAwareOperatingTemplate[];
     executiveOperationalStance: { expand: string[]; avoid: string[] };
     revisitDecisions: boolean;
