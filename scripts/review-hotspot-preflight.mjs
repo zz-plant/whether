@@ -68,12 +68,38 @@ function addedTypeAssertions(diffRange) {
   const lines = diff.split("\n");
   const offenders = [];
 
+  // Tracks /* */ state across added lines. Only `//` was stripped before, so
+  // block and JSX ({/* */}) comments reached the matcher and any prose using
+  // the English word "as" — "reads as boilerplate", "renders as a header" —
+  // was reported as an unsafe type assertion.
+  let inBlockComment = false;
+
+  const stripBlockComments = (code) => {
+    let out = "";
+    let index = 0;
+    while (index < code.length) {
+      if (inBlockComment) {
+        const end = code.indexOf("*/", index);
+        if (end === -1) return out;
+        inBlockComment = false;
+        index = end + 2;
+        continue;
+      }
+      const start = code.indexOf("/*", index);
+      if (start === -1) return out + code.slice(index);
+      out += code.slice(index, start);
+      inBlockComment = true;
+      index = start + 2;
+    }
+    return out;
+  };
+
   for (const line of lines) {
     if (!line.startsWith("+") || line.startsWith("+++")) continue;
 
     const code = line.slice(1);
-    // Strip single-line comments before matching to avoid false positives
-    const codeWithoutComments = code.replace(/\/\/.*/g, "");
+    // Strip comments before matching to avoid false positives
+    const codeWithoutComments = stripBlockComments(code).replace(/\/\/.*/g, "");
     const nonTypeAssertionPrepostions = /\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(codeWithoutComments);
     if (nonTypeAssertionPrepostions) {
       // English prose false positives ("as of", "as in", etc.)
