@@ -7,16 +7,12 @@ const ALLOWED_EXACT_KEYS = new Set([
   "whether-decision-log",
 ]);
 
-const ALLOWED_PREFIXES = [
-  "whether-",
-];
-
 export const isAllowedSyncKey = (key: string) =>
   key.length > 0
   && key.length <= MAX_SYNC_KEY_LENGTH
   && !key.includes("..")
   && !key.includes(":")
-  && (ALLOWED_EXACT_KEYS.has(key) || ALLOWED_PREFIXES.some((prefix) => key.startsWith(prefix)));
+  && ALLOWED_EXACT_KEYS.has(key);
 
 export const validateSyncTimestamp = (ts: unknown, now = Date.now()) => {
   if (typeof ts !== "number" || !Number.isFinite(ts) || ts <= 0) return false;

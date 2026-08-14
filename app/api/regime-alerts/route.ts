@@ -7,17 +7,14 @@ import {
   type SignalAlertInputPayload,
 } from "../../../lib/signalOps";
 import { buildLineage } from "../../../lib/storage/lineage";
-import { constantTimeCompare } from "../../../lib/constantTimeCompare";
+import { requireCronAuth } from "../../../lib/api/cronAuth";
 
 export const runtime = "edge";
 
 /* GET requires authentication — exposes internal alert data. */
 export async function GET(request: Request) {
-  const authToken = request.headers?.get?.("authorization")?.replace("Bearer ", "");
-  const expectedToken = process.env.WHETHER_CRON_SECRET;
-  if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const limitRaw = url.searchParams.get("limit");
@@ -39,6 +36,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
   const requestPayload = (await request.json()) as SignalAlertInputPayload;
   const repository = getRegimeAlertRepository();
   const latest = await repository.latestAlert();

@@ -64,7 +64,7 @@ export function FreshnessDot({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-[40px] items-center gap-2 px-2.5 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+        className="inline-flex min-h-11 items-center gap-2 px-2.5 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -85,8 +85,7 @@ export function FreshnessDot({
       {open ? (
         <div
           id={menuId}
-          role="dialog"
-          aria-modal="true"
+          role="region"
           aria-label="Data freshness"
           className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left overscroll-contain"
         >

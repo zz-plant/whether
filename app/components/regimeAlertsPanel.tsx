@@ -124,7 +124,9 @@ export const RegimeAlertsPanel = () => {
       return;
     }
 
-    void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(clientId)}`)
+    void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(clientId)}`, {
+      headers: { "x-whether-client-id": clientId },
+    })
       .then(async (response) => {
         if (!response.ok) {
           return;
@@ -179,7 +181,7 @@ export const RegimeAlertsPanel = () => {
     setPreferences(next);
     void fetch("/api/alert-preferences", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-whether-client-id": clientId },
       body: JSON.stringify({ clientId, preferences: next }),
     }).catch(() => {
       // Keep the optimistic toggle and avoid noisy fetch errors in the console.

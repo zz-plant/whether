@@ -156,4 +156,5 @@ describe("createHomePageReportDataLoader", () => {
     assert.equal(fourthResult.ok, true);
     assert.equal(callCount, 3);
   });
+
 });

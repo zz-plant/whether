@@ -19,6 +19,11 @@ async function digestSecret(secret: string): Promise<string> {
   return Array.from(new Uint8Array(hash)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+async function storageSyncId(requestedId: string, secret: string | null): Promise<string | null> {
+  if (!secret || secret.length < 16 || requestedId.length > 128) return null;
+  return `${requestedId.slice(0, 24)}:${(await digestSecret(secret)).slice(0, 40)}`;
+}
+
 async function authorizeSync(state: SyncState, secret: string | null): Promise<boolean> {
   if (!secret || secret.length < 16) return false;
   const expected = Object.values(state).find((entry) => entry.secretHash)?.secretHash;
@@ -57,8 +62,13 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const syncId = url.searchParams.get("id");
   if (!syncId) return NextResponse.json({ ok: false, error: "Missing id" }, { status: 400 });
+  const scopedId = await storageSyncId(syncId, readSyncSecret(request));
+  if (!scopedId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
-  const state = await loadState(kv, syncId);
+  const state = await loadState(kv, scopedId);
+  if (Object.keys(state).length === 0) {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
   if (!await authorizeSync(state, readSyncSecret(request))) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -88,8 +98,10 @@ export async function POST(request: Request) {
   if (!validateSyncTimestamp(ts)) {
     return NextResponse.json({ ok: false, error: "invalid_timestamp" }, { status: 400 });
   }
+  const scopedId = await storageSyncId(syncId, readSyncSecret(request));
+  if (!scopedId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
-  const state = await loadState(kv, syncId);
+  const state = await loadState(kv, scopedId);
   const secret = readSyncSecret(request);
   if (!await authorizeSync(state, secret)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
@@ -103,6 +115,6 @@ export async function POST(request: Request) {
   if (!validateSyncStateSize(state)) {
     return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
   }
-  await saveState(kv, syncId, state);
+  await saveState(kv, scopedId, state);
   return NextResponse.json({ ok: true });
 }

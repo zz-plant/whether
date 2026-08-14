@@ -33,6 +33,7 @@ import {
 } from "./viewModel";
 import { formatDateUTC } from "../lib/formatters";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
+import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 
 const EvidenceTools = dynamic(
   () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
@@ -147,7 +148,7 @@ function WeeklyTopFoldContract({
         </div>
         {memoryItems.length ? (
           <div className="rounded-md border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-fluid-xs text-white/60">
-            <span className="block text-[10px] font-mono uppercase text-slate-400 mb-0.5">4-Month Trajectory</span>
+            <span className="block text-[10px] font-mono uppercase text-slate-400 mb-0.5">Last 4 weeks · posture</span>
             <span className="font-mono text-slate-200">{memoryItems.join(" → ")}</span>
           </div>
         ) : null}
@@ -263,26 +264,7 @@ async function PageContent({
   try {
     data = await loadHomePageAssembly(searchParams);
   } catch {
-    return (
-      <div className="weather-card my-8 mx-auto max-w-xl text-center py-14 space-y-4">
-        <div className="space-y-2">
-          <p className="text-white/80 font-medium text-base">Couldn&apos;t load this week&apos;s brief.</p>
-          <p className="text-white/50 text-fluid-micro">Data sources are temporarily unavailable or delayed.</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="weather-button inline-flex items-center gap-2 px-4 py-2 text-emerald-300 text-sm font-medium"
-          >
-            Retry now
-          </button>
-          <ActionLink href="/trust" variant="inline">
-            Check data status →
-          </ActionLink>
-        </div>
-      </div>
-    );
+    return <HomeBriefLoadError />;
   }
 
   const { homepage, reportData, operatorContext } = data;
@@ -415,9 +397,7 @@ async function PageContent({
              />
 
             <ThreeWhethersCard
-               signalDirection={signalDirection}
-               tightness={tightness}
-               guardrail={numericGuardrailLabel}
+               items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
              />
 
             <CompareStrip

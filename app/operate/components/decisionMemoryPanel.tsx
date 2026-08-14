@@ -43,7 +43,9 @@ export const DecisionMemoryPanel = () => {
       return;
     }
     setStatusMessage(null);
-    void fetch(`/api/decision-memory?clientId=${encodeURIComponent(clientId)}`)
+    void fetch(`/api/decision-memory?clientId=${encodeURIComponent(clientId)}`, {
+      headers: { "x-whether-client-id": clientId },
+    })
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("HTTP error");

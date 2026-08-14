@@ -5,7 +5,7 @@ type Cursor = string | null;
 
 export interface DecisionMemoryRepository {
   append(entry: DecisionMemoryEntry): Promise<void>;
-  list(options?: { cursor?: Cursor; limit?: number; clientId?: string }): Promise<{ entries: DecisionMemoryEntry[]; nextCursor: Cursor }>;
+  list(options: { cursor?: Cursor; limit?: number; clientId: string }): Promise<{ entries: DecisionMemoryEntry[]; nextCursor: Cursor }>;
   backendStatus(): "durable" | "local-fallback";
 }
 
@@ -16,11 +16,11 @@ class InMemoryDecisionMemoryRepository implements DecisionMemoryRepository {
     await this.eventLog.append(entry);
   }
 
-  async list(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {
+  async list(options: { cursor?: Cursor; limit?: number; clientId: string }) {
     const result = await this.eventLog.list({
       cursor: options?.cursor,
       limit: options?.limit,
-      filter: options?.clientId ? (item) => item.context.clientId === options.clientId : undefined,
+      filter: (item) => item.context.clientId === options.clientId,
     });
     return { entries: result.items, nextCursor: result.nextCursor };
   }
@@ -41,11 +41,11 @@ class KvDecisionMemoryRepository implements DecisionMemoryRepository {
     await this.eventLog.append(entry);
   }
 
-  async list(options?: { cursor?: Cursor; limit?: number; clientId?: string }) {
+  async list(options: { cursor?: Cursor; limit?: number; clientId: string }) {
     const result = await this.eventLog.list({
       cursor: options?.cursor,
       limit: options?.limit,
-      filter: options?.clientId ? (item) => item.context.clientId === options.clientId : undefined,
+      filter: (item) => item.context.clientId === options.clientId,
     });
     return { entries: result.items, nextCursor: result.nextCursor };
   }
