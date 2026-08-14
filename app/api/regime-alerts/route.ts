@@ -11,10 +11,8 @@ import { requireCronAuth } from "../../../lib/api/cronAuth";
 
 export const runtime = "edge";
 
-/* GET requires authentication — exposes internal alert data. */
+/* Alert history is browser-readable; only the cron-owned write path requires its secret. */
 export async function GET(request: Request) {
-  const authError = requireCronAuth(request);
-  if (authError) return authError;
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const limitRaw = url.searchParams.get("limit");

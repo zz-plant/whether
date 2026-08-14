@@ -4,6 +4,7 @@ import { GET as getDecisionMemoryRoute, POST as postDecisionMemoryRoute } from "
 import { GET as getAlertPreferencesRoute, POST as postAlertPreferencesRoute } from "../app/api/alert-preferences/route";
 import { GET as getAlertDeliveriesRoute, POST as postAlertDeliveriesRoute } from "../app/api/alert-deliveries/route";
 import { GET as getWeeklyDigestRoute } from "../app/api/weekly-digest/route";
+import { GET as getRegimeAlertsRoute, POST as postRegimeAlertsRoute } from "../app/api/regime-alerts/route";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { resetDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
 import { resetAlertPreferenceRepository } from "../lib/storage/alertPreferenceRepository";
@@ -352,6 +353,56 @@ describe("decision memory and alert routes", () => {
     assert.equal(response.status, 400);
     const body = (await response.json()) as { error?: string };
     assert.equal(body.error, "invalid-payload");
+  });
+
+  it("keeps regime alert history readable by the browser without cron credentials", async () => {
+    const repository = getRegimeAlertRepository();
+    const alert: RegimeAlertEvent = {
+      eventId: "browser-alert-event",
+      sourceVersion: "v1",
+      canonicalTimestampSource: "request-received-at",
+      id: "browser-alert",
+      createdAt: "2026-02-16T00:00:00.000Z",
+      payload: {
+        previousRecordDate: "2026-02-09",
+        currentRecordDate: "2026-02-16",
+        previousAssessment: { regime: "DEFENSIVE" } as RegimeAlertEvent["payload"]["previousAssessment"],
+        currentAssessment: { regime: "SCARCITY" } as RegimeAlertEvent["payload"]["currentAssessment"],
+        reasons: [{ code: "risk", message: "risk moved" }],
+        decisionDeltas: [],
+        triggerStates: {},
+        sourceUrls: [],
+        timeMachineHref: "/",
+      },
+    };
+    await repository.appendAlert(alert);
+
+    const response = await getRegimeAlertsRoute(new Request("http://localhost/api/regime-alerts"));
+
+    assert.equal(response.status, 200);
+    const body = (await response.json()) as { alerts: Array<{ id: string }> };
+    assert.equal(body.alerts[0]?.id, "browser-alert");
+  });
+
+  it("continues to protect regime alert writes with cron authentication", async () => {
+    const previousSecret = process.env.WHETHER_CRON_SECRET;
+    process.env.WHETHER_CRON_SECRET = "regime-alert-route-test-secret";
+
+    try {
+      const response = await postRegimeAlertsRoute(new Request("http://localhost/api/regime-alerts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      }));
+
+      assert.equal(response.status, 401);
+    } finally {
+      if (previousSecret === undefined) {
+        delete process.env.WHETHER_CRON_SECRET;
+      } else {
+        process.env.WHETHER_CRON_SECRET = previousSecret;
+      }
+    }
   });
 
   it("keeps weekly digest counts top-level and marks fallback-backed payloads as degraded", async () => {
