@@ -252,7 +252,7 @@ export const DecisionShieldPanel = ({
 
     void fetch("/api/decision-memory", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-whether-client-id": clientId },
       body: JSON.stringify({
         clientId,
         recordDate: provenance.recordDateLabel,

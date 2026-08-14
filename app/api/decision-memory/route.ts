@@ -7,6 +7,7 @@ import {
   toDecisionMemoryCsv,
 } from "../../../lib/decisionMemory";
 import { getDecisionMemoryRepository } from "../../../lib/storage/decisionMemoryRepository";
+import { requireClientOwner } from "../../../lib/api/clientOwnership";
 
 export const runtime = "edge";
 
@@ -55,8 +56,10 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const format = url.searchParams.get("format");
   const clientId = url.searchParams.get("clientId") ?? undefined;
+  const owner = requireClientOwner(request, clientId);
+  if (owner.error) return owner.error;
   const repository = getDecisionMemoryRepository();
-  const listed = await repository.list({ limit: 64, clientId });
+  const listed = await repository.list({ limit: 64, clientId: owner.ownerId! });
   const degraded = repository.backendStatus() === "local-fallback";
 
   if (format === "csv") {
@@ -95,6 +98,11 @@ export async function POST(request: Request) {
   if (!snapshot && !parsed) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-payload", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
+  const claimedClientId = snapshot?.clientId ?? parsed?.clientId;
+  const owner = requireClientOwner(request, claimedClientId);
+  if (owner.error) return owner.error;
+  if (snapshot) snapshot.clientId = owner.ownerId!;
+  if (parsed) parsed.clientId = owner.ownerId!;
 
   const entry = snapshot
     ? buildDecisionMemorySnapshotEntry(snapshot)

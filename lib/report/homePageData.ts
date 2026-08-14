@@ -13,6 +13,7 @@ type HomePageDataDependencies = {
 type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
 
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 300;
+const HOMEPAGE_DATA_PARAM_KEYS = new Set(["month", "year", "sector", "view"]);
 
 const defaultDependencies: HomePageDataDependencies = {
   loadReportDataSafe,
@@ -37,7 +38,7 @@ const normalizeHomePageSearchParams = (searchParams?: HomePageSearchParams) => {
   }
 
   const normalizedEntries = Object.entries(searchParams)
-    .filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].trim().length > 0)
+    .filter((entry): entry is [string, string] => HOMEPAGE_DATA_PARAM_KEYS.has(entry[0]) && typeof entry[1] === "string" && entry[1].trim().length > 0)
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([key, value]) => [key, value.trim()] as const);
 

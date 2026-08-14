@@ -4,6 +4,7 @@ import {
   getAlertPreferenceRepository,
   type AlertPreferences,
 } from "../../../lib/storage/alertPreferenceRepository";
+import { requireClientOwner } from "../../../lib/api/clientOwnership";
 
 export const runtime = "edge";
 
@@ -25,8 +26,10 @@ export async function GET(request: Request) {
   if (!clientId) {
     return NextResponse.json({ preferences: DEFAULT_ALERT_PREFERENCES, error: "clientId-required", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
+  const owner = requireClientOwner(request, clientId);
+  if (owner.error) return owner.error;
 
-  const stored = await repository.get(clientId);
+  const stored = await repository.get(owner.ownerId!);
 
   return NextResponse.json({
     preferences: stored ?? DEFAULT_ALERT_PREFERENCES,
@@ -54,7 +57,9 @@ export async function POST(request: Request) {
   if (typeof candidate.clientId !== "string" || !candidate.clientId || !isAlertPreferences(candidate.preferences)) {
     return NextResponse.json({ preferences: DEFAULT_ALERT_PREFERENCES, error: "invalid-payload", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
+  const owner = requireClientOwner(request, candidate.clientId);
+  if (owner.error) return owner.error;
 
-  const preferences = await repository.upsert(candidate.clientId, candidate.preferences);
+  const preferences = await repository.upsert(owner.ownerId!, candidate.preferences);
   return NextResponse.json({ preferences, degraded, backend: repository.backendStatus() });
 }

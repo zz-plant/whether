@@ -149,7 +149,7 @@ ${citation}
         ref={triggerRef}
         type="button"
         onClick={handleToggleDropdown}
-        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100 transition-colors focus:outline-none"
+        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-controls={isOpen ? menuId : undefined}

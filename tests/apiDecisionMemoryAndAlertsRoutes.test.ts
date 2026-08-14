@@ -20,7 +20,7 @@ describe("decision memory and alert routes", () => {
   it("creates and lists decision memory entries, including csv export", async () => {
     const postRequest = new Request("http://localhost/api/decision-memory", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-whether-client-id": "client-a" },
       body: JSON.stringify({
         clientId: "client-a",
         recordDate: "2026-02-16",
@@ -52,21 +52,21 @@ describe("decision memory and alert routes", () => {
     assert.equal(postBody.created, true);
     assert.equal(postBody.count, 1);
 
-    const getResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory"));
+    const getResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", { headers: { "x-whether-client-id": "client-a" } }));
     assert.equal(getResponse.status, 200);
     const getBody = (await getResponse.json()) as { entries: unknown[]; count: number };
     assert.equal(getBody.count, 1);
     assert.equal(getBody.entries.length, 1);
 
     const filteredResponse = await getDecisionMemoryRoute(
-      new Request("http://localhost/api/decision-memory?clientId=client-a"),
+      new Request("http://localhost/api/decision-memory?clientId=client-a", { headers: { "x-whether-client-id": "client-a" } }),
     );
     assert.equal(filteredResponse.status, 200);
     const filteredBody = (await filteredResponse.json()) as { entries: Array<{ context: { clientId: string } }>; count: number };
     assert.equal(filteredBody.count, 1);
     assert.equal(filteredBody.entries[0]?.context.clientId, "client-a");
 
-    const csvResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?format=csv"));
+    const csvResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?format=csv", { headers: { "x-whether-client-id": "client-a" } }));
     assert.equal(csvResponse.status, 200);
     assert.equal(csvResponse.headers.get("content-type"), "text/csv; charset=utf-8");
     const csvBody = await csvResponse.text();
@@ -93,10 +93,10 @@ describe("decision memory and alert routes", () => {
     });
 
     await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload("client-a")),
+      method: "POST", headers: { "content-type": "application/json", "x-whether-client-id": "client-a" }, body: JSON.stringify(payload("client-a")),
     }));
     const response = await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload("client-b")),
+      method: "POST", headers: { "content-type": "application/json", "x-whether-client-id": "client-b" }, body: JSON.stringify(payload("client-b")),
     }));
 
     const body: unknown = await response.json();
@@ -112,7 +112,7 @@ describe("decision memory and alert routes", () => {
     const response = await postDecisionMemoryRoute(
       new Request("http://localhost/api/decision-memory", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", "x-whether-client-id": "client-hero" },
         body: JSON.stringify({
           kind: "posture-snapshot",
           clientId: "client-hero",
@@ -157,7 +157,7 @@ describe("decision memory and alert routes", () => {
   it("lists posture snapshots alongside decision entries and exports both to csv", async () => {
     await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-whether-client-id": "client-mixed" },
       body: JSON.stringify({
         kind: "posture-snapshot",
         clientId: "client-mixed",
@@ -168,7 +168,7 @@ describe("decision memory and alert routes", () => {
     }));
     await postDecisionMemoryRoute(new Request("http://localhost/api/decision-memory", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-whether-client-id": "client-mixed" },
       body: JSON.stringify({
         clientId: "client-mixed",
         recordDate: "2026-02-16",
@@ -189,7 +189,7 @@ describe("decision memory and alert routes", () => {
     }));
 
     const listed = await getDecisionMemoryRoute(
-      new Request("http://localhost/api/decision-memory?clientId=client-mixed"),
+      new Request("http://localhost/api/decision-memory?clientId=client-mixed", { headers: { "x-whether-client-id": "client-mixed" } }),
     );
     const listedBody = (await listed.json()) as { count: number; entries: Array<{ kind?: string }> };
     assert.equal(listedBody.count, 2);
@@ -197,7 +197,7 @@ describe("decision memory and alert routes", () => {
     assert.ok(listedBody.entries.some((entry) => entry.kind === "decision"));
 
     const csvResponse = await getDecisionMemoryRoute(
-      new Request("http://localhost/api/decision-memory?clientId=client-mixed&format=csv"),
+      new Request("http://localhost/api/decision-memory?clientId=client-mixed&format=csv", { headers: { "x-whether-client-id": "client-mixed" } }),
     );
     assert.equal(csvResponse.status, 200);
     const csvBody = await csvResponse.text();
@@ -240,8 +240,17 @@ describe("decision memory and alert routes", () => {
     assert.equal(body.error, "invalid-payload");
   });
 
+  it("rejects missing and mismatched decision-memory ownership", async () => {
+    const missing = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?clientId=client-a"));
+    assert.equal(missing.status, 401);
+    const mismatch = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?clientId=client-a", {
+      headers: { "x-whether-client-id": "client-b" },
+    }));
+    assert.equal(mismatch.status, 403);
+  });
+
   it("gets and upserts alert preferences", async () => {
-    const initial = await getAlertPreferencesRoute(new Request("http://localhost/api/alert-preferences?clientId=abc"));
+    const initial = await getAlertPreferencesRoute(new Request("http://localhost/api/alert-preferences?clientId=abc", { headers: { "x-whether-client-id": "abc" } }));
     assert.equal(initial.status, 200);
     const initialBody = (await initial.json()) as { preferences: { slack: boolean } };
     assert.equal(initialBody.preferences.slack, true);
@@ -249,7 +258,7 @@ describe("decision memory and alert routes", () => {
     const post = await postAlertPreferencesRoute(
       new Request("http://localhost/api/alert-preferences", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", "x-whether-client-id": "abc" },
         body: JSON.stringify({
           clientId: "abc",
           preferences: { slack: false, email: true, webhook: true },

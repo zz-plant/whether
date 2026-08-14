@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { appendCommittedPostureEvent, buildPostureState } from "../../../lib/report/postureStateSource";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { getPostureDecisionEventRepository } from "../../../lib/storage/postureDecisionEventRepository";
+import { requireCronAuth } from "../../../lib/api/cronAuth";
 
 export const runtime = "edge";
 
@@ -25,7 +26,9 @@ export async function GET() {
   });
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/posture-state" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury, regimeAlert } = reportData;

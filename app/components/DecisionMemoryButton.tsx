@@ -47,7 +47,7 @@ export function DecisionMemoryButton({
     try {
       const response = await fetch("/api/decision-memory", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-whether-client-id": clientId },
         body: JSON.stringify({
           kind: "posture-snapshot",
           clientId,
