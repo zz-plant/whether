@@ -56,7 +56,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       <GlobalHeaderScrollWrapper>
         <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
           <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
-            <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
+            <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
             <GlobalHeaderNavClient pathname={pathname} />
@@ -86,7 +86,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
         <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
           <div className="flex items-center gap-2">
-            <Link href="/" className="shrink-0 font-display text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
+            <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
             <span className="hidden text-fluid-micro font-medium tracking-[0.04em] text-[var(--app-text-muted)] min-[360px]:inline sm:text-fluid-xs">

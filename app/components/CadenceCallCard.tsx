@@ -50,7 +50,7 @@ export function CadenceCallCard({ cadence, data }: Props) {
           </span>
         ) : null}
       </div>
-      <h2 className="max-w-4xl text-pretty font-display text-[1.35rem] font-semibold leading-[1.12] text-white sm:text-[1.55rem]">
+      <h2 className="max-w-4xl text-pretty text-[1.35rem] font-semibold leading-[1.12] text-white sm:text-[1.55rem]">
         {summary.title}
       </h2>
       {summary.guidance ? (

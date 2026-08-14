@@ -30,7 +30,7 @@ export default function VisualSystemMockupPage() {
                 4-Tier Hybrid Pipeline
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-white sm:text-5xl" style={{ fontFamily: "var(--weather-font-display)" }}>
+            <h1 className="text-3xl font-bold text-white sm:text-5xl">
               Whether Programmatic Graphics System
             </h1>
             <p className="max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base">

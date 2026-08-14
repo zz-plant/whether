@@ -13,7 +13,7 @@ export function PageMasthead({ page, summary, recordDate }: PageMastheadProps) {
           Whether · {page}{recordDate ? ` · ${recordDate}` : ""}
         </span>
       </div>
-      <h2 className="text-fluid-lg sm:text-fluid-xl font-semibold text-white leading-snug max-w-2xl mx-auto font-display">
+      <h2 className="text-fluid-lg sm:text-fluid-xl font-semibold text-white leading-snug max-w-2xl mx-auto">
         {summary}
       </h2>
     </div>

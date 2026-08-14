@@ -48,13 +48,15 @@
   --color-trust-low: #fda4af;
 
   /* Text role tokens */
-  /* Display is capped near 3.4rem: the weekly-call headline is a full sentence,
-     and the old 7vw/6.5rem ceiling set it at ~100px on desktop, wrapping it to
-     seven lines and pushing the whole brief below the fold. (The inline
-     sm:text-[2.8rem] cap on the h2 never applied — this file is unlayered, so
-     .text-display beat the layered Tailwind utility.) 2-3 lines at 54px keeps
-     the drama and keeps the brief on one screen. */
-  --text-display: clamp(2.125rem, 1.5rem + 2.2vw, 3.375rem);
+  /* Display sizes the weekly-call headline (its only consumer, DecisionHero).
+     It was 54px in the serif display face, which set a machine-composed
+     sentence as a magazine cover line and put it in direct competition with
+     the boldness score beside it — two competing focal points, neither
+     winning. The score is the hero now; the call is the sentence that explains
+     it, so this steps down to a size that reads decisive at 2 lines without
+     shouting. Kept as a token because the earlier 7vw/6.5rem ceiling wrapped
+     it to seven lines and pushed the brief below the fold — the cap matters. */
+  --text-display: clamp(1.5rem, 1.2rem + 1.35vw, 2.25rem);
   --text-heading: clamp(1.25rem, 1rem + 1.4vw, 2.15rem);
   --text-label: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
   --text-caption: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
@@ -87,6 +89,12 @@
   --weather-shell-pad-inline: 1rem;
   color-scheme: dark;
   --font-sans: var(--font-sans-google, "IBM Plex Sans", system-ui, sans-serif);
+  /* Deliberately outside @theme: there is no `font-display` utility, and adding
+     the key here would mint one. The serif reaches the page through real rules
+     only — :where(h1, h2), .type-headline, .type-section — which keeps its use
+     bounded to headings. A `className="font-display"` is a silent no-op; if a
+     non-heading needs the serif, set font-family in CSS rather than minting the
+     utility. See the --text-display note above for why serif is rationed. */
   --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
@@ -260,10 +268,15 @@
   --white-overlay-subtle: rgba(255, 255, 255, 0.02);
   --white-overlay-faint: rgba(255, 255, 255, 0.01);
 
-  /* CTA button */
-  --cta-gradient: linear-gradient(180deg, rgba(71, 204, 234, 0.94), rgba(32, 139, 196, 0.96));
-  --cta-shadow: 0 6px 12px -10px rgba(56, 189, 248, 0.6);
-  --cta-shadow-hover: 0 8px 16px -10px rgba(56, 189, 248, 0.72);
+  /* CTA button. The previous stops (#47cce a → #208bc4, stock sky/cyan) put
+     .weather-button-primary's text-slate-100 at 1.73:1 against the top of the
+     gradient and 3.45:1 against the bottom — both under AA for the app's most
+     prominent control. These stops hold 5.3:1 and 7.3:1 against the same ink,
+     and read as an instrument surface rather than a default cyan button. */
+  --cta-gradient: linear-gradient(180deg, #2b6c8c, #1e5673);
+  --cta-shadow: 0 6px 12px -10px rgba(6, 22, 32, 0.85);
+  --cta-shadow-hover: 0 8px 16px -10px rgba(6, 22, 32, 0.95);
+  --cta-border: rgba(125, 174, 200, 0.55);
 
   /* Interactive */
   --transition-fast: 200ms ease;
@@ -554,7 +567,10 @@ html[data-theme="light"] {
   --accent-border-soft: rgba(3, 105, 161, 0.14);
   --accent-glow: rgba(3, 105, 161, 0.05);
   --accent-glow-faint: rgba(3, 105, 161, 0.025);
-  --cta-gradient: linear-gradient(180deg, #0284c7, #0369a1);
+  /* Top stop was #0284c7, which held only 4.10:1 against the white ink the
+     light theme forces on this button (see the rule near the end of this file). */
+  --cta-gradient: linear-gradient(180deg, #0369a1, #075985);
+  --cta-border: rgba(3, 105, 161, 0.5);
   --cta-shadow: 0 4px 10px -8px rgba(3, 105, 161, 0.45);
   --cta-shadow-hover: 0 6px 14px -8px rgba(3, 105, 161, 0.55);
   --white-overlay-subtle: rgba(0, 0, 0, 0.015);

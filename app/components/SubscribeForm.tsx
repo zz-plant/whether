@@ -80,7 +80,7 @@ export function SubscribeForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="min-h-11 rounded-lg bg-sky-400 px-4 py-2 text-xs font-semibold text-slate-950 transition-colors hover:bg-sky-300 disabled:opacity-50 weather-focus-ring weather-press-scale"
+          className="weather-button-primary min-h-11 px-4 py-2 text-xs disabled:opacity-50 weather-focus-ring weather-press-scale"
         >
           {status === "loading" ? "Subscribing…" : "Subscribe"}
         </button>

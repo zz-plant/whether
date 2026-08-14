@@ -240,21 +240,32 @@ export const ReportShell = (props: ReportShellProps) => {
               </aside>
             ) : null}
 
-            <div className={`order-1 min-w-0 space-y-5 lg:space-y-6 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+            {/* Between whole report sections. Was space-y-5/6, the same 20-24px
+                used between items *inside* a section, so section boundaries
+                carried no more weight than item boundaries. */}
+            <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
               {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
 
-              <div className="divide-y divide-white/[0.04]">
+              {/* The section rule was white/[0.04] — below the visible threshold
+                  by this repo's own measure (see the border-alpha note in
+                  tokens.css, which raised the floor to 0.10 for exactly this
+                  reason). So report pages had no visible section boundary at
+                  all, and the only thing chunking them was 24px of padding that
+                  matched the spacing used *inside* sections. A visible rule plus
+                  a wider outer gap makes the boundary the strongest horizontal
+                  signal on the page. */}
+              <div className="divide-y divide-white/[0.10]">
                 {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
                       ? section.key
                       : `section-${index}`;
                   return (
-                    <div key={sectionKey} className={index === 0 ? "pb-4 lg:pb-6" : "py-4 lg:py-6"}>
+                    <div key={sectionKey} className={index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}>
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
                         <div className="mt-4">

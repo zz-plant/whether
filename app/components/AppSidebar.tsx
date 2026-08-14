@@ -67,7 +67,7 @@ function SidebarContent({
         onClick={onClose}
         className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 no-underline hover:bg-slate-800/30"
       >
-        <span className="font-display text-lg font-semibold tracking-tight text-slate-100">
+        <span className="text-lg font-semibold tracking-tight text-slate-100">
           Whether
         </span>
       </Link>

@@ -35,7 +35,7 @@ function ErrorView() {
         <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400">
           WHETHER
         </p>
-        <h1 className="text-fluid-lg font-semibold text-slate-100 font-display">
+        <h1 className="text-fluid-lg font-semibold text-slate-100">
           Unable to load market data.
         </h1>
         <p className="text-fluid-sm text-slate-400">
@@ -63,7 +63,7 @@ function MarketStateView({ state }: { state: MarketState }) {
           WHETHER
         </p>
 
-        <h1 className="text-fluid-xl font-semibold text-slate-100 leading-snug font-display">
+        <h1 className="text-fluid-xl font-semibold text-slate-100 leading-snug">
           {state.decision}
         </h1>
 

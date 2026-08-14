@@ -100,7 +100,8 @@
 }
 
 .weather-button-primary {
-  @apply border border-sky-400/60 text-slate-100;
+  @apply border text-slate-100;
+  border-color: var(--cta-border);
   border-radius: var(--radius-lg);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -132,7 +133,7 @@
 }
 
 .weather-cta-primary {
-  border-color: rgba(56, 189, 248, 0.72);
+  border-color: var(--cta-border);
   color: rgb(241 245 249);
   background: var(--cta-gradient);
   box-shadow: var(--cta-shadow);

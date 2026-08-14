@@ -20,7 +20,6 @@ export const buildOperationsExecutionStepHref = (stepId: string) => `#${stepId}`
 export const resolveOperationsExecutionStepActionLabel = (isActive: boolean) =>
   isActive ? "Current step" : "Open step";
 
-export const resolveOperationsExecutionStepReturnLabel = () => "Back to steps";
 
 export const resolveOperationsExecutionStepId = ({
   hashId,
@@ -169,11 +168,33 @@ export function OperationsExecutionStepper({
               id={step.id}
               className={`weather-step-panel scroll-mt-28 space-y-4 rounded-xl border p-4 sm:p-5 transition-all ${activeClass}`}
             >
-              <div className="relative overflow-hidden flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-white/[0.04]">
+              {/* The rule divides the header from the step body, so a closed step
+                  drew a divider with nothing under it. */}
+              <div
+                className={`relative overflow-hidden flex flex-wrap items-start justify-between gap-3 ${
+                  isActive ? "pb-4 border-b border-white/[0.04]" : ""
+                }`}
+              >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
                 <div className="space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
-                  <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
+                  {/* An inactive step renders as a header with no body, but nothing
+                      about it was clickable — only the checklist above could open
+                      it, so five of the six sections on this page looked
+                      interactive and were not. The title now carries the same
+                      hash link the checklist uses. */}
+                  {isActive ? (
+                    <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
+                  ) : (
+                    <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em]">
+                      <a
+                        href={buildOperationsExecutionStepHref(step.id)}
+                        className="inline-flex min-h-11 items-center text-slate-100 no-underline hover:text-sky-100"
+                      >
+                        {step.title}
+                      </a>
+                    </h3>
+                  )}
                   <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {step.owner ? (
@@ -191,12 +212,10 @@ export function OperationsExecutionStepper({
                         Check again if: {step.changeSignal}
                       </span>
                     ) : null}
-                    <a
-                      href="#planning-stepper"
-                      className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100"
-                    >
-                      {resolveOperationsExecutionStepReturnLabel()}
-                    </a>
+                    {/* A "Back to steps" pill used to sit here, in all six steps,
+                        anchoring to the checklist a couple of hundred pixels
+                        above and still on screen. Six identical controls
+                        pointing at visible content is navigation noise. */}
                   </div>
                 </div>
                 {isActive && (

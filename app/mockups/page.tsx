@@ -48,10 +48,7 @@ export default function MockupsIndexPage() {
           <p className="text-fluid-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
             Visual Lab
           </p>
-          <h1
-            className="max-w-4xl text-4xl font-semibold text-white sm:text-5xl"
-            style={{ fontFamily: "var(--weather-font-display)" }}
-          >
+          <h1 className="max-w-4xl text-4xl font-semibold text-white sm:text-5xl">
             Faster UI iteration, without touching the main product flow.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-slate-200">
@@ -78,10 +75,7 @@ export default function MockupsIndexPage() {
                   ))}
                 </div>
                 <div>
-                  <h2
-                    className="text-2xl font-semibold text-white"
-                    style={{ fontFamily: "var(--weather-font-display)" }}
-                  >
+                  <h2 className="text-2xl font-semibold text-white">
                     {mockup.title}
                   </h2>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{mockup.summary}</p>

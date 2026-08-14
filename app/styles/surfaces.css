@@ -70,8 +70,11 @@
   @apply w-full;
 }
 
+/* Matches the between-section rhythm the report shell uses (space-y-10/12), so
+   a page built from .weather-section chunks the same way as one built from
+   ReportSection. */
 .weather-section + .weather-section {
-  @apply mt-8;
+  @apply mt-12;
 }
 
 .weather-section-border {
@@ -277,18 +280,43 @@
   background: rgba(120, 53, 15, 0.12);
 }
 
-:where(.weather-panel > .weather-surface),
-:where(.weather-surface > .weather-surface) {
-  border-color: rgba(148, 163, 184, 0.10);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
-    rgba(12, 14, 18, 0.46);
+/* Depth de-escalation ---------------------------------------------------
+   A container nested inside another container must not out-weigh it, or
+   proximity and enclosure stop signalling grouping and every level reads as
+   a peer. Two things were wrong here:
+
+   1. These rules were wrapped in :where(), which zeroes specificity, so they
+      lost to `.weather-surface` (0,1,0) declared above and never applied at
+      all. Measured on /signals: a nested .weather-surface rendered with
+      --border-strong (0.19), elev-3 and an 18px backdrop blur inside a
+      .weather-panel that has no shadow at all — the child floated above its
+      own parent.
+   2. They used the child combinator, so any wrapper div between the two
+      containers (a grid, a space-y stack) defeated the match. Nesting in this
+      app is almost always through a wrapper, so descendant is the correct
+      relationship.
+
+   Only the depth cues are reset — shadow, blur, and the top-edge specular.
+   Border and background are deliberately left alone: those slots carry the
+   semantic tints (.weather-surface-amber, inline border-amber-400/20 and
+   friends), and resetting them here would silently flatten meaning into
+   decoration. Grouping comes from removing the float, not from bleaching. */
+:is(.weather-panel, .weather-surface, .weather-card)
+  :is(.weather-panel, .weather-surface, .weather-card) {
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-:where(.weather-panel > .weather-panel),
-:where(.weather-surface > .weather-panel) {
-  border-color: rgba(71, 85, 105, 0.12);
-  background: rgba(2, 6, 23, 0.20);
+/* Third level and deeper: a box inside a box inside a box is a list, so drop
+   the enclosure entirely and let spacing and type carry the structure. The
+   :not() guards keep semantically tinted leaves boxed, since for those the
+   border is the meaning. */
+:is(.weather-panel, .weather-surface, .weather-card)
+  :is(.weather-panel, .weather-surface, .weather-card)
+  :is(.weather-panel, .weather-surface, .weather-card):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+  border-color: transparent;
+  background: none;
 }
 
 .weather-quick-glance {

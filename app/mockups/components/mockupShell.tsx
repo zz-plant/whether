@@ -72,10 +72,7 @@ export function MockupShell({
               Visual Lab
             </p>
             <div className="space-y-1">
-              <h1
-                className="text-2xl font-semibold text-white sm:text-3xl"
-                style={{ fontFamily: "var(--weather-font-display)" }}
-              >
+              <h1 className="text-2xl font-semibold text-white sm:text-3xl">
                 {title}
               </h1>
               <p className="max-w-3xl text-sm leading-6 text-slate-300">{description}</p>

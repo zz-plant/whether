@@ -3,7 +3,6 @@ import { describe, it } from "bun:test";
 import {
   buildOperationsExecutionStepHref,
   resolveOperationsExecutionStepActionLabel,
-  resolveOperationsExecutionStepReturnLabel,
   resolveOperationsExecutionStepId,
   resolveOperationsExecutionStepIdFromLocation,
 } from "../app/operate/components/planningExecutionStepper";
@@ -43,7 +42,6 @@ describe("resolveOperationsExecutionStepId", () => {
   it("uses action labels that make the stepper feel navigable", () => {
     assert.equal(resolveOperationsExecutionStepActionLabel(true), "Current step");
     assert.equal(resolveOperationsExecutionStepActionLabel(false), "Open step");
-    assert.equal(resolveOperationsExecutionStepReturnLabel(), "Back to steps");
   });
 
   it("keeps canonical step ids when the hash already matches a step", () => {

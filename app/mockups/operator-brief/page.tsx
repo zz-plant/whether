@@ -126,10 +126,7 @@ export default async function OperatorBriefMockupPage({
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)]">
             <div className="rounded-lg border border-slate-700/70 bg-slate-900/72 p-5">
               <SectionLabel>Weekly operating call</SectionLabel>
-              <h1
-                className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]"
-                style={{ fontFamily: "var(--weather-font-display)" }}
-              >
+              <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]">
                 {weeklyCall.currentCall}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">

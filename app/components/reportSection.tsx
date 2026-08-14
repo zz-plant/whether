@@ -30,8 +30,13 @@ export function ReportSection({
   const HeadingTag = headingLevel || (variant === "unified" ? "h2" : "h4");
 
   if (variant === "split") {
+    // space-y-2, not -4: the header and the body below it are one section drawn
+    // as two boxes, so they have to sit closer to each other than the items
+    // inside the body (space-y-6) and far closer than the gap between whole
+    // sections (reportShell's space-y-10). Previously all three were 16-24px,
+    // which is why nothing on these pages chunked.
     return (
-      <section id={id} className="space-y-4 scroll-mt-28" aria-labelledby={headingId}>
+      <section id={id} className="space-y-2 scroll-mt-28" aria-labelledby={headingId}>
         {hideHeader ? (
           <HeadingTag id={headingId} className="sr-only">
             {title}

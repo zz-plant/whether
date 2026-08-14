@@ -1,8 +1,12 @@
-import { Users, DollarSign, Lock } from "lucide-react";
 import type { ActionStripItem } from "../../lib/report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
-const ICONS = [Users, DollarSign, Lock] as const;
+const STATE_TONE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
+  Closed: "text-semantic-tightening-fg",
+  Guarded: "text-semantic-caution-fg",
+  Staged: "text-semantic-unchanged-fg",
+  Open: "text-semantic-easing-fg",
+};
 
 export function ThreeWhethersCard({ items }: { items: ActionStripItem[] }) {
   const decisions = items.slice(0, 3);
@@ -10,31 +14,56 @@ export function ThreeWhethersCard({ items }: { items: ActionStripItem[] }) {
 
   return (
     <section className="weather-section" aria-labelledby="three-whethers-heading">
-      <div className="flex items-center justify-between mb-4">
-        <h3 id="three-whethers-heading" className="type-section text-white font-semibold tracking-tight">This week&apos;s bounded decisions</h3>
-        <span className="text-fluid-nano font-mono text-slate-400 uppercase tracking-wider">Canonical rules</span>
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <h3 id="three-whethers-heading" className="type-section font-semibold tracking-tight text-white">
+          This week&apos;s bounded decisions
+        </h3>
+        <span className="text-fluid-nano font-mono uppercase tracking-wider text-slate-400">Canonical rules</span>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {decisions.map((item, index) => {
-          const Icon = ICONS[index] ?? Lock;
-          return (
-            <article key={item.lever} className="weather-card relative overflow-hidden flex flex-col justify-between space-y-3">
-              <div className="weather-bar bg-sky-400" aria-hidden="true" />
-              <div className="space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 text-sky-400"><Icon className="w-4 h-4" aria-hidden="true" /></span>
-                  <h4 className="text-sm font-semibold text-white tracking-tight">{item.label}</h4>
-                </div>
-                <p className="text-fluid-xs text-slate-200 leading-relaxed">{item.areaActionNow}</p>
+
+      {/* A ledger, not a card grid: these are standing rules with a current state,
+          so they read down a shared column of conditions rather than as three
+          equal floating panels. Rows carry the state and distance the model
+          already computes — the previous layout dropped both for an icon. */}
+      <dl className="border-t border-slate-800/60">
+        {decisions.map((item) => (
+          <div
+            key={item.lever}
+            className="grid gap-x-6 gap-y-2 border-b border-slate-800/60 py-4 sm:grid-cols-[minmax(11rem,15rem)_minmax(0,1fr)]"
+          >
+            <div className="min-w-0">
+              <dt className="text-sm font-semibold tracking-tight text-white">{item.label}</dt>
+              {/* State only. tightenDistanceLabel is derived from the shared lane
+                  state, so it renders the same sentence on every lever — three
+                  identical copies of "Cash availability 0.0 pts to caution."
+                  reads as boilerplate rather than as data. */}
+              {item.currentStateLabel ? (
+                <p className={`mt-1 text-fluid-nano font-semibold ${STATE_TONE[item.currentStateLabel]}`}>
+                  {item.currentStateLabel}
+                </p>
+              ) : null}
+            </div>
+
+            <dd className="min-w-0 space-y-2">
+              <p className="text-fluid-xs leading-relaxed text-slate-200">{item.areaActionNow}</p>
+              <div className="space-y-1 text-fluid-nano text-slate-300">
+                <p className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="shrink-0 font-semibold text-slate-400">
+                    {DECISION_CONTRACT_LABELS.threshold.pauseIf}:
+                  </span>
+                  <span className="font-mono text-semantic-caution-fg">{item.triggerThreshold}</span>
+                </p>
+                <p className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="shrink-0 font-semibold text-slate-400">
+                    {DECISION_CONTRACT_LABELS.reversal.clearsWhen}:
+                  </span>
+                  <span className="font-mono text-semantic-easing-fg">{item.reversalCondition}</span>
+                </p>
               </div>
-              <dl className="pt-2.5 border-t border-slate-800/60 space-y-1.5 text-fluid-nano text-slate-300">
-                <div className="flex items-start gap-2"><dt className="font-semibold text-slate-400 shrink-0">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt><dd><code className="font-mono text-amber-300/90 break-words">{item.triggerThreshold}</code></dd></div>
-                <div className="flex items-start gap-2"><dt className="font-semibold text-slate-400 shrink-0">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt><dd><code className="font-mono text-rose-300/90 break-words">{item.reversalCondition}</code></dd></div>
-              </dl>
-            </article>
-          );
-        })}
-      </div>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

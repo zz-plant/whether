@@ -107,14 +107,11 @@ export const SignalsModeSwitcherSection = ({
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
           Depth
         </p>
+        {/* The paragraph that sat here restated both radio options, which carry
+            their own descriptions a few lines below. */}
         <h2 className="text-base font-semibold text-slate-100">
-          Read the short version first. Open deeper evidence only when you need to defend it.
+          Open the deeper view when you need to defend the call.
         </h2>
-        <p className="text-sm text-slate-300">
-          The short read tells you what changed, what it means this week, and what would make the
-          assessment wrong. The deeper view adds diagnostics, replay, and supporting checks only when
-          someone needs to see the evidence behind the recommendation.
-        </p>
       </div>
       <div
         role="radiogroup"
@@ -198,7 +195,19 @@ export const SignalsDecisionSummarySection = ({
   startItems: string[];
   stopItems: string[];
   topDiagnosticCallouts: Array<{ label: string; why: string }>;
-}) => (
+}) => {
+  // "Wrong if" (the guardrail threshold) and the "Hold or gate" list come from
+  // separate report fields that regularly carry the same sentence — this week
+  // both read "Over-engineering before demand proves out", printed twice within
+  // one screen. Drop the repeat from the list, which is the secondary of the
+  // two, unless that would empty it.
+  const normalize = (value: string) => value.trim().toLowerCase().replace(/\.$/, "");
+  const stopItemsWithoutTrigger = stopItems.filter(
+    (item) => normalize(item) !== normalize(triggerCondition),
+  );
+  const displayStopItems = stopItemsWithoutTrigger.length > 0 ? stopItemsWithoutTrigger : stopItems;
+
+  return (
   <section
     id="decision-summary"
     className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
@@ -224,10 +233,20 @@ export const SignalsDecisionSummarySection = ({
           <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             Main pressure
           </p>
-          <p className="mt-2 text-sm text-slate-200">
-            {topDiagnosticCallouts[0]?.why ??
-              "Review the scorecard below to confirm the main driver before you change posture."}
-          </p>
+          {topDiagnosticCallouts[0] ? (
+            <>
+              {/* Names the driver as well as describing it — this cell is now the
+                  only place the top mover appears. */}
+              <p className="mt-2 text-sm font-semibold text-slate-100">
+                {displaySignalLabel(topDiagnosticCallouts[0].label)}
+              </p>
+              <p className="mt-1 text-sm text-slate-200">{topDiagnosticCallouts[0].why}</p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-slate-200">
+              Review the scorecard below to confirm the main driver before you change posture.
+            </p>
+          )}
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
@@ -297,48 +316,18 @@ export const SignalsDecisionSummarySection = ({
         </p>
       </div>
     </div>
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
-      <article className="weather-surface space-y-3 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          Big picture
-        </p>
-        <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          {regimeLabel} is the current funding environment.
-        </h2>
-        <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Use this section to confirm that the weekly brief still fits the evidence. The sections
-           below show what changed, why it matters, and what would overturn the outlook.
-        </p>
-        <dl className="grid gap-3 rounded-md border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
-          <div>
-            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-              What to do
-            </dt>
-            <dd className="mt-1 text-xs text-slate-100">
-              Run this week&apos;s plan with the start, stop, and watch rules shown here.
-            </dd>
-          </div>
-          <div>
-            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-              If this is wrong
-            </dt>
-            <dd className="mt-1 text-xs text-slate-100">
-              You risk over-hiring or over-committing if funding conditions weaken faster than expected.
-            </dd>
-          </div>
-          <div>
-            <dt className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Check again
-            </dt>
-            <dd className="mt-1 text-xs text-slate-100">
-              At the next refresh, or sooner if a watch line breaks.
-            </dd>
-          </div>
-        </dl>
-        <p className="text-xs text-slate-300">
-          The main drivers and watch lines are below.
-        </p>
-      </article>
+    {/* The "Big picture" card that stood here held one data-driven line (the
+        regime headline, now promoted to this section heading) wrapped in four
+        blocks of copy that never changed with the data: a "the sections below
+        show..." preamble, a hardcoded What to do / If this is wrong / Check
+        again list, and a "the main drivers are below" sign-off. The list
+        restated the playbook card beside it and the Freshness cell above it,
+        and it printed identical text every week on a page whose entire job is
+        reporting what changed this week. */}
+    <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+      {regimeLabel} is the current funding environment.
+    </h2>
+    <div className="grid gap-4 lg:grid-cols-2">
       <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
           This week
@@ -361,7 +350,7 @@ export const SignalsDecisionSummarySection = ({
             Hold or gate
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
-            {stopItems.slice(0, 3).map((item) => (
+            {displayStopItems.slice(0, 3).map((item) => (
               <li key={item}>• {item}</li>
             ))}
           </ul>
@@ -371,31 +360,35 @@ export const SignalsDecisionSummarySection = ({
           markets are to risk, and whether interest rates are rising or falling.
         </p>
       </article>
-      <article className="weather-surface space-y-3 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          What moved most
-        </p>
-        <ul className="space-y-3" aria-label="Top mover callouts">
-          {topDiagnosticCallouts.map((item, index) => (
-            <li
-              key={item.label}
-              className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
-            >
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                Top mover {index + 1}
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
-              <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="text-xs text-slate-300">
-          The scorecards below show the watch line behind each mover.
-        </p>
-      </article>
+      {/* Starts at the second callout. The first one's `why` is already the
+          Main pressure cell in the summary above, word for word, so listing it
+          again here was the same sentence twice on one screen. Numbering keeps
+          its true rank so "Top mover 2" still means second. */}
+      {topDiagnosticCallouts.length > 1 ? (
+        <article className="weather-surface space-y-3 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+            Also moved
+          </p>
+          <ul className="space-y-3" aria-label="Top mover callouts">
+            {topDiagnosticCallouts.slice(1).map((item, index) => (
+              <li
+                key={item.label}
+                className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
+              >
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
+                  Top mover {index + 2}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
+                <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ) : null}
     </div>
   </section>
-);
+  );
+};
 
 export const SignalsCurrentScoresSection = ({
   scoreCardsByType,

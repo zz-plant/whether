@@ -60,13 +60,6 @@ const REGIME_BOUNDARIES: Record<RegimeKey, { label: string; threshold: number; c
   EXPANSION: { label: "Expansion", threshold: 45, color: "emerald" },
 };
 
-const formatCompactTrust = (label: string | undefined, degradedCount?: number, showOfflineBadge?: boolean) => {
-  if (label) return label;
-  if (showOfflineBadge) return "Snapshot";
-  if (degradedCount && degradedCount > 0) return `${degradedCount} cached`;
-  return "Live";
-};
-
 export function DecisionHero({
   tightness,
   tightnessDelta,
@@ -239,7 +232,7 @@ export function DecisionHero({
             <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
             <h2
               id="weekly-call-title"
-              className="max-w-3xl text-pretty font-display text-display leading-[1.15] text-white"
+              className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
             >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
@@ -355,13 +348,13 @@ export function DecisionHero({
         <div className="">
           <SignalWaterfall data={signalData ?? {}}>
             <div className="inline-flex items-baseline justify-center gap-1">
-              <span className="font-display text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">
+              <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">
                 {boldnessScore}
               </span>
               <span className="text-fluid-xs font-semibold text-white/40">/100</span>
             </div>
           </SignalWaterfall>
-          <div className={`mt-2 flex items-center justify-center gap-1.5 font-display text-base font-bold tabular-nums ${
+          <div className={`mt-2 flex items-center justify-center gap-1.5 text-base font-bold tabular-nums ${
             boldnessDelta > 0 ? "text-emerald-300"
             : boldnessDelta < 0 ? "text-rose-300"
             : "text-slate-400"
@@ -387,38 +380,3 @@ export function DecisionHero({
     </section>
   );
 }
-
-// Compose a compact trust badge from a live signal (used on hero) and
-// on the trust page, with a "data as of" + confidence line.
-// The trust badge stays compact — one line showing freshness, confidence,
-// and source mode, not a separate summary card.
-const CompactTrustBadge = ({
-  confidenceLabel,
-  trustStatusLabel,
-  sourceNode,
-  recordDate,
-  showOfflineBadge,
-  degradedCount,
-}: {
-  confidenceLabel?: string;
-  trustStatusLabel?: string;
-  sourceNode?: string;
-  recordDate?: string;
-  showOfflineBadge?: boolean;
-  degradedCount?: number;
-}) => {
-  const statusLine = formatCompactTrust(trustStatusLabel, degradedCount, showOfflineBadge);
-  return (
-    <span className="inline-flex items-center gap-1.5 text-fluid-micro">
-      <span className={`size-1.5 rounded-full ${confidenceLabel === "HIGH" ? "bg-emerald-400/80" : confidenceLabel === "MED" ? "bg-amber-400/80" : "bg-rose-400/80"}`} aria-hidden="true" />
-      <span className={confidenceLabel === "HIGH" ? "text-emerald-300" : confidenceLabel === "MED" ? "text-amber-300" : "text-rose-300"}>
-        {confidenceLabel}
-      </span>
-      <span className="text-white/40">·</span>
-      <span className="text-white/50">{sourceNode ?? "FRED"}</span>
-      <span className="text-white/40">·</span>
-      <span className="text-white/50">{recordDate}</span>
-      {statusLine ? <span className="text-white/50">· {statusLine}</span> : null}
-    </span>
-  );
-};
