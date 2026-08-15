@@ -15,6 +15,8 @@ import type { PostureArchivePeriod, PostureArchiveRegimeShare } from "../lib/sum
 const OUTPUT_PATH = new URL("../data/posture_archive_index.json", import.meta.url);
 /** Tiny companion file so client bundles can link the archive without the full index. */
 const YEARS_OUTPUT_PATH = new URL("../data/posture_archive_years.json", import.meta.url);
+/** Minimal chart data for the OG renderer, which must not bundle the full index. */
+const OG_TIMELINE_OUTPUT_PATH = new URL("../data/posture_og_timeline.json", import.meta.url);
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
 
@@ -232,7 +234,17 @@ const years = periods
   .map((period) => ({ slug: period.slug, title: period.title, operatorLabel: period.operatorLabel }));
 await writeFile(YEARS_OUTPUT_PATH, `${JSON.stringify(years, null, 2)}\n`, "utf8");
 
+const ogTimeline = periods
+  .filter((period) => period.kind === "quarter")
+  .sort((a, b) => a.asOf.localeCompare(b.asOf))
+  .map((period) => ({
+    label: period.title,
+    regime: period.regime,
+    intensity: Math.max(0.35, (period.regimeMix[0]?.share ?? 50) / 100),
+  }));
+await writeFile(OG_TIMELINE_OUTPUT_PATH, `${JSON.stringify(ogTimeline, null, 2)}\n`, "utf8");
+
 const quarterCount = periods.filter((period) => period.kind === "quarter").length;
 console.log(
-  `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly) to data/posture_archive_index.json`,
+  `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly) and compact OG timeline data`,
 );
