@@ -73,10 +73,13 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Do not add synonyms (outlook/conditions) for the forward estimate. The command bar's
   "{regime} outlook" chip is a pass-through descriptor of current conditions, not a
   forecast synonym.
-- **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
-  (`lib/report/reportCopy.ts`): imperative forms on screens (Do now / Pause if / Change
-  course if), noun slots in exports (Action / Threshold / Reversal). Consume the export
-  instead of hardcoding slot words in new components.
+- **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS` and
+  `ACTION_STRIP_DISPLAY_COPY`** (`lib/report/reportCopy.ts`): general imperative forms on
+  screens are Do now / Pause if / Change course if; the homepage scan ledger uses Do now /
+  Stop or tighten if / Open up again when. Noun slots in exports remain Action / Threshold /
+  Reversal. Consume these exports instead of hardcoding slot words in components. The homepage
+  ledger also translates structured lane states into actions: Keep this closed / Proceed with
+  guardrails / Stage the next move / Move ahead now.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
   shareable, and metadata surfaces must not print "Whether Report".
