@@ -20,20 +20,44 @@ const regimeProbabilityTone = {
   Expansion: "bg-emerald-400/80 text-emerald-950",
 } as const;
 
+const REGIME_PATH_ORDER = ["Scarcity", "Defensive", "Mixed", "Expansion"] as const;
+
 function RegimeProbabilityStrip({
   transitionProbabilities,
-}: Pick<DiagnosticsSectionProps, "transitionProbabilities">) {
-  const orderedStates = (["Scarcity", "Defensive", "Mixed", "Expansion"] as const).map((label) => ({
+  currentStateLabel,
+}: Pick<DiagnosticsSectionProps, "transitionProbabilities"> & { currentStateLabel?: string }) {
+  const orderedStates = REGIME_PATH_ORDER.map((label) => ({
     label,
     value: Math.max(0, transitionProbabilities[label] ?? 0),
   }));
   const total = orderedStates.reduce((sum, state) => sum + state.value, 0) || 1;
   const leadingState = orderedStates.reduce((highest, state) => (state.value > highest.value ? state : highest), orderedStates[0]);
 
+  // The strip is ordered tightest → loosest, so "where am I on it" decides
+  // whether the probability mass sits toward tighter or looser conditions.
+  // Without a current marker the bar showed magnitudes with no origin.
+  const currentIndex = REGIME_PATH_ORDER.findIndex(
+    (label) => label.toLowerCase() === (currentStateLabel ?? "").trim().toLowerCase(),
+  );
+  const tighterShare = currentIndex > 0
+    ? orderedStates.slice(0, currentIndex).reduce((sum, state) => sum + state.value, 0) / total
+    : null;
+  const looserShare = currentIndex >= 0 && currentIndex < orderedStates.length - 1
+    ? orderedStates.slice(currentIndex + 1).reduce((sum, state) => sum + state.value, 0) / total
+    : null;
+
+  const driftLine = tighterShare === null && looserShare === null
+    ? null
+    : (looserShare ?? 0) > (tighterShare ?? 0)
+      ? `Drift is toward looser conditions (${formatProbabilityPercent(looserShare ?? 0)} looser vs ${formatProbabilityPercent(tighterShare ?? 0)} tighter).`
+      : (tighterShare ?? 0) > (looserShare ?? 0)
+        ? `Drift is toward tighter conditions (${formatProbabilityPercent(tighterShare ?? 0)} tighter vs ${formatProbabilityPercent(looserShare ?? 0)} looser).`
+        : "Drift is balanced between tighter and looser conditions.";
+
   return (
     <article className="mt-2 border-t border-slate-800/50 pt-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className={`text-xs ${neutralLabel}`}>Possible paths</p>
+        <p className={`text-xs ${neutralLabel}`}>Possible paths · tightest to loosest</p>
         <p className="text-fluid-xs text-slate-400">Most likely: {leadingState.label} {formatProbabilityPercent(leadingState.value)}</p>
       </div>
       <div className="mt-2 flex h-3 overflow-hidden rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
@@ -45,13 +69,27 @@ function RegimeProbabilityStrip({
           />
         ))}
       </div>
+      {driftLine ? <p className="mt-1.5 text-fluid-xs text-slate-300">{driftLine}</p> : null}
       <ul className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
-        {orderedStates.map((state) => (
-          <li key={state.label} className="flex items-center justify-between gap-2 rounded-lg border border-slate-800/70 bg-slate-950/40 px-2.5 py-2">
-            <span>{state.label}</span>
-            <span className="font-semibold text-slate-100">{formatProbabilityPercent(state.value)}</span>
-          </li>
-        ))}
+        {orderedStates.map((state, index) => {
+          const isCurrent = index === currentIndex;
+          return (
+            <li
+              key={state.label}
+              className={`flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 ${
+                isCurrent
+                  ? "border-sky-400/70 bg-sky-500/10"
+                  : "border-slate-800/70 bg-slate-950/40"
+              }`}
+            >
+              <span>
+                {state.label}
+                {isCurrent ? <span className="ml-1.5 text-sky-200">· now</span> : null}
+              </span>
+              <span className="font-semibold text-slate-100">{formatProbabilityPercent(state.value)}</span>
+            </li>
+          );
+        })}
       </ul>
     </article>
   );
@@ -70,6 +108,7 @@ export function DiagnosticsSection({
   transitionProbabilities,
   failureModes,
   sinceLastReview,
+  statusLabel,
 }: DiagnosticsSectionProps) {
   const changedItems = sinceLastReview?.items ?? [];
   const firstDelta = changedItems[0]?.detail ?? weeklyMemoLines.find((line) => line.trim().length > 0) ?? immediateDecision;
@@ -109,7 +148,10 @@ export function DiagnosticsSection({
             <Accordion.Panel className={disclosurePanelClass}>
               <article className="py-1"><p className={`text-xs ${neutralLabel}`}>Evidence</p><ul className="mt-1 space-y-1 text-xs text-slate-200">{evidenceItems.map((item) => <li key={item.key}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>)}</ul></article>
               <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>Drivers</p><p className="mt-1 text-xs text-slate-300">Top contributors: {topContributors}</p><p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary.replace(/\.$/, "")}</p></article>
-              <RegimeProbabilityStrip transitionProbabilities={transitionProbabilities} />
+              <RegimeProbabilityStrip
+                transitionProbabilities={transitionProbabilities}
+                currentStateLabel={statusLabel}
+              />
               {failureModes.length > 0 ? <article className="mt-2 border-t border-slate-800/50 pt-2"><p className={`text-xs ${neutralLabel}`}>False-signal warnings</p><ul className="mt-1 space-y-1 text-xs text-slate-300">{failureModes.slice(0, 2).map((mode) => <li key={mode.id}>• {mode.warning}</li>)}</ul></article> : null}
             </Accordion.Panel>
           </Accordion.Item>

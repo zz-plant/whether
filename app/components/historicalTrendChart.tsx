@@ -1,4 +1,5 @@
 import { buildSparklinePath, rangeLabel, sparklineDomain } from "./ui/sparkline";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
 type TrendPoint = { date: string; value: number };
 
@@ -30,9 +31,7 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
   const currentVal = points[points.length - 1].value;
   const firstVal = points[0].value;
   const delta = currentVal - firstVal;
-  const improved = increaseIsPositive ? delta > 0 : delta < 0;
-  const deltaArrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
-  const deltaColor = delta === 0 ? "text-slate-400" : improved ? "text-emerald-200" : "text-amber-200";
+  const direction = trendDirectionFromDelta(delta);
 
   return (
     <div className="flex flex-col gap-1">
@@ -40,8 +39,19 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
         <span className="type-eyebrow">{label}</span>
         <span className="text-fluid-xs font-semibold tabular-nums text-slate-300">
           {currentVal}
-          <span className={`${deltaColor} ml-1`}>
-            {deltaArrow}{Math.abs(delta).toFixed(0)}
+          <span
+            className={`ml-1 inline-flex items-center gap-0.5 align-baseline ${trendToneClass(direction, increaseIsPositive)}`}
+          >
+            <TrendGlyph direction={direction} className="h-3 w-3" />
+            <span aria-hidden="true">{Math.abs(delta).toFixed(0)}</span>
+            <span className="sr-only">
+              {describeTrend({
+                label,
+                delta,
+                current: currentVal,
+                period: `over ${points.length} periods`,
+              })}
+            </span>
           </span>
         </span>
       </div>

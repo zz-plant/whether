@@ -9,6 +9,7 @@ import { REGIME_COLORS, REGIME_DISPLAY } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
 import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";
 import { buildBoldnessScore } from "../../lib/report/weeklyLeadershipBrief";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import { useClipboardCopy } from "./useClipboardCopy";
 
 type RegimeHistoryEntry = {
@@ -74,6 +75,18 @@ export function RegimeHistory({ regimes }: Props) {
     (regime) => REGIME_COLORS[regime],
   );
 
+  // Direction across the visible window. The bars carry level; without this the
+  // chart never states whether the series ends higher or lower than it started.
+  const boldnessAt = (entry: RegimeHistoryEntry) =>
+    entry.tightness != null && entry.riskAppetite != null
+      ? buildBoldnessScore(entry.tightness, entry.riskAppetite)
+      : null;
+  const firstBoldness = boldnessAt(regimes[0]);
+  const lastBoldness = boldnessAt(regimes[regimes.length - 1]);
+  const windowDelta =
+    firstBoldness !== null && lastBoldness !== null ? lastBoldness - firstBoldness : null;
+  const windowDirection = trendDirectionFromDelta(windowDelta);
+
   return (
     <div className="weather-card">
       <div className="flex items-center justify-between mb-2">
@@ -110,10 +123,40 @@ export function RegimeHistory({ regimes }: Props) {
         ) : null}
       </div>
 
-      {/* Carries the scale rather than restating the heading above it. */}
-      <p className="text-fluid-nano text-white/40 mb-2">Boldness score · 0–100</p>
+      {/* Carries the scale rather than restating the heading above it, plus the
+          direction across the window — the bars show level, and nothing else
+          here said whether the series ends above or below where it started. */}
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <p className="text-fluid-nano text-white/40">Boldness score · 0–100 · midline = 50</p>
+        {windowDelta !== null ? (
+          <p
+            className={`inline-flex items-center gap-1 text-fluid-nano font-medium ${trendToneClass(windowDirection, true)}`}
+          >
+            <TrendGlyph direction={windowDirection} className="h-3 w-3 shrink-0" />
+            <span aria-hidden="true">
+              {firstBoldness} → {lastBoldness} across window
+            </span>
+            <span className="sr-only">
+              {describeTrend({
+                label: "Boldness score",
+                delta: windowDelta,
+                current: lastBoldness ?? undefined,
+                period: `across the ${regimes.length}-month window`,
+              })}
+            </span>
+          </p>
+        ) : null}
+      </div>
       <div className="relative flex h-14 items-end gap-1 overflow-x-auto">
+        {/* The 50 line is the neutral reference the bars are read against, so it
+            gets a label; unlabelled it read as decoration. */}
         <div className="absolute left-0 right-0 top-1/2 h-px bg-white/[0.06]" aria-hidden="true" />
+        <span
+          className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--bg-panel)] pr-1 text-fluid-nano leading-none text-white/30"
+          aria-hidden="true"
+        >
+          50
+        </span>
         {regimes.map((entry, i) => {
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
           const selected = isSelectedEntry(entry);

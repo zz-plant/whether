@@ -304,11 +304,45 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-4">
             <PanelTitle title="4) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread (monthly)." />
-            <svg viewBox="0 0 100 72" className="h-48 w-full" role="img" aria-label="Monthly steepness vs level scatter">
+            <svg
+              viewBox="0 0 100 72"
+              className="h-48 w-full"
+              role="img"
+              aria-label={
+                monthlyScatter.length >= 2
+                  ? `Monthly steepness vs level, ${monthlyScatter.length} months tracing from ${monthlyScatter[0].key} to ${monthlyScatter[monthlyScatter.length - 1].key}. Arrows follow the direction of travel.`
+                  : "Monthly steepness vs level scatter"
+              }
+            >
               <rect x="0" y="0" width="100" height="72" fill="rgb(2 6 23)" />
               {inDomain(0, rateMin, rateMax) ? <line x1={toChartX(0, rateMin, rateMax, 100)} y1="0" x2={toChartX(0, rateMin, rateMax, 100)} y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
               {inDomain(0, spreadMin, spreadMax) ? <line x1="0" y1={toChartY(0, spreadMin, spreadMax, 72)} x2="100" y2={toChartY(0, spreadMin, spreadMax, 72)} stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
-              {scatterPath ? <path d={scatterPath} fill="none" stroke="rgb(56 189 248 / 0.28)" strokeWidth="0.8" /> : null}
+              {/* Arrowheads along the path. Opacity fade plus a "latest" label
+                  told you which end was now, but nothing showed the direction of
+                  travel through the middle of the trail. */}
+              <defs>
+                <marker
+                  id="scatter-direction-arrow"
+                  viewBox="0 0 8 8"
+                  refX="4"
+                  refY="4"
+                  markerWidth="4"
+                  markerHeight="4"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="rgb(56 189 248 / 0.55)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </marker>
+              </defs>
+              {scatterPath ? (
+                <path
+                  d={scatterPath}
+                  fill="none"
+                  stroke="rgb(56 189 248 / 0.28)"
+                  strokeWidth="0.8"
+                  markerMid="url(#scatter-direction-arrow)"
+                  markerEnd="url(#scatter-direction-arrow)"
+                />
+              ) : null}
               {monthlyScatter.map((point, index) => {
                 const x = toChartX(point.x, rateMin, rateMax, 100);
                 const y = toChartY(point.y, spreadMin, spreadMax, 72);
@@ -339,7 +373,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 </text>
               ) : null}
             </svg>
-            <p className="text-fluid-xs text-slate-400">Older months fade back; the path shows direction, not just position.</p>
+            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">

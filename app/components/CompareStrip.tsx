@@ -4,6 +4,56 @@ import { useEffect, useId, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { REGIME_DISPLAY, REGIME_COLORS } from "../viewModel";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
+
+/**
+ * One chip per metric, coloured by whether the move was favourable *for that
+ * metric* rather than by its raw sign. These two chips sit side by side and
+ * move in opposite directions for the same news — cash availability rising is
+ * bad, risk appetite rising is good — so hard-coding "up is green" put two
+ * contradictory colour rules next to each other with nothing explaining them.
+ */
+function DeltaChip({
+  label,
+  delta,
+  increaseIsPositive,
+  unit = "pts",
+}: {
+  label: string;
+  delta: number | null | undefined;
+  increaseIsPositive: boolean;
+  unit?: string;
+}) {
+  const direction = trendDirectionFromDelta(delta);
+  const notable = typeof delta === "number" && Math.abs(delta) >= 3;
+
+  if (direction === "flat" || delta == null) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-white/60">
+        <TrendGlyph direction="flat" className="h-3 w-3 shrink-0" />
+        <span aria-hidden="true">{label}: unchanged</span>
+        <span className="sr-only">{describeTrend({ label, delta: 0 })}</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 ${trendToneClass(direction, increaseIsPositive)}`}
+    >
+      <TrendGlyph direction={direction} className="h-3 w-3 shrink-0" />
+      <span aria-hidden="true">
+        {label}: {delta > 0 ? "+" : "−"}
+        {Math.abs(delta).toFixed(1)} {unit}
+        {notable ? " · notable shift" : ""}
+      </span>
+      <span className="sr-only">
+        {describeTrend({ label, delta, unit })}
+        {notable ? " Notable shift." : ""}
+      </span>
+    </span>
+  );
+}
 
 export function CompareStrip({
   currentRegime,
@@ -43,6 +93,13 @@ export function CompareStrip({
 
   if (!previous) return null;
 
+  // Reconstructed from the deltas so both columns can state a level.
+  const previousTightness = tightnessDelta != null ? currentTightness - tightnessDelta : null;
+  const previousRiskAppetite =
+    typeof riskAppetite === "number" && typeof riskAppetiteDelta === "number"
+      ? riskAppetite - riskAppetiteDelta
+      : null;
+
   return (
     <div className="weather-section-border">
       {/* Reveals static content, so it's a disclosure like the evidence drawer —
@@ -63,12 +120,27 @@ export function CompareStrip({
 
       {isComparing ? (
         <div id={panelId} className="mt-4 grid gap-4 sm:grid-cols-2">
+          {/* Both columns carry the same rows. Previously only "Current" showed
+              numbers, so the panel asked the reader to diff against a blank. */}
           <div className="space-y-1">
             <p className="text-fluid-nano text-white/40">Previous</p>
-            <div className="flex items-center gap-2">
-              <span className={`size-2 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
-              <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[previous.regime] ?? previous.regime}</span>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <span className={`size-2 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
+                <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[previous.regime] ?? previous.regime}</span>
+              </span>
+              {previousTightness !== null ? (
+                <span className="text-fluid-nano text-white/50 font-mono">{previousTightness.toFixed(0)} pts</span>
+              ) : null}
             </div>
+            {typeof riskAppetite === "number" ? (
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-fluid-sm text-white/70 font-medium">Risk appetite</span>
+                <span className="text-fluid-nano text-white/50 font-mono">
+                  {previousRiskAppetite !== null ? `${previousRiskAppetite.toFixed(0)}/100` : "—"}
+                </span>
+              </div>
+            ) : null}
             <p className="text-fluid-nano text-white/40">{previous.recordDate}</p>
           </div>
 
@@ -100,23 +172,11 @@ export function CompareStrip({
               Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
             </span>
           ) : null}
-          {tightnessDelta != null && tightnessDelta !== 0 ? (
-            <span className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 ${tightnessDelta > 0 ? "bg-amber-500/10 text-amber-300" : "bg-emerald-500/10 text-emerald-300"}`}>
-              Cash availability: {tightnessDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(tightnessDelta).toFixed(1)} pts {Math.abs(tightnessDelta) >= 3 ? "· notable shift" : ""}
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-white/60">
-              Cash availability: → unchanged
-            </span>
-          )}
-          {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
-            <span className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 ${riskAppetiteDelta > 0 ? "bg-emerald-500/10 text-emerald-300" : "bg-rose-500/10 text-rose-300"}`}>
-              Risk appetite: {riskAppetiteDelta > 0 ? "↑ +" : "↓ -"}{Math.abs(riskAppetiteDelta).toFixed(1)} pts {Math.abs(riskAppetiteDelta) >= 3 ? "· notable shift" : ""}
-            </span>
-          ) : typeof riskAppetite === "number" ? (
-            <span className="inline-flex items-center gap-1.5 rounded-sm bg-white/[0.04] px-2 py-0.5 text-white/60">
-              Risk appetite: → unchanged
-            </span>
+          {/* Cash availability rises when capital gets scarcer, so a rise is the
+              unfavourable direction; risk appetite is the other way round. */}
+          <DeltaChip label="Cash availability" delta={tightnessDelta} increaseIsPositive={false} />
+          {typeof riskAppetite === "number" ? (
+            <DeltaChip label="Risk appetite" delta={riskAppetiteDelta} increaseIsPositive />
           ) : null}
         </div>
       ) : null}

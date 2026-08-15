@@ -5,16 +5,28 @@ import { useSearchParams } from "next/navigation";
 import { Copy, CopyCheck, ImageIcon } from "lucide-react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
+import { TrendGlyph, trendDirectionFromDelta, trendToneClass, type TrendDirection } from "./illustrations/TrendGlyph";
+import { DIRECTION_ARROW, DIRECTION_LABEL, type SignalDirection } from "../viewModel";
 
 type Props = {
   call: string;
-  arrow: string;
+  /** Weekly posture direction. Names the movement; the glyph is drawn from it. */
+  direction: SignalDirection;
   boldnessScore: number;
   boldnessDelta: number;
   shareLines?: string[];
 };
 
-export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, shareLines }: Props) {
+/** The badge is the only place the weekly direction appears once scrolled, so it
+ *  states the direction in words rather than leaving a bare arrow character for
+ *  a screen reader to announce as "upwards arrow". */
+const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: string }> = {
+  tighten: { glyph: "up", tone: "bg-rose-500/20 text-rose-300 border border-rose-500/30" },
+  ease: { glyph: "down", tone: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
+  hold: { glyph: "flat", tone: "bg-sky-500/20 text-sky-300 border border-sky-500/30" },
+};
+
+export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta, shareLines }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
@@ -27,7 +39,9 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, sha
   const deltaLabel = boldnessDelta !== 0
     ? `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`
     : "unchanged";
-  const deltaColor = boldnessDelta > 0 ? "text-emerald-300" : boldnessDelta < 0 ? "text-rose-300" : "text-white/60";
+  // Boldness rising is the favourable direction, so it resolves through the
+  // shared delta palette rather than a local emerald/rose pair.
+  const deltaColor = trendToneClass(trendDirectionFromDelta(boldnessDelta), true);
 
   useEffect(() => {
     let blockingControlInView = false;
@@ -69,7 +83,9 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, sha
   const handleCopy = async () => {
     const text = [
       `Whether · Boldness budget ${boldnessScore}/100 (${deltaLabel})`,
-      `${arrow} ${call}`,
+      // Plain-text artifact, so the compact glyph is right here — sourced from
+      // the shared map rather than re-derived.
+      `${DIRECTION_ARROW[direction]} ${call}`,
       ...(shareLines ?? []),
       "whether.work",
     ].filter(Boolean).join(" — ");
@@ -89,9 +105,12 @@ export function StickyCallStrip({ call, arrow, boldnessScore, boldnessDelta, sha
         >
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-slate-800/90 bg-slate-900/95 px-3 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl lg:max-w-md lg:shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
-              <span className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold shadow-inner ${
-                arrow === "↑" ? "bg-rose-500/20 text-rose-300 border border-rose-500/30" : arrow === "↓" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-sky-500/20 text-sky-300 border border-sky-500/30"
-              }`}>{arrow}</span>
+              <span
+                className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold shadow-inner ${DIRECTION_BADGE[direction].tone}`}
+              >
+                <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
+                <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
+              </span>
               <span className="text-slate-400 font-mono text-xs">{boldnessScore}/100</span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
