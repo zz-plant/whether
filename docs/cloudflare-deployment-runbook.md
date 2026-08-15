@@ -34,12 +34,16 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 - Generic Vinext commands still route through [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs)
 - Cloudflare-targeted build/deploy commands route through [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs)
 
-`deploy:cloudflare` builds against the top-level Wrangler config and then runs `vinext deploy --skip-build`, so the build artifact and deploy target stay on the same environment contract.
+`deploy:cloudflare` builds against the top-level Wrangler config and then runs the dedicated `@vinext/cloudflare deploy --skip-build` CLI, so the build artifact and deploy target stay on the same environment contract without relying on Vinext's deprecated deploy compatibility shim.
+
+The dry-run commands are intentionally stronger than the adapter's native `--dry-run`. They first build the selected environment and then run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only checking that the Vinext scaffold exists.
+
+Upgrade Guardrails runs this production dry run on every pull request, so deploy packaging remains a mechanical gate rather than a manual-only check.
 
 ### Current toolchain notes
 
 - Tailwind now runs on v4 via [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) and [`postcss.config.js`](/Users/kanav/Documents/GitHub/whether-app/postcss.config.js) using `@tailwindcss/postcss`; the legacy `tailwind.config.ts` file was removed during the CSS-first migration.
-- Keep `vinext` pinned to `0.0.41`. This repo still repairs Bun's incomplete Vinext install during [`postinstall`](https://docs.npmjs.com/cli/v10/using-npm/scripts#life-cycle-scripts) via [`scripts/repair-vinext-install.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/repair-vinext-install.mjs), which restores missing `dist/` runtime files from the published tarball before build/deploy commands run.
+- Keep `vinext` and `@vinext/cloudflare` on the same pinned release (currently `0.2.1`). This repo still verifies Bun's Vinext install during `postinstall` via [`scripts/repair-vinext-install.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/repair-vinext-install.mjs) before build/deploy commands run.
 - Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
 - Root layout fonts now load from CSS in [`app/globals.css`](/Users/kanav/Documents/GitHub/whether-app/app/globals.css) instead of `next/font/google` in [`app/layout.tsx`](/Users/kanav/Documents/GitHub/whether-app/app/layout.tsx), which removes the last repo-local compatibility gap on the active Vinext lane.
 
