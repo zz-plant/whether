@@ -212,7 +212,7 @@ Implementation guardrails:
 - Citation + provenance belong near the lower fold: `Cite this call` stays separate from the share-action rail, and compact provenance remains immediately after the weekly card on `/`.
 - Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
 - The homepage should make the primary audience assumption explicit without adding a second explainer block: Whether defaults to U.S.-based operators and a U.S. market baseline, while still telling the operator to pressure-test the call against company-specific data.
-- Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.
+- Rendering tests should verify that `data-testid="weekly-top-fold"` remains inside the decision hero and that the homepage does not restore a competing sticky history rail.
 
 ## Slack screenshot card contract
 This card is the dissemination mechanism and must stand alone when pasted into Slack.
@@ -341,25 +341,26 @@ Drift guardrails:
 - Reversal language should remain trigger-based (clear condition + resume rule), not narrative advice.
 - If mode copy changes, update both the bounded rules source and this contract in the same PR.
 
-## Homepage consolidation notes (2026-08-01)
+## Homepage consolidation notes (2026-08-15)
 
 The homepage now renders one dominant weekly decision block instead of several equal-weight posture cards, per the `lg:grid-cols-12` single-card guardrail.
 
 - **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` and regime-transition probability now render as a compact `Flip watch:` line inside `DecisionHero`. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
-- **Top fold no longer repeats the windows grid.** `WeeklyTopFoldContract` kept `Posture shift`, `Revisit`, `Watch`, and the memory rail, and dropped the `Hiring / Expansion / Fundraising` window grid that duplicated the `ThreeWhethersCard` verdicts.
+- **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
+- **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Boldness Budget, delta, and pause/reversal conditions remain visible.
+- **History no longer competes in a sticky rail.** Regime history, subscription, and the citable permalink now sit in a lower continuity-and-delivery section after the operating workflow.
 
 ## Controls & nav pass (2026-08-11)
 
 Compressed the shell chrome and unified control vocabulary on `/`.
 
-- **View switcher is a select, not five segments.** Interpretation views are an optional
-  translation layer; `ViewSelector` now renders as one compact `View: … ▾` select that highlights
-  only when a non-default view is active. It also gained a home on the sub-`lg` cadence rail
-  (previously mobile users could never reach views).
-- **One header band on `lg+` home.** Brand · nav · cadence · view · icons in a single row;
-  below `lg`, cadence + view drop to a second rail; below `md` the nav collapses to the drawer
-  trigger. Report sub-routes keep the two-band layout with the next-step CTA.
+- **Interpretation controls follow the call.** `ViewSelector` and company stage selection now live
+  together behind `Interpret this call for your company` below the weekly decision modules rather
+  than competing with current conditions in the header or hero.
+- **One header band on `lg+` home.** Brand · nav · cadence · icons stay in a single row;
+  below `lg`, cadence drops to a second rail; below `md` the nav collapses to the drawer trigger.
+  Report sub-routes keep the two-band layout with the next-step CTA.
 - **Nav de-glowed.** Active links lost the glow shadow and status dot (filled state carries it);
   the mobile drawer trigger swapped its pulsing dot + glow for a menu icon — it read as a status
   chip, not a button. No perpetual motion remains in the header.

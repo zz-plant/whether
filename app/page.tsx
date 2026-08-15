@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
-import { STEADY_WEEK_CONSEQUENCE, STEADY_WEEK_LABEL } from "../lib/report/reportCopy";
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/publishedBriefs";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
@@ -19,6 +18,8 @@ import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { FreshnessDot } from "./components/FreshnessDot";
+import { StageSwitcher } from "./components/StageSwitcher";
+import { ViewSelector } from "./components/cadenceSelector";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import dynamic from "next/dynamic";
@@ -28,7 +29,6 @@ import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
   DIRECTION_ARROW,
-  REGIME_DISPLAY,
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
@@ -110,93 +110,6 @@ function CanonicalWeekPermalink() {
       <ActionLink href={buildPublishedBriefPath(latestPublishedBrief.slug)} variant="pill">
         Citable permalink
       </ActionLink>
-    </section>
-  );
-}
-
-function compactSentence(value: string | undefined, maxLength = 132) {
-  if (!value) return "";
-  const normalized = value.replace(/\s+/g, " ").trim();
-  if (normalized.length <= maxLength) return normalized;
-
-  return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
-}
-
-function WeeklyTopFoldContract({
-  model,
-  memoryRegimes,
-}: {
-  model: Awaited<ReturnType<typeof loadHomePageAssembly>>["homepage"]["weeklyDecisionCardModel"];
-  memoryRegimes: Array<{ record_date: string; regime: string }>;
-}) {
-  const weeklySummary = model.decision.weeklyLeadershipSummary;
-  const memoryRailItems = model.history.memoryRail.slice(-4).map((item) => item.posture);
-  const memoryFallbackItems = memoryRegimes.slice(-4).map((item) => item.regime);
-  const rawItems = (memoryRailItems.length >= 4 ? memoryRailItems : memoryFallbackItems).slice(-4);
-  const memoryItems = rawItems.map((label) => REGIME_DISPLAY[label] ?? label ?? "—");
-  const isSteadyWeek = weeklySummary.steadyWeek;
-  const shouldRevisit = model.decision.revisitDecisions;
-  const revisitQueue = model.decision.revisitQueue.slice(0, 3);
-  // One signal can queue up to three areas, so the driver sentence is identical
-  // across items more often than not. Hoist it when it is shared; otherwise each
-  // item carries its own composed reason.
-  const revisitDrivers = [...new Set(revisitQueue.map((item) => item.driver).filter(Boolean))];
-  const sharedDriver = revisitDrivers.length === 1 ? revisitDrivers[0] : null;
-
-   return (
-    <section
-      data-testid="weekly-top-fold"
-      aria-label="Weekly posture delta and revisit queue"
-      className="weather-section-border rounded-xl border border-slate-800/70 bg-slate-950/40 p-4 grid gap-4 md:grid-cols-12 md:items-start backdrop-blur-sm"
-    >
-      <div className="space-y-2 md:col-span-5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-micro font-mono type-eyebrow">Weekly Posture Delta</p>
-          <span className="text-fluid-micro font-medium text-sky-300/90">
-            {isSteadyWeek ? STEADY_WEEK_LABEL : weeklySummary.notchShiftLabel}
-          </span>
-        </div>
-        {isSteadyWeek ? (
-          <p className="text-fluid-xs text-slate-300">{STEADY_WEEK_CONSEQUENCE}</p>
-        ) : null}
-        {memoryItems.length ? (
-          <div className="rounded-md border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-fluid-xs text-white/60">
-            <span className="block text-[10px] font-mono uppercase text-slate-400 mb-0.5">Last 4 weeks · posture</span>
-            <span className="font-mono text-slate-200">{memoryItems.join(" → ")}</span>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="space-y-2 md:col-span-7 border-t border-slate-800/60 pt-3 md:border-t-0 md:border-l md:pt-0 md:pl-4">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-micro font-mono type-eyebrow">Revisit Queue</p>
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-fluid-micro font-mono font-semibold ${
-            shouldRevisit ? "border border-amber-500/40 bg-amber-500/10 text-amber-300" : "border border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-          }`}>
-            <span className={`size-1.5 rounded-full ${shouldRevisit ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
-            {shouldRevisit ? "Revisit active" : "Plan on track"}
-          </span>
-        </div>
-        {revisitQueue.length ? (
-          <>
-            {sharedDriver ? (
-              <p className="text-fluid-xs text-slate-300">{compactSentence(sharedDriver, 96)}</p>
-            ) : null}
-            <ul className="space-y-1.5 text-fluid-xs text-white/70">
-              {revisitQueue.map((item) => (
-                <li key={item.id} className="flex items-start gap-1.5">
-                  <span className="font-semibold text-slate-200 shrink-0">{item.label}:</span>
-                  <span className="text-slate-300">
-                    {compactSentence(sharedDriver ? item.recheck : item.reason, 96)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className="text-fluid-xs text-slate-400 italic">No decisions require re-checking this week.</p>
-        )}
-      </div>
     </section>
   );
 }
@@ -372,8 +285,7 @@ async function PageContent({
           <span className="text-amber-300/50">Stage decisions but don&apos;t commit until live data returns.</span>
         </div>
       ) : null}
-      <FirstVisitExplainer />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
+      <div className="mx-auto max-w-[64rem] space-y-8">
         <div className="space-y-8 min-w-0">
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
@@ -408,7 +320,6 @@ async function PageContent({
                signalDirection={signalDirection}
                recordDate={homepage.reportShell.recordDateLabel}
                fetchedAt={homepage.reportShell.fetchedAtLabel}
-               operatorContext={operatorContext}
                confidenceLabel={confidenceLabel}
                trustStatusLabel={homepage.reportShell.trustStatusLabel}
                treasurySource={homepage.reportShell.treasurySource}
@@ -421,12 +332,9 @@ async function PageContent({
                 guardrail={guardrailLabel}
                 reversalTrigger={reversalTriggerLabel}
                 shareLines={briefShareLines}
+                revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
+                revisitQueue={homepage.weeklyDecisionCardModel.decision.revisitQueue.slice(0, 3)}
                />
-
-            <WeeklyTopFoldContract
-               model={homepage.weeklyDecisionCardModel}
-               memoryRegimes={macroTrendline}
-             />
 
             <ThreeWhethersCard
                items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
@@ -442,7 +350,17 @@ async function PageContent({
                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
                autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
              />
+            <details className="group weather-section-border">
+              <summary className="flex min-h-11 cursor-pointer select-none items-center text-fluid-xs font-medium text-slate-300 after:ml-auto after:text-slate-500 after:content-['▾'] group-open:after:content-['▴']">
+                Interpret this call for your company
+              </summary>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <StageSwitcher currentStage={operatorContext.companyStage} />
+                <ViewSelector />
+              </div>
+            </details>
           </SwipeableWeek>
+          <FirstVisitExplainer />
 
           <Suspense fallback={
             <div className="space-y-6">
@@ -467,7 +385,7 @@ async function PageContent({
           </Suspense>
         </div>
 
-          <div className="space-y-4 lg:col-start-2 lg:sticky lg:top-24 lg:self-start">
+        <section className="grid gap-4 border-t border-slate-800/70 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)]" aria-label="Continuity and delivery">
           <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
             <BelowTheFoldHistory
               regimes={macroTrendline}
@@ -475,7 +393,7 @@ async function PageContent({
           </Suspense>
           <SubscribeForm />
           <CanonicalWeekPermalink />
-         </div>
+        </section>
        </div>
 
         <script

@@ -12,7 +12,7 @@ describe("navigation information architecture", () => {
   it("orders primary layers by the operator loop", () => {
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.href),
-      ["/", "/signals", "/operate", "/answer", "/trust"],
+      ["/", "/operate", "/signals", "/answer", "/trust"],
     );
   });
 

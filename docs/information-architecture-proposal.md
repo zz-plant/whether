@@ -39,7 +39,7 @@ This contract keeps secondary pages indexable/discoverable while reinforcing the
 
 ## Implementation notes
 - Keep the global nav limited to the five primary hubs.
-- Order the workflow hubs to match the operator loop users are asked to follow in-product: **Weekly Brief → Evidence → Planning → Decision Tools → Trust**.
+- Order the workflow hubs to match the action-first operator loop users are asked to follow in-product: **Weekly Brief → Planning → Evidence → Decision Tools → Trust**. Evidence is the exception path for pressure-testing a settled call, not a required checkpoint before planning.
 - Surface helper-library discovery inside the parent hubs first:
   - `/resolve` should expose fast tools, direct answers, and one curated translation layer before users ever need the full role or situation library.
   - Full role and situation browse inside `/resolve` should stay collapsed behind a secondary “open library” affordance.

@@ -11,7 +11,7 @@ import {
 } from "../../lib/navigation/globalHeader";
 import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
-import { CadenceSelector, ViewSelector } from "./cadenceSelector";
+import { CadenceSelector } from "./cadenceSelector";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
@@ -63,7 +63,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
               <div className="hidden items-center gap-1.5 lg:flex">
                 <CadenceSelector />
-                <ViewSelector />
               </div>
               <div className="flex items-center gap-1.5 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
                 <GlobalHeaderActionsClient />
@@ -72,9 +71,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
           <div className="flex items-center gap-1.5 overflow-x-auto border-t border-white/[0.05] px-3 py-1.5 lg:hidden">
             <CadenceSelector />
-            <div className="hidden sm:block">
-              <ViewSelector />
-            </div>
           </div>
         </div>
       </GlobalHeaderScrollWrapper>

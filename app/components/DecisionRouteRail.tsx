@@ -6,28 +6,23 @@ import { ActionLink } from "./ui/actionLink";
 
 const routeGroups = [
   {
-    label: "Plan",
+    label: "Plan next",
     links: [
       { href: "/planning/financial", label: "Capital posture" },
       { href: "/planning/ship-checklist", label: "Ship call" },
     ],
   },
   {
-    label: "Resolve",
+    label: "Resolve a question",
     links: [
       { href: "/answer", label: "By role" },
       { href: "/answer#toolkit-library", label: "Toolkits" },
-    ],
-  },
-  {
-    label: "Rule",
-    links: [
       { href: "/template", label: "Blank decision form" },
       { href: "/resources/reversal-trigger-checklist", label: "Reversal checklist" },
     ],
   },
   {
-    label: "Compare",
+    label: "Review evidence",
     links: [
       { href: "/history/compare", label: "Past epochs" },
       { href: "/history", label: "Full archive" },
@@ -36,7 +31,7 @@ const routeGroups = [
 ] as const;
 
 // Lower homepage handoff: a collapsed disclosure, not an always-open rail. It
-// surfaces the operator-loop routes (Plan / Resolve / Rule / Compare) that sit
+// surfaces optional planning, resolution, and evidence routes that sit
 // one hop off the brief without competing with the leading /planning card.
 export function DecisionRouteRail() {
   const [open, setOpen] = useState(false);
@@ -54,10 +49,10 @@ export function DecisionRouteRail() {
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="font-semibold text-white">Route this week&apos;s call</span>
           <span className="hidden sm:inline-block h-3 w-px bg-slate-700/60" aria-hidden="true" />
-          <span className="truncate text-fluid-nano text-slate-400 font-mono">Plan · Resolve · Rule · Compare</span>
+          <span className="truncate text-fluid-nano text-slate-400 font-mono">Plan next · Resolve a question · Review evidence</span>
         </div>
         <div className="flex items-center gap-2 text-slate-400 group-hover:text-white transition-colors">
-          <span className="text-fluid-nano font-mono uppercase tracking-wider">{open ? "Hide paths" : "Explore 8 paths"}</span>
+          <span className="text-fluid-nano font-mono uppercase tracking-wider">{open ? "Hide paths" : "More paths"}</span>
           <ChevronRight
             className={`h-4 w-4 shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-sky-400" : ""}`}
             aria-hidden="true"
@@ -67,7 +62,7 @@ export function DecisionRouteRail() {
 
       <div id={panelId} hidden={!open}>
         <div className="px-4 pb-4 pt-1 border-t border-slate-800/60">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-3">
             {routeGroups.map((group) => (
               <div key={group.label} className="rounded-lg border border-slate-800/60 bg-slate-950/40 p-3 space-y-2">
                 <span className="text-fluid-nano font-mono font-bold text-sky-400 uppercase tracking-wider block border-b border-slate-800/60 pb-1">

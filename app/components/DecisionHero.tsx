@@ -1,10 +1,8 @@
-import type { OperatorContext } from "../../lib/report/operatorContext";
 import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
 import type { SignalDirection } from "../viewModel";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { SignalWaterfall } from "./SignalWaterfall";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
-import { PostureDial } from "./illustrations/PostureDial";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
@@ -12,7 +10,6 @@ import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import type { SparklinePoint } from "./ui/sparkline";
-import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
@@ -35,7 +32,6 @@ type Props = {
   signalDirection: SignalDirection;
   recordDate: string;
   fetchedAt: string;
-  operatorContext: OperatorContext;
   confidenceLabel?: string;
   trustStatusLabel?: string;
   treasurySource?: string;
@@ -48,6 +44,13 @@ type Props = {
   shareLines?: string[];
   /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
   signalIndicators?: readonly RegimeSignalIndicator[];
+  revisitDecisions?: boolean;
+  revisitQueue?: ReadonlyArray<{
+    id: string;
+    label: string;
+    reason: string;
+    recheck: string;
+  }>;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -84,7 +87,6 @@ export function DecisionHero({
   signalDirection,
   recordDate,
   fetchedAt,
-  operatorContext,
   confidenceLabel,
   trustStatusLabel,
   treasurySource,
@@ -96,6 +98,8 @@ export function DecisionHero({
   reversalTrigger,
   shareLines,
   signalIndicators,
+  revisitDecisions = false,
+  revisitQueue = [],
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -108,10 +112,6 @@ export function DecisionHero({
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
-   // PostureDial reads -1 (loosen) .. +1 (tighten); tightness is 0-100.
-   const toDialScale = (v: number) => (v - 50) / 50;
-   const dialValue = toDialScale(tightness);
-   const dialPrevious = toDialScale(tightness - tightnessDelta);
    const regimeKey = isRegimeKey(regime) ? regime : undefined;
 
    // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
@@ -286,22 +286,42 @@ export function DecisionHero({
               : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
           </p>
 
-          {/* Signal readout: fixed cells instead of a wrap-dependent metadata sentence.
-              Collapsed to the one-line summary on mobile (DD-004); auto-open on sm+. */}
-          {/* Desktop: static cells, no JS involved. */}
-          <div className="hidden max-w-xl grid-cols-2 gap-2 sm:grid sm:grid-cols-3" role="group" aria-label="Signal readout">
-            {renderSignalCells("desktop")}
-          </div>
+          <section
+            data-testid="weekly-top-fold"
+            aria-label="Decisions to revisit"
+            className={`rounded-lg border px-3 py-2.5 ${
+              revisitDecisions
+                ? "border-amber-500/35 bg-amber-500/10"
+                : "border-emerald-500/25 bg-emerald-500/[0.06]"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-fluid-xs font-semibold text-slate-100">
+                Revisit last week&apos;s decisions?
+              </p>
+              <span className={`shrink-0 text-fluid-nano font-mono font-semibold uppercase ${revisitDecisions ? "text-amber-300" : "text-emerald-300"}`}>
+                {revisitDecisions ? "Yes · revisit active" : "No · plan on track"}
+              </span>
+            </div>
+            {revisitDecisions && revisitQueue.length > 0 ? (
+              <ul className="mt-2 grid gap-1 text-fluid-xs text-slate-300 sm:grid-cols-2">
+                {revisitQueue.slice(0, 2).map((item) => (
+                  <li key={item.id}>
+                    <span className="font-semibold text-slate-100">{item.label}:</span>{" "}
+                    {item.recheck || item.reason}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
 
-          {/* Mobile: native disclosure, collapsed by default (DD-004). Pure CSS
-              split — <details> toggles without JS and neither viewport shifts
-              layout after hydration. */}
-          <details className="group sm:hidden">
-            <summary className="flex min-h-11 cursor-pointer select-none items-center rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/85 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
-              {signalReadoutSummary}
+          <details className="group">
+            <summary className="flex min-h-11 cursor-pointer select-none items-center rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
+              <span className="sm:hidden">Why this call · {signalReadoutSummary}</span>
+              <span className="hidden sm:inline">Why this call · inspect the signal breakdown</span>
             </summary>
-            <div className="mt-2 grid grid-cols-2 gap-2" role="group" aria-label="Signal readout">
-              {renderSignalCells("mobile")}
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
+              {renderSignalCells("details")}
             </div>
           </details>
 
@@ -361,7 +381,6 @@ export function DecisionHero({
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
-            <StageSwitcher currentStage={operatorContext.companyStage} />
             <DecisionMemoryButton
               regime={regime}
               recordDate={recordDate}
@@ -422,16 +441,6 @@ export function DecisionHero({
           <p className="text-fluid-xs font-medium text-white/50 mt-1">
             Boldness budget
           </p>
-          <p className="text-fluid-xs text-white/45 mt-0.5">70% risk appetite + 30% cash availability</p>
-          <div className="mt-3 w-full max-w-[10rem] mx-auto">
-            <PostureDial
-              idPrefix="hero-posture"
-              value={dialValue}
-              previous={dialPrevious}
-              label={postureLabel}
-              regime={regimeKey}
-            />
-          </div>
         </div>
       </div>
     </section>
