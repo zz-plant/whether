@@ -258,7 +258,11 @@ export const ReportShell = (props: ReportShellProps) => {
                   matched the spacing used *inside* sections. A visible rule plus
                   a wider outer gap makes the boundary the strongest horizontal
                   signal on the page. */}
-              <div className="divide-y divide-white/[0.10]">
+              {/* Token, not divide-white/[0.10]: a hardcoded white rule is
+                  invisible on the light theme's near-white ground, and 0.10 is
+                  not one of the four alphas the light escape-hatch block
+                  remaps. */}
+              <div className="divide-y divide-[color:var(--border-default)]">
                 {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
