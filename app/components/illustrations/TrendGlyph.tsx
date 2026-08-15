@@ -31,6 +31,14 @@ export const trendDirectionFromDelta = (delta: number | null | undefined): Trend
   return delta > 0 ? "up" : "down";
 };
 
+/**
+ * Adapter for `RegimeSignalIndicator.trendArrow`, which the report model still
+ * emits as a literal character. Callers should render the glyph rather than the
+ * character so the direction has a shape and an accessible name.
+ */
+export const trendDirectionFromArrow = (arrow: "↑" | "↓" | "→"): TrendDirection =>
+  arrow === "↑" ? "up" : arrow === "↓" ? "down" : "flat";
+
 /** Maps the `directionLabel` vocabulary from `reportDynamics` onto a glyph direction. */
 export const trendDirectionFromLabel = (trendLabel?: string): TrendDirection => {
   const key = trendLabel?.trim().toLowerCase() ?? "";
@@ -61,23 +69,26 @@ export const describeTrend = ({
   delta,
   unit,
   current,
+  /** Period the delta spans. Override for anything wider than a week. */
+  period = "since last week",
 }: {
   label: string;
   delta: number | null | undefined;
   unit?: string;
   current?: number;
+  period?: string;
 }) => {
   const suffix = unit ? ` ${unit}` : "";
-  const at = current === undefined ? "" : ` at ${formatTrendValue(current)}${suffix}`;
+  const at = current === undefined ? "" : ` to ${formatTrendValue(current)}${suffix}`;
 
   if (delta === null || delta === undefined || !Number.isFinite(delta) || delta === 0) {
-    return `${label} unchanged${at}.`;
+    return `${label} unchanged ${period}${at}.`;
   }
 
   const size = `${formatTrendValue(Math.abs(delta))}${suffix}`;
   return delta > 0
-    ? `${label} rose ${size} since last week${at}.`
-    : `${label} fell ${size} since last week${at}.`;
+    ? `${label} rose ${size} ${period}${at}.`
+    : `${label} fell ${size} ${period}${at}.`;
 };
 
 /**

@@ -7,7 +7,9 @@ import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import { PostureDial } from "./illustrations/PostureDial";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
+import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
+import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import type { SparklinePoint } from "./ui/sparkline";
 import { StageSwitcher } from "./StageSwitcher";
@@ -44,6 +46,8 @@ type Props = {
   guardrail?: string;
   reversalTrigger?: string;
   shareLines?: string[];
+  /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
+  signalIndicators?: readonly RegimeSignalIndicator[];
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -91,6 +95,7 @@ export function DecisionHero({
   guardrail,
   reversalTrigger,
   shareLines,
+  signalIndicators,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -178,8 +183,11 @@ export function DecisionHero({
           <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
         </p>
         {tightnessDelta !== 0 ? (
+          // The glyph carries its own title/desc ("Rose from 61 to 64"), so it
+          // stays exposed to assistive tech rather than sitting behind
+          // aria-hidden with only "+3.0 pts" left to announce.
           <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-            <span className="inline-block w-10 shrink-0" aria-hidden="true">
+            <span className="inline-block w-10 shrink-0">
               <DeltaGlyph
                 idPrefix={`hero-tightness-delta-${idSuffix}`}
                 previous={tightness - tightnessDelta}
@@ -189,7 +197,12 @@ export function DecisionHero({
                 label="Cash availability"
               />
             </span>
-            <span className={DIRECTION_COLOR[signalDirection]}>{tightnessDeltaMetadataLabel}</span>
+            {/* Coloured by this signal's own move. Using the week's overall
+                direction here painted a rising tightness emerald whenever the
+                headline call happened to be "easing". */}
+            <span className={trendToneClass(trendDirectionFromDelta(tightnessDelta), false)}>
+              {tightnessDeltaMetadataLabel}
+            </span>
           </p>
         ) : null}
       </div>
@@ -204,7 +217,7 @@ export function DecisionHero({
           </p>
           {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
             <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-              <span className="inline-block w-10 shrink-0" aria-hidden="true">
+              <span className="inline-block w-10 shrink-0">
                 <DeltaGlyph
                   idPrefix={`hero-risk-appetite-delta-${idSuffix}`}
                   previous={riskAppetite - riskAppetiteDelta}
@@ -215,7 +228,9 @@ export function DecisionHero({
                   increaseIsPositive
                 />
               </span>
-              <span className={riskAppetiteDelta > 0 ? "text-emerald-300" : "text-rose-300"}>{riskAppetiteDeltaLabel}</span>
+              <span className={trendToneClass(trendDirectionFromDelta(riskAppetiteDelta), true)}>
+                {riskAppetiteDeltaLabel}
+              </span>
             </p>
           ) : null}
         </div>
@@ -308,6 +323,9 @@ export function DecisionHero({
                     min={0}
                     max={100}
                     current={tightness}
+                    // Turns the rail into approach-or-retreat: the rule that
+                    // matters is whether this week closed on the trigger.
+                    previous={tightness - tightnessDelta}
                     trigger={tightnessThreshold}
                     signalLabel="Cash availability"
                   />
@@ -371,7 +389,7 @@ export function DecisionHero({
         </div>
 
         <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1 sm:row-span-2">
-          <SignalWaterfall data={signalData ?? {}}>
+          <SignalWaterfall data={signalData ?? {}} indicators={signalIndicators}>
             <div className="inline-flex items-baseline justify-center gap-1">
               <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">
                 {boldnessScore}
@@ -379,12 +397,10 @@ export function DecisionHero({
               <span className="text-fluid-xs font-semibold text-white/40">/100</span>
             </div>
           </SignalWaterfall>
-          <div className={`mt-2 flex items-center justify-center gap-1.5 text-base font-bold tabular-nums ${
-            boldnessDelta > 0 ? "text-emerald-300"
-            : boldnessDelta < 0 ? "text-rose-300"
-            : "text-slate-400"
-          }`}>
-            <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
+          <div
+            className={`mt-2 flex items-center justify-center gap-1.5 text-base font-bold tabular-nums ${trendToneClass(trendDirectionFromDelta(boldnessDelta), true)}`}
+          >
+            <TrendGlyph direction={trendDirectionFromDelta(boldnessDelta)} className="h-4 w-4" />
             <span>{boldnessDeltaLabel}</span>
           </div>
           {trendPoints && trendDomain ? (

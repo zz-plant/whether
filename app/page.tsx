@@ -415,6 +415,7 @@ async function PageContent({
                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
                 isFallback={homepage.reportShell.showOfflineBadge}
                 signalData={v2HeroSignalData}
+                signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
                 flipConditions={flipConditionLabels}
                 transitionProbability={transition.probability}
                 guardrail={guardrailLabel}
@@ -505,7 +506,7 @@ async function PageContent({
 
         <StickyCallStrip
           call={primaryCall}
-          arrow={DIRECTION_ARROW[signalDirection]}
+          direction={signalDirection}
           boldnessScore={weeklyLeadershipSummary.boldnessScore}
           boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
           shareLines={briefShareLines}

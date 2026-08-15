@@ -176,7 +176,12 @@ export const ReturningVisitorDeltaStrip = ({
                 {item.label} · {item.tone.label}
               </span>
               <span className="sr-only">
-                {describeTrend({ label: item.label, delta: item.delta })} {item.tone.impactLabel}.
+                {describeTrend({
+                  label: item.label,
+                  delta: item.delta,
+                  period: "since your last review",
+                })}{" "}
+                {item.tone.impactLabel}.
               </span>
             </a>
           </li>

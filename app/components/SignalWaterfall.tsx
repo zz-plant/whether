@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
+import { Sparkline } from "./ui/sparkline";
+import { TrendGlyph, trendDirectionFromArrow, trendToneClass } from "./illustrations/TrendGlyph";
 
 type SignalData = {
   baseRate?: number | null;
@@ -10,11 +13,64 @@ type SignalData = {
   tightnessThreshold?: number;
 };
 
+/** Which way counts as favourable per signal key. */
+const INCREASE_IS_POSITIVE: Record<string, boolean> = {
+  tightness: false,
+  riskAppetite: true,
+  baseRate: false,
+  curveSlope: true,
+};
+
+/**
+ * Per-signal movement row. The report model has been computing `trendArrow`,
+ * `trendDeltaLabel` and a trailing `sparkline` for every signal all along;
+ * nothing rendered them, so this panel showed four levels and no movement.
+ */
+function IndicatorRow({ indicator }: { indicator: RegimeSignalIndicator }) {
+  // The model rounds `trendDeltaLabel` to one decimal, so a raw move of +0.04
+  // arrives as "+0.0". Showing a rising glyph beside a zero reads as a
+  // contradiction, so glyph and number are kept in agreement.
+  const roundsToZero = /^[+-]?0\.0\b/.test(indicator.trendDeltaLabel);
+  const direction = roundsToZero ? "flat" : trendDirectionFromArrow(indicator.trendArrow);
+  const tone = trendToneClass(direction, INCREASE_IS_POSITIVE[indicator.key] ?? false);
+  const points = indicator.sparkline.map((value, index, all) => {
+    const back = all.length - 1 - index;
+    return {
+      label: back === 0 ? "this week" : `${back} ${back === 1 ? "week" : "weeks"} ago`,
+      value,
+    };
+  });
+
+  return (
+    <div className="flex items-center justify-between gap-2 text-fluid-nano">
+      <span className="text-white/60">{indicator.label}</span>
+      <span className="flex items-center gap-1.5">
+        {points.length >= 2 ? (
+          <Sparkline
+            points={points}
+            label={indicator.label}
+            tone={direction === "flat" ? "unchanged" : "caution"}
+            widthEm={3}
+            className={tone}
+          />
+        ) : null}
+        <span className="tabular-nums text-white/70">{indicator.valueLabel}</span>
+        <span className={`inline-flex items-center gap-0.5 ${tone}`}>
+          <TrendGlyph direction={direction} className="h-3 w-3 shrink-0" />
+          <span className="sr-only">{`${indicator.label} ${indicator.trendDeltaLabel}.`}</span>
+        </span>
+      </span>
+    </div>
+  );
+}
+
 export function SignalWaterfall({
   data,
+  indicators,
   children,
 }: {
   data: SignalData;
+  indicators?: readonly RegimeSignalIndicator[];
   children: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
@@ -59,6 +115,16 @@ export function SignalWaterfall({
       {show && hasData ? (
         <div className="absolute right-0 top-full mt-3 z-50 w-64 origin-top-right rounded-xl border border-white/[0.08] bg-[var(--bg-raised)] px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
           <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 mb-2">Signal breakdown</p>
+
+          {indicators && indicators.length > 0 ? (
+            <div className="mb-2 space-y-1.5 border-b border-white/[0.06] pb-2">
+              <p className="text-fluid-nano text-white/50">Movement vs last week</p>
+              {indicators.map((indicator) => (
+                <IndicatorRow key={indicator.key} indicator={indicator} />
+              ))}
+            </div>
+          ) : null}
+
           <div className="space-y-2">
             {data.baseRate != null ? (
               <div>

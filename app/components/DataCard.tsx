@@ -1,11 +1,17 @@
 import type { ReactNode } from "react";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
 type DataCardProps = {
   variant: "metric" | "reading" | "narrative";
   label?: string;
   value?: string | number;
   unit?: string;
-  delta?: { value: number; direction: "up" | "down" | "flat"; label?: string };
+  /**
+   * `value` is signed: negative means the reading fell. `increaseIsPositive`
+   * says which sign counts as good news — without it this badge painted every
+   * rise emerald, so a climbing tightness score read as an improvement.
+   */
+  delta?: { value: number; label?: string; increaseIsPositive?: boolean };
   interpretation?: string;
   source?: { label: string; url?: string; freshness?: string };
   sparkline?: ReactNode;
@@ -21,15 +27,19 @@ const STATUS_COLORS = {
   neutral: "border-slate-400/25 bg-slate-500/10 text-slate-200",
 };
 
-function DeltaBadge({ delta }: { delta: DataCardProps["delta"] }) {
+function DeltaBadge({ delta, metricLabel }: { delta: DataCardProps["delta"]; metricLabel?: string }) {
   if (!delta) return null;
-  const arrow = delta.direction === "up" ? "↑" : delta.direction === "down" ? "↓" : "→";
-  const color = delta.direction === "up"
-    ? "text-emerald-200"
-    : delta.direction === "down" ? "text-rose-200" : "text-slate-400";
+  const direction = trendDirectionFromDelta(delta.value);
+  const tone = trendToneClass(direction, delta.increaseIsPositive ?? false);
   return (
-    <span className={`text-xs font-semibold ${color}`}>
-      {arrow} {Math.abs(delta.value).toFixed(1)} {delta.label ?? ""}
+    <span className={`inline-flex items-center gap-1 text-xs font-semibold ${tone}`}>
+      <TrendGlyph direction={direction} className="h-3 w-3 shrink-0" />
+      <span aria-hidden="true">
+        {Math.abs(delta.value).toFixed(1)} {delta.label ?? ""}
+      </span>
+      <span className="sr-only">
+        {describeTrend({ label: metricLabel ?? "Value", delta: delta.value, unit: delta.label })}
+      </span>
     </span>
   );
 }
@@ -56,7 +66,7 @@ export function DataCard({
         <p className="mt-1 text-sm font-bold tabular-nums text-slate-100">
           {value}{unit ? <span className="text-xs font-normal text-slate-400 ml-0.5">{unit}</span> : null}
         </p>
-        <DeltaBadge delta={delta} />
+        <DeltaBadge delta={delta} metricLabel={label} />
         {children}
       </div>
     );
@@ -81,7 +91,7 @@ export function DataCard({
               <p className="mono text-2xl tabular-nums text-slate-100">
                 {value}{unit ? <span className="text-sm text-slate-400 ml-0.5">{unit}</span> : null}
               </p>
-              <DeltaBadge delta={delta} />
+              <DeltaBadge delta={delta} metricLabel={label} />
             </div>
           </div>
           {source?.freshness ? (
