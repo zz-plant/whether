@@ -5,7 +5,11 @@ import {
   formatBoundedDecisionReverse,
   formatSharedFlipCorridor,
 } from "../boundedDecisionRules";
-import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../operatingCalls";
+import {
+  buildActionStripItems,
+  buildRoleAwareOperatingTemplates,
+  buildThresholdBusinessConsequence,
+} from "../operatingCalls";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } from "../../regimeEngineCore";
 import { type ReportDynamics } from "../reportData";
@@ -538,6 +542,10 @@ export const buildHomeBriefModelInternal = (
     decisionRules,
     reportDynamics,
   });
+  const thresholdBusinessConsequence = buildThresholdBusinessConsequence({
+    actionStripItems,
+    revisitAreaPriority: revisitQueue.map((item) => item.id),
+  });
 
   const regimeSignalIndicators = buildRegimeSignalIndicators({
     assessment,
@@ -618,6 +626,7 @@ export const buildHomeBriefModelInternal = (
     startupVariantPolicy,
     decisionMatrix,
     actionStripItems,
+    thresholdBusinessConsequence,
     sharedFlipCorridor,
     roleAwareTemplates,
     executiveOperationalStance,
@@ -762,6 +771,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionMatrix: homeBriefModel.decisionMatrix,
       startupVariantPolicy: homeBriefModel.startupVariantPolicy,
       actionStripItems: homeBriefModel.actionStripItems,
+      thresholdBusinessConsequence: homeBriefModel.thresholdBusinessConsequence,
       sharedFlipCorridor: homeBriefModel.sharedFlipCorridor,
       roleAwareTemplates: homeBriefModel.roleAwareTemplates,
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,

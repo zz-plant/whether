@@ -328,12 +328,13 @@ async function PageContent({
                 signalData={v2HeroSignalData}
                 signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
                 flipConditions={flipConditionLabels}
-                transitionProbability={transition.probability}
+                transitionForecast={transition.forecast}
                 guardrail={guardrailLabel}
                 reversalTrigger={reversalTriggerLabel}
                 shareLines={briefShareLines}
                 revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
                 revisitQueue={homepage.weeklyDecisionCardModel.decision.revisitQueue.slice(0, 3)}
+                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
                />
 
             <ThreeWhethersCard

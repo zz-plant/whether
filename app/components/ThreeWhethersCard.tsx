@@ -1,5 +1,5 @@
 import type { ActionStripItem } from "../../lib/report/operatingCalls";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { ACTION_STRIP_DISPLAY_COPY } from "../../lib/report/reportCopy";
 
 const STATE_TONE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
   Closed: "text-semantic-tightening-fg",
@@ -20,11 +20,10 @@ export function ThreeWhethersCard({
 
   return (
     <section className="weather-section" aria-labelledby="three-whethers-heading">
-      <div className="mb-4 flex items-baseline justify-between gap-3">
+      <div className="mb-4">
         <h3 id="three-whethers-heading" className="type-section font-semibold tracking-tight text-white">
-          This week&apos;s bounded decisions
+          {ACTION_STRIP_DISPLAY_COPY.heading}
         </h3>
-        <span className="text-fluid-nano font-mono uppercase tracking-wider text-slate-400">Canonical rules</span>
       </div>
 
       {/* Every row's clear-condition is drawn from the same pair of lines, so the
@@ -56,23 +55,28 @@ export function ThreeWhethersCard({
                   reads as boilerplate rather than as data. */}
               {item.currentStateLabel ? (
                 <p className={`mt-1 text-fluid-nano font-semibold ${STATE_TONE[item.currentStateLabel]}`}>
-                  {item.currentStateLabel}
+                  {ACTION_STRIP_DISPLAY_COPY.state[item.currentStateLabel]}
                 </p>
               ) : null}
             </div>
 
             <dd className="min-w-0 space-y-2">
-              <p className="text-fluid-xs leading-relaxed text-slate-200">{item.areaActionNow}</p>
               <div className="space-y-1 text-fluid-nano text-slate-300">
+                <p className="flex flex-wrap items-baseline gap-x-2 text-fluid-xs leading-relaxed text-slate-200">
+                  <span className="shrink-0 font-semibold text-slate-400">
+                    {ACTION_STRIP_DISPLAY_COPY.action}:
+                  </span>
+                  <span>{item.areaActionNow}</span>
+                </p>
                 <p className="flex flex-wrap items-baseline gap-x-2">
                   <span className="shrink-0 font-semibold text-slate-400">
-                    {DECISION_CONTRACT_LABELS.threshold.pauseIf}:
+                    {ACTION_STRIP_DISPLAY_COPY.threshold}:
                   </span>
                   <span className="font-mono text-semantic-caution-fg">{item.triggerThreshold}</span>
                 </p>
                 <p className="flex flex-wrap items-baseline gap-x-2">
                   <span className="shrink-0 font-semibold text-slate-400">
-                    {DECISION_CONTRACT_LABELS.reversal.clearsWhen}:
+                    {ACTION_STRIP_DISPLAY_COPY.reversal}:
                   </span>
                   <span className="font-mono text-semantic-easing-fg">{item.reversalCondition}</span>
                 </p>
