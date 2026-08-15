@@ -36,6 +36,8 @@ import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters"
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
+import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
+import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 
 const EvidenceTools = dynamic(
   () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
@@ -128,6 +130,7 @@ type BelowTheFoldEvidenceProps = {
   riskAppetiteDelta: number;
   recordDate: string;
   recentRecordDates: string[];
+  operateHref?: string;
 };
 
 function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
@@ -153,7 +156,7 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
 
       <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <ActionLink href="/operate" variant="primary">
+          <ActionLink href={props.operateHref ?? "/operate"} variant="primary">
             Build this week&apos;s plan →
           </ActionLink>
           <RitualCheck
@@ -201,11 +204,22 @@ async function PageContent({
   const { homepage, reportData, operatorContext } = data;
   const isDegraded = !homepage.reportResult.ok;
 
+  const timeMachineRequest = parseTimeMachineRequest(searchParams);
+  const operateHref = buildTimeMachineHref("/operate", timeMachineRequest);
+
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
-  const macroTrendline = regimeHistory.slice(-24);
+
+  const asOfDate = timeMachineRequest
+    ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
+    : null;
+  const asOfTimestamp = asOfDate ? new Date(asOfDate).getTime() : Number.NaN;
+  const alignedRegimeHistory = Number.isFinite(asOfTimestamp)
+    ? regimeHistory.filter((entry) => new Date(entry.record_date).getTime() <= asOfTimestamp)
+    : regimeHistory;
+  const macroTrendline = alignedRegimeHistory.slice(-24);
 
   // Same score the hero headlines, computed back across the window so the number
   // carries its own history. Months missing either input are dropped rather than
@@ -348,6 +362,7 @@ async function PageContent({
                tightnessDelta={tightnessDelta}
                riskAppetite={riskAppetite}
                riskAppetiteDelta={riskAppetiteDelta}
+               currentRecordDate={homepage.reportShell.recordDateLabel}
                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
                autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
              />
@@ -382,6 +397,7 @@ async function PageContent({
               riskAppetiteDelta={riskAppetiteDelta}
               recordDate={homepage.reportShell.recordDateLabel}
               recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
+              operateHref={operateHref}
             />
           </Suspense>
         </div>
@@ -392,8 +408,10 @@ async function PageContent({
               regimes={macroTrendline}
             />
           </Suspense>
-          <SubscribeForm />
-          <CanonicalWeekPermalink />
+          <div className="space-y-4">
+            <SubscribeForm />
+            <CanonicalWeekPermalink />
+          </div>
         </section>
        </div>
 

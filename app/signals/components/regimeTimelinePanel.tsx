@@ -116,7 +116,7 @@ export const RegimeTimelinePanel = ({
     nextParams.set("year", String(year));
 
     const queryString = nextParams.toString();
-    return queryString ? `/evidence?${queryString}` : "/signals";
+    return queryString ? `/signals?${queryString}` : "/signals";
   };
 
   return (

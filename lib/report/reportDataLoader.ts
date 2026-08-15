@@ -334,9 +334,7 @@ export const loadReportDataUncachedInternal = async ({
     : null;
   const { playbook, startItems, stopItems, actionStripItems } = deps.buildGuidanceBundleFromAssessment(assessment);
   const fenceItems = assessment.constraints;
-  const previousSnapshot = historicalSelection
-    ? null
-    : deps.getPreviousTimeMachineSnapshot(treasury.record_date);
+  const previousSnapshot = deps.getPreviousTimeMachineSnapshot(treasury.record_date);
   const recordDate = new Date(treasury.record_date);
   const comparisonDate = new Date(treasury.record_date);
   comparisonDate.setUTCFullYear(recordDate.getUTCFullYear() - 1);
@@ -350,7 +348,7 @@ export const loadReportDataUncachedInternal = async ({
       assessment,
       previousSnapshot?.record_date,
       treasury.record_date,
-      "/evidence?advanced=1#time-machine",
+      "/signals?advanced=1#time-machine",
     );
   }
   const lastYearAssessment = lastYearSnapshot ? deps.evaluateRegime(lastYearSnapshot, thresholds) : null;

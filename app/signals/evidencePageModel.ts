@@ -145,7 +145,7 @@ export const buildSignalsPageModel = async (
   const previousHistoricalHref = previousHistoricalSelection
     ? buildTimeMachineHref("/signals", previousHistoricalSelection)
     : undefined;
-  const historicalTimeMachineHref = "/evidence?advanced=1#time-machine";
+  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const {

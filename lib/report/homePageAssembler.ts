@@ -198,7 +198,7 @@ export const assembleHomePage = async ({
   const previousHistoricalHref = previousHistoricalSelection
     ? buildTimeMachineHref("/", previousHistoricalSelection)
     : undefined;
-  const historicalTimeMachineHref = "/evidence?advanced=1#time-machine";
+  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const baseSnapshot = buildWeeklyBriefSnapshot({
     reportData,
     degraded: !reportResult.ok,

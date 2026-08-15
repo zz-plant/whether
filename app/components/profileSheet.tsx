@@ -52,7 +52,7 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
                   onClick={() => setShowDatePicker(true)}
                   className="w-full text-left flex items-center justify-between px-3 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-800/50 transition-colors"
                 >
-                  Pick a week
+                  Browse past months
                 </button>
                 <CalendarButton
                   title="Whether Weekly Brief"

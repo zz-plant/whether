@@ -126,6 +126,17 @@ export default async function SignalsPage({
         topDiagnosticCallouts={model.topDiagnosticCallouts}
       />
 
+      <ReturningVisitorDeltaStrip
+        assessment={model.assessment}
+        recordDate={model.treasury.record_date}
+        impactLinks={[
+          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
+          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
+          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
+        ]}
+        openPanelHref={model.timeMachineHref}
+      />
+
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="type-eyebrow">Trends</p>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -211,17 +222,6 @@ export default async function SignalsPage({
           />
         </>
       ) : null}
-
-      <ReturningVisitorDeltaStrip
-        assessment={model.assessment}
-        recordDate={model.treasury.record_date}
-        impactLinks={[
-          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
-          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
-          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
-        ]}
-        openPanelHref={model.timeMachineHref}
-      />
     </ReportShell>
   );
 }

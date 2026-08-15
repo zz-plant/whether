@@ -4,6 +4,7 @@ import { RegimeStats } from "../components/history/RegimeStats";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
+import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
@@ -19,6 +20,7 @@ export default async function HistoryPage({
   const statsSeries = getTimeMachineRegimeSeries(60);
   const tightnessTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
   const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
+  const publishedBriefs = getPublishedBriefs();
 
   return (
     <ReportShell
@@ -42,6 +44,37 @@ export default async function HistoryPage({
           <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
         </div>
       </section>
+
+      {publishedBriefs.length > 0 ? (
+        <section className="weather-panel space-y-4 px-5 py-5">
+          <div>
+            <h2 className="type-eyebrow">Published weekly briefs</h2>
+            <p className="text-sm text-slate-300">
+              Permanent, immutable weekly operating calls cited in executive and board documents.
+            </p>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {publishedBriefs.map((brief) => (
+              <li key={brief.slug}>
+                <ActionLink
+                  href={buildPublishedBriefPath(brief.slug)}
+                  variant="pill"
+                  className="flex w-full flex-col items-start justify-start gap-1.5 p-3.5 text-left rounded-lg border border-slate-800/80 bg-slate-900/40 hover:border-sky-500/50 hover:bg-slate-900/70"
+                >
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span className="text-fluid-micro font-mono text-slate-400">{brief.recordDateLabel}</span>
+                    <span className="type-badge text-fluid-micro rounded-sm px-1.5 py-0.5 bg-slate-800 text-slate-200">
+                      {brief.postureLabel}
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-slate-100 line-clamp-1">{brief.headline}</span>
+                  <span className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</span>
+                </ActionLink>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <DecisionArchive />
 

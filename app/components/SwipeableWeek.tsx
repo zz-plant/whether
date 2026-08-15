@@ -83,11 +83,19 @@ export function SwipeableWeek({
   // sortedMonths is newest-first, so "previous" moves to a HIGHER index.
   const effectiveIndex = currentIndex >= 0 ? currentIndex : 0;
   const canGoToPrevious = effectiveIndex < sortedMonths.length - 1;
-  const canGoToLatest = effectiveIndex > 0;
+  const canGoToNext = effectiveIndex > 0;
 
   const goToPrevious = useCallback(() => {
     if (effectiveIndex < sortedMonths.length - 1) navigateToMonth(sortedMonths[effectiveIndex + 1]);
   }, [effectiveIndex, sortedMonths, navigateToMonth]);
+
+  const goToNext = useCallback(() => {
+    if (effectiveIndex > 1) {
+      navigateToMonth(sortedMonths[effectiveIndex - 1]);
+    } else if (effectiveIndex === 1) {
+      router.push("/", { scroll: false });
+    }
+  }, [effectiveIndex, sortedMonths, navigateToMonth, router]);
 
   const goToLatest = useCallback(() => {
     // Return to the canonical live brief rather than the latest month's permalink.
@@ -109,11 +117,11 @@ export function SwipeableWeek({
       if (dx > 0) {
         goToPrevious();
       } else {
-        goToLatest();
+        goToNext();
       }
     }
     touchStart.current = null;
-  }, [goToPrevious, goToLatest]);
+  }, [goToPrevious, goToNext]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -122,9 +130,9 @@ export function SwipeableWeek({
     if (event.key === "ArrowLeft") {
       goToPrevious();
     } else {
-      goToLatest();
+      goToNext();
     }
-  }, [goToPrevious, goToLatest]);
+  }, [goToPrevious, goToNext]);
 
   return (
     <div
@@ -134,10 +142,10 @@ export function SwipeableWeek({
       onTouchEnd={handleTouchEnd}
       onKeyDown={handleKeyDown}
       className="touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-0 rounded-lg"
-      aria-label="Swipe left for current week, right for previous weeks. Use the left and right arrow keys to browse past weeks."
+      aria-label="Swipe left for next month, right for previous months. Use the left and right arrow keys to browse past months."
     >
       {months.length > 0 ? (
-        <div className="mb-1 flex items-center justify-center gap-1">
+        <div className="mb-1 flex items-center justify-center gap-1.5">
           <button
             type="button"
             onClick={goToPrevious}
@@ -156,6 +164,16 @@ export function SwipeableWeek({
               return effectiveIndex > 0 ? label : `${label} · current`;
             })()}
           </span>
+          {effectiveIndex > 0 ? (
+            <button
+              type="button"
+              onClick={goToLatest}
+              className="rounded-sm bg-sky-500/10 px-1.5 py-0.5 text-fluid-nano font-medium text-sky-300 transition-colors hover:bg-sky-500/20"
+              aria-label="Jump to current live brief"
+            >
+              Jump to live
+            </button>
+          ) : null}
           <div className="ml-1 flex items-center gap-1" aria-hidden="true">
             {months.slice(-6).map((m, i, arr) => {
               const isActive = activeMonth === m.month && activeYear === m.year;
@@ -165,9 +183,9 @@ export function SwipeableWeek({
           </div>
           <button
             type="button"
-            onClick={goToLatest}
-            disabled={!canGoToLatest}
-            aria-label="Current month"
+            onClick={goToNext}
+            disabled={!canGoToNext}
+            aria-label="Next month"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 disabled:pointer-events-none disabled:opacity-25"
           >
             <ChevronRight className="size-4" aria-hidden="true" />

@@ -138,7 +138,7 @@ export async function buildPlanningPageModel(
   const previousHistoricalHref = previousHistoricalSelection
     ? buildTimeMachineHref("/operate", previousHistoricalSelection)
     : undefined;
-  const historicalTimeMachineHref = "/evidence?advanced=1#time-machine";
+  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,

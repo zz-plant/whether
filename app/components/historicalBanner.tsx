@@ -40,7 +40,7 @@ export const HistoricalBanner = ({
               href={liveHref}
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
             >
-              <ArrowRightIcon className="mr-1 h-3.5 w-3.5" aria-hidden="true" />Back to current week
+              <ArrowRightIcon className="mr-1 h-3.5 w-3.5" aria-hidden="true" />Back to live brief
             </Link>
           ) : null}
         </div>
@@ -49,8 +49,8 @@ export const HistoricalBanner = ({
       <p className="mt-2 text-xs text-slate-400">
         You are viewing archived Treasury data, so live signals are hidden for now.
         {previousHref
-          ? " Use “View older snapshot” to step to an earlier week."
-          : " Use “View older snapshot” to open Time Machine and pick an earlier week."}
+          ? " Use “View older snapshot” to step to an earlier month."
+          : " Use “View older snapshot” to open Time Machine and pick an earlier month."}
       </p>
     </div>
   );

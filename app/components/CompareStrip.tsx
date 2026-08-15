@@ -62,6 +62,7 @@ export function CompareStrip({
   riskAppetite,
   riskAppetiteDelta,
   serverPrevious,
+  currentRecordDate,
   autoExpand = false,
 }: {
   currentRegime: string;
@@ -70,15 +71,16 @@ export function CompareStrip({
   riskAppetite?: number;
   riskAppetiteDelta?: number;
   serverPrevious?: { regime: string; recordDate: string } | null;
+  currentRecordDate?: string;
   autoExpand?: boolean;
 }) {
   const [isComparing, setIsComparing] = useState(autoExpand);
-  const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(null);
+  const [previous, setPrevious] = useState<{ regime: string; recordDate: string } | null>(serverPrevious ?? null);
   const panelId = useId();
 
   useEffect(() => {
     try {
-      const series = getTimeMachineRegimeSeries(12);
+      const series = getTimeMachineRegimeSeries(12, undefined, currentRecordDate);
       if (series.length >= 2) {
         const prev = series[series.length - 2];
         setPrevious({ regime: prev.regime, recordDate: prev.recordDate });
@@ -89,7 +91,7 @@ export function CompareStrip({
     if (serverPrevious) {
       setPrevious(serverPrevious);
     }
-  }, [serverPrevious]);
+  }, [serverPrevious, currentRecordDate]);
 
   if (!previous) return null;
 
