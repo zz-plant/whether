@@ -65,6 +65,11 @@ describe("summaryCopyRenderer", () => {
           "Keep the month anchored to scale proven bets.",
           "Keep new commitments inside the current constraints.",
         ],
+        operatingRules: [{
+          action: "Run no more than three concurrent experiments.",
+          threshold: "Pause new experiments if risk appetite falls below 44.0.",
+          reversal: "Reopen slots when risk appetite rises above 54.0.",
+        }],
         reversalConditions: [
           "Re-open broader bets if regime posture or confidence weakens.",
           "Re-check the plan when any execution constraint starts to bind.",
@@ -82,6 +87,8 @@ describe("summaryCopyRenderer", () => {
     assert.match(copy, /PLANNING LANGUAGE TO USE/);
     assert.match(copy, /> Plan the month around scale proven bets/);
     assert.match(copy, /BOUNDED NEXT ACTIONS/);
+    assert.match(copy, /MONTHLY OPERATING RULES/);
+    assert.match(copy, /Action: Run no more than three concurrent experiments/);
     assert.match(copy, /TOP REVERSALS/);
     assert.match(copy, /EXECUTION CONSTRAINTS/);
     assert.match(copy, /EXECUTION CONSTRAINTS\n\n• Sequence delivery around revenue durability/);

@@ -180,6 +180,10 @@ Implementation guardrails:
   - **Threshold**: the trip line that pauses/tightens the current call.
   - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
   - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
+- Dynamic fallback copy must remain decision-complete. Do not emit placeholders such as `Stay the course`, `current track`, `standard guardrails`, or `trigger confirmation` without naming the held decision, measurable threshold, and reversal condition.
+- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition.
+- Boundary commentary must name the signal, current distance, threshold direction, and decision consequence. Qualitative watch language alone (`worth watching`, `next release`) does not satisfy the bounded-decision contract.
+- Trust readiness describes whether the current read can support this week's approvals; it must point operators back to the thresholds in the current call rather than independently declaring decisions safe.
 - Decision readiness and trust must use structured freshness state, not display copy. Consumers should gate on machine-readable staleness (`fresh`, `stale`, `unknown`) and source mode (`live`, `cached`, `historical`) rather than inferring trust from a rendered timestamp string.
 - When the policy layer refuses a posture change, the canonical weekly-call payload must override the default regime phrasing with reversible-only execution language. Refusal is not decorative metadata; it constrains readiness, share copy, and exported brief text.
 - Historical playback should run through the same assessment path as live mode whenever aligned macro history exists. If macro history is partial or unavailable, the brief should explicitly label that degraded coverage rather than silently switching to a Treasury-only interpretation model.

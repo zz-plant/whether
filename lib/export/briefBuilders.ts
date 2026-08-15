@@ -83,7 +83,7 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     topActionStripItems[0]?.triggerThreshold
     ?? modeled.guardrailThreshold
     ?? assessment.constraints[1]
-    ?? "Do not approve irreversible commitments without trigger confirmation.";
+    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
   const changeCourseIf =
     topActionStripItems[0]?.reversalCondition
     ?? modeled.reversalTrigger
