@@ -5,6 +5,7 @@ import { History, Search, Settings } from "lucide-react";
 import { SettingsPanel } from "./settingsPanel";
 import { ProfileSheet } from "./profileSheet";
 import { CommandPalette } from "./commandPalette";
+import { ThemeToggleButton } from "./themeToggleButton";
 
 export function GlobalHeaderActionsClient() {
   const [showSettings, setShowSettings] = useState(false);
@@ -31,6 +32,11 @@ export function GlobalHeaderActionsClient() {
       >
         <History aria-hidden="true" size={16} strokeWidth={1.8} />
       </button>
+      {/* The light theme has a full token set in tokens.css and layout.tsx
+          restores the saved choice pre-paint, but nothing rendered the control,
+          so the theme was unreachable from the UI. Matches the sizing of the
+          buttons either side rather than using the component's pill default. */}
+      <ThemeToggleButton className="!rounded-lg min-h-11 sm:min-h-9 min-w-11 border border-slate-800/80 bg-slate-900/60 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/80" />
       <button
         type="button"
         onClick={() => setShowSettings(true)}

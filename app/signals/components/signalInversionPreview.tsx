@@ -171,7 +171,7 @@ export function SignalInversionPreview({
             />
           ))}
           <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-          <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 type-eyebrow">
+          <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">
             zero line
           </text>
           {spread10Y2YSeries.paths.map((path, index) => (
@@ -183,7 +183,7 @@ export function SignalInversionPreview({
           {spread10Y2YSeries.lastPoint ? (
             <>
               <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="rgb(74 222 128)" />
-              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 type-eyebrow">
+              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">
                 10Y-2Y
               </text>
             </>
@@ -191,7 +191,7 @@ export function SignalInversionPreview({
           {spread2Y3MSeries.lastPoint ? (
             <>
               <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="rgb(250 204 21)" />
-              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 type-eyebrow">
+              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">
                 2Y-3M
               </text>
             </>

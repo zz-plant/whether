@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { renderToStaticMarkup } from "react-dom/server";
-import { HomeInterpretationPanel } from "../app/components/homeInterpretationPanel";
-import { buildInterpretationLayer } from "../lib/report/interpretationLayer";
+import { buildInterpretationLayer, type InterpretationLayer } from "../lib/report/interpretationLayer";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { ForecastModel } from "../lib/report/forecastModel";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
@@ -56,7 +54,21 @@ const homeBriefModel = {
   macroOverlay: [{ label: "Sector sensitivity", detail: "Consumer teams should stage expansions." }],
 } as ReturnType<typeof import("../lib/report/homeBriefModel").buildHomeBriefModel>;
 
-describe("interpretation view panel", () => {
+// The panel these views were asserted through is gone; buildInterpretationLayer
+// is the live half (lib/export/briefBuilders, lib/report/home/artifactPayload,
+// lib/report/homePageAssembler all consume it), so the content assertions now
+// read the layer directly instead of its former HTML. Assertions that only
+// described the panel's markup — toggle hrefs, aria-current, the toggle-shell
+// labels — are gone with it.
+const layerText = (layer: InterpretationLayer) =>
+  [
+    layer.label,
+    layer.summary,
+    ...layer.bullets,
+    ...(layer.financialAction ? Object.values(layer.financialAction) : []),
+  ].join("\n");
+
+describe("interpretation layer", () => {
   it("keeps default view parity with core interpretation copy", () => {
     const layer = buildInterpretationLayer({
       view: "default",
@@ -66,14 +78,11 @@ describe("interpretation view panel", () => {
       decisionRules,
     });
 
-    const html = renderToStaticMarkup(
-      <HomeInterpretationPanel layer={layer} searchParams={{ month: "3", year: "2026" }} />,
-    );
+    const text = layerText(layer);
 
-    assert.match(html, /Default view/);
-    assert.match(html, /canonical decision lives above/i);
-    assert.match(html, /Action: Pressure rose compared to last week\./);
-    assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
+    assert.match(text, /Default view/);
+    assert.match(text, /canonical decision lives above/i);
+    assert.match(text, /Action: Pressure rose compared to last week\./);
   });
 
 
@@ -177,42 +186,21 @@ describe("interpretation view panel", () => {
     assert.match(layer.bullets[0], /Action: Operate for DEFENSIVE while the current posture holds — it carries 0% of the next-90-day weight\./);
   });
 
-  it("keeps interpretation toggle links query-stable and marks active view", () => {
-    const layer = buildInterpretationLayer({
-      view: "forecast",
-      homeBriefModel,
-      assessment,
-      forecast,
-      decisionRules,
-    });
-
-    const html = renderToStaticMarkup(
-      <HomeInterpretationPanel layer={layer} searchParams={{ month: "3", year: "2026", sector: "consumer" }} />,
-    );
-
-    assert.match(html, /aria-current="page"[^>]*><span>Forecast<\/span>/);
-    assert.match(html, /\/?month=3&amp;year=2026&amp;sector=consumer/);
-    assert.doesNotMatch(html, /view=default/);
-  });
-
-  it("swaps interpretation content without changing toggle shell", () => {
+  it("swaps interpretation content between sector and financial views", () => {
     const sector = buildInterpretationLayer({ view: "sector", homeBriefModel, assessment, forecast, decisionRules });
     const financial = buildInterpretationLayer({ view: "financial", homeBriefModel, assessment, forecast, decisionRules });
 
-    const sectorHtml = renderToStaticMarkup(<HomeInterpretationPanel layer={sector} searchParams={{}} />);
-    const financialHtml = renderToStaticMarkup(<HomeInterpretationPanel layer={financial} searchParams={{}} />);
+    const sectorText = layerText(sector);
+    const financialText = layerText(financial);
 
-    assert.match(sectorHtml, /Sector view/);
-    assert.match(sectorHtml, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
-    assert.match(financialHtml, /Financial view/);
-    assert.match(financialHtml, /Runway risk/);
-    assert.match(financialHtml, /Trigger: Open the raise between month/);
-    assert.match(financialHtml, /Reverse: Move burn by/);
-    assert.match(financialHtml, /Financial action summary/);
-    assert.match(sectorHtml, /Trigger: Hold irreversible hiring\./);
-    assert.match(sectorHtml, /Reverse: Drop the sector tilt if cash availability rises above 70\.0\./);
-    assert.match(sectorHtml, /Default/);
-    assert.match(financialHtml, /Default/);
+    assert.match(sectorText, /Sector view/);
+    assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
+    assert.match(sectorText, /Trigger: Hold irreversible hiring\./);
+    assert.match(sectorText, /Reverse: Drop the sector tilt if cash availability rises above 70\.0\./);
+    assert.match(financialText, /Financial view/);
+    assert.match(financialText, /Runway risk/);
+    assert.match(financialText, /Trigger: Open the raise between month/);
+    assert.match(financialText, /Reverse: Move burn by/);
   });
 
   it("adds fallback indicator when isFallback is active", () => {

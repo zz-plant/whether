@@ -63,6 +63,14 @@
   letter-spacing: 0.12em;
 }
 
+/* SVG <text> sizes itself from the fontSize presentation attribute, which a CSS
+   font-size always beats. Applying either primitive to a chart label therefore
+   resizes it to body-text scale — it blew up the yield-curve labels once. Chart
+   labels keep uppercase + tracking inline and let the attribute drive size. */
+svg :where(.type-eyebrow, .type-badge) {
+  font-size: inherit;
+}
+
 /* Uppercase micro badge — status pills, mode chips, trust tags. Shares the
    uppercase treatment with .type-eyebrow but is deliberately a separate
    primitive: these sit on dynamic tone classes (trustToneClass, STATUS_COLORS,
