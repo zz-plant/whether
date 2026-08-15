@@ -1,4 +1,5 @@
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
+import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 
 type YieldCurvePoint = {
   year: number;
@@ -48,60 +49,6 @@ const toMonthlyPoints = (series: YieldCurvePoint[]): MonthlyPoint[] => {
       spread2Y3M: mean(points.map((point) => point.spread2Y3M)),
     }))
     .slice(-12);
-};
-
-const buildSegmentedLineSeries = ({
-  values,
-  width,
-  height,
-  min,
-  max,
-}: {
-  values: Array<number | null>;
-  width: number;
-  height: number;
-  min: number;
-  max: number;
-}) => {
-  const range = max - min || 1;
-  const step = width / Math.max(values.length - 1, 1);
-  const paths: string[] = [];
-  const points: Array<{ x: number; y: number; value: number; index: number }> = [];
-  const missingColumns: Array<{ x: number; width: number }> = [];
-  let currentPath: string[] = [];
-  let currentPoints: Array<{ x: number; y: number; value: number; index: number }> = [];
-
-  values.forEach((value, index) => {
-    if (typeof value !== "number") {
-      if (currentPath.length >= 2) {
-        paths.push(currentPath.join(" "));
-        points.push(...currentPoints);
-      }
-      currentPath = [];
-      currentPoints = [];
-      missingColumns.push({
-        x: Math.max(0, index * step - step / 2),
-        width: Math.max(step, 4),
-      });
-      return;
-    }
-
-    const x = index * step;
-    const y = height - ((value - min) / range) * height;
-    currentPath.push(`${currentPath.length === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`);
-    currentPoints.push({ x, y, value, index });
-  });
-
-  if (currentPath.length >= 2) {
-    paths.push(currentPath.join(" "));
-    points.push(...currentPoints);
-  }
-
-  return {
-    paths,
-    missingColumns,
-    lastPoint: points[points.length - 1] ?? null,
-  };
 };
 
 const formatBp = (value: number | null) =>
@@ -158,8 +105,10 @@ export function SignalInversionPreview({
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
         <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
-          <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="rgba(244,63,94,0.12)" />
-          <rect x="0" y="0" width={CHART_WIDTH} height={zeroLineY} fill="rgba(16,185,129,0.08)" />
+          {/* Zone fills and strokes were hardcoded rgba() tuned to the dark
+              ground; on the light theme they rendered as dark-toned washes. */}
+          <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="var(--color-semantic-tightening-border)" fillOpacity="0.12" />
+          <rect x="0" y="0" width={CHART_WIDTH} height={zeroLineY} fill="var(--color-semantic-easing-border)" fillOpacity="0.08" />
           {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
             <rect
               key={`missing-${index}`}
@@ -167,22 +116,22 @@ export function SignalInversionPreview({
               y="0"
               width={column.width}
               height={CHART_HEIGHT}
-              fill="rgba(148,163,184,0.08)"
+              fill="var(--border-subtle)"
             />
           ))}
-          <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
+          <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
           <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">
             zero line
           </text>
           {spread10Y2YSeries.paths.map((path, index) => (
-            <path key={`10-2-${index}`} d={path} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.6" />
+            <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="1.6" />
           ))}
           {spread2Y3MSeries.paths.map((path, index) => (
-            <path key={`2-3-${index}`} d={path} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.6" />
+            <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="1.6" />
           ))}
           {spread10Y2YSeries.lastPoint ? (
             <>
-              <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="rgb(74 222 128)" />
+              <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-easing-border)" />
               <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">
                 10Y-2Y
               </text>
@@ -190,7 +139,7 @@ export function SignalInversionPreview({
           ) : null}
           {spread2Y3MSeries.lastPoint ? (
             <>
-              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="rgb(250 204 21)" />
+              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
               <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">
                 2Y-3M
               </text>
@@ -206,6 +155,10 @@ export function SignalInversionPreview({
           <span>10Y−2Y {formatBp(latest?.spread10Y2Y ?? null)}</span>
           <span>2Y−3M {formatBp(latest?.spread2Y3M ?? null)}</span>
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
+          {/* Autoscaled to the visible window, so the extent has to be stated. */}
+          <span className="tabular-nums text-slate-400">
+            Vertical scale {spreadMin.toFixed(2)} to {spreadMax.toFixed(2)} pts
+          </span>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 type-eyebrow">
           <span className="rounded-sm border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">

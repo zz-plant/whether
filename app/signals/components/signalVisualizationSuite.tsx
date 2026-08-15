@@ -5,6 +5,7 @@ import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
 import { ChevronDownIcon } from "../../components/uiIcons";
 import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
+import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 
 type Cadence = "weekly" | "monthly" | "yearly";
 
@@ -35,12 +36,6 @@ type ChartPoint = {
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
   curveSignal: number | null;
-};
-
-type SegmentedLineSeries = {
-  paths: string[];
-  missingColumns: Array<{ x: number; width: number }>;
-  lastPoint: { x: number; y: number; value: number; index: number } | null;
 };
 
 const formatPercent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
@@ -100,51 +95,42 @@ const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] =>
   }));
 };
 
+/**
+ * Positional shim over the shared builder. The local copy this replaces tracked
+ * `lastPoint` on every numeric value, including points in runs too short to be
+ * drawn — so a series label could point at a spot with no line under it.
+ */
 const linePath = (
   values: Array<number | null>,
   width: number,
   height: number,
   min: number,
   max: number,
-): SegmentedLineSeries => {
-  const range = max - min || 1;
-  const step = width / Math.max(values.length - 1, 1);
-  const paths: string[] = [];
-  const missingColumns: Array<{ x: number; width: number }> = [];
-  let currentPath: string[] = [];
-  let lastPoint: SegmentedLineSeries["lastPoint"] = null;
-
-  values.forEach((value, index) => {
-    if (typeof value !== "number") {
-      if (currentPath.length >= 2) {
-        paths.push(currentPath.join(" "));
-      }
-      currentPath = [];
-      missingColumns.push({
-        x: Math.max(0, index * step - step / 2),
-        width: Math.max(step, 4),
-      });
-      return;
-    }
-
-    const x = index * step;
-    const y = height - ((value - min) / range) * height;
-    currentPath.push(`${currentPath.length === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`);
-    lastPoint = { x, y, value, index };
-  });
-
-  if (currentPath.length >= 2) {
-    paths.push(currentPath.join(" "));
-  }
-
-  return { paths, missingColumns, lastPoint };
-};
+) => buildSegmentedLineSeries({ values, width, height, min, max });
 
 const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
 
 const toChartY = (value: number, min: number, max: number, height: number) => height - ((value - min) / (max - min || 1)) * height;
 
 const inDomain = (value: number, min: number, max: number) => value >= min && value <= max;
+
+/**
+ * Series colors as tokens. These were hardcoded `rgb(...)` literals picked
+ * against the dark ground, and the scatter's backdrop was `rgb(2 6 23)` — a
+ * black box once the light theme is on.
+ */
+const SERIES = {
+  oneMonth: "var(--color-semantic-unchanged-border)",
+  threeMonth: "var(--accent-action)",
+  twoYear: "var(--accent-success)",
+  tenYear: "var(--accent-info)",
+  spread10Y2Y: "var(--color-semantic-easing-border)",
+  spread2Y3M: "var(--color-semantic-caution-border)",
+} as const;
+
+/** Vertical extent as text. A chart with no stated scale cannot be read off. */
+const formatRange = (min: number, max: number, unit: string) =>
+  `${min.toFixed(2)} to ${max.toFixed(2)}${unit}`;
 
 const ribbonTone = (value: number | null) => {
   if (value === null) return "bg-slate-700/70";
@@ -184,11 +170,23 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const monthlyScatter = byCadence(yieldCurveSeries, "monthly")
     .map((point) => ({ x: point.twoYear, y: point.spread10Y2Y, key: point.label }))
     .filter((point): point is { x: number; y: number; key: string } => typeof point.x === "number" && typeof point.y === "number");
+  // This panel always plots monthly data, but it used to borrow rateMin/rateMax
+  // and spreadMin/spreadMax from `points` — which follow the cadence toggle. So
+  // switching the Rate stack to weekly or yearly silently rescaled this chart
+  // from a different aggregation, sliding every dot and pushing some outside the
+  // viewBox entirely. Its domain now comes from its own data.
+  const scatterXs = monthlyScatter.map((point) => point.x);
+  const scatterYs = monthlyScatter.map((point) => point.y);
+  const scatterXMin = scatterXs.length ? Math.min(...scatterXs) - 0.2 : 0;
+  const scatterXMax = scatterXs.length ? Math.max(...scatterXs) + 0.2 : 1;
+  const scatterYMin = scatterYs.length ? Math.min(...scatterYs, 0) - 0.1 : -0.5;
+  const scatterYMax = scatterYs.length ? Math.max(...scatterYs, 0) + 0.1 : 0.5;
+
   const scatterPath = monthlyScatter.length >= 2
     ? monthlyScatter
       .map((point, index) => {
-        const x = toChartX(point.x, rateMin, rateMax, 100);
-        const y = toChartY(point.y, spreadMin, spreadMax, 72);
+        const x = toChartX(point.x, scatterXMin, scatterXMax, 100);
+        const y = toChartY(point.y, scatterYMin, scatterYMax, 72);
         return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(" ")
@@ -274,19 +272,19 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </div>
             <svg viewBox="0 0 100 36" className="h-48 w-full" role="img" aria-label="1M, 3M, 2Y and 10Y rate stack">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
-                <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="rgb(148 163 184 / 0.08)" />
+                <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               {oneMonthSeries.paths.map((path, index) => (
-                <path key={`1m-${index}`} d={path} fill="none" stroke="rgb(148 163 184)" strokeWidth="1.4" />
+                <path key={`1m-${index}`} d={path} fill="none" stroke={SERIES.oneMonth} strokeWidth="1.4" />
               ))}
               {threeMonthSeries.paths.map((path, index) => (
-                <path key={`3m-${index}`} d={path} fill="none" stroke="rgb(125 211 252)" strokeWidth="1.4" />
+                <path key={`3m-${index}`} d={path} fill="none" stroke={SERIES.threeMonth} strokeWidth="1.4" />
               ))}
               {twoYearSeries.paths.map((path, index) => (
-                <path key={`2y-${index}`} d={path} fill="none" stroke="rgb(45 212 191)" strokeWidth="1.4" />
+                <path key={`2y-${index}`} d={path} fill="none" stroke={SERIES.twoYear} strokeWidth="1.4" />
               ))}
               {tenYearSeries.paths.map((path, index) => (
-                <path key={`10y-${index}`} d={path} fill="none" stroke="rgb(165 180 252)" strokeWidth="1.4" />
+                <path key={`10y-${index}`} d={path} fill="none" stroke={SERIES.tenYear} strokeWidth="1.4" />
               ))}
               {oneMonthSeries.lastPoint ? <text x="98" y={Math.max(5, oneMonthSeries.lastPoint.y - 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-300 uppercase tracking-[0.12em]">1M</text> : null}
               {threeMonthSeries.lastPoint ? <text x="98" y={Math.max(5, threeMonthSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-sky-200 uppercase tracking-[0.12em]">3M</text> : null}
@@ -299,11 +297,15 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <span>{latest?.label ?? "Latest"}</span>
             </div>
             <p className="text-xs text-slate-300">1M {formatPercent(latest?.oneMonth ?? null)} · 3M {formatPercent(latest?.threeMonth ?? null)} · 2Y {formatPercent(latest?.twoYear ?? null)} · 10Y {formatPercent(latest?.tenYear ?? null)}</p>
+            {/* Autoscaled to the visible window, so the extent has to be stated. */}
+            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(rateMin, rateMax, "%")}</p>
             {hasRateGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            <PanelTitle title="4) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread (monthly)." />
+            {/* Numbered to match DOM order, which is also the screen-reader and
+                mobile reading order. The titles used to run 1, 2, 4, 3, 5. */}
+            <PanelTitle title="3) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread. Always monthly, regardless of the cadence toggle." />
             <svg
               viewBox="0 0 100 72"
               className="h-48 w-full"
@@ -314,9 +316,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   : "Monthly steepness vs level scatter"
               }
             >
-              <rect x="0" y="0" width="100" height="72" fill="rgb(2 6 23)" />
-              {inDomain(0, rateMin, rateMax) ? <line x1={toChartX(0, rateMin, rateMax, 100)} y1="0" x2={toChartX(0, rateMin, rateMax, 100)} y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
-              {inDomain(0, spreadMin, spreadMax) ? <line x1="0" y1={toChartY(0, spreadMin, spreadMax, 72)} x2="100" y2={toChartY(0, spreadMin, spreadMax, 72)} stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
+              <rect x="0" y="0" width="100" height="72" fill="var(--bg-nested)" />
+              {inDomain(0, scatterXMin, scatterXMax) ? <line x1={toChartX(0, scatterXMin, scatterXMax, 100)} y1="0" x2={toChartX(0, scatterXMin, scatterXMax, 100)} y2="72" stroke="var(--border-strong)" strokeDasharray="2 2" /> : null}
+              {inDomain(0, scatterYMin, scatterYMax) ? <line x1="0" y1={toChartY(0, scatterYMin, scatterYMax, 72)} x2="100" y2={toChartY(0, scatterYMin, scatterYMax, 72)} stroke="var(--border-strong)" strokeDasharray="2 2" /> : null}
               {/* Arrowheads along the path. Opacity fade plus a "latest" label
                   told you which end was now, but nothing showed the direction of
                   travel through the middle of the trail. */}
@@ -330,22 +332,23 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   markerHeight="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="rgb(56 189 248 / 0.55)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--accent-action)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </marker>
               </defs>
               {scatterPath ? (
                 <path
                   d={scatterPath}
                   fill="none"
-                  stroke="rgb(56 189 248 / 0.28)"
+                  stroke="var(--accent-action)"
+                  strokeOpacity="0.28"
                   strokeWidth="0.8"
                   markerMid="url(#scatter-direction-arrow)"
                   markerEnd="url(#scatter-direction-arrow)"
                 />
               ) : null}
               {monthlyScatter.map((point, index) => {
-                const x = toChartX(point.x, rateMin, rateMax, 100);
-                const y = toChartY(point.y, spreadMin, spreadMax, 72);
+                const x = toChartX(point.x, scatterXMin, scatterXMax, 100);
+                const y = toChartY(point.y, scatterYMin, scatterYMax, 72);
                 const opacity = 0.25 + ((index + 1) / Math.max(monthlyScatter.length, 1)) * 0.65;
                 const isLatestPoint = point.key === monthlyScatter[monthlyScatter.length - 1]?.key;
                 return (
@@ -354,16 +357,17 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                     cx={x}
                     cy={y}
                     r={isLatestPoint ? "2.3" : "1.8"}
-                    fill={`rgb(56 189 248 / ${opacity.toFixed(2)})`}
-                    stroke={isLatestPoint ? "rgb(224 242 254 / 0.9)" : undefined}
+                    fill="var(--accent-action)"
+                    fillOpacity={opacity.toFixed(2)}
+                    stroke={isLatestPoint ? "var(--app-text)" : undefined}
                     strokeWidth={isLatestPoint ? "0.5" : undefined}
                   />
                 );
               })}
               {monthlyScatter.length ? (
                 <text
-                  x={Math.min(98, toChartX(monthlyScatter[monthlyScatter.length - 1].x, rateMin, rateMax, 100) + 4)}
-                  y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, spreadMin, spreadMax, 72) - 4)}
+                  x={Math.min(98, toChartX(monthlyScatter[monthlyScatter.length - 1].x, scatterXMin, scatterXMax, 100) + 4)}
+                  y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, scatterYMin, scatterYMax, 72) - 4)}
                   textAnchor="end"
                   fontSize="5"
                   fontFamily="Inter, system-ui, sans-serif"
@@ -373,22 +377,27 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 </text>
               ) : null}
             </svg>
+            {monthlyScatter.length ? (
+              <p className="text-fluid-xs tabular-nums text-slate-400">
+                X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, " pts")}
+              </p>
+            ) : null}
             <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">
-            <PanelTitle title="3) Inversion timeline" subtitle="Spreads vs zero-line; below zero means inversion." />
+            <PanelTitle title="4) Inversion timeline" subtitle="Spreads vs zero-line; below zero means inversion." />
             <svg viewBox="0 0 100 36" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
-                <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="rgb(148 163 184 / 0.08)" />
+                <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
-              <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
+              <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
               <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">zero</text>
               {spread10Y2YSeries.paths.map((path, index) => (
-                <path key={`spread-10-2-${index}`} d={path} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.4" />
+                <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="1.4" />
               ))}
               {spread2Y3MSeries.paths.map((path, index) => (
-                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.4" />
+                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="1.4" />
               ))}
               {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">10Y-2Y</text> : null}
               {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">2Y-3M</text> : null}
@@ -399,6 +408,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <span>{latest?.label ?? "Latest"}</span>
             </div>
             <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
+            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, " pts")}</p>
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 

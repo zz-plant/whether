@@ -27,7 +27,7 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
           ) : null}
           <span className="hidden sm:inline-block h-3 w-px bg-slate-700/60" aria-hidden="true" />
           <span className="truncate text-fluid-nano text-slate-400 font-mono">
-            Simulator · Signals · Trendline · Shift risk
+            Simulator · Signals · Shift risk
           </span>
         </div>
         <div className="flex items-center gap-2 text-slate-400 group-hover:text-white transition-colors">
@@ -42,7 +42,7 @@ export function EvidenceDrawer({ children, highlight }: { children?: ReactNode; 
         <div className="px-4 pb-4 pt-1 border-t border-slate-800/60 space-y-4">
           <div className="rounded-lg border border-slate-800/60 bg-slate-950/40 p-3">
             <p className="text-fluid-nano text-slate-400 leading-relaxed font-mono">
-              <span className="text-sky-400 font-semibold">Simulator:</span> test macro shocks · <span className="text-sky-400 font-semibold">Signals:</span> U.S. market drivers · <span className="text-sky-400 font-semibold">Trendline:</span> regime history · <span className="text-sky-400 font-semibold">Shift risk:</span> transition probability.
+              <span className="text-sky-400 font-semibold">Simulator:</span> test macro shocks · <span className="text-sky-400 font-semibold">Signals:</span> U.S. market drivers · <span className="text-sky-400 font-semibold">Shift risk:</span> transition probability.
             </p>
           </div>
           {children}
