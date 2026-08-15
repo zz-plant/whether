@@ -328,7 +328,7 @@ async function PageContent({
                 signalData={v2HeroSignalData}
                 signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
                 flipConditions={flipConditionLabels}
-                transitionProbability={transition.probability}
+                transitionForecast={transition.forecast}
                 guardrail={guardrailLabel}
                 reversalTrigger={reversalTriggerLabel}
                 shareLines={briefShareLines}

@@ -350,7 +350,7 @@ Drift guardrails:
 
 The homepage now renders one dominant weekly decision block instead of several equal-weight posture cards, per the `lg:grid-cols-12` single-card guardrail.
 
-- **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` and regime-transition probability now render as a compact `Flip watch:` line inside `DecisionHero`. The tightness barometer visual duplicated hero metrics and was cut.
+- **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` now render as a compact `Flip watch:` line inside `DecisionHero`. The distinct transition forecast follows as subordinate text with its modeled event and monthly horizon; it is never appended to the decision-reversal sentence. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
 - **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Boldness Budget, delta, and pause/reversal conditions remain visible.

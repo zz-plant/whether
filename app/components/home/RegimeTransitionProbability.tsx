@@ -1,13 +1,22 @@
 import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 
+export type TransitionForecastDisplay = {
+  probabilityPercent: number;
+  eventLabel: "Chance conditions change";
+  horizonLabel: "by next month";
+};
+
 export function computeTransitionProbability(currentRegime: string): {
   probability: number;
   likelyNext: string;
   avgDuration: number;
+  forecast: TransitionForecastDisplay | null;
 } {
   const series = getTimeMachineRegimeSeries(60);
-  if (series.length < 6) return { probability: 0, likelyNext: "Unknown", avgDuration: 0 };
+  if (series.length < 6) {
+    return { probability: 0, likelyNext: "Unknown", avgDuration: 0, forecast: null };
+  }
 
   const current = currentRegime.toUpperCase();
   let transitions = 0;
@@ -38,6 +47,17 @@ export function computeTransitionProbability(currentRegime: string): {
     probability,
     likelyNext: mostLikely ? mostLikely[0] : "Unknown",
     avgDuration,
+    // The time-machine series contains monthly observations. The reciprocal of
+    // the average run length is therefore a one-observation (one-month) exit
+    // rate for the current regime, not a multi-week probability of reaching the
+    // most common next regime.
+    forecast: probability > 0
+      ? {
+          probabilityPercent: probability,
+          eventLabel: "Chance conditions change",
+          horizonLabel: "by next month",
+        }
+      : null,
   };
 }
 
@@ -75,8 +95,8 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
           that uses it; the hairline below is the whole graphic it needs. */}
       <p className="mt-2 text-fluid-sm leading-relaxed text-slate-200">
         <span className={`text-fluid-xl font-bold tabular-nums ${tone.text}`}>{probability}%</span>{" "}
-        chance of shifting from {currentRegime} to {likelyNextLabel} in the next{" "}
-        <span className="tabular-nums">{avgDuration}</span> weeks.
+        estimated chance conditions shift from {currentRegime} over the next month. The most common
+        next observation is {likelyNextLabel}.
       </p>
 
       <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.07]" aria-hidden="true">
@@ -86,9 +106,9 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
       {/* Natural frequencies read faster than bare percentages, and this one is
           exact rather than a restatement: probability is defined as 1/avgDuration. */}
       <p className="mt-2 text-fluid-nano leading-relaxed text-white/45">
-        About 1 week in <span className="tabular-nums">{avgDuration}</span>, from the average time this
-        regime has held across the historical series. Most useful when you are already near a
-        decision boundary.
+        About 1 monthly observation in <span className="tabular-nums">{avgDuration}</span>, from the
+        average run length for this regime in the historical series. Most useful when you are already
+        near a decision boundary.
       </p>
     </div>
   );

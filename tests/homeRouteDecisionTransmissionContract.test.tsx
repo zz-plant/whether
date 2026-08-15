@@ -30,6 +30,24 @@ describe("home route render contract", () => {
     assert.ok(!rulesSource.includes("ShareBriefButton"), "bounded rules card must not duplicate the hero copy action");
   });
 
+  it("keeps the transition forecast distinct from the decision reversal", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
+
+    assert.ok(routeSource.includes("transitionForecast={transition.forecast}"), "the route passes forecast semantics, not a bare percentage");
+    assert.ok(heroSource.includes("transitionForecast.eventLabel"), "the forecast renders its modeled event");
+    assert.ok(heroSource.includes("transitionForecast.horizonLabel"), "the forecast renders its modeled horizon");
+    assert.ok(!heroSource.includes("transitionProbability"), "a bare probability cannot be appended to the flip condition");
+
+    const reversalIndex = heroSource.indexOf("DECISION_CONTRACT_LABELS.reversal.reversal");
+    const boundedListEndIndex = heroSource.indexOf("</dl>", reversalIndex);
+    const forecastIndex = heroSource.indexOf("transitionForecast.eventLabel");
+    assert.ok(
+      reversalIndex >= 0 && boundedListEndIndex > reversalIndex && forecastIndex > boundedListEndIndex,
+      "the subordinate forecast remains outside the bounded list and separate from Change course if",
+    );
+  });
+
   it("routes the lower home handoff through a collapsed disclosure to the operator-loop surfaces", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
     const railSource = readFileSync("app/components/DecisionRouteRail.tsx", "utf8");
