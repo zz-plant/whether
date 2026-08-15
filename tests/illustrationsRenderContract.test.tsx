@@ -87,6 +87,26 @@ describe("ThresholdLadder", () => {
     );
     assert.equal(html.includes("Reversal"), false);
   });
+
+  it("shares the visible scale direction with the accessible description", () => {
+    const direction = "0 = easier funding · 100 = harder funding";
+    const html = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l4"
+        min={0}
+        max={100}
+        current={64}
+        previous={61}
+        trigger={68}
+        signalLabel="Cash availability"
+        scaleDirection={direction}
+      />,
+    );
+
+    assert.match(html, /Cash availability: 64/);
+    assert.match(html, /Trigger at 68\./);
+    assert.equal(html.match(/0 = easier funding · 100 = harder funding/g)?.length, 2);
+  });
 });
 
 describe("RegimeGlyph", () => {
