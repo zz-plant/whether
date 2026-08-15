@@ -475,10 +475,19 @@ A what-if slider that lets operators drag tightness from 20–85 and see the reg
 
 Computes historical transition frequency from the time machine data and displays the probability of moving from the current regime to the most likely next regime, with an SVG arc visualization and average duration in weeks.
 
-### 8.3 Multi-week decision trendline
-**Location**: `app/components/home/DecisionTrendline.tsx`, rendered on `/` below the visitor context.
+### 8.3 Regime history over time
+**Location**: `app/components/RegimeHistory.tsx`, rendered on `/` in the sticky right column.
 
-Reads the decision journal from localStorage and renders a 6-week bar chart showing posture momentum. Color-coded bars (rose=tightening, emerald=expanding, slate=holding) with date labels. Momentum label and color gradient indicate direction.
+Renders the trailing 24 months of `getMonthlyRegimeHistory()` as a bar chart. Bar height encodes a
+boldness score (`riskAppetite * 0.7 + (100 - tightness) * 0.3`, stated on the card as `0–100`); bar
+hue encodes the regime and is backed by a text key, because hue-only encoding does not survive a
+screenshot. Bars link to that month via `?month=&year=`, and notable events are marked.
+
+Removed Aug 2026: `app/components/home/DecisionTrendline.tsx` rendered this same
+`macroTrendline` array a second time on the same screen, but derived its bar heights and trend
+line from the array index rather than from any data — so it drew an identical rising staircase
+regardless of the regimes. It also read a decision journal from localStorage that it never
+displayed. This section owns the display now; do not reintroduce a parallel one.
 
 ### 8.4 Decision journal and visitor context
 **Location**: `app/components/home/VisitorContext.tsx`, rendered on `/` below the hero.

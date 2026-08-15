@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
 type ScoreVariant = "large" | "compact" | "card";
 
@@ -24,20 +25,41 @@ type ScoreCardProps = {
   children?: ReactNode;
 };
 
-const deltaColor = (delta: number, increaseIsPositive: boolean) => {
-  if (delta === 0) return "text-slate-400";
-  const improved = increaseIsPositive ? delta > 0 : delta < 0;
-  return improved ? "text-emerald-200" : "text-amber-200";
-};
-
 const scoreColor = (value: number) => {
   if (value >= 70) return "border-emerald-400/50";
   if (value >= 40) return "border-amber-400/50";
   return "border-rose-400/50";
 };
 
-// "→" for unchanged, matching the delta glyphs on the weekly brief (DecisionHero, CompareStrip).
-const deltaArrow = (delta: number) => (delta > 0 ? "↑" : delta < 0 ? "↓" : "→");
+/**
+ * Delta readout: shaped glyph + tone + a sentence for assistive tech. The bare
+ * "↑"/"↓" characters this replaced carried the direction in a decorative
+ * codepoint that screen readers announce inconsistently or skip entirely.
+ */
+function ScoreDelta({
+  label,
+  delta,
+  increaseIsPositive,
+  glyphClass = "h-3.5 w-3.5",
+  className = "",
+}: {
+  label: string;
+  delta: number;
+  increaseIsPositive: boolean;
+  glyphClass?: string;
+  className?: string;
+}) {
+  const direction = trendDirectionFromDelta(delta);
+  return (
+    <span
+      className={`inline-flex items-center gap-0.5 align-baseline ${trendToneClass(direction, increaseIsPositive)} ${className}`}
+    >
+      <TrendGlyph direction={direction} className={glyphClass} />
+      {delta !== 0 ? <span aria-hidden="true">{Math.abs(delta)}</span> : null}
+      <span className="sr-only">{describeTrend({ label, delta })}</span>
+    </span>
+  );
+}
 
 export function ScoreCard({
   label,
@@ -58,9 +80,13 @@ export function ScoreCard({
         </p>
         <p className="text-2xl font-bold tabular-nums text-slate-100">
           {value}
-          <span className={`text-lg ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
-            {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
-          </span>
+          <ScoreDelta
+            label={label}
+            delta={delta}
+            increaseIsPositive={increaseIsPositive}
+            glyphClass="h-4 w-4"
+            className="ml-1 text-lg"
+          />
         </p>
         {children}
       </div>
@@ -76,9 +102,12 @@ export function ScoreCard({
         <p className="font-semibold tabular-nums text-slate-100" title={tooltip}>
           {value}
           {suffix}
-          <span className={`ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
-            {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
-          </span>
+          <ScoreDelta
+            label={label}
+            delta={delta}
+            increaseIsPositive={increaseIsPositive}
+            className="ml-1"
+          />
         </p>
         {children}
       </div>
@@ -95,9 +124,13 @@ export function ScoreCard({
       <p className="text-2xl font-bold tabular-nums text-slate-100">
         {value}
         {suffix}
-        <span className={`text-lg ml-1 ${deltaColor(delta, increaseIsPositive)}`}>
-          {deltaArrow(delta)}{delta !== 0 ? Math.abs(delta) : ""}
-        </span>
+        <ScoreDelta
+          label={label}
+          delta={delta}
+          increaseIsPositive={increaseIsPositive}
+          glyphClass="h-4 w-4"
+          className="ml-1 text-lg"
+        />
       </p>
       {children}
     </div>

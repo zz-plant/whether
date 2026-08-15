@@ -8,6 +8,8 @@ import { PostureDial } from "./illustrations/PostureDial";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import type { RegimeKey } from "../../lib/types";
+import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
+import type { SparklinePoint } from "./ui/sparkline";
 import { StageSwitcher } from "./StageSwitcher";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
@@ -20,6 +22,8 @@ type Props = {
   riskAppetiteDelta?: number;
   boldnessScore: number;
   boldnessDelta: number;
+  /** Trailing monthly boldness readings, oldest first. Omit to hide the sparkline. */
+  boldnessTrend?: readonly SparklinePoint[];
   boldnessShorthand?: string;
   weeklyCall?: string;
   actionNow?: string;
@@ -67,6 +71,7 @@ export function DecisionHero({
   riskAppetiteDelta,
   boldnessScore,
   boldnessDelta,
+  boldnessTrend,
   boldnessShorthand,
   weeklyCall,
   actionNow,
@@ -119,6 +124,15 @@ export function DecisionHero({
     : pointsToPause <= 20
       ? "text-amber-300"
       : "text-emerald-300";
+
+  // The score column states a level and a one-week delta; neither says whether 68
+  // is a normal reading or an outlier. The sparkline answers that in the space of
+  // a word, and the shaded band is the middle 50% of the same window.
+  const trendPoints = boldnessTrend && boldnessTrend.length >= 2 ? boldnessTrend : undefined;
+  const trendValues = trendPoints?.map((p) => p.value);
+  const trendDomain = trendValues ? sparklineDomain(trendValues) : undefined;
+  const trendBand = trendValues ? interquartileRange(trendValues) : undefined;
+  const trendTone = boldnessDelta > 0 ? "easing" : boldnessDelta < 0 ? "tightening" : "unchanged";
 
   const isDegradedData = isFallback || (degradedCount && degradedCount > 0);
   const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
@@ -373,6 +387,22 @@ export function DecisionHero({
             <span aria-hidden="true">{boldnessDelta > 0 ? "↑" : boldnessDelta < 0 ? "↓" : "→"}</span>
             <span>{boldnessDeltaLabel}</span>
           </div>
+          {trendPoints && trendDomain ? (
+            <p className="mt-1.5 flex items-center justify-center gap-1.5 text-fluid-nano tabular-nums text-white/45">
+              <Sparkline
+                points={trendPoints}
+                label="Boldness budget"
+                domain={trendDomain}
+                band={trendBand}
+                tone={trendTone}
+                widthEm={6}
+                className="text-white/60"
+              />
+              {/* The graphic is autoscaled, so the span has to be readable or the
+                  shape can't be decoded. */}
+              <span>{trendPoints.length} mo · {rangeLabel(trendDomain)}</span>
+            </p>
+          ) : null}
           <p className="text-fluid-xs font-medium text-white/50 mt-1">
             Boldness budget
           </p>

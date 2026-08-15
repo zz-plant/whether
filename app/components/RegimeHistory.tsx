@@ -8,6 +8,7 @@ import { Star } from "lucide-react";
 import { REGIME_COLORS, REGIME_DISPLAY } from "../viewModel";
 import { findEventAt, findNearestEvent } from "../../lib/summary/regimeEvents";
 import { formatMonthYear2DigitFromValue, formatMonthYearShortFromValue } from "../../lib/formatters";
+import { buildBoldnessScore } from "../../lib/report/weeklyLeadershipBrief";
 import { useClipboardCopy } from "./useClipboardCopy";
 
 type RegimeHistoryEntry = {
@@ -117,7 +118,7 @@ export function RegimeHistory({ regimes }: Props) {
           const isCurrent = i === regimes.length - 1 && !isViewingHistory;
           const selected = isSelectedEntry(entry);
           const boldness = entry.tightness != null && entry.riskAppetite != null
-            ? Math.round(entry.riskAppetite * 0.7 + (100 - entry.tightness) * 0.3)
+            ? buildBoldnessScore(entry.tightness, entry.riskAppetite)
             : null;
           const barHeight = boldness != null ? `${Math.max(20, Math.min(95, boldness))}%` : "85%";
           const ym = parseYearMonth(entry.record_date);

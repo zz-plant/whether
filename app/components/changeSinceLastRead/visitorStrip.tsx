@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatDateLabel } from "../../../lib/report/signalFormatting";
 import { literacyAssistStorageKeys, type LiteracyAssistMode } from "../../../lib/literacyAssist";
+import { TrendGlyph, describeTrend, trendDirectionFromDelta } from "../illustrations/TrendGlyph";
 import {
   getImpactTone,
   hasAssessmentChanged,
@@ -14,6 +15,21 @@ import {
 
 type DeltaMetricKey = "tightness" | "riskAppetite" | "baseRate";
 
+/**
+ * Which way counts as favourable per metric. Tightness and base rate rise when
+ * capital gets more expensive; risk appetite rises when it loosens.
+ */
+const METRIC_INCREASE_IS_POSITIVE: Record<DeltaMetricKey, boolean> = {
+  tightness: false,
+  riskAppetite: true,
+  baseRate: false,
+};
+
+/**
+ * Signed, deliberately. This used to return `Math.abs(...)`, which meant the
+ * one panel whose whole job is "what moved since you last looked" could never
+ * say which way anything moved.
+ */
 const getDeltaValueForMetric = ({
   metric,
   current,
@@ -25,11 +41,11 @@ const getDeltaValueForMetric = ({
 }) => {
   switch (metric) {
     case "tightness":
-      return Math.abs(current.scores.tightness - previous.scores.tightness);
+      return current.scores.tightness - previous.scores.tightness;
     case "riskAppetite":
-      return Math.abs(current.scores.riskAppetite - previous.scores.riskAppetite);
+      return current.scores.riskAppetite - previous.scores.riskAppetite;
     case "baseRate":
-      return Math.abs(current.scores.baseRate - previous.scores.baseRate);
+      return current.scores.baseRate - previous.scores.baseRate;
     default:
       return 0;
   }
@@ -102,8 +118,14 @@ export const ReturningVisitorDeltaStrip = ({
         previous: previous.assessment,
       }),
     }))
-    .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
-    .sort((left, right) => right.delta - left.delta)
+    .map((item) => ({
+      ...item,
+      tone: getImpactTone(item.delta, {
+        increaseIsPositive: METRIC_INCREASE_IS_POSITIVE[item.metric],
+      }),
+    }))
+    // Rank by size of move; the sign is carried by the tag, not by the order.
+    .sort((left, right) => Math.abs(right.delta) - Math.abs(left.delta))
     .slice(0, 3);
 
   const titleByFocus: Record<LiteracyAssistMode, string> = {
@@ -147,9 +169,15 @@ export const ReturningVisitorDeltaStrip = ({
           <li key={item.label}>
             <a
               href={item.href}
-              className={`inline-flex min-h-[44px] items-center rounded-sm border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
+              className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-sm border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
             >
-              {item.label} · {item.tone.label}
+              <TrendGlyph direction={trendDirectionFromDelta(item.delta)} className="h-3.5 w-3.5 shrink-0" />
+              <span aria-hidden="true">
+                {item.label} · {item.tone.label}
+              </span>
+              <span className="sr-only">
+                {describeTrend({ label: item.label, delta: item.delta })} {item.tone.impactLabel}.
+              </span>
             </a>
           </li>
         ))}

@@ -32,7 +32,8 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC } from "../lib/formatters";
+import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
+import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 
@@ -209,7 +210,6 @@ type BelowTheFoldEvidenceProps = {
   pauseThreshold: number;
   currentRiskAppetite: number;
   currentRegime: string;
-  regimes: RegimeEntry[];
   companyStage: string | undefined;
   tightnessDelta: number;
   riskAppetiteDelta: number;
@@ -231,7 +231,6 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
             currentTightness={props.tightness}
             currentRiskAppetite={props.currentRiskAppetite}
             currentRegime={props.currentRegime}
-            regimes={props.regimes}
             companyStage={props.companyStage}
             tightnessDelta={props.tightnessDelta}
             riskAppetiteDelta={props.riskAppetiteDelta}
@@ -294,6 +293,18 @@ async function PageContent({
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
   const macroTrendline = regimeHistory.slice(-24);
+
+  // Same score the hero headlines, computed back across the window so the number
+  // carries its own history. Months missing either input are dropped rather than
+  // interpolated — a gap is honest, an invented point is not.
+  const boldnessTrend = macroTrendline.flatMap((entry) =>
+    entry.tightness != null && entry.riskAppetite != null
+      ? [{
+          label: formatMonthYearShortFromValue(entry.record_date),
+          value: buildBoldnessScore(entry.tightness, entry.riskAppetite),
+        }]
+      : [],
+  );
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
@@ -388,6 +399,7 @@ async function PageContent({
                 riskAppetiteDelta={riskAppetiteDelta}
                 boldnessScore={weeklyLeadershipSummary.boldnessScore}
                boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+               boldnessTrend={boldnessTrend}
                boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
                weeklyCall={primaryCall}
                actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
@@ -445,7 +457,6 @@ async function PageContent({
               pauseThreshold={pauseThreshold}
               currentRiskAppetite={riskAppetite}
               currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
-              regimes={macroTrendline}
               companyStage={operatorContext.companyStage ?? undefined}
               tightnessDelta={tightnessDelta}
               riskAppetiteDelta={riskAppetiteDelta}

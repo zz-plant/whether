@@ -8,14 +8,40 @@ export type LastReadSnapshot = {
 
 export const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
 
-export const getImpactTone = (value: number) => {
-  if (value >= 1.5) {
-    return { label: "High impact", className: "border-rose-300/80 bg-rose-500/15 text-rose-100" };
+/**
+ * Impact tone for a signed weekly move.
+ *
+ * Size sets the impact band; direction sets the colour. Colouring by magnitude
+ * alone painted every large move rose, so a 2-point tightness *drop* — good
+ * news — arrived looking like an alarm.
+ */
+export const getImpactTone = (
+  delta: number,
+  { increaseIsPositive = false }: { increaseIsPositive?: boolean } = {},
+) => {
+  const size = Math.abs(delta);
+  const impactLabel = size >= 1.5 ? "High impact" : size >= 0.75 ? "Medium impact" : "Low impact";
+
+  if (size < 0.05) {
+    return {
+      label: "Unchanged",
+      impactLabel: "Unchanged",
+      directionLabel: "unchanged",
+      className: "border-slate-400/70 bg-slate-500/15 text-slate-100",
+    };
   }
-  if (value >= 0.75) {
-    return { label: "Medium impact", className: "border-amber-300/80 bg-amber-500/15 text-amber-100" };
-  }
-  return { label: "Low impact", className: "border-emerald-300/80 bg-emerald-500/15 text-emerald-100" };
+
+  const rose = delta > 0;
+  const improved = increaseIsPositive ? rose : !rose;
+
+  return {
+    label: `${rose ? "Up" : "Down"} · ${impactLabel}`,
+    impactLabel,
+    directionLabel: rose ? "rose" : "fell",
+    className: improved
+      ? "border-emerald-300/80 bg-emerald-500/15 text-emerald-100"
+      : "border-amber-300/80 bg-amber-500/15 text-amber-100",
+  };
 };
 
 export const hasAssessmentChanged = (

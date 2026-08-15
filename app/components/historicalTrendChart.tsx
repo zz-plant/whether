@@ -1,3 +1,5 @@
+import { buildSparklinePath, rangeLabel, sparklineDomain } from "./ui/sparkline";
+
 type TrendPoint = { date: string; value: number };
 
 type HistoricalTrendChartProps = {
@@ -11,21 +13,19 @@ type HistoricalTrendChartProps = {
   increaseIsPositive?: boolean;
 };
 
+const W = 100;
+const H = 32;
+const PAD_Y = 2;
+
 export function HistoricalTrendChart({ label, color, points, increaseIsPositive = false }: HistoricalTrendChartProps) {
   if (points.length < 2) return null;
 
   const values = points.map((p) => p.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const w = 100;
-  const h = 32;
-
-  const pathD = points.map((p, i) => {
-    const x = (i / (points.length - 1)) * w;
-    const y = h - ((p.value - min) / range) * (h - 4) - 2;
-    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
+  // Same projection the inline sparkline uses, so the two never drift apart.
+  const domain = sparklineDomain(values);
+  const [min, max] = domain;
+  const span = max - min || 1;
+  const pathD = buildSparklinePath(values, domain, W, H, PAD_Y);
 
   const currentVal = points[points.length - 1].value;
   const firstVal = points[0].value;
@@ -45,9 +45,16 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
           </span>
         </span>
       </div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-8 overflow-visible" aria-label={`${label} trend over ${points.length} periods`}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full h-8 overflow-visible"
+        role="img"
+        // The chart is autoscaled, so the range has to be stated or the shape
+        // can't be decoded.
+        aria-label={`${label} over ${points.length} periods, ranging ${rangeLabel(domain)}. Latest ${currentVal}.`}
+      >
         <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={w} cy={h - ((currentVal - min) / range) * (h - 4) - 2} r="2" fill={color} />
+        <circle cx={W} cy={H - PAD_Y - ((currentVal - min) / span) * (H - PAD_Y * 2)} r="2" fill={color} />
       </svg>
     </div>
   );

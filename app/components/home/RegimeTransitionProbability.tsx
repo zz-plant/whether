@@ -1,7 +1,5 @@
 import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
-import type { RegimeKey } from "../../../lib/regimeEngine";
-
-const REGIME_ORDER: RegimeKey[] = ["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"];
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 
 export function computeTransitionProbability(currentRegime: string): {
   probability: number;
@@ -57,33 +55,41 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
 
   if (probability === 0) return null;
 
-  const arcRotation = (probability / 100) * 180;
-  const color = probability > 50 ? "text-amber-200" : probability > 25 ? "text-sky-200" : "text-emerald-200";
-  const strokeColor = probability > 50 ? "var(--color-semantic-caution-border)" : probability > 25 ? "var(--accent-action)" : "var(--color-semantic-easing-border)";
+  // likelyNext arrives as a raw regime key while currentRegime is already a
+  // display label, so the sentence used to read "from Expansion to VOLATILE".
+  const likelyNextLabel = likelyNext === "Unknown" ? likelyNext : getRegimePublicLabel(likelyNext);
+
+  const tone = probability > 50
+    ? { text: "text-semantic-caution-fg", fill: "var(--color-semantic-caution-border)" }
+    : probability > 25
+      ? { text: "text-sky-200", fill: "var(--accent-action)" }
+      : { text: "text-semantic-easing-fg", fill: "var(--color-semantic-easing-border)" };
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/30 px-5 py-4">
       <p className="type-eyebrow">Regime outlook</p>
-      <div className="mt-3 flex items-center gap-4">
-        <svg viewBox="0 0 80 44" className="h-16 w-28 flex-shrink-0" aria-hidden="true">
-          <path
-            d="M 10 34 A 30 30 0 0 1 70 34"
-            fill="none"
-            stroke={strokeColor}
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeDasharray={`${(arcRotation / 180) * 94} 200`}
-            opacity="0.85"
-          />
-          <circle cx="40" cy="34" r="2" fill={strokeColor} />
-        </svg>
-        <div title={`Based on ${avgDuration}-week historical pattern. A regime is a specific combination of credit availability and investor risk appetite. Transitions happen when market conditions shift — watch this % when you're at decision boundaries.`}>
-          <p className={`text-lg font-bold ${color}`}>{probability}%</p>
-          <p className="text-xs text-slate-400">
-            chance of transitioning from {currentRegime} to {likelyNext} within {avgDuration} weeks
-          </p>
-        </div>
+
+      {/* The previous version spent a 112x64 semicircular dial on this single
+          scalar and put its only explanation in a title tooltip — invisible in a
+          screenshot, unreachable by keyboard. One number belongs in the sentence
+          that uses it; the hairline below is the whole graphic it needs. */}
+      <p className="mt-2 text-fluid-sm leading-relaxed text-slate-200">
+        <span className={`text-fluid-xl font-bold tabular-nums ${tone.text}`}>{probability}%</span>{" "}
+        chance of shifting from {currentRegime} to {likelyNextLabel} in the next{" "}
+        <span className="tabular-nums">{avgDuration}</span> weeks.
+      </p>
+
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.07]" aria-hidden="true">
+        <div className="h-full rounded-full" style={{ width: `${probability}%`, background: tone.fill }} />
       </div>
+
+      {/* Natural frequencies read faster than bare percentages, and this one is
+          exact rather than a restatement: probability is defined as 1/avgDuration. */}
+      <p className="mt-2 text-fluid-nano leading-relaxed text-white/45">
+        About 1 week in <span className="tabular-nums">{avgDuration}</span>, from the average time this
+        regime has held across the historical series. Most useful when you are already near a
+        decision boundary.
+      </p>
     </div>
   );
 }
