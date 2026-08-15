@@ -19,6 +19,8 @@ export type ThresholdLadderProps = {
   unit?: string;
   /** Name of the measured signal, for the accessible title. */
   signalLabel: string;
+  /** Compact explanation of which end of the scale carries which meaning. */
+  scaleDirection?: string;
   className?: string;
 };
 
@@ -39,6 +41,7 @@ export function ThresholdLadder({
   reversal,
   unit = "",
   signalLabel,
+  scaleDirection,
   className,
 }: ThresholdLadderProps) {
   if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return null;
@@ -79,14 +82,15 @@ export function ThresholdLadder({
         ? " Unchanged since last period."
         : ` ${currentValue > previousValue ? "Rose" : "Fell"} from ${formatNumber(previousValue)}${unit}, ${movingToward ? "moving toward" : "moving away from"} the trigger.`;
 
-  const desc = `${thresholdDesc}${movementDesc}`;
+  const directionDesc = scaleDirection ? ` Scale direction: ${scaleDirection}` : "";
+  const desc = `${thresholdDesc}${directionDesc}${movementDesc}`;
 
   // Keep end-of-rail captions from spilling out of the viewBox.
   const clampLabelX = (x: number) => Math.min(Math.max(x, 26), 214);
 
   return (
     <svg
-      viewBox="0 0 240 56"
+      viewBox={`0 0 240 ${scaleDirection ? 68 : 56}`}
       width="100%"
       style={{ height: "auto" }}
       role="img"
@@ -95,6 +99,17 @@ export function ThresholdLadder({
     >
       <title id={`${idPrefix}-title`}>{`${signalLabel}: ${readout}`}</title>
       <desc id={`${idPrefix}-desc`}>{desc}</desc>
+
+      {scaleDirection ? (
+        <text
+          x={RAIL_START}
+          y={9}
+          fill="var(--app-text-muted)"
+          fontSize={8}
+        >
+          {scaleDirection}
+        </text>
+      ) : null}
 
       <line
         x1={RAIL_START}

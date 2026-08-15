@@ -205,6 +205,18 @@ export function DecisionHero({
             </span>
           </p>
         ) : null}
+        <div className="mt-1.5 w-full">
+          <ThresholdLadder
+            idPrefix={`hero-tightness-${idSuffix}`}
+            min={0}
+            max={100}
+            current={tightness}
+            previous={tightness - tightnessDelta}
+            trigger={tightnessThreshold}
+            signalLabel="Cash availability"
+            scaleDirection="0 = easier funding · 100 = harder funding"
+          />
+        </div>
       </div>
 
       {typeof riskAppetite === "number" ? (
@@ -336,21 +348,6 @@ export function DecisionHero({
                   {pointsToPause} pts to pause
                 </span>
               </div>
-              {typeof tightnessThreshold === "number" ? (
-                <div className="w-full max-w-[20rem]">
-                  <ThresholdLadder
-                    idPrefix="hero-tightness"
-                    min={0}
-                    max={100}
-                    current={tightness}
-                    // Turns the rail into approach-or-retreat: the rule that
-                    // matters is whether this week closed on the trigger.
-                    previous={tightness - tightnessDelta}
-                    trigger={tightnessThreshold}
-                    signalLabel="Cash availability"
-                  />
-                </div>
-              ) : null}
               <dl className="space-y-1.5 text-fluid-xs">
                 {guardrail ? (
                   <div className="flex gap-2">
