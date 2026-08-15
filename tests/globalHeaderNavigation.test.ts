@@ -49,9 +49,9 @@ describe("global header navigation helpers", () => {
   });
 
   it("walks the operator loop for next-step cues and cycles back to the brief", () => {
-    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/signals", label: "Evidence" });
-    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/operate", label: "Plan" });
-    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/answer", label: "Resolve" });
+    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/operate", label: "Plan" });
+    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/signals", label: "Evidence" });
+    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/answer", label: "Resolve" });
     assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/trust", label: "Trust" });
     assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Brief" });
     assert.equal(resolveReportHeaderNextStep("/history"), null);

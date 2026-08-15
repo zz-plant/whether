@@ -4,14 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
-
-const WORKFLOW_ROUTES = [
-  { href: "/", label: "Brief" },
-  { href: "/signals", label: "Evidence" },
-  { href: "/operate", label: "Plan" },
-  { href: "/answer", label: "Resolve" },
-  { href: "/trust", label: "Trust" },
-] as const;
+import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
 
 function OutlineItem({
   href,
@@ -100,7 +93,7 @@ function SidebarContent({
         Workflow
       </p>
       <nav aria-label="Workflow" className="space-y-0.5">
-        {WORKFLOW_ROUTES.map((route) => {
+        {primaryNavigationLayers.map((route) => {
           const isActive =
             route.href === "/"
               ? pathname === "/"
@@ -109,7 +102,7 @@ function SidebarContent({
             <OutlineItem
               key={route.href}
               href={route.href}
-              label={route.label}
+              label={route.navLabel ?? route.label}
               isActive={isActive}
               onClick={onClose}
             />

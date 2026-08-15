@@ -20,7 +20,7 @@ export type NavigationLayer = {
   parentKey?: NavigationLayerKey;
 };
 
-// Primary layers are listed in operator-loop order: brief → evidence → plan →
+// Primary layers are listed in operator-loop order: brief → plan → evidence →
 // resolve → readiness. Header next-step cues and nav ordering derive from this
 // array — do not maintain a parallel ordering elsewhere.
 export const navigationLayers: NavigationLayer[] = [
@@ -34,21 +34,21 @@ export const navigationLayers: NavigationLayer[] = [
     tier: "primary",
   },
   {
-    key: "signals",
-    href: "/signals",
-    label: "Evidence",
-    navLabel: "Evidence",
-    description: "See what changed, what drove it, and the thresholds worth watching.",
-    boundary: "Use this when you want the proof behind the call.",
-    tier: "primary",
-  },
-  {
     key: "planning",
     href: "/operate",
     label: "Plan",
     navLabel: "Plan",
     description: "Turn this week's brief into decisions on hiring, spend, roadmap, and what to share.",
     boundary: "Use this when you are ready to turn the brief into approvals.",
+    tier: "primary",
+  },
+  {
+    key: "signals",
+    href: "/signals",
+    label: "Evidence",
+    navLabel: "Evidence",
+    description: "See what changed, what drove it, and the thresholds worth watching.",
+    boundary: "Use this when you want the proof behind the call.",
     tier: "primary",
   },
   {
