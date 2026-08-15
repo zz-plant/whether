@@ -49,7 +49,7 @@ export default async function ShipChecklistPage({
             ["blastRadius", "Blast radius", ["large", "medium", "small"]],
             ["strategicAlignment", "Strategic alignment", ["low", "medium", "high"]],
           ] as const).map(([key, label, options]) => (
-            <label key={key} className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
+            <label key={key} className="space-y-1 type-eyebrow text-slate-300">
               {label}
               <select name={key} defaultValue={input[key]} className="weather-control rounded-md border-slate-700 bg-slate-900">
                 {options.map((option) => (
@@ -67,7 +67,7 @@ export default async function ShipChecklistPage({
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Result</p>
+        <p className="type-eyebrow">Result</p>
         <h2 className="text-xl font-semibold text-slate-100">Recommendation: {result.verdict.toUpperCase()}</h2>
         <p className="text-sm text-slate-300">Adjusted score: {result.adjustedScore}</p>
         <ul className="space-y-2 text-sm text-slate-200">

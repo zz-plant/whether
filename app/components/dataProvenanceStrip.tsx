@@ -137,16 +137,16 @@ export const DataProvenanceStrip = ({
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
         <p className="text-xs text-slate-300">{derivationLine}</p>
         <div className="flex flex-wrap items-center gap-2 text-fluid-xs">
-          <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
+          <span className={`${dataMode.className} type-badge`}>
             <span aria-hidden="true">{dataModeIcon}</span>
             <span>{dataMode.label}</span>
           </span>
-          <span className="inline-flex items-center rounded-sm border border-slate-700/75 bg-slate-900/70 px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-slate-100">
+          <span className="inline-flex items-center rounded-sm border border-slate-700/75 bg-slate-900/70 px-2 py-0.5 type-eyebrow text-slate-100">
             Confidence {confidencePct}%
           </span>
           <Popover.Root>
             <Popover.Trigger
-              className={`weather-chip min-h-[44px] border px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
+              className={`weather-chip min-h-[44px] border px-3 py-2 type-badge transition-colors hover:border-slate-500/80 ${
                 statusStyle ?? "border-slate-700 text-slate-200"
               }`}
             >
@@ -169,13 +169,13 @@ export const DataProvenanceStrip = ({
           <ManualRefreshButton
             label="Refresh"
             title="Request a fresh snapshot for this provenance context."
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 type-eyebrow text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
           />
         </div>
         <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
           {provenanceRows.map((row) => (
             <p key={row.label} className="space-y-1">
-              <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
+              <span className="block type-eyebrow">{row.label}</span>
               <span className="block tracking-normal normal-case">{row.value}</span>
             </p>
           ))}
@@ -188,17 +188,17 @@ export const DataProvenanceStrip = ({
     <div className="weather-surface space-y-2 rounded-lg border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-slate-400 uppercase tracking-[0.14em]">{label}</span>
-        <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
+        <span className="text-slate-400 type-eyebrow">{label}</span>
+        <span className={`${dataMode.className} type-badge`}>
           <span aria-hidden="true">{dataModeIcon}</span>
           <span>{dataMode.label}</span>
         </span>
-        <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs uppercase tracking-[0.12em] text-slate-200">
+        <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-1 type-eyebrow text-slate-200">
           Confidence {confidencePct}%
         </span>
         <Popover.Root>
           <Popover.Trigger
-            className={`weather-chip inline-flex min-h-[44px] items-center border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
+            className={`weather-chip inline-flex min-h-[44px] items-center border px-2 py-1 type-badge transition-colors hover:border-slate-500/80 ${
               statusStyle ?? "border-slate-700 text-slate-200"
             }`}
           >
@@ -207,7 +207,7 @@ export const DataProvenanceStrip = ({
           <Popover.Portal>
             <Popover.Positioner side="top" align="center" sideOffset={8}>
               <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
+                <p className="type-eyebrow">Trust snapshot</p>
                 <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
                 <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
                   <p><span className="text-slate-400">Confidence:</span> {confidencePct}%</p>
@@ -220,13 +220,13 @@ export const DataProvenanceStrip = ({
         <ManualRefreshButton
           label="Refresh"
           title="Request a fresh snapshot for this provenance context."
-          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 type-eyebrow hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
         />
       </div>
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (
           <p key={row.label} className="space-y-1">
-            <span className="block text-fluid-micro uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
+            <span className="block type-eyebrow">{row.label}</span>
             <span className="block tracking-normal normal-case">{row.value}</span>
           </p>
         ))}

@@ -29,7 +29,7 @@ export function RouteLoadingShell({
       currentPath={currentPath}
     >
       <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2 text-fluid-xs font-semibold uppercase tracking-[0.12em]">
+        <div className="flex flex-wrap items-center gap-2 type-eyebrow">
           <span className="rounded-sm border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
           <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
         </div>
@@ -66,7 +66,7 @@ export function RouteLoadingShell({
         <div className="space-y-2">
           {["Why this call?", "Can I trust this?", "What else can I explore?", "How does this affect me?"].map((q) => (
             <div key={q} className="border-b border-slate-800/60 py-3">
-              <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">{q} ▸</span>
+              <span className="type-eyebrow">{q} ▸</span>
             </div>
           ))}
         </div>

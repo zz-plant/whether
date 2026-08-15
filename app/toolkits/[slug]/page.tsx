@@ -73,7 +73,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <ol className="space-y-3 text-sm text-slate-200">
           {toolkit.runSequence.map((step) => (
             <li key={step.phase} className="weather-surface space-y-2 px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">{step.phase}</p>
+              <p className="type-eyebrow text-slate-300">{step.phase}</p>
               <p><span className="font-semibold text-slate-100">Objective:</span> {step.objective}</p>
               <p className="font-semibold text-slate-100">Prompts</p>
               <ul className="space-y-1">
@@ -118,13 +118,13 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <div className="grid gap-3 sm:grid-cols-2">
           {decisionPaths.roles.map((path) => (
             <Link key={path.slug} href={path.href as Route} className="weather-surface space-y-1 px-4 py-4 text-sm text-slate-100">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Role path</p>
+              <p className="type-eyebrow text-slate-300">Role path</p>
               <p className="font-semibold">{path.title}</p>
             </Link>
           ))}
           {decisionPaths.situations.map((path) => (
             <Link key={path.slug} href={path.href as Route} className="weather-surface space-y-1 px-4 py-4 text-sm text-slate-100">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Situation path</p>
+              <p className="type-eyebrow text-slate-300">Situation path</p>
               <p className="font-semibold">{path.title}</p>
             </Link>
           ))}

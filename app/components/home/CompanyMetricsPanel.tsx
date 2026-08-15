@@ -100,7 +100,7 @@ export function CompanyMetricsPanel({
   return (
     <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-4 py-4">
       <div className="flex items-center justify-between gap-3 mb-3">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Your numbers</p>
+        <p className="type-eyebrow">Your numbers</p>
         <button
           type="button"
           onClick={editing ? handleSave : handleStartEdit}

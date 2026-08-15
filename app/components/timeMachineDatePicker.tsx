@@ -61,7 +61,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
         <Dialog.Popup className="weather-slide-panel fixed z-50 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[20rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Time machine">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Historical view</h2>
+            <h2 className="type-eyebrow text-slate-300">Historical view</h2>
             <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close">
               <CloseIcon />
             </Dialog.Close>
@@ -99,7 +99,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
           ) : (
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Year</label>
+                <label className="type-eyebrow">Year</label>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {years.map((year) => (
                     <button key={year} type="button" onClick={() => setSelectedYear(year)}
@@ -110,7 +110,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
               </div>
               {months.length > 0 ? (
                 <div>
-                  <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Month</label>
+                  <label className="type-eyebrow">Month</label>
                   <div className="mt-1.5 grid grid-cols-4 gap-1.5">
                     {months.map((month) => (
                       <button key={month} type="button" onClick={() => navigateTo(selectedYear, month)}

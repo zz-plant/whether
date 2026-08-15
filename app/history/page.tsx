@@ -106,7 +106,7 @@ export default function HistoryPage() {
 
         {regimeSeries.length > 0 ? (
           <div className="space-y-1.5">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Regime timeline</p>
+            <p className="type-eyebrow">Regime timeline</p>
             <div className="flex flex-wrap gap-1">
               {regimeSeries.slice(-24).map((entry) => {
                 const isSelected = entry.year === selectedYear && entry.month === selectedMonth;
@@ -190,9 +190,9 @@ export default function HistoryPage() {
         {regimeForPeriod ? (
           <div className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-4 py-3 space-y-3">
             <div className="space-y-1">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Selected period</p>
+              <p className="type-eyebrow">Selected period</p>
               <p className="text-sm text-slate-100">{selectedMonth}/{selectedYear}</p>
-              <span className={`inline-block rounded-sm px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${
+              <span className={`inline-block rounded-sm px-2 py-0.5 type-badge ${
                 regimeForPeriod === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
                 regimeForPeriod === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
                 regimeForPeriod === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :
@@ -221,12 +221,12 @@ export default function HistoryPage() {
 
       {history.length > 0 ? (
         <section className="weather-panel space-y-4 px-5 py-5">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision archive</h2>
+          <h2 className="type-eyebrow">Decision archive</h2>
           <p className="text-sm text-slate-300">Past weekly decisions recorded from your visits.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-700/60 text-left text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
+                <tr className="border-b border-slate-700/60 text-left type-eyebrow">
                   <th className="pb-2 pr-4">Week</th>
                   <th className="pb-2 pr-4">Decision</th>
                   <th className="pb-2 pr-4">Regime</th>
@@ -239,7 +239,7 @@ export default function HistoryPage() {
                     <td className="py-2.5 pr-4 text-slate-400 whitespace-nowrap">{record.recordDate}</td>
                     <td className="py-2.5 pr-4 text-slate-200">{record.action}</td>
                     <td className="py-2.5 pr-4">
-                      <span className={`rounded-sm px-2 py-0.5 font-semibold uppercase tracking-[0.08em] text-fluid-micro ${
+                      <span className={`rounded-sm px-2 py-0.5 type-badge text-fluid-micro ${
                         record.regime === "EXPANSION" ? "text-emerald-200 bg-emerald-500/10" :
                         record.regime === "SCARCITY" ? "text-rose-200 bg-rose-500/10" :
                         record.regime === "DEFENSIVE" ? "text-amber-200 bg-amber-500/10" :
@@ -259,7 +259,7 @@ export default function HistoryPage() {
       ) : null}
 
       <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Posture by year</h2>
+        <h2 className="type-eyebrow">Posture by year</h2>
         <p className="text-sm text-slate-300">
           What the operating posture was in each closed period, with the regime splits and mid-period reversals behind it.
         </p>

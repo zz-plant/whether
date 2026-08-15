@@ -41,15 +41,15 @@ export default function CompsPage() {
         ) : data ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Median EV/Revenue</p>
+              <p className="type-eyebrow">Median EV/Revenue</p>
               <p className="text-2xl font-semibold text-slate-100">{data.medianEvToRevenue?.toFixed(1)}x</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Median Revenue Growth</p>
+              <p className="type-eyebrow">Median Revenue Growth</p>
               <p className="text-2xl font-semibold text-slate-100">{data.medianRevenueGrowth?.toFixed(1)}%</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Companies Tracked</p>
+              <p className="type-eyebrow">Companies Tracked</p>
               <p className="text-2xl font-semibold text-slate-100">{data.companyCount}/15</p>
             </div>
           </div>
@@ -58,7 +58,7 @@ export default function CompsPage() {
         )}
 
         <section className="space-y-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Basket composition</h2>
+          <h2 className="type-eyebrow">Basket composition</h2>
           <p className="text-sm text-slate-300">
             Snowflake, Shopify, Salesforce, HubSpot, MongoDB, Datadog, Atlassian, Workday, ServiceNow, Zscaler, Confluent, Toast, GitLab, Cloudflare, Freshworks.
           </p>
@@ -68,7 +68,7 @@ export default function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why this matters</h2>
+          <h2 className="type-eyebrow">Why this matters</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
             Public SaaS valuation multiples directly affect private startup fundraising. When public multiples compress, private valuations follow — because the same public market investors often lead or influence late-stage rounds. When multiples expand, fundraising conditions improve.
           </p>

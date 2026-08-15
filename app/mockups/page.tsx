@@ -45,7 +45,7 @@ export default function MockupsIndexPage() {
     <main id="main-content" tabIndex={-1} className="weather-page-shell weather-page-shell-wide">
       <section className="weather-panel rounded-lg border border-slate-700/70 px-5 py-8 sm:px-8 sm:py-10">
         <div className="space-y-4">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+          <p className="type-eyebrow text-cyan-200">
             Visual Lab
           </p>
           <h1 className="max-w-4xl text-4xl font-semibold text-white sm:text-5xl">
@@ -68,7 +68,7 @@ export default function MockupsIndexPage() {
                   {mockup.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex min-h-[36px] items-center rounded-sm border border-slate-700/80 bg-slate-950/70 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300"
+                      className="inline-flex min-h-[36px] items-center rounded-sm border border-slate-700/80 bg-slate-950/70 px-3 py-1 type-eyebrow text-slate-300"
                     >
                       {tag}
                     </span>
@@ -100,7 +100,7 @@ export default function MockupsIndexPage() {
         </div>
 
         <aside className="weather-panel rounded-lg border border-slate-700/70 px-5 py-5">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
+          <p className="type-eyebrow">
             Working Rules
           </p>
           <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-200">

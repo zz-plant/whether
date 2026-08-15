@@ -148,7 +148,7 @@ export function SignalInversionPreview({
   return (
     <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
       <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Curve context</p>
+        <p className="type-eyebrow">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
           Inversion timeline before you open the deeper evidence.
         </h2>
@@ -171,7 +171,7 @@ export function SignalInversionPreview({
             />
           ))}
           <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-          <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">
+          <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 type-eyebrow">
             zero line
           </text>
           {spread10Y2YSeries.paths.map((path, index) => (
@@ -183,7 +183,7 @@ export function SignalInversionPreview({
           {spread10Y2YSeries.lastPoint ? (
             <>
               <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="rgb(74 222 128)" />
-              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.14em]">
+              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 type-eyebrow">
                 10Y-2Y
               </text>
             </>
@@ -191,13 +191,13 @@ export function SignalInversionPreview({
           {spread2Y3MSeries.lastPoint ? (
             <>
               <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="rgb(250 204 21)" />
-              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.14em]">
+              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 type-eyebrow">
                 2Y-3M
               </text>
             </>
           ) : null}
         </svg>
-        <div className="mt-2 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-400">
+        <div className="mt-2 flex items-center justify-between type-eyebrow">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
           <span>{latest?.label}</span>
@@ -207,7 +207,7 @@ export function SignalInversionPreview({
           <span>2Y−3M {formatBp(latest?.spread2Y3M ?? null)}</span>
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
+        <div className="mt-3 flex flex-wrap gap-2 type-eyebrow">
           <span className="rounded-sm border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
             10Y-2Y inverted {monthsInverted10Y2Y} mo
           </span>

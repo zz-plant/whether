@@ -68,7 +68,7 @@ export default function IdenticonsMockupPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+              <span className="inline-flex items-center gap-1.5 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 type-eyebrow text-cyan-300">
                 <Sparkles className="h-3.5 w-3.5" /> Whether Visual Lab
               </span>
               <span className="inline-flex items-center rounded-sm border border-slate-700 bg-slate-950 px-2.5 py-1 text-fluid-micro font-medium text-slate-300">

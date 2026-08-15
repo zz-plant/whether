@@ -63,7 +63,7 @@ export function RegimeTransitionProbability({ currentRegime }: { currentRegime: 
 
   return (
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-950/30 px-5 py-4">
-      <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Regime outlook</p>
+      <p className="type-eyebrow">Regime outlook</p>
       <div className="mt-3 flex items-center gap-4">
         <svg viewBox="0 0 80 44" className="h-16 w-28 flex-shrink-0" aria-hidden="true">
           <path

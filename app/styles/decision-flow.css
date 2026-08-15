@@ -1,8 +1,4 @@
-.weather-decision-hero {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
+
 
 .weather-decision-hero::before {
   content: "";
@@ -12,16 +8,6 @@
   background:
     linear-gradient(180deg, var(--accent-glow), transparent 36%);
   pointer-events: none;
-}
-
-.weather-decision-chip {
-  position: relative;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease,
-    color 180ms ease;
 }
 
 .weather-decision-chip[data-priority="true"] {
@@ -43,18 +29,6 @@
 .weather-delta-card:hover,
 .weather-delta-card:focus-within {
   transform: translateY(-1px);
-}
-
-.weather-step-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(30, 30, 30, 0.55);
-  transition:
-    transform 220ms ease,
-    border-color 220ms ease,
-    background-color 220ms ease,
-    box-shadow 220ms ease,
-    color 220ms ease;
 }
 
 .weather-step-card[data-active="true"] {
@@ -81,22 +55,6 @@
   animation: weather-panel-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.weather-step-summary {
-  background: rgba(30, 30, 30, 0.45);
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.weather-step-summary:hover,
-.weather-step-summary:focus-within {
-  transform: translateY(-1px);
-  border-color: rgba(125, 211, 252, 0.22);
-  box-shadow: var(--elev-2);
-}
-
 .weather-disclosure-panel {
   overflow: hidden;
   transform-origin: top center;
@@ -107,7 +65,6 @@
     transform var(--transition-fast) var(--ease-out),
     color var(--transition-fast) var(--ease-out);
 }
-
 
 button:focus-visible,
 a:focus-visible,
@@ -128,14 +85,6 @@ summary:focus-visible {
 
 :where(.weather-panel a:hover, .weather-surface a:hover) {
   text-decoration-color: rgba(125, 211, 252, 0.9);
-}
-
-
-.weather-meta-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.65rem;
 }
 
 .weather-meta-list__item {
@@ -194,5 +143,4 @@ summary:focus-visible {
 :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   text-wrap: pretty;
 }
-
 

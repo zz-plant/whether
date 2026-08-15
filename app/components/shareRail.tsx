@@ -92,7 +92,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
         <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share brief">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Share</h2>
+          <h2 className="type-eyebrow text-slate-300">Share</h2>
           <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">
             <CloseIcon />
           </Dialog.Close>
@@ -100,7 +100,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
         <div className="mt-4 space-y-3">
           <fieldset>
-            <legend className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Preset</legend>
+            <legend className="type-eyebrow">Preset</legend>
             <div className="mt-1.5 grid grid-cols-2 gap-1.5">
               {(Object.keys(presetLabels) as SharePreset[]).map((key) => (
                 <button
@@ -155,7 +155,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 })()}
               />
             </div>
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Copy as</p>
+            <p className="type-eyebrow">Copy as</p>
             <p role="status" aria-live="polite" className="sr-only">
               {copyStatusMessage}
             </p>

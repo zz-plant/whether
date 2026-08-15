@@ -163,7 +163,7 @@ export const ExecutiveBriefingPanel = ({
                       key={section.key}
                       className={`weather-surface border p-4 ${section.surfaceClass}`}
                     >
-                      <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-slate-300">
+                      <p className="type-eyebrow text-slate-300">
                         {section.badge}
                       </p>
                       <h4 className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-50">

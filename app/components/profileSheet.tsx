@@ -18,7 +18,7 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
         <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="History & export">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">History & Export</h2>
+            <h2 className="type-eyebrow text-slate-300">History & Export</h2>
             <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close">
               <CloseIcon />
             </Dialog.Close>
@@ -26,7 +26,7 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
 
           <div className="mt-4 space-y-4">
             <div>
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Past Briefs</p>
+              <p className="type-eyebrow mb-2">Past Briefs</p>
               <nav className="space-y-1" aria-label="History and compare">
                 <ActionLink href="/history" variant="inline" className="block px-3 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-800/50">
                   Full archive
@@ -38,7 +38,7 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="border-t border-slate-800/60 pt-4">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-2">Export & Share</p>
+              <p className="type-eyebrow mb-2">Export & Share</p>
               <div className="space-y-2">
                 <button
                   type="button"

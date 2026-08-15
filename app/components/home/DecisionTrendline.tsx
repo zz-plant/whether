@@ -57,7 +57,7 @@ export function DecisionTrendline({ regimes }: MacroTrendlineProps) {
     <div className="max-w-xl mx-auto rounded-lg border border-slate-800/60 bg-slate-900/30 px-4 py-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">Macro trend</p>
+          <p className="type-eyebrow">Macro trend</p>
           <p className="mt-1 text-sm font-semibold text-slate-200">{momentumLabel}</p>
         </div>
         <div className="flex items-end gap-1.5 h-16 relative">

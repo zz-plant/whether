@@ -49,13 +49,13 @@ export function SourceHealthPanel({ rows }: { rows: SourceHealthRow[] }) {
                   <p className="mt-0.5 text-fluid-xs text-slate-400">{row.cadenceLabel}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className={`rounded-sm border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${modeStyle}`}>
+                  <span className={`rounded-sm border px-2 py-0.5 type-badge ${modeStyle}`}>
                     {modeLabel}
                   </span>
-                  <span className={`rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${freshnessStyle}`}>
+                  <span className={`rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 type-badge ${freshnessStyle}`}>
                     {freshnessLabel}
                   </span>
-                  <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 type-eyebrow">
                     {formatSla(row.freshnessSlaHours)}
                   </span>
                 </div>

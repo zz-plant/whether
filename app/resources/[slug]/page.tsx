@@ -221,7 +221,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
             {RESOURCES_RETURN_LABEL}
           </Link>
         </div>
-        <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Primary keyword: {page.keyword}</p>
+        <p className="type-eyebrow">Primary keyword: {page.keyword}</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.h1}</h1>
         <p className="text-sm text-slate-200">{page.description}</p>
         <p className="text-sm text-slate-300">{page.boardPackContext}</p>
@@ -293,7 +293,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
               />
             ) : null}
 
-            <p className="pt-1 text-xs uppercase tracking-[0.14em] text-slate-400">
+            <p className="pt-1 type-eyebrow">
               <Link href="#top" className="text-slate-300 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">
                 Back to top
               </Link>

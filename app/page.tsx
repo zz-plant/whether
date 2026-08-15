@@ -150,7 +150,7 @@ function WeeklyTopFoldContract({
     >
       <div className="space-y-2 md:col-span-5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-micro font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">Weekly Posture Delta</p>
+          <p className="text-fluid-micro font-mono type-eyebrow">Weekly Posture Delta</p>
           <span className="text-fluid-micro font-medium text-sky-300/90">
             {isSteadyWeek ? STEADY_WEEK_LABEL : weeklySummary.notchShiftLabel}
           </span>
@@ -168,7 +168,7 @@ function WeeklyTopFoldContract({
 
       <div className="space-y-2 md:col-span-7 border-t border-slate-800/60 pt-3 md:border-t-0 md:border-l md:pt-0 md:pl-4">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-micro font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">Revisit Queue</p>
+          <p className="text-fluid-micro font-mono type-eyebrow">Revisit Queue</p>
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-fluid-micro font-mono font-semibold ${
             shouldRevisit ? "border border-amber-500/40 bg-amber-500/10 text-amber-300" : "border border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
           }`}>

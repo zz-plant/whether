@@ -11,7 +11,7 @@ const actionLinkVariantClasses: Record<ActionLinkVariant, string> = {
   ghost:
     "weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
   inline:
-    "weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-300 transition-colors hover:text-sky-200",
+    "weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center type-badge text-sky-300 transition-colors hover:text-sky-200",
 };
 
 const joinClasses = (...values: Array<string | undefined>) => values.filter(Boolean).join(" ");

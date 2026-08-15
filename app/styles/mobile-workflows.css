@@ -48,36 +48,11 @@ body::-webkit-scrollbar-thumb:hover,
   margin: -1rem -0.75rem;
 }
 
-.weather-mobile-nav {
-  @apply border border-white/[0.08] bg-slate-950/90 backdrop-blur-lg;
-  border-radius: var(--radius-xl);
-  box-shadow:
-    0 calc(-20 * var(--sh)) calc(40 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-deep),
-    0 calc(-8 * var(--sh)) calc(18 * var(--sh)) calc(-14 * var(--sh)) var(--accent-border-soft);
-  overscroll-behavior: contain;
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-}
-
-.weather-mobile-panel {
-  @apply border border-white/[0.08] bg-slate-950/95 backdrop-blur-lg;
-  border-radius: var(--radius-xl);
-  box-shadow:
-    var(--elev-5),
-    var(--glow-soft);
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.weather-mobile-sheet {
-  max-height: min(80vh, calc(100dvh - env(safe-area-inset-top) - 5.75rem));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .weather-live-dot {
     animation: none;
   }
 }
-
 
 .cadence-checklist {
   container-type: inline-size;
@@ -141,7 +116,6 @@ body::-webkit-scrollbar-thumb:hover,
     justify-content: center;
   }
 }
-
 
 .anchor-feedback-active {
   animation: anchorGlow 820ms ease-out;

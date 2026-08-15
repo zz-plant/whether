@@ -14,6 +14,12 @@ type ReportSectionProps = {
    * for screen readers so `aria-labelledby` and the `id` anchor keep working.
    */
   hideHeader?: boolean;
+  /**
+   * Trailing control for the section header — a toggle, an export link, a count.
+   * Without this, any section needing one had to hand-roll the whole wrapper,
+   * which is the other reason this component stayed unadopted outside /trust.
+   */
+  action?: ReactNode;
 };
 
 export function ReportSection({
@@ -25,6 +31,7 @@ export function ReportSection({
   label,
   headingLevel,
   hideHeader = false,
+  action,
 }: ReportSectionProps) {
   const headingId = `section-${id}-heading`;
   const HeadingTag = headingLevel || (variant === "unified" ? "h2" : "h4");
@@ -48,7 +55,7 @@ export function ReportSection({
             aria-hidden="true"
           />
           {label ? (
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200/80">
+            <span className="type-eyebrow text-sky-200/80">
               {label}
             </span>
           ) : null}
@@ -75,15 +82,24 @@ export function ReportSection({
       aria-labelledby={headingId}
       className="weather-panel space-y-5 px-5 py-5 scroll-mt-28"
     >
-      <div>
-        <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
-          {title}
-        </HeadingTag>
-        {description ? (
-          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
-            {description}
-          </p>
-        ) : null}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          {/* The unified variant used to drop `label` on the floor — only the split
+              variant rendered it. Every route that needed an eyebrow above its
+              section title therefore hand-rolled the whole section instead of
+              using this component, which is a large part of why it only ever got
+              adopted on /trust. */}
+          {label ? <p className="type-eyebrow mb-1">{label}</p> : null}
+          <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
+            {title}
+          </HeadingTag>
+          {description ? (
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
       {children}
     </section>

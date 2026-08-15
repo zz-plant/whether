@@ -5,28 +5,6 @@
     linear-gradient(90deg, rgba(52, 211, 153, 0.018), rgba(56, 189, 248, 0.014), rgba(251, 191, 36, 0.012));
 }
 
-.weather-grid {
-  background-image:
-    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.36) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 88% 22%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 58% 30%, rgba(191, 219, 254, 0.25) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 26% 58%, rgba(226, 232, 240, 0.18) 0 1px, transparent 1.5px);
-  background-size: 100% 100%;
-  opacity: 0.34;
-}
-
-.weather-grid {
-  @apply rounded-lg border;
-  border-color: var(--border-default);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
-    var(--bg-panel);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight);
-  container-type: inline-size;
-}
-
 /* Tier 2: Secondary surfaces — bands, section bodies */
 .weather-surface-secondary {
   @apply rounded-lg border backdrop-blur-sm;
@@ -45,19 +23,6 @@
   border-color: var(--color-border-subtle);
   background-color: transparent;
   box-shadow: none;
-}
-
-.weather-appbar {
-  @apply rounded-lg border backdrop-blur-sm;
-  border-color: var(--color-border-default);
-  background-color: rgba(24, 27, 32, 0.86);
-  background-image:
-    linear-gradient(180deg, rgba(34, 38, 45, 0.94) 0%, rgba(22, 25, 30, 0.96) 62%, rgba(14, 16, 20, 0.98) 100%);
-  box-shadow:
-    var(--elev-4),
-    0 calc(8 * var(--sh)) calc(20 * var(--sh)) calc(-18 * var(--sh)) rgba(45, 212, 191, 0.12),
-    inset 0 1px 0 var(--edge-highlight),
-    inset 0 0 0 1px var(--accent-border-soft);
 }
 
 .weather-panel-static {
@@ -270,12 +235,6 @@
 .weather-hub-chip:focus-visible {
   outline: 2px solid rgba(56, 189, 248, 0.85);
   outline-offset: 2px;
-}
-
-.weather-hub-chip-active {
-  border-color: rgba(56, 189, 248, 0.30);
-  background: rgba(14, 116, 144, 0.15);
-  color: white;
 }
 
 .weather-hub-stat-grid {
@@ -535,26 +494,6 @@
   color: rgb(203 213 225);
 }
 
-.weather-tile {
-  @apply rounded-lg border border-white/[0.08] backdrop-blur-md;
-  background: var(--bg-surface);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
-}
-
-.weather-bento-grid {
-  display: grid;
-  gap: clamp(0.85rem, 0.75rem + 0.6vw, 1.25rem);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.weather-forecast-strip {
-  display: grid;
-  gap: clamp(0.75rem, 0.65rem + 0.4vw, 1rem);
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .weather-panel,
 .weather-appbar,
 .weather-panel-static,
@@ -582,16 +521,6 @@
   border-color: var(--border-default);
   background: var(--bg-surface-raised);
   font-variant-numeric: tabular-nums;
-}
-
-.weather-forecast-icon {
-  @apply inline-flex h-11 w-11 items-center justify-center rounded-lg border text-base;
-  border-color: var(--border-default);
-  background: rgba(24, 24, 24, 0.75);
-  color: rgb(248 250 252);
-  box-shadow:
-    inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-    var(--elev-1);
 }
 
 @media (min-width: 640px) {
@@ -637,7 +566,5 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-
 }
-
 

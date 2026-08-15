@@ -29,7 +29,7 @@ const adj = MACRO_ADJUSTMENT_CONSTANTS;
 function FormulaCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <article className="weather-hub-card space-y-2 rounded-lg px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{title}</p>
+      <p className="type-eyebrow">{title}</p>
       {children}
     </article>
   );

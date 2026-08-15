@@ -103,7 +103,7 @@ export async function DecisionAnswerPageContent({
           description={liveDirectAnswer}
           aside={(
             <div className="weather-surface space-y-2 px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Short answer</p>
+              <p className="type-eyebrow">Short answer</p>
               <p className="text-sm font-semibold text-sky-200">{liveShortAnswer}</p>
               {payload.noindex ? (
                 <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
@@ -150,7 +150,7 @@ export async function DecisionAnswerPageContent({
           <div className="grid gap-3 sm:grid-cols-2">
             {mappedRules.map((rule) => (
               <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
+                <p className="type-eyebrow text-sky-200">{decisionAreaLabel(rule.area)}</p>
                 <p className="font-semibold text-slate-100">{rule.recommendation}</p>
                 <p className="text-xs text-slate-300">Scope: {rule.scope}</p>
                 {rule.doNow[0] ? (

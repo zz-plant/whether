@@ -83,7 +83,7 @@ export function HubHero({
             <div className="grid gap-2 sm:grid-cols-3">
               {stats.map((item) => (
                 <div key={item.label} className="weather-stat-card">
-                  <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  <p className="type-eyebrow">
                     {item.label}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.value}</p>

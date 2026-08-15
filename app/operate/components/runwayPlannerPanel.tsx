@@ -224,7 +224,7 @@ This memo aligns our company budget and operating guardrails with the current cl
         <div className="weather-surface border-sky-500/25 bg-slate-950/60 p-5 rounded-lg space-y-4">
           <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Generated board memo</p>
+              <p className="type-eyebrow text-sky-200">Generated board memo</p>
               <p className="text-fluid-xs text-slate-400">Review the aligned budget structure below.</p>
             </div>
             <ClipboardActionRow

@@ -96,7 +96,7 @@ export function GuidedTranslationPanels({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Team view</p>
+                <p className="type-eyebrow text-violet-200">Team view</p>
                 <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
               </div>
               <Link
@@ -119,7 +119,7 @@ export function GuidedTranslationPanels({
           </article>
 
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">How this changes by stage</p>
+            <p className="type-eyebrow">How this changes by stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {selectedStakeholder.stageSpecificContent.map((entry) => {
                 const stage = findStageGuide(entry.stageSlug);
@@ -129,7 +129,7 @@ export function GuidedTranslationPanels({
                     <p className="mt-1">{entry.guidance}</p>
                     <Link
                       href={buildGuidedTranslationHref({ stakeholder: selectedStakeholder.slug, stage: entry.stageSlug })}
-                      className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                      className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
                     >
                       Open {stage?.title ?? "stage"} view
                     </Link>
@@ -139,7 +139,7 @@ export function GuidedTranslationPanels({
             </ul>
             {selectedStakeholder.promotionAccelerator ? (
               <div className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="type-eyebrow">
                   {selectedStakeholder.promotionAccelerator.title}
                 </p>
                 <p className="mt-2 text-sm text-slate-200">
@@ -164,7 +164,7 @@ export function GuidedTranslationPanels({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Stage view</p>
+                <p className="type-eyebrow text-violet-200">Stage view</p>
                 <h3 className="text-lg font-semibold text-slate-100">{selectedStage.title}</h3>
               </div>
               <Link
@@ -193,7 +193,7 @@ export function GuidedTranslationPanels({
           </article>
 
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">How each team should read this stage</p>
+            <p className="type-eyebrow">How each team should read this stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {relatedStakeholderGuides.map((guide) => (
                 <li key={guide.slug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
@@ -201,7 +201,7 @@ export function GuidedTranslationPanels({
                   <p className="mt-1">{guide.guidance}</p>
                   <Link
                     href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage.slug })}
-                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                    className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
                   >
                     Open {guide.title} view
                   </Link>
@@ -220,7 +220,7 @@ export function GuidedTranslationPanels({
             <p className="text-sm text-slate-200">{guide.positioning}</p>
             <Link
               href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage?.slug })}
-              className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+              className="inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
             >
               Open {guide.title} view
             </Link>
@@ -229,7 +229,7 @@ export function GuidedTranslationPanels({
       </div>
 
       <details className="weather-panel weather-auto-chevron space-y-3 px-5 py-5">
-        <summary data-chevron className="cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">
+        <summary data-chevron className="cursor-pointer list-none text-sm type-eyebrow text-sky-200">
           {showStageLibrary ? "Browse the other stages" : `Open the other stages (${stageGuides.length})`}
         </summary>
         <div className="mt-4 space-y-4">
@@ -237,7 +237,7 @@ export function GuidedTranslationPanels({
             <div className="overflow-x-auto weather-hub-card px-4 py-4">
               <table className="w-full min-w-[620px] text-left text-sm text-slate-200">
                 <thead>
-                  <tr className="border-b border-slate-700 text-xs uppercase tracking-[0.12em] text-slate-400">
+                  <tr className="border-b border-slate-700 type-eyebrow">
                     <th className="py-2 pr-4">Stage</th>
                     <th className="py-2 pr-4">Team size</th>
                     <th className="py-2 pr-4">Primary value</th>
@@ -267,7 +267,7 @@ export function GuidedTranslationPanels({
                 <p className="text-xs text-slate-300">{stage.primaryValue}</p>
                 <Link
                   href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: selectedStakeholder?.slug })}
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                  className="inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
                 >
                   Open stage view
                 </Link>
