@@ -38,10 +38,10 @@ jobs:
           mkdir -p artifacts
           bun run check:vinext 2>&1 | tee artifacts/vinext-check.log
 
-      - name: Build for Cloudflare Worker target
+      - name: Package Cloudflare Worker deploy
         run: |
           mkdir -p artifacts
-          bun run build:cloudflare 2>&1 | tee artifacts/cloudflare-build.log
+          bun run deploy:cloudflare:dry-run 2>&1 | tee artifacts/cloudflare-deploy-dry-run.log
 
       - name: Upload Cloudflare warning artifacts
         if: always()
