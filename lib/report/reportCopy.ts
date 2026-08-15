@@ -57,6 +57,20 @@ export const DECISION_CONTRACT_LABELS = {
   },
 } as const;
 
+/** Plain-language copy for the homepage's scan-first bounded-decision ledger. */
+export const ACTION_STRIP_DISPLAY_COPY = {
+  heading: "What can we do this week?",
+  action: "Do now",
+  threshold: "Stop or tighten if",
+  reversal: "Open up again when",
+  state: {
+    Closed: "Keep this closed",
+    Guarded: "Proceed with guardrails",
+    Staged: "Stage the next move",
+    Open: "Move ahead now",
+  },
+} as const;
+
 /**
  * A flat week is the common case and a useful answer in itself: it means the
  * standing calls survive another week. State the consequence rather than

@@ -67,6 +67,8 @@ on ≥640px viewports (DD-004 mobile-compression work, 2026-08-11).
 The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
 - boldness budget score and weekly delta,
 - hiring, expansion, and fundraising windows,
+- a scan-first “What can we do this week?” ledger using `Do now`, `Stop or tighten if`, and
+  `Open up again when`, with structured lane states translated into explicit action phrases,
 - one-line net delta shorthand.
 The canonical weekly-call block now also includes:
 - a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
