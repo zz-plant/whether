@@ -27,7 +27,7 @@ export const ReportSectionNavigation = ({
     <nav aria-label="Section index" className={className}>
       <div className="weather-panel-static space-y-3 rounded px-3 py-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-400">
+          <p className="type-eyebrow">
             On this page
           </p>
           <span className="weather-tag weather-tag-slate">

@@ -152,7 +152,7 @@ export const RegimeTimelinePanel = ({
                       aria-hidden="true"
                     />
                     <div className="relative z-10 w-full bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent px-2 pb-2 pt-8 sm:px-3">
-                      <p className="truncate text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-100 sm:text-xs">
+                      <p className="truncate type-eyebrow text-slate-100 sm:text-xs">
                         {runLabel}
                       </p>
                       <p className="hidden text-fluid-micro text-slate-200/90 sm:block">{spanLabel}</p>

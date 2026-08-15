@@ -71,7 +71,7 @@ export function FreshnessDot({
       >
         {/* Shape carries the state alongside color: circle = fully live feed, square = static
             input present (snapshot or cached/degraded sources) — and the pulse means "live". */}
-        <span className={`inline-flex items-center gap-1 text-fluid-nano font-semibold uppercase tracking-[0.06em] ${statusColor}`}>
+        <span className={`inline-flex items-center gap-1 type-badge ${statusColor}`}>
           {showOfflineBadge || hasDegraded ? (
             <StatusStaticIcon className="size-1.5" />
           ) : (

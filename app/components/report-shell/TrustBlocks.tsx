@@ -120,16 +120,16 @@ export function HeroTrustProvenanceBlock({
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex min-h-[28px] items-center rounded-md border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${trustToneClass}`}
+              className={`inline-flex min-h-[28px] items-center rounded-md border px-2.5 py-1 type-badge ${trustToneClass}`}
             >
               {controlHeadline}
             </span>
-            <span className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400">
+            <span className="type-eyebrow">
               Approval readiness
             </span>
             {outageSeverity ? (
               <span
-                className={`inline-flex min-h-[28px] items-center rounded-md border px-2.5 py-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] ${
+                className={`inline-flex min-h-[28px] items-center rounded-md border px-2.5 py-1 type-badge ${
                   outageSeverity === "critical"
                     ? "border-rose-400/45 bg-rose-500/10 text-rose-100"
                     : outageSeverity === "blocking"
@@ -159,7 +159,7 @@ export function HeroTrustProvenanceBlock({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="type-eyebrow">
             Approval lane
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -167,7 +167,7 @@ export function HeroTrustProvenanceBlock({
               {currentApprovalLane?.label ?? (isCompactStableState ? "Allowed now" : "Use caution")}
             </p>
             <span
-              className={`rounded-md border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${trustToneClass}`}
+              className={`rounded-md border px-2 py-0.5 type-badge ${trustToneClass}`}
             >
               {trustReadiness.tone === "stable" ? "Clear" : "Watch"}
             </span>
@@ -178,7 +178,7 @@ export function HeroTrustProvenanceBlock({
         </article>
 
         <article className="weather-trust-lane px-3 py-3">
-          <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="type-eyebrow">
             Reliability window
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -187,7 +187,7 @@ export function HeroTrustProvenanceBlock({
                 ? `${degradedSourceRows?.length} source${(degradedSourceRows?.length ?? 0) === 1 ? "" : "s"} degraded`
                 : "Core feeds look usable"}
             </p>
-            <span className="text-fluid-micro uppercase tracking-[0.12em] text-slate-400">
+            <span className="type-eyebrow">
               {outageExitGate
                 ? `${outageExitGate.metCount}/${outageExitGate.totalCount} clear`
                 : trustReadiness.tone === "warning"
@@ -211,7 +211,7 @@ export function HeroTrustProvenanceBlock({
       </div>
 
       <details className="weather-auto-chevron weather-transmission-segment rounded-md px-3 py-2">
-          <summary data-chevron className="min-h-[44px] cursor-pointer list-none pt-1 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <summary data-chevron className="min-h-[44px] cursor-pointer list-none pt-1 type-eyebrow text-slate-300">
             Source board
           </summary>
           <div className="mt-2">

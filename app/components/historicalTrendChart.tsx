@@ -37,7 +37,7 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">{label}</span>
+        <span className="type-eyebrow">{label}</span>
         <span className="text-fluid-xs font-semibold tabular-nums text-slate-300">
           {currentVal}
           <span className={`${deltaColor} ml-1`}>

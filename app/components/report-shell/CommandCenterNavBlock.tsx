@@ -95,7 +95,7 @@ export function CommandCenterNavBlock({
       <div className="space-y-3 sm:space-y-4">
         {roleSwitcher && heroVariant === "full" ? (
           <div className="rounded border border-slate-800/55 bg-slate-950/40 p-3">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">
+            <p className="type-eyebrow">
               Role
             </p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -206,7 +206,7 @@ export function CommandCenterNavBlock({
           <details className="group rounded border border-slate-800/55 bg-slate-950/40 px-4 py-3 sm:px-5 sm:py-4">
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 sm:cursor-default sm:list-none">
               <span className="min-w-0">
-                <span className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <span className="type-eyebrow">
                   {missionSequenceTitle || "Use this order"}
                 </span>
                 <span className="mt-0.5 block text-fluid-xs text-slate-400">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
@@ -222,12 +222,12 @@ export function CommandCenterNavBlock({
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-sky-100/70">
+                        <p className="type-eyebrow text-sky-100/70">
                           {item.phase}
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
                       </div>
-                      <span className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
+                      <span className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-0.5 type-eyebrow">
                         {item.cta}
                       </span>
                     </div>

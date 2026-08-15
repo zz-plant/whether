@@ -43,23 +43,6 @@
   100% { background-position: -200% 0; }
 }
 
-.weather-loading-beacon {
-  display: inline-block;
-  height: 0.55rem;
-  width: 0.55rem;
-  border-radius: 9999px;
-  background: rgba(45, 212, 191, 0.70);
-  animation: weather-pulse 1.4s ease-in-out infinite;
-}
-
-.weather-loading-progress {
-  position: relative;
-  overflow: hidden;
-  height: 0.56rem;
-  border-radius: var(--radius-sm);
-  background: rgba(15, 23, 42, 0.80);
-}
-
 .weather-loading-progress::after {
   content: "";
   position: absolute;
@@ -138,20 +121,7 @@
   will-change: opacity, transform;
 }
 
-.weather-section-stage--short {
-  animation-delay: 80ms;
-}
-
-.weather-section-stage--medium {
-  animation-delay: 160ms;
-}
-
-.weather-section-stage--long {
-  animation-delay: 240ms;
-}
-
 .weather-section-stage + .weather-section-stage {
   content-visibility: auto;
 }
-
 

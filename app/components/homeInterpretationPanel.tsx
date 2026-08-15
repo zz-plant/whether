@@ -61,7 +61,7 @@ const CueCard = ({
   body: string;
 }) => (
   <article className={`weather-surface rounded-lg border px-3 py-3 text-sm text-slate-200 ${toneClass}`}>
-    <p className="inline-flex items-center gap-2 text-fluid-micro font-semibold uppercase tracking-[0.1em]">
+    <p className="inline-flex items-center gap-2 type-eyebrow">
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-current/20 bg-slate-950/55">
         {icon}
       </span>
@@ -86,12 +86,12 @@ export const HomeInterpretationPanel = ({
     <section id="interpretation-layer" className="weather-surface-secondary space-y-4 px-5 py-5" aria-label="View for this situation">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">View for this situation</p>
+          <p className="type-eyebrow">View for this situation</p>
           <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
           <p className="text-xs text-slate-300">{layer.summary}</p>
           <p className="text-xs text-slate-400">Same decision, framed for your context.</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 type-eyebrow text-slate-300">
           <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
           <span>Filtered view</span>
         </div>
@@ -138,21 +138,21 @@ export const HomeInterpretationPanel = ({
       {layer.financialAction ? (
         <div className="grid gap-3 md:grid-cols-3" aria-label="Financial action summary">
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+            <p className="inline-flex items-center gap-2 type-eyebrow">
               <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
               <span>Runway risk</span>
             </p>
             <p className="mt-2">{layer.financialAction.runwayRisk}</p>
           </article>
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+            <p className="inline-flex items-center gap-2 type-eyebrow">
               <CircleTargetIcon className="h-3.5 w-3.5 text-amber-200" />
               <span>Raise timing</span>
             </p>
             <p className="mt-2">{layer.financialAction.raiseTiming}</p>
           </article>
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+            <p className="inline-flex items-center gap-2 type-eyebrow">
               <BoltIcon className="h-3.5 w-3.5 text-violet-200" />
               <span>Burn adjustment</span>
             </p>

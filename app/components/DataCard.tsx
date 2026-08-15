@@ -51,7 +51,7 @@ export function DataCard({
     return (
       <div className={`rounded-md bg-slate-950/25 px-3 py-3 ${className}`}>
         {label ? (
-          <p className="text-fluid-micro uppercase tracking-[0.1em] text-slate-400">{label}</p>
+          <p className="type-eyebrow">{label}</p>
         ) : null}
         <p className="mt-1 text-sm font-bold tabular-nums text-slate-100">
           {value}{unit ? <span className="text-xs font-normal text-slate-400 ml-0.5">{unit}</span> : null}
@@ -71,7 +71,7 @@ export function DataCard({
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold text-slate-200">{label}</p>
                 {status ? (
-                  <span className={`rounded-full border px-2 py-0.5 text-fluid-micro font-semibold uppercase tracking-[0.08em] ${STATUS_COLORS[status.tone]}`}>
+                  <span className={`rounded-full border px-2 py-0.5 type-badge ${STATUS_COLORS[status.tone]}`}>
                     {status.label}
                   </span>
                 ) : null}
@@ -117,7 +117,7 @@ export function DataCard({
   return (
     <div className={`rounded-lg bg-slate-950/30 border border-slate-800/60 px-4 py-4 ${className}`}>
       {label ? (
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-slate-400">{label}</p>
+        <p className="type-eyebrow">{label}</p>
       ) : null}
       {value ? (
         <p className="mt-1 text-sm text-slate-200">{value}</p>

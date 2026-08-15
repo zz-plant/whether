@@ -101,7 +101,7 @@ export default function TemplatePage() {
         </p>
 
         <section className="space-y-4 border-t border-slate-700/50 pt-6">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next steps</h2>
+          <h2 className="type-eyebrow">Next steps</h2>
           <div className="grid gap-3 sm:grid-cols-3">
             <Link href="/" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
               <p className="text-xs font-semibold text-sky-200">Weekly brief →</p>

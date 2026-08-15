@@ -53,7 +53,7 @@ export function ScoreCard({
     const scoreBorder = scoreColor(value);
     return (
       <div className={`rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem] border-b-2 ${scoreBorder}`}>
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
+        <p className="type-eyebrow mb-1">
           {label}
         </p>
         <p className="text-2xl font-bold tabular-nums text-slate-100">
@@ -70,7 +70,7 @@ export function ScoreCard({
   if (variant === "compact") {
     return (
       <div className="group/tip relative">
-        <span className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-slate-400">
+        <span className="type-eyebrow">
           {label}
         </span>
         <p className="font-semibold tabular-nums text-slate-100" title={tooltip}>
@@ -89,7 +89,7 @@ export function ScoreCard({
   const scoreBorder = scoreColor(value);
   return (
     <div className={`rounded-lg border border-slate-700/60 bg-slate-950/40 px-4 sm:px-6 py-3 text-center min-w-[8rem] border-b-2 ${scoreBorder}`}>
-      <p className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 mb-1">
+      <p className="type-eyebrow mb-1">
         {label}
       </p>
       <p className="text-2xl font-bold tabular-nums text-slate-100">

@@ -357,7 +357,7 @@ export const ExportBriefPanel = ({
         />
 
         <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Share-ready brief</p>
+          <p className="type-eyebrow text-sky-200">Share-ready brief</p>
           <p className="mt-1 text-fluid-xs text-slate-400">One click copies everything your team needs in a Slack-ready format.</p>
           <div className="mt-3">
             <ClipboardActionRow
@@ -425,13 +425,13 @@ export const ExportBriefPanel = ({
 
         {hasOverride ? (
           <div className="mt-4 rounded-lg border border-amber-300/30 bg-amber-500/10 p-4 text-xs leading-5 text-amber-100">
-            <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
+            <p className="type-eyebrow text-amber-100">Override active</p>
             <p className="mt-2">{overrideLine}</p>
           </div>
         ) : null}
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
-          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
+          <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
             Quick share formats
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
@@ -462,7 +462,7 @@ export const ExportBriefPanel = ({
         </details>
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
-          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
+          <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
             Board and governance formats
           </summary>
           <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
@@ -492,7 +492,7 @@ export const ExportBriefPanel = ({
         </details>
 
         <details className="weather-auto-chevron mt-4 rounded-lg border border-amber-300/25 bg-amber-500/8 p-4">
-          <summary data-chevron className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">
+          <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
             Company-specific exception
           </summary>
           <div className="mt-4 space-y-3 border-t border-amber-300/20 pt-4">
@@ -501,7 +501,7 @@ export const ExportBriefPanel = ({
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
-                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Reason</span>
+                <span className="type-eyebrow text-amber-100/80">Reason</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideReason}
@@ -509,7 +509,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Local indicator</span>
+                <span className="type-eyebrow text-amber-100/80">Local indicator</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideIndicator}
@@ -517,7 +517,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Owner</span>
+                <span className="type-eyebrow text-amber-100/80">Owner</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideOwner}
@@ -525,7 +525,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-amber-100/80">Change course if</span>
+                <span className="type-eyebrow text-amber-100/80">Change course if</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideReversal}

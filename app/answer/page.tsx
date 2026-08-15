@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Details } from "../components/details";
+import { ReportSection } from "../components/reportSection";
 import { ButtonLink } from "../components/ui/buttonLink";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
@@ -135,12 +136,14 @@ export default async function DecidePage({
       structuredData={breadcrumbStructuredData}
       >
         <OperatorWorkflowRouteTracker />
-      <section id="unresolved-question-router" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Which decision is still open?</p>
-        <p className="text-sm text-slate-300">Start with the recommended next step.</p>
+      <ReportSection
+        id="unresolved-question-router"
+        title="Which decision is still open?"
+        description="Start with the recommended next step."
+      >
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <article className="weather-surface space-y-4 px-4 py-4">
-            <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{recommendedPath.kicker}</p>
+            <p className="type-eyebrow text-sky-200">{recommendedPath.kicker}</p>
             <div className="space-y-2">
               <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
@@ -152,12 +155,12 @@ export default async function DecidePage({
 
           <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Alternative paths</p>
+              <p className="type-eyebrow">Alternative paths</p>
               <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
             </div>
             <div className="space-y-4">
               <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Single answer</p>
+                <p className="type-eyebrow text-amber-200">Single answer</p>
                 <p className="mt-1 text-fluid-xs text-slate-300">A direct yes-or-no decision.</p>
                 <div className="mt-3 space-y-2">
                   {recommendedAnswerPages.map((page) => (
@@ -172,7 +175,7 @@ export default async function DecidePage({
                 id="guided-translation"
                 className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Need this tailored to a role or company stage?</p>
+                <p className="type-eyebrow text-violet-200">Need this tailored to a role or company stage?</p>
                 <p className="mt-1 text-fluid-xs text-slate-300">For a role or company-stage lens.</p>
                 <div className="mt-3 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (
@@ -201,15 +204,15 @@ export default async function DecidePage({
           </div>
         </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
-      </section>
+      </ReportSection>
 
       <Details id="decide-secondary-paths" variant="auto-chevron" className="weather-panel px-6 py-6"
-        summary={<span className="text-sm font-semibold uppercase tracking-[0.12em] text-sky-200">Browse more options</span>}
+        summary={<span className="text-sm type-eyebrow text-sky-200">Browse more options</span>}
       >
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More team help</h2>
+              <h2 className="text-sm type-eyebrow text-slate-300">More team help</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
                   <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
@@ -219,7 +222,7 @@ export default async function DecidePage({
               </div>
             </div>
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">More situation help</h2>
+              <h2 className="text-sm type-eyebrow text-slate-300">More situation help</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
                   <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">

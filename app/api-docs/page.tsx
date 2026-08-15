@@ -17,7 +17,7 @@ export default function ApiDocsPage() {
         </p>
 
         <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">For AI agents</h2>
+          <h2 className="type-eyebrow">For AI agents</h2>
           <div className="space-y-3">
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /api/mcp?tool=get_brief</p>
@@ -39,7 +39,7 @@ export default function ApiDocsPage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">For developers</h2>
+          <h2 className="type-eyebrow">For developers</h2>
           <div className="space-y-3">
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /api/posture/current</p>

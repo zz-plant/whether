@@ -61,7 +61,7 @@ const copyBriefText = [
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="text-fluid-micro font-semibold uppercase tracking-[0.16em] text-slate-300">
+    <p className="type-eyebrow text-slate-300">
       {children}
     </p>
   );
@@ -112,13 +112,13 @@ export default async function OperatorBriefMockupPage({
         />
         <div className="relative space-y-5">
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-cyan-300/35 bg-cyan-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-cyan-50">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-cyan-300/35 bg-cyan-300/10 px-3 py-1.5 type-eyebrow text-cyan-50">
               Weekly brief
             </span>
-            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 type-eyebrow text-slate-200">
               Default lens: Product / Eng
             </span>
-            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-emerald-300/35 bg-emerald-300/10 px-3 py-1.5 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-emerald-50">
+            <span className="inline-flex min-h-[38px] items-center rounded-sm border border-emerald-300/35 bg-emerald-300/10 px-3 py-1.5 type-eyebrow text-emerald-50">
               Decision readiness: {weeklyCall.readiness}
             </span>
           </div>
@@ -146,7 +146,7 @@ export default async function OperatorBriefMockupPage({
                     key={item.label}
                     className="rounded-lg border border-slate-700/70 bg-slate-950/65 px-3 py-3"
                   >
-                    <p className="text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-300">
+                    <p className="type-eyebrow text-slate-300">
                       {item.label}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-slate-100">{item.value}</p>

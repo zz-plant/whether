@@ -72,7 +72,7 @@ export function ConfidenceBadge({
     return (
       <Link
         href="/trust#revisit-call"
-        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-semibold uppercase tracking-[0.08em] transition-colors hover:text-sky-200 no-underline ${pillClass} ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 type-badge transition-colors hover:text-sky-200 no-underline ${pillClass} ${className}`}
         title="When we get this wrong"
       >
         {iconSeal}
@@ -83,7 +83,7 @@ export function ConfidenceBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-semibold uppercase tracking-[0.08em] ${pillClass} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 type-badge ${pillClass} ${className}`}
     >
       {iconSeal}
       {display}

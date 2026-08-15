@@ -163,14 +163,14 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
       <div className="space-y-6 print:text-black">
         {decisionArtifact ? (
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">This week first (live Whether posture)</p>
+            <p className="type-eyebrow">This week first (live Whether posture)</p>
             <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Decision delta before long-form reading</h2>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
             <div className="grid gap-3 sm:grid-cols-2">
               {decisionArtifact.mappedRules.map((rule) => (
                 <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Bounded rule · {decisionAreaLabel(rule.area)}</p>
+                  <p className="type-eyebrow text-sky-200">Bounded rule · {decisionAreaLabel(rule.area)}</p>
                   <p className="font-semibold text-slate-100">{rule.recommendation}</p>
                   <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
                   <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
@@ -182,7 +182,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         ) : null}
 
         <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Problem-first operating brief</p>
+          <p className="type-eyebrow">Problem-first operating brief</p>
           <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>
           <p className="text-sm text-slate-200 print:text-slate-700">{article.description}</p>
           <div className="flex flex-wrap gap-2 text-sm">
@@ -255,7 +255,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
 
       <aside className="hidden lg:block">
         <div className="weather-panel sticky top-24 space-y-3 px-5 py-5 print:hidden">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Next action</h2>
+          <h2 className="text-sm type-eyebrow text-slate-300">Next action</h2>
           <Link href={article.toolLink.href as Route} className="weather-button inline-flex w-full items-center justify-center" data-conversion-event="download">
             {article.toolLink.label}
           </Link>

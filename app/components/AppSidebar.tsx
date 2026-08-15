@@ -74,7 +74,7 @@ function SidebarContent({
 
       {sectionLinks.length > 0 ? (
         <>
-          <p className="px-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2">
+          <p className="px-3 type-eyebrow mb-2">
             On this page
           </p>
           <nav aria-label="Page sections" className="space-y-0.5">
@@ -96,7 +96,7 @@ function SidebarContent({
 
       <div className="my-4 border-t border-slate-800/60" />
 
-      <p className="px-3 text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2">
+      <p className="px-3 type-eyebrow mb-2">
         Workflow
       </p>
       <nav aria-label="Workflow" className="space-y-0.5">

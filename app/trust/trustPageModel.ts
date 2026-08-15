@@ -51,10 +51,13 @@ export async function buildTrustPageModel() {
   });
   const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
 
-  const revisitBullets = [
+  const revisitBullets: Array<{ label: string; detail?: string; href: string }> = [
     {
+      // No detail: this row's own link points at #confidence-limits, and that
+      // section already prints reportData.flipThreshold under "This
+      // recommendation breaks if". Carrying the sentence here too put the same
+      // long condition on screen twice within one section.
       label: "Trigger",
-      detail: reportData.flipThreshold,
       href: "#confidence-limits",
     },
     {

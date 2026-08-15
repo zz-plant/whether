@@ -32,7 +32,7 @@ function ErrorView() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md space-y-6 text-center">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400">
+        <p className="type-eyebrow text-sky-200">
           WHETHER
         </p>
         <h1 className="text-fluid-lg font-semibold text-slate-100">
@@ -59,7 +59,7 @@ function MarketStateView({ state }: { state: MarketState }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-2xl space-y-6 text-center">
-        <p className="text-fluid-micro font-semibold uppercase tracking-[0.2em] text-slate-400">
+        <p className="type-eyebrow text-sky-200">
           WHETHER
         </p>
 
@@ -67,7 +67,7 @@ function MarketStateView({ state }: { state: MarketState }) {
           {state.decision}
         </h1>
 
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.15em] text-sky-200">
+        <p className="type-eyebrow text-sky-200">
           {regimeDisplay}
           {" · "}
           {state.posture}

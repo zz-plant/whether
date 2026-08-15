@@ -16,7 +16,7 @@ export function SourceDisagreement({
 
   return (
     <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3">
-      <p className="text-fluid-xs font-semibold uppercase tracking-[0.1em] text-amber-200">Sources disagree</p>
+      <p className="type-eyebrow text-amber-200">Sources disagree</p>
       <p className="mt-1 text-xs text-amber-100/80">
         Treasury signals point {result.treasuryDirection} while macro signals point {result.macroDirection}.
       </p>

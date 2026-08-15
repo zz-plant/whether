@@ -27,7 +27,7 @@ export default function Page() {
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="vc" intent="vc-partner" />
       <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs uppercase tracking-[0.14em] text-slate-400">VC authority page</p>
+        <p className="type-eyebrow">VC authority page</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           How VC firms can enforce capital discipline across portfolios
         </h1>

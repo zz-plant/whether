@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
+import { ReportSection } from "../../components/reportSection";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
 import {
@@ -104,7 +105,7 @@ export const SignalsModeSwitcherSection = ({
   return (
     <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+        <p className="type-eyebrow text-sky-200">
           Depth
         </p>
         {/* The paragraph that sat here restated both radio options, which carry
@@ -155,7 +156,7 @@ export const SignalsModeSwitcherSection = ({
               ) : null}
             </span>
             <span className="min-w-0">
-              <span className="text-fluid-xs font-semibold uppercase tracking-[0.14em]">{item.label}</span>
+              <span className="type-eyebrow">{item.label}</span>
               <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
             </span>
           </button>
@@ -217,12 +218,12 @@ export const SignalsDecisionSummarySection = ({
       {decisionDeltaLabel}
     </p>
     <article className="weather-surface space-y-3 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">
+      <p className="type-eyebrow text-sky-200">
         What this means now
       </p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="type-eyebrow text-sky-200">
             Current outlook
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
@@ -230,7 +231,7 @@ export const SignalsDecisionSummarySection = ({
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="type-eyebrow text-sky-200">
             Main pressure
           </p>
           {topDiagnosticCallouts[0] ? (
@@ -249,19 +250,19 @@ export const SignalsDecisionSummarySection = ({
           )}
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+          <p className="type-eyebrow text-sky-200">
             What would change this
           </p>
           {showMicroDecisionRows ? (
             <div className="mt-2 space-y-2 text-sm text-slate-200">
               <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-amber-200">
+                <p className="type-eyebrow text-sky-200">
                   Wrong if
                 </p>
                 <p className="mt-1">{triggerCondition}</p>
               </div>
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                <p className="text-fluid-micro font-semibold uppercase tracking-[0.08em] text-sky-200">
+                <p className="type-eyebrow text-sky-200">
                   Safe again when
                 </p>
                 <p className="mt-1">{reversalCondition}</p>
@@ -269,7 +270,7 @@ export const SignalsDecisionSummarySection = ({
             </div>
           ) : (
             <p className="mt-2 text-sm text-slate-200">
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-amber-200">
+              <span className="mr-1 type-eyebrow text-amber-200">
                 Wrong if:
               </span>
               {" "}
@@ -277,7 +278,7 @@ export const SignalsDecisionSummarySection = ({
               {" "}
               <span aria-hidden="true" className="text-slate-400">·</span>
               {" "}
-              <span className="mr-1 font-semibold uppercase tracking-[0.08em] text-sky-200">
+              <span className="mr-1 type-eyebrow text-amber-200">
                 Safe again when:
               </span>
               {" "}
@@ -289,25 +290,25 @@ export const SignalsDecisionSummarySection = ({
     </article>
     <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="type-eyebrow text-sky-200">
           Current environment
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
       </div>
       <div>
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="type-eyebrow text-sky-200">
           Confidence
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
       </div>
       <div>
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="type-eyebrow text-sky-200">
           Decision as-of
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
       </div>
       <div>
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+        <p className="type-eyebrow text-sky-200">
           Freshness
         </p>
         <p className="mt-1 text-sm font-semibold text-slate-100">{freshnessSummaryLabel}</p>
@@ -329,14 +330,14 @@ export const SignalsDecisionSummarySection = ({
     </h2>
     <div className="grid gap-4 lg:grid-cols-2">
       <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+        <p className="type-eyebrow text-sky-200">
           This week
         </p>
         <h3 className="text-lg font-semibold text-slate-100">
           What founders should do this week
         </h3>
         <div className="rounded-md border border-emerald-800/60 bg-emerald-950/20 p-3">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">
+          <p className="type-eyebrow text-sky-200">
             Lean in here
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
@@ -346,7 +347,7 @@ export const SignalsDecisionSummarySection = ({
           </ul>
         </div>
         <div className="rounded-md border border-rose-800/60 bg-rose-950/20 p-3">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-rose-200">
+          <p className="type-eyebrow text-sky-200">
             Hold or gate
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
@@ -366,7 +367,7 @@ export const SignalsDecisionSummarySection = ({
           its true rank so "Top mover 2" still means second. */}
       {topDiagnosticCallouts.length > 1 ? (
         <article className="weather-surface space-y-3 p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+          <p className="type-eyebrow text-sky-200">
             Also moved
           </p>
           <ul className="space-y-3" aria-label="Top mover callouts">
@@ -411,13 +412,11 @@ export const SignalsCurrentScoresSection = ({
     }>
   >;
 }) => (
-  <section id="current-scores" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
-    <header className="space-y-2">
-      <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Key numbers</p>
-      <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        The three numbers most responsible for this week&apos;s outlook.
-      </h2>
-    </header>
+  <ReportSection
+    id="current-scores"
+    label="Key numbers"
+    title="The three numbers most responsible for this week's outlook."
+  >
     <div className="space-y-4">
       {(["leading", "lagging"] as const).map((type) => (
         <section key={type} className="space-y-2">
@@ -439,13 +438,13 @@ export const SignalsCurrentScoresSection = ({
               return (
                 <article key={card.label} className="weather-surface space-y-3 p-4">
                   <dl>
-                    <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+                    <dt className="type-eyebrow text-slate-300">
                       {displaySignalLabel(card.label)}
                     </dt>
                     <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.valueLabel}</dd>
                   </dl>
                   <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
-                    <div className="flex items-center justify-between gap-3 text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    <div className="flex items-center justify-between gap-3 type-eyebrow">
                       <span>Current vs watch line</span>
                       <span>{card.watchDistanceLabel}</span>
                     </div>
@@ -473,7 +472,7 @@ export const SignalsCurrentScoresSection = ({
                             style={{ left: `${meterState.currentPercent}%` }}
                           />
                         </div>
-                        <div className="mt-1 flex items-center justify-between text-fluid-micro uppercase tracking-[0.08em] text-slate-400">
+                        <div className="mt-1 flex items-center justify-between type-eyebrow">
                           <span>{meterState.leftLabel}</span>
                           <span>Watch line</span>
                           <span>{meterState.rightLabel}</span>
@@ -494,7 +493,7 @@ export const SignalsCurrentScoresSection = ({
         </section>
       ))}
     </div>
-  </section>
+  </ReportSection>
 );
 
 export const SignalsNeedMoreProofSection = ({
@@ -637,29 +636,24 @@ export const SignalsDiagnosticsSection = ({
   treasury: TreasuryData;
   yieldCurveSeries: YieldCurvePoint[];
 }) => (
-  <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics">
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-          Diagnostics
-        </p>
-        <h2 className="text-xl font-semibold text-slate-100">
-          {showFullDiagnostics ? "Full diagnostics" : "Top drivers"}
-        </h2>
-        <p className="text-sm text-slate-300">
-          {showFullDiagnostics
-            ? "Showing the full evidence set for a deeper validation pass."
-            : "Start with the top 3 reasons. Expand only when you need the full evidence set."}
-        </p>
-      </div>
+  <ReportSection
+    id="signal-diagnostics"
+    label="Diagnostics"
+    title={showFullDiagnostics ? "Full diagnostics" : "Top drivers"}
+    description={
+      showFullDiagnostics
+        ? "Showing the full evidence set for a deeper validation pass."
+        : "Start with the top 3 reasons. Expand only when you need the full evidence set."
+    }
+    action={
       <a
         href={buildDiagnosticsExpansionHref(searchParams, !showFullDiagnostics)}
         className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
       >
         {showFullDiagnostics ? "Show top 3 only" : "Show full evidence"}
       </a>
-    </div>
-
+    }
+  >
     {!showFullDiagnostics ? (
       <ol className="grid gap-3 md:grid-cols-3" aria-label="Top 3 signal drivers">
         {topDiagnosticCallouts.map((item, index) => (
@@ -678,7 +672,7 @@ export const SignalsDiagnosticsSection = ({
     ) : SignalVisualizationSuite ? (
       <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
     ) : null}
-  </section>
+  </ReportSection>
 );
 
 export const SignalsAdvancedControlsSection = ({
@@ -688,20 +682,18 @@ export const SignalsAdvancedControlsSection = ({
   showAdvanced: boolean;
   searchParams?: Record<string, string | undefined>;
 }) => (
-  <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
-    <div className="grid gap-4 rounded-lg border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-      <div className="space-y-3">
-        <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
-          <span>Replay and threshold tools</span>
-          <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
-            {showAdvanced ? "Open" : "Closed"}
-          </span>
-        </div>
-        <p className="text-sm leading-relaxed text-slate-300">
-          Use these only when the evidence still needs a replay, historical comparison, or threshold check.
-        </p>
-      </div>
+  // The hand-rolled version wrapped a bordered box inside the section panel,
+  // so the header sat in a box inside a box with nothing else in the outer one.
+  // ReportSection is that outer box, so the inner one goes away.
+  <ReportSection
+    id="advanced-controls"
+    title="Replay and threshold tools"
+    description="Use these only when the evidence still needs a replay, historical comparison, or threshold check."
+    action={
       <div className="flex flex-wrap items-center justify-end gap-2">
+        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
+          {showAdvanced ? "Open" : "Closed"}
+        </span>
         {!showAdvanced ? (
           <a
             href={buildSignalsAdvancedHref(searchParams, true) + "#time-machine"}
@@ -717,6 +709,8 @@ export const SignalsAdvancedControlsSection = ({
           {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
         </a>
       </div>
-    </div>
-  </section>
+    }
+  >
+    {null}
+  </ReportSection>
 );

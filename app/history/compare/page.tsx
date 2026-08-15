@@ -161,7 +161,7 @@ export default async function HistoryComparePage({
           
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="weather-surface p-4 text-center">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Boldness Score Shift</p>
+              <p className="type-eyebrow">Boldness Score Shift</p>
               <p className={`mt-2 text-2xl font-bold ${boldnessDelta > 0 ? "text-emerald-400" : boldnessDelta < 0 ? "text-rose-400" : "text-slate-300"}`}>
                 {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts
               </p>
@@ -171,7 +171,7 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-surface p-4 text-center">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">Yield Curve Delta</p>
+              <p className="type-eyebrow">Yield Curve Delta</p>
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {spreadA !== null && spreadB !== null ? `${(spreadA - spreadB).toFixed(2)}%` : "N/A"}
               </p>
@@ -181,7 +181,7 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-surface p-4 text-center">
-              <p className="text-fluid-micro font-semibold uppercase tracking-[0.12em] text-slate-400">BBB Spread Diff</p>
+              <p className="type-eyebrow">BBB Spread Diff</p>
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
               </p>
@@ -210,7 +210,7 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-panel p-6 space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Playbook Rules</h3>
+              <h3 className="type-eyebrow">Playbook Rules</h3>
               <div className="space-y-2">
                 <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
                 <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
@@ -219,22 +219,22 @@ export default async function HistoryComparePage({
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-emerald-300">Action Now</p>
+                  <p className="type-eyebrow text-emerald-300">Action Now</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.actionNow}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-300">Pause Guardrail</p>
+                  <p className="type-eyebrow text-amber-300">Pause Guardrail</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.pauseIf}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-violet-300">Reversal Trigger</p>
+                  <p className="type-eyebrow text-violet-300">Reversal Trigger</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.changeCourseIf}</p>
                 </div>
               </div>
             </div>
 
             <div className="weather-panel p-6">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">Macro Signals</h3>
+              <h3 className="type-eyebrow mb-4">Macro Signals</h3>
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">
@@ -296,7 +296,7 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-panel p-6 space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Playbook Rules</h3>
+              <h3 className="type-eyebrow">Playbook Rules</h3>
               <div className="space-y-2">
                 <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
                 <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
@@ -305,22 +305,22 @@ export default async function HistoryComparePage({
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-emerald-300">Action Now</p>
+                  <p className="type-eyebrow text-emerald-300">Action Now</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.actionNow}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-300">Pause Guardrail</p>
+                  <p className="type-eyebrow text-amber-300">Pause Guardrail</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.pauseIf}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-violet-300">Reversal Trigger</p>
+                  <p className="type-eyebrow text-violet-300">Reversal Trigger</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.changeCourseIf}</p>
                 </div>
               </div>
             </div>
 
             <div className="weather-panel p-6">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">Macro Signals</h3>
+              <h3 className="type-eyebrow mb-4">Macro Signals</h3>
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">

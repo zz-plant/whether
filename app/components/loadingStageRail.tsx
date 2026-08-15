@@ -21,7 +21,7 @@ export function LoadingStageRail({
 }) {
   return (
     <section aria-label={title} className="space-y-2.5">
-      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{title}</p>
+      <p className="type-eyebrow">{title}</p>
       <div className="weather-loading-stage-rail" role="list">
         {items.map(({ label, hint, state = "queued" }) => (
           <article key={label} role="listitem" className="weather-loading-stage" data-state={state}>

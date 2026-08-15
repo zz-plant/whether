@@ -58,7 +58,7 @@ export function ToolkitLibraryPanels({
   return (
     <section id="toolkit-library" className="space-y-3">
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">
+        <h2 className="text-sm type-eyebrow text-slate-300">
           {normalizedQuery ? "Tool results" : "Recommended tools"}
         </h2>
         <p className="text-sm text-slate-300">

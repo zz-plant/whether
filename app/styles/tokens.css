@@ -335,7 +335,6 @@
   :root { --shadow-scale: 1.28; }
 }
 
-
 body {
   font-family: var(--font-sans);
   color: var(--text-primary);

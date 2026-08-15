@@ -5,11 +5,26 @@
   }
 }
 
-.weather-icon-chip {
-  @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border;
-  border-color: var(--border-default);
-  background: var(--bg-surface);
-}
+/* Container ladder ------------------------------------------------------
+   Three tiers, deliberately distinct — do not add a fourth, and do not reach
+   for a new variant when one of these fits. Eight near-dead siblings
+   (weather-tile, weather-surface-utility, weather-stat-card, …) accumulated
+   because the ladder was never written down, and were removed once they hit
+   zero call sites.
+
+     .weather-surface  outermost. rounded-2xl, --border-strong, elev-3,
+                       16px blur, container-type. No padding: callers set it,
+                       because this tier wraps grids as often as prose.
+     .weather-card     one step in. rounded-xl, --border-default, elev-2,
+                       12px blur, padding baked in. For a self-contained item
+                       in a list or grid.
+     .weather-panel    layout tier. Padding only; appearance comes from the
+                       shell. For a page section that shouldn't read as a
+                       floating object.
+
+   Nesting any of these inside another strips shadow and blur automatically —
+   see the depth de-escalation block near the end of this file. That is what
+   keeps the ladder readable, so a nested tier does not need its own class. */
 
 .weather-surface {
   @apply rounded-2xl border;
@@ -83,132 +98,6 @@
   padding-top: var(--space-xl);
 }
 
-.weather-label {
-  @apply text-xs font-medium text-slate-400 tracking-wide;
-  letter-spacing: 0.04em;
-  text-transform: none;
-}
-
-.weather-dot {
-  @apply inline-flex items-center gap-1.5;
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  text-transform: none;
-  color: var(--app-text-secondary);
-}
-
-.weather-bar {
-  @apply absolute top-0 bottom-0 left-0 w-0.5;
-}
-
-.weather-brief-shell {
-  border-color: rgba(125, 211, 252, 0.20);
-  background:
-    linear-gradient(180deg, rgba(45, 212, 191, 0.035), rgba(251, 191, 36, 0.014)),
-    rgba(27, 30, 35, 0.78);
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight);
-}
-
-.weather-brief-kicker {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: none;
-  /* Was a hardcoded slate-400, which is a dark-theme value: on the light
-     surface the kicker measured 2.08:1. The role token tracks the theme. */
-  color: var(--app-text-muted);
-}
-
-.weather-brief-meta-rail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.weather-brief-meta-chip {
-  display: inline-flex;
-  min-height: 2rem;
-  align-items: center;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-default);
-  background: rgba(20, 23, 28, 0.82);
-  padding: 0.35rem 0.75rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: none;
-  color: rgb(226 232 240 / 0.92);
-}
-
-.weather-brief-meta-chip-strong {
-  border-color: rgba(125, 211, 252, 0.22);
-  background: rgba(14, 116, 144, 0.12);
-  color: rgb(224 242 254);
-}
-
-.weather-brief-meta-chip-caution {
-  border-color: rgba(251, 191, 36, 0.18);
-  background: rgba(146, 64, 14, 0.12);
-  color: rgb(254 243 199);
-}
-
-.weather-nav-card-index {
-  display: inline-flex;
-  min-height: 1.55rem;
-  min-width: 1.55rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-default);
-  background: var(--bg-surface-muted);
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: rgb(186 230 253 / 0.86);
-}
-
-.weather-sequence-card {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.008)),
-    rgba(24, 27, 32, 0.72);
-  box-shadow: var(--elev-2);
-}
-
-.weather-route-card-proof {
-  border-color: rgba(56, 189, 248, 0.22);
-}
-
-.weather-route-card-trust {
-  border-color: rgba(251, 191, 36, 0.20);
-}
-
-.weather-route-card-replay {
-  border-color: rgba(167, 139, 250, 0.20);
-}
-
-.weather-route-card-utility {
-  border-color: var(--border-default);
-}
-
-.weather-ritual-card {
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface-muted);
-  box-shadow: var(--elev-1);
-}
-
-.weather-transmission-card {
-  border: 1px solid rgba(56, 189, 248, 0.14);
-  border-radius: var(--radius-lg);
-  background:
-    linear-gradient(180deg, rgba(56, 189, 248, 0.035), rgba(52, 211, 153, 0.014)),
-    rgba(24, 27, 32, 0.72);
-  box-shadow: var(--elev-1);
-}
-
 .weather-transmission-segment {
   border-radius: var(--radius-md);
   background: rgba(14, 14, 14, 0.25);
@@ -226,13 +115,6 @@
   background: var(--bg-surface-muted);
 }
 
-.weather-priority-card {
-  @apply rounded-lg border;
-  border-color: rgba(125, 211, 252, 0.18);
-  background: rgba(26, 26, 26, 0.75);
-  box-shadow: var(--elev-2);
-}
-
 :where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
   border-color: rgba(71, 85, 105, 0.14);
   background:
@@ -242,7 +124,6 @@
     inset 0 1px 0 var(--edge-highlight-faint),
     inset 0 0 0 1px var(--bg-nested-light);
 }
-
 
 .weather-surface-sky {
   border-color: rgba(56, 189, 248, 0.18);
@@ -268,16 +149,6 @@
 .weather-surface-indigo {
   border-color: rgba(129, 140, 248, 0.16);
   background: rgba(30, 27, 75, 0.12);
-}
-
-.weather-surface-teal {
-  border-color: rgba(45, 212, 191, 0.16);
-  background: rgba(19, 78, 74, 0.10);
-}
-
-.weather-surface-amber {
-  border-color: rgba(251, 191, 36, 0.16);
-  background: rgba(120, 53, 15, 0.12);
 }
 
 /* Depth de-escalation ---------------------------------------------------
@@ -317,11 +188,6 @@
   :is(.weather-panel, .weather-surface, .weather-card):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
-}
-
-.weather-quick-glance {
-  border-color: var(--border-default);
-  background: rgba(30, 30, 30, 0.40);
 }
 
 /* Nav scroll fade — subtle right-edge gradient hinting at more items on small screens */
@@ -372,53 +238,6 @@ button .weather-chip:active,
   outline-offset: 2px;
 }
 
-.weather-chip-amber {
-  border-color: color-mix(in srgb, var(--color-semantic-caution-border) 25%, transparent);
-  background: color-mix(in srgb, var(--color-semantic-caution-bg) 12%, transparent);
-  color: var(--color-semantic-caution-fg);
-}
-
-.weather-chip-emerald {
-  border-color: color-mix(in srgb, var(--color-semantic-easing-border) 25%, transparent);
-  background: color-mix(in srgb, var(--color-semantic-easing-bg) 12%, transparent);
-  color: var(--color-semantic-easing-fg);
-}
-
-.weather-chip-sky {
-  border-color: color-mix(in srgb, var(--color-semantic-unchanged-border) 25%, transparent);
-  background: color-mix(in srgb, var(--color-semantic-unchanged-bg) 12%, transparent);
-  color: var(--color-semantic-unchanged-fg);
-}
-
-.weather-chip-rose {
-  border-color: color-mix(in srgb, var(--color-semantic-tightening-border) 25%, transparent);
-  background: color-mix(in srgb, var(--color-semantic-tightening-bg) 12%, transparent);
-  color: var(--color-semantic-tightening-fg);
-}
-
-.weather-chip-slate {
-  border-color: var(--border-strong);
-  background: rgba(15, 23, 42, 0.35);
-  color: rgb(203 213 225);
-}
-
-.weather-chip-violet {
-  border-color: color-mix(in srgb, var(--color-semantic-reversal-border) 25%, transparent);
-  background: color-mix(in srgb, var(--color-semantic-reversal-bg) 12%, transparent);
-  color: var(--color-semantic-reversal-fg);
-}
-
-.weather-decision-cell {
-  border-radius: var(--radius-sm);
-  padding: 0.6rem 0.7rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.weather-brief-container {
-  container-type: inline-size;
-  container-name: brief;
-}
-
 @container brief (max-width: 700px) {
   .weather-brief-secondary-lane {
     display: none;
@@ -432,10 +251,6 @@ button .weather-chip:active,
   }
 }
 
-.weather-decision-card {
-  padding: var(--space-md);
-}
-
 /* Decision delta strip — scannable in <5 seconds */
 .weather-decision-delta {
   display: flex;
@@ -445,20 +260,6 @@ button .weather-chip:active,
   padding: 0.5rem var(--space-md);
   border-bottom: 1px solid var(--border-faint);
   font-variant-numeric: tabular-nums;
-}
-
-.weather-decision-delta-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: none;
-  color: rgb(148 163 184 / 0.85);
-}
-
-.weather-decision-delta-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgb(226 232 240);
 }
 
 /* Page & Tab View Transitions */
@@ -521,6 +322,4 @@ button .weather-chip:active,
     font-size: 0.8rem;
   }
 }
-
-
 

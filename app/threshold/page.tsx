@@ -23,7 +23,7 @@ export default function ThresholdPage() {
         </p>
 
         <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">The three parts</h2>
+          <h2 className="type-eyebrow">The three parts</h2>
           <div className="grid gap-4">
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className="text-fluid-xs font-semibold tracking-[0.08em] text-sky-200">Action</p>
@@ -41,7 +41,7 @@ export default function ThresholdPage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why it works</h2>
+          <h2 className="type-eyebrow">Why it works</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
             Most strategic decisions fail not because the action was wrong, but because there was no condition for stopping. The action continues past the point where it should have paused, and by the time the error is visible, the cost has already been incurred.
           </p>
@@ -54,7 +54,7 @@ export default function ThresholdPage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">In practice</h2>
+          <h2 className="type-eyebrow">In practice</h2>
           <div className="weather-surface px-4 py-4 space-y-2">
             <p className="text-sm text-slate-200 font-semibold">Action: Gate net-new hiring to short-payback roles only.</p>
             <p className="text-sm text-slate-300">Threshold: Pause all hiring if credit conditions tighten above 76.</p>
@@ -66,7 +66,7 @@ export default function ThresholdPage() {
         </section>
 
         <section className="space-y-4 border-t border-slate-700/50 pt-6">
-          <h2 className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Next steps</h2>
+          <h2 className="type-eyebrow">Next steps</h2>
           <div className="grid gap-3 sm:grid-cols-3">
             <Link href="/" className="weather-surface block min-h-[44px] no-underline px-4 py-3 space-y-1 hover:border-sky-500/40 transition-colors">
               <p className="text-xs font-semibold text-sky-200">Weekly brief →</p>

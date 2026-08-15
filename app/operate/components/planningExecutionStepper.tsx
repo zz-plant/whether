@@ -144,7 +144,7 @@ export function OperationsExecutionStepper({
                     <span className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
                       {step.title}
                     </span>
-                    <span className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400 flex-shrink-0">
+                    <span className="type-eyebrow flex-shrink-0">
                       {step.label}
                     </span>
                   </div>
@@ -177,7 +177,7 @@ export function OperationsExecutionStepper({
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
+                  <p className="type-eyebrow">{step.label}</p>
                   {/* An inactive step renders as a header with no body, but nothing
                       about it was clickable — only the checklist above could open
                       it, so five of the six sections on this page looked
@@ -219,7 +219,7 @@ export function OperationsExecutionStepper({
                   </div>
                 </div>
                 {isActive && (
-                  <span className="rounded-sm border border-sky-300/80 bg-sky-500/15 px-3 py-1 text-fluid-xs font-semibold uppercase tracking-[0.14em] text-sky-100">
+                  <span className="rounded-sm border border-sky-300/80 bg-sky-500/15 px-3 py-1 type-eyebrow text-sky-100">
                     Active
                   </span>
                 )}

@@ -280,7 +280,7 @@ export function DecisionHero({
           {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
             <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-fluid-nano font-mono font-semibold uppercase tracking-[0.14em] text-slate-400">
+                <p className="text-fluid-nano font-mono type-eyebrow">
                   {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
                 </p>
                 <span className={`text-fluid-nano font-medium tabular-nums ${counterColor}`}>

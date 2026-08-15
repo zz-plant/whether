@@ -44,7 +44,7 @@ export function DateSelector({
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-fluid-micro font-semibold uppercase tracking-[0.1em] text-slate-400">
+      <label className="type-eyebrow">
         {label}
       </label>
       <select

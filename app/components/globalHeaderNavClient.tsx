@@ -73,7 +73,7 @@ export function MobileNavContent({ navigationLinks, currentPathname, onClose }: 
       <div className="mx-auto mb-3 h-1 w-10 rounded-sm bg-slate-700" />
       <div className="space-y-4">
         <div>
-          <p className="px-4 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400 mb-1.5">
+          <p className="px-4 type-eyebrow mb-1.5">
             Operator Loop
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
@@ -111,7 +111,7 @@ export function MobileNavContent({ navigationLinks, currentPathname, onClose }: 
         </div>
 
         <div className="border-t border-slate-800/60 pt-3">
-          <p className="px-4 text-fluid-micro font-semibold uppercase tracking-[0.14em] text-slate-400 mb-1.5">
+          <p className="px-4 type-eyebrow mb-1.5">
             Resources & Framework
           </p>
           <nav className="space-y-0.5" aria-label="Resources and documentation">

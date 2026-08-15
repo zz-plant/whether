@@ -47,6 +47,34 @@
   text-transform: none;
 }
 
+/* Uppercase section eyebrow. The one label style the app actually renders 282
+   times, previously hand-rolled inline at ten different tracking values
+   (0.06/0.08/0.1/0.12/0.14/0.15/0.16/0.18/0.2/0.22em) and three sizes, so the
+   same element was tuned by eye at every call site.
+
+   Distinct from .type-label, which is the sentence-case metadata label the
+   surface system was migrating toward. Keeping them separate means the case
+   change can happen here, once, rather than being decided per call site.
+   Values are the dominant ones: fluid-xs at 0.12em (125 of the 282). */
+
+.type-eyebrow {
+  @apply font-semibold uppercase text-slate-400;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+}
+
+/* Uppercase micro badge — status pills, mode chips, trust tags. Shares the
+   uppercase treatment with .type-eyebrow but is deliberately a separate
+   primitive: these sit on dynamic tone classes (trustToneClass, STATUS_COLORS,
+   regimeStyle) that set their own color, so the eyebrow's slate default would
+   fight them. Sets typography only, never color. */
+
+.type-badge {
+  @apply font-semibold uppercase;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+}
+
 .type-data {
   @apply leading-relaxed;
   font-size: var(--fs-base);
