@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { createHomePageReportDataLoader } from "../lib/report/homePageData";
+import { buildHomePageCacheKey, createHomePageReportDataLoader } from "../lib/report/homePageData";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";
 
 const createFakeUnstableCache = () => {
@@ -56,6 +56,14 @@ const createFakeRevalidatingUnstableCache = () => {
 };
 
 describe("createHomePageReportDataLoader", () => {
+  it("shares canonical report data across presentation-only overlays", () => {
+    const saasInvestorKey = buildHomePageCacheKey({ month: "3", year: "2026", sector: "saas", view: "investor" });
+    const fintechOperatorKey = buildHomePageCacheKey({ year: "2026", month: "3", sector: "fintech", view: "operator" });
+
+    assert.equal(saasInvestorKey, JSON.stringify({ month: "3", year: "2026" }));
+    assert.equal(fintechOperatorKey, saasInvestorKey);
+  });
+
   it("retries fallback results instead of caching degraded payloads", async () => {
     type FallbackReportResult = Extract<LoadReportDataSafeResult, { ok: false }>;
     type LiveReportResult = Extract<LoadReportDataSafeResult, { ok: true }>;

@@ -67,6 +67,8 @@ on ≥640px viewports (DD-004 mobile-compression work, 2026-08-11).
 The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
 - boldness budget score and weekly delta,
 - hiring, expansion, and fundraising windows,
+- a scan-first “What can we do this week?” ledger using `Do now`, `Stop or tighten if`, and
+  `Open up again when`, with structured lane states translated into explicit action phrases,
 - one-line net delta shorthand.
 The canonical weekly-call block now also includes:
 - a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
@@ -475,7 +477,7 @@ A what-if slider that lets operators drag tightness from 20–85 and see the reg
 ### 8.2 Regime transition probability
 **Location**: `app/components/home/RegimeTransitionProbability.tsx`, rendered on `/` below the simulator.
 
-Computes historical transition frequency from the time machine data and displays the probability of moving from the current regime to the most likely next regime, with an SVG arc visualization and average duration in weeks.
+Computes an empirical one-month exit rate for the current regime from monthly time-machine observations. The percentage represents the chance that conditions leave the current regime by the next monthly observation; the most common next regime is descriptive context, not the forecast event being scored. Homepage consumers receive the event and horizon alongside the number and keep that forecast separate from the decision reversal.
 
 ### 8.3 Regime history over time
 **Location**: `app/components/RegimeHistory.tsx`, rendered on `/` in the sticky right column.

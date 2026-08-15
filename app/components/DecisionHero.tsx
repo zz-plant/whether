@@ -14,6 +14,7 @@ import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
+import type { TransitionForecastDisplay } from "./home/RegimeTransitionProbability";
 
 type Props = {
   tightness: number;
@@ -39,7 +40,7 @@ type Props = {
   degradedCount?: number;
   isFallback?: boolean;
   flipConditions?: string[];
-  transitionProbability?: number;
+  transitionForecast?: TransitionForecastDisplay | null;
   guardrail?: string;
   reversalTrigger?: string;
   shareLines?: string[];
@@ -88,7 +89,7 @@ export function DecisionHero({
   degradedCount,
   isFallback,
   flipConditions,
-  transitionProbability,
+  transitionForecast,
   guardrail,
   reversalTrigger,
   shareLines,
@@ -319,7 +320,7 @@ export function DecisionHero({
           </details>
 
           {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
-          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
+          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger || transitionForecast ? (
             <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-fluid-nano font-mono type-eyebrow">
@@ -364,15 +365,16 @@ export function DecisionHero({
                 {flipConditions && flipConditions.length > 0 ? (
                   <div className="flex gap-2">
                     <dt className="shrink-0 font-medium text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</dt>
-                    <dd className="text-white/60">
-                      {flipConditions.join(" · ")}
-                      {transitionProbability && transitionProbability > 0 ? (
-                        <span> ({transitionProbability}% probability)</span>
-                      ) : null}
-                    </dd>
+                    <dd className="text-white/60">{flipConditions.join(" · ")}</dd>
                   </div>
                 ) : null}
               </dl>
+              {transitionForecast ? (
+                <p className="text-fluid-nano text-white/40">
+                  {transitionForecast.eventLabel} {transitionForecast.horizonLabel}:{" "}
+                  <span className="tabular-nums">{transitionForecast.probabilityPercent}%</span>
+                </p>
+              ) : null}
             </div>
           ) : null}
 

@@ -169,12 +169,13 @@ Canonical top-fold order on homepage must remain:
 3. **Compact backdrop row** (`Boldness budget` plus external market backdrops for hiring, expansion, and raise conditions)
 4. **Share actions + lower-emphasis detail** (one routine-first artifact card stays visible; citation and continuity remain secondary collapsed details)
 5. **Why this call** disclosure (supporting evidence hidden behind details/summary)
-6. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
+6. **Decision matrix + action strip** (headed “What can we do this week?” and showing bounded rules as `Do now`, `Stop or tighten if`, and `Open up again when`)
 7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
 - Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Boldness Budget`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
+- The homepage action strip translates structured lane states into explicit action phrases (`Keep this closed`, `Proceed with guardrails`, `Stage the next move`, `Move ahead now`). The underlying `Closed` / `Guarded` / `Staged` / `Open` values remain stable for model consumers.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
   - **Action**: what to do now.
   - **Threshold**: the trip line that pauses/tightens the current call.
@@ -349,7 +350,7 @@ Drift guardrails:
 
 The homepage now renders one dominant weekly decision block instead of several equal-weight posture cards, per the `lg:grid-cols-12` single-card guardrail.
 
-- **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` and regime-transition probability now render as a compact `Flip watch:` line inside `DecisionHero`. The tightness barometer visual duplicated hero metrics and was cut.
+- **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` now render as a compact `Flip watch:` line inside `DecisionHero`. The distinct transition forecast follows as subordinate text with its modeled event and monthly horizon; it is never appended to the decision-reversal sentence. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
 - **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Boldness Budget, delta, and pause/reversal conditions remain visible.
