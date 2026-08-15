@@ -27,8 +27,11 @@ jobs:
       - name: Generate monthly summaries
         run: bun scripts/generateMonthlySummaries.ts
 
+      # No continue-on-error: this step failed every week from June to August 2026
+      # with "GitHub Actions is not permitted to create or approve pull requests"
+      # while the job kept reporting success, so the month rail silently froze at
+      # May 2026. A refresh that cannot deliver its data is a failed refresh.
       - name: Open pull request with refreshed data
-        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           branch: automation/monthly-summary-refresh
