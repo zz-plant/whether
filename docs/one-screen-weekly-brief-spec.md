@@ -353,6 +353,7 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
 - **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Boldness Budget, delta, and pause/reversal conditions remain visible.
+- **Threshold distance names the decision consequence.** The hero preserves the nearest bounded-rule distance but labels it with one associated surfaced decision (for example, `3 points until hiring review`). Shared thresholds use revisit priority rather than listing every affected lever; crossed lines render as crossed instead of implying distance remains.
 - **History no longer competes in a sticky rail.** Regime history, subscription, and the citable permalink now sit in a lower continuity-and-delivery section after the operating workflow.
 
 ## Controls & nav pass (2026-08-11)
