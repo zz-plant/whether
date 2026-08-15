@@ -8,7 +8,7 @@ import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
 import { renderStaticOgImage } from "./staticTemplate";
-import { getPostureArchivePeriods } from "../../../lib/summary/postureArchive";
+import postureTimeline from "../../../data/posture_og_timeline.json";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 
 const OG_WIDTH = 1200;
@@ -21,6 +21,9 @@ type StaticOgTemplate = Exclude<OgTemplate, "report" | "brief-chart">;
 
 const regimeKeys = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
+const normalizeRegime = (value: string): RegimeKey =>
+  regimeKeys.find((key) => key === value) ?? "VOLATILE";
+
 const readRegime = (searchParams: URLSearchParams): RegimeKey => {
   const value = searchParams.get("regime")?.trim().toUpperCase();
   return regimeKeys.find((key) => key === value) ?? "VOLATILE";
@@ -31,18 +34,10 @@ const readRegime = (searchParams: URLSearchParams): RegimeKey => {
  * Built from the quarterly archive so the bars show real history, not filler.
  */
 const buildPostureTimelinePoints = (): BriefChartPoint[] =>
-  getPostureArchivePeriods()
-    .filter((period) => period.kind === "quarter")
-    .sort((a, b) => a.asOf.localeCompare(b.asOf))
-    .map((period) => {
-      const dominant = period.regimeMix[0];
-      return {
-        label: period.title,
-        regime: period.regime,
-        // Bar height reads as posture conviction: how much of the quarter held one call.
-        intensity: dominant ? Math.max(0.35, dominant.share / 100) : 0.5,
-      };
-    });
+  postureTimeline.map((period) => ({
+    ...period,
+    regime: normalizeRegime(period.regime),
+  }));
 
 const readParam = (
   searchParams: URLSearchParams,
