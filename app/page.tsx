@@ -334,6 +334,7 @@ async function PageContent({
                 shareLines={briefShareLines}
                 revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
                 revisitQueue={homepage.weeklyDecisionCardModel.decision.revisitQueue.slice(0, 3)}
+                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
                />
 
             <ThreeWhethersCard

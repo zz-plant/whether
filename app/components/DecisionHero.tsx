@@ -8,6 +8,7 @@ import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
+import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
@@ -52,6 +53,7 @@ type Props = {
     reason: string;
     recheck: string;
   }>;
+  thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -64,13 +66,6 @@ type Props = {
 const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
 const isRegimeKey = (value: string): value is RegimeKey =>
   REGIME_GLYPH_KEYS.some((key) => key === value);
-
-const REGIME_BOUNDARIES: Record<RegimeKey, { label: string; threshold: number; color: string }> = {
-  SCARCITY: { label: "Scarcity", threshold: 75, color: "rose" },
-  DEFENSIVE: { label: "Defensive", threshold: 65, color: "amber" },
-  VOLATILE: { label: "Volatile", threshold: 55, color: "sky" },
-  EXPANSION: { label: "Expansion", threshold: 45, color: "emerald" },
-};
 
 export function DecisionHero({
   tightness,
@@ -101,6 +96,7 @@ export function DecisionHero({
   signalIndicators,
   revisitDecisions = false,
   revisitQueue = [],
+  thresholdBusinessConsequence,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -121,13 +117,10 @@ export function DecisionHero({
    const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
    const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
 
-   const upperRegime = regime.toUpperCase();
-   const regimeBounds = isRegimeKey(upperRegime) ? REGIME_BOUNDARIES[upperRegime] : REGIME_BOUNDARIES.EXPANSION;
-
-  const pointsToPause = Math.max(0, Math.round(regimeBounds.threshold - tightness));
-  const counterColor = pointsToPause <= 10
+  const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
+  const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
     ? "text-rose-300"
-    : pointsToPause <= 20
+    : typeof pointsToPause === "number" && pointsToPause <= 20
       ? "text-amber-300"
       : "text-emerald-300";
 
@@ -333,9 +326,13 @@ export function DecisionHero({
                 <p className="text-fluid-nano font-mono type-eyebrow">
                   {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
                 </p>
-                <span className={`text-fluid-nano font-medium tabular-nums ${counterColor}`}>
-                  {pointsToPause} pts to pause
-                </span>
+                {thresholdBusinessConsequence ? (
+                  <span className={`whitespace-nowrap text-fluid-nano font-medium tabular-nums ${counterColor}`}>
+                    {thresholdBusinessConsequence.status === "crossed"
+                      ? `${pointsToPause} points — ${thresholdBusinessConsequence.consequenceLabel} threshold crossed`
+                      : `${pointsToPause} points until ${thresholdBusinessConsequence.consequenceLabel}`}
+                  </span>
+                ) : null}
               </div>
               {typeof tightnessThreshold === "number" ? (
                 <div className="w-full max-w-[20rem]">

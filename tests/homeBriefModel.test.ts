@@ -3,10 +3,68 @@ import { describe, it } from "bun:test";
 import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from "../lib/report/homeBriefModel";
 import { getWeeklyPostureHistory } from "../lib/summary/weeklyPostureHistory";
 import { REGIME_SHORT_LABELS } from "../lib/regimePresentation";
+import { buildThresholdBusinessConsequence, type ActionStripItem } from "../lib/report/operatingCalls";
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 describe("buildHomeBriefModel", () => {
+  it("derives the nearest threshold consequence from its single affected bounded decision", () => {
+    const consequence = buildThresholdBusinessConsequence({
+      actionStripItems: [{
+        lever: "hiring-stance",
+        label: "Hiring posture",
+        areaActionNow: "Hold speculative hiring.",
+        triggerThreshold: "Pause net-new hiring above 56.",
+        reversalCondition: "Resume below 46.",
+        priorityDistancePoints: 3,
+        priorityOrderIndex: 0,
+      }],
+    });
+
+    assert.deepEqual(consequence, {
+      pointsToThreshold: 3,
+      consequenceLabel: "hiring review",
+      status: "approaching",
+    });
+  });
+
+  it("uses the highest-priority surfaced decision when decisions share a threshold", () => {
+    const sharedItems: ActionStripItem[] = [
+      {
+        lever: "hiring-stance", label: "Hiring posture", areaActionNow: "A", triggerThreshold: "T",
+        reversalCondition: "R", priorityDistancePoints: 4, priorityOrderIndex: 0,
+      },
+      {
+        lever: "investment-pace", label: "Investment pace", areaActionNow: "A", triggerThreshold: "T",
+        reversalCondition: "R", priorityDistancePoints: 4, priorityOrderIndex: 1,
+      },
+    ];
+
+    assert.deepEqual(buildThresholdBusinessConsequence({
+      actionStripItems: sharedItems,
+      revisitAreaPriority: ["expansion-bets", "hiring"],
+    }), {
+      pointsToThreshold: 4,
+      consequenceLabel: "expansion pauses",
+      status: "approaching",
+    });
+  });
+
+  it("preserves zero distance when the bounded threshold is already crossed", () => {
+    const consequence = buildThresholdBusinessConsequence({
+      actionStripItems: [{
+        lever: "hiring-stance", label: "Hiring posture", areaActionNow: "A", triggerThreshold: "T",
+        reversalCondition: "R", priorityDistancePoints: 0, priorityOrderIndex: 0,
+      }],
+    });
+
+    assert.deepEqual(consequence, {
+      pointsToThreshold: 0,
+      consequenceLabel: "hiring review",
+      status: "crossed",
+    });
+  });
+
   it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
     const expectedPriorEntries = getWeeklyPostureHistory()
