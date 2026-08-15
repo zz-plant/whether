@@ -81,7 +81,7 @@ export const buildWeeklyMovementMetric = ({
   return {
     score,
     direction: "stable" as const,
-    summary: "Conditions held steady this week. Keep your current plan in place.",
+    summary: "Conditions held steady this week. Last week's calls stand.",
   };
 };
 
@@ -170,16 +170,20 @@ export const buildWeeklyMemoLines = ({
   operatingStanceLine,
   trendLabel,
   transitionWatch,
+  pauseIf,
+  changeCourseIf,
 }: {
   operatingStanceLine: string;
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
+  pauseIf: string;
+  changeCourseIf: string;
 }) => [
   trendMemoLines[trendLabel] ?? trendMemoLines.Stable,
   operatingStanceLine,
   transitionWatch === "ON"
-    ? "Flip watch is on. Keep hiring, roadmap, and spend decisions reversible until the next live read."
-    : "Flip watch is off. This week's approvals can stay on the current track.",
+    ? `Flip watch is on. Keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
+    : `Flip watch is off. ${operatingStanceLine} Change course when: ${changeCourseIf}`,
 ];
 
 export const buildWhyItMattersLine = ({

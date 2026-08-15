@@ -13,7 +13,11 @@ type HomePageDataDependencies = {
 type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
 
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 300;
-const HOMEPAGE_DATA_PARAM_KEYS = new Set(["month", "year", "sector", "view"]);
+// Only historical selection changes the canonical report inputs. Sector and
+// interpretation view are presentation overlays applied by homePageAssembler;
+// including them here fragments the shared five-minute data cache without
+// changing the value it stores.
+const HOMEPAGE_DATA_PARAM_KEYS = new Set(["month", "year"]);
 
 const defaultDependencies: HomePageDataDependencies = {
   loadReportDataSafe,
@@ -49,7 +53,7 @@ const normalizeHomePageSearchParams = (searchParams?: HomePageSearchParams) => {
   return Object.fromEntries(normalizedEntries) as HomePageSearchParams;
 };
 
-const buildHomePageCacheKey = (searchParams?: HomePageSearchParams) =>
+export const buildHomePageCacheKey = (searchParams?: HomePageSearchParams) =>
   JSON.stringify(normalizeHomePageSearchParams(searchParams) ?? null);
 
 const parseHomePageCacheKey = (cacheKey: string): HomePageSearchParams | undefined => {

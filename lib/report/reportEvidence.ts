@@ -155,7 +155,11 @@ const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {
   return "LOW";
 };
 
-const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number]["key"], delta: number) => {
+const signalImmediateImplication = (
+  key: ReportDynamics["changedSignals"][number]["key"],
+  delta: number,
+  assessment: ReturnType<typeof evaluateRegime>,
+) => {
   if (delta === 0) {
     return "No material operating change this week.";
   }
@@ -178,9 +182,11 @@ const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number
       : "Maintain discipline while testing selective long-payback upside.";
   }
 
+  const curveLine = assessment.scores.curveSlope ?? 0;
+  const paybackCap = curveLine > 0 ? 12 : 9;
   return delta > 0
-    ? "Longer-payback work becomes incrementally safer if guardrails hold."
-    : "Keep commitments staged while macro risk remains elevated.";
+    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and cash availability stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`
+    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and cash availability stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
 };
 
 export const buildReportEvidenceItems = ({
@@ -222,7 +228,7 @@ export const buildReportEvidenceItems = ({
       supportingBullets,
       confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
       directionLabel,
-      immediateImplication: signalImmediateImplication(key, delta),
+      immediateImplication: signalImmediateImplication(key, delta, assessment),
     };
   });
 

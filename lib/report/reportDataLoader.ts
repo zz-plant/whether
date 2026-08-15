@@ -467,7 +467,7 @@ export const loadReportDataUncachedInternal = async ({
     currentTrendDirection: reportDynamics.directionLabel,
   });
   const actionNowShort = deps.buildActionNowShort(reportDynamics);
-  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const guardrailThreshold = stopItems[0];
   const flipThreshold = deps.buildFlipThreshold(assessment);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics,
@@ -579,7 +579,7 @@ export const buildFallbackReportDataInternal = ({
     directionLabel: "stable",
   };
   const actionNowShort = deps.buildActionNowShort(fallbackReportDynamics);
-  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const guardrailThreshold = stopItems[0];
   const flipThreshold = deps.buildFlipThreshold(assessment);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics: fallbackReportDynamics,

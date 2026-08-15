@@ -25,6 +25,10 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
+    assert.equal(
+      result.decisionImpactWindow,
+      "Use this live read for this week's approvals; apply the thresholds shown in the current call.",
+    );
   });
 
   it("returns warning trust copy that keeps decision path but stages irreversible approvals", () => {

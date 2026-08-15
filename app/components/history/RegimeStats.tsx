@@ -1,7 +1,4 @@
-"use client";
-
-import { useMemo } from "react";
-import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 
 type RegimeStats = {
   avgDuration: number;
@@ -10,9 +7,8 @@ type RegimeStats = {
   currentStreak: number;
 };
 
-function computeRegimeStats(): RegimeStats | null {
+function computeRegimeStats(series: TimeMachineRegimeEntry[]): RegimeStats | null {
   try {
-    const series = getTimeMachineRegimeSeries(60);
     if (series.length < 6) return null;
 
     const streaks: { regime: string; months: number }[] = [];
@@ -56,8 +52,8 @@ function computeRegimeStats(): RegimeStats | null {
   }
 }
 
-export function RegimeStats() {
-  const stats = useMemo(() => computeRegimeStats(), []);
+export function RegimeStats({ series }: { series: TimeMachineRegimeEntry[] }) {
+  const stats = computeRegimeStats(series);
 
   if (!stats) return null;
 
