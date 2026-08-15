@@ -19,7 +19,7 @@ export type WeeklyCallContract = {
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
 const FALLBACK_CURRENT_CALL = "Hold bounded operating discipline.";
-const FALLBACK_PAUSE_IF = "Do not approve irreversible commitments without trigger confirmation.";
+const FALLBACK_PAUSE_IF = "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
 const FALLBACK_CHANGE_COURSE_IF = "Re-open approvals when confidence and trend stabilize.";
 
 const dedupeLines = (lines: Array<string | undefined>, maxItems = 4) =>

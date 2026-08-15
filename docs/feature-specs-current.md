@@ -5,6 +5,8 @@ product does today, based on shipped UI routes, data loaders, and APIs.
 
 Positioning summary: Whether is an operator briefing system for leadership teams answering three recurring questions: what regime are we in, what should we do now, and which decisions are misaligned with current macro conditions.
 
+Dynamic decision copy follows the same bounded contract across weekly, evidence, trust, export, and monthly-summary surfaces: name the action, measurable pause threshold, and reversal condition. Flat-week fallbacks identify which prior calls remain in force; trust language scopes use of the data rather than substituting generic safety claims; monthly summaries expose structured operating rules instead of relying on phrases such as “use guardrails.”
+
 ## 1) Product surfaces (UI routes)
 
 ### 1.0 Rationalized IA (primary vs supporting)

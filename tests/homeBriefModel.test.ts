@@ -53,6 +53,8 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");
+    assert.doesNotMatch(model.weeklyMemoLines.join(" "), /current track|next release/i);
+    assert.match(model.weeklyMemoLines.join(" "), /Change course when:|next live weekly refresh/i);
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.startupVariantPolicy.options.length, 6);
@@ -96,7 +98,8 @@ describe("buildHomeBriefModel", () => {
     assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
-    assert.match(model.whyThisCall[0].detail, /nearest trigger is .* points away/i);
+    assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
+    assert.match(model.whyThisCall[0].detail, /re-check .* approvals/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
     assert.equal(typeof model.weeklyMovement.score, "number");
@@ -167,7 +170,8 @@ describe("buildHomeBriefModel", () => {
     assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
-    assert.match(model.whyThisCall[0].detail, /nearest trigger is .* points away/i);
+    assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
+    assert.match(model.whyThisCall[0].detail, /re-check .* approvals/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(model.weeklyMovement.direction, "stable");
     assert.equal(model.weeklyMovement.score, 0);
@@ -623,7 +627,25 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.equal(model.sinceLastReview.hasMeaningfulDelta, false);
-    assert.match(model.sinceLastReview.fallbackCopy, /No significant delta/);
+    assert.match(model.sinceLastReview.fallbackCopy, /No change\. Last week's calls stand\./);
+    assert.match(model.sinceLastReview.fallbackCopy, /Re-check when:/);
     assert.equal(model.sinceLastReview.items.length, 0);
+  });
+
+  it("derives a measurable guardrail when upstream copy is absent", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "VOLATILE",
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+        scores: { tightness: 64, riskAppetite: 52 },
+      },
+      regimeAlert: null,
+      stopItems: [],
+      reportDynamics: { directionLabel: "stable", changedSignals: [], anomalySignals: [] },
+    });
+
+    assert.match(model.guardrail, /cash availability.*76|risk appetite.*44/i);
+    assert.doesNotMatch(model.guardrail, /trigger confirmation/i);
+    assert.doesNotMatch(model.netConstraintSummary, /stay the course/i);
   });
 });

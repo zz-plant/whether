@@ -515,7 +515,7 @@ export const buildTrustStatus = ({
       ? "Safe for reversible moves only until a live update lands."
       : policyRefusalActive
         ? "Safe for staged moves only until policy signals clear."
-      : "Safe for near-term approvals under standard guardrails.";
+      : "Use this live read for this week's approvals; apply the thresholds shown in the current call.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

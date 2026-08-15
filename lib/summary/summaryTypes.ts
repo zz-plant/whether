@@ -33,6 +33,11 @@ export type MonthlyStructured = {
   };
   planningLanguage: string;
   boundedNextActions: string[];
+  operatingRules: Array<{
+    action: string;
+    threshold: string;
+    reversal: string;
+  }>;
   reversalConditions: string[];
   executionConstraints: string[];
   provenance: {

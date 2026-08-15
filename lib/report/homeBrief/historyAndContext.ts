@@ -205,28 +205,44 @@ const overallDirectionCopy: Record<string, string> = {
 export const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
+  tightnessNow,
+  riskNow,
+  tightnessThreshold,
+  riskThreshold,
+  tightnessDirection,
+  riskDirection,
   reportDynamics,
   transitionWatch,
 }: {
   tightnessGap: number;
   riskGap: number;
+  tightnessNow: number;
+  riskNow: number;
+  tightnessThreshold: number;
+  riskThreshold: number;
+  tightnessDirection: "riseAbove" | "fallToOrBelow";
+  riskDirection: "riseAbove" | "fallToOrBelow";
   reportDynamics: HomeReportData["reportDynamics"];
   transitionWatch: "ON" | "OFF";
 }): WhyThisCallItem[] => {
-  const nearestGap = Math.min(tightnessGap, riskGap);
-  const boundaryCopy =
-    nearestGap <= 5
-      ? "close enough to trip on a single bad read"
-      : nearestGap <= 12
-        ? "close enough to be worth watching weekly"
-        : "far enough that a single week will not move it";
+  const nearestIsTightness = tightnessGap <= riskGap;
+  const nearestGap = nearestIsTightness ? tightnessGap : riskGap;
+  const boundaryLabel = nearestIsTightness ? "Cash availability" : "Risk appetite";
+  const boundaryNow = nearestIsTightness ? tightnessNow : riskNow;
+  const boundaryThreshold = nearestIsTightness ? tightnessThreshold : riskThreshold;
+  const boundaryDirection = (nearestIsTightness ? tightnessDirection : riskDirection) === "riseAbove"
+    ? "rises above"
+    : "falls to or below";
+  const boundaryConsequence = nearestIsTightness
+    ? "re-check fixed-cost approvals"
+    : "re-check hiring and expansion approvals";
   const changedSignal = reportDynamics?.changedSignals[0];
 
   return [
     {
       key: "distance-to-regime-change",
       label: "Distance to regime change",
-      detail: `The nearest trigger is ${nearestGap.toFixed(1)} points away — ${boundaryCopy}.`,
+      detail: `${boundaryLabel} is ${nearestGap.toFixed(1)} points from its ${boundaryThreshold.toFixed(1)} line. If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
     },
     {
       key: "momentum",
@@ -241,8 +257,8 @@ export const buildWhyThisCall = ({
       label: "Confidence",
       detail:
         transitionWatch === "ON"
-          ? "Transition watch is on. Wait for the next release before committing anything you cannot undo."
-          : "Transition watch is off. The signal set is steady enough for near-term planning.",
+          ? "Transition watch is on. Hold net-new headcount, multi-quarter vendors, and irreversible roadmap expansion until the next live weekly refresh confirms the call."
+          : "Transition watch is off. Use this live read for this week's approvals and apply the thresholds in the current call.",
     },
   ];
 };
@@ -300,6 +316,7 @@ export const buildStartRouteDeltaBlock = ({
   failureModes,
   trendLabel,
   historicalTimeline,
+  heldDecision,
 }: {
   currentRegime: Regime;
   regimeAlert: HomeReportData["regimeAlert"];
@@ -310,6 +327,7 @@ export const buildStartRouteDeltaBlock = ({
   failureModes: HomeBriefTrustWarning[];
   trendLabel: string;
   historicalTimeline: HistoricalTimelineItem[];
+  heldDecision: string;
 }) => {
   const isReturningUser = historicalTimeline.length >= 2;
   const changedSignals = reportDynamics?.changedSignals ?? [];
@@ -330,7 +348,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: true,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        "No significant delta since your last review. Hold posture, keep current guardrails, and monitor thresholds before changing plans.",
+        `No change. Last week's calls stand. ${heldDecision} Re-check when: ${reversalTrigger}`,
       items: [],
     };
   }

@@ -157,7 +157,9 @@ describe("buildReportEvidenceItems", () => {
 
     const curveSlopeItem = items.find((item) => item.key === "curveSlope");
 
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /incrementally safer/i);
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /12-month payback/i);
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /curve remains above 0\.0%/i);
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /cash availability stays below 70\.0/i);
   });
 });
 
