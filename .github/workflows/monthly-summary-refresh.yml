@@ -27,6 +27,16 @@ jobs:
       - name: Generate monthly summaries
         run: bun scripts/generateMonthlySummaries.ts
 
+      # Monthly generation alone leaves the quarterly/yearly archive behind: once
+      # June 2026 landed, Q2 2026 was still missing, and
+      # tests/summaryDerivedHistory.test.ts fails on exactly that drift.
+      - name: Generate quarterly and yearly summaries
+        run: bun scripts/generateQuarterlyYearlySummaries.ts
+
+      # A refresh that produces data the suite rejects should not open a PR.
+      - name: Verify refreshed data
+        run: bun run test tests/summaryDerivedHistory.test.ts
+
       # No continue-on-error: this step failed every week from June to August 2026
       # with "GitHub Actions is not permitted to create or approve pull requests"
       # while the job kept reporting success, so the month rail silently froze at
