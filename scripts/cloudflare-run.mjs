@@ -39,7 +39,7 @@ if (!parsed.dryRun) {
   ensureWranglerAuth(childEnv);
 }
 
-if (!parsed.skipBuild && !parsed.dryRun) {
+if (!parsed.skipBuild) {
   const buildStatus = runVinext(["build"], childEnv);
   if (buildStatus !== 0) {
     process.exit(buildStatus);
@@ -48,7 +48,14 @@ if (!parsed.skipBuild && !parsed.dryRun) {
   deployArgs.push("--skip-build");
 }
 
-process.exit(runVinext(deployArgs, childEnv));
+// The adapter's --dry-run only validates scaffolding: it deliberately skips both
+// the build and Wrangler. Run Wrangler directly so this command catches invalid
+// bindings, oversized bundles, and other upload-time failures without publishing.
+if (parsed.dryRun) {
+  process.exit(runWranglerDryRun(targetEnv, childEnv));
+}
+
+process.exit(runCloudflareDeploy(deployArgs, childEnv));
 
 function parseArgs(args) {
   const result = {
@@ -109,6 +116,41 @@ function rebuildDeployArgs(parsed, targetEnvName) {
 
 function runVinext(args, env) {
   const result = spawnSync(process.execPath, ["scripts/vinext-run.mjs", ...args], {
+    env,
+    stdio: "inherit",
+  });
+
+  return result.status ?? 1;
+}
+
+function runCloudflareDeploy(args, env) {
+  const cliPath = join(process.cwd(), "node_modules", "@vinext", "cloudflare", "dist", "cli.js");
+
+  if (!existsSync(cliPath)) {
+    console.error(`Unable to locate the @vinext/cloudflare CLI at ${cliPath}. Run bun install first.`);
+    return 1;
+  }
+
+  const result = spawnSync(process.execPath, ["--no-deprecation", cliPath, ...args], {
+    env,
+    stdio: "inherit",
+  });
+
+  return result.status ?? 1;
+}
+
+function runWranglerDryRun(targetEnvName, env) {
+  const wranglerPath = join(process.cwd(), "node_modules", "wrangler", "bin", "wrangler.js");
+
+  if (!existsSync(wranglerPath)) {
+    console.error(`Unable to locate Wrangler at ${wranglerPath}. Run bun install first.`);
+    return 1;
+  }
+
+  const args = ["--no-deprecation", wranglerPath, "deploy", "--dry-run"];
+  if (targetEnvName) args.push("--env", targetEnvName);
+
+  const result = spawnSync(process.execPath, args, {
     env,
     stdio: "inherit",
   });
