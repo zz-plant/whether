@@ -145,7 +145,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   const pauseIf =
     actionStripItems[0]?.triggerThreshold
     ?? assessment.constraints[1]
-    ?? "Do not approve irreversible commitments without trigger confirmation.";
+    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
 
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),

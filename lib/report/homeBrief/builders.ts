@@ -474,12 +474,15 @@ export const buildHomeBriefModelInternal = (
       implication: analog.implication,
     }));
 
-  const guardrail = guardrailThreshold ?? stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const decisionRules = buildCanonicalBoundedDecisionRules({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
     scores: assessment.scores,
   });
+  const guardrail = guardrailThreshold
+    ?? stopItems[0]
+    ?? decisionRules[0]?.pauseTrigger
+    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
   const startupVariantPolicy: StartupVariantPolicy = {
     selectedMode: startupVariantMode,
     options: startupVariantModes,
@@ -556,7 +559,7 @@ export const buildHomeBriefModelInternal = (
   const netConstraintSummary = joinSentences(
     displayRegime.label,
     pressureLine,
-    conciseActionNow || "Stay the course",
+    conciseActionNow || decisionRules[0]?.doNow[0] || "Last week's hiring, roadmap, and spend calls stand",
     conciseFlipThreshold,
   );
 
@@ -592,6 +595,8 @@ export const buildHomeBriefModelInternal = (
       operatingStanceLine: effectiveOperatingStanceLine,
       trendLabel,
       transitionWatch,
+      pauseIf: guardrail,
+      changeCourseIf: conciseFlipThreshold,
     }),
     startupClimateIndex,
     regimeDistance,
@@ -658,10 +663,17 @@ export const buildHomeBriefModelInternal = (
       failureModes,
       trendLabel,
       historicalTimeline,
+      heldDecision: decisionRules[0]?.doNow[0] ?? effectiveOperatingStanceLine,
     }),
     whyThisCall: buildWhyThisCall({
       tightnessGap,
       riskGap,
+      tightnessNow: assessment.scores.tightness,
+      riskNow: assessment.scores.riskAppetite,
+      tightnessThreshold: assessment.thresholds.tightnessRegime,
+      riskThreshold: assessment.thresholds.riskAppetiteRegime,
+      tightnessDirection: boundaryDirectionForRegime(assessment.regime, "tightness"),
+      riskDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
       reportDynamics,
       transitionWatch,
     }),

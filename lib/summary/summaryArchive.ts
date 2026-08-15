@@ -110,6 +110,11 @@ const MonthlyStructuredSchema = z.object({
   }),
   planningLanguage: z.string().optional(),
   boundedNextActions: z.array(z.string()),
+  operatingRules: z.array(z.object({
+    action: z.string(),
+    threshold: z.string(),
+    reversal: z.string(),
+  })).default([]),
   reversalConditions: z.array(z.string()),
   executionConstraints: z.array(z.string()),
   provenance: z.object({

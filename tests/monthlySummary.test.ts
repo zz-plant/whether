@@ -34,11 +34,18 @@ describe("buildMonthlySummary", () => {
     assert.equal(summary.structured.posture.summary.length > 0, true);
     assert.equal(summary.structured.planningLanguage.length > 0, true);
     assert.equal(summary.structured.boundedNextActions.length > 0, true);
+    assert.equal(summary.structured.operatingRules.length > 0, true);
+    for (const rule of summary.structured.operatingRules) {
+      assert.ok(rule.action.length > 0);
+      assert.ok(rule.threshold.length > 0);
+      assert.ok(rule.reversal.length > 0);
+    }
     assert.equal(summary.structured.reversalConditions.length > 0, true);
     assert.deepEqual(summary.structured.executionConstraints, summary.constraints);
     assert.match(summary.copy, /MONTHLY POSTURE/);
     assert.match(summary.copy, /PLANNING LANGUAGE TO USE/);
     assert.match(summary.copy, /BOUNDED NEXT ACTIONS/);
+    assert.match(summary.copy, /MONTHLY OPERATING RULES/);
     assert.match(summary.copy, /TOP REVERSALS/);
     assert.match(summary.copy, /EXECUTION CONSTRAINTS\n\n• /);
     assert.match(summary.copy, /Source:\nSource: /);

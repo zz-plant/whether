@@ -36,7 +36,7 @@ const monthlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
   DEFENSIVE:
     "double down on retention, reduce fixed costs, and sequence delivery around revenue durability",
   VOLATILE:
-    "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+    "cap concurrent experiments, stage fixed-cost approvals, and assign a named checkpoint owner",
   EXPANSION:
     "scale proven bets, invest in durable growth channels, and keep payback discipline",
 };
@@ -44,6 +44,39 @@ const monthlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
 
 export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   monthlyActionGuidance[regime];
+
+export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructured["operatingRules"] => {
+  const tightnessPause = assessment.thresholds.tightnessRegime + 6;
+  const tightnessResume = Math.max(assessment.thresholds.tightnessRegime - 4, 0);
+  const riskPause = Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0);
+  const riskResume = Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100);
+
+  if (assessment.regime === "VOLATILE") {
+    return [
+      {
+        action: "Run no more than three concurrent experiments, each with a named rollback owner.",
+        threshold: `Pause new experiments if risk appetite falls below ${riskPause.toFixed(1)}.`,
+        reversal: `Reopen slots when risk appetite is above ${riskResume.toFixed(1)} and weekly direction stabilizes or improves.`,
+      },
+      {
+        action: "Stage net-new headcount and multi-quarter vendor approvals.",
+        threshold: `Pause fixed-cost approvals if cash availability rises above ${tightnessPause.toFixed(1)}.`,
+        reversal: `Resume staged approvals when cash availability falls below ${tightnessResume.toFixed(1)}.`,
+      },
+      {
+        action: "Assign one checkpoint owner to every cross-team commitment before work starts.",
+        threshold: "Stop adding scope when an active commitment has no owner or rollback checkpoint.",
+        reversal: "Resume scope after an owner, checkpoint date, and rollback decision are recorded.",
+      },
+    ];
+  }
+
+  return [{
+    action: `Apply this month's priority: ${getMonthlyActionGuidance(assessment.regime)}.`,
+    threshold: `Pause broader commitments if cash availability rises above ${tightnessPause.toFixed(1)} or risk appetite falls below ${riskPause.toFixed(1)}.`,
+    reversal: `Reopen broader scope when cash availability is below ${tightnessResume.toFixed(1)} and risk appetite is above ${riskResume.toFixed(1)}.`,
+  }];
+};
 
 export const buildMonthlyStructured = ({
   regimeLabel,
@@ -53,6 +86,7 @@ export const buildMonthlyStructured = ({
   transitionWatch,
   constraints,
   provenance,
+  operatingRules = [],
 }: {
   regimeLabel: string;
   guidance: string;
@@ -61,6 +95,7 @@ export const buildMonthlyStructured = ({
   transitionWatch: boolean;
   constraints: string[];
   provenance: MonthlySummaryProvenance;
+  operatingRules?: MonthlyStructured["operatingRules"];
 }): MonthlyStructured => {
   const postureSummary = [
     `The priority this month is to ${guidance}.`,
@@ -93,6 +128,7 @@ export const buildMonthlyStructured = ({
     },
     planningLanguage,
     boundedNextActions,
+    operatingRules,
     reversalConditions,
     executionConstraints: constraints,
     provenance: {
@@ -114,6 +150,7 @@ export const buildMonthlySummary = ({
 }): MonthlySummary => {
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
+  const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "Evidence is sitting near a regime boundary, so hold major scope changes until the next read."
     : "";
@@ -134,6 +171,7 @@ export const buildMonthlySummary = ({
     transitionWatch: assessment.diagnostics.transitionWatch,
     constraints: assessment.constraints,
     provenance,
+    operatingRules,
   });
   const copy = renderMonthlySummaryCopy({
     title,

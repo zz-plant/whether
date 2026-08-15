@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import {
   buildMonthlySummary,
   getMonthlyActionGuidance,
+  getMonthlyOperatingRules,
 } from "../../../lib/summary/monthlySummary";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 import { buildCadenceAlignment } from "../../../lib/cadenceAlignment";
@@ -81,6 +82,7 @@ export const MonthlyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getMonthlyActionGuidance(assessment.regime);
+  const operatingRules = getMonthlyOperatingRules(assessment);
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance,
@@ -108,6 +110,14 @@ export const MonthlyActionSummaryPanel = ({
             classes: "border-rose-500/60 bg-rose-500/10 text-rose-100",
           };
   const monthlyBlocks: ActionSummaryBlock[] = [
+    {
+      heading: "Monthly operating rules",
+      bullets: operatingRules.flatMap((rule) => [
+        `Action: ${rule.action}`,
+        `Threshold: ${rule.threshold}`,
+        `Reversal: ${rule.reversal}`,
+      ]),
+    },
     {
       heading: "Monthly leadership asks sound like",
       bullets: [
