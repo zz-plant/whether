@@ -496,10 +496,18 @@ html[data-theme="light"] {
   --bg-nested: #e8edf2;
   --bg-nested-light: rgba(0, 0, 0, 0.035);
 
-  --border-faint: rgba(0, 0, 0, 0.03);
-  --border-subtle: rgba(0, 0, 0, 0.045);
-  --border-default: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
+  /* Matched to the dark ladder's measured contrast against its own ground.
+     DD-006 raised the dark alphas because below a threshold "a card edge is
+     below the visible threshold", but noted the light theme was "verified
+     unaffected" and left it alone — nobody could reach the light theme to
+     notice, since the toggle was never rendered. Light was consistently a step
+     weaker than dark (subtle 1.10 vs 1.21, default 1.20 vs 1.31, strong 1.41 vs
+     1.58 against their respective grounds), which is why the light page read
+     washed out. These alphas reproduce the dark ratios on #faf8f5. */
+  --border-faint: rgba(0, 0, 0, 0.045);
+  --border-subtle: rgba(0, 0, 0, 0.085);
+  --border-default: rgba(0, 0, 0, 0.12);
+  --border-strong: rgba(0, 0, 0, 0.195);
 
   --app-surface: #ffffff;
   --app-raised: #f1f5f9;
@@ -509,8 +517,9 @@ html[data-theme="light"] {
   /* slate-600, not slate-500: muted text is the target of text-slate-400/500 and
      at 12-13px slate-500 lands at 3.9-4.5:1 on --bg-body, just under AA. */
   --app-text-muted: #475569;
-  --app-border: rgba(0, 0, 0, 0.08);
-  --app-border-strong: rgba(0, 0, 0, 0.15);
+  /* Kept in lockstep with --border-default / --border-strong above. */
+  --app-border: rgba(0, 0, 0, 0.12);
+  --app-border-strong: rgba(0, 0, 0, 0.195);
 
   /* Light-surface posture tint: same hues, held to a wash so text keeps contrast. */
   --atmosphere-expansion: rgba(16, 185, 129, 0.10);
@@ -645,6 +654,15 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 
 /* Slate text is bound to theme text roles via @theme inline in this file */
 [data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
+/* Catch-all first: a white border is invisible on this theme's near-white
+   ground, and the hand-maintained list below had drifted badly from actual
+   usage — it covers four alphas while the app uses eleven, leaving 24 of 41
+   call sites (border-white/[0.10] alone accounts for ten) painting white on
+   white. This floor guarantees any border-white/* stays visible; the specific
+   rules under it still win, via !important, wherever the exact step matters. */
+[data-theme="light"] [class*="border-white/"] { border-color: var(--border-default); }
+[data-theme="light"] [class*="divide-white/"] > * + * { border-color: var(--border-default); }
+
 [data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }
 [data-theme="light"] .border-white\/\[0\.12\] { border-color: rgba(0,0,0,0.12) !important; }
