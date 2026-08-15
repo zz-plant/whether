@@ -475,7 +475,7 @@ A what-if slider that lets operators drag tightness from 20–85 and see the reg
 ### 8.2 Regime transition probability
 **Location**: `app/components/home/RegimeTransitionProbability.tsx`, rendered on `/` below the simulator.
 
-Computes historical transition frequency from the time machine data and displays the probability of moving from the current regime to the most likely next regime, with an SVG arc visualization and average duration in weeks.
+Computes an empirical one-month exit rate for the current regime from monthly time-machine observations. The percentage represents the chance that conditions leave the current regime by the next monthly observation; the most common next regime is descriptive context, not the forecast event being scored. Homepage consumers receive the event and horizon alongside the number and keep that forecast separate from the decision reversal.
 
 ### 8.3 Regime history over time
 **Location**: `app/components/RegimeHistory.tsx`, rendered on `/` in the sticky right column.
