@@ -8,17 +8,13 @@ import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { RitualCheck } from "./components/RitualCheck";
-import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
 import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
-import { DecisionRouteRail } from "./components/DecisionRouteRail";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { FreshnessDot } from "./components/FreshnessDot";
-import { StageSwitcher } from "./components/StageSwitcher";
-import { ViewSelector } from "./components/cadenceSelector";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
@@ -83,7 +79,6 @@ function CanonicalWeekPermalink() {
 type BelowTheFoldEvidenceProps = {
   tightness: number;
   riskAppetite: number;
-  companyStage?: string;
   recordDate: string;
   recentRecordDates: string[];
   operateHref?: string;
@@ -96,8 +91,6 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
       />
 
-      <CompanyMetricsPanel tightness={props.tightness} companyStage={props.companyStage} />
-
       <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <ActionLink href={props.operateHref ?? "/operate"} variant="primary">
@@ -108,7 +101,6 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
             recentRecordDates={props.recentRecordDates}
           />
         </div>
-        <DecisionRouteRail />
       </div>
     </>
   );
@@ -137,7 +129,7 @@ async function PageContent({
     return <HomeBriefLoadError />;
   }
 
-  const { homepage, reportData, operatorContext } = data;
+  const { homepage, reportData } = data;
   const isDegraded = !homepage.reportResult.ok;
 
   const timeMachineRequest = parseTimeMachineRequest(searchParams);
@@ -302,17 +294,7 @@ shareLines={briefShareLines}
                riskAppetiteDelta={riskAppetiteDelta}
                currentRecordDate={homepage.reportShell.recordDateLabel}
                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-               autoExpand={Math.abs(tightnessDelta) >= 3 || (macroTrendline.length >= 2 && macroTrendline[macroTrendline.length - 2].regime !== regime)}
              />
-            <details className="group weather-section-border">
-              <summary className="flex min-h-11 cursor-pointer select-none items-center text-fluid-xs font-medium text-slate-300 after:ml-auto after:text-slate-500 after:content-['▾'] group-open:after:content-['▴']">
-                Interpret this call for your company
-              </summary>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <StageSwitcher currentStage={operatorContext.companyStage} />
-                <ViewSelector />
-              </div>
-            </details>
           </SwipeableWeek>
           <FirstVisitExplainer />
 
@@ -326,7 +308,6 @@ shareLines={briefShareLines}
             <BelowTheFoldEvidence
               tightness={tightness}
               riskAppetite={riskAppetite}
-              companyStage={operatorContext.companyStage ?? undefined}
               recordDate={homepage.reportShell.recordDateLabel}
               recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
               operateHref={operateHref}

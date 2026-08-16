@@ -9,13 +9,13 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 
 ## 1) Product surfaces (UI routes)
 
-### 1.0 Rationalized IA (primary vs supporting)
-Primary IA is now the five-surface operator loop:
-- `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact
-- `/evidence` — **Evidence**: evidence depth for thresholds, freshness, and replay
-- `/resolve` — **Decision Tools**: role, situation, and utility-based decision translation
-- `/planning` — **Planning**: execution guardrails, finance posture, and final-brief approval
-- `/trust` — **Trust**: trust, source, formula, and confidence audit
+### 1.0 Rationalized IA (one screen + reachable depth)
+Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
+as supporting layers, deep links, or URL-driven states of `/`:
+- `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact (the product)
+- `/operate` (Plan), `/signals` (Evidence), `/answer` (Resolve), `/trust` (Trust): reachable
+  but **supporting**, one click from the brief — not peer routes that invite a second scan
+- `/history`, `/history/compare`: supporting archive and scrub/playback
 
 Supporting surfaces are intentionally subordinate:
 - `/toolkits` is a supporting instrument library under **Decision Tools**
@@ -37,8 +37,10 @@ The homepage keeps interpretation layers optional and query-driven: the default 
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/evidence`, `/planning`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
-Workflow navigation on report-shell routes now also includes a compact step-progress state so users can keep their place in the five-surface loop while scrolling.
-Primary navigation now follows the action-first weekly workflow (`Brief`, `Plan`, `Evidence`, `Resolve`, `Trust`), while in-flow homepage CTAs use the most natural task verb for each destination, such as `Build this week's plan`, `Open evidence`, and `Check trust`.
+Primary navigation now keeps the Weekly Brief as the only primary destination. Plan,
+Evidence, Resolve, and Trust are supporting layers under the brief, reachable from the mobile
+drawer, command palette, and in-flow CTAs (`Build this week's plan`) — never as equal-weight
+desktop nav peers.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It

@@ -9,11 +9,19 @@ import {
 } from "../lib/navigation/informationArchitecture";
 
 describe("navigation information architecture", () => {
-  it("orders primary layers by the operator loop", () => {
+  it("keeps the weekly brief as the only primary layer", () => {
     assert.deepEqual(
       primaryNavigationLayers.map((layer) => layer.href),
-      ["/", "/operate", "/signals", "/answer", "/trust"],
+      ["/"],
     );
+  });
+
+  it("keeps demoted hubs reachable as supporting layers", () => {
+    for (const href of ["/operate", "/signals", "/answer", "/trust", "/history", "/history/compare"]) {
+      const layer = navigationLayers.find((candidate) => candidate.href === href);
+      assert.ok(layer, `${href} stays in the IA layer set`);
+      assert.equal(layer!.tier, "supporting", `${href} is reachable but not primary`);
+    }
   });
 
   it("keeps one layer for each IA boundary and route", () => {

@@ -26,9 +26,6 @@ const findActiveLayer = (pathname: string) => {
     .find((layer) => pathMatchesLink(layer.href, normalizedPathname));
 };
 
-const findActivePrimaryLayer = (pathname: string) =>
-  primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, normalizePathname(pathname)));
-
 // Resolve route label from utility links (framework, template, api-docs, about, etc.)
 const resolveUtilityRouteLabel = (pathname: string) => {
   const normalizedPathname = normalizePathname(pathname);
@@ -45,18 +42,21 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
   return resolveUtilityRouteLabel(normalizePathname(pathname)) ?? fallbackLabel;
 };
 
-// Next step in the operator loop: walks primaryNavigationLayers in IA order
-// and cycles back to the brief after the last hub.
+// Next step in the operator loop. The weekly brief is the only primary layer,
+// so any other report-shell route resolves back to the one-screen brief rather
+// than promoting a further hub. Non-report routes return null.
 export const resolveReportHeaderNextStep = (pathname: string) => {
-  const activeLayer = findActivePrimaryLayer(pathname);
+  const normalizedPathname = normalizePathname(pathname);
 
-  if (!activeLayer) {
+  if (normalizedPathname === "/") {
     return null;
   }
 
-  const activeIndex = primaryNavigationLayers.indexOf(activeLayer);
-  const nextLayer = primaryNavigationLayers[(activeIndex + 1) % primaryNavigationLayers.length];
-  return { href: nextLayer.href, label: nextLayer.navLabel ?? nextLayer.label } as const;
+  if (isReportShellRoute(normalizedPathname)) {
+    return { href: "/", label: "Weekly Brief" } as const;
+  }
+
+  return null;
 };
 
 export type GlobalHeaderNavigationLink = NavigationLayer & { isActive: boolean };

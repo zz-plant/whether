@@ -39,27 +39,19 @@ describe("home route render contract", () => {
     assert.ok(!heroSource.includes("transitionProbability"), "a bare probability cannot be appended to the flip condition");
   });
 
-  it("routes the lower home handoff through a collapsed disclosure to the operator-loop surfaces", () => {
+  it("keeps the lower home handoff to the one-screen loop without a peer-route rail", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
-    const railSource = readFileSync("app/components/DecisionRouteRail.tsx", "utf8");
+    const paletteSource = readFileSync("app/components/commandPalette.tsx", "utf8");
 
-    assert.ok(routeSource.includes("<DecisionRouteRail"), "home route mounts the route-handoff disclosure");
-    assert.ok(railSource.includes("hidden={!open}"), "route handoff is a collapsed disclosure, not an always-open rail");
+    assert.ok(!routeSource.includes("<DecisionRouteRail"), "home route no longer mounts a peer-route handoff rail");
+    assert.ok(!routeSource.includes("<StageSwitcher"), "the interpretation-layer switch is gone from /");
+    assert.ok(!routeSource.includes("<ViewSelector"), "the view selector is gone from /");
+    assert.ok(!routeSource.includes("autoExpand="), "CompareStrip is a manual disclosure, not an auto-opened panel");
 
-    for (const target of [
-      "/planning/financial",
-      "/planning/ship-checklist",
-      "/answer",
-      "/answer#toolkit-library",
-      "/template",
-      "/resources/reversal-trigger-checklist",
-      "/history/compare",
-      "/history",
-    ]) {
-      assert.ok(railSource.includes(`"${target}"`), `route handoff surfaces ${target}`);
-    }
-
-    assert.ok(!railSource.includes("<ShareBriefButton"), "route handoff must not add a copy action");
+    // Demoted hubs stay reachable on demand: the command palette mounts every
+    // IA navigation layer and its own history shortcut.
+    assert.ok(paletteSource.includes("navigationLayers"), "command palette mounts the IA navigation layers");
+    assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 
 it("opens the command palette from the header search button", () => {

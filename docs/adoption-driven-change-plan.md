@@ -162,6 +162,92 @@ The useful thing is "What needs reconsideration this week?" — which the revisi
 already answers. `RitualCheck.tsx` (mark reviewed + streak) is weak gamification; keep at
 most the reviewed marker, drop the streak if it adds no decision value.
 
+## One-screen redraft (2026-08)
+
+The adoption-driven phases above made `/` the decision-attention surface. This section goes
+further: the weekly operating call is the product, and everything outside one screen faces a
+very high bar. The bar is **"does this surface change what the operator does this week?"** If
+not, it is either a disclosure on `/`, a deep link, or gone from nav. It must never be a peer
+route that invites a second scan.
+
+### The keep list (the ritual)
+
+Everything that answers "how bold should we be this week?" in one scan:
+
+```
+THIS WEEK
+Boldness Budget + weekly delta
+  ↓ What should change? (3–5 operating calls: hiring / spend / raise / expansion)
+  ↓ Pause if ...
+  ↓ Reopen when ...
+four-week memory
+one shareable artifact
+```
+
+Ships as: `DecisionHero` (budget, delta, sparkline), `ThreeWhethersCard` (action strip),
+`DecisionHero` bounded box (guardrail / reversal / flip watch), `RitualCheck` +
+`DecisionStalenessPanel` + memory rail (memory), `ShareBriefButton` + citation footer
+(artifact), `FreshnessDot` + confidence line (compact trust).
+
+### Cut — primary nav collapses to `/`
+
+Today `navigationLayers` exposes five primary routes: `/`, `/operate`, `/signals`, `/answer`,
+`/trust`, plus supporting `/history` and `/history/compare`. The redraft demotes all but `/`:
+
+| Route | Current job | Redraft |
+| --- | --- | --- |
+| `/` | Weekly Brief | The product. Everything else is one click from here. |
+| `/operate` (Plan) | Execution stepper, export, memory, alerts | Deep link + `?view=plan` state on `/`. The "Action now / Pause if / Change course if" block already ships on `/`. |
+| `/signals` (Evidence) | "Why this call" + detail mode | `?detail=` disclosure on `/`. Evidence belongs under the call, not on a peer route. |
+| `/answer` (Resolve) | Role/stage translation, toolkits | Deep link only. "Tell me what matters to me" is solved by company decisions, not role views. |
+| `/trust` | Freshness, confidence, formula | Inline trust line + citation footer on `/`. Formula reference stays as a deep link. |
+| `/history`, `/history/compare` | Scrub/playback | Keep the immutable archive (`/brief/[week]`); scrub/playback stays behind a disclosure. |
+
+Primary nav then has one entry. `primaryNavigationLayers` shrinks to `/`.
+
+### Cut — the `/` below-the-fold browsing layer
+
+The rest of `/` must not invite browsing either. Remove or demote to disclosure:
+
+- `StageSwitcher` + `ViewSelector` (`cadenceSelector`) — the interpretation layer switch.
+- `CompanyMetricsPanel` ("Your numbers") — company view as a home widget.
+- `CompareStrip` auto-expand — keep as a manual "compare to last week" disclosure, not an
+  auto-opened panel.
+- `DecisionRouteRail` — the "Route this week's call" handoff that points at the peer routes
+  being demoted.
+- `?view=` interpretation machinery on `/` (`sector`, `company`, `financial`, `forecast`) —
+  the default view is the product.
+
+### Keep — engines, SEO, deep links (do not delete)
+
+- All lib machinery: regime engine, forecast model, time machine, sector sensitivity,
+  interpretation layer, runway planner, decision memory, staleness, export builders.
+- Programmatic SEO corpus (`/answers`, `/resources`, `/concepts`, `/guides`) — the only
+  organic discovery surface, since the weekly brief changes weekly and cannot be indexed.
+- MCP + API surface — the "generate on demand" path for evidence, projection, comps.
+- `/brief/[week]` immutable archive.
+- Deep links and unlisted URLs — hidden but reachable beats deleted.
+
+### The rule that decides each cut
+
+> If a surface doesn't change what the operator does this week, it's a disclosure on `/` or
+> gone from nav. Provenance, confidence, evidence, replay, tooling, and packaging only pass as
+> compact inline elements of the artifact — never as peer routes.
+
+### One-screen cut — DONE (2026-08)
+
+Executed:
+- `navigationLayers`: `/operate`, `/signals`, `/answer`, `/trust` moved to `tier: "supporting"`
+  under `weekly-brief`. `primaryNavigationLayers` is now just `/`. All routes stay in
+  `navigationLayers`, so report-shell chrome, command palette, deep links, MCP/API, and SEO
+  remain intact. Demoted routes resolve their header next-step back to the brief.
+- Removed from `/`: `StageSwitcher`, `ViewSelector`, `CompanyMetricsPanel`, `DecisionRouteRail`.
+  `CompareStrip` no longer auto-expands. The `?view=` interpretation layers no longer have a
+  `/` UI switch; the machinery stays in `lib/report/interpretationLayer.ts` for export/share/OG
+  and URL-driven deep links.
+- Kept on `/`: the ritual (hero, action strip, bounded conditions, memory, share artifact,
+  trust line) plus `DecisionStalenessPanel` and the plan deep-link CTA.
+
 ## Execution order
 
 ### Phase 1 — protect the home screen (smallest, highest leverage) — DONE (2026-08)

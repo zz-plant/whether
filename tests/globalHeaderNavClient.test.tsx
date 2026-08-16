@@ -5,16 +5,18 @@ import { GlobalHeaderNavClient, MobileNavContent } from "../app/components/globa
 import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders workflow step links and API link", () => {
+  it("renders the one-screen brief and API link in desktop nav", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavClient pathname="/" />,
     );
     assert.ok(html.includes("Brief"), "renders Brief link");
-    assert.ok(html.includes("Evidence"), "renders Evidence link");
-    assert.ok(html.includes("Plan"), "renders Plan link");
-    assert.ok(html.includes("Resolve"), "renders Resolve link");
-    assert.ok(html.includes("Trust"), "renders Trust link");
     assert.ok(html.includes("API"), "renders API link");
+
+    // The four hubs are no longer primary peers; they stay reachable through the
+    // mobile drawer as supporting layers under the brief.
+    for (const hub of ["Evidence", "Plan", "Resolve", "Trust"]) {
+      assert.ok(!html.includes(hub), `desktop nav does not render ${hub} as a primary peer`);
+    }
   });
 
   it("marks API link active when on /api-docs", () => {
@@ -34,6 +36,16 @@ describe("GlobalHeaderNavClient", () => {
     assert.ok(html.includes("Framework"), "includes Framework link");
     assert.ok(html.includes("Template"), "includes Template link");
     assert.ok(html.includes("About"), "includes About link");
+  });
+
+  it("nests demoted hubs as supporting layers under the brief in mobile", () => {
+    const navigationLinks = resolveGlobalHeaderNavigationLinks("/");
+    const html = renderToStaticMarkup(
+      <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
+    );
+    for (const hub of ["Evidence", "Plan", "Resolve", "Trust"]) {
+      assert.ok(html.includes(hub), `mobile drawer keeps ${hub} reachable under the brief`);
+    }
   });
 });
 

@@ -40,7 +40,8 @@ export const navigationLayers: NavigationLayer[] = [
     navLabel: "Plan",
     description: "Turn this week's brief into decisions on hiring, spend, roadmap, and what to share.",
     boundary: "Use this when you are ready to turn the brief into approvals.",
-    tier: "primary",
+    tier: "supporting",
+    parentKey: "weekly-brief",
   },
   {
     key: "signals",
@@ -49,7 +50,8 @@ export const navigationLayers: NavigationLayer[] = [
     navLabel: "Evidence",
     description: "See what changed, what drove it, and the thresholds worth watching.",
     boundary: "Use this when you want the proof behind the call.",
-    tier: "primary",
+    tier: "supporting",
+    parentKey: "weekly-brief",
   },
   {
     key: "resolve",
@@ -58,7 +60,8 @@ export const navigationLayers: NavigationLayer[] = [
     navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",
     boundary: "Use this page when the brief is clear but one question still needs an answer.",
-    tier: "primary",
+    tier: "supporting",
+    parentKey: "weekly-brief",
   },
   {
     key: "trust",
@@ -67,7 +70,8 @@ export const navigationLayers: NavigationLayer[] = [
     navLabel: "Trust",
     description: "Check freshness, confidence, source coverage, and what would change the brief.",
     boundary: "Use this when you want to sanity-check the brief before a big decision.",
-    tier: "primary",
+    tier: "supporting",
+    parentKey: "weekly-brief",
   },
   {
     key: "history",

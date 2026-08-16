@@ -48,20 +48,24 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/templating"), "Page");
   });
 
-  it("walks the operator loop for next-step cues and cycles back to the brief", () => {
-    assert.deepEqual(resolveReportHeaderNextStep("/"), { href: "/operate", label: "Plan" });
-    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/signals", label: "Evidence" });
-    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/answer", label: "Resolve" });
-    assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/trust", label: "Trust" });
-    assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Brief" });
-    assert.equal(resolveReportHeaderNextStep("/history"), null);
+  it("resolves report routes back to the one-screen brief", () => {
+    assert.equal(resolveReportHeaderNextStep("/"), null);
+    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/", label: "Weekly Brief" });
+    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/", label: "Weekly Brief" });
+    assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/", label: "Weekly Brief" });
+    assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Weekly Brief" });
+    assert.deepEqual(resolveReportHeaderNextStep("/history"), { href: "/", label: "Weekly Brief" });
     assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
   });
 
-  it("marks only one primary link active for nested paths", () => {
-    const activeLinks = resolveGlobalHeaderNavigationLinks("/answer/use-cases").filter((link) => link.isActive);
+  it("marks the brief active only on the home route", () => {
+    const homeLinks = resolveGlobalHeaderNavigationLinks("/").filter((link) => link.isActive);
+    assert.equal(homeLinks.length, 1);
+    assert.equal(homeLinks[0]?.href, "/");
 
-    assert.equal(activeLinks.length, 1);
-    assert.equal(activeLinks[0]?.href, "/answer");
+    // Demoted report routes are not primary, so no primary link is active there;
+    // the one-screen brief stays the single primary destination.
+    const reportLinks = resolveGlobalHeaderNavigationLinks("/answer/use-cases").filter((link) => link.isActive);
+    assert.equal(reportLinks.length, 0);
   });
 });
