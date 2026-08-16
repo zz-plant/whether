@@ -44,4 +44,20 @@ describe("time navigation and historical replay", () => {
     assert.ok(first.recordDateLabel);
     assert.equal(buildPublishedBriefPath(first.slug), `/brief/${first.slug}`);
   });
+
+  it("slices regime series across timeline zoom presets", async () => {
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const series1Y = getTimeMachineRegimeSeries(12);
+    assert.equal(series1Y.length, 12, "1Y preset should return 12 months");
+
+    const series3Y = getTimeMachineRegimeSeries(36);
+    assert.equal(series3Y.length, 36, "3Y preset should return 36 months");
+
+    const series5Y = getTimeMachineRegimeSeries(60);
+    assert.equal(series5Y.length, 60, "5Y preset should return 60 months");
+
+    const seriesMax = getTimeMachineRegimeSeries(180);
+    assert.ok(seriesMax.length > 100, "MAX preset should return full historical dataset");
+    assert.ok(seriesMax[0].recordDate < seriesMax[seriesMax.length - 1].recordDate, "Series should be chronological");
+  });
 });
