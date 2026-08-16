@@ -7,10 +7,9 @@ import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/pub
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { RegimeHistory } from "./components/RegimeHistory";
-import { EvidenceDrawer } from "./components/EvidenceDrawer";
 import { RitualCheck } from "./components/RitualCheck";
-import { ToolsPanel } from "./components/ToolsPanel";
+import { CompanyMetricsPanel } from "./components/home/CompanyMetricsPanel";
+import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { DecisionRouteRail } from "./components/DecisionRouteRail";
 import { StickyCallStrip } from "./components/StickyCallStrip";
@@ -22,8 +21,6 @@ import { StageSwitcher } from "./components/StageSwitcher";
 import { ViewSelector } from "./components/cadenceSelector";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
-import dynamic from "next/dynamic";
-import { computeTransitionProbability } from "./components/home/RegimeTransitionProbability";
 import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
@@ -34,44 +31,11 @@ import {
 } from "./viewModel";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
+import { decisionAreaLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-
-const EvidenceTools = dynamic(
-  () => import("./components/EvidenceTools").then((mod) => mod.EvidenceTools),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="weather-card h-64 animate-pulse space-y-4 p-5">
-        <div className="h-5 w-40 rounded bg-white/10" />
-        <div className="grid grid-cols-2 gap-4">
-          <div className="h-20 rounded bg-white/5" />
-          <div className="h-20 rounded bg-white/5" />
-        </div>
-        <div className="h-10 w-full rounded bg-white/10" />
-      </div>
-    ),
-  },
-);
-
-const ScenarioSimulator = dynamic(
-  () => import("./components/ScenarioSimulator").then((mod) => mod.ScenarioSimulator),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="weather-card h-72 animate-pulse space-y-4 p-5">
-        <div className="flex items-center justify-between">
-          <div className="h-5 w-48 rounded bg-white/10" />
-          <div className="h-4 w-20 rounded bg-white/5" />
-        </div>
-        <div className="h-24 w-full rounded bg-white/5" />
-        <div className="h-12 w-full rounded bg-white/10" />
-      </div>
-    ),
-  },
-);
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -116,18 +80,10 @@ function CanonicalWeekPermalink() {
   );
 }
 
-type RegimeEntry = { record_date: string; regime: string };
-
 type BelowTheFoldEvidenceProps = {
-  highlight: string | undefined;
   tightness: number;
-  boldnessScore: number;
-  pauseThreshold: number;
-  currentRiskAppetite: number;
-  currentRegime: string;
-  companyStage: string | undefined;
-  tightnessDelta: number;
-  riskAppetiteDelta: number;
+  riskAppetite: number;
+  companyStage?: string;
   recordDate: string;
   recentRecordDates: string[];
   operateHref?: string;
@@ -136,23 +92,11 @@ type BelowTheFoldEvidenceProps = {
 function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   return (
     <>
-      <EvidenceDrawer highlight={props.highlight}>
-        <ToolsPanel>
-          <ScenarioSimulator
-            baseTightness={props.tightness}
-            baseBoldness={props.boldnessScore}
-            pauseThreshold={props.pauseThreshold}
-          />
-          <EvidenceTools
-            currentTightness={props.tightness}
-            currentRiskAppetite={props.currentRiskAppetite}
-            currentRegime={props.currentRegime}
-            companyStage={props.companyStage}
-            tightnessDelta={props.tightnessDelta}
-            riskAppetiteDelta={props.riskAppetiteDelta}
-          />
-        </ToolsPanel>
-      </EvidenceDrawer>
+      <DecisionStalenessPanel
+        conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
+      />
+
+      <CompanyMetricsPanel tightness={props.tightness} companyStage={props.companyStage} />
 
       <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -168,14 +112,6 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
       </div>
     </>
   );
-}
-
-function BelowTheFoldHistory({
-  regimes,
-}: {
-  regimes: RegimeEntry[];
-}) {
-  return <RegimeHistory regimes={regimes} />;
 }
 
 async function AsyncCadenceSection({ cadence }: { cadence: Exclude<AgentCadence, "weekly"> }) {
@@ -253,16 +189,18 @@ async function PageContent({
   const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
 
-  const v2HeroSignalData = buildV2HeroSignalData(reportData);
+  const revisitQueue = homepage.weeklyDecisionCardModel.decision.revisitQueue;
+  const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));
+  const noChangeAreas = homepage.weeklyDecisionCardModel.decision.decisionRules
+    .filter((rule) => !revisitAreaIds.has(rule.area))
+    .map((rule) => decisionAreaLabel(rule.area));
 
-  const transition = computeTransitionProbability(regime);
-  const toolHighlight = transition.probability > 50 ? "Transition" : Math.abs(tightnessDelta) > 3 ? "Simulator" : undefined;
+  const v2HeroSignalData = buildV2HeroSignalData(reportData);
 
   const guardrailThresholdRaw = homepage.weeklyDecisionCardModel.decision.guardrailThreshold;
   const parsedGuardrailThreshold = typeof guardrailThresholdRaw === "number"
     ? guardrailThresholdRaw
     : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
-  const pauseThreshold = Number.isFinite(parsedGuardrailThreshold) ? parsedGuardrailThreshold : 70;
 
   const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
     ? `Cash availability crosses ${parsedGuardrailThreshold}`
@@ -340,15 +278,15 @@ async function PageContent({
                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
                 isFallback={homepage.reportShell.showOfflineBadge}
                 signalData={v2HeroSignalData}
-                signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-                flipConditions={flipConditionLabels}
-                transitionForecast={transition.forecast}
-                guardrail={guardrailLabel}
+signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
+                 flipConditions={flipConditionLabels}
+                 guardrail={guardrailLabel}
                 reversalTrigger={reversalTriggerLabel}
-                shareLines={briefShareLines}
-                revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
-                revisitQueue={homepage.weeklyDecisionCardModel.decision.revisitQueue.slice(0, 3)}
-                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+shareLines={briefShareLines}
+                 revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
+                 revisitQueue={revisitQueue}
+                 noChangeAreas={noChangeAreas}
+                 thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
                />
 
             <ThreeWhethersCard
@@ -386,15 +324,9 @@ async function PageContent({
             </div>
           }>
             <BelowTheFoldEvidence
-              highlight={toolHighlight}
               tightness={tightness}
-              boldnessScore={weeklyLeadershipSummary.boldnessScore}
-              pauseThreshold={pauseThreshold}
-              currentRiskAppetite={riskAppetite}
-              currentRegime={homepage.weeklyDecisionCardModel.status.postureLabel}
+              riskAppetite={riskAppetite}
               companyStage={operatorContext.companyStage ?? undefined}
-              tightnessDelta={tightnessDelta}
-              riskAppetiteDelta={riskAppetiteDelta}
               recordDate={homepage.reportShell.recordDateLabel}
               recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
               operateHref={operateHref}
@@ -402,17 +334,10 @@ async function PageContent({
           </Suspense>
         </div>
 
-        <section className="grid gap-4 border-t border-slate-800/70 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)]" aria-label="Continuity and delivery">
-          <Suspense fallback={<div className="weather-card h-48 animate-pulse" />}>
-            <BelowTheFoldHistory
-              regimes={macroTrendline}
-            />
-          </Suspense>
-          <div className="space-y-4">
-            <SubscribeForm />
-            <CanonicalWeekPermalink />
-          </div>
-        </section>
+        <div className="space-y-4 border-t border-slate-800/70 pt-6">
+          <SubscribeForm />
+          <CanonicalWeekPermalink />
+        </div>
        </div>
 
         <script

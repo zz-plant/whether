@@ -1,6 +1,6 @@
 import type { RegimeAssessment, RegimeChangeReason } from "./regimeEngine";
 import { buildRegimeChangeReasons } from "./regimeEngineDiagnostics";
-import { applyConfidenceGate, buildDecisionDeltaRules } from "./alerts/decisionDeltaRules";
+import { applyConfidenceGate, buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "./alerts/decisionDeltaRules";
 import { getRegimeAlertRepository } from "./storage/regimeAlertRepository";
 
 export type AlertChannel = "slack" | "email" | "webhook";
@@ -100,7 +100,7 @@ export const buildSignalAlertPayload = (
     decisionDeltas.length > 0
       ? decisionDeltas.map((delta) => ({
           code: delta.code,
-          message: `${delta.actionText} Trigger ${delta.triggerValue.toFixed(2)} vs ${delta.thresholdLabel} ${delta.thresholdValue.toFixed(2)}. ${delta.reversalText}`,
+          message: `${buildDecisionVerdictHeadline(delta)}. ${delta.actionText} Trigger ${delta.triggerValue.toFixed(2)} vs ${delta.thresholdLabel} ${delta.thresholdValue.toFixed(2)}. ${delta.reversalText}`,
         }))
       : payload.reasons ?? [{ code: "signals-updated", message: "Signal values updated with no threshold crossing." }];
 
@@ -241,7 +241,7 @@ export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {
       `Tightness delta: ${tightnessDelta >= 0 ? "+" : ""}${tightnessDelta.toFixed(2)}.`,
       `Risk appetite delta: ${riskDelta >= 0 ? "+" : ""}${riskDelta.toFixed(2)}.`,
       ...latest.payload.decisionDeltas.map(
-        (delta) => `${delta.decisionArea}: ${delta.actionText} Reversal: ${delta.reversalText}`,
+        (delta) => `${buildDecisionVerdictHeadline(delta)} — ${delta.actionText} Reversal: ${delta.reversalText}`,
       ),
     ],
   };

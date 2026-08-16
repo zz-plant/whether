@@ -73,6 +73,7 @@ export type V2HeroSignalData = {
   curveSlope?: number | null;
   macroContributors?: string[];
   tightnessThreshold?: number;
+  riskAppetiteThreshold?: number;
 };
 
 type V2HeroReportData = {
@@ -84,6 +85,7 @@ type V2HeroReportData = {
     };
     thresholds: {
       tightnessRegime?: number;
+      riskAppetiteRegime?: number;
     };
   };
   reportDynamics?: {
@@ -112,11 +114,17 @@ export const buildV2HeroSignalData = (reportData: V2HeroReportData): V2HeroSigna
       return item.label;
     });
 
-  return {
+  const signalData: V2HeroSignalData = {
     baseRate: reportData.assessment.scores.baseRate ?? null,
     baseRateUsed: reportData.assessment.scores.baseRateUsed,
     curveSlope: reportData.assessment.scores.curveSlope ?? null,
     macroContributors: topContributors.length ? topContributors : undefined,
     tightnessThreshold: reportData.assessment.thresholds.tightnessRegime,
   };
+
+  if (typeof reportData.assessment.thresholds.riskAppetiteRegime === "number") {
+    signalData.riskAppetiteThreshold = reportData.assessment.thresholds.riskAppetiteRegime;
+  }
+
+  return signalData;
 };

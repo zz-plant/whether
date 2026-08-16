@@ -26,25 +26,11 @@ export default async function HistoryPage({
     <ReportShell
       model={{
         status: { statusLabel: "Historical", recordDateLabel: "", fetchedAtLabel: "", treasurySource: "https://fred.stlouisfed.org" },
-        page: { pageTitle: "History", pageSummary: "Tightness and risk appetite over time.", sectionLinks: [], currentPath: "/history" },
+        page: { pageTitle: "History", pageSummary: "The permanent record of past weekly calls.", sectionLinks: [], currentPath: "/history" },
         trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
         chrome: { sidebarVariant: "full" },
       }}
     >
-      <section className="weather-panel space-y-5 px-5 py-5">
-        <HistoryExplorer
-          coverage={getTimeMachineMonthsByYear()}
-          initialMonth={Number(resolvedSearchParams?.month) || 0}
-          initialYear={Number(resolvedSearchParams?.year) || 0}
-          regimeSeries={regimeSeries}
-        />
-        <RegimeStats series={statsSeries} />
-        <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
-          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
-        </div>
-      </section>
-
       {publishedBriefs.length > 0 ? (
         <section className="weather-panel space-y-4 px-5 py-5">
           <div>
@@ -94,6 +80,25 @@ export default async function HistoryPage({
           ))}
         </ul>
       </section>
+
+      <details className="group weather-panel px-5 py-4">
+        <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between gap-3 text-fluid-xs font-medium text-white/70 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
+          <span>Explore raw historical conditions</span>
+        </summary>
+        <div className="mt-4 space-y-5">
+          <HistoryExplorer
+            coverage={getTimeMachineMonthsByYear()}
+            initialMonth={Number(resolvedSearchParams?.month) || 0}
+            initialYear={Number(resolvedSearchParams?.year) || 0}
+            regimeSeries={regimeSeries}
+          />
+          <RegimeStats series={statsSeries} />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
+            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
+          </div>
+        </div>
+      </details>
     </ReportShell>
   );
 }

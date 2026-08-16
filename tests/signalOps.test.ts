@@ -3,11 +3,13 @@ import { describe, it } from "bun:test";
 import {
   buildDeliverySummary,
   buildSignalAlertPayload,
+  buildWeeklyDigest,
   shouldCreateSignalAlert,
   type RegimeAlertEvent,
   type SignalAlertInputPayload,
 } from "../lib/signalOps";
 import { DEFAULT_THRESHOLDS, type RegimeAssessment } from "../lib/regimeEngine";
+import { buildDecisionVerdictHeadline } from "../lib/alerts/decisionDeltaRules";
 
 const assessment = (
   regime: RegimeAssessment["regime"],
@@ -220,5 +222,38 @@ describe("signalOps", () => {
     const summary = buildDeliverySummary(latest);
     assert.match(summary, /SCARCITY/);
     assert.match(summary, /tightness-upshift/);
+  });
+
+  it("names the decision the alert affects in the verdict headline, not the raw signal move", () => {
+    const severe = buildDecisionVerdictHeadline({ decisionArea: "spend", severe: true });
+    assert.equal(severe, "RECONSIDER SPENDING");
+    const watch = buildDecisionVerdictHeadline({ decisionArea: "hiring", severe: false });
+    assert.equal(watch, "WATCH HIRING");
+    const posture = buildDecisionVerdictHeadline({ decisionArea: "posture", severe: true });
+    assert.equal(posture, "RECONSIDER OPERATING POSTURE");
+  });
+
+  it("leads alert reasons and digest bullets with the decision verdict", () => {
+    const payload = buildSignalAlertPayload(
+      basePayload(assessment("DEFENSIVE", 68, 55), assessment("SCARCITY", 88, 44)),
+    );
+    assert.ok(
+      payload.reasons.some((reason) => reason.message.startsWith("RECONSIDER")),
+      "reason messages lead with the verdict headline",
+    );
+
+    const latest: RegimeAlertEvent = {
+      eventId: "evt-4",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
+      id: "1",
+      createdAt: new Date().toISOString(),
+      payload,
+    };
+    const digest = buildWeeklyDigest([latest]);
+    assert.ok(
+      digest.bullets.some((bullet) => bullet.startsWith("RECONSIDER")),
+      "digest bullets lead with the verdict headline",
+    );
   });
 });

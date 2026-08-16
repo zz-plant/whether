@@ -122,3 +122,24 @@ export const applyConfidenceGate = (
     }))
     .filter((delta) => delta.gate !== "suppressed");
 };
+
+const AREA_LABEL: Record<DecisionArea, string> = {
+  posture: "operating posture",
+  hiring: "hiring",
+  spend: "spending",
+  risk: "risk appetite",
+};
+
+/**
+ * Decision-alert headline. The analysis's good surface names the decision the
+ * alert affects ("RECONSIDER Q4 HIRING"), not the raw signal move ("10Y yield
+ * crossed 4.2%"). This maps a decision-delta rule to that verdict headline.
+ */
+export const buildDecisionVerdictHeadline = (
+  delta: Pick<DecisionDeltaRule, "decisionArea" | "severe">,
+): string => {
+  const area = AREA_LABEL[delta.decisionArea] ?? "operating posture";
+  return delta.severe
+    ? `RECONSIDER ${area.toUpperCase()}`
+    : `WATCH ${area.toUpperCase()}`;
+};

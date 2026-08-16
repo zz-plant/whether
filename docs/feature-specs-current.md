@@ -92,6 +92,15 @@ The homepage global header now keeps the weekly brief calmer: it shows the direc
 The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
 The collapsed `Route this week's call` disclosure groups the downstream paths into Plan (capital posture, ship call), Resolve (by role, toolkits), Rule (blank decision form, reversal checklist), and Compare (past epochs, full archive), keeping them one expand away from the leading plan card.
 
+The home page now leads with a canonical **What needs reconsideration this week?** block inside
+the hero: when signals moved, it lists the bounded decision areas queued for revisit with why each
+is queued; it always shows an explicit `No change` lane for the decision areas that are on track,
+so the steady state is stated rather than implied. Below-the-fold tool racks (transition
+probability, regime history chart, what-if simulators, ticker, source-disagreement, evidence
+drawer) were removed from `/` as surfaces that competed with the decision-attention block; their
+engines stay internal (see section 8). The only remaining below-fold company context is the
+`Your numbers` panel (`CompanyMetricsPanel`) feeding company-adjusted guidance.
+
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/evidence` and `/trust` instead of reproducing those workflows inline.
 The shared report shell no longer inserts extra homepage header / command chrome ahead of the weekly card, so the canonical brief remains the first major decision block.
@@ -415,6 +424,25 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 - Alert creation enforces trigger filtering and a 24-hour cooldown unless the regime flips again.
 - Weekly digest output is available via `/api/weekly-digest`, including score deltas and dominant
   reason messages.
+- Alert headlines now name the decision the alert affects rather than the raw signal move:
+  `RECONSIDER HIRING` / `WATCH SPENDING` / `RECONSIDER OPERATING POSTURE`, from
+  `buildDecisionVerdictHeadline` (`lib/alerts/decisionDeltaRules.ts`). Slack blocks
+  (`/api/check-regime-change`) and email templates (`lib/alert/alertTemplates.ts`) lead with the
+  verdict and keep the raw regime/signal detail as support.
+
+### 5.7 Decision staleness (protect stale decisions)
+- Decision Memory records an **assumption snapshot** at write time — the tightness, risk appetite,
+  and regime watch lines that had to hold for the decision to make sense
+  (`DecisionAssumptionSnapshot` in `lib/decisionMemory.ts`).
+- `lib/report/decisionStaleness.ts` compares current conditions against a recorded snapshot and
+  emits a bounded verdict: **RECONSIDER** (two supporting assumptions moved outside the recorded
+  range), **WATCH** (one moved), or **No change** (all hold).
+- The home page renders `DecisionStalenessPanel` below the hero: it reads the client's saved
+  decision memory from localStorage, runs the staleness engine against this week's conditions,
+  and surfaces "N DECISIONS NEED ATTENTION" with per-decision verdicts and a "No change" lane.
+  It renders only when the operator has saved decisions; empty state is silent.
+- The hero's canonical revisit block now reads **What needs reconsideration this week?** with an
+  explicit `No change` lane listing decision areas that are on track.
 
 ## 6) APIs (server routes)
 
@@ -438,6 +466,8 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 
 ### 6.4 Decision audit APIs
 - `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
+- Entries carry an `assumptions` snapshot (conditions that had to hold at decision time) so the
+  decision-staleness engine can compare current conditions against the recorded range.
 
 ### 6.5 Integration APIs
 - `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
@@ -469,29 +499,24 @@ weekly-only — the cadence promise is weekly; only rule firings break cadence.
 
 ## 8) Demo and interactive features (2026-05-23)
 
-### 8.1 Decision simulation slider
-**Location**: `app/components/home/DecisionSimulator.tsx`, rendered on `/` below the hero.
+### 8.1 What-if simulator tools (removed Aug 2026)
+`app/components/home/DecisionSimulator.tsx` and `app/components/ScenarioSimulator.tsx` rendered
+below the hero on `/`. Both were removed as below-the-fold tool racks that competed with the
+weekly decision-attention block. The scenario what-if still lives in the decision-attention flow
+only where it changes a revisit verdict; it is no longer a standalone home surface.
 
-A what-if slider that lets operators drag tightness from 20–85 and see the regime, call, and action recompute in real time. Color-coded threshold markers show Defensive (↑65) and Scarcity (↑75) boundaries. A status badge indicates whether the current regime holds or the call would change.
+### 8.2 Regime transition probability (removed Aug 2026)
+`app/components/home/RegimeTransitionProbability.tsx` computed an empirical one-month exit rate
+for the current regime from monthly time-machine observations. The card and the hero's
+`transitionForecast` line were removed from home. `computeTransitionProbability` remains as an
+internal model diagnostic at `lib/timeMachine/transitionProbability.ts`; it is not rendered as a
+user surface.
 
-### 8.2 Regime transition probability
-**Location**: `app/components/home/RegimeTransitionProbability.tsx`, rendered on `/` below the simulator.
-
-Computes an empirical one-month exit rate for the current regime from monthly time-machine observations. The percentage represents the chance that conditions leave the current regime by the next monthly observation; the most common next regime is descriptive context, not the forecast event being scored. Homepage consumers receive the event and horizon alongside the number and keep that forecast separate from the decision reversal.
-
-### 8.3 Regime history over time
-**Location**: `app/components/RegimeHistory.tsx`, rendered on `/` in the sticky right column.
-
-Renders the trailing 24 months of `getMonthlyRegimeHistory()` as a bar chart. Bar height encodes a
-boldness score (`riskAppetite * 0.7 + (100 - tightness) * 0.3`, stated on the card as `0–100`); bar
-hue encodes the regime and is backed by a text key, because hue-only encoding does not survive a
-screenshot. Bars link to that month via `?month=&year=`, and notable events are marked.
-
-Removed Aug 2026: `app/components/home/DecisionTrendline.tsx` rendered this same
-`macroTrendline` array a second time on the same screen, but derived its bar heights and trend
-line from the array index rather than from any data — so it drew an identical rising staircase
-regardless of the regimes. It also read a decision journal from localStorage that it never
-displayed. This section owns the display now; do not reintroduce a parallel one.
+### 8.3 Regime history over time (removed Aug 2026)
+`app/components/RegimeHistory.tsx` rendered the trailing 24 months of `getMonthlyRegimeHistory()`
+as a bar chart in the lower home band. Removed from home; the engine
+(`getMonthlyRegimeHistory`, `lib/summary/monthlyRegimeHistory.ts`) stays for evidence/replay
+surfaces.
 
 ### 8.4 Decision journal and visitor context
 **Location**: `app/components/home/VisitorContext.tsx`, rendered on `/` below the hero.
@@ -520,13 +545,7 @@ To record GIFs of interactive features:
 bun run dev                                    # Start dev server
 ```
 
-**Decision simulator GIF**: Navigate to `/`, scroll to the simulator. Record dragging the tightness slider from current value to the flip threshold and back. The regime/call/action cells update in real time. ~8 seconds.
-
 **Reliability cascade GIF**: Open `/` with simulated degraded state (set `?offline=1` or use cached data). Record the hero: emerald reliability score → amber warning in "What to adjust." ~5 seconds.
-
-**Trendline GIF**: Visit `/` on 3+ different weeks (or pre-fill localStorage with mock entries). Record the trendline bar chart showing posture momentum. ~5 seconds.
-
-**Transition probability GIF**: Navigate to `/` and scroll to the probability arc. Record the SVG arc and percentage display. ~4 seconds.
 
 **Print layout GIF**: Open `/`, Cmd+P, show print preview with clean white layout. ~5 seconds.
 

@@ -80,6 +80,13 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Reversal. Consume these exports instead of hardcoding slot words in components. The homepage
   ledger also translates structured lane states into actions: Keep this closed / Proceed with
   guardrails / Stage the next move / Move ahead now.
+- **Decision-attention verdicts are `RECONSIDER` / `WATCH` / `No change`** (single source:
+  `lib/report/decisionStaleness.ts`). These label recorded decisions whose supporting
+  assumptions have moved: RECONSIDER when two assumptions moved outside the recorded range,
+  WATCH when one did, No change when all hold. Alert headlines reuse the same vocabulary
+  (`buildDecisionVerdictHeadline` in `lib/alerts/decisionDeltaRules.ts`: RECONSIDER / WATCH
+  + decision area). Do not mint synonyms like "attention needed" or "review now" for these
+  verdict labels.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
   shareable, and metadata surfaces must not print "Whether Report".

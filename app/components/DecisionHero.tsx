@@ -14,7 +14,6 @@ import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
-import type { TransitionForecastDisplay } from "./home/RegimeTransitionProbability";
 
 type Props = {
   tightness: number;
@@ -40,7 +39,6 @@ type Props = {
   degradedCount?: number;
   isFallback?: boolean;
   flipConditions?: string[];
-  transitionForecast?: TransitionForecastDisplay | null;
   guardrail?: string;
   reversalTrigger?: string;
   shareLines?: string[];
@@ -53,6 +51,8 @@ type Props = {
     reason: string;
     recheck: string;
   }>;
+  /** Decision areas that are not flagged for revisit this week. */
+  noChangeAreas?: readonly string[];
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
   signalData?: {
     baseRate?: number | null;
@@ -60,6 +60,7 @@ type Props = {
     curveSlope?: number | null;
     macroContributors?: string[];
     tightnessThreshold?: number;
+    riskAppetiteThreshold?: number;
   };
 };
 
@@ -89,13 +90,13 @@ export function DecisionHero({
   degradedCount,
   isFallback,
   flipConditions,
-  transitionForecast,
   guardrail,
   reversalTrigger,
   shareLines,
   signalIndicators,
   revisitDecisions = false,
   revisitQueue = [],
+  noChangeAreas = [],
   thresholdBusinessConsequence,
   signalData,
 }: Props) {
@@ -116,6 +117,7 @@ export function DecisionHero({
    const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-emerald-300" : riskAppetite >= 45 ? "text-amber-300" : "text-rose-300") : undefined;
    const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
    const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
+    const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
 
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
   const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
@@ -294,7 +296,7 @@ export function DecisionHero({
 
           <section
             data-testid="weekly-top-fold"
-            aria-label="Decisions to revisit"
+            aria-label="What needs reconsideration this week"
             className={`rounded-lg border px-3 py-2.5 ${
               revisitDecisions
                 ? "border-amber-500/35 bg-amber-500/10"
@@ -303,21 +305,27 @@ export function DecisionHero({
           >
             <div className="flex items-center justify-between gap-3">
               <p className="text-fluid-xs font-semibold text-slate-100">
-                Revisit last week&apos;s decisions?
+                What needs reconsideration this week?
               </p>
               <span className={`shrink-0 text-fluid-nano font-mono font-semibold uppercase ${revisitDecisions ? "text-amber-300" : "text-emerald-300"}`}>
-                {revisitDecisions ? "Yes · revisit active" : "No · plan on track"}
+                {revisitDecisions ? `${revisitQueue.length} need attention` : "No change"}
               </span>
             </div>
-            {revisitDecisions && revisitQueue.length > 0 ? (
+            {revisitQueue.length > 0 ? (
               <ul className="mt-2 grid gap-1 text-fluid-xs text-slate-300 sm:grid-cols-2">
-                {revisitQueue.slice(0, 2).map((item) => (
+                {revisitQueue.slice(0, 3).map((item) => (
                   <li key={item.id}>
                     <span className="font-semibold text-slate-100">{item.label}:</span>{" "}
                     {item.recheck || item.reason}
                   </li>
                 ))}
               </ul>
+            ) : null}
+            {noChangeAreas.length > 0 ? (
+              <p className="mt-2 border-t border-white/[0.06] pt-2 text-fluid-nano text-white/45">
+                <span className="font-semibold text-slate-400">No change:</span>{" "}
+                {noChangeAreas.join(" · ")}
+              </p>
             ) : null}
           </section>
 
@@ -332,7 +340,7 @@ export function DecisionHero({
           </details>
 
           {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
-          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger || transitionForecast ? (
+          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
             <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-fluid-nano font-mono type-eyebrow">
@@ -366,12 +374,6 @@ export function DecisionHero({
                   </div>
                 ) : null}
               </dl>
-              {transitionForecast ? (
-                <p className="text-fluid-nano text-white/40">
-                  {transitionForecast.eventLabel} {transitionForecast.horizonLabel}:{" "}
-                  <span className="tabular-nums">{transitionForecast.probabilityPercent}%</span>
-                </p>
-              ) : null}
             </div>
           ) : null}
 
@@ -386,6 +388,8 @@ export function DecisionHero({
               primaryCall={weeklyCall ?? postureLabel}
               guardrail={guardrail}
               reversalTrigger={reversalTrigger}
+              tightnessThreshold={tightnessThreshold}
+              riskAppetiteThreshold={riskAppetiteThreshold}
             />
           </div>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-fluid-micro text-white/50">

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { computeTransitionProbability } from "../app/components/home/RegimeTransitionProbability";
+import { computeTransitionProbability } from "../lib/timeMachine/transitionProbability";
 
 describe("regime transition probability", () => {
   it("exposes the event and monthly horizon represented by the transition rate", () => {

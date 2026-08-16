@@ -27,14 +27,14 @@ export async function POST(request: Request) {
 
     /* 1. Regime change — highest priority alert */
     if (previousRegime && previousRegime !== currentRegime) {
-      alerts.push(`*${previousRegime}* → *${currentRegime}*\nThe operating regime has shifted.`);
+      alerts.push(`RECONSIDER OPERATING POSTURE — regime shifted from ${previousRegime} to ${currentRegime}`);
       if (slackWebhook) {
         await fetch(slackWebhook, {
           method: "POST",
           body: JSON.stringify({
             blocks: [
-              { type: "header", text: { type: "plain_text", text: "⚠️ Regime Change" } },
-              { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe operating regime has shifted. Review the weekly brief for updated guidance.` } },
+              { type: "header", text: { type: "plain_text", text: "⚠️ Reconsider Operating Posture" } },
+              { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.` } },
               { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
             ],
           }),
@@ -56,14 +56,14 @@ export async function POST(request: Request) {
     if (projection.weeksToFlip && projection.weeksToFlip <= 2) {
       const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
       if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
-        alerts.push(`Flip window narrowing: ${projection.velocityLabel}`);
+        alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
         if (slackWebhook) {
           await fetch(slackWebhook, {
             method: "POST",
             body: JSON.stringify({
               blocks: [
-                { type: "header", text: { type: "plain_text", text: "📊 Flip Window Narrowing" } },
-                { type: "section", text: { type: "mrkdwn", text: projection.velocityLabel } },
+                { type: "header", text: { type: "plain_text", text: "👀 Watch Decisions — Flip Window Narrowing" } },
+                { type: "section", text: { type: "mrkdwn", text: `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.` } },
                 { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
               ],
             }),

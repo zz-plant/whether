@@ -1,5 +1,11 @@
 # whether.work Product Review: Add / Remove / Change Plan
 
+> Superseded by `docs/adoption-driven-change-plan.md` (2026-08). The adoption analysis
+> reverses several of this review's ADD recommendations: the Startup Climate Index becomes
+> supporting metadata or is removed, historical timeline / regime replay are demoted to
+> evidence rather than P0 product surfaces, and role personalization is dropped in favor of
+> company decisions/context. Follow the adoption-driven plan for new work.
+
 This review converts your recommendations into a product-execution plan optimized for Whether's core loop:
 
 **signals → posture → decision → artifact**

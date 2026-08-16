@@ -739,100 +739,102 @@ export const ExportBriefPanel = ({
             />
           </div>
         </div>
-        <div className="mt-4 weather-surface p-4">
-          <p className="type-kicker">
-            <WorkAppLabel app="jira" label="Jira" className="inline-flex items-center gap-2" />, <WorkAppLabel app="confluence" label="Confluence" className="inline-flex items-center gap-2" />, and <WorkAppLabel app="linear" label="Linear" className="inline-flex items-center gap-2" />
-          </p>
-          <p className="mt-3 text-sm text-slate-300">
-            Paste tool-optimized summaries into your issue trackers or documentation.
-          </p>
-          <div className="mt-4 grid gap-4">
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="jira" label="Jira note" />
-              </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Jira issue description field.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Jira note")}
-                  disabled={isCopyDisabled("Jira note")}
-                  onClick={() => void handleCopy(jiraMarkdownBrief, "Jira note")}
-                />
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleDownload(
-                      jiraMarkdownBrief,
-                      `whether-jira-note-${treasury.record_date}.md`
-                    )
-                  }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Download <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" />
-                </Button>
+        <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
+          <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
+            Issue tracker formats
+          </summary>
+          <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-4">
+            <p className="text-sm text-slate-300">
+              <WorkAppLabel app="jira" label="Jira" className="inline-flex items-center gap-2" />, <WorkAppLabel app="confluence" label="Confluence" className="inline-flex items-center gap-2" />, and <WorkAppLabel app="linear" label="Linear" className="inline-flex items-center gap-2" /> paste tool-optimized summaries into your issue trackers or documentation.
+            </p>
+            <div className="grid gap-4">
+              <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                  <WorkAppLabel app="jira" label="Jira note" />
+                </p>
+                <p className="mt-2 text-sm text-slate-400">
+                  Paste into the Jira issue description field.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <ClipboardActionRow
+                    label={<><span>Copy</span> <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" /></>}
+                    state={clipboardState("Jira note")}
+                    disabled={isCopyDisabled("Jira note")}
+                    onClick={() => void handleCopy(jiraMarkdownBrief, "Jira note")}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleDownload(
+                        jiraMarkdownBrief,
+                        `whether-jira-note-${treasury.record_date}.md`
+                      )
+                    }
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  >
+                    Download <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" />
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="confluence" label="Confluence note" />
-              </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Confluence page body.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Confluence note")}
-                  disabled={isCopyDisabled("Confluence note")}
-                  onClick={() => void handleCopy(confluenceWikiBrief, "Confluence note")}
-                />
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleDownload(
-                      confluenceWikiBrief,
-                      `whether-confluence-note-${treasury.record_date}.txt`
-                    )
-                  }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Download <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" />
-                </Button>
+              <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                  <WorkAppLabel app="confluence" label="Confluence note" />
+                </p>
+                <p className="mt-2 text-sm text-slate-400">
+                  Paste into the Confluence page body.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <ClipboardActionRow
+                    label={<><span>Copy</span> <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" /></>}
+                    state={clipboardState("Confluence note")}
+                    disabled={isCopyDisabled("Confluence note")}
+                    onClick={() => void handleCopy(confluenceWikiBrief, "Confluence note")}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleDownload(
+                        confluenceWikiBrief,
+                        `whether-confluence-note-${treasury.record_date}.txt`
+                      )
+                    }
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  >
+                    Download <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" />
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                <WorkAppLabel app="linear" label="Linear note" />
-              </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Linear issue description field.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <ClipboardActionRow
-                  label={<><span>Copy</span> <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" /></>}
-                  state={clipboardState("Linear note")}
-                  disabled={isCopyDisabled("Linear note")}
-                  onClick={() => void handleCopy(linearMarkdownBrief, "Linear note")}
-                />
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleDownload(
-                      linearMarkdownBrief,
-                      `whether-linear-note-${treasury.record_date}.md`
-                    )
-                  }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Download <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" />
-                </Button>
+              <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                  <WorkAppLabel app="linear" label="Linear note" />
+                </p>
+                <p className="mt-2 text-sm text-slate-400">
+                  Paste into the Linear issue description field.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <ClipboardActionRow
+                    label={<><span>Copy</span> <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" /></>}
+                    state={clipboardState("Linear note")}
+                    disabled={isCopyDisabled("Linear note")}
+                    onClick={() => void handleCopy(linearMarkdownBrief, "Linear note")}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleDownload(
+                        linearMarkdownBrief,
+                        `whether-linear-note-${treasury.record_date}.md`
+                      )
+                    }
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  >
+                    Download <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </details>
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
             <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">

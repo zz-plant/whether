@@ -57,31 +57,44 @@ const alertBanner = (severity: "warning" | "critical" | "info", message: string)
 };
 
 /**
- * Regime change alert — sent when the operating regime shifts.
+ * Decision-verdict alert — the analysis's good surface names the decision an
+ * alert affects ("RECONSIDER Q4 HIRING") rather than the raw signal move.
  */
-export const regimeChangeEmail = (
-  regime: string,
-  actionNow: string,
-): EmailContent => {
-  const subject = `Whether Alert — Regime Change: ${regime}`;
+export const decisionVerdictEmail = ({
+  headline,
+  why,
+  actionNow,
+  reversal,
+}: {
+  headline: string;
+  why: string;
+  actionNow: string;
+  reversal: string;
+}): EmailContent => {
+  const subject = `Whether Alert — ${headline}`;
   const text = [
-    `Whether Regime Alert`,
-    `The operating regime has shifted to: ${regime}`,
+    `Whether Decision Alert`,
+    headline,
+    why,
     `Action: ${actionNow}`,
+    `Reversal: ${reversal}`,
     ``,
     `View full brief: https://whether.work`,
     `---`,
     `Whether · weekly operating brief`,
   ].join("\n");
   const html = baseHtml(
-    "Whether Regime Alert",
+    "Whether Decision Alert",
     [
-      alertBanner("critical", `The operating regime has shifted to <strong>${regime}</strong>. Review the weekly brief for updated guidance.`),
+      alertBanner("critical", `<strong>${headline}</strong> — conditions have moved outside the range recorded when this decision was made.`),
       `<div style="margin-top:12px;">`,
-      sectionBlock("New Regime", regime, "#fca5a5", "#fca5a5"),
+      sectionBlock("Why", why),
       `</div>`,
       `<div style="margin-top:12px;">`,
       sectionBlock("Action Now", actionNow),
+      `</div>`,
+      `<div style="margin-top:12px;">`,
+      sectionBlock("Reversal", reversal, "#94a3b8", "#f1f5f9"),
       `</div>`,
     ].join("\n"),
   );

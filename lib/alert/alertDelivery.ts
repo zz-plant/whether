@@ -1,6 +1,6 @@
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { evaluateAlert } from "./alertEvaluator";
-import { regimeChangeEmail, thresholdCrossingEmail } from "./alertTemplates";
+import { decisionVerdictEmail, thresholdCrossingEmail } from "./alertTemplates";
 import {
   createCloudflareEmailAdapter,
   type EmailDeliveryAdapter,
@@ -167,9 +167,14 @@ export const deliverAlertToSubscriber = async (
   adapter: EmailDeliveryAdapter,
 ): Promise<boolean> => {
   try {
-    let template: ReturnType<typeof regimeChangeEmail>;
+    let template: ReturnType<typeof decisionVerdictEmail>;
     if (alert.type === "regime_change") {
-      template = regimeChangeEmail(conditions.regime, conditions.posture);
+      template = decisionVerdictEmail({
+        headline: "RECONSIDER OPERATING POSTURE",
+        why: `The operating regime shifted to ${conditions.regime}. The assumptions behind the current posture have moved.`,
+        actionNow: conditions.posture,
+        reversal: "Revert only if the prior regime state holds across two consecutive updates.",
+      });
     } else if (
       alert.headline.toLowerCase().includes("tightness")
     ) {

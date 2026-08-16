@@ -16,6 +16,10 @@ export type DecisionMemoryButtonProps = {
   primaryCall?: string;
   guardrail?: string;
   reversalTrigger?: string;
+  /** Tightness regime boundary in force — the assumption watch line for the snapshot. */
+  tightnessThreshold?: number;
+  /** Risk appetite regime boundary in force — the assumption watch line for the snapshot. */
+  riskAppetiteThreshold?: number;
   className?: string;
 };
 
@@ -30,6 +34,8 @@ export function DecisionMemoryButton({
   primaryCall,
   guardrail,
   reversalTrigger,
+  tightnessThreshold,
+  riskAppetiteThreshold,
   className = "",
 }: DecisionMemoryButtonProps) {
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -59,6 +65,8 @@ export function DecisionMemoryButton({
           boldnessScore,
           guardrail,
           reversalTrigger,
+          tightnessThreshold,
+          riskAppetiteThreshold,
         }),
       });
 
