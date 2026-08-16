@@ -1,21 +1,30 @@
 # Whether
 
+**How aggressively should your company hire, spend, raise, and expand this week?**
+
+Whether turns public macro and capital-market signals into a weekly operating posture: what to do now, what would make the call tighten, and what conditions would justify opening back up.
+
+`signals → posture → decisions → artifact`
+
 <p align="center">
   <img src="docs/assets/whether-demo.gif" alt="whether demo animation" width="720">
 </p>
-
-Whether turns public macro signals into a weekly operating posture for startup and product leaders.
-Each week it answers, fast: what should change right now, how sure we are, and what would flip the call.
-
-The core product loop is:
-
-`signals -> posture -> decision -> artifact`
 
 <p align="center">
   <img src="docs/assets/whether-dashboard.png" alt="Whether signal dashboard showing CPI, Fed Rate, VIX, and operating posture" width="720">
 </p>
 
 Everything in this repo should make that loop faster to understand, easier to trust, and easier to share.
+
+---
+
+## Boldness Budget
+
+**Boldness Budget** — a weekly measure of how much operating aggressiveness current conditions support.
+
+Higher budget → faster approvals, more experimentation, greater willingness to hire and expand.
+
+Lower budget → shorter payback requirements, greater reversibility, tighter fixed-cost commitments.
 
 ---
 
