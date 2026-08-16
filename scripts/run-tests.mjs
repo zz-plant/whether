@@ -61,7 +61,8 @@ function hasPathFilter(args) {
 
 const extraArgs = process.argv.slice(2);
 const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, TEST_ROOT_ARG];
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...targetArgs], {
+const concurrency = process.env.BUN_TEST_CONCURRENCY ?? '8';
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...targetArgs], {
   stdio: 'inherit',
   env: process.env,
 });

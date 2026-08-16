@@ -15,7 +15,7 @@
     "clean:build": "bun scripts/clean-build-artifacts.mjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
-    "check": "bun run assets:check && bun run review:hotspot-preflight && bun run lint && bun run typecheck && bun run test",
+    "check": "bun run lint && bun run typecheck && bun run test && bun run assets:check && bun run review:hotspot-preflight",
     "typecheck": "tsc --noEmit",
     "test": "bun scripts/run-tests.mjs",
     "test:watch": "bun scripts/run-tests.mjs --watch",
@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.42.1",
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "25.6.0",
