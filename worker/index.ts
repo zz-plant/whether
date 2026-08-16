@@ -1,6 +1,7 @@
 import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { executeIngest } from "../lib/ingestion/executeIngest";
+import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
 
 interface Env {
   ASSETS: {
@@ -54,16 +55,30 @@ const CRON_STEP_TIMEOUT_MS = 60_000;
  * rather than thrown, so one bad dependency degrades a single step.
  */
 const runCronStep = async (label: string, url: string, headers: Record<string, string>) => {
+  const startTime = Date.now();
   try {
     const response = await fetch(url, {
       method: "POST",
       headers,
       signal: AbortSignal.timeout(CRON_STEP_TIMEOUT_MS),
     });
+    const durationMs = Date.now() - startTime;
+    writeAnalytics(
+      "cron-step",
+      { step: label, ok: response.ok, status: response.status, durationMs },
+      { doubles: [response.status, durationMs] },
+    );
     if (!response.ok) {
       console.error(`[cron] ${label} responded ${response.status}`);
     }
   } catch (error) {
+    const durationMs = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    writeAnalytics(
+      "cron-step",
+      { step: label, ok: false, error: errorMessage, durationMs },
+      { doubles: [0, durationMs] },
+    );
     console.error(`[cron] ${label} failed`, error);
   }
 };

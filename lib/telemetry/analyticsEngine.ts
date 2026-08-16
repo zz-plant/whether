@@ -51,7 +51,11 @@ export type TelemetryStream =
   | "web-vitals"
   | "operator-workflow"
   | "content-measurement"
-  | "premium-funnel";
+  | "premium-funnel"
+  | "ingest-pipeline"
+  | "cron-step"
+  | "regime-transition"
+  | "degraded-state";
 
 export type WriteAnalyticsOptions = {
   doubles?: number[];

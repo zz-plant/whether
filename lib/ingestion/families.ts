@@ -193,7 +193,15 @@ const familyFetchers: Record<SignalFamily, FamilyFetcher> = {
   volatility: fetchVolatility,
 };
 
-export const pullSignalFamily = (family: SignalFamily, fetcher: typeof fetch, ingestedAt: string) =>
-  familyFetchers[family](fetcher, ingestedAt);
+export const pullSignalFamily = async (family: SignalFamily, fetcher: typeof fetch, ingestedAt: string): Promise<SignalEntitySnapshot[]> => {
+  const handler = familyFetchers[family];
+  if (!handler) return [];
+  try {
+    return await handler(fetcher, ingestedAt);
+  } catch (error) {
+    console.warn(`[families] Ingest error for family '${family}':`, error instanceof Error ? error.message : error);
+    return [];
+  }
+};
 
 export const SIGNAL_FAMILIES: SignalFamily[] = ["rates", "spreads", "labor", "inflation", "credit", "volatility"];
