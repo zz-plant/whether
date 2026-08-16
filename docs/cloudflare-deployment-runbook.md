@@ -36,7 +36,7 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 `deploy:cloudflare` builds against the top-level Wrangler config and then runs the dedicated `@vinext/cloudflare deploy --skip-build` CLI, so the build artifact and deploy target stay on the same environment contract without relying on Vinext's deprecated deploy compatibility shim.
 
-The dry-run commands are intentionally stronger than the adapter's native `--dry-run`. They first build the selected environment and then run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only checking that the Vinext scaffold exists.
+The dry-run commands combine both validation layers. They first build the selected environment, run `@vinext/cloudflare deploy --dry-run --skip-build` to validate Vinext scaffolding, its Cloudflare plugin, and cache-adapter setup, and only then run the repo-local `wrangler deploy --dry-run` to package the Worker and validate bindings and upload limits without publishing. The command stops if adapter validation fails, so a successful dry run provides both adapter-contract and deploy-package evidence.
 
 Upgrade Guardrails runs this production dry run on every pull request, so deploy packaging remains a mechanical gate rather than a manual-only check.
 

@@ -48,10 +48,15 @@ if (!parsed.skipBuild) {
   deployArgs.push("--skip-build");
 }
 
-// The adapter's --dry-run only validates scaffolding: it deliberately skips both
-// the build and Wrangler. Run Wrangler directly so this command catches invalid
-// bindings, oversized bundles, and other upload-time failures without publishing.
+// The adapter's --dry-run validates its scaffolding, plugin, and cache-adapter
+// contracts but deliberately skips Wrangler. Preserve that validation before
+// asking Wrangler to catch invalid bindings, oversized bundles, and other
+// upload-time failures without publishing.
 if (parsed.dryRun) {
+  const adapterStatus = runCloudflareDeploy(deployArgs, childEnv);
+  if (adapterStatus !== 0) {
+    process.exit(adapterStatus);
+  }
   process.exit(runWranglerDryRun(targetEnv, childEnv));
 }
 

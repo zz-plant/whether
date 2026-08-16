@@ -12,10 +12,13 @@ describe("Cloudflare deploy contracts", () => {
     assert.doesNotMatch(source, /runVinext\(deployArgs, childEnv\)/);
   });
 
-  it("builds and asks Wrangler to package dry runs", () => {
+  it("builds, validates the adapter, and asks Wrangler to package dry runs", () => {
     assert.match(source, /if \(!parsed\.skipBuild\)/);
     assert.match(source, /wranglerPath, "deploy", "--dry-run"/);
-    assert.match(source, /runWranglerDryRun\(targetEnv, childEnv\)/);
+    assert.match(
+      source,
+      /if \(parsed\.dryRun\) \{[\s\S]*runCloudflareDeploy\(deployArgs, childEnv\)[\s\S]*if \(adapterStatus !== 0\)[\s\S]*runWranglerDryRun\(targetEnv, childEnv\)/,
+    );
   });
 
   it("packages a production dry run in upgrade CI", () => {
