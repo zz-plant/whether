@@ -1,6 +1,30 @@
 import type { LucideProps } from "lucide-react";
 
-import { ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Download, FileText, Grid2x2, History, ScanSearch, Settings, Shield, Target, TrendingUp, Waypoints, X, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  Bookmark,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Download,
+  FileText,
+  Flame,
+  Grid2x2,
+  History,
+  Moon,
+  ScanSearch,
+  Settings,
+  Share2,
+  Shield,
+  Sun,
+  Target,
+  TrendingUp,
+  Waypoints,
+  X,
+  Zap,
+} from 'lucide-react';
 
 import type { SVGProps } from "react";
 
@@ -81,6 +105,26 @@ export const ChevronRightIcon = ({ className = "h-4 w-4", title: _title, ...prop
 
 export const TrendUpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <TrendingUp className={className} {...baseProps} {...props} />
+);
+
+export const SunIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <Sun className={className} {...baseProps} {...props} />
+);
+
+export const MoonIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
+  <Moon className={className} {...baseProps} {...props} />
+);
+
+export const ShareIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <Share2 className={className} {...baseProps} {...props} />
+);
+
+export const BookmarkIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <Bookmark className={className} {...baseProps} {...props} />
+);
+
+export const FlameIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <Flame className={className} {...baseProps} {...props} />
 );
 
 export const StatusLiveIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (

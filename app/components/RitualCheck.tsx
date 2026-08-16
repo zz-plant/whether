@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import { useLocalStorageState } from "../../lib/hooks/useLocalStorageState";
-
-const COMPLETE_KEY = "whether_reviewed";
+import { STORAGE_KEYS } from "../../lib/storage/keys";
+import { FlameIcon } from "./uiIcons";
 
 export function RitualCheck({
   recordDate,
@@ -12,7 +12,10 @@ export function RitualCheck({
   recordDate?: string;
   recentRecordDates?: string[];
 }) {
-  const [data, setData] = useLocalStorageState<Record<string, { reviewed: boolean }>>(COMPLETE_KEY, {});
+  const [data, setData] = useLocalStorageState<Record<string, { reviewed: boolean }>>(
+    STORAGE_KEYS.reviewedRecordDates,
+    {},
+  );
 
   const reviewed = recordDate ? data[recordDate]?.reviewed ?? false : false;
   const streak = useMemo(() => {
@@ -60,7 +63,7 @@ export function RitualCheck({
         type="button"
         onClick={handleToggle}
         aria-label={reviewed ? "Reviewed: remove confirmation" : "Mark reviewed: confirm this week"}
-        className={`inline-flex min-h-[40px] items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
+        className={`inline-flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
           reviewed
             ? "bg-emerald-500/12 text-emerald-300 border border-emerald-500/30"
             : "bg-white/[0.06] text-white/60 border border-white/[0.10] hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-sky-400"
@@ -89,7 +92,7 @@ export function RitualCheck({
         {streak >= 1 ? (
           <span className="text-fluid-nano text-white/50">
             <span className="inline-flex items-center gap-1">
-              <svg className="size-3 text-amber-300/70" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1c.5 2-1 3-2 4s-2 2-2 4a4 4 0 0 0 8 0c0-2-1-3-2-4 .5 1 .5 2 0 2.5C11 6 10 4 10 3c0-1-.5-1.5-2-2z"/></svg>
+              <FlameIcon className="size-3 text-amber-300/70" />
               {streak}wk streak
             </span>
           </span>

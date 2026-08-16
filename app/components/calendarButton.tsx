@@ -24,7 +24,7 @@ export function CalendarButton({ title, description, date }: { title: string; de
       href={googleUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="weather-button inline-flex min-h-[36px] items-center justify-center rounded-sm px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
+      className="weather-button inline-flex min-h-[44px] items-center justify-center rounded-sm px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.04em]"
     >
       Add to Calendar
     </a>

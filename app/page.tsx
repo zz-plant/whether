@@ -249,52 +249,52 @@ async function PageContent({
               </Suspense>
             ) : null}
             <DecisionHero
-                tightness={tightness}
-                tightnessDelta={tightnessDelta}
-                riskAppetite={riskAppetite}
-                riskAppetiteDelta={riskAppetiteDelta}
-                boldnessScore={weeklyLeadershipSummary.boldnessScore}
-               boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-               boldnessTrend={boldnessTrend}
-               boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
-               weeklyCall={primaryCall}
-               actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-               regime={regime}
-               postureLabel={postureLabel}
-               signalDirection={signalDirection}
-               recordDate={homepage.reportShell.recordDateLabel}
-               fetchedAt={homepage.reportShell.fetchedAtLabel}
-               confidenceLabel={confidenceLabel}
-               trustStatusLabel={homepage.reportShell.trustStatusLabel}
-               treasurySource={homepage.reportShell.treasurySource}
-               degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-                isFallback={homepage.reportShell.showOfflineBadge}
-                signalData={v2HeroSignalData}
-signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-                 flipConditions={flipConditionLabels}
-                 guardrail={guardrailLabel}
-                reversalTrigger={reversalTriggerLabel}
-shareLines={briefShareLines}
-                 revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
-                 revisitQueue={revisitQueue}
-                 noChangeAreas={noChangeAreas}
-                 thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-               />
+              tightness={tightness}
+              tightnessDelta={tightnessDelta}
+              riskAppetite={riskAppetite}
+              riskAppetiteDelta={riskAppetiteDelta}
+              boldnessScore={weeklyLeadershipSummary.boldnessScore}
+              boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+              boldnessTrend={boldnessTrend}
+              boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
+              weeklyCall={primaryCall}
+              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+              regime={regime}
+              postureLabel={postureLabel}
+              signalDirection={signalDirection}
+              recordDate={homepage.reportShell.recordDateLabel}
+              fetchedAt={homepage.reportShell.fetchedAtLabel}
+              confidenceLabel={confidenceLabel}
+              trustStatusLabel={homepage.reportShell.trustStatusLabel}
+              treasurySource={homepage.reportShell.treasurySource}
+              degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+              isFallback={homepage.reportShell.showOfflineBadge}
+              signalData={v2HeroSignalData}
+              signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
+              flipConditions={flipConditionLabels}
+              guardrail={guardrailLabel}
+              reversalTrigger={reversalTriggerLabel}
+              shareLines={briefShareLines}
+              revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
+              revisitQueue={revisitQueue}
+              noChangeAreas={noChangeAreas}
+              thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+            />
 
             <ThreeWhethersCard
-               items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
-               sharedFlipCorridor={homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor}
-             />
+              items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
+              sharedFlipCorridor={homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor}
+            />
 
             <CompareStrip
-               currentRegime={regime}
-               currentTightness={tightness}
-               tightnessDelta={tightnessDelta}
-               riskAppetite={riskAppetite}
-               riskAppetiteDelta={riskAppetiteDelta}
-               currentRecordDate={homepage.reportShell.recordDateLabel}
-               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-             />
+              currentRegime={regime}
+              currentTightness={tightness}
+              tightnessDelta={tightnessDelta}
+              riskAppetite={riskAppetite}
+              riskAppetiteDelta={riskAppetiteDelta}
+              currentRecordDate={homepage.reportShell.recordDateLabel}
+              serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+            />
           </SwipeableWeek>
           <FirstVisitExplainer />
 
@@ -319,41 +319,41 @@ shareLines={briefShareLines}
           <SubscribeForm />
           <CanonicalWeekPermalink />
         </div>
-       </div>
+      </div>
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": ["Article", "Report"],
-              "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-              "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-              "about": "US Macro Operating Posture for Startup Leaders",
-              "datePublished": homepage.reportShell.recordDateLabel,
-              "dateModified": homepage.reportShell.fetchedAtLabel,
-              "result": {
-                "posture": postureLabel,
-                "regime": publicRegimeLabel,
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": ["Article", "Report"],
+            "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+            "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
+            "about": "US Macro Operating Posture for Startup Leaders",
+            "datePublished": homepage.reportShell.recordDateLabel,
+            "dateModified": homepage.reportShell.fetchedAtLabel,
+            "result": {
+              "posture": postureLabel,
+              "regime": publicRegimeLabel,
+              "confidence": confidenceLabel,
+              "provenance": {
+                "source": homepage.reportShell.treasurySource ?? "FRED",
+                "dataDate": homepage.reportShell.recordDateLabel,
+                "refreshedAt": homepage.reportShell.fetchedAtLabel,
                 "confidence": confidenceLabel,
-                "provenance": {
-                  "source": homepage.reportShell.treasurySource ?? "FRED",
-                  "dataDate": homepage.reportShell.recordDateLabel,
-                  "refreshedAt": homepage.reportShell.fetchedAtLabel,
-                  "confidence": confidenceLabel,
-                },
               },
+            },
           }),
-            }}
-          />
+        }}
+      />
 
-        <StickyCallStrip
-          call={primaryCall}
-          direction={signalDirection}
-          boldnessScore={weeklyLeadershipSummary.boldnessScore}
-          boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-          shareLines={briefShareLines}
-        />
+      <StickyCallStrip
+        call={primaryCall}
+        direction={signalDirection}
+        boldnessScore={weeklyLeadershipSummary.boldnessScore}
+        boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+        shareLines={briefShareLines}
+      />
     </>
   );
 }

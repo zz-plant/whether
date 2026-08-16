@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePersistentClientId } from "../clientIdentity";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
+import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import {
   assessDecisionStaleness,
   stalenessVerdictLabel,
@@ -53,7 +54,7 @@ export function DecisionStalenessPanel({
   useEffect(() => {
     if (!clientId) return;
     try {
-      const key = `whether.decisionMemory:${clientId}`;
+      const key = STORAGE_KEYS.decisionMemory(clientId);
       const raw = window.localStorage.getItem(key);
       const parsed = raw ? (JSON.parse(raw) as DecisionMemoryEntry[]) : [];
       setEntries(

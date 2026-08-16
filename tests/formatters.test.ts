@@ -5,6 +5,8 @@ import {
   formatWeekEndingUTC,
   resolveWeekEndingIsoDateUTC,
   formatSignedDelta,
+  formatMonthShortUtc,
+  formatMonthLongYearUtc,
 } from "../lib/formatters";
 import {
   formatQuarterLabel,
@@ -82,5 +84,18 @@ describe("formatSignedDelta", () => {
     assert.equal(formatSignedDelta(2.567, 1), "+2.6");
     assert.equal(formatSignedDelta(-2.567, 2), "-2.57");
     assert.equal(formatSignedDelta(0, 3), "0.000");
+  });
+});
+
+describe("month UTC formatting", () => {
+  it("formats short month name deterministically", () => {
+    assert.equal(formatMonthShortUtc(1), "Jan");
+    assert.equal(formatMonthShortUtc(6), "Jun");
+    assert.equal(formatMonthShortUtc(12), "Dec");
+  });
+
+  it("formats month and year long name deterministically", () => {
+    assert.equal(formatMonthLongYearUtc(2026, 3), "March 2026");
+    assert.equal(formatMonthLongYearUtc(2024, 11), "November 2024");
   });
 });

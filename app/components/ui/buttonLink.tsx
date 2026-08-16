@@ -5,7 +5,7 @@ import { ActionLink, type ActionLinkVariant } from "./actionLink";
 type ButtonLinkProps = Omit<ComponentProps<typeof Link>, "className"> & {
   children: ReactNode;
   className?: string;
-  variant?: Extract<ActionLinkVariant, "primary" | "pill" | "ghost">;
+  variant?: ActionLinkVariant;
 };
 
 export function ButtonLink({ children, className, variant = "primary", ...linkProps }: ButtonLinkProps) {
@@ -15,3 +15,5 @@ export function ButtonLink({ children, className, variant = "primary", ...linkPr
     </ActionLink>
   );
 }
+
+export type { ButtonLinkProps };

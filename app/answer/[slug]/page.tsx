@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ActionLink } from "../../components/ui/actionLink";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import {
@@ -145,8 +146,8 @@ export default async function DecideDetailPage({
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Still unsure?</h2>
         <div className="flex gap-3">
-          <Link href="/trust#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Revisit triggers</Link>
-          <Link href="/trust" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Trust</Link>
+          <ActionLink href="/trust#revisit-call" variant="pill">Revisit triggers</ActionLink>
+          <ActionLink href="/trust" variant="pill">Trust</ActionLink>
         </div>
       </section>
     </main>

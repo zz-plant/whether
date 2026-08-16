@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ActionLink } from "../../../components/ui/actionLink";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
@@ -94,10 +95,10 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href="/answer#unresolved-question-router" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision help</Link>
-          <Link href="/evidence/capital-tightness-watch" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence page</Link>
-          <Link href="/toolkits/focus" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision toolkit</Link>
+          <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
+          <ActionLink href="/answer#unresolved-question-router" variant="pill">Decision help</ActionLink>
+          <ActionLink href="/evidence/capital-tightness-watch" variant="pill">Evidence page</ActionLink>
+          <ActionLink href="/toolkits/focus" variant="pill">Decision toolkit</ActionLink>
         </div>
       </section>
     </main>

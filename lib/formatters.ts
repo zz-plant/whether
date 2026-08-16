@@ -19,6 +19,17 @@ const monthYearShortUtcFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+const monthShortUtcFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  timeZone: "UTC",
+});
+
+const monthLongYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 const monthDayYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -131,6 +142,12 @@ export const formatMonthYearShortFromValue = (value: string) =>
 
 export const formatMonthYear2DigitFromValue = (value: string) =>
   formatDateValue(value, monthYearShort2DigitUtcFormatter);
+
+export const formatMonthShortUtc = (month: number) =>
+  monthShortUtcFormatter.format(new Date(Date.UTC(2020, month - 1, 1)));
+
+export const formatMonthLongYearUtc = (year: number, month: number) =>
+  monthLongYearUtcFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 
 export const formatConceptPublishedLabel = (year: number, month: number) =>
   formatMonthYearShortUtc(new Date(Date.UTC(year, month - 1, 1)));

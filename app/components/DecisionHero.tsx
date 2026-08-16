@@ -110,14 +110,14 @@ export function DecisionHero({
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
-   const regimeKey = isRegimeKey(regime) ? regime : undefined;
+  const regimeKey = isRegimeKey(regime) ? regime : undefined;
 
-   // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
-   const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "High" : riskAppetite >= 45 ? "Moderate" : "Low") : undefined;
-   const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-emerald-300" : riskAppetite >= 45 ? "text-amber-300" : "text-rose-300") : undefined;
-   const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
-   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
-    const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
+  // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
+  const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "High" : riskAppetite >= 45 ? "Moderate" : "Low") : undefined;
+  const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-emerald-300" : riskAppetite >= 45 ? "text-amber-300" : "text-rose-300") : undefined;
+  const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
+  const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
+  const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
 
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
   const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10

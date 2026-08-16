@@ -7,6 +7,7 @@ import { ButtonLink } from "../components/ui/buttonLink";
 import { TimelineBar } from "../components/TimelineBar";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { REGIME_COLORS } from "../viewModel";
+import { formatMonthShortUtc, formatMonthLongYearUtc } from "../../lib/formatters";
 import type { TimeMachineRegimeEntry } from "../../lib/timeMachine/timeMachineCache";
 
 type Coverage = Record<number, number[]>;
@@ -86,7 +87,11 @@ export function HistoryExplorer({
         <div className="flex items-center justify-between">
           <p className="type-eyebrow">Jump to specific month</p>
           {selectedMonth > 0 ? (
-            <button type="button" onClick={clearSelection} className="text-fluid-micro text-sky-200 hover:text-sky-100 underline decoration-sky-600">
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="inline-flex min-h-[44px] items-center text-fluid-micro text-sky-200 hover:text-sky-100 underline decoration-sky-600"
+            >
               Clear filter
             </button>
           ) : null}
@@ -95,7 +100,7 @@ export function HistoryExplorer({
           <select
             value={selectedYear}
             onChange={(event) => { setSelectedYear(Number(event.target.value)); setSelectedMonth(0); }}
-            className="min-h-[40px] rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)] focus:border-sky-400/60 focus:outline-none"
+            className="min-h-[44px] rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)] focus:border-sky-400/60 focus:outline-none"
             style={{ colorScheme: "light dark" }}
             aria-label="Select year"
           >
@@ -107,13 +112,13 @@ export function HistoryExplorer({
                 key={month}
                 type="button"
                 onClick={() => navigateTo(selectedYear, month)}
-                className={`min-h-[40px] rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`min-h-[44px] rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                   month === selectedMonth
                     ? "bg-sky-500/20 text-sky-100 border border-sky-400/50 shadow-sm"
                     : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"
                 }`}
               >
-                {new Date(selectedYear, month - 1).toLocaleString("en", { month: "short" })}
+                {formatMonthShortUtc(month)}
               </button>
             ))}
           </div>
@@ -125,7 +130,7 @@ export function HistoryExplorer({
           <div className="space-y-1">
             <p className="type-eyebrow">Selected period</p>
             <p className="text-sm font-semibold text-slate-100">
-              {new Date(selectedYear, selectedMonth - 1).toLocaleString("en", { month: "long" })} {selectedYear}
+              {formatMonthLongYearUtc(selectedYear, selectedMonth)}
             </p>
             <span className={`inline-block rounded-sm px-2 py-0.5 type-badge text-slate-950 font-bold ${REGIME_COLORS[regimeForPeriod] ?? "bg-slate-500"}`}>
               {getRegimePublicLabel(regimeForPeriod)}
