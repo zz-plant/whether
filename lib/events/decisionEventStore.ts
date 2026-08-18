@@ -1,3 +1,4 @@
+import type { KvNamespace } from "../runtime/kv";
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 
 export type RegimeDecisionEvent = {
@@ -29,17 +30,7 @@ type ListSinceResult = {
   cursor: Cursor;
 };
 
-type CloudflareKvListResult = {
-  keys: Array<{ name: string }>;
-  list_complete: boolean;
-  cursor?: string;
-};
-
-export type CloudflareKvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<CloudflareKvListResult>;
-};
+export type CloudflareKvNamespaceLike = KvNamespace;
 
 const EVENT_PREFIX = "decision-event:";
 const EVENT_INDEX_KEY = "meta:decision-event:index";

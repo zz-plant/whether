@@ -50,7 +50,8 @@ Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check
 ## Architectural invariants
 
 - **Read deadlines**: `lib/report/reportData.ts` wraps report assembly in `withDeadline(10s)`. Health endpoint wraps its probe in `withDeadline(3s)`. Do not remove or increase these without commensurate fallback work.
-- **Cron does not self-fetch**: `worker/index.ts` calls `executeIngest()` directly instead of `fetch(${site}/api/ingest)`. The same `executeIngest` function powers the `/api/ingest` HTTP route.
+- **Cron does not self-fetch**: `worker/index.ts` calls `executeIngest()`, `sendWeeklyBrief()`, `checkRegimeChange()`, and `runScheduledAlertDelivery()` directly instead of fetching its own public endpoints. The same functions power the corresponding HTTP routes, which remain for manual authenticated runs.
+- **Ingest stays off the read path**: `loadCanonicalReportInputs` with `refresh: "background"` (the report read path) serves the existing materialized model and refreshes due signal families via detached `waitUntil` work behind a KV lock (`lib/runtime/backgroundWork.ts`). Only a cold store ingests inline. A successful ingest calls `revalidateTag("report-data")` so tag-cached report data refreshes immediately (`lib/report/cacheTags.ts`).
 - **Materialized model includes history**: `MaterializedSignalReadModel.recentHistory` stores the trailing 92-day window per signal key, built at write time. The read path (`loadCanonicalReportInputs`) avoids scanning raw snapshot keys when `recentHistory` is present.
 - **`getDefaultIngestionStore` re-checks binding**: No longer permanently memoizes — if the KV binding becomes available after an earlier fallback, the store reinitializes.
 - **CI enforced**: `.github/workflows/ci.yml` blocks merges that fail lint, typecheck, or test.

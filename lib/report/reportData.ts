@@ -145,7 +145,10 @@ export type DecisionTransmission = {
 
 const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {
   try {
-    return await loadCanonicalReportInputs(options);
+    /* Report rendering must never pay for ingestion: refresh due families off the
+     * request (waitUntil) and serve the existing materialized model. Only a cold
+     * store ingests inline. Cron/executeIngest keeps the inline default. */
+    return await loadCanonicalReportInputs({ ...options, refresh: "background" });
   } catch {
     return null;
   }

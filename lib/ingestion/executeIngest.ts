@@ -1,5 +1,6 @@
 import { loadCanonicalReportInputs } from "./materialized";
 import { writeAnalytics } from "../telemetry/analyticsEngine";
+import { revalidateReportDataCaches } from "../report/cacheTags";
 
 export type IngestResult = {
   ok: boolean;
@@ -19,6 +20,10 @@ export const executeIngest = async (): Promise<IngestResult> => {
       writeAnalytics("ingest-pipeline", { ok: false, error: "Ingestion produced no data", durationMs }, { doubles: [0, 0, durationMs] });
       return { ok: false, error: "Ingestion produced no data", durationMs };
     }
+    /* Fresh inputs invalidate tag-cached report data immediately instead of leaving
+     * the homepage to wait out its time-based revalidate window. */
+    await revalidateReportDataCaches();
+
     const macroLive = result.macroSeries.filter((s) => s.isLive).length;
     const macroTotal = result.macroSeries.length;
     writeAnalytics(

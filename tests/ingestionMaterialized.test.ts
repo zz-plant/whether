@@ -4,6 +4,7 @@ import {
   buildCanonicalMacroSeriesFromReadModel,
   buildCanonicalTreasuryFromReadModel,
   buildMaterializedReadModel,
+  loadCanonicalReportInputs,
   resolveSignalFamiliesToRefresh,
 } from "../lib/ingestion/materialized";
 import type { SignalEntitySnapshot } from "../lib/ingestion/types";
@@ -232,5 +233,50 @@ describe("materialized ingestion model", () => {
     const treasury = buildCanonicalTreasuryFromReadModel(model);
 
     assert.equal(treasury, null);
+  });
+});
+
+describe("loadCanonicalReportInputs refresh modes", () => {
+  const staleModelStore = () => {
+    const staleModel = buildMaterializedReadModel(baseSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    let ingestCalls = 0;
+    const store = {
+      appendSnapshots: async () => { ingestCalls++; },
+      readSnapshots: async () => baseSnapshots,
+      readLatestMaterialized: async () => staleModel,
+      writeLatestMaterialized: async () => {},
+      acquireRefreshLock: async () => true,
+    };
+    return { store, wasWritten: () => ingestCalls > 0 };
+  };
+
+  const failingFetcher: typeof fetch = async () => {
+    throw new Error("upstream should not be reached inline");
+  };
+
+  it("background mode serves the stale model without awaiting ingestion", async () => {
+    const { store } = staleModelStore();
+    const result = await loadCanonicalReportInputs({ store, fetcher: failingFetcher, refresh: "background" });
+    assert.ok(result, "stale model should still produce report inputs");
+    assert.equal(result?.materializedSignals.asOf, "2026-01-10T02:00:00.000Z");
+  });
+
+  it("background mode skips ingestion entirely when the lock is held elsewhere", async () => {
+    const { store, wasWritten } = staleModelStore();
+    store.acquireRefreshLock = async () => false;
+    await loadCanonicalReportInputs({ store, fetcher: failingFetcher, refresh: "background" });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(wasWritten(), false);
+  });
+
+  it("inline mode (default) still ingests before returning", async () => {
+    const { store } = staleModelStore();
+    let fetched = 0;
+    const countingFetcher: typeof fetch = async () => {
+      fetched++;
+      throw new Error("network unavailable in test");
+    };
+    await loadCanonicalReportInputs({ store, fetcher: countingFetcher });
+    assert.ok(fetched > 0, "inline refresh should attempt upstream fetches before returning");
   });
 });

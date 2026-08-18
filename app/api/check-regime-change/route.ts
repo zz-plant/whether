@@ -1,98 +1,22 @@
 import { NextResponse } from "next/server";
 import { requireCronAuth } from "../../../lib/api/cronAuth";
-import { loadReportData } from "../../../lib/report/reportData";
-import { getRegimeProjection } from "../../../lib/report/regimeContext";
+import { checkRegimeChange } from "../../../lib/alert/checkRegimeChange";
 
 export const runtime = "edge";
 
 /* POST /api/check-regime-change — checks regime, distance-to-flip velocity, and confidence.
-   Alerts on: regime change, narrowing flip window, or confidence drop.
-   Called by cron (Mon 14:00 UTC) and on key signal changes. */
+   The cron trigger calls checkRegimeChange() directly (worker/index.ts); this route
+   remains for manual/authenticated runs. */
 export async function POST(request: Request) {
   try {
     const authError = requireCronAuth(request);
     if (authError) return authError;
 
-    const kv = (globalThis as { WHETHER_DURABLE_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string): Promise<void> } }).WHETHER_DURABLE_KV;
-    if (!kv) return NextResponse.json({ ok: false, error: "KV not available" }, { status: 503 });
-
-    const { assessment, reportDynamics, actionNowShort } = await loadReportData({});
-    const currentRegime = assessment.regime;
-    const slackWebhook = process.env.SLACK_WEBHOOK_URL;
-
-    const lastKnown = await kv.get("regime:last-known");
-    const prevWeeksToFlip = await kv.get("regime:weeks-to-flip");
-    const previousRegime = lastKnown ?? null;
-    const alerts: string[] = [];
-
-    /* 1. Regime change — highest priority alert */
-    if (previousRegime && previousRegime !== currentRegime) {
-      alerts.push(`RECONSIDER OPERATING POSTURE — regime shifted from ${previousRegime} to ${currentRegime}`);
-      if (slackWebhook) {
-        await fetch(slackWebhook, {
-          method: "POST",
-          body: JSON.stringify({
-            blocks: [
-              { type: "header", text: { type: "plain_text", text: "⚠️ Reconsider Operating Posture" } },
-              { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.` } },
-              { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
-            ],
-          }),
-        });
-      }
+    const result = await checkRegimeChange();
+    if (!result.ok) {
+      return NextResponse.json(result, { status: result.error === "KV not available" ? 503 : 500 });
     }
-
-    /* 2. Distance-to-flip velocity — alert when narrowing rapidly */
-    const tightnessDelta = reportDynamics?.changedSignals?.find((s: { key: string }) => s.key === "tightness")?.delta ?? 0;
-    const riskDelta = reportDynamics?.changedSignals?.find((s: { key: string }) => s.key === "riskAppetite")?.delta ?? 0;
-    const projection = getRegimeProjection(
-      currentRegime,
-      assessment.scores.tightness,
-      assessment.scores.riskAppetite,
-      tightnessDelta,
-      riskDelta,
-    );
-
-    if (projection.weeksToFlip && projection.weeksToFlip <= 2) {
-      const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
-      if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
-        alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
-        if (slackWebhook) {
-          await fetch(slackWebhook, {
-            method: "POST",
-            body: JSON.stringify({
-              blocks: [
-                { type: "header", text: { type: "plain_text", text: "👀 Watch Decisions — Flip Window Narrowing" } },
-                { type: "section", text: { type: "mrkdwn", text: `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.` } },
-                { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
-              ],
-            }),
-          });
-        }
-      }
-    }
-
-    /* 3. Confidence drop — alert when the data is getting noisier */
-    const prevConfidence = await kv.get("regime:confidence");
-    const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
-    if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
-      alerts.push(`Confidence dropped from ${prevConfidence} to ${currentConfidence}. Data is getting noisier — review thresholds.`);
-    }
-
-    /* Persist state for next check */
-    await kv.put("regime:last-known", currentRegime);
-    await kv.put("regime:weeks-to-flip", String(projection.weeksToFlip ?? ""));
-    await kv.put("regime:confidence", currentConfidence);
-
-    return NextResponse.json({
-      ok: true,
-      previousRegime,
-      currentRegime,
-      changed: previousRegime !== null && previousRegime !== currentRegime,
-      weeksToFlip: projection.weeksToFlip,
-      velocityLabel: projection.velocityLabel,
-      alerts: alerts.length > 0 ? alerts : undefined,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({
       ok: false,

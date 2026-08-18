@@ -2,6 +2,11 @@ import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { executeIngest } from "../lib/ingestion/executeIngest";
 import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
+import { installWaitUntil } from "../lib/runtime/backgroundWork";
+import { withDeadline } from "../lib/withDeadline";
+import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
+import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
+import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 
 interface Env {
   ASSETS: {
@@ -30,7 +35,6 @@ interface Env {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ScheduledEvent = { cron: string; scheduledTime: number; type: "scheduled" };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroughOnException(): void };
 
 /**
@@ -51,25 +55,22 @@ const CRON_STEP_TIMEOUT_MS = 60_000;
 
 /**
  * Cron steps are independent: a failing ingest should not silently cancel the weekly
- * email and alert delivery that follow it. Each step is bounded and its outcome logged
- * rather than thrown, so one bad dependency degrades a single step.
+ * email and alert delivery that follow it. Each step is a direct library call (no
+ * self-fetch through the public edge), bounded by a wall-clock deadline, and its
+ * outcome is logged rather than thrown, so one bad dependency degrades a single step.
  */
-const runCronStep = async (label: string, url: string, headers: Record<string, string>) => {
+const runCronStep = async (label: string, step: () => Promise<{ ok: boolean; error?: string }>) => {
   const startTime = Date.now();
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      signal: AbortSignal.timeout(CRON_STEP_TIMEOUT_MS),
-    });
+    const result = await withDeadline(step(), CRON_STEP_TIMEOUT_MS, `cron:${label}`);
     const durationMs = Date.now() - startTime;
     writeAnalytics(
       "cron-step",
-      { step: label, ok: response.ok, status: response.status, durationMs },
-      { doubles: [response.status, durationMs] },
+      { step: label, ok: result.ok, error: result.error, durationMs },
+      { doubles: [result.ok ? 1 : 0, durationMs] },
     );
-    if (!response.ok) {
-      console.error(`[cron] ${label} responded ${response.status}`);
+    if (!result.ok) {
+      console.error(`[cron] ${label} failed`, result.error);
     }
   } catch (error) {
     const durationMs = Date.now() - startTime;
@@ -95,27 +96,29 @@ export default {
       console.error("[cron] ingest failed", ingestResult.error);
     }
 
-    const secret = env.WHETHER_CRON_SECRET;
-    const headers: Record<string, string> = {};
-    if (secret) headers["Authorization"] = `Bearer ${secret}`;
-
-    const site = env.SITE_URL || "https://whether.work";
-
     /* Both crons evaluate bounded-rule tripwires against the fresh signals, so a
        regime flip or threshold crossing pushes the day it lands instead of waiting
-       for Monday. Both endpoints are transition-based (KV last-known state), so
+       for Monday. Both checks are transition-based (KV last-known state), so
        daily runs stay silent unless something actually crossed. The brief email
        remains weekly-only — the cadence promise is weekly; only rule firings
        break cadence. */
     if (!isDailyIngestion) {
-      await runCronStep("email/send-weekly", `${site}/api/email/send-weekly`, headers);
+      await runCronStep("email/send-weekly", sendWeeklyBrief);
     }
 
-    await runCronStep("check-regime-change", `${site}/api/check-regime-change`, headers);
-    await runCronStep("alert-deliveries", `${site}/api/alert-deliveries`, headers);
+    await runCronStep("check-regime-change", checkRegimeChange);
+    await runCronStep("alert-deliveries", async () => {
+      const result = await runScheduledAlertDelivery();
+      return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
+    });
   },
 
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    /* Lets library code detach work (e.g. background signal refresh) past the response.
+     * Installed per-request on globalThis; concurrent requests in one isolate may hand
+     * work to a sibling ctx, which Workers keeps alive just the same. */
+    installWaitUntil(ctx.waitUntil.bind(ctx));
+
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {

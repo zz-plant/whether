@@ -1,11 +1,8 @@
+import type { KvNamespace } from "../runtime/kv";
+
 type Cursor = string | null;
 
-type KvListResult = { keys: Array<{ name: string }>; list_complete: boolean; cursor?: string };
-export type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<KvListResult>;
-};
+export type KvNamespaceLike = KvNamespace;
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
@@ -168,7 +165,11 @@ export class DurableEventLog<T> {
 
     for (let offset = 0; offset < indexes.length; offset += READ_CONCURRENCY) {
       const batch = indexes.slice(offset, offset + READ_CONCURRENCY);
-      const raws = await Promise.all(batch.map((index) => this.kv!.get(this.toKey(index))));
+      /* Entries are append-only and never rewritten, so a short edge cache absorbs
+       * repeated scans of the same window. 60s is the KV minimum; it also caches
+       * misses, which bounds how quickly another isolate's fresh append becomes
+       * visible here — acceptable for list views, so latest() stays uncached. */
+      const raws = await Promise.all(batch.map((index) => this.kv!.get(this.toKey(index), { cacheTtl: 60 })));
 
       for (let i = 0; i < batch.length; i++) {
         const raw = raws[i];

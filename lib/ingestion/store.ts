@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "./types";
 import { buildLineage, type DurableLineage } from "../storage/lineage";
+import { getWhetherKv, type KvNamespace } from "../runtime/kv";
 
 export type StoredSnapshotRecord = DurableLineage & {
   sequence: number;
@@ -18,6 +19,13 @@ export interface IngestionStore {
   readLatestMaterialized(): Promise<MaterializedSignalReadModel | null>;
   writeLatestMaterialized(model: MaterializedSignalReadModel): Promise<void>;
   backendStatus?(): "durable" | "local-fallback";
+  /**
+   * Best-effort cross-isolate dedup for background refreshes. Returns false when another
+   * isolate holds a live lock. KV is not transactional, so two isolates racing the same
+   * expired lock can both win — acceptable, because ingestion writes are idempotent
+   * merges; the lock only bounds redundant upstream fetch volume.
+   */
+  acquireRefreshLock?(ttlSeconds: number): Promise<boolean>;
 }
 
 const DEFAULT_DIR = path.join(process.cwd(), ".cache", "ingestion");
@@ -85,18 +93,19 @@ export class FileIngestionStore implements IngestionStore {
   backendStatus() {
     return "local-fallback" as const;
   }
+
+  async acquireRefreshLock() {
+    /* Single-process local dev: the per-instance queue already serializes writes. */
+    return true;
+  }
 }
 
-type KvListResult = { keys: Array<{ name: string }>; list_complete: boolean; cursor?: string };
-type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<KvListResult>;
-};
+type KvNamespaceLike = KvNamespace;
 
 const SNAPSHOT_PREFIX = "ingestion:snapshot:";
 const SNAPSHOT_INDEX_KEY = "ingestion:snapshot:index";
 const MATERIALIZED_KEY = "ingestion:materialized:latest";
+const REFRESH_LOCK_KEY = "ingestion:refresh-lock";
 
 /**
  * Snapshot keys accumulate forever (one per signal per ingestion run, ~10/day), so an
@@ -113,9 +122,8 @@ const SNAPSHOT_READ_CONCURRENCY = 64;
 const formatSnapshotKey = (sequence: number) => `${SNAPSHOT_PREFIX}${String(sequence).padStart(12, "0")}`;
 
 const getKvBinding = () => {
-  const binding = (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike; INGESTION_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV
-    ?? (globalThis as { INGESTION_KV?: KvNamespaceLike }).INGESTION_KV;
-  if (!binding || typeof binding.get !== "function" || typeof binding.put !== "function" || typeof binding.list !== "function") {
+  const binding = getWhetherKv("INGESTION_KV");
+  if (!binding || typeof binding.list !== "function") {
     return null;
   }
   return binding;
@@ -149,7 +157,10 @@ export class KvIngestionStore implements IngestionStore {
           sequence: current,
           snapshot,
         };
-        await this.kv.put(formatSnapshotKey(current), JSON.stringify(record));
+        /* Snapshots outside the 92-day materialized history window are never read
+         * (reads already cap to the newest slice), so let KV retire them server-side
+         * instead of accumulating forever. 180d keeps double the read window. */
+        await this.kv.put(formatSnapshotKey(current), JSON.stringify(record), { expirationTtl: 180 * 24 * 60 * 60 });
       }
       await this.kv.put(SNAPSHOT_INDEX_KEY, String(current));
     });
@@ -197,7 +208,9 @@ export class KvIngestionStore implements IngestionStore {
 
     for (let offset = 0; offset < sequences.length; offset += SNAPSHOT_READ_CONCURRENCY) {
       const batch = sequences.slice(offset, offset + SNAPSHOT_READ_CONCURRENCY);
-      const raws = await Promise.all(batch.map((sequence) => this.kv.get(formatSnapshotKey(sequence))));
+      /* Snapshot records are immutable once written; edge-cache them so repeated
+       * legacy-path scans of the same window stop paying origin reads. */
+      const raws = await Promise.all(batch.map((sequence) => this.kv.get(formatSnapshotKey(sequence), { cacheTtl: 3600 })));
 
       for (const raw of raws) {
         if (!raw) {
@@ -258,6 +271,16 @@ export class KvIngestionStore implements IngestionStore {
 
   backendStatus() {
     return "durable" as const;
+  }
+
+  async acquireRefreshLock(ttlSeconds: number) {
+    const held = await this.kv.get(REFRESH_LOCK_KEY);
+    if (held !== null) {
+      return false;
+    }
+    // KV enforces a 60s minimum expirationTtl.
+    await this.kv.put(REFRESH_LOCK_KEY, new Date().toISOString(), { expirationTtl: Math.max(60, ttlSeconds) });
+    return true;
   }
 }
 

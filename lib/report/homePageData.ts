@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { REPORT_DATA_CACHE_TAG } from "./cacheTags";
 import { loadReportDataSafe } from "./reportData";
 import type { HomePageSearchParams } from "./homeMetadata";
 
@@ -107,7 +108,7 @@ export const createHomePageReportDataLoader = (
       return reportResult;
     },
     ["home-page-report-data"],
-    { revalidate: HOMEPAGE_REPORT_REVALIDATE_SECONDS },
+    { revalidate: HOMEPAGE_REPORT_REVALIDATE_SECONDS, tags: [REPORT_DATA_CACHE_TAG] },
   );
 
   return async (searchParams?: HomePageSearchParams): Promise<HomePageReportResult> => {

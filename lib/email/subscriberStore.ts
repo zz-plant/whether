@@ -1,3 +1,4 @@
+import type { KvNamespace } from "../runtime/kv";
 /**
  * Subscriber storage using Cloudflare KV.
  * Stores individual subscriber records keyed by email
@@ -14,13 +15,7 @@ export type Subscriber = {
   active: boolean;
 };
 
-type KvListResult = { keys: Array<{ name: string }>; list_complete: boolean; cursor?: string };
-type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-  delete?: (key: string) => Promise<void>;
-  list?: (options?: { prefix?: string; cursor?: string; limit?: number }) => Promise<KvListResult>;
-};
+type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
 
 export interface SubscriberStore {
   subscribe(email: string): Promise<Subscriber>;

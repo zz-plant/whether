@@ -11,6 +11,12 @@ preview_urls = true
 enabled = true
 head_sampling_rate = 1
 
+# Render close to the data, not the visitor: each request makes several sequential KV
+# round-trips (materialized model, event logs) plus upstream FRED calls, so Smart
+# Placement's latency profile beats edge placement for this Worker.
+[placement]
+mode = "smart"
+
 [assets]
 binding = "ASSETS"
 not_found_handling = "none"
@@ -46,7 +52,8 @@ preview_id = "d116663399244346bd302324b485e8f3"
 [[kv_namespaces]]
 binding = "VINEXT_KV_CACHE"
 id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
-preview_id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+# `wrangler dev --remote` sessions write to the preview namespace, not the prod cache.
+preview_id = "241a4b51d9aa4eab844ad103c3b78e74"
 
 [[send_email]]
 name = "EMAIL"
@@ -59,6 +66,9 @@ NEXT_PUBLIC_SITE_URL = "https://whether.work"
 
 [env.preview]
 preview_urls = true
+
+[env.preview.placement]
+mode = "smart"
 
 [env.preview.vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"
@@ -83,7 +93,9 @@ binding = "WHETHER_DURABLE_KV"
 id = "d116663399244346bd302324b485e8f3"
 preview_id = "d116663399244346bd302324b485e8f3"
 
+# Dedicated namespace: preview deploys must not share (and poison) the production
+# ISR/data cache. Created via `wrangler kv namespace create VINEXT_KV_CACHE_PREVIEW`.
 [[env.preview.kv_namespaces]]
 binding = "VINEXT_KV_CACHE"
-id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
-preview_id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+id = "241a4b51d9aa4eab844ad103c3b78e74"
+preview_id = "241a4b51d9aa4eab844ad103c3b78e74"

@@ -12,9 +12,7 @@ import {
   type AlertChannel,
   type AlertDeliveryEvent,
 } from "../../../lib/signalOps";
-import { loadReportData } from "../../../lib/report/reportData";
-import { deliverAlerts } from "../../../lib/alert/alertDelivery";
-import type { AlertConditions } from "../../../lib/alert/alertEvaluator";
+import { runScheduledAlertDelivery } from "../../../lib/alert/alertDelivery";
 import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
@@ -62,21 +60,12 @@ export async function POST(request: Request) {
     ?.replace("Bearer ", "");
   const expectedToken = process.env.WHETHER_CRON_SECRET;
 
-  /* Cron-triggered automated alert evaluation and delivery */
+  /* Cron-triggered automated alert evaluation and delivery. The cron trigger calls
+     runScheduledAlertDelivery() directly (worker/index.ts); this branch remains for
+     manual/authenticated runs. */
   if (expectedToken && authToken && constantTimeCompare(authToken, expectedToken)) {
     try {
-      const reportResult = await loadReportData();
-      const { assessment } = reportResult;
-
-      const conditions: AlertConditions = {
-        regime: assessment.regime,
-        tightness: assessment.scores.tightness,
-        riskAppetite: assessment.scores.riskAppetite,
-        posture: assessment.description,
-        recordDate: reportResult.recordDateLabel ?? new Date().toISOString(),
-      };
-
-      const result = await deliverAlerts(conditions);
+      const result = await runScheduledAlertDelivery();
 
       return NextResponse.json({
         ok: true,

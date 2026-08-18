@@ -1,6 +1,8 @@
 import { SIGNAL_CADENCE } from "./cadence";
 import { SIGNAL_FAMILIES, pullSignalFamily } from "./families";
 import { getDefaultIngestionStore, type IngestionStore } from "./store";
+import { runInBackground } from "../runtime/backgroundWork";
+import { revalidateReportDataCaches } from "../report/cacheTags";
 import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
 import { loadMacroSeries, macroSeries as snapshotMacroSeries } from "../macroSnapshot";
 import snapshotFallbackJson from "../../data/snapshot_fallback.json";
@@ -415,14 +417,34 @@ export const buildCanonicalMacroSeriesFromReadModel = (
   });
 };
 
-export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fetch; store?: IngestionStore }) => {
+const BACKGROUND_REFRESH_LOCK_TTL_SECONDS = 120;
+
+export const loadCanonicalReportInputs = async (
+  options?: { fetcher?: typeof fetch; store?: IngestionStore; refresh?: "inline" | "background" },
+) => {
   const store = options?.store ?? getDefaultIngestionStore();
   let model = await loadMaterializedSignals(store);
   const familiesToRefresh = resolveSignalFamiliesToRefresh(model);
 
   if (familiesToRefresh.length > 0) {
-    await ingestCanonicalSignals({ fetcher: options?.fetcher, store, families: familiesToRefresh });
-    model = await loadMaterializedSignals(store);
+    if (model && options?.refresh === "background") {
+      /* Serve the current model and refresh due families off the request. Only a cold
+       * store (no materialized model at all) still ingests inline, since there is
+       * nothing stale to serve. The lock bounds duplicate upstream fetches when
+       * concurrent isolates hit the same due window. */
+      const fetcher = options?.fetcher;
+      runInBackground("canonical-signal-refresh", async () => {
+        const acquired = (await store.acquireRefreshLock?.(BACKGROUND_REFRESH_LOCK_TTL_SECONDS)) ?? true;
+        if (!acquired) {
+          return;
+        }
+        await ingestCanonicalSignals({ fetcher, store, families: familiesToRefresh });
+        await revalidateReportDataCaches();
+      });
+    } else {
+      await ingestCanonicalSignals({ fetcher: options?.fetcher, store, families: familiesToRefresh });
+      model = await loadMaterializedSignals(store);
+    }
   }
 
   if (!model) {

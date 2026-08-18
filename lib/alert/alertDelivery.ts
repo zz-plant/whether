@@ -1,4 +1,6 @@
+import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
+import { loadReportData } from "../report/reportData";
 import { evaluateAlert } from "./alertEvaluator";
 import { decisionVerdictEmail, thresholdCrossingEmail } from "./alertTemplates";
 import {
@@ -10,20 +12,6 @@ import {
   type AlertPreferences,
 } from "../storage/alertPreferenceRepository";
 import { getSubscriberStore } from "../email/subscriberStore";
-
-type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-  list(options?: {
-    prefix?: string;
-    cursor?: string;
-    limit?: number;
-  }): Promise<{
-    keys: Array<{ name: string }>;
-    list_complete: boolean;
-    cursor?: string;
-  }>;
-};
 
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
@@ -209,6 +197,26 @@ export const trackAlertDelivery = async (
   alertType: string,
 ): Promise<void> => {
   await recordDelivery(email, alertType);
+};
+
+/**
+ * Cron entry point: derive current alert conditions from report data and deliver.
+ * Shared by the cron trigger (direct call from worker/index.ts) and the authenticated
+ * branch of POST /api/alert-deliveries, so the cron never fetches its own endpoint.
+ */
+export const runScheduledAlertDelivery = async (): Promise<DeliveryResult> => {
+  const reportResult = await loadReportData();
+  const { assessment } = reportResult;
+
+  const conditions: AlertConditions = {
+    regime: assessment.regime,
+    tightness: assessment.scores.tightness,
+    riskAppetite: assessment.scores.riskAppetite,
+    posture: assessment.description,
+    recordDate: reportResult.recordDateLabel ?? new Date().toISOString(),
+  };
+
+  return deliverAlerts(conditions);
 };
 
 export const deliverAlerts = async (

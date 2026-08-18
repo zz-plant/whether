@@ -1,9 +1,6 @@
 import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
 
-type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-};
+import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 
 const SNAPSHOT_KV_KEY = "regime:machine-snapshot";
 const SNAPSHOT_CACHE_TTL_MS = 5000;

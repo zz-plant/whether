@@ -1,11 +1,7 @@
+import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertChannel } from "../signalOps";
 
 export type AlertPreferences = Record<AlertChannel, boolean>;
-
-type KvNamespaceLike = {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-};
 
 export interface AlertPreferenceRepository {
   get(clientId: string): Promise<AlertPreferences | null>;

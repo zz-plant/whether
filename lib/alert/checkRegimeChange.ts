@@ -1,0 +1,103 @@
+import { loadReportData } from "../report/reportData";
+import { getRegimeProjection } from "../report/regimeContext";
+import { getWhetherKv } from "../runtime/kv";
+
+export type CheckRegimeChangeResult = {
+  ok: boolean;
+  error?: string;
+  previousRegime?: string | null;
+  currentRegime?: string;
+  changed?: boolean;
+  weeksToFlip?: number | null;
+  velocityLabel?: string;
+  alerts?: string[];
+};
+
+/**
+ * Check regime, distance-to-flip velocity, and confidence against KV last-known state,
+ * pushing Slack alerts on transitions. Shared by the cron trigger (direct call from
+ * worker/index.ts) and POST /api/check-regime-change, mirroring the executeIngest
+ * pattern so the cron never fetches its own public endpoint.
+ */
+export const checkRegimeChange = async (): Promise<CheckRegimeChangeResult> => {
+  const kv = getWhetherKv();
+  if (!kv) return { ok: false, error: "KV not available" };
+
+  const { assessment, reportDynamics } = await loadReportData({});
+  const currentRegime = assessment.regime;
+  const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+
+  const lastKnown = await kv.get("regime:last-known");
+  const prevWeeksToFlip = await kv.get("regime:weeks-to-flip");
+  const previousRegime = lastKnown ?? null;
+  const alerts: string[] = [];
+
+  /* 1. Regime change — highest priority alert */
+  if (previousRegime && previousRegime !== currentRegime) {
+    alerts.push(`RECONSIDER OPERATING POSTURE — regime shifted from ${previousRegime} to ${currentRegime}`);
+    if (slackWebhook) {
+      await fetch(slackWebhook, {
+        method: "POST",
+        body: JSON.stringify({
+          blocks: [
+            { type: "header", text: { type: "plain_text", text: "⚠️ Reconsider Operating Posture" } },
+            { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.` } },
+            { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+          ],
+        }),
+      });
+    }
+  }
+
+  /* 2. Distance-to-flip velocity — alert when narrowing rapidly */
+  const tightnessDelta = reportDynamics?.changedSignals?.find((s: { key: string }) => s.key === "tightness")?.delta ?? 0;
+  const riskDelta = reportDynamics?.changedSignals?.find((s: { key: string }) => s.key === "riskAppetite")?.delta ?? 0;
+  const projection = getRegimeProjection(
+    currentRegime,
+    assessment.scores.tightness,
+    assessment.scores.riskAppetite,
+    tightnessDelta,
+    riskDelta,
+  );
+
+  if (projection.weeksToFlip && projection.weeksToFlip <= 2) {
+    const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
+    if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
+      alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
+      if (slackWebhook) {
+        await fetch(slackWebhook, {
+          method: "POST",
+          body: JSON.stringify({
+            blocks: [
+              { type: "header", text: { type: "plain_text", text: "👀 Watch Decisions — Flip Window Narrowing" } },
+              { type: "section", text: { type: "mrkdwn", text: `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.` } },
+              { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+            ],
+          }),
+        });
+      }
+    }
+  }
+
+  /* 3. Confidence drop — alert when the data is getting noisier */
+  const prevConfidence = await kv.get("regime:confidence");
+  const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
+  if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
+    alerts.push(`Confidence dropped from ${prevConfidence} to ${currentConfidence}. Data is getting noisier — review thresholds.`);
+  }
+
+  /* Persist state for next check */
+  await kv.put("regime:last-known", currentRegime);
+  await kv.put("regime:weeks-to-flip", String(projection.weeksToFlip ?? ""));
+  await kv.put("regime:confidence", currentConfidence);
+
+  return {
+    ok: true,
+    previousRegime,
+    currentRegime,
+    changed: previousRegime !== null && previousRegime !== currentRegime,
+    weeksToFlip: projection.weeksToFlip,
+    velocityLabel: projection.velocityLabel,
+    alerts: alerts.length > 0 ? alerts : undefined,
+  };
+};
