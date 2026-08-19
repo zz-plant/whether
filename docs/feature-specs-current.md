@@ -1156,10 +1156,18 @@ as a bar chart in the lower home band. Removed from home; the engine
 (`getMonthlyRegimeHistory`, `lib/summary/monthlyRegimeHistory.ts`) stays for evidence/replay
 surfaces.
 
-### 8.4 Decision journal and visitor context
-**Location**: `app/components/home/VisitorContext.tsx`, rendered on `/` below the hero.
+### 8.4 Decision records (canonical: decision memory)
+**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/operate/memory/`,
+`app/components/DecisionMemoryButton.tsx`, `app/components/home/DecisionStalenessPanel.tsx`.
 
-Stores weekly decisions in localStorage on each visit. On return visits, shows "It's been a few days" or "Last visit: X posture · This week: Y posture" when posture has changed.
+The one system of record for "what did we decide and when": server-backed entries keyed by
+client id, saved from the hero, browsed on `/operate/memory`, and checked for staleness on `/`.
+
+Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
+a spec update, and with it the only writer of the `whether_decision_history` localStorage key.
+The `DecisionArchive` table on `/history` kept reading that key, so it rendered nothing for every
+visitor — it and `useDecisionHistory` are now deleted too. Do not add a second decision-record
+store; extend decision memory instead.
 
 ### 8.5 Reliability score
 **Location**: Computed in `app/page.tsx`, rendered in `BriefHero.tsx` next to the tightness number.
