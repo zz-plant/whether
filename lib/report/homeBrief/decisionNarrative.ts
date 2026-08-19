@@ -181,9 +181,11 @@ export const buildWeeklyMemoLines = ({
 }) => [
   trendMemoLines[trendLabel] ?? trendMemoLines.Stable,
   operatingStanceLine,
+  // The stance line is already line 2, so this line adds the watch state and its
+  // condition instead of restating it.
   transitionWatch === "ON"
-    ? `Flip watch is on. Keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `Flip watch is off. ${operatingStanceLine} Change course when: ${changeCourseIf}`,
+    ? `Flip watch is on, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
+    : `Flip watch is off, so this week's calls hold. Change course when: ${changeCourseIf}`,
 ];
 
 export const buildWhyItMattersLine = ({
@@ -201,7 +203,7 @@ export const buildWhyItMattersLine = ({
     return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
   }
 
-  return "Stable posture means no new signal to change pace. Keep last week's approval rules until a significant change shifts the forecast.";
+  return "Nothing moved enough this week to change pace, so last week's approval rules still hold until a significant signal shifts the forecast.";
 };
 
 export const buildReadThisCardItems = ({
