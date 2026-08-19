@@ -18,6 +18,39 @@ This file only covers mechanics: commands, costs, and where things live.
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge.
 
+### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
+
+| Command | What it does |
+| --- | --- |
+| `bun run agent:doctor` | Preflight: branch, dirty-worktree, relevant `AGENTS.md`, task-profile check. |
+| `bun run agent:route -- "<task>"` | Recommends docs, first files, and minimum checks for a task. |
+| `bun run agent:handoff -- --job "<job>"` | Generates a canonical subagent handoff packet with repo defaults. |
+| `bun run agent:index` | Refreshes the repo cache under `artifacts/agent/`. |
+| `bun run agent:prewarm` | Checks LM Studio, warms the fast local model role, refreshes the repo cache. |
+
+Details: [docs/agents/mcp-and-skills-playbook.md](docs/agents/mcp-and-skills-playbook.md).
+
+### UI capture / mockups
+
+| Command | What it does |
+| --- | --- |
+| `bun run ui:iterate` | Screenshot-driven UI loop — starts dev server if needed, captures targets, writes a gallery to `artifacts/ui/`. Use with `-- --only <targets>` to narrow. |
+| `bun run ui:iterate:list` | Lists available capture targets. |
+| `bun run ui:shots` | Raw capture only (skips dev-server management) — use if you already have one running. |
+| `bun run ui:mockups` | Prints mockup URLs for local exploration. |
+
+Use the `whether-ui-loop` skill instead of running these ad hoc — it sequences capture, review, and
+recapture correctly.
+
+### Review and agent-interface tooling
+
+| Command | What it does |
+| --- | --- |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. |
+| `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
+| `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
+| `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
+
 ## Where things live
 
 Canonical modules — extend these before creating new ones:
@@ -53,4 +86,9 @@ reading the set. Product specs live in `docs/`.
   listed in AGENTS.md and are load-bearing. Don't relax them casually.
 - **UI work** has dedicated skills: `whether-ui-loop` (screenshot iteration) and
   `whether-ui-standards`. Use them instead of editing CSS blind.
+- **Other repo-local skills** live under `.claude/skills/` — see
+  [.claude/skills/README.md](.claude/skills/README.md) for the full index (research briefs, feature
+  audits, PR hygiene, provenance audits, executive briefs, skill authoring, subagent handoffs, React/
+  Next.js performance rules). These are mirrored at `.codex/skills/` for the Codex runtime; keep both
+  in sync when editing.
 - Use `rg` for discovery; avoid `ls -R` and `grep -R`.

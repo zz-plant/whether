@@ -2,6 +2,11 @@
 
 Use this index to decide whether a first-party Whether skill should be loaded before you open individual `SKILL.md` files.
 
+This index and its skill directories are mirrored at `.claude/skills/` for Claude Code (which only
+discovers skills under `.claude/skills/`, not `.codex/skills/`). `web-design-guidelines` is the one
+exception — Claude Code already gets that skill from a global plugin, so it isn't mirrored. When you
+add, remove, or materially change a skill here, make the same change under `.claude/skills/`.
+
 ## When to use this index
 
 - you are deciding which repo-local skill fits the task
@@ -20,6 +25,8 @@ Use this index to decide whether a first-party Whether skill should be loaded be
 | `executive-brief-pack` | Share-ready leadership artifacts from current Whether signals | Methodology-heavy explainers | Executive headline, bounded actions, citations |
 | `agent-skill-architect` | Creating or upgrading first-party repo-local skills | General product or engineering implementation | Skill spec, trigger test, maintenance notes |
 | `subagent-handoff` | Bounded subagent delegation packets with repo anchors and verification | Early ambiguity shaping or broad implementation work | Handoff packet, return contract, open risks |
+| `system-skill-router` | Routing skill-management requests (list/install vs create/update) | General task work unrelated to skill management | Routing decision, next tool call |
+| `vercel-react-best-practices` | React/Next.js performance review or authoring (rendering, bundling, server, async) | Non-React/Next.js code | Rule-referenced findings and fixes |
 
 ## Selection rules
 
