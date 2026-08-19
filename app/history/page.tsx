@@ -5,6 +5,7 @@ import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { TrackRecord } from "../components/history/TrackRecord";
+import { TrackRecordSection } from "../components/history/TrackRecordSection";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
@@ -123,6 +124,11 @@ export default async function HistoryPage({
           </ul>
         </section>
       ) : null}
+
+
+      {/* Grades the record above: which regime changes were visible in the near band
+          beforehand, and which were not. */}
+      <TrackRecordSection series={statsSeries} />
 
       <section className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Posture by year</h2>
