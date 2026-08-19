@@ -114,7 +114,9 @@ Read:
 - `documentation.md`
 
 Usually also inspect:
-- `../../.codex/skills/README.md`
+- `../../.claude/skills/README.md` if you are Claude Code (skills live under `.claude/skills/`, not
+  `.codex/skills/`, for that runtime)
+- `../../.codex/skills/README.md` for the Codex-runtime index — keep both in sync when a skill changes
 - `../../.roomodes` if you are using Roo workspace modes
 
 ### If you plan to delegate

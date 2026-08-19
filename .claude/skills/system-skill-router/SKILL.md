@@ -1,29 +1,34 @@
 ---
 name: system-skill-router
-description: Deterministically route skill-management requests to `skill-installer` for list or install work and or `skill-creator` for create or update work, with explicit sequencing and fallback behavior.
+description: Deterministically route skill-management requests to the right built-in mechanism for create/update work, with explicit sequencing and fallback behavior.
 ---
 
 # System skill router
 
-Route skill-management requests to the correct built-in system skill without inventing parallel logic.
+Route skill-management requests to the correct built-in mechanism without inventing parallel logic.
+
+**Runtime note:** this skill was originally written for Codex, where `skill-installer` and
+`skill-creator` are built-in system skills. Claude Code has no `skill-installer` equivalent — there is
+no curated skill marketplace to install from here. For create/update work in this repo, use
+`agent-skill-architect` (repo-local) or the global `anthropic-skills:skill-creator` skill if it's
+available. Do not tell the user to "restart Codex" in a Claude Code session.
 
 ## Use this skill when
 
-- a request is about listing installable skills
-- a request is about installing a curated skill or a skill from GitHub
-- a request is about creating, updating, or refactoring a skill
-- a request mixes installation with later customization
+- a request is about creating, updating, or refactoring a repo-local skill
+- a request is about discovering which repo-local skills already exist (point at
+  `.claude/skills/README.md`)
 
 ## Do not use this skill when
 
 - the task is about using an already-installed repo-local skill for normal work
 - the task is a general product or engineering request with no skill-management action
 
-## Deterministic routing
+## Deterministic routing (Claude Code)
 
-- discovery or install intent -> `skill-installer`
-- create or update intent -> `skill-creator`
-- install then customize -> `skill-installer` first, then `skill-creator`
+- discovery intent -> read `.claude/skills/README.md`
+- create or update intent -> `agent-skill-architect`, or the global `anthropic-skills:skill-creator`
+  skill if the user wants a non-repo-local skill
 
 ## Workflow
 
@@ -46,13 +51,13 @@ Return in this order:
 ## Quality checks before finalizing
 
 - Trigger classification is specific, not vague.
-- Mixed requests use `skill-installer` before `skill-creator`.
-- No custom installer logic is invented when `skill-installer` already covers the job.
-- Install flows remind the user to restart Codex.
+- Create/update work goes through `agent-skill-architect` (or `anthropic-skills:skill-creator` for
+  non-repo-local skills) rather than inventing custom logic.
+- Discovery requests point at `.claude/skills/README.md`, not a fabricated install flow.
 
 ## Fallback behavior
 
-If a required system skill is unavailable or fails:
+If a required skill or mechanism is unavailable or fails:
 
 - state the exact blocker
 - provide the best manual fallback you can

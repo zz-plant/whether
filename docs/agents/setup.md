@@ -93,14 +93,19 @@ Available starter skills:
 - `signal-provenance-audit` → source URL/timestamp/formula provenance audits
 - `executive-brief-pack` → leadership-ready strategy/export brief outputs
 - `system-skill-router` → routes skill-management tasks with deterministic sequencing and standardized output sections
+- `vercel-react-best-practices` → React/Next.js performance rules for rendering, bundling, server, and async code
 
-Repository path convention:
-- `.codex/skills/<skill-name>/SKILL.md`
-- skill index: `.codex/skills/README.md`
+Repository path convention (runtime-dependent — see below):
+- Codex: `.codex/skills/<skill-name>/SKILL.md`, index at `.codex/skills/README.md`
+- Claude Code: `.claude/skills/<skill-name>/SKILL.md`, index at `.claude/skills/README.md`
+
+Claude Code only discovers skills under `.claude/skills/`, so the same skill set is mirrored there
+(minus `web-design-guidelines`, which Claude Code already gets from a global plugin). Keep both
+directories in sync when a skill is added, removed, or materially changed.
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/subagent-handoff`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, or `/system-skill-router`
+- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/subagent-handoff`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, `/system-skill-router`, or `/vercel-react-best-practices`
 
 When using skill outputs in a deliverable, preserve each skill's output-contract sections so reviewers can verify completeness quickly.
 
