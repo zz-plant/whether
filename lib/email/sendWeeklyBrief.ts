@@ -57,6 +57,9 @@ export type SendWeeklyBriefResult = {
   errors: number;
   total: number;
   slackPosted: boolean;
+  /** "stub" means the EMAIL binding is missing and nothing was delivered. */
+  deliveryMode: "live" | "stub";
+  error?: string;
   message?: string;
 };
 
@@ -70,8 +73,10 @@ export const sendWeeklyBrief = async (options?: {
   weeklyCall?: WeeklyCallContract;
 }): Promise<SendWeeklyBriefResult> => {
   const subscriptions = await getActiveSubscriptions();
+  const adapter = createCloudflareEmailAdapter();
+  const deliveryMode = adapter.mode ?? "live";
   if (subscriptions.length === 0) {
-    return { ok: true, sent: 0, errors: 0, total: 0, slackPosted: false, message: "No active subscriptions." };
+    return { ok: true, sent: 0, errors: 0, total: 0, slackPosted: false, deliveryMode, message: "No active subscriptions." };
   }
 
   let snapshot = options?.snapshot;
@@ -93,7 +98,6 @@ export const sendWeeklyBrief = async (options?: {
   const pauseIf = weeklyCall?.pauseIf ?? "Pause irreversible commitments if funding tightness rises.";
   const changeCourseIf = weeklyCall?.changeCourseIf ?? "Resume staged approvals when conditions stabilize.";
   const recordDate = snapshot?.provenance.recordDateLabel ?? "this week";
-  const adapter = createCloudflareEmailAdapter();
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
@@ -205,5 +209,12 @@ export const sendWeeklyBrief = async (options?: {
     } catch { /* Slack post failure is non-fatal */ }
   }
 
-  return { ok: true, sent, errors, total: subscriptions.length, slackPosted: slackOk };
+  const ok = errors === 0;
+  const error = ok
+    ? undefined
+    : deliveryMode === "stub"
+      ? `email_binding_missing: 0/${subscriptions.length} delivered`
+      : `${errors}/${subscriptions.length} sends failed`;
+
+  return { ok, sent, errors, total: subscriptions.length, slackPosted: slackOk, deliveryMode, ...(error ? { error } : {}) };
 };

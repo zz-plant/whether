@@ -14,6 +14,8 @@ export type EmailRecipient = {
 };
 
 export type EmailDeliveryAdapter = {
+  /** Absent means live (custom adapters in tests are real senders). */
+  mode?: "live" | "stub";
   send: (params: { to: EmailRecipient; subject: string; html: string; text: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
@@ -43,11 +45,13 @@ export const createCloudflareEmailAdapter = (
     const allowStub = options.allowStub ?? process.env.NODE_ENV !== "production";
     if (!allowStub) {
       return {
+        mode: "stub",
         send: async () => ({ ok: false, error: EMAIL_NOT_CONFIGURED_ERROR }),
       };
     }
     console.warn("[EMAIL] No EMAIL binding found — using stub. Add send_email binding to wrangler.toml.");
     return {
+      mode: "stub",
       send: async ({ to, subject }) => {
         console.log(`[EMAIL STUB] To: ${to.email} | Subject: ${subject}`);
         return { ok: true };
@@ -56,6 +60,7 @@ export const createCloudflareEmailAdapter = (
   }
 
   return {
+    mode: "live",
     send: async ({ to, subject, html, text }) => {
       try {
         await emailBinding.send({
