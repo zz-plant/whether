@@ -41,6 +41,7 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { ExecutiveBriefingPanel } from "./components/executiveBriefingPanel";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
+import { PremiumGate } from "./components/PremiumGate";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { ReportSection } from "../components/reportSection";
 
@@ -527,7 +528,12 @@ export async function buildPlanningPageModel(
                 provenance: treasuryProvenance,
                 showProvenance: false,
               }),
-              h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
+              h(PremiumGate, {
+                source: "runway_planner",
+                title: "Runway planner",
+                description: "Model burn, revenue, and growth rate against the current regime to see how far your runway actually stretches.",
+                children: h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
+              }),
               ),
             }),
           },

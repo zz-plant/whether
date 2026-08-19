@@ -5,6 +5,7 @@ import {
   isPremiumPlanCandidate,
   isPremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
+import { cancelEntitlementByCustomerId, saveEntitlement } from "../../../../lib/billing/entitlements";
 
 const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
 
@@ -109,13 +110,31 @@ type StripeCheckoutCompletedEvent = {
   data: {
     object: {
       id?: string;
+      customer?: string;
+      customer_details?: { email?: string };
       metadata?: {
+        plan?: string;
         source?: string;
         planCandidate?: string;
         seatBand?: string;
       };
     };
   };
+};
+
+type StripeSubscriptionDeletedEvent = {
+  type: "customer.subscription.deleted";
+  data: { object: { customer?: string } };
+};
+
+const isSubscriptionDeletedEvent = (payload: unknown): payload is StripeSubscriptionDeletedEvent => {
+  if (!payload || typeof payload !== "object") return false;
+  const event = payload as Record<string, unknown>;
+  if (event.type !== "customer.subscription.deleted") return false;
+  const data = event.data;
+  if (!data || typeof data !== "object") return false;
+  const object = (data as Record<string, unknown>).object;
+  return Boolean(object && typeof object === "object");
 };
 
 const isCheckoutCompletedEvent = (payload: unknown): payload is StripeCheckoutCompletedEvent => {
@@ -153,6 +172,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
+  if (isSubscriptionDeletedEvent(parsedPayload)) {
+    const customerId = parsedPayload.data.object.customer;
+    if (customerId) {
+      await cancelEntitlementByCustomerId(customerId);
+    }
+    return NextResponse.json({ ok: true }, { status: 200 });
+  }
+
   if (!isCheckoutCompletedEvent(parsedPayload)) {
     return NextResponse.json({ ok: true, ignored: true }, { status: 200 });
   }
@@ -161,8 +188,38 @@ export async function POST(request: Request) {
   const metadata = checkout.metadata;
   const source = metadata?.source;
 
+  /* Persistence is the point of this webhook. It happens before (and
+     independently of) funnel telemetry, and a persistence failure returns 500
+     so Stripe retries — a paid customer with no stored entitlement is the
+     exact bug this endpoint previously guaranteed. */
+  const plan = metadata?.plan;
+  if (checkout.id && (plan === "pro" || plan === "team")) {
+    try {
+      await saveEntitlement({
+        plan,
+        sessionId: checkout.id,
+        customerEmail: checkout.customer_details?.email,
+        stripeCustomerId: checkout.customer,
+        seatBand: metadata?.seatBand,
+        status: "active",
+        activatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      return NextResponse.json(
+        { ok: false, error: error instanceof Error ? error.message : String(error) },
+        { status: 500 },
+      );
+    }
+  }
+
   if (!source || !isPremiumIntentSource(source)) {
-    return NextResponse.json({ ok: true, ignored: true }, { status: 200 });
+    /* Unknown/missing telemetry source still leaves ignored:true — that field
+       describes premium-funnel attribution, which is separate from whether an
+       entitlement was persisted above. */
+    return NextResponse.json(
+      { ok: true, ignored: true, entitlementStored: Boolean(checkout.id && plan) },
+      { status: 200 },
+    );
   }
 
   const planCandidate = metadata?.planCandidate;
