@@ -22,7 +22,7 @@ describe("report narrative signs", () => {
     const signs = buildSignsToWatch(assessment);
 
     assert.deepEqual(signs, [
-      "No additional caution signs this cycle; maintain baseline monitoring unless the posture modifier shifts.",
+      "Nothing new to flag this cycle. Keep watching the same signals until the posture changes.",
     ]);
   });
 
@@ -39,8 +39,8 @@ describe("report narrative signs", () => {
     const signs = buildSignsToWatch(assessment);
 
     assert.equal(signs.length, 3);
-    assert.ok(signs[0].includes("curve slope stays inverted"));
-    assert.ok(signs[1].includes("cash availability tightens"));
-    assert.ok(signs[2].includes("risk appetite softens"));
+    assert.ok(signs[0].includes("recession warning gauge is still inverted"));
+    assert.ok(signs[1].includes("Cash is tight"));
+    assert.ok(signs[2].includes("Risk appetite is softening"));
   });
 });

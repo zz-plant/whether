@@ -2,12 +2,12 @@ import type { RegimeAssessment } from "../regimeEngine";
 
 const narrativeSigns = {
   inversion:
-    "When curve slope stays inverted, assume decision caution will persist for 1–2 quarters.",
+    "The recession warning gauge is still inverted, so plan for another quarter or two of cautious approvals.",
   tightness:
-    "When cash availability tightens and approvals slow, expect roadmap compression before demand recovers.",
+    "Cash is tight and approvals are slowing, so expect the roadmap to compress before demand comes back.",
   risk:
-    "When risk appetite softens, keep launches reversible and measure retention before scaling scope.",
-  fallback: "No additional caution signs this cycle; maintain baseline monitoring unless the posture modifier shifts.",
+    "Risk appetite is softening, so keep launches reversible and prove retention before you scale scope.",
+  fallback: "Nothing new to flag this cycle. Keep watching the same signals until the posture changes.",
 } as const;
 
 export const buildSignsToWatch = (assessment: RegimeAssessment) => {

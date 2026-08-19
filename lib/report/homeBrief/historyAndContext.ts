@@ -195,11 +195,16 @@ const describeSignalDirection = (
   return isImprovingSignalDelta(signal.key, signal.delta) ? "improved" : "deteriorated";
 };
 
+/**
+ * Written as a clause that reads correctly both after "…, and" and on its own
+ * as a sentence, so the same string can carry the momentum line and the
+ * top-driver fallback without a carrier phrase gluing a verb onto a verb.
+ */
 const overallDirectionCopy: Record<string, string> = {
-  improving: "the signal set is improving overall",
-  deteriorating: "the signal set is deteriorating overall",
-  mixed: "the signal set is split overall",
-  stable: "the signal set is otherwise flat",
+  improving: "the rest of the week's readings improved on balance",
+  deteriorating: "the rest of the week's readings weakened on balance",
+  mixed: "the rest of the week's readings pulled both ways",
+  stable: "nothing else moved much",
 };
 
 export const buildWhyThisCall = ({
@@ -376,7 +381,8 @@ export const buildStartRouteDeltaBlock = ({
       detail: joinSentences(
         `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}`,
         topDriverEvidence?.immediateImplication
-          ?? `That leaves ${overallDirectionCopy[trendLabel.toLowerCase()] ?? "the signal set otherwise flat"}`,
+          ?? overallDirectionCopy[trendLabel.toLowerCase()]
+          ?? overallDirectionCopy.stable,
       ),
       href: "/signals" as const,
     });

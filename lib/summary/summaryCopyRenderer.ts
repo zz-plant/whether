@@ -109,7 +109,7 @@ export const renderWeeklySummaryCopy = ({
     "RECOMMENDATION CONFIDENCE",
     "",
     `Confidence: ${provenance.statusLabel}`,
-    "Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.",
+    "Uncertainty: this is an interpretive read, not a forecast. Check the assumptions against your own numbers before you act on it.",
     "",
     "",
     "---",
