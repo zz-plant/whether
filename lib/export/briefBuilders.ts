@@ -243,7 +243,7 @@ export const buildBoardSlideBullets = (
   options?: ExportLayerOptions,
 ) => [
   `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? formatRegimeLabel(assessment.regime)}`,
-  `Market pressure ${assessment.scores.tightness} / Expansion support ${assessment.scores.riskAppetite}`,
+  `Funding pressure ${assessment.scores.tightness} / Risk appetite ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...buildBoundedDecisionLines(assessment, options),
   ...buildInterpretationLayerBlock(options),
@@ -272,7 +272,7 @@ export const buildSlackBrief = (
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Posture: ${postureLabel}`,
-    `Market pressure: ${assessment.scores.tightness} | Expansion support: ${assessment.scores.riskAppetite}`,
+    `Funding pressure: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
@@ -316,7 +316,7 @@ export const buildConstraintHeadlines = (
   treasury: TreasuryData,
 ) => {
   const regimeLabel = formatRegimeLabel(assessment.regime);
-  const headline = `${regimeLabel}: market pressure ${assessment.scores.tightness}/100 with expansion support ${assessment.scores.riskAppetite}/100.`;
+  const headline = `${regimeLabel}: funding pressure ${assessment.scores.tightness}/100 with risk appetite ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.map((item) => `• ${item}`);
 
   return [

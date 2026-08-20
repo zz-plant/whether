@@ -129,7 +129,7 @@ export function ShareMenuDropdown({
 
 ## Bounded Decision Rules
 * **Action Now**: ${actionNow}
-* **Pause Trigger**: ${guardrail ? `Pause if tightness crosses ${guardrail}` : "N/A"}
+* **Pause Trigger**: ${guardrail ? `Pause if funding pressure crosses ${guardrail}` : "N/A"}
 * **Flip Trigger**: ${flipConditions.length ? `Flip if ${flipConditions.join(" or ")}` : "N/A"}
 
 ## Citation

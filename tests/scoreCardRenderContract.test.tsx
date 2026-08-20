@@ -13,11 +13,11 @@ import { ScoreCard } from "../app/components/ScoreCard";
 describe("ScoreCard render contract", () => {
   it("shows a rising tightness-style delta in the unfavorable color by default", () => {
     const html = renderToStaticMarkup(
-      <ScoreCard label="Cash availability" value={62} delta={3} />,
+      <ScoreCard label="Funding pressure" value={62} delta={3} />,
     );
 
     assert.match(html, /text-amber-300/);
-    assert.match(html, /Cash availability rose 3 since last week/);
+    assert.match(html, /Funding pressure rose 3 since last week/);
   });
 
   it("shows a rising appetite-style delta in the favorable color with increaseIsPositive", () => {
@@ -31,26 +31,26 @@ describe("ScoreCard render contract", () => {
 
   it("shows a falling tightness-style delta as favorable", () => {
     const html = renderToStaticMarkup(
-      <ScoreCard label="Cash availability" value={59} delta={-3} />,
+      <ScoreCard label="Funding pressure" value={59} delta={-3} />,
     );
 
     assert.match(html, /text-emerald-300/);
-    assert.match(html, /Cash availability fell 3 since last week/);
+    assert.match(html, /Funding pressure fell 3 since last week/);
   });
 
   it("renders an unchanged delta as neutral, with no directional wording", () => {
     const html = renderToStaticMarkup(
-      <ScoreCard label="Cash availability" value={62} delta={0} />,
+      <ScoreCard label="Funding pressure" value={62} delta={0} />,
     );
 
     assert.match(html, /text-slate-400/);
-    assert.match(html, /Cash availability unchanged/);
+    assert.match(html, /Funding pressure unchanged/);
     assert.ok(!/\brose\b|\bfell\b/.test(html), "no directional wording when unchanged");
   });
 
   it("never emits a bare arrow character as the only direction cue", () => {
     const html = renderToStaticMarkup(
-      <ScoreCard label="Cash availability" value={62} delta={3} />,
+      <ScoreCard label="Funding pressure" value={62} delta={3} />,
     );
 
     assert.ok(!html.includes("↑") && !html.includes("↓"), "direction is a glyph, not a codepoint");

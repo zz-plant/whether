@@ -61,11 +61,19 @@ export function FirstVisitExplainer() {
       suppressHydrationWarning
       className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-800/60 pb-2 text-fluid-xs text-slate-300"
     >
+      {/* The line a first-time visitor reads. It previously opened with "Treasury
+          yields, credit spreads, and VIX" — three undefined terms in the one
+          sentence written for people with no context. Say the job first; the
+          inputs are one click away on /trust. */}
       <p className="min-w-0">
-        Treasury yields, credit spreads, and VIX, scored into one operating call each Monday.
+        How hard it is to raise money right now, and how much risk investors will fund, scored into
+        one operating call each Monday.
       </p>
       <Link href="/trust#formula-reference" className={orientationLinkClass}>
         How the score works
+      </Link>
+      <Link href="/trust#beginner-glossary" className={orientationLinkClass}>
+        Glossary
       </Link>
       <a
         href="https://github.com/zz-plant/whether"

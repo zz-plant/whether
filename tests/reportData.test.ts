@@ -159,7 +159,7 @@ describe("buildReportEvidenceItems", () => {
 
     assert.match(curveSlopeItem?.immediateImplication ?? "", /12-month payback/i);
     assert.match(curveSlopeItem?.immediateImplication ?? "", /curve remains above 0\.0%/i);
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /cash availability stays below 70\.0/i);
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /funding pressure stays below 70\.0/i);
   });
 });
 

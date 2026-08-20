@@ -122,11 +122,11 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       avoidNow: isExpansion
         ? ["Avoid broad hiring classes without clear revenue or reliability linkage."]
         : ["Avoid net-new hiring for speculative capacity or long-payback initiatives."],
-      scope: `Applies to all net-new headcount; current cash availability ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
-      pauseTrigger: `Pause net-new hiring if cash availability tightens above ${fmt(tightnessPause)} or risk appetite falls below ${fmt(riskPause)}.`,
-      resumeTrigger: `Resume staged approvals when cash availability eases below ${fmt(tightnessResume)} and risk appetite is above ${fmt(riskResume)}.`,
+      scope: `Applies to all net-new headcount; current funding pressure ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
+      pauseTrigger: `Pause net-new hiring if funding pressure rises above ${fmt(tightnessPause)} or risk appetite falls below ${fmt(riskPause)}.`,
+      resumeTrigger: `Resume staged approvals when funding pressure falls below ${fmt(tightnessResume)} and risk appetite is above ${fmt(riskResume)}.`,
       flipConditions: [
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
       ],
       rationale: "Protect delivery capacity without locking in irreversible fixed-cost growth.",
@@ -162,11 +162,11 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid waiting for urgency before engaging investors while leverage is strong."]
         : ["Avoid speed-first terms that reduce durability under tighter conditions."],
       scope: "Fundraising launch timing, process pacing, and minimum term quality.",
-      pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or cash availability tightens above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume full process when risk appetite is above ${fmt(riskResume)} and cash availability eases below ${fmt(tightnessResume)}.`,
+      pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or funding pressure rises above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume full process when risk appetite is above ${fmt(riskResume)} and funding pressure falls below ${fmt(tightnessResume)}.`,
       flipConditions: [
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
       ],
       rationale: "Timing the process around signal windows improves optionality and reduces forced terms.",
     },
@@ -176,10 +176,10 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       doNow: ["Gate discretionary spend by measurable short-cycle payback proof."],
       avoidNow: ["Avoid multi-quarter spend commitments without clear payback evidence."],
       scope: "Hiring, vendor, and GTM program spend with multi-quarter commitments.",
-      pauseTrigger: `Pause discretionary burn expansion if cash availability tightens above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume controlled burn expansion when cash availability eases below ${fmt(tightnessResume)} and budget payback proof is intact.`,
+      pauseTrigger: `Pause discretionary burn expansion if funding pressure rises above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume controlled burn expansion when funding pressure falls below ${fmt(tightnessResume)} and budget payback proof is intact.`,
       flipConditions: [
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
       ],
       rationale: "Cash durability preserves strategic options when macro direction changes quickly.",
     },
@@ -195,11 +195,11 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid one-way expansion commitments without stage-gate evidence."]
         : ["Avoid irreversible expansion bets until window strength improves."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
-      pauseTrigger: `Pause expansion bets if risk appetite falls below ${fmt(riskPause)} or cash availability tightens above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume in tranches when risk appetite is above ${fmt(riskResume)} and cash availability eases below ${fmt(tightnessResume)}.`,
+      pauseTrigger: `Pause expansion bets if risk appetite falls below ${fmt(riskPause)} or funding pressure rises above ${fmt(tightnessPause)}.`,
+      resumeTrigger: `Resume in tranches when risk appetite is above ${fmt(riskResume)} and funding pressure falls below ${fmt(tightnessResume)}.`,
       flipConditions: [
         { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Cash availability < ${fmt(tightnessResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
       ],
       rationale: "Expansion should scale with validated window strength, not optimism.",
     },
@@ -291,8 +291,8 @@ export const buildScopedVariantDecisionAdjustment = ({
         describeBoundaryGap({
           dimension: "tightness",
           gap: tightnessGap,
-          whenNearBoundary: () => "Runway trigger: tighten immediately because cash availability is already at the regime boundary.",
-          whenAway: (formattedGap) => `Runway trigger: tighten immediately if cash availability gap compresses below ${formattedGap} points for 2 reads.`,
+          whenNearBoundary: () => "Runway trigger: tighten immediately because funding pressure is already at the regime boundary.",
+          whenAway: (formattedGap) => `Runway trigger: tighten immediately if funding pressure gap compresses below ${formattedGap} points for 2 reads.`,
         }),
       ],
       thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
@@ -339,12 +339,12 @@ export const buildScopedVariantDecisionAdjustment = ({
         describeBoundaryGap({
           dimension: "tightness",
           gap: tightnessGap,
-          whenNearBoundary: () => "Leverage trigger: hold expansion now because cash availability is already at the regime boundary.",
-          whenAway: (formattedGap) => `Leverage trigger: hold expansion if cash availability rises within ${formattedGap} points of the boundary.`,
+          whenNearBoundary: () => "Leverage trigger: hold expansion now because funding pressure is already at the regime boundary.",
+          whenAway: (formattedGap) => `Leverage trigger: hold expansion if funding pressure rises within ${formattedGap} points of the boundary.`,
         }),
       ],
       thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
-      reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and cash availability clear their resume bands in the same week.",
+      reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and funding pressure clear their resume bands in the same week.",
     };
   }
 
@@ -387,8 +387,8 @@ export const buildScopedVariantDecisionAdjustment = ({
         describeBoundaryGap({
           dimension: "tightness",
           gap: tightnessGap,
-          whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now because cash availability is already at the regime boundary.",
-          whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if cash availability closes inside ${formattedGap} points.`,
+          whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now because funding pressure is already at the regime boundary.",
+          whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if funding pressure closes inside ${formattedGap} points.`,
         }),
       ],
       thresholdEmphasis: "Emphasize earnings durability, cash conversion, and guidance credibility.",

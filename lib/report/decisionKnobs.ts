@@ -127,9 +127,9 @@ type WeeklyLockCommitmentContext = {
 };
 
 const weeklyCallByRegime: Record<RegimeKey, string> = {
-  SCARCITY: "Capital is tight: Freeze discretionary spend. Pause if cash availability < 50; resume when > 60.",
+  SCARCITY: "Capital is tight: Freeze discretionary spend. Pause if funding pressure > 60; resume when < 50.",
   DEFENSIVE: "Focus on efficiency: Limit new commitments to 12-month payback. Pause if risk < 40; resume when > 50.",
-  VOLATILE: "Conditions uncertain: Prioritize reversible moves. Pause if tightness > 60; resume when < 50.",
+  VOLATILE: "Conditions uncertain: Prioritize reversible moves. Pause if funding pressure > 60; resume when < 50.",
   EXPANSION: "Growth conditions: Scale high-margin lanes. Pause if risk < 40; resume when > 50.",
 };
 

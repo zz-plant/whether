@@ -56,7 +56,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     threshold,
     direction,
   }: {
-    label: "Cash availability" | "Risk appetite";
+    label: "Funding pressure" | "Risk appetite";
     now: number;
     threshold: number;
     direction: "riseAbove" | "fallToOrBelow";
@@ -95,7 +95,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
 
   return [
     watchPrefix,
-    crossingText({ label: "Cash availability", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
+    crossingText({ label: "Funding pressure", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
     crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
   ].join(" ");
 };
@@ -132,7 +132,7 @@ const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =
   );
 
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  tightness: "Cash availability",
+  tightness: "Funding pressure",
   riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
@@ -185,8 +185,8 @@ const signalImmediateImplication = (
   const curveLine = assessment.scores.curveSlope ?? 0;
   const paybackCap = curveLine > 0 ? 12 : 9;
   return delta > 0
-    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and cash availability stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`
-    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and cash availability stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
+    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and funding pressure stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`
+    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and funding pressure stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
 };
 
 export const buildReportEvidenceItems = ({

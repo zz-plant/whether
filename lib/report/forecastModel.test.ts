@@ -114,7 +114,7 @@ describe("buildForecastModel", () => {
     );
     const dynamics = {
       changedSignals: [
-        { key: "tightness" as const, label: "Cash availability", delta: -4.5 },
+        { key: "tightness" as const, label: "Funding pressure", delta: -4.5 },
         { key: "riskAppetite" as const, label: "Risk appetite", delta: 5.2 },
         { key: "curveSlope" as const, label: "Curve slope", delta: 0.08 },
       ],

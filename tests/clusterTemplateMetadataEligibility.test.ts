@@ -45,7 +45,7 @@ describe("cluster template metadata eligibility", () => {
     const metadata = buildSignalDecisionScenarioMetadata({
       cluster: "capital-tightness-watch",
       decisionScenario: "hiring",
-      signalTitle: "Cash availability watch",
+      signalTitle: "Funding pressure watch",
       signalSummary: "Financing and spend pressure signal.",
       scenarioTitle: "Hiring",
       payload: {
@@ -66,7 +66,7 @@ describe("cluster template metadata eligibility", () => {
       cluster: "capital-tightness-watch",
       toolkitTitle: "Focus toolkit",
       decisionThisSession: "Tighten scope.",
-      contextTitle: "Cash availability watch",
+      contextTitle: "Funding pressure watch",
       isCanonical: true,
       payload: {
         degraded: false,
@@ -84,7 +84,7 @@ describe("cluster template metadata eligibility", () => {
       cluster: "capital-tightness-watch",
       toolkitTitle: "Focus toolkit",
       decisionThisSession: "Tighten scope.",
-      contextTitle: "Cash availability watch",
+      contextTitle: "Funding pressure watch",
       isCanonical: true,
       payload: {
         degraded: false,

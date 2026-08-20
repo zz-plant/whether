@@ -229,7 +229,7 @@ const buildInputInfluenceDescription = ({
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong defensive pull" : "Defensive pull",
-          effectDetail: `Cash availability is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the watch line at ${tightnessLine}; approvals and fixed-cost tolerance stay tighter.`,
+          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the watch line at ${tightnessLine}; approvals and fixed-cost tolerance stay tighter.`,
           watchLabel: `Watch line ${tightnessLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${gap.toFixed(1)} pts above watch line`,
@@ -240,7 +240,7 @@ const buildInputInfluenceDescription = ({
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Expansion support" : "Room to loosen",
-          effectDetail: `Cash availability is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the watch line at ${tightnessLine}; the call has room to loosen if other inputs confirm.`,
+          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the watch line at ${tightnessLine}; the call has room to loosen if other inputs confirm.`,
           watchLabel: `Watch line ${tightnessLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below watch line`,

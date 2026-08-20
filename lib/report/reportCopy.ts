@@ -124,9 +124,9 @@ export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
 export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   {
     value: "tightness",
-    term: "Cash availability",
+    term: "Funding pressure",
     summary:
-      "How hard or easy it is for U.S. companies to access funding. Higher tightness means conserving cash and extending runway.",
+      "How hard or easy it is for U.S. companies to access funding. A higher score means conserving cash and extending runway.",
     why: "Why it matters: tighter U.S. capital markets make long-payback projects riskier and fundraising harder.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
@@ -255,10 +255,93 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   {
     value: "boldness-score",
     term: "Boldness budget",
-    summary: "Inverse of tightness: how much room you have to hire, spend, and make long-term commitments. Calculated as (risk appetite × 0.7) + (100 - tightness) × 0.3.",
+    summary: "The inverse of funding pressure: how much room you have to hire, spend, and make long-term commitments. Calculated as (risk appetite × 0.7) + (100 − funding pressure) × 0.3.",
     why: "Why it matters: boldness tells you how aggressively you can operate at a glance—higher budget means more expansion room, lower means conserve.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
+  },
+  // Market-mechanics terms. Everything above names something Whether invented;
+  // everything below names something the bond market invented and the charts on
+  // /signals and the formulas on /trust use without translating.
+  {
+    value: "yield-curve",
+    term: "Yield curve",
+    summary:
+      "The set of interest rates the U.S. government pays to borrow for different lengths of time — one month, three months, two years, ten years.",
+    why: "Why it matters: the shape of that set is the cheapest available read on whether lenders expect growth or a slowdown.",
+    usedInLabel: "Signal diagnostics",
+    usedInHref: "/signals",
+  },
+  {
+    value: "treasury-maturities",
+    term: "1M, 3M, 2Y, 10Y",
+    summary:
+      "Shorthand for how long the government is borrowing for: one month, three months, two years, ten years. Charts label the lines this way.",
+    why: "Why it matters: short maturities track what the Fed is doing now; long ones track what the market expects later.",
+    usedInLabel: "Signal diagnostics",
+    usedInHref: "/signals",
+  },
+  {
+    value: "spread",
+    term: "Spread",
+    summary:
+      "One rate minus another. \"10Y-2Y\" is the ten-year rate minus the two-year rate; a spread of +1.2% means long borrowing costs 1.2 points more than short.",
+    why: "Why it matters: the gap, not either rate on its own, is what carries the signal.",
+    usedInLabel: "Signal diagnostics",
+    usedInHref: "/signals",
+  },
+  {
+    value: "inversion",
+    term: "Inversion (negative spread)",
+    summary:
+      "When a spread drops below zero — short-term borrowing costs more than long-term. On the charts, any line below the zero line is inverted.",
+    why: "Why it matters: inversion has preceded most U.S. recessions, so it argues for short-payback projects over multi-year bets.",
+    usedInLabel: "Signal diagnostics",
+    usedInHref: "/signals",
+  },
+  {
+    value: "basis-point",
+    term: "Basis point (bp)",
+    summary: "One hundredth of a percentage point. A move from 4.10% to 4.35% is 25 bp.",
+    why: "Why it matters: weekly rate moves are small in percent terms, so the charts measure them in basis points to stay readable.",
+    usedInLabel: "Signal diagnostics",
+    usedInHref: "/signals",
+  },
+  {
+    value: "credit-spread",
+    term: "High-yield credit spread",
+    summary:
+      "The extra interest riskier companies pay to borrow, over what the government pays. Widens when lenders get nervous.",
+    why: "Why it matters: it is the closest public proxy for how expensive risk capital has become for companies like yours.",
+    usedInLabel: "Formula reference",
+    usedInHref: "/trust#formula-reference",
+  },
+  {
+    value: "vix",
+    term: "VIX",
+    summary:
+      "A market-wide index of how much stock-price turbulence traders expect over the next month. Higher means more expected turbulence.",
+    why: "Why it matters: sustained high readings mean investors are protecting themselves, which shows up as slower funding decisions.",
+    usedInLabel: "Formula reference",
+    usedInHref: "/trust#formula-reference",
+  },
+  {
+    value: "financial-conditions-index",
+    term: "Chicago Fed financial conditions index",
+    summary:
+      "A Federal Reserve summary of how easy or hard overall borrowing conditions are. Zero is average; above zero is tighter than average.",
+    why: "Why it matters: it catches funding stress that shows up outside the Treasury market.",
+    usedInLabel: "Formula reference",
+    usedInHref: "/trust#formula-reference",
+  },
+  {
+    value: "fred-series",
+    term: "FRED series codes (DFF, DGS2, DGS10)",
+    summary:
+      "FRED is the Federal Reserve's free public data service. Each code names one published series — DFF is the Fed's policy rate, DGS2 the two-year Treasury rate, DGS10 the ten-year.",
+    why: "Why it matters: the codes are what make the score auditable — anyone can pull the same series and recompute it.",
+    usedInLabel: "Formula reference",
+    usedInHref: "/trust#formula-reference",
   },
 ];
 

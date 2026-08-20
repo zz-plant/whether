@@ -6,6 +6,7 @@ import type { TreasuryData } from "../../../lib/types";
 import { ChevronDownIcon } from "../../components/uiIcons";
 import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
+import { CurveTermsKey } from "./curveTermsKey";
 
 type Cadence = "weekly" | "monthly" | "yearly";
 
@@ -245,9 +246,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           YCURVE | Last: {treasury.record_date} | Live/Cache: {treasury.isLive ? "Live" : "Cache"}
         </div>
 
+        {/* Five panels labelled entirely in maturities and spreads. The key goes
+            above them, not below, so the shorthand is defined before it is used. */}
+        <CurveTermsKey
+          terms={["maturities", "spread10Y2Y", "spread2Y3M", "bp"]}
+          className="mt-3 border-b border-slate-800/80 pb-3"
+        />
+
         <div className="mt-3 grid gap-2 lg:grid-cols-12">
           <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="1) Curve signal ribbon" subtitle="Green = steep/normal, Amber = flat, Red = inversion." />
+            <PanelTitle title="1) Curve signal ribbon" subtitle="One block per period. Green = normal, Amber = flattening, Red = inverted (recession warning)." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
@@ -256,7 +264,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <PanelTitle title="2) Rate stack" subtitle="1M, 3M, 2Y, 10Y in one panel." />
+              <PanelTitle title="2) Rate stack" subtitle="What the government pays to borrow, by how long it is borrowing for." />
               <div className="inline-flex rounded-md bg-slate-900/70 p-1">
                 {(["weekly", "monthly", "yearly"] as Cadence[]).map((option) => (
                   <button
@@ -305,7 +313,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           <FlatPanel className="lg:col-span-4">
             {/* Numbered to match DOM order, which is also the screen-reader and
                 mobile reading order. The titles used to run 1, 2, 4, 3, 5. */}
-            <PanelTitle title="3) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread. Always monthly, regardless of the cadence toggle." />
+            <PanelTitle title="3) Steepness vs level" subtitle="Each dot is one month: across = the two-year rate, up = the 10Y−2Y spread. Always monthly, regardless of the cadence toggle." />
             <svg
               viewBox="0 0 100 72"
               className="h-48 w-full"
@@ -386,7 +394,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">
-            <PanelTitle title="4) Inversion timeline" subtitle="Spreads vs zero-line; below zero means inversion." />
+            <PanelTitle title="4) Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
             <svg viewBox="0 0 100 36" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
@@ -413,7 +421,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            <PanelTitle title="5) Shock ladder" subtitle="Largest weekly moves in 2Y and 10Y." />
+            <PanelTitle title="5) Shock ladder" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (
                 topShocks.map((shock) => (

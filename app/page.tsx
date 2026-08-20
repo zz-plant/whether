@@ -195,7 +195,7 @@ async function PageContent({
     : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
 
   const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
-    ? `Cash availability crosses ${parsedGuardrailThreshold}`
+    ? `Funding pressure crosses ${parsedGuardrailThreshold}`
     : undefined;
   const guardrailLabel = numericGuardrailLabel
     ?? homepage.weeklyDecisionCardModel.decision.guardrail

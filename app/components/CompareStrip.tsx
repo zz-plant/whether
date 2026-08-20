@@ -9,7 +9,7 @@ import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } fr
 /**
  * One chip per metric, coloured by whether the move was favourable *for that
  * metric* rather than by its raw sign. These two chips sit side by side and
- * move in opposite directions for the same news — cash availability rising is
+ * move in opposite directions for the same news — funding pressure rising is
  * bad, risk appetite rising is good — so hard-coding "up is green" put two
  * contradictory colour rules next to each other with nothing explaining them.
  */
@@ -174,9 +174,9 @@ export function CompareStrip({
               Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
             </span>
           ) : null}
-          {/* Cash availability rises when capital gets scarcer, so a rise is the
+          {/* Funding pressure rises when capital gets scarcer, so a rise is the
               unfavourable direction; risk appetite is the other way round. */}
-          <DeltaChip label="Cash availability" delta={tightnessDelta} increaseIsPositive={false} />
+          <DeltaChip label="Funding pressure" delta={tightnessDelta} increaseIsPositive={false} />
           {typeof riskAppetite === "number" ? (
             <DeltaChip label="Risk appetite" delta={riskAppetiteDelta} increaseIsPositive />
           ) : null}

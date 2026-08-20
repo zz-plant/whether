@@ -19,17 +19,17 @@ describe("bounded decision rule formatting", () => {
       scores: { tightness: 0.9, riskAppetite: 56 },
     });
 
-    assert.match(rules[0].scope, /current cash availability 0\.9 and risk appetite 56\.?0?/i);
-    assert.match(rules[0].pauseTrigger, /cash availability tightens above 6\.4/i);
+    assert.match(rules[0].scope, /current funding pressure 0\.9 and risk appetite 56\.?0?/i);
+    assert.match(rules[0].pauseTrigger, /funding pressure rises above 6\.4/i);
   });
 
   it("keeps decimal thresholds intact when compacting reversal copy", () => {
     assert.equal(
       extractCompactClause(
-        "Cash availability < 0.0 and Risk appetite > 54. Resume staged approvals next refresh.",
+        "Funding pressure < 0.0 and Risk appetite > 54. Resume staged approvals next refresh.",
         "fallback",
       ),
-      "Cash availability < 0.0 and Risk appetite > 54",
+      "Funding pressure < 0.0 and Risk appetite > 54",
     );
 
     const rules = buildCanonicalBoundedDecisionRules({
@@ -40,7 +40,7 @@ describe("bounded decision rule formatting", () => {
 
     assert.equal(
       formatBoundedDecisionReverse(rules[0]!),
-      "staged approvals when cash availability eases below 0.0 and risk appetite is above 54",
+      "staged approvals when funding pressure falls below 0.0 and risk appetite is above 54",
     );
   });
 });
@@ -103,7 +103,7 @@ it("keeps caution and reopen distances available with crossing/above-below thres
   assert.ok(hiringItem);
   assert.doesNotMatch(hiringItem.tightenDistanceLabel ?? "", /unavailable/i);
   assert.doesNotMatch(hiringItem.reopenDistanceLabel ?? "", /unavailable/i);
-  assert.match(hiringItem.reopenDistanceLabel ?? "", /cash availability|risk appetite/i);
+  assert.match(hiringItem.reopenDistanceLabel ?? "", /funding pressure|risk appetite/i);
 });
 
 
@@ -177,7 +177,7 @@ describe("shared flip corridor", () => {
     // riskResume pair, so the whole ledger collapses to two lines.
     assert.ok(corridor, "expected a corridor when the rules share their clear conditions");
     assert.equal(corridor?.split(" · ").length, 2);
-    assert.match(corridor ?? "", /Cash availability </);
+    assert.match(corridor ?? "", /Funding pressure </);
     assert.match(corridor ?? "", /Risk appetite >/);
   });
 
@@ -191,7 +191,7 @@ describe("shared flip corridor", () => {
           metric: "tightness",
           operator: "<",
           value: 10 + index,
-          label: `Cash availability < ${10 + index}`,
+          label: `Funding pressure < ${10 + index}`,
         },
       ],
     }));

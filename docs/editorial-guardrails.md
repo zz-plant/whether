@@ -95,7 +95,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Pick one canonical form per slot (full in the hero, threshold ladder, exports, and SEO;
   short in inline metrics); never a third spelling. A lone "Tightness" or "Appetite"
   always expands to its full axis name, and the tightness watch line is always
-  "Cash availability watch".
+  "Funding pressure watch".
 - **The call has three bounded-state markers**: certainty (input confidence), flip, and
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they

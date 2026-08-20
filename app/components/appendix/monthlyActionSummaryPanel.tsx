@@ -128,7 +128,7 @@ export const MonthlyActionSummaryPanel = ({
     {
       heading: "Monthly constraints should force",
       bullets: [
-        "“Only one major growth bet at a time until cash availability improves.”",
+        "“Only one major growth bet at a time until funding pressure eases.”",
         "“Move hires to contingency approval and revisit after the next Treasury refresh.”",
       ],
     },

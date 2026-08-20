@@ -19,7 +19,6 @@ import {
 
 const SIGNAL_LABEL_COPY: Record<string, string> = {
   Tightness: "Funding pressure",
-  "Risk appetite": "Investor appetite",
   "Curve slope": "Rate trend",
   "Base rate": "Base rate",
   "Regime timeline": "Past changes",

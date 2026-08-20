@@ -98,12 +98,12 @@ describe("ThresholdLadder", () => {
         current={64}
         previous={61}
         trigger={68}
-        signalLabel="Cash availability"
+        signalLabel="Funding pressure"
         scaleDirection={direction}
       />,
     );
 
-    assert.match(html, /Cash availability: 64/);
+    assert.match(html, /Funding pressure: 64/);
     assert.match(html, /Trigger at 68\./);
     assert.equal(html.match(/0 = easier funding · 100 = harder funding/g)?.length, 2);
   });
@@ -125,14 +125,14 @@ describe("RegimeGlyph", () => {
 describe("DeltaGlyph", () => {
   it("states the direction of travel in words", () => {
     const rose = renderToStaticMarkup(
-      <DeltaGlyph idPrefix="d1" previous={40} current={54} min={0} max={100} label="Cash availability" />,
+      <DeltaGlyph idPrefix="d1" previous={40} current={54} min={0} max={100} label="Funding pressure" />,
     );
     assertNoNaN(rose);
     assertTokensWrapped(rose);
     assert.match(rose, /Rose from 40 to 54\./);
 
     const fell = renderToStaticMarkup(
-      <DeltaGlyph idPrefix="d2" previous={54} current={40} min={0} max={100} label="Cash availability" />,
+      <DeltaGlyph idPrefix="d2" previous={54} current={40} min={0} max={100} label="Funding pressure" />,
     );
     assert.match(fell, /Fell from 54 to 40\./);
     assert.match(fell, /var\(--accent-success\)/);

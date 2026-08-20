@@ -141,7 +141,7 @@ const buildReversalCondition = (
 
   if (useTightness) {
     const direction = actionBias === "loosen" ? "rises above" : "falls to or below";
-    return `Drop the sector tilt if cash availability ${direction} ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
+    return `Drop the sector tilt if funding pressure ${direction} ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
   }
 
   const direction = actionBias === "loosen" ? "falls to or below" : "rises above";

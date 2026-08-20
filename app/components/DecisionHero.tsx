@@ -10,6 +10,12 @@ import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
+import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "./ui/plainLanguage";
+import {
+  SCORE_BAND_LABELS,
+  classifyScoreBand,
+  compositeSignalScales,
+} from "../../lib/report/signalTranslations";
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
@@ -105,16 +111,32 @@ export function DecisionHero({
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
 
-  const tightnessLevel = tightness >= 75 ? "Elevated" : tightness >= 55 ? "Moderate" : "Low";
-  const tightnessLevelColor = tightness >= 75 ? "text-rose-300/60" : tightness >= 55 ? "text-amber-300/60" : "text-emerald-300/60";
+  // Band words and band sentences have to come from the same classification, or
+  // the card says "low" above a sentence that says "balanced".
+  const tightnessBand = classifyScoreBand(tightness);
+  const tightnessLevel = SCORE_BAND_LABELS[tightnessBand];
+  const tightnessLevelColor =
+    tightnessBand === "high"
+      ? "text-rose-300/60"
+      : tightnessBand === "mid"
+        ? "text-amber-300/60"
+        : "text-emerald-300/60";
   const isUnusual = Math.abs(tightnessDelta) >= 3;
   const tightnessDeltaMetadataLabel = isUnusual ? `${tightnessDeltaLabel} · notable` : tightnessDeltaLabel;
 
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
 
   // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
-  const riskAppetiteLevel = riskAppetite !== undefined ? (riskAppetite >= 75 ? "High" : riskAppetite >= 45 ? "Moderate" : "Low") : undefined;
-  const riskAppetiteLevelColor = riskAppetite !== undefined ? (riskAppetite >= 75 ? "text-emerald-300" : riskAppetite >= 45 ? "text-amber-300" : "text-rose-300") : undefined;
+  const riskAppetiteBand = riskAppetite !== undefined ? classifyScoreBand(riskAppetite) : undefined;
+  const riskAppetiteLevel = riskAppetiteBand ? SCORE_BAND_LABELS[riskAppetiteBand] : undefined;
+  const riskAppetiteLevelColor =
+    riskAppetiteBand === "high"
+      ? "text-emerald-300"
+      : riskAppetiteBand === "mid"
+        ? "text-amber-300"
+        : riskAppetiteBand === "low"
+          ? "text-rose-300"
+          : undefined;
   const riskAppetiteDeltaLabel = typeof riskAppetiteDelta === "number" ? `${riskAppetiteDelta > 0 ? "+" : ""}${riskAppetiteDelta.toFixed(1)} pts` : "";
   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
   const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
@@ -158,7 +180,7 @@ export function DecisionHero({
   // Mobile-collapsed signal readout (DD-004): the summary line keeps all three
   // values visible, so collapsing hides only deltas and descriptors.
   const signalReadoutSummary = [
-    `Cash availability ${tightness}`,
+    `Funding pressure ${tightness}`,
     typeof riskAppetite === "number" ? `Risk appetite ${riskAppetite}` : null,
     regimeDisplay,
   ]
@@ -172,7 +194,7 @@ export function DecisionHero({
   const renderSignalCells = (idSuffix: string) => (
     <>
       <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-        <p className="text-fluid-nano text-white/40">Cash availability</p>
+        <p className="text-fluid-nano text-white/40">Funding pressure</p>
         <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
           {tightness}
           <span className="font-normal text-white/35">/100</span>{" "}
@@ -190,7 +212,7 @@ export function DecisionHero({
                 current={tightness}
                 min={0}
                 max={100}
-                label="Cash availability"
+                label="Funding pressure"
               />
             </span>
             {/* Coloured by this signal's own move. Using the week's overall
@@ -209,10 +231,16 @@ export function DecisionHero({
             current={tightness}
             previous={tightness - tightnessDelta}
             trigger={tightnessThreshold}
-            signalLabel="Cash availability"
-            scaleDirection="0 = easier funding · 100 = harder funding"
+            signalLabel="Funding pressure"
+            scaleDirection={compositeSignalScales.tightness.directionLabel}
           />
         </div>
+        <PlainEnglishScoreNote
+          signalKey="tightness"
+          score={tightness}
+          lead="This signal alone"
+          className="mt-1.5"
+        />
       </div>
 
       {typeof riskAppetite === "number" ? (
@@ -241,6 +269,13 @@ export function DecisionHero({
               </span>
             </p>
           ) : null}
+          <SignalScaleNote signalKey="riskAppetite" className="mt-1.5" />
+          <PlainEnglishScoreNote
+            signalKey="riskAppetite"
+            score={riskAppetite}
+            lead="This signal alone"
+            className="mt-1"
+          />
         </div>
       ) : null}
 
@@ -337,6 +372,9 @@ export function DecisionHero({
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
               {renderSignalCells("details")}
             </div>
+            <p className="mt-2 text-fluid-nano text-white/45">
+              Unfamiliar with a term here? <GlossaryLink>Open the glossary</GlossaryLink>
+            </p>
           </details>
 
           {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}

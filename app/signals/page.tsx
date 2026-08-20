@@ -130,17 +130,19 @@ export default async function SignalsPage({
         assessment={model.assessment}
         recordDate={model.treasury.record_date}
         impactLinks={[
-          { label: "Current pressure", href: model.regimeTimelineHref, metric: "tightness" },
-          { label: "Expansion support", href: "#current-scores", metric: "riskAppetite" },
-          { label: "Rate backdrop", href: "#current-scores", metric: "baseRate" },
+          { label: "Funding pressure", href: model.regimeTimelineHref, metric: "tightness" },
+          { label: "Risk appetite", href: "#current-scores", metric: "riskAppetite" },
+          { label: "Fed interest rate", href: "#current-scores", metric: "baseRate" },
         ]}
         openPanelHref={model.timeMachineHref}
       />
 
       <div className="weather-panel space-y-4 px-5 py-5">
         <p className="type-eyebrow">Trends</p>
+        {/* "Tightness" is the engine's internal name for this score; every reader-facing
+            surface calls it funding pressure. */}
         <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
+          <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
           <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
         </div>
       </div>

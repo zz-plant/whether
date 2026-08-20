@@ -3,6 +3,7 @@ import Link from "next/link";
 import { loadMarketState, type MarketState } from "../../lib/marketStateModel";
 import { ConfidenceBadge } from "../components/ConfidenceBadge";
 import { ScoreCard } from "../components/ScoreCard";
+import { SignalMeaningList, SignalScaleNote } from "../components/ui/plainLanguage";
 import {
   buildMarketMetadata,
   buildMarketFallbackMetadata,
@@ -75,17 +76,33 @@ function MarketStateView({ state }: { state: MarketState }) {
 
         <div className="flex flex-wrap justify-center gap-4 pt-2">
           <ScoreCard
-            label="Cash availability"
+            label="Funding pressure"
             value={state.tightness}
             delta={state.tightnessDelta}
-          />
+          >
+            {/* A bare 0-100 score is only readable if you already know which end
+                is bad. The anchor line is the cheapest way to say so. */}
+            <SignalScaleNote signalKey="tightness" className="mx-auto mt-1 max-w-[11rem]" />
+          </ScoreCard>
           <ScoreCard
             label="Risk appetite"
             value={state.riskAppetite}
             delta={state.riskAppetiteDelta}
             increaseIsPositive
-          />
+          >
+            <SignalScaleNote signalKey="riskAppetite" className="mx-auto mt-1 max-w-[11rem]" />
+          </ScoreCard>
         </div>
+
+        {/* Labelled, not two bare sentences under two cards: stacked into one
+            column, an unlabelled pair loses which sentence describes which score. */}
+        <SignalMeaningList
+          className="mx-auto max-w-xl text-left"
+          signals={[
+            { signalKey: "tightness", score: state.tightness },
+            { signalKey: "riskAppetite", score: state.riskAppetite },
+          ]}
+        />
 
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-fluid-micro text-slate-400">
           <ConfidenceBadge label={state.confidenceLabel} />

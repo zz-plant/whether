@@ -65,7 +65,7 @@ export const buildWeeklyMandateEnvelope = (
 ): WeeklyMandateEnvelope => {
   const resolvedPostureState = resolvePostureState(postureState, assessment, treasury);
   const title = `Whether weekly mandate — ${treasury.record_date}`;
-  const summary = `${resolvedPostureState.currentState.postureLabel}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
+  const summary = `${resolvedPostureState.currentState.postureLabel}: Funding pressure ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.slice(0, 3);
 
   return {

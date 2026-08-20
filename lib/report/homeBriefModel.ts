@@ -319,7 +319,7 @@ export type WeeklyDecisionCardViewModel = {
     operatingStanceLine: string;
     weeklyMemoLines: string[];
     netConstraintSummary: string;
-    /** Prose description of the pause-if condition. e.g. "Pause net-new hiring if cash availability rises above 76." */
+    /** Prose description of the pause-if condition. e.g. "Pause net-new hiring if funding pressure rises above 76." */
     guardrail: string;
     /** Prose description of the condition that reverses the pause. Same concept as guardrail but for what re-opens approvals. */
     reversalTrigger: string;

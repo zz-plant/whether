@@ -232,7 +232,7 @@ export const buildWhyThisCall = ({
 }): WhyThisCallItem[] => {
   const nearestIsTightness = tightnessGap <= riskGap;
   const nearestGap = nearestIsTightness ? tightnessGap : riskGap;
-  const boundaryLabel = nearestIsTightness ? "Cash availability" : "Risk appetite";
+  const boundaryLabel = nearestIsTightness ? "Funding pressure" : "Risk appetite";
   const boundaryNow = nearestIsTightness ? tightnessNow : riskNow;
   const boundaryThreshold = nearestIsTightness ? tightnessThreshold : riskThreshold;
   const boundaryDirection = (nearestIsTightness ? tightnessDirection : riskDirection) === "riseAbove"

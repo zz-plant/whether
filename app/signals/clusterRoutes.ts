@@ -13,7 +13,7 @@ const hasYield = (value: number | null | undefined) => typeof value === "number"
 const signalClusterDefinitions: SignalClusterDefinition[] = [
   {
     slug: "capital-tightness-watch",
-    title: "Cash availability watch",
+    title: "Funding pressure watch",
     summary: "Track liquidity pressure before approving long-payback commitments.",
     evidence: "Treasury rate stack and regime threshold distance.",
     isIndexable: hasYield(snapshotData.yields.threeMonth) && hasYield(snapshotData.yields.tenYear),

@@ -60,8 +60,8 @@ export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyS
       },
       {
         action: "Stage net-new headcount and multi-quarter vendor approvals.",
-        threshold: `Pause fixed-cost approvals if cash availability rises above ${tightnessPause.toFixed(1)}.`,
-        reversal: `Resume staged approvals when cash availability falls below ${tightnessResume.toFixed(1)}.`,
+        threshold: `Pause fixed-cost approvals if funding pressure rises above ${tightnessPause.toFixed(1)}.`,
+        reversal: `Resume staged approvals when funding pressure falls below ${tightnessResume.toFixed(1)}.`,
       },
       {
         action: "Assign one checkpoint owner to every cross-team commitment before work starts.",
@@ -73,8 +73,8 @@ export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyS
 
   return [{
     action: `Apply this month's priority: ${getMonthlyActionGuidance(assessment.regime)}.`,
-    threshold: `Pause broader commitments if cash availability rises above ${tightnessPause.toFixed(1)} or risk appetite falls below ${riskPause.toFixed(1)}.`,
-    reversal: `Reopen broader scope when cash availability is below ${tightnessResume.toFixed(1)} and risk appetite is above ${riskResume.toFixed(1)}.`,
+    threshold: `Pause broader commitments if funding pressure rises above ${tightnessPause.toFixed(1)} or risk appetite falls below ${riskPause.toFixed(1)}.`,
+    reversal: `Reopen broader scope when funding pressure is below ${tightnessResume.toFixed(1)} and risk appetite is above ${riskResume.toFixed(1)}.`,
   }];
 };
 

@@ -11,7 +11,7 @@ type SignalChange = {
  * four produces nonsense like "Risk appetite tightened".
  */
 const signalMoveCopy: Record<SignalChange["key"], { better: string; worse: string }> = {
-  tightness: { better: "cash availability loosened", worse: "cash availability tightened" },
+  tightness: { better: "funding pressure eased", worse: "funding pressure rose" },
   riskAppetite: { better: "risk appetite strengthened", worse: "risk appetite weakened" },
   baseRate: { better: "borrowing costs eased", worse: "borrowing costs rose" },
   curveSlope: {

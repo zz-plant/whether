@@ -272,7 +272,7 @@ export const buildInterpretationLayer = ({
     const thresholds = assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 };
     const tightnessGap = Math.abs(assessment.scores.tightness - thresholds.tightnessRegime);
     const riskGap = Math.abs(assessment.scores.riskAppetite - thresholds.riskAppetiteRegime);
-    const closestDimension = tightnessGap <= riskGap ? "Cash availability" : "Risk appetite";
+    const closestDimension = tightnessGap <= riskGap ? "Funding pressure" : "Risk appetite";
     const closestScore = tightnessGap <= riskGap ? assessment.scores.tightness : assessment.scores.riskAppetite;
     const closestThreshold = tightnessGap <= riskGap ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
 

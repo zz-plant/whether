@@ -58,7 +58,7 @@ const buildMovedAssumptions = (
     moved.push({
       dimension: "capital",
       label: CAPITAL_LABEL,
-      detail: `Cash availability tightened from ${recorded.tightness} to ${current.tightness} (watch line ${recorded.tightnessThreshold}).`,
+      detail: `Funding pressure rose from ${recorded.tightness} to ${current.tightness} (watch line ${recorded.tightnessThreshold}).`,
     });
   }
 

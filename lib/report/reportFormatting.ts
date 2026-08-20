@@ -28,7 +28,7 @@ export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 
 /** Same canonical names as `deltaLabelBySignal` and the glossary in `reportCopy.ts`. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Cash availability",
+  tightness: "Funding pressure",
   riskAppetite: "Risk appetite",
   baseRate: "Fed interest rate",
   curveSlope: "Recession warning gauge",
@@ -56,7 +56,7 @@ export const buildRegimeAlert = (
 
   if (wasTight !== isTight) {
     reasons.push(
-      `Cash availability crossed ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
+      `Funding pressure crossed ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
     );
   }
   if (wasBrave !== isBrave) {
@@ -66,7 +66,7 @@ export const buildRegimeAlert = (
   }
   if (reasons.length === 0) {
     reasons.push(
-      `Cash availability moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
+      `Funding pressure moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
         `and risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
         "carrying the posture across a boundary."
     );
