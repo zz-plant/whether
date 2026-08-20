@@ -15,6 +15,7 @@ import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
+import { CadenceCallCardFallback } from "./components/suspenseFallbacks";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
@@ -253,7 +254,7 @@ async function PageContent({
             })}
           >
             {activeCadence !== "weekly" ? (
-              <Suspense fallback={<div className="weather-card h-28 animate-pulse" />}>
+              <Suspense fallback={<CadenceCallCardFallback />}>
                 <AsyncCadenceSection cadence={activeCadence} />
               </Suspense>
             ) : null}
@@ -307,21 +308,13 @@ async function PageContent({
             />
           </SwipeableWeek>
 
-          <Suspense fallback={
-            <div className="space-y-6">
-              <div className="weather-card h-20 animate-pulse" />
-              <div className="weather-card h-32 animate-pulse" />
-              <div className="weather-card h-12 animate-pulse" />
-            </div>
-          }>
-            <BelowTheFoldEvidence
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              recordDate={homepage.reportShell.recordDateLabel}
-              recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-              operateHref={operateHref}
-            />
-          </Suspense>
+          <BelowTheFoldEvidence
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            recordDate={homepage.reportShell.recordDateLabel}
+            recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
+            operateHref={operateHref}
+          />
         </div>
 
         <div className="space-y-4 border-t border-slate-800/70 pt-6">

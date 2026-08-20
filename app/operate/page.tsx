@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { OperationsWorkstreamNav } from "./components/planningWorkstreamNav";
+import { WorkstreamNavFallback } from "../components/suspenseFallbacks";
 import {
   buildPlanningPageModel,
   type PlanningSearchParams,
@@ -30,7 +31,7 @@ export default async function OperationsPage({
   return (
     <ReportShell model={reportShellModel}>
       {children}
-      <Suspense fallback={null}>
+      <Suspense fallback={<WorkstreamNavFallback />}>
         <OperationsWorkstreamNav currentPath="/operate" />
       </Suspense>
     </ReportShell>
