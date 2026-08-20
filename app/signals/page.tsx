@@ -147,6 +147,14 @@ export default async function SignalsPage({
         </div>
       </div>
 
+      {/* The model builds `scoreCardsByType` on every request and both view modes
+          list "Current scores" in their section nav, but nothing rendered it —
+          so #current-scores was a dead anchor from the nav and from the delta
+          strip. It is also the most useful block on the page for a reader
+          without a macro background: each signal's current value against its
+          watch line, with both ends of the scale labelled. */}
+      <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
+
       <DomainContextSection regime={model.assessment.regime} />
 
       <SignalsModeSwitcherSection

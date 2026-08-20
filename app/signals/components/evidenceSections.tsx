@@ -19,7 +19,7 @@ import {
 
 const SIGNAL_LABEL_COPY: Record<string, string> = {
   Tightness: "Funding pressure",
-  "Curve slope": "Rate trend",
+  "Curve slope": "Recession warning gauge",
   "Base rate": "Base rate",
   "Regime timeline": "Past changes",
   "Macro source series": "Raw source data",

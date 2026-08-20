@@ -269,7 +269,16 @@ export const ReportShell = (props: ReportShellProps) => {
                       ? section.key
                       : `section-${index}`;
                   return (
-                    <div key={sectionKey} className={index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}>
+                    // `empty:hidden` because a section can decide at render time not to
+                    // render — ReturningVisitorDeltaStrip returns null for anyone without
+                    // a stored previous read, which is every first-time visitor.
+                    // Children.toArray only drops children that are already null at the
+                    // JSX level, so such a section still claimed a padded row and drew its
+                    // divider: an empty ~64px band between two rules on a first visit.
+                    <div
+                      key={sectionKey}
+                      className={`empty:hidden ${index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}`}
+                    >
                       {section}
                       {renderTrustAfterFirstSection && index === 0 ? (
                         <div className="mt-4">
