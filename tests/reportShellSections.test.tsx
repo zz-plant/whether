@@ -109,16 +109,12 @@ describe("ReportShell extracted sections", () => {
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
         missionSupportText="Stable feed"
-        missionSequenceTitle="Planning sequence"
-        missionSequenceItems={[{ title: "Now", detail: "Act", href: "#", cta: "Do", phase: "Now" }]}
       />,
     );
 
     assert.match(html, /Weekly operating brief/);
     assert.match(html, /Decision summary/);
     assert.match(html, /Start/);
-    assert.match(html, /Planning sequence/);
-    assert.match(html, /href="#"/);
   });
 
   it("keeps compact command-center intros to one decision block without a second status rail", () => {
@@ -140,8 +136,6 @@ describe("ReportShell extracted sections", () => {
         offlineBadgeLabel="Cached"
         decisionBanner={{ label: "Resolve one question", decision: "Resolve one remaining question without reopening the weekly brief.", horizon: "This week", confidence: "HIGH", effectiveDate: "Apr 1", evidenceHref: "#router" }}
         missionSupportText="Use the recommended path first."
-        missionSequenceTitle="Planning sequence"
-        missionSequenceItems={[{ title: "Now", detail: "Act", href: "#", cta: "Do", phase: "Now" }]}
       />,
     );
 
@@ -150,8 +144,6 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Updated Apr 2/);
     assert.doesNotMatch(html, /Current report status/);
     assert.doesNotMatch(html, /Review order/);
-    assert.doesNotMatch(html, /Planning sequence/);
-    assert.doesNotMatch(html, /sm:hidden/);
   });
 
   it("renders sidebar sequence rail", () => {

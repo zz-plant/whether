@@ -33,8 +33,6 @@ export function CommandCenterNavBlock({
   offlineBadgeLabel,
   decisionBanner,
   decisionDiffs,
-  missionSequenceTitle,
-  missionSequenceItems,
 }: {
   heroVariant: "full" | "compact";
   pageTitle: string;
@@ -57,14 +55,6 @@ export function CommandCenterNavBlock({
   decisionBanner?: DecisionBanner;
   missionSupportText: string;
   decisionDiffs?: DecisionDiff[];
-  missionSequenceTitle: string;
-  missionSequenceItems: Array<{
-    title: string;
-    detail: string;
-    href: string;
-    cta: string;
-    phase: string;
-  }>;
 }) {
   const primaryDecisionText =
     decisionBanner?.decision ??
@@ -84,7 +74,6 @@ export function CommandCenterNavBlock({
     showOfflineBadge ? offlineBadgeLabel : null,
   ].filter(Boolean).join(" • ");
   const decisionDeltaLine = decisionDiffs?.map((item) => item.label).join(" • ");
-  const shouldShowMissionSequence = heroVariant === "full" && missionSequenceItems.length > 0;
   const mobileDecisionText = decisionBanner?.decision ?? primaryDecisionText;
 
   return (
@@ -202,42 +191,6 @@ export function CommandCenterNavBlock({
           </div>
         ) : null}
 
-        {shouldShowMissionSequence ? (
-          <details className="group rounded border border-slate-800/55 bg-slate-950/40 px-4 py-3 sm:px-5 sm:py-4">
-            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 sm:cursor-default sm:list-none">
-              <span className="min-w-0">
-                <span className="type-eyebrow">
-                  {missionSequenceTitle || "Use this order"}
-                </span>
-                <span className="mt-0.5 block text-fluid-xs text-slate-400">{nextStep ? `Next: ${nextStep.description}` : ""}</span>
-              </span>
-              <span aria-hidden="true" className="rounded-md border border-slate-700/60 bg-slate-950/50 px-2 py-0.5 text-fluid-xs text-slate-400 transition group-open:rotate-180 sm:hidden">▾</span>
-            </summary>
-            <ol className="mt-3 grid gap-2 sm:grid-cols-3">
-              {missionSequenceItems.map((item) => (
-                <li key={`${item.phase}-${item.title}`}>
-                  <InternalAwareLink
-                    href={item.href}
-                    className="block rounded-md border border-slate-800/60 bg-slate-950/30 px-3 py-3 transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-sky-400/40"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="type-eyebrow text-sky-100/70">
-                          {item.phase}
-                        </p>
-                        <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
-                      </div>
-                      <span className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-0.5 type-eyebrow">
-                        {item.cta}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-fluid-xs leading-5 text-slate-400">{item.detail}</p>
-                  </InternalAwareLink>
-                </li>
-              ))}
-            </ol>
-          </details>
-        ) : null}
       </div>
     </section>
   );

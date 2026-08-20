@@ -206,7 +206,7 @@ export default async function DecidePage({
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </ReportSection>
 
-      <Details id="decide-secondary-paths" variant="auto-chevron" className="weather-panel px-6 py-6"
+      <Details id="decide-secondary-paths" className="weather-panel px-6 py-6"
         summary={<span className="text-sm type-eyebrow text-sky-200">Browse more options</span>}
       >
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />

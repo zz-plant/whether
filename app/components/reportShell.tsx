@@ -25,7 +25,6 @@ import {
   InlineTrustBlock,
 } from "./report-shell/TrustBlocks";
 import type {
-  ActionSequence,
   DecisionBanner,
   DecisionDiff,
   ExportCtaProps,
@@ -72,7 +71,6 @@ type ReportShellInput = {
     items: ReportStageItem[];
   };
   decisionBanner?: DecisionBanner;
-  actionSequence?: ActionSequence;
   roleSwitcher?: RoleSwitcher;
   decisionDiffs?: DecisionDiff[];
   nextStep?: { description: string; href: string };
@@ -89,7 +87,7 @@ type ReportShellModel = {
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
   chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
   actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "sharePayload" | "nextStep" | "nextRefreshLabel">;
-  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
+  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
 
 type ReportShellProps = { children: ReactNode } & (
@@ -159,7 +157,6 @@ export const ReportShell = (props: ReportShellProps) => {
     historicalBanner: resolvedHistoricalBanner,
     stageRail: resolvedStageRail,
     decisionBanner: resolvedDecisionBanner,
-    actionSequence: resolvedActionSequence,
     roleSwitcher: resolvedRoleSwitcher,
     decisionDiffs: resolvedDecisionDiffs,
     nextStep: resolvedNextStep,
@@ -177,9 +174,6 @@ export const ReportShell = (props: ReportShellProps) => {
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
   const hasSidebar = resolvedSidebarVariant === "full";
   const sidebarEnabled = hasSidebar;
-  const missionSequenceLabels = ["Now", "Next", "Later"];
-  const missionSequenceTitle = resolvedActionSequence?.title ?? "Plan";
-  const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
   const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
@@ -244,7 +238,7 @@ export const ReportShell = (props: ReportShellProps) => {
                 used between items *inside* a section, so section boundaries
                 carried no more weight than item boundaries. */}
             <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 

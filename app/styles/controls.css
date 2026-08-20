@@ -265,11 +265,15 @@ summary.list-none:focus-visible {
   }
 }
 
-/* Disclosure affordance for <summary> that opts out of the native marker with
-   `list-none`. Without this the control reads as a static heading. Sites that
-   draw their own chevron (see app/trust/page.tsx) simply omit `data-chevron`. */
+/* The single disclosure contract: 44px target, focus ring, and the rotating ▾.
+   Opt in three ways, all equivalent — `data-chevron` on the summary, the
+   `list-none` class on the summary, or `weather-auto-chevron` on the parent
+   details. This block is the only definition; decision-flow.css used to repeat
+   it for the parent-class form. Sites that draw their own chevron (see
+   app/trust/page.tsx) use `list-none` and omit `data-chevron`. */
 summary[data-chevron],
-summary.list-none {
+summary.list-none,
+.weather-auto-chevron > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -277,26 +281,31 @@ summary.list-none {
   min-height: 44px;
   cursor: pointer;
   outline: none;
+  list-style: none;
 }
 summary[data-chevron]:focus-visible,
-summary.list-none:focus-visible {
+summary.list-none:focus-visible,
+.weather-auto-chevron > summary:focus-visible {
   outline: 2px solid var(--accent-action);
   outline-offset: 2px;
   box-shadow: var(--focus-halo);
 }
 
-summary[data-chevron]::after {
+summary[data-chevron]::after,
+.weather-auto-chevron > summary::after {
   content: "▾";
   color: var(--app-text-muted);
   transition: transform 150ms ease;
 }
 
-details[open] > summary[data-chevron]::after {
+details[open] > summary[data-chevron]::after,
+.weather-auto-chevron[open] > summary::after {
   transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  summary[data-chevron]::after {
+  summary[data-chevron]::after,
+  .weather-auto-chevron > summary::after {
     transition: none;
   }
 }
