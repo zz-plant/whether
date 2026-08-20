@@ -180,8 +180,10 @@ export function DecisionHero({
   // Mobile-collapsed signal readout (DD-004): the summary line keeps all three
   // values visible, so collapsing hides only deltas and descriptors.
   const signalReadoutSummary = [
-    `Funding pressure ${tightness}`,
-    typeof riskAppetite === "number" ? `Risk appetite ${riskAppetite}` : null,
+    `Funding pressure ${tightness} ${tightnessLevel.toLowerCase()}`,
+    typeof riskAppetite === "number" && riskAppetiteLevel
+      ? `Risk appetite ${riskAppetite} ${riskAppetiteLevel.toLowerCase()}`
+      : null,
     regimeDisplay,
   ]
     .filter(Boolean)
@@ -366,8 +368,7 @@ export function DecisionHero({
 
           <details className="group">
             <summary className="flex min-h-11 cursor-pointer select-none items-center rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
-              <span className="sm:hidden">Why this call · {signalReadoutSummary}</span>
-              <span className="hidden sm:inline">Why this call · inspect the signal breakdown</span>
+              <span>Why this call · {signalReadoutSummary}</span>
             </summary>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
               {renderSignalCells("details")}
@@ -478,6 +479,9 @@ export function DecisionHero({
           ) : null}
           <p className="text-fluid-xs font-medium text-white/50 mt-1">
             Boldness budget
+          </p>
+          <p className="text-fluid-nano leading-snug text-white/40">
+            How much room you have to hire, spend, and commit.
           </p>
         </div>
       </div>

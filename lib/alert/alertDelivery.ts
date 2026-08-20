@@ -163,9 +163,7 @@ export const deliverAlertToSubscriber = async (
         actionNow: conditions.posture,
         reversal: "Revert only if the prior regime state holds across two consecutive updates.",
       });
-    } else if (
-      alert.headline.toLowerCase().includes("tightness")
-    ) {
+    } else if (alert.metric === "credit") {
       const threshold = alert.severity === "warning" ? 75 : 50;
       template = thresholdCrossingEmail(
         "credit",

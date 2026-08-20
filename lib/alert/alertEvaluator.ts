@@ -13,10 +13,17 @@ export type LastAlertState = {
   lastSentAt: string;
 };
 
+/** Which score crossed. Structural, because delivery picks the email template
+ *  from it — it used to substring-match the headline for "tightness", which made
+ *  a copy edit able to silently misroute every threshold alert. */
+export type AlertMetric = "credit" | "sentiment";
+
 export type AlertDecision = {
   type: "regime_change" | "threshold";
   severity: "info" | "warning" | "critical";
   headline: string;
+  /** Set on threshold alerts; absent on regime changes. */
+  metric?: AlertMetric;
 };
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -50,13 +57,15 @@ const buildRegimeDecision = (regime: string): AlertDecision => ({
 });
 
 const buildThresholdDecision = (
-  metric: string,
+  metric: AlertMetric,
+  label: string,
   score: number,
   threshold: number,
 ): AlertDecision => ({
   type: "threshold",
   severity: threshold === 75 ? "warning" : "info",
-  headline: `${metric} crossed ${threshold} boundary (${score.toFixed(1)})`,
+  headline: `${label} crossed ${threshold} boundary (${score.toFixed(1)})`,
+  metric,
 });
 
 const isWithinCooldown = (lastSentAt: string): boolean => {
@@ -91,7 +100,7 @@ export const evaluateAlert = (
       )
     ) {
       decisions.push(
-        buildThresholdDecision("Tightness", readiness.tightness, boundary),
+        buildThresholdDecision("credit", "Funding pressure", readiness.tightness, boundary),
       );
     }
 
@@ -105,7 +114,8 @@ export const evaluateAlert = (
     ) {
       decisions.push(
         buildThresholdDecision(
-          "Risk Appetite",
+          "sentiment",
+          "Risk appetite",
           readiness.riskAppetite,
           boundary,
         ),

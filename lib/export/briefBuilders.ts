@@ -68,26 +68,29 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
   };
 };
 
+/** `??` only falls through on null/undefined, and several of these fields are
+ *  optional strings that arrive as "". An empty string in a decision slot prints
+ *  a bullet with a label and nothing after it. */
+const firstMeaningful = (...values: Array<string | undefined | null>) =>
+  values.find((value) => typeof value === "string" && value.trim().length > 0);
+
 export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   const modeled = resolveModeledDecisionPayload(options);
   const topActionStripItems = (modeled.actionStripItems ?? []).slice(0, 3);
   const currentCall =
-    modeled.currentCall
-    ?? assessment.constraints[0]
+    firstMeaningful(modeled.currentCall, assessment.description)
     ?? "Hold bounded operating discipline.";
   const actionNow =
-    modeled.actionNow
-    ?? topActionStripItems[0]?.areaActionNow
-    ?? currentCall;
+    firstMeaningful(
+      modeled.actionNow,
+      topActionStripItems[0]?.areaActionNow,
+      assessment.constraints[0],
+    ) ?? currentCall;
   const pauseIf =
-    topActionStripItems[0]?.triggerThreshold
-    ?? modeled.guardrailThreshold
-    ?? assessment.constraints[1]
+    firstMeaningful(topActionStripItems[0]?.triggerThreshold, modeled.guardrailThreshold)
     ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
   const changeCourseIf =
-    topActionStripItems[0]?.reversalCondition
-    ?? modeled.reversalTrigger
-    ?? assessment.constraints[2]
+    firstMeaningful(topActionStripItems[0]?.reversalCondition, modeled.reversalTrigger)
     ?? "Re-open approvals when confidence and trend stabilize.";
 
   return [
@@ -199,7 +202,7 @@ const buildDecisionTransmissionRiskBlock = (assessment: RegimeAssessment, option
     "Decision transmission check:",
     `• Confidence: ${confidenceLine}`,
     `• Why this could be wrong: ${whyCouldBeWrong}`,
-    "• Change-course trigger: see Change course if and supporting signals above.",
+    `• Change-course trigger: see "${publicDecisionLabels.reversal}" above, plus the signal check.`,
   ];
 };
 
@@ -273,8 +276,8 @@ export const buildSlackBrief = (
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Posture: ${postureLabel}`,
     `Funding pressure: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
-    `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `Fed interest rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `Recession warning gauge (10Y−2Y): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "Signal check:",
     ...macroLines,

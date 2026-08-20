@@ -72,7 +72,7 @@ export const sendWeeklyBrief = async (): Promise<SendWeeklyBriefResult> => {
           `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:16px;"><tr>`,
           `<td style="padding:12px 16px;border:1px solid rgba(52,211,153,0.2);border-radius:8px;background:rgba(16,185,129,0.06);">`,
           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#34d399;margin:0 0 6px;">Expansion conditions</p>`,
-          `<p style="font-size:0.85rem;color:#e2e8f0;margin:0;">Investor appetite is strong. Consider updating your fundraising materials and exploring growth-stage toolkits on the site.</p>`,
+          `<p style="font-size:0.85rem;color:#e2e8f0;margin:0;">Risk appetite is strong. Consider updating your fundraising materials and exploring growth-stage toolkits on the site.</p>`,
           `</td></tr></table>`
         );
       }
