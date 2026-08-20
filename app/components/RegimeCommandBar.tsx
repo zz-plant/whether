@@ -324,7 +324,7 @@ export const RegimeCommandBar = ({
             <div className="sm:hidden rounded-lg border border-slate-700/70 bg-slate-950/78 p-3">
               <details className="weather-auto-chevron">
                 <summary className="cursor-pointer list-none type-eyebrow text-slate-300">
-                  Posture map (tap to expand)
+                  Posture map · where this week sits
                 </summary>
                 <div className="mt-2">
                   <PostureMapSummary trendLabel={trajectoryViewProps.trendLabel} postureTrajectory={trajectoryViewProps.postureTrajectory} />

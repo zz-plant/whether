@@ -11,6 +11,7 @@ import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "./ui/plainLanguage";
+import { UrlDetails } from "./ui/urlDetails";
 import {
   SCORE_BAND_LABELS,
   classifyScoreBand,
@@ -60,6 +61,8 @@ type Props = {
   /** Decision areas that are not flagged for revisit this week. */
   noChangeAreas?: readonly string[];
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
+  /** Server-resolved from `?why=1`, so a shared link opens on the same panel. */
+  signalBreakdownOpen?: boolean;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -104,6 +107,7 @@ export function DecisionHero({
   revisitQueue = [],
   noChangeAreas = [],
   thresholdBusinessConsequence,
+  signalBreakdownOpen = false,
   signalData,
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
@@ -366,17 +370,23 @@ export function DecisionHero({
             ) : null}
           </section>
 
-          <details className="group">
-            <summary className="flex min-h-11 cursor-pointer select-none items-center rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
-              <span>Why this call · {signalReadoutSummary}</span>
-            </summary>
+          {/* The chevron comes from the shared contract rather than a hand-rolled
+              `after:content` pair, and the open state rides in `?why=1` so the
+              panel survives being shared. */}
+          <UrlDetails
+            queryKey="why"
+            initialOpen={signalBreakdownOpen}
+            className="weather-auto-chevron"
+            summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75"
+            summary={<span>Why this call · {signalReadoutSummary}</span>}
+          >
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
               {renderSignalCells("details")}
             </div>
             <p className="mt-2 text-fluid-nano text-white/45">
               Unfamiliar with a term here? <GlossaryLink>Open the glossary</GlossaryLink>
             </p>
-          </details>
+          </UrlDetails>
 
           {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
           {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (

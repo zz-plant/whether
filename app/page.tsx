@@ -14,6 +14,7 @@ import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
+import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
@@ -287,6 +288,7 @@ async function PageContent({
               revisitQueue={revisitQueue}
               noChangeAreas={noChangeAreas}
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+              signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
             />
 
             <ThreeWhethersCard

@@ -236,7 +236,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
       <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-4">
         <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
-          <span>Open one-screen terminal</span>
+          <span>One-screen terminal · 5 chart panels</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
         </Collapsible.Trigger>
 

@@ -93,3 +93,44 @@
   (e.g. step "Test a decision" → section "Is this move safe right now?").
 - NEVER: repeat a section's full description in both a checklist/index entry and that section's own
   header. The index carries titles; the section carries the description.
+
+## XII. Disclosure (what earns collapsing, and what carries its state)
+
+Scope: every `<details>`, `Collapsible`, and `Accordion` in `app/`.
+
+### What earns collapsing
+
+- MUST: collapse **evidence for a claim made above it** — the derivation, the source board, the raw
+  series, the chart terminal, the per-signal breakdown. The reader has already been told the
+  conclusion; the disclosure is there for the person who wants to check it.
+- NEVER: collapse **the claim itself**, or anything a reader needs in order to act this week. The
+  weekly call, what to do now, the pause condition, and the reversal condition are always visible.
+- NEVER: collapse the only explanation of a term or number that appears above the fold. If a label
+  needs a gloss, the gloss is visible and the *detail* behind it collapses — not the other way round.
+- SHOULD: open by default when the panel has something the reader must see this week and stay closed
+  otherwise. `advancedThresholdsSection` is the reference: it computes `defaultOpen` from whether a
+  threshold is actually near, rather than picking a fixed default.
+- SHOULD: state in the summary what is behind it. "Detailed verification & source board" earns its
+  click; "inspect the signal breakdown" and "tap to expand" do not — they describe the gesture, not
+  the content. A summary that shows the current values (`Why this call · Funding pressure 50
+  moderate …`) is better still, because it pays the reader back without a click.
+
+### Mechanism
+
+- MUST: opt into the single disclosure contract in `app/styles/controls.css` — `data-chevron` on the
+  summary, the `list-none` class on the summary, or `weather-auto-chevron` on the parent `details`.
+  All three are equivalent and carry the 44px target, focus ring, list-style reset, and rotating ▾.
+  Do not hand-roll a chevron with `after:content`; that is how the codebase ended up with four
+  implementations of one affordance.
+- SHOULD: prefer a native `<details>` over a JS collapsible. It works before hydration, costs no
+  client bundle, and keeps its content server-rendered.
+
+### State
+
+- MUST: persist to the URL any disclosure whose open state changes what a screenshot or a shared
+  link would show. Use `UrlDetails` (`app/components/ui/urlDetails.tsx`), which reads the query key
+  on the server for the initial state and rewrites it with `replaceState` on toggle.
+- Rationale: this product's job includes handing someone an artifact. A link that drops the panel the
+  sender had open sends the recipient a different page than the one that was shared.
+- Disclosures whose state is incidental — a copy-to-clipboard block, a template list — do not need a
+  query key. Ask whether a colleague opening the link should see what you saw.
