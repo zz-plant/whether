@@ -31,7 +31,7 @@ export default function ThresholdPage() {
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className="text-fluid-xs font-semibold tracking-[0.08em] text-amber-200">Threshold</p>
-              <p className="text-sm text-slate-200">The specific, measurable condition that would cause you to pause the action. Not a feeling — a number. &ldquo;Pause if tightness exceeds 76.&rdquo;</p>
+              <p className="text-sm text-slate-200">The specific, measurable condition that would cause you to pause the action. Not a feeling — a number. &ldquo;Pause if funding pressure exceeds 76.&rdquo;</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className="text-fluid-xs font-semibold tracking-[0.08em] text-emerald-200">Reversal</p>

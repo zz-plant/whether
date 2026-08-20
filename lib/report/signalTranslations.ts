@@ -325,25 +325,31 @@ export type TermSubstitution = {
   replacement: string;
 };
 
+/**
+ * Applied in order, so every multi-word phrase containing a term must come
+ * before the bare term. "Cash tightness" placed after the bare /tightness/ rule
+ * produced "Cash funding pressure" — the bare rule consumed the second word and
+ * the specific rule then had nothing left to match.
+ */
 export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
+  // Multi-word phrases first.
   { pattern: /\bCapital tightness\b/gi, replacement: "Funding pressure" },
+  { pattern: /\bCash tightness\b/gi, replacement: "Funding pressure" },
   { pattern: /\bYield curve slope\b/gi, replacement: "Recession warning gauge" },
+  { pattern: /\bCurve slope\b/gi, replacement: "Recession warning gauge" },
+  { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
+  { pattern: /\bVC funding slowdown\b/gi, replacement: "VC funding is slowing" },
+  { pattern: /\bTech layoff pressure\b/gi, replacement: "tech layoffs are rising" },
   { pattern: /\bBase rate\b/gi, replacement: "Fed interest rate" },
+  // Regime keys.
   { pattern: /\bSCARCITY\b/g, replacement: "Freezing" },
   { pattern: /\bDEFENSIVE\b/g, replacement: "Cloudy" },
   { pattern: /\bVOLATILE\b/g, replacement: "Stormy" },
   { pattern: /\bEXPANSION\b/g, replacement: "Sunny" },
+  // Bare terms last.
   { pattern: /\btightness\b/gi, replacement: "funding pressure" },
-  { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
   { pattern: /\bregime\b/gi, replacement: "operating environment" },
   { pattern: /\bposture\b/gi, replacement: "operating stance" },
-  { pattern: /\bHY OAS stress\b/gi, replacement: "high-yield bond market stress" },
-  { pattern: /\bEquity volatility shock\b/gi, replacement: "stock market volatility" },
-  { pattern: /\bFinancial conditions tightening\b/gi, replacement: "financial conditions tightening" },
-  { pattern: /\bVC funding slowdown\b/gi, replacement: "VC funding is slowing" },
-  { pattern: /\bTech layoff pressure\b/gi, replacement: "tech layoffs are rising" },
-  { pattern: /\bCash tightness\b/gi, replacement: "Funding pressure" },
-  { pattern: /\bCurve slope\b/gi, replacement: "Recession warning gauge" },
 ];
 
 export const applyPlainEnglishSubstitutions = (text: string): string => {

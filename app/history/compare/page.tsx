@@ -238,39 +238,39 @@ export default async function HistoryComparePage({
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Tightness Score</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Funding pressure</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportA.assessment.scores.tightness).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Risk Appetite</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Risk appetite</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportA.assessment.scores.riskAppetite).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Base Rate (1M/3M)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Fed interest rate (1M/3M)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {reportA.assessment.scores.baseRate !== undefined ? `${reportA.assessment.scores.baseRate.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Curve Spread (10Y-2Y)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Recession warning gauge (10Y−2Y)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {spreadA !== null ? `${spreadA.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">BBB Credit Spread</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Corporate borrowing premium (BBB)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {bbbA !== null ? `${bbbA.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">CPI Inflation (YoY)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Inflation (CPI, year over year)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {cpiA !== null ? `${cpiA.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 text-slate-400 font-medium">Unemployment Rate</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Unemployment rate</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {unempA !== null ? `${unempA.toFixed(1)}%` : "N/A"}
                     </td>
@@ -324,39 +324,39 @@ export default async function HistoryComparePage({
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Tightness Score</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Funding pressure</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportB.assessment.scores.tightness).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Risk Appetite</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Risk appetite</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportB.assessment.scores.riskAppetite).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Base Rate (1M/3M)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Fed interest rate (1M/3M)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {reportB.assessment.scores.baseRate !== undefined ? `${reportB.assessment.scores.baseRate.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Curve Spread (10Y-2Y)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Recession warning gauge (10Y−2Y)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {spreadB !== null ? `${spreadB.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">BBB Credit Spread</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Corporate borrowing premium (BBB)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {bbbB !== null ? `${bbbB.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">CPI Inflation (YoY)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Inflation (CPI, year over year)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {cpiB !== null ? `${cpiB.toFixed(2)}%` : "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 text-slate-400 font-medium">Unemployment Rate</td>
+                    <td className="py-2.5 text-slate-400 font-medium">Unemployment rate</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {unempB !== null ? `${unempB.toFixed(1)}%` : "N/A"}
                     </td>

@@ -7,6 +7,8 @@ import { CurveTermsKey } from "../app/signals/components/curveTermsKey";
 import { ScoreBandReference, SignalScaleNote } from "../app/components/ui/plainLanguage";
 import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
 import {
+  PLAIN_ENGLISH_SUBSTITUTIONS,
+  applyPlainEnglishSubstitutions,
   compositeSignalScales,
   scoreBandReference,
   signalPlainEnglish,
@@ -116,5 +118,45 @@ describe("beginner glossary", () => {
 
   it("keeps entry values unique so the accordion can key on them", () => {
     assert.equal(values.size, BEGINNER_GLOSSARY_ENTRIES.length);
+  });
+});
+
+describe("plain-English substitutions", () => {
+  it("rewrites multi-word phrases before the bare term they contain", () => {
+    // Ordered the other way, the bare /tightness/ rule fired first and left
+    // "Cash funding pressure" behind.
+    assert.equal(
+      applyPlainEnglishSubstitutions("Cash tightness is elevated."),
+      "Funding pressure is elevated.",
+    );
+    assert.equal(
+      applyPlainEnglishSubstitutions("Capital tightness eased."),
+      "Funding pressure eased.",
+    );
+  });
+
+  it("keeps every multi-word rule ahead of any bare term it contains", () => {
+    const sources = PLAIN_ENGLISH_SUBSTITUTIONS.map((sub) =>
+      sub.pattern.source.replace(/\\b/g, "").toLowerCase(),
+    );
+    sources.forEach((source, index) => {
+      if (source.includes(" ")) return;
+      const laterContaining = sources
+        .slice(index + 1)
+        .filter((other) => other.includes(" ") && other.split(" ").includes(source));
+      assert.deepEqual(
+        laterContaining,
+        [],
+        `"${source}" runs before multi-word rules that contain it: ${laterContaining.join(", ")}`,
+      );
+    });
+  });
+
+  it("carries no rule whose replacement only changes case", () => {
+    const noOps = PLAIN_ENGLISH_SUBSTITUTIONS.filter(
+      (sub) =>
+        sub.pattern.source.replace(/\\b/g, "").toLowerCase() === sub.replacement.toLowerCase(),
+    );
+    assert.deepEqual(noOps.map((sub) => sub.replacement), []);
   });
 });
