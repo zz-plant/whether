@@ -16,7 +16,7 @@ const redirectChecks = [
   { from: "/learn", to: "/trust" },
 ];
 
-const retiredRouteChecks = ["/operate", "/templates"];
+const retiredRouteChecks = ["/templates"];
 
 const weeklyRequiredKeys = [
   "summary",
