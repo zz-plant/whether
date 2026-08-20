@@ -231,6 +231,14 @@ async function PageContent({
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-8">
         <div className="space-y-8 min-w-0">
+          {/* Above the brief, not after it. This is the orientation line for a
+              first-time visitor, and it sat below the hero, all three operating
+              levers, and the compare strip — roughly 2,800px down on mobile,
+              where it cannot orient anyone. Its own bottom-border styling was
+              always that of a top strip. Hiding once dismissed is a global CSS
+              rule keyed on the data attribute (app/layout.tsx), so it stays
+              pre-paint and CLS-free at either position. */}
+          <FirstVisitExplainer />
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
@@ -296,7 +304,6 @@ async function PageContent({
               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
             />
           </SwipeableWeek>
-          <FirstVisitExplainer />
 
           <Suspense fallback={
             <div className="space-y-6">

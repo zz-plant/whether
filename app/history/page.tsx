@@ -94,8 +94,8 @@ export default async function HistoryPage({
           />
           <RegimeStats series={statsSeries} />
           <div className="grid gap-6 sm:grid-cols-2">
-            <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
-            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
+            <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
+            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
           </div>
         </div>
       </details>

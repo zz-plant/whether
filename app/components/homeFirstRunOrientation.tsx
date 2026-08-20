@@ -65,7 +65,7 @@ export function FirstVisitExplainer() {
           yields, credit spreads, and VIX" — three undefined terms in the one
           sentence written for people with no context. Say the job first; the
           inputs are one click away on /trust. */}
-      <p className="min-w-0">
+      <p className="w-full min-w-0">
         How hard it is to raise money right now, and how much risk investors will fund, scored into
         one operating call each Monday.
       </p>

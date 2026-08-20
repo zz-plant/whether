@@ -142,8 +142,8 @@ export default async function SignalsPage({
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
         <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
-          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
+          <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
+          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
         </div>
       </div>
 
