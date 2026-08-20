@@ -98,6 +98,52 @@ describe("assembleHomePage streaming contract", () => {
     assert.ok(workspaceModel.translate.toolkitShortcuts.length > 0);
   });
 
+  it("does no enrichment work for consumers that never read the promises", async () => {
+    // Eight routes call this assembler and none of them read these promises.
+    // Eagerly built, every one of them paid for a decision-events query and the
+    // support-model build, then threw the result away.
+    let postureStateCalls = 0;
+    const homepage = await assembleHomePage(
+      { searchParams: undefined },
+      {
+        loadHomePageReportData: async () => buildReportResult(),
+        buildPostureState: async () => {
+          postureStateCalls += 1;
+          return postureState;
+        },
+      },
+    );
+
+    assert.ok(homepage.weeklyDecisionCardModel);
+    await Promise.resolve();
+    assert.equal(postureStateCalls, 0, "enrichment ran for a consumer that never asked for it");
+  });
+
+  it("enriches once however many of the deferred models are read", async () => {
+    let postureStateCalls = 0;
+    const homepage = await assembleHomePage(
+      { searchParams: undefined },
+      {
+        loadHomePageReportData: async () => buildReportResult(),
+        buildPostureState: async () => {
+          postureStateCalls += 1;
+          return postureState;
+        },
+      },
+    );
+
+    const [diagnosticsLane, workspaceModel, artifactPayload] = await Promise.all([
+      homepage.diagnosticsLanePromise,
+      homepage.workspaceModelPromise,
+      homepage.leadershipArtifactPayloadPromise,
+    ]);
+
+    assert.ok(diagnosticsLane.immediateDecision.length > 0);
+    assert.ok(workspaceModel.workspaceActions.auditHref);
+    assert.ok(artifactPayload);
+    assert.equal(postureStateCalls, 1, "enrichment ran more than once");
+  });
+
   it("parses interpretation view from search params without changing the canonical weekly call", async () => {
     const homepage = await assembleHomePage(
       { searchParams: { view: "forecast", month: "3", year: "2026" } },

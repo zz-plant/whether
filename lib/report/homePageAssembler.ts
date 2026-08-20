@@ -243,7 +243,20 @@ export const assembleHomePage = async ({
       }, {})
     : undefined;
 
-  const enrichedHomePageModelPromise = (async () => {
+  // Lazy, and memoised on first access.
+  //
+  // These three promises are a streaming contract: a consumer can render the
+  // weekly call immediately and await the enriched models behind a Suspense
+  // boundary. Today nothing reads them — the homepage renders `reportResult`,
+  // `reportShell`, and `weeklyDecisionCardModel` only — and the work is not
+  // free: it costs a decision-events query (64 rows) plus the support-model
+  // build, on every request to all eight routes that call this assembler.
+  //
+  // Eager, that cost was paid by everyone and used by no one. Deferred behind
+  // getters, the contract stays available for whoever wires it up and costs
+  // nothing until someone touches a property.
+  let enrichedHomePageModelMemo: ReturnType<typeof buildEnrichedHomePageModel> | null = null;
+  const buildEnrichedHomePageModel = () => (async () => {
     try {
       const postureState = await resolvedDependencies.buildPostureState({
         recordDate: treasury.record_date,
@@ -275,6 +288,15 @@ export const assembleHomePage = async ({
     }
   })();
 
+  const enrichedHomePageModel = () => {
+    enrichedHomePageModelMemo ??= buildEnrichedHomePageModel();
+    return enrichedHomePageModelMemo;
+  };
+
+  // Both the diagnostics lane and the workspace model come out of one build.
+  // Called once each, that builder ran twice per request on identical inputs.
+  let deferredSupportModelsMemo: ReturnType<typeof buildDeferredHomeSupportModels> | null = null;
+
   const fallbackAlert = !historicalSelection && isFallback
     ? {
         lastCachedTimestamp: reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp,
@@ -288,29 +310,32 @@ export const assembleHomePage = async ({
     reportResult,
     weeklyCall,
     weeklyDecisionCardModel,
-    leadershipArtifactPayloadPromise: enrichedHomePageModelPromise.then(({ postureState, homeBriefModel: enrichedHomeBriefModel }) =>
-      postureState
-        ? buildLeadershipArtifactPayload({
-            assessment,
-            treasury,
-            weeklyRecordDate,
-            sensors,
-            macroSeries,
-            homeBriefModel: enrichedHomeBriefModel,
-            postureState,
-            interpretationView,
-            forecast,
-            freshnessLabel: freshnessMeta.updatedAtLabel,
-            weeklyCall,
-          })
-        : null
-    ),
+    get leadershipArtifactPayloadPromise() {
+      return enrichedHomePageModel().then(({ postureState, homeBriefModel: enrichedHomeBriefModel }) =>
+        postureState
+          ? buildLeadershipArtifactPayload({
+              assessment,
+              treasury,
+              weeklyRecordDate,
+              sensors,
+              macroSeries,
+              homeBriefModel: enrichedHomeBriefModel,
+              postureState,
+              interpretationView,
+              forecast,
+              freshnessLabel: freshnessMeta.updatedAtLabel,
+              weeklyCall,
+            })
+          : null,
+      );
+    },
     fallbackActive: !historicalSelection && isFallback,
     fallbackAlert,
     interpretationLayer,
     interpretationSearchParams,
-    diagnosticsLanePromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
-      buildDeferredHomeSupportModels({
+    get diagnosticsLanePromise() {
+      return enrichedHomePageModel().then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
+        deferredSupportModelsMemo ??= buildDeferredHomeSupportModels({
         reportData,
         homeBriefModel: enrichedHomeBriefModel,
         weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
@@ -329,10 +354,13 @@ export const assembleHomePage = async ({
         freshnessLabel: freshnessMeta.line,
         trustMarker,
         sectionLinks,
-      }).diagnosticsLane
-    ),
-    workspaceModelPromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
-      buildDeferredHomeSupportModels({
+      });
+        return deferredSupportModelsMemo.diagnosticsLane;
+      });
+    },
+    get workspaceModelPromise() {
+      return enrichedHomePageModel().then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
+        deferredSupportModelsMemo ??= buildDeferredHomeSupportModels({
         reportData,
         homeBriefModel: enrichedHomeBriefModel,
         weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
@@ -351,8 +379,10 @@ export const assembleHomePage = async ({
         freshnessLabel: freshnessMeta.line,
         trustMarker,
         sectionLinks,
-      }).workspaceModel
-    ),
+      });
+        return deferredSupportModelsMemo.workspaceModel;
+      });
+    },
     reportShell: {
       regime: assessment.regime,
       statusLabel,
