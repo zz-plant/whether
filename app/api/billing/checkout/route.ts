@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createStripeCheckoutSession, StripeBillingError } from "../../../../lib/billingStripe";
+import { CHECKOUT_RETURN_PATH, createStripeCheckoutSession, StripeBillingError } from "../../../../lib/billingStripe";
 import {
   PREMIUM_INTENT_SOURCES,
   dispatchPremiumFunnelEvent,
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       await dispatchPremiumFunnelEvent(
         buildCheckoutStartEvent({
           source,
-          path: returnPath ?? "/pricing",
+          path: returnPath ?? CHECKOUT_RETURN_PATH,
           ctaId: `checkout_${plan}`,
           planCandidate,
           seatBand,
