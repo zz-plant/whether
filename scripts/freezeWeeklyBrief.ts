@@ -6,7 +6,7 @@
  * `--force` is passed, because a published brief that silently changes is not a
  * citable record.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { appendFile, readFile, writeFile } from "node:fs/promises";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
 import { parsePublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
@@ -26,6 +26,15 @@ const { homeBriefModel } = snapshot;
 const recordDate = reportData.treasury.record_date ?? reportData.treasury.fetched_at;
 const isoWeek = getIsoWeekInfo(new Date(recordDate));
 const slug = formatIsoWeekSlug(isoWeek);
+
+/*
+ * The workflow names its pull-request branch after the week, so an unmerged
+ * week is never reset by the next one. Emitted before the already-published
+ * exit below so the branch name is always defined.
+ */
+if (process.env.GITHUB_OUTPUT) {
+  await appendFile(process.env.GITHUB_OUTPUT, `slug=${slug}\n`);
+}
 
 const existing = parsePublishedBriefs(JSON.parse(await readFile(OUTPUT_PATH, "utf8")));
 

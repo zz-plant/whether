@@ -3,7 +3,7 @@
  * Supports specialized templates for report, operations, signals, solutions, and guides.
  */
 import { ImageResponse } from "next/og";
-import { loadOgFonts } from "./ogFonts";
+import { loadOgFonts } from "../../../lib/image/ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";

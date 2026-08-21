@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
   buildStripeCheckoutReturnUrl,
+  CHECKOUT_RETURN_PATH,
   createStripeCheckoutSession,
   isStripeBillingReady,
   StripeBillingError,
@@ -65,11 +68,11 @@ describe("stripe billing helpers", () => {
     assert.equal(
       buildStripeCheckoutReturnUrl({
         appBaseUrl: "https://whether.test",
-        path: "/pricing?source=hero",
+        path: "/operate?source=hero",
         checkout: "success",
         plan: "pro",
       }),
-      "https://whether.test/pricing?source=hero&checkout=success&plan=pro",
+      "https://whether.test/operate?source=hero&checkout=success&plan=pro",
     );
 
     assert.equal(
@@ -79,7 +82,7 @@ describe("stripe billing helpers", () => {
         checkout: "cancelled",
         plan: "team",
       }),
-      "https://whether.test/pricing?checkout=cancelled&plan=team",
+      `https://whether.test${CHECKOUT_RETURN_PATH}?checkout=cancelled&plan=team`,
     );
   });
 
@@ -113,5 +116,57 @@ describe("stripe billing helpers", () => {
         error.message === "stripe_unreachable" &&
         error.statusCode === 502,
     );
+  });
+});
+
+/** Static routes the app actually serves, read off the filesystem. */
+const collectStaticRoutes = (dir = "app", prefix = ""): string[] => {
+  const routes: string[] = [];
+
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name === "page.tsx") {
+      routes.push(prefix === "" ? "/" : prefix);
+      continue;
+    }
+    if (!entry.isDirectory() || entry.name.startsWith("_") || entry.name === "api") continue;
+    // Dynamic segments cannot be a fixed return path; route groups are invisible in the URL.
+    if (entry.name.startsWith("[")) continue;
+    const segment = entry.name.startsWith("(") ? prefix : `${prefix}/${entry.name}`;
+    routes.push(...collectStaticRoutes(join(dir, entry.name), segment));
+  }
+
+  return routes;
+};
+
+describe("checkout return path", () => {
+  it("names a route the app actually serves", () => {
+    const routes = collectStaticRoutes();
+
+    // The default was /pricing, which has never existed: every checkout that did
+    // not pass an explicit returnPath sent the customer to a 404 on both success
+    // and cancel. When a pricing page ships, move the constant and this passes.
+    assert.ok(
+      routes.includes(CHECKOUT_RETURN_PATH),
+      `${CHECKOUT_RETURN_PATH} is not a route; Stripe would return customers to a 404`,
+    );
+  });
+
+  it("uses that path for both success and cancel", () => {
+    const success = buildStripeCheckoutReturnUrl({
+      appBaseUrl: "https://whether.work",
+      path: CHECKOUT_RETURN_PATH,
+      checkout: "success",
+      plan: "pro",
+    });
+    const cancelled = buildStripeCheckoutReturnUrl({
+      appBaseUrl: "https://whether.work",
+      path: "//evil.example.com",
+      checkout: "cancelled",
+      plan: "team",
+    });
+
+    assert.equal(success, "https://whether.work/operate?checkout=success&plan=pro");
+    // A protocol-relative path falls back rather than becoming an offsite redirect.
+    assert.equal(cancelled, "https://whether.work/operate?checkout=cancelled&plan=team");
   });
 });

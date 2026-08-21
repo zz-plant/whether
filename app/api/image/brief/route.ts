@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
 import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
+import { loadOgFonts } from "../../../../lib/image/ogFonts";
 import type { SignalChange } from "../../../../lib/report/homeBriefModel";
 import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
 import { SECTOR_TAXONOMY, type SectorKey } from "../../../../lib/report/sectorSensitivity";
@@ -80,11 +81,18 @@ export const buildBriefImagePayload = (
 
 export async function GET(request: Request) {
   const requestContext = parseImageBriefRequestContext(new URL(request.url).searchParams);
-  const homepage = await assembleHomePage(requestContext);
+  const [homepage, fonts] = await Promise.all([
+    assembleHomePage(requestContext),
+    loadOgFonts(request.url),
+  ]);
 
+  // Without registered faces satori falls back to its default font and fetches a
+  // Google font for every glyph that font lacks -- the brief carries at least one
+  // (the U+2264 in the flip-condition copy). That fetch failing aborts the render
+  // after the headers are already sent, so the card downloads as an empty file.
   const image = new ImageResponse(
     renderBriefImage(buildBriefImagePayload(homepage, requestContext)),
-    { width: 1200, height: 800 },
+    { width: 1200, height: 800, ...(fonts ? { fonts } : {}) },
   );
 
   image.headers.set(

@@ -30,18 +30,25 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Freeze the current week
+        id: freeze
         run: bun run brief:freeze
 
       - name: Verify the frozen record parses and routes
         run: bun run test tests/publishedBriefs.test.ts
 
+      # Not continue-on-error: this step failed silently every week from at least
+      # 2026-08-06, so the job stayed green while three frozen weeks were pushed to
+      # a branch that no pull request ever pointed at. A freeze nobody can merge is
+      # a failed freeze, and it should read as one.
       - name: Open pull request with the frozen week
-        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: automation/weekly-brief-freeze
+          # One branch per week. The shared branch was reset on every run, so an
+          # unmerged week was overwritten by the next -- weeks 32 and 33 of 2026
+          # were frozen, pushed, and lost that way.
+          branch: automation/weekly-brief-freeze-${{ steps.freeze.outputs.slug }}
           delete-branch: true
-          title: "chore: freeze this week's brief"
+          title: "chore: freeze the ${{ steps.freeze.outputs.slug }} brief"
           commit-message: "chore: freeze weekly brief to its permanent dated URL"
           body: |
             ## Summary

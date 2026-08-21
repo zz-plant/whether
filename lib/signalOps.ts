@@ -219,14 +219,46 @@ export const writeRegimeTransitionAlert = async (
   return true;
 };
 
-export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {
-  const latest = alerts[0];
-  const previous = alerts[1];
+/** A week, in ms. The digest speaks for one week; older alerts are history. */
+const WEEKLY_DIGEST_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Alerts are kept indefinitely, so the newest one in the store can be months
+ * old -- the log holds nothing between a threshold crossing and the next one.
+ * Summarising it unconditionally is how the weekly digest came to announce a
+ * DEFENSIVE call from April while the live posture was EXPANSION in August.
+ *
+ * Anything older than the window is reported as the last recorded change rather
+ * than as this week's call, so the digest can be stale-but-honest but never
+ * contradicts the posture the rest of the product is showing.
+ */
+export const buildWeeklyDigest = (
+  alerts: RegimeAlertEvent[],
+  options?: { now?: number; windowMs?: number },
+) => {
+  const now = options?.now ?? Date.now();
+  const windowMs = options?.windowMs ?? WEEKLY_DIGEST_WINDOW_MS;
+  const thisWeek = alerts.filter((alert) => {
+    const createdAt = Date.parse(alert.createdAt);
+    return Number.isFinite(createdAt) && now - createdAt <= windowMs;
+  });
+
+  const latest = thisWeek[0];
+  const previous = thisWeek[1];
 
   if (!latest) {
+    // alerts[0] is the newest: the event log lists newest-first.
+    const lastRecorded = alerts[0];
     return {
       summary: "No regime-change alerts this week.",
-      bullets: ["Evidence updated with no threshold crossings."],
+      bullets: [
+        "Evidence updated with no threshold crossings.",
+        ...(lastRecorded
+          ? [
+              `Last recorded change: ${lastRecorded.payload.currentAssessment.regime} as of ${lastRecorded.payload.currentRecordDate}.`,
+            ]
+          : []),
+      ],
     };
   }
 

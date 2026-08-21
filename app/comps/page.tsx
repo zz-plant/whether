@@ -11,17 +11,30 @@ type CompsData = {
   fetchedAt: string;
 };
 
+const formatMultiple = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}x`);
+const formatPercent = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
+
 export default function CompsPage() {
   const [data, setData] = useState<CompsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [sourceDown, setSourceDown] = useState(false);
 
   useEffect(() => {
     let active = true;
     fetch("/api/comps")
-      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then((d) => { if (active) { setData(d); setLoading(false); } })
-      .catch(() => { if (active) { setError(true); setLoading(false); } });
+      .then(async (response) => {
+        // 503 means the quote source turned us away, which is a different thing
+        // to say than a basket of dashes.
+        if (response.status === 503) throw new Error("quote_source_unavailable");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((payload) => { if (active) { setData(payload); setLoading(false); } })
+      .catch((error: Error) => {
+        if (!active) return;
+        setSourceDown(error.message === "quote_source_unavailable");
+        setLoading(false);
+      });
     return () => { active = false; };
   }, []);
 
@@ -32,8 +45,8 @@ export default function CompsPage() {
           Public SaaS Valuation Multiples
         </h1>
         <p className="text-sm text-slate-300">
-          Median enterprise value to revenue multiples for a basket of 15 public SaaS companies.
-          Updated in real-time from Yahoo Finance. No API key, no subscription required.
+          Median enterprise value to revenue multiples for a basket of 15 public SaaS companies,
+          read from Yahoo Finance when the page loads.
         </p>
 
         {loading ? (
@@ -42,17 +55,22 @@ export default function CompsPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Median EV/Revenue</p>
-              <p className="text-2xl font-semibold text-slate-100">{data.medianEvToRevenue?.toFixed(1)}x</p>
+              <p className="text-2xl font-semibold text-slate-100">{formatMultiple(data.medianEvToRevenue)}</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Median Revenue Growth</p>
-              <p className="text-2xl font-semibold text-slate-100">{data.medianRevenueGrowth?.toFixed(1)}%</p>
+              <p className="text-2xl font-semibold text-slate-100">{formatPercent(data.medianRevenueGrowth)}</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Companies Tracked</p>
               <p className="text-2xl font-semibold text-slate-100">{data.companyCount}/15</p>
             </div>
           </div>
+        ) : sourceDown ? (
+          <p className="text-sm text-slate-400">
+            Yahoo Finance is not serving quotes to us right now, so there are no multiples to show.
+            This is an upstream outage, not a reading of zero — the basket is unchanged.
+          </p>
         ) : (
           <p className="text-sm text-slate-400">Unable to load data. Please try again later.</p>
         )}

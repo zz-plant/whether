@@ -2,7 +2,13 @@
 
 This checklist covers the minimum instrumentation and product plumbing to put in place **before** publicly announcing premium availability.
 
-Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet.
+Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet. Nothing in `app/` calls `POST /api/billing/checkout`, which is the intended pre-reveal state — the intent attributes on export and planning controls measure demand, they are not upgrade CTAs.
+
+Return path (2026-08-21): the checkout return URL defaulted to `/pricing`, so any
+session created without an explicit `returnPath` sent the customer to a 404 on both
+success and cancel. It now defaults to `CHECKOUT_RETURN_PATH` in `lib/billingStripe.ts`,
+which `tests/billingStripe.test.ts` checks against the routes on disk. Move that
+constant to `/pricing` in the same change that ships the pricing page.
 
 Capture status (2026-08-21): funnel events are persisted durably by default. Until this date the
 only sink was `PREMIUM_FUNNEL_WEBHOOK_URL`, which has never been set in any environment, so every

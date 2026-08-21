@@ -54,6 +54,15 @@ export const isStripeBillingReady = () => {
 };
 
 
+/**
+ * Where Stripe sends the customer back. It defaulted to /pricing, which does not
+ * exist -- no pricing surface has shipped (see docs/premium-launch-readiness.md),
+ * so both success_url and cancel_url resolved to a 404 for any caller that did
+ * not pass an explicit returnPath. Point this at /pricing on the day that page
+ * lands; tests/billingStripe.test.ts fails if it names a route the app lacks.
+ */
+export const CHECKOUT_RETURN_PATH = "/operate";
+
 export const buildStripeCheckoutReturnUrl = ({
   appBaseUrl,
   path,
@@ -65,7 +74,7 @@ export const buildStripeCheckoutReturnUrl = ({
   checkout: "success" | "cancelled";
   plan: PremiumPlan;
 }) => {
-  const safePath = path.startsWith("/") && !path.startsWith("//") ? path : "/pricing";
+  const safePath = path.startsWith("/") && !path.startsWith("//") ? path : CHECKOUT_RETURN_PATH;
   const url = new URL(safePath, appBaseUrl);
   url.searchParams.set("checkout", checkout);
   url.searchParams.set("plan", plan);
@@ -84,7 +93,7 @@ export class StripeBillingError extends Error {
 
 export const createStripeCheckoutSession = async ({
   plan,
-  path = "/pricing",
+  path = CHECKOUT_RETURN_PATH,
   customerEmail,
   source,
   planCandidate,

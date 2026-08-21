@@ -45,10 +45,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Valid ticker required" }, { status: 400 });
   }
 
-  const quote = await fetchQuote(ticker);
-  if (!quote) {
+  const result = await fetchQuote(ticker);
+  // "No data for MSFT" was the answer for every ticker, including the ones the
+  // source knows perfectly well -- it was rate-limiting us. Say which it is.
+  if (result.status === "unavailable") {
+    return NextResponse.json(
+      { error: "Market data source unavailable", detail: result.reason },
+      { status: 503 },
+    );
+  }
+  if (result.status === "missing") {
     return NextResponse.json({ error: `No data for ${ticker}` }, { status: 404 });
   }
+
+  const quote = result.quote;
 
   const revenue = quote.financialData?.totalRevenue;
   const growth = quote.financialData?.revenueGrowth;
@@ -71,12 +81,13 @@ export async function GET(request: Request) {
     : null;
 
   const peerSymbols = SAAS_BASKET.filter((s) => s !== ticker);
-  const peerQuotes = await Promise.all(peerSymbols.map((s) => fetchQuote(s)));
+  const peerResults = await Promise.all(peerSymbols.map((s) => fetchQuote(s)));
 
   const peerData: Array<{ symbol: string; growth?: number; fcfMargin?: number | null }> = [];
   for (let i = 0; i < peerSymbols.length; i++) {
-    const peerQuote = peerQuotes[i];
-    if (!peerQuote) continue;
+    const peerResult = peerResults[i];
+    if (peerResult?.status !== "ok") continue;
+    const peerQuote = peerResult.quote;
     const pRev = peerQuote.financialData?.totalRevenue;
     const pOcf = peerQuote.cashflowStatementHistory?.cashflowStatements?.[0]?.operatingCashFlow?.raw;
     const pCapex = peerQuote.cashflowStatementHistory?.cashflowStatements?.[0]?.capitalExpenditure?.raw;
