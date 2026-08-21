@@ -5,11 +5,10 @@ import type { ReactElement } from "react";
  *
  * The share card is the product artifact most people see first (Slack unfurl,
  * link preview), so it renders with the site's own faces and surfaces rather
- * than generic system type. Fonts load via loadOgFonts in ogFonts.ts; the
- * family names here must match the names registered there.
+ * than generic system type. Fonts and their family names both come from
+ * lib/image/ogFonts.ts, which every generated image route shares.
  */
-export const OG_FONT_DISPLAY = "Fraunces";
-export const OG_FONT_BODY = "IBM Plex Sans";
+export { OG_FONT_BODY, OG_FONT_DISPLAY } from "../../../lib/image/ogFonts";
 
 /** Mirrors --bg-body / --bg-panel / border tokens in app/styles/tokens.css. */
 export const OG_BG = "#08090b";

@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
-import { isValidElement, type ReactNode } from "react";
+import { ImageResponse } from "next/og";
+import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
+import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "../lib/image/ogFonts";
 import { buildWeeklyDecisionCardModel } from "./factories/weeklyDecisionCardModel";
 
 const collectText = (node: ReactNode): string => {
@@ -67,5 +70,89 @@ describe("buildBriefImagePayload", () => {
     assert.match(imageText, /Pause net-new hiring if tightness rises above 73\./);
     assert.doesNotMatch(imageText, /Until tightness reaches 80/);
     assert.doesNotMatch(imageText, /80/);
+  });
+});
+
+/**
+ * Satori's own rule, verbatim: a <div> whose children are anything other than a
+ * single string must declare display. Breaking it throws *during* the render,
+ * after the response headers are out -- so the route answers 200 with an empty
+ * body and the decision card downloads as a 0-byte PNG. Nothing short of
+ * rendering catches that, which is how it shipped unnoticed.
+ */
+const findSatoriLayoutViolations = (node: ReactNode, path = "root"): string[] => {
+  if (!isValidElement(node)) return [];
+
+  const element = node as ReactElement<{ children?: ReactNode; style?: Record<string, unknown> }>;
+  const { children, style } = element.props;
+  const tag = typeof element.type === "string" ? element.type : "component";
+  const here = `${path} > ${tag}`;
+  const display = style?.display;
+  const violations: string[] = [];
+
+  if (tag === "div" && children !== undefined && children !== null && typeof children !== "string") {
+    if (display !== "flex" && display !== "none" && display !== "contents") {
+      violations.push(`${here} holds a ${Array.isArray(children) ? "list" : typeof children} child without an explicit display`);
+    }
+  }
+
+  const list = Array.isArray(children) ? children : [children];
+  return list.reduce<string[]>(
+    (found, child, index) => found.concat(findSatoriLayoutViolations(child, `${here}[${index}]`)),
+    violations,
+  );
+};
+
+const ogFontFaces = [
+  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/fraunces-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-400.ttf"), weight: 400 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-600.ttf"), weight: 600 as const, style: "normal" as const },
+];
+
+/** Threshold copy reaches the card carrying the symbols the report model uses. */
+const briefImageProps = {
+  decision: "Hold hiring \u2192 reassess next week with measurable outcomes.",
+  regime: "EXPANSION",
+  postureLabel: "Guarded Expansion",
+  tightness: 49,
+  tightnessDelta: 0,
+  confidenceLabel: "MED",
+  recordDate: "Aug 19, 2026",
+  briefLabel: "Weekly Brief",
+  contextLabel: "Consumer \u00b7 Series A",
+  guardrail: "Pause net-new hiring if tightness \u2265 76.",
+  pauseThreshold: 66,
+  flipConditions: ["Tightness \u2264 66 for 2 consecutive updates"],
+};
+
+describe("brief decision card render", () => {
+  it("emits no <div> that satori would reject mid-render", () => {
+    const violations = findSatoriLayoutViolations(renderBriefImage(briefImageProps));
+
+    assert.deepEqual(violations, []);
+  });
+
+  it("rewrites glyphs the OG font subset cannot draw", () => {
+    const imageText = collectText(renderBriefImage(briefImageProps));
+
+    // The faces are Latin subsets; an uncovered glyph sends satori to a Google
+    // font download, and that failing aborts the render the same way.
+    assert.doesNotMatch(imageText, /[\u2264\u2265\u2192]/);
+    assert.match(imageText, /tightness >= 76/);
+    assert.match(imageText, /Tightness <= 66/);
+    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a <= b >= c -> d");
+  });
+
+  it("produces a non-empty PNG", async () => {
+    const image = new ImageResponse(renderBriefImage(briefImageProps), {
+      width: 1200,
+      height: 800,
+      fonts: ogFontFaces,
+    });
+
+    const body = await image.arrayBuffer();
+
+    assert.ok(body.byteLength > 1000, `expected a rendered PNG, got ${body.byteLength} bytes`);
+    assert.deepEqual([...new Uint8Array(body.slice(0, 4))], [0x89, 0x50, 0x4e, 0x47]);
   });
 });

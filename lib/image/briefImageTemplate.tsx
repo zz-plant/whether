@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { OG_FONT_BODY, toImageSafeText } from "./ogFonts";
 
 export type BriefImageProps = {
   decision: string;
@@ -16,6 +17,24 @@ export type BriefImageProps = {
   flipConditions?: string[];
 };
 
+/**
+ * Copy arrives from the report model, which is free to use symbols the OG font
+ * subset does not carry. Everything headed for the canvas goes through here so
+ * one stray glyph cannot abort the render. See toImageSafeText.
+ */
+const toImageSafeProps = (props: BriefImageProps): BriefImageProps => ({
+  ...props,
+  decision: toImageSafeText(props.decision),
+  regime: toImageSafeText(props.regime),
+  postureLabel: toImageSafeText(props.postureLabel),
+  confidenceLabel: toImageSafeText(props.confidenceLabel),
+  recordDate: toImageSafeText(props.recordDate),
+  briefLabel: props.briefLabel === undefined ? undefined : toImageSafeText(props.briefLabel),
+  contextLabel: props.contextLabel === undefined ? undefined : toImageSafeText(props.contextLabel),
+  guardrail: props.guardrail === undefined ? undefined : toImageSafeText(props.guardrail),
+  flipConditions: props.flipConditions?.map((condition) => toImageSafeText(condition)),
+});
+
 const confidenceColor = (label: string) =>
   label === "HIGH" ? "#34d399" : label === "MED" ? "#fbbf24" : "#f87171";
 
@@ -23,12 +42,14 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const {
     decision, regime, postureLabel, tightness, pauseThreshold,
     confidenceLabel, recordDate, briefLabel = "Weekly Brief", contextLabel, guardrail, flipConditions,
-  } = props;
+  } = toImageSafeProps(props);
 
   const cc = confidenceColor(confidenceLabel);
   const gaugeThreshold = Math.max(1, pauseThreshold ?? tightness);
+  // "\u00bb" rather than a right arrow: the OG faces are Latin subsets and carry
+  // no U+2192, and an uncovered glyph aborts the render (see toImageSafeText).
   const arrow = decision.toLowerCase().includes("tighten") ? "↑"
-    : decision.toLowerCase().includes("ease") ? "↓" : "→";
+    : decision.toLowerCase().includes("ease") ? "↓" : "\u00bb";
   const arrowColor = arrow === "↑" ? "#f87171" : arrow === "↓" ? "#34d399" : "#fbbf24";
   const gaugePct = Math.min(100, Math.round((tightness / gaugeThreshold) * 100));
   const gaugeColor = tightness >= gaugeThreshold ? "#f87171"
@@ -38,26 +59,38 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
 
   const truncated = decision.length > 80 ? decision.slice(0, 77) + "\u2026" : decision;
 
+  /*
+   * Satori throws on any <div> whose children are not a single string unless the
+   * div declares display -- and it throws mid-render, which surfaces as a 200 with
+   * an empty body rather than an error. So text that reads as one line is built as
+   * one string here instead of several adjacent JSX children, and every div that
+   * holds an element or a number carries an explicit display.
+   */
+  const eyebrow = ["WHETHER", briefLabel, recordDate].filter(Boolean).join(" \u00b7 ");
+  const postureLine = [displayRegime, postureLabel, contextLabel].filter(Boolean).join(" \u00b7 ");
+  const watching = flipConditions?.length ? `Watching: ${flipConditions.join(" \u00b7 ")}` : "";
+  const confidenceBadge = `${confidenceLabel} CONFIDENCE`;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: "linear-gradient(160deg, #020617 0%, #0f172a 100%)", color: "#f8fafc", fontFamily: "ui-sans-serif, system-ui, sans-serif", justifyContent: "space-between" }}>
-      <div>
+    <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: "linear-gradient(160deg, #020617 0%, #0f172a 100%)", color: "#f8fafc", fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`, justifyContent: "space-between" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 32 }}>
-          WHETHER · {briefLabel}{recordDate ? ` · ${recordDate}` : ""}
+          {eyebrow}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <span style={{ fontSize: 52, color: arrowColor, marginRight: 16 }}>{arrow}</span>
           <span style={{ fontSize: 40, fontWeight: 800, color: "#f8fafc", maxWidth: 800 }}>{truncated}</span>
         </div>
         <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 48 }}>
-          {displayRegime}{" \u00b7 "}{postureLabel}{contextLabel ? ` · ${contextLabel}` : ""}
+          {postureLine}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ marginRight: 32 }}>
-            <div style={{ fontSize: 60, fontWeight: 800, color: "#f8fafc" }}>{tightness}</div>
+          <div style={{ display: "flex", flexDirection: "column", marginRight: 32 }}>
+            <div style={{ fontSize: 60, fontWeight: 800, color: "#f8fafc" }}>{String(tightness)}</div>
             <div style={{ fontSize: 13, fontWeight: 600, textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.08em", marginTop: 4 }}>Tightness</div>
           </div>
-          <div style={{ width: 400 }}>
-            <div style={{ height: 6, borderRadius: 3, background: "rgba(51,65,85,0.5)", overflow: "hidden" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: 400 }}>
+            <div style={{ display: "flex", height: 6, borderRadius: 3, background: "rgba(51,65,85,0.5)", overflow: "hidden" }}>
               <div style={{ height: 6, borderRadius: 3, width: `${gaugePct}%`, background: gaugeColor }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748b", marginTop: 4 }}>
@@ -69,12 +102,12 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
         {flipConditions && flipConditions.length > 0 ? (
           <div style={{ display: "flex", alignItems: "center", fontSize: 13, color: "#93c5fd", marginTop: 8 }}>
             <div style={{ width: 6, height: 6, borderRadius: 6, background: "#38bdf8", marginRight: 6 }} />
-            <span>Watching: {flipConditions.join(" · ")}</span>
+            <span>{watching}</span>
           </div>
         ) : null}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 20, borderTop: "1px solid rgba(51,65,85,0.3)" }}>
-        <span style={{ padding: "6px 16px", borderRadius: 999, backgroundColor: `${cc}20`, border: `1px solid ${cc}50`, color: cc, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>{confidenceLabel} CONFIDENCE</span>
+        <span style={{ padding: "6px 16px", borderRadius: 999, backgroundColor: `${cc}20`, border: `1px solid ${cc}50`, color: cc, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>{confidenceBadge}</span>
         <div style={{ display: "flex", alignItems: "center" }}>
           <span style={{ fontSize: 12, color: "#64748b", marginRight: 16 }}>Data: FRED · Treasury · Yahoo Finance</span>
           <span style={{ fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>whether.work</span>
