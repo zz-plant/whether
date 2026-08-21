@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useId } from "react";
 import { useClipboardCopy } from "../useClipboardCopy";
+import { useSlackPreviewOverlay } from "../useSlackPreviewOverlay";
 import { CheckIcon, CopyIcon, DocumentIcon, ChevronDownIcon, AuditIcon } from "../uiIcons";
 
 type ShareMenuDropdownProps = {
@@ -37,7 +38,6 @@ export function ShareMenuDropdown({
   meetingPackText = "",
 }: ShareMenuDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [slackOverlayActive, setSlackOverlayActive] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -96,28 +96,10 @@ export function ShareMenuDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    // Listen to changes from other components toggling it (e.g. if we hide it via key press)
-    const handleExternalToggle = (e: Event) => {
-      const customEvent = e as CustomEvent<{ active?: boolean }>;
-      if (customEvent.detail && typeof customEvent.detail.active === "boolean") {
-        setSlackOverlayActive(customEvent.detail.active);
-      }
-    };
-    window.addEventListener("whether-slack-preview-changed", handleExternalToggle);
-    return () => {
-      window.removeEventListener("whether-slack-preview-changed", handleExternalToggle);
-    };
-  }, []);
+  const { active: slackOverlayActive, toggle: toggleSlackOverlay } = useSlackPreviewOverlay();
 
   const handleToggleSlackOverlay = () => {
-    const nextActive = !slackOverlayActive;
-    setSlackOverlayActive(nextActive);
-    window.dispatchEvent(
-      new CustomEvent("whether-toggle-slack-preview", {
-        detail: { active: nextActive },
-      })
-    );
+    toggleSlackOverlay();
     setIsOpen(false);
   };
 

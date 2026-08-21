@@ -8,8 +8,8 @@ export function GlobalShareRail() {
 
   useEffect(() => {
     const handle = () => setOpen(true);
-    window.addEventListener("whether-open-share-rail", handle);
-    return () => window.removeEventListener("whether-open-share-rail", handle);
+    document.addEventListener("whether-open-share-rail", handle);
+    return () => document.removeEventListener("whether-open-share-rail", handle);
   }, []);
 
   if (!open) return null;

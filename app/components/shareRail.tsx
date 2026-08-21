@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useState, useEffect, useId } from "react";
+import { useCallback, useState, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { useSlackPreviewOverlay } from "./useSlackPreviewOverlay";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -19,33 +20,10 @@ const presetLabels: Record<SharePreset, string> = {
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
-  const [slackOverlayActive, setSlackOverlayActive] = useState(false);
+  const { active: slackOverlayActive, toggle: handleToggleSlackOverlay } = useSlackPreviewOverlay();
   const includeContextLabelId = useId();
   const slackOverlayLabelId = useId();
   const { copyToClipboard, copiedTarget } = useClipboardCopy();
-
-  useEffect(() => {
-    const handleExternalToggle = (e: Event) => {
-      const customEvent = e as CustomEvent<{ active?: boolean }>;
-      if (customEvent.detail && typeof customEvent.detail.active === "boolean") {
-        setSlackOverlayActive(customEvent.detail.active);
-      }
-    };
-    window.addEventListener("whether-slack-preview-changed", handleExternalToggle);
-    return () => {
-      window.removeEventListener("whether-slack-preview-changed", handleExternalToggle);
-    };
-  }, []);
-
-  const handleToggleSlackOverlay = () => {
-    const nextActive = !slackOverlayActive;
-    setSlackOverlayActive(nextActive);
-    window.dispatchEvent(
-      new CustomEvent("whether-toggle-slack-preview", {
-        detail: { active: nextActive },
-      })
-    );
-  };
 
   const buildShareText = useCallback(() => {
     const context = includeContext
