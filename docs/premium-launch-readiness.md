@@ -4,6 +4,11 @@ This checklist covers the minimum instrumentation and product plumbing to put in
 
 Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet.
 
+Capture status (2026-08-21): funnel events are persisted durably by default. Until this date the
+only sink was `PREMIUM_FUNNEL_WEBHOOK_URL`, which has never been set in any environment, so every
+production event was silently discarded and the go/no-go checks below could not pass no matter how
+long they ran. Treat the event history as starting 2026-08-21, not at first deploy.
+
 ## Goals
 - Preserve the free weekly posture ritual (`/`) as the acquisition and trust surface.
 - Measure where users hit premium intent (exports, integrations, API/data, planning depth).
@@ -41,8 +46,12 @@ Source of truth: `lib/premiumFunnel.ts`.
 ### 3) API endpoint for funnel intake and forwarding
 - `POST /api/telemetry/premium-funnel`
 - Validates source + type before accepting payloads.
-- Forwards accepted events to `PREMIUM_FUNNEL_WEBHOOK_URL` when configured.
-- Falls back to structured server logs when webhook is not configured.
+- Persists every accepted event to the durable event log (`lib/storage/premiumFunnelEventRepository.ts`,
+  topic `premium-funnel`, KV binding `WHETHER_DURABLE_KV`, in-memory fallback when unbound).
+- Additionally forwards to `PREMIUM_FUNNEL_WEBHOOK_URL` when configured — a mirror for external
+  dashboards, no longer the only sink.
+- `GET /api/telemetry/premium-funnel` reads the data back (aggregate by default, `?events=1` for the
+  raw tail). Authorized with the cron secret; `?limit=` caps the scan window at 1000.
 
 ### 3b) Stripe webhook conversion capture
 - `POST /api/billing/webhook`
@@ -50,10 +59,17 @@ Source of truth: `lib/premiumFunnel.ts`.
 - On `checkout.session.completed`, emits `premium_checkout_complete` when metadata includes valid `source` attribution.
 - Carries optional `planCandidate` and `seatBand` metadata through conversion telemetry.
 
-### 4) Initial premium-intent instrumentation on high-value surfaces
-- Export brief actions (copy Slack/board, export PDF).
-- Runway planner copy action.
-- Operations workflow navigation into integrations/data stages.
+### 4) Premium-intent instrumentation on high-value surfaces
+All five declared intent sources now have at least one instrumented element, and the tracker mounts
+in the root layout so `/` is measured alongside `/operate`:
+
+| Source | Where |
+| --- | --- |
+| `export_brief` | `app/operate/components/exportBriefPanel.tsx` — copy Slack/board/explainer, export PDF |
+| `runway_planner` | `app/operate/components/runwayPlannerPanel.tsx` — copy financial block |
+| `api_access` | `app/api-docs/page.tsx` — the five endpoint try-it links |
+| `integrations` | `app/components/regimeAlertsPanel.tsx` — Slack/email/webhook channel toggles |
+| `team_workflow` | `app/operate/components/decisionMemoryPanel.tsx` — export CSV, copy latest JSON |
 
 ## Pre-reveal go/no-go checks
 1. Confirm event volume for at least 1–2 weeks on free traffic.

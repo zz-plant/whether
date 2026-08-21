@@ -170,6 +170,8 @@ export const DecisionMemoryPanel = () => {
                 type="button"
                 onClick={downloadCsv}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/50 hover:text-slate-100 transition-colors"
+                data-premium-intent="team_workflow"
+                data-premium-cta="export_decision_memory_csv"
               >
                 <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export CSV</span>
               </button>
@@ -181,6 +183,10 @@ export const DecisionMemoryPanel = () => {
                 buttonVariant="pill"
                 buttonLabels={{ copied: <span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />JSON copied</span> }}
                 onClick={() => void copyToClipboard(JSON.stringify(latestEntry, null, 2), "json")}
+                buttonProps={{
+                  "data-premium-intent": "team_workflow",
+                  "data-premium-cta": "copy_decision_memory_json",
+                }}
               />
             ) : null}
           </div>

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { dispatchPremiumFunnelEvent, isValidPremiumFunnelEvent } from "../../../../lib/premiumFunnel";
+import { requireCronAuth } from "../../../../lib/api/cronAuth";
+import {
+  listPremiumFunnelEvents,
+  summarizePremiumFunnelEvents,
+} from "../../../../lib/storage/premiumFunnelEventRepository";
 
 export const runtime = "edge";
 
@@ -23,4 +28,32 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ ok: true }, { status: 202 });
+}
+
+/**
+ * Reads back what POST captured. Shares the cron secret rather than introducing a second
+ * admin credential — this is operator-only funnel data, not a public surface.
+ *
+ * `?events=1` returns the raw tail instead of the aggregate.
+ */
+export async function GET(request: Request) {
+  const unauthorized = requireCronAuth(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
+  const { searchParams } = new URL(request.url);
+  const rawLimit = Number.parseInt(searchParams.get("limit") ?? "", 10);
+  const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 1000) : 500;
+
+  if (searchParams.get("events") === "1") {
+    const { events, nextCursor } = await listPremiumFunnelEvents({
+      limit,
+      cursor: searchParams.get("cursor"),
+    });
+    return NextResponse.json({ ok: true, events, nextCursor });
+  }
+
+  const summary = await summarizePremiumFunnelEvents(limit);
+  return NextResponse.json({ ok: true, summary });
 }

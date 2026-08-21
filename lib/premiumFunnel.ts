@@ -72,10 +72,22 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
   );
 };
 
+/**
+ * Persist first, then fan out to the webhook when one is configured.
+ *
+ * The webhook used to be the only sink, which meant an unset PREMIUM_FUNNEL_WEBHOOK_URL
+ * discarded every production event silently. Durable capture no longer depends on that
+ * env var being set; the webhook is now an optional mirror for external dashboards.
+ */
 export const dispatchPremiumFunnelEvent = async (
   payload: PremiumFunnelEvent,
   webhookUrl = process.env.PREMIUM_FUNNEL_WEBHOOK_URL,
 ) => {
+  /* Imported lazily so the client bundle that pulls the validators and endpoint
+     constant out of this module does not also pull in the KV storage layer. */
+  const { recordPremiumFunnelEvent } = await import("./storage/premiumFunnelEventRepository");
+  await recordPremiumFunnelEvent(payload);
+
   if (webhookUrl) {
     await fetch(webhookUrl, {
       method: "POST",
@@ -83,10 +95,5 @@ export const dispatchPremiumFunnelEvent = async (
       body: JSON.stringify(payload),
       keepalive: true,
     });
-    return;
-  }
-
-  if (process.env.NODE_ENV === "development") {
-    console.info("[premium-funnel]", payload);
   }
 };

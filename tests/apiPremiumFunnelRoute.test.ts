@@ -1,10 +1,18 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
-import { POST as postPremiumFunnelRoute } from "../app/api/telemetry/premium-funnel/route";
+import { afterEach, describe, it } from "bun:test";
+import { GET, POST } from "../app/api/telemetry/premium-funnel/route";
+import { resetPremiumFunnelEventLogForTests } from "../lib/storage/premiumFunnelEventRepository";
+
+const ORIGINAL_ENV = { ...process.env };
+
+afterEach(() => {
+  process.env = { ...ORIGINAL_ENV };
+  resetPremiumFunnelEventLogForTests();
+});
 
 describe("/api/telemetry/premium-funnel", () => {
   it("rejects invalid payloads", async () => {
-    const response = await postPremiumFunnelRoute(
+    const response = await POST(
       new Request("http://localhost/api/telemetry/premium-funnel", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -18,7 +26,7 @@ describe("/api/telemetry/premium-funnel", () => {
   });
 
   it("accepts valid premium intent events", async () => {
-    const response = await postPremiumFunnelRoute(
+    const response = await POST(
       new Request("http://localhost/api/telemetry/premium-funnel", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -35,5 +43,44 @@ describe("/api/telemetry/premium-funnel", () => {
     assert.equal(response.status, 202);
     const body = (await response.json()) as { ok?: boolean };
     assert.equal(body.ok, true);
+  });
+
+  it("refuses to read the funnel without the cron secret", async () => {
+    process.env.WHETHER_CRON_SECRET = "s3cret";
+
+    const response = await GET(
+      new Request("http://localhost/api/telemetry/premium-funnel"),
+    );
+
+    assert.equal(response.status, 401);
+  });
+
+  it("returns a summary of captured events to an authorized reader", async () => {
+    process.env.WHETHER_CRON_SECRET = "s3cret";
+    resetPremiumFunnelEventLogForTests();
+
+    await POST(
+      new Request("http://localhost/api/telemetry/premium-funnel", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          type: "premium_intent",
+          source: "api_access",
+          path: "/api-docs",
+          occurredAt: new Date().toISOString(),
+        }),
+      }),
+    );
+
+    const response = await GET(
+      new Request("http://localhost/api/telemetry/premium-funnel", {
+        headers: { authorization: "Bearer s3cret" },
+      }),
+    );
+
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.summary.total, 1);
+    assert.equal(body.summary.bySource.api_access, 1);
   });
 });
