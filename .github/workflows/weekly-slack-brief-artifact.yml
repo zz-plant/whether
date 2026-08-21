@@ -37,8 +37,11 @@ jobs:
           name: weekly-slack-brief
           path: artifacts/weekly-slack-brief.txt
 
+      # No continue-on-error, for the same reason as the sibling automations:
+      # this step fails with "GitHub Actions is not permitted to create or approve
+      # pull requests" while the job reports success, so the committed brief goes
+      # stale with nothing to show for it.
       - name: Open pull request with latest weekly brief
-        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           branch: automation/weekly-slack-brief
