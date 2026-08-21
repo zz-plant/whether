@@ -18,8 +18,16 @@ const MAX_SERIES_FETCH_ATTEMPTS = 2;
 // backoff sleep is pure suite wall clock. The retry path still runs.
 const RETRY_BACKOFF_MS =
   typeof process !== "undefined" && process.env?.NODE_ENV === "test" ? 0 : 250;
-const TREASURY_RATES_ENDPOINT =
-  "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
+/**
+ * Year-scoped rather than `/current/all`: that path answers 200 with a
+ * zero-byte body -- an empty object cached at the CDN, not an error -- so the
+ * client fell through to FRED, which refuses Worker-originated requests, and
+ * production served a June snapshot into late August. The year file carries the
+ * same columns and the same current row, and is served normally.
+ */
+const buildTreasuryRatesEndpoint = (year: number) =>
+  `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/${year}/all` +
+  `?type=daily_treasury_yield_curve&field_tdr_date_value=${year}&_format=csv`;
 export const TREASURY_ENDPOINTS = {
   fedFunds: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFF",
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
@@ -127,10 +135,10 @@ const parseCsvRow = (row: string) => {
   return values;
 };
 
-const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: string) => {
+const fetchTreasuryYearCsv = async (fetcher: typeof fetch, fetchedAt: string, year: number) => {
   const response = await fetchWithTimeout(
     fetcher,
-    TREASURY_RATES_ENDPOINT,
+    buildTreasuryRatesEndpoint(year),
     { headers: TREASURY_FETCH_HEADERS },
     PRIMARY_FETCH_TIMEOUT_MS
   );
@@ -191,6 +199,26 @@ const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: 
   }
 
   throw new Error("Treasury daily rates CSV missing one or more required tenors.");
+};
+
+/**
+ * The current year's file, then the previous one: in the first days of January
+ * the new file can be empty or not yet published, and the latest curve is still
+ * the prior year's last session.
+ */
+const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: string) => {
+  const currentYear = new Date(fetchedAt).getUTCFullYear();
+  let firstError: unknown;
+
+  for (const year of [currentYear, currentYear - 1]) {
+    try {
+      return await fetchTreasuryYearCsv(fetcher, fetchedAt, year);
+    } catch (error) {
+      firstError ??= error;
+    }
+  }
+
+  throw firstError ?? new Error("Treasury daily rates CSV returned no data.");
 };
 
 

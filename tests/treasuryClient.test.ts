@@ -442,4 +442,51 @@ describe("treasury client", () => {
       tenYear: 4.58,
     });
   });
+  it("requests the year-scoped daily rates file, not the empty /current/all path", async () => {
+    const requested: string[] = [];
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      requested.push(url);
+      if (url.includes("home.treasury.gov")) {
+        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "08/21/2026,3.80,3.88,4.24,4.74"].join("\n"));
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    const treasuryUrl = requested.find((url) => url.includes("home.treasury.gov")) ?? "";
+    const currentYear = new Date().getUTCFullYear();
+
+    // /current/all answers 200 with a zero-byte body, which reads as a successful
+    // fetch of nothing -- production fell through to FRED and served a snapshot
+    // two months old. The year file is the same data, served normally.
+    assert.ok(!treasuryUrl.includes("/current/all"), `still requesting /current/all: ${treasuryUrl}`);
+    assert.ok(treasuryUrl.includes(`/${currentYear}/all`), `expected the ${currentYear} file: ${treasuryUrl}`);
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-08-21");
+  });
+
+  it("falls back to the previous year's file when the current year's is empty", async () => {
+    const currentYear = new Date().getUTCFullYear();
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      if (url.includes(`/${currentYear}/all`)) {
+        // Early January: the new file exists but carries no sessions yet.
+        return new Response("");
+      }
+
+      if (url.includes(`/${currentYear - 1}/all`)) {
+        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "12/31/2025,4.02,4.11,4.20,4.51"].join("\n"));
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2025-12-31");
+    assert.equal(data.source, "https://home.treasury.gov");
+  });
 });
