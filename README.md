@@ -57,6 +57,21 @@ curl -s "http://localhost:3000/api/agent?cadence=weekly" \
 
 See [docs/developer/quickstart.md](docs/developer/quickstart.md) for the full integration flow.
 
+### 4) Read the call from the terminal
+
+```bash
+bun run cli:whether -- status
+```
+
+`whether brief slack`, `whether export pdf`, `whether watch --changes-only`, and
+`whether explain flip` cover the common operator paths. Full command list:
+[docs/cli-command-reference.md](docs/cli-command-reference.md).
+
+### 5) Connect an MCP client
+
+Point any MCP client at `https://whether.work/api/mcp` (streamable HTTP) to query the weekly call
+as a tool. `bun run mcp:whether` starts the same interface over stdio against your local checkout.
+
 ---
 
 ## Product intent

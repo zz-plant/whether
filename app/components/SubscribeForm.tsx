@@ -54,7 +54,9 @@ export function SubscribeForm() {
     <div className="weather-section-border space-y-3">
       <div>
         <p className="text-fluid-sm font-medium text-white">Get the weekly brief</p>
-        <p className="text-fluid-xs text-white/60 mt-0.5">Weekly operating call + evidence, every Monday.</p>
+        <p className="text-fluid-xs text-white/60 mt-0.5">
+          Monday morning: the regime, the one action it calls for, and a link to the evidence behind it.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
