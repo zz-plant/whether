@@ -60,6 +60,25 @@ describe("premium funnel helpers", () => {
     );
   });
 
+  it("rejects oversized free-text fields", () => {
+    const base = {
+      type: "premium_intent",
+      source: "export_brief",
+      path: "/operate",
+      occurredAt: new Date().toISOString(),
+    };
+
+    assert.equal(isValidPremiumFunnelEvent({ ...base, path: "/".repeat(513) }), false);
+    assert.equal(isValidPremiumFunnelEvent({ ...base, ctaId: "x".repeat(129) }), false);
+    assert.equal(isValidPremiumFunnelEvent({ ...base, detail: "x".repeat(129) }), false);
+    assert.equal(isValidPremiumFunnelEvent({ ...base, occurredAt: "x".repeat(65) }), false);
+
+    assert.equal(
+      isValidPremiumFunnelEvent({ ...base, ctaId: "x".repeat(128), detail: "y".repeat(128) }),
+      true,
+    );
+  });
+
   it("forwards events when webhook is configured", async () => {
     const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async () =>
       new Response(JSON.stringify({ ok: true }), { status: 200 }),

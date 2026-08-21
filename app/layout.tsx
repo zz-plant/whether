@@ -8,6 +8,7 @@ import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
+import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
@@ -200,6 +201,7 @@ export default function RootLayout({
           <GlobalCommandPalette />
           <GlobalShareRail />
           <ScreenshotDetector />
+          <PremiumFunnelTracker />
           {children}
         </ToastProviderRoot>
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8">

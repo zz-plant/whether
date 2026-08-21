@@ -44,27 +44,27 @@ export default function ApiDocsPage() {
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /api/posture/current</p>
               <p className="text-xs text-slate-300">Stable JSON endpoint for the current posture. Returns regime, tightness, direction, confidence, week, summary, url, and version. Type contract at lib/types.ts.</p>
-              <a href="/api/posture/current" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>
+              <a href="/api/posture/current" data-premium-intent="api_access" data-premium-cta="try_posture_current" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /api/agent?cadence=weekly</p>
               <p className="text-xs text-slate-300">Full structured brief data with handoff payload. Supports weekly, monthly, quarterly, yearly.</p>
-              <a href="/api/agent?cadence=weekly" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>
+              <a href="/api/agent?cadence=weekly" data-premium-intent="api_access" data-premium-cta="try_agent_brief" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">Try it →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /brief.md</p>
               <p className="text-xs text-slate-300">The current brief in Markdown format. Instant, structured, cacheable.</p>
-              <a href="/brief.md" aria-label="View Markdown brief" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View brief.md →</a>
+              <a href="/brief.md" data-premium-intent="api_access" data-premium-cta="view_brief_md" aria-label="View Markdown brief" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View brief.md →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /llms.txt</p>
               <p className="text-xs text-slate-300">Agent discovery document. Linked from &lt;link rel=&quot;llm&quot;&gt; in the page head.</p>
-              <a href="/llms.txt" aria-label="View LLMs discovery document" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View llms.txt →</a>
+              <a href="/llms.txt" data-premium-intent="api_access" data-premium-cta="view_llms_txt" aria-label="View LLMs discovery document" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View llms.txt →</a>
             </div>
             <div className="weather-surface px-4 py-3 space-y-1">
               <p className="text-fluid-xs font-semibold text-sky-200">GET /feed.xml</p>
               <p className="text-xs text-slate-300">RSS feed for the weekly brief. Subscribe in any RSS reader.</p>
-              <a href="/feed.xml" aria-label="View RSS feed" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View feed.xml →</a>
+              <a href="/feed.xml" data-premium-intent="api_access" data-premium-cta="view_feed_xml" aria-label="View RSS feed" className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600">View feed.xml →</a>
             </div>
           </div>
         </section>

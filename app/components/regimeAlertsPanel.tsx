@@ -249,6 +249,9 @@ export const RegimeAlertsPanel = () => {
                     preferences[channel] ? "text-emerald-200" : "text-slate-400"
                   }`}
                   aria-pressed={preferences[channel]}
+                  data-premium-intent="integrations"
+                  data-premium-cta={`toggle_alert_channel_${channel}`}
+                  data-premium-detail={channel}
                 >
                   {preferences[channel] ? "✓" : "○"} {channel}
                 </button>

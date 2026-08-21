@@ -209,5 +209,6 @@ lib/
 - Keep `app/layout.tsx` server-first and limit it to true shell concerns (document metadata, skip link, and shared header).
 - Scope client providers to the smallest route subtree that needs them:
   - `app/evidence/layout.tsx` wraps only the signals experience with `ToastProviderRoot` because summary-copy toasts are rendered from the time machine summary cards.
-  - `app/planning/layout.tsx` wraps operations routes with `ToastProviderRoot` and `PremiumFunnelTracker` because operations panels emit both toast notifications and premium CTA telemetry attributes.
+  - `app/operate/layout.tsx` wraps operations routes; `ToastProviderRoot` lives in the root layout because operations panels emit toast notifications.
+- `PremiumFunnelTracker` is the deliberate exception to the scoping rule: it mounts once in `app/layout.tsx`. Premium-intent CTAs now span `/api-docs`, the alerts panel, and the operate panels, and scoping it to one subtree left the acquisition surface (`/`) unmeasured. Mount it in exactly one place — two instances attach two document listeners and double-count every click.
 - Avoid attaching interaction trackers or toast infrastructure to unrelated routes; this reduces client-side work on pages that do not present those interactions.

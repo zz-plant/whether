@@ -471,7 +471,8 @@ These are the safest places to extend the system without blurring the architectu
 - **Global (`app/layout.tsx`)**: Server-first, shell concerns only (metadata, skip link, shared header)
 - **Scoped providers**:
   - `app/evidence/layout.tsx`: ToastProviderRoot for time machine summaries
-  - `app/planning/layout.tsx`: ToastProviderRoot + PremiumFunnelTracker
+  - `app/operate/layout.tsx`: operations routes (pass-through)
+  - `PremiumFunnelTracker`: root layout only — single mount, or clicks double-count
 
 ---
 
