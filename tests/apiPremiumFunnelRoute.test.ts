@@ -45,6 +45,24 @@ describe("/api/telemetry/premium-funnel", () => {
     assert.equal(body.ok, true);
   });
 
+  it("refuses an oversized body before parsing it", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/telemetry/premium-funnel", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          type: "premium_intent",
+          source: "export_brief",
+          path: "/operate",
+          detail: "x".repeat(8192),
+          occurredAt: new Date().toISOString(),
+        }),
+      }),
+    );
+
+    assert.equal(response.status, 413);
+  });
+
   it("refuses to read the funnel without the cron secret", async () => {
     process.env.WHETHER_CRON_SECRET = "s3cret";
 

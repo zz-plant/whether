@@ -8,11 +8,25 @@ import {
 
 export const runtime = "edge";
 
+/* A well-formed event is a few hundred bytes. Reject anything larger before parsing so a
+   large body is never materialized, let alone persisted. Field-level caps live in
+   isValidPremiumFunnelEvent; this is the outer bound for the whole request. */
+const MAX_BODY_BYTES = 4096;
+
 export async function POST(request: Request) {
+  const declaredLength = Number.parseInt(request.headers.get("content-length") ?? "", 10);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  }
+
   let payload: unknown;
 
   try {
-    payload = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+    }
+    payload = JSON.parse(raw);
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }

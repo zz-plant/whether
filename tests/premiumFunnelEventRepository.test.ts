@@ -86,20 +86,106 @@ describe("premium funnel durable capture", () => {
     assert.equal(summary.byPath["/api-docs"], 2);
   });
 
-  it("reports the first and last event timestamps", async () => {
-    await recordPremiumFunnelEvent(event({ occurredAt: "2026-08-19T09:00:00.000Z" }));
-    await recordPremiumFunnelEvent(event({ occurredAt: "2026-08-21T17:30:00.000Z" }));
-    await recordPremiumFunnelEvent(event({ occurredAt: "2026-08-20T12:00:00.000Z" }));
+  it("stamps a trusted server receive time alongside the client timestamp", async () => {
+    const before = Date.now();
+    await recordPremiumFunnelEvent(event({ occurredAt: "1999-01-01T00:00:00.000Z" }));
 
-    const summary = await summarizePremiumFunnelEvents();
+    const { events } = await listPremiumFunnelEvents();
 
-    assert.equal(summary.firstEventAt, "2026-08-19T09:00:00.000Z");
-    assert.equal(summary.lastEventAt, "2026-08-21T17:30:00.000Z");
+    assert.equal(events[0].occurredAt, "1999-01-01T00:00:00.000Z");
+    assert.ok(Date.parse(events[0].receivedAt) >= before);
+  });
+
+  it("returns events newest first", async () => {
+    await recordPremiumFunnelEvent(event({ source: "export_brief" }));
+    await recordPremiumFunnelEvent(event({ source: "api_access" }));
+    await recordPremiumFunnelEvent(event({ source: "integrations" }));
+
+    const { events } = await listPremiumFunnelEvents();
+
+    assert.deepEqual(events.map((entry) => entry.source), [
+      "integrations",
+      "api_access",
+      "export_brief",
+    ]);
+  });
+
+  it("flags a filled window as truncated so a windowed count is not read as total", async () => {
+    await recordPremiumFunnelEvent(event());
+    await recordPremiumFunnelEvent(event());
+
+    assert.equal((await summarizePremiumFunnelEvents(2)).truncated, true);
+    assert.equal((await summarizePremiumFunnelEvents(50)).truncated, false);
   });
 
   it("reports local-fallback when no KV binding is present", async () => {
     const summary = await summarizePremiumFunnelEvents();
     assert.equal(summary.backend, "local-fallback");
+  });
+
+  /* Guards the property that makes this store safe where DurableEventLog was not:
+     a key is derived per event with no shared counter and no serialization, so
+     concurrent writers cannot land on the same key and overwrite each other. The
+     assertion on `written.size` is the load-bearing one — an allocator that collided
+     would produce fewer stored keys than events. */
+  it("allocates a distinct key per event under concurrent writes", async () => {
+    const written = new Map<string, string>();
+    const kv = {
+      get: async (key: string) => written.get(key) ?? null,
+      put: async (key: string, value: string) => { written.set(key, value); },
+      list: async ({ prefix, limit }: { prefix?: string; limit?: number }) => {
+        const keys = [...written.keys()]
+          .filter((key) => !prefix || key.startsWith(prefix))
+          .sort()
+          .slice(0, limit ?? 1000)
+          .map((name) => ({ name }));
+        return { keys, list_complete: true, cursor: undefined };
+      },
+    };
+    Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
+
+    await Promise.all(
+      Array.from({ length: 50 }, (_unused, index) =>
+        recordPremiumFunnelEvent(event({ path: `/click/${index}` })),
+      ),
+    );
+
+    assert.equal(written.size, 50, "a collided key would leave fewer stored entries");
+
+    const { events } = await listPremiumFunnelEvents({ limit: 100 });
+    assert.equal(events.length, 50);
+    assert.equal(new Set(events.map((entry) => entry.path)).size, 50);
+
+    Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
+  });
+
+  it("skips malformed stored rows instead of counting them", async () => {
+    const written = new Map<string, string>([
+      ["premium-funnel:00000000000001:a", JSON.stringify({ nonsense: true })],
+      ["premium-funnel:00000000000002:b", "{not json"],
+      [
+        "premium-funnel:00000000000003:c",
+        JSON.stringify({ ...event({ source: "api_access" }), receivedAt: "2026-08-21T10:00:00.000Z" }),
+      ],
+    ]);
+    Object.assign(globalThis, {
+      WHETHER_DURABLE_KV: {
+        get: async (key: string) => written.get(key) ?? null,
+        put: async () => undefined,
+        list: async () => ({
+          keys: [...written.keys()].map((name) => ({ name })),
+          list_complete: true,
+          cursor: undefined,
+        }),
+      },
+    });
+
+    const summary = await summarizePremiumFunnelEvents();
+
+    assert.equal(summary.total, 1);
+    assert.equal(summary.bySource.api_access, 1);
+
+    Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
   });
 
   it("filters the tail by source", async () => {

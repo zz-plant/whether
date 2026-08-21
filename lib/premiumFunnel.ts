@@ -46,6 +46,16 @@ export const isPremiumPlanCandidate = (value: string): value is PremiumPlanCandi
 export const isPremiumSeatBand = (value: string): value is PremiumSeatBand =>
   value === "1" || value === "2-5" || value === "6-20" || value === "21+";
 
+export const MAX_PATH_LENGTH = 512;
+export const MAX_LABEL_LENGTH = 128;
+const MAX_TIMESTAMP_LENGTH = 64;
+
+/** Optional unless `required`; when present must be a string within `max`. */
+const withinBound = (value: unknown, max: number, required = false): boolean => {
+  if (value === undefined || value === null) return !required;
+  return typeof value === "string" && value.length > 0 && value.length <= max;
+};
+
 export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunnelEvent => {
   if (!input || typeof input !== "object") {
     return false;
@@ -63,10 +73,15 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
     return false;
   }
 
+  /* The intake is public by necessity — it is browser telemetry — and every accepted
+     event is now persisted. Unbounded free-text fields would let one caller write
+     arbitrarily large KV values, so each is capped at a length no legitimate CTA needs. */
+  if (!withinBound(payload.path, MAX_PATH_LENGTH, true)) return false;
+  if (!withinBound(payload.ctaId, MAX_LABEL_LENGTH)) return false;
+  if (!withinBound(payload.detail, MAX_LABEL_LENGTH)) return false;
+  if (!withinBound(payload.occurredAt, MAX_TIMESTAMP_LENGTH, true)) return false;
+
   return (
-    typeof payload.path === "string" &&
-    payload.path.length > 0 &&
-    typeof payload.occurredAt === "string" &&
     isPremiumFunnelEventType(String(payload.type)) &&
     isPremiumIntentSource(String(payload.source))
   );

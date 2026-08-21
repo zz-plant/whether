@@ -163,6 +163,8 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={handleCopy}
+                data-premium-intent="export_brief"
+                data-premium-cta="share_rail_copy_plain"
                 className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "plain" ? "Copied!" : "Plain text"}
@@ -170,6 +172,8 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={copySlackText}
+                data-premium-intent="export_brief"
+                data-premium-cta="share_rail_copy_slack"
                 className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "slack" ? "Copied!" : "Slack format"}
@@ -194,6 +198,8 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                   const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
                   copyToClipboard(text, "section");
                 }}
+                data-premium-intent="export_brief"
+                data-premium-cta="share_rail_copy_decision_card"
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "section" ? "Copied!" : "Decision card"}
