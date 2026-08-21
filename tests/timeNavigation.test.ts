@@ -1,8 +1,24 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { getPublishedBriefs, buildPublishedBriefPath } from "../lib/report/publishedBriefs";
 import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
+
+// Without this the historical-replay case calls the real global fetch and waits
+// out the live Treasury/FRED timeouts (~4s) before falling back to the snapshot
+// it is actually asserting on. Same idiom as tests/apiSlackBriefRoute.test.ts.
+const originalFetch = globalThis.fetch;
+const disabledFetch: typeof fetch = async () => {
+  throw new Error("Test fetch disabled");
+};
+
+beforeEach(() => {
+  globalThis.fetch = disabledFetch;
+});
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+});
 
 describe("time navigation and historical replay", () => {
   it("computes previous snapshot and report dynamics for historical selections", async () => {

@@ -7,10 +7,30 @@ export const FRED_FETCH_HEADERS = {
   "user-agent": "WhetherDataBot/1.0 (+https://whether.app)",
 } as const;
 
+const isTestRuntime = () =>
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+
 const DEFAULT_TIMEOUT_MS = 8_000;
 const DEFAULT_REVALIDATE_SECONDS = 900;
 const DEFAULT_RETRY_ATTEMPTS = 3;
-const DEFAULT_RETRY_BACKOFF_MS = 500;
+// Backoff spaces out retries against a real upstream. Under `bun test` every
+// upstream is a stub that fails instantly, so the sleep adds pure wall clock to
+// the suite without exercising anything — the retry path itself still runs.
+const DEFAULT_RETRY_BACKOFF_MS = isTestRuntime() ? 0 : 500;
+
+/**
+ * Wall-clock ceiling for every attempt of one series fetch combined.
+ *
+ * Report assembly runs under `withDeadline(10s)` (lib/report/reportData.ts), and
+ * that deadline is documented as sized against upstream fetches "individually
+ * capped at 8s". Retrying does not get free time on top of that: `withDeadline`
+ * abandons work rather than cancelling it, so an attempt that begins after the
+ * deadline has fired keeps holding the isolate and its subrequest quota to
+ * produce a value no caller can still read. Bounding the whole sequence keeps
+ * the retry budget inside the deadline that governs it, and leaves headroom for
+ * the fallback path to actually run.
+ */
+const DEFAULT_RETRY_BUDGET_MS = 9_000;
 
 const CIRCUIT_BREAKER_THRESHOLD = 3;
 const CIRCUIT_BREAKER_COOLDOWN_MS = 120_000;
@@ -32,23 +52,93 @@ export const resetFredCircuitBreaker = () => {
   cbLastFailureAt = null;
 };
 
+/**
+ * Thrown when FRED answers with a status we did not accept. Carries the status so
+ * the retry policy can tell "try again" apart from "this will fail identically".
+ */
+export class FredResponseError extends Error {
+  readonly status: number;
+
+  constructor(seriesId: string, status: number) {
+    super(`FRED request failed for ${seriesId} (HTTP ${status})`);
+    this.name = "FredResponseError";
+    this.status = status;
+  }
+}
+
+/**
+ * A retry is only worth its latency when the same request could plausibly answer
+ * differently. Transport faults, timeouts, and server-side failures qualify; a
+ * request FRED actively rejected (unknown series id, malformed range) will be
+ * rejected identically every time, and retrying it only spends the budget that
+ * the genuinely transient case needs.
+ */
+export const isRetryableFredError = (error: unknown): boolean => {
+  if (error instanceof FredResponseError) {
+    return error.status >= 500 || error.status === 408 || error.status === 429;
+  }
+
+  // Transport-level failures (aborts, DNS, resets) surface as plain errors.
+  return true;
+};
+
+export interface RetryOptions {
+  attempts?: number;
+  backoffMs?: number;
+  /** Ceiling for all attempts combined, including backoff. */
+  budgetMs?: number;
+  isRetryable?: (error: unknown) => boolean;
+  now?: () => number;
+}
+
+const pause = (durationMs: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, durationMs));
+
+/**
+ * Runs `fn` with bounded retries, handing it the time still left in the budget so
+ * the work it starts cannot outlive the sequence it belongs to.
+ */
 export const withRetry = async <T>(
-  fn: () => Promise<T>,
-  attempts: number = DEFAULT_RETRY_ATTEMPTS,
-  backoffMs: number = DEFAULT_RETRY_BACKOFF_MS,
+  fn: (remainingMs: number) => Promise<T>,
+  options: RetryOptions = {},
 ): Promise<T> => {
+  const attempts = options.attempts ?? DEFAULT_RETRY_ATTEMPTS;
+  const backoffMs = options.backoffMs ?? DEFAULT_RETRY_BACKOFF_MS;
+  const budgetMs = options.budgetMs ?? DEFAULT_RETRY_BUDGET_MS;
+  const isRetryable = options.isRetryable ?? isRetryableFredError;
+  const now = options.now ?? Date.now;
+
+  const startedAt = now();
+  const elapsed = () => now() - startedAt;
   let lastError: unknown;
+
   for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const remainingMs = budgetMs - elapsed();
+    if (remainingMs <= 0) {
+      break;
+    }
+
     try {
-      return await fn();
+      return await fn(remainingMs);
     } catch (error) {
       lastError = error;
-      if (attempt < attempts - 1) {
-        await new Promise((resolve) => setTimeout(resolve, backoffMs * (attempt + 1)));
+
+      if (attempt >= attempts - 1 || !isRetryable(error)) {
+        break;
       }
+
+      // Only sleep when the budget can still fund an attempt afterwards;
+      // otherwise the backoff is pure delay in front of a guaranteed failure.
+      const backoff = backoffMs * (attempt + 1);
+      if (elapsed() + backoff >= budgetMs) {
+        break;
+      }
+
+      await pause(backoff);
     }
   }
-  throw lastError;
+
+  throw lastError ?? new Error("FRED request failed before any attempt was made");
 };
 
 export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: string): string => {
@@ -69,6 +159,8 @@ export interface FetchFredCsvOptions {
   revalidateSeconds?: number;
   attempts?: number;
   backoffMs?: number;
+  /** Ceiling for all attempts combined. Keep below the caller's deadline. */
+  budgetMs?: number;
   /** Only request observations from this many days back. Omit for full history. */
   lookbackDays?: number;
 }
@@ -91,7 +183,7 @@ export const fetchFredCsv = async (
 
   try {
     const result = await withRetry(
-      async () => {
+      async (remainingMs) => {
         const response = await fetchWithTimeout(
           fetcher,
           buildFredSeriesUrl(
@@ -102,17 +194,21 @@ export const fetchFredCsv = async (
             headers: FRED_FETCH_HEADERS,
             next: { revalidate: revalidateSeconds },
           },
-          timeoutMs,
+          // An attempt may not outlive the budget shared by the whole sequence.
+          Math.min(timeoutMs, remainingMs),
         );
 
         if (!response.ok) {
-          throw new Error(`FRED request failed for ${seriesId}`);
+          throw new FredResponseError(seriesId, response.status);
         }
 
         return response.text();
       },
-      options?.attempts,
-      options?.backoffMs,
+      {
+        attempts: options?.attempts,
+        backoffMs: options?.backoffMs,
+        budgetMs: options?.budgetMs,
+      },
     );
 
     cbConsecutiveFailures = 0;

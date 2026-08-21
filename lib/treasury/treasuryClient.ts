@@ -14,7 +14,10 @@ const TREASURY_FETCH_HEADERS = {
 const PRIMARY_FETCH_TIMEOUT_MS = 1_500;
 const RETRY_FETCH_TIMEOUT_MS = 2_500;
 const MAX_SERIES_FETCH_ATTEMPTS = 2;
-const RETRY_BACKOFF_MS = 250;
+// See lib/fred.ts: stubbed upstreams fail instantly under `bun test`, so the
+// backoff sleep is pure suite wall clock. The retry path still runs.
+const RETRY_BACKOFF_MS =
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test" ? 0 : 250;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 export const TREASURY_ENDPOINTS = {

@@ -15,7 +15,6 @@ const toKebabFlags = (obj) =>
     ]),
   );
 import { Command } from "commander";
-import { PDFDocument, StandardFonts } from "pdf-lib";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
 EXIT.NETWORK = 6;
@@ -378,6 +377,11 @@ const sanitizePdfText = (value) =>
     .replace(/“|”/g, "\"");
 
 const createPdfFromText = async (title, content, outputFile) => {
+  // pdf-lib costs ~56ms to evaluate — roughly half this CLI's startup — and only
+  // `export --format pdf` ever needs it. Loading it here keeps that cost on the
+  // one command that uses it instead of on every `status`, `ping`, or `call`.
+  const { PDFDocument, StandardFonts } = await import("pdf-lib");
+
   const pdfDoc = await PDFDocument.create();
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
