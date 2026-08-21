@@ -8,8 +8,8 @@ export function GlobalCommandPalette() {
 
   useEffect(() => {
     const handle = () => setOpen(true);
-    window.addEventListener("whether-open-command-palette", handle);
-    return () => window.removeEventListener("whether-open-command-palette", handle);
+    document.addEventListener("whether-open-command-palette", handle);
+    return () => document.removeEventListener("whether-open-command-palette", handle);
   }, []);
 
   if (!open) return null;

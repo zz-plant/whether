@@ -82,11 +82,14 @@ carrying `data-premium-intent`, so a surface is measured only if something on it
 ## Pre-reveal go/no-go checks
 1. Confirm event volume for at least 1–2 weeks on free traffic.
 2. Validate `source` distribution lines up with product thesis (exports/integrations should dominate).
-Known gap: the tags on `app/components/shareRail.tsx` currently capture nothing, because the global
-share rail cannot open — `app/components/commandPalette.tsx` dispatches `whether-open-share-rail` as
-a non-bubbling `CustomEvent` on `document`, while `app/components/globalShareRail.tsx` listens on
-`window`, so the event never arrives. The tags are correct and will produce data once that is fixed;
-do not count them as live coverage until then.
+Resolved (Aug 2026): the tags on `app/components/shareRail.tsx` are now live. The global share rail
+had been unreachable — `app/components/commandPalette.tsx` dispatches `whether-open-share-rail` as a
+non-bubbling `CustomEvent` on `document`, while `app/components/globalShareRail.tsx` listened on
+`window`, so the event never arrived. The same defect also broke ⌘K
+(`app/components/globalCommandPalette.tsx`), which is the rail's only entry point. Both listeners now
+bind to `document`, and `tests/customEventTargetContract.test.ts` fails if any `whether` event is
+dispatched somewhere its listener cannot hear it. Export-brief coverage starts from the deploy that
+carries this fix, so earlier weeks have no share-rail data to compare against.
 
 3. Establish baseline conversion denominator:
    - unique premium-intent sessions — **available**, from the events captured here
