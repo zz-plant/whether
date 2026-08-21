@@ -1,5 +1,23 @@
 # Cloudflare deployment runbook
 
+## How production actually deploys
+
+Cloudflare Workers Builds watches `main` and deploys on its own, roughly two
+minutes after a merge — `wrangler deployments list` shows one deployment per
+merge commit. Nothing in GitHub Actions deploys this Worker, and nothing should:
+a second lane would race Workers Builds for the same Worker.
+
+There was a `Deploy` workflow that ran `wrangler deploy` on every push to main.
+It never once succeeded — the repo has no `CLOUDFLARE_API_TOKEN` secret, so
+Wrangler exited on every run from 2026-05-30 onward — while Workers Builds
+shipped those same commits. It was removed in Aug 2026 because a permanently
+red check on every merge is the signal that hides a real deploy failure. `CI`
+still runs lint, typecheck, test, assets, and build on both pushes and PRs, so
+nothing stopped being verified.
+
+The commands below are for out-of-band deploys from a workstation (`wrangler
+login` first) and for verifying a build locally.
+
 ## Build + deploy commands
 
 This repo now has one Wrangler source of truth with two deployment targets:
