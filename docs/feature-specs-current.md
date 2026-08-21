@@ -63,7 +63,7 @@ U.S.-based operators and a U.S. market baseline, then asks the user to pressure-
 against company-specific demand, retention, and cash signals.
 Operator-workflow telemetry still logs artifact-mode selection and route transitions across the core
 weekly loop.
-On phones the hero's signal readout (cash availability / risk appetite / conditions) collapses to a
+On phones the hero's signal readout (funding pressure / risk appetite / conditions) collapses to a
 one-line summary via a native disclosure that keeps all three values visible; it opens automatically
 on ≥640px viewports (DD-004 mobile-compression work, 2026-08-11).
 The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:

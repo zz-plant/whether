@@ -11,7 +11,7 @@ const buildLiveInputs = ({
   reportEvidenceItems = [
     {
       key: "tightness" as const,
-      title: "Cash availability moved above the operating threshold",
+      title: "Funding pressure moved above the operating threshold",
       supportingBullets: ["Tightness rose 2 points week over week."],
       confidenceLabel: "HIGH",
       directionLabel: "Tightening" as const,
@@ -37,7 +37,7 @@ const buildLiveInputs = ({
         label: "BBB credit spread",
         value: 180,
         unit: "bps",
-        explanation: "Credit spreads proxy cash availability for operating posture.",
+        explanation: "Credit spreads proxy funding pressure for operating posture.",
         sourceLabel: "Federal Reserve Economic Data (FRED)",
         sourceUrl: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
         formulaUrl: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",

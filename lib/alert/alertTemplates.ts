@@ -109,7 +109,7 @@ export const thresholdCrossingEmail = (
   value: number,
   threshold: number,
 ): EmailContent => {
-  const metricLabel = metric === "credit" ? "Tightness" : "Risk Appetite";
+  const metricLabel = metric === "credit" ? "Funding pressure" : "Risk appetite";
   const direction = value > threshold ? "above" : "below";
   const subject = `Whether Alert — ${metricLabel} crossed ${threshold} threshold`;
   const text = [

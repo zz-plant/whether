@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import {
   buildDisclosureHref,
   resolveDisclosureInitialOpen,
-} from "../app/components/compactDisclosure";
+} from "../app/components/ui/disclosureUrlState";
 
 describe("compact disclosure url sync", () => {
   it("derives open state from the matching query param", () => {

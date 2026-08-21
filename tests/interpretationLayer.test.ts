@@ -196,7 +196,7 @@ describe("interpretation layer", () => {
     assert.match(sectorText, /Sector view/);
     assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
     assert.match(sectorText, /Trigger: Hold irreversible hiring\./);
-    assert.match(sectorText, /Reverse: Drop the sector tilt if cash availability rises above 70\.0\./);
+    assert.match(sectorText, /Reverse: Drop the sector tilt if funding pressure rises above 70\.0\./);
     assert.match(financialText, /Financial view/);
     assert.match(financialText, /Runway risk/);
     assert.match(financialText, /Trigger: Open the raise between month/);

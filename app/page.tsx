@@ -14,6 +14,8 @@ import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
+import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
+import { CadenceCallCardFallback } from "./components/suspenseFallbacks";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
@@ -195,7 +197,7 @@ async function PageContent({
     : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
 
   const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
-    ? `Cash availability crosses ${parsedGuardrailThreshold}`
+    ? `Funding pressure crosses ${parsedGuardrailThreshold}`
     : undefined;
   const guardrailLabel = numericGuardrailLabel
     ?? homepage.weeklyDecisionCardModel.decision.guardrail
@@ -231,6 +233,14 @@ async function PageContent({
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-8">
         <div className="space-y-8 min-w-0">
+          {/* Above the brief, not after it. This is the orientation line for a
+              first-time visitor, and it sat below the hero, all three operating
+              levers, and the compare strip — roughly 2,800px down on mobile,
+              where it cannot orient anyone. Its own bottom-border styling was
+              always that of a top strip. Hiding once dismissed is a global CSS
+              rule keyed on the data attribute (app/layout.tsx), so it stays
+              pre-paint and CLS-free at either position. */}
+          <FirstVisitExplainer />
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
@@ -244,7 +254,7 @@ async function PageContent({
             })}
           >
             {activeCadence !== "weekly" ? (
-              <Suspense fallback={<div className="weather-card h-28 animate-pulse" />}>
+              <Suspense fallback={<CadenceCallCardFallback />}>
                 <AsyncCadenceSection cadence={activeCadence} />
               </Suspense>
             ) : null}
@@ -279,6 +289,7 @@ async function PageContent({
               revisitQueue={revisitQueue}
               noChangeAreas={noChangeAreas}
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+              signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
             />
 
             <ThreeWhethersCard
@@ -296,23 +307,14 @@ async function PageContent({
               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
             />
           </SwipeableWeek>
-          <FirstVisitExplainer />
 
-          <Suspense fallback={
-            <div className="space-y-6">
-              <div className="weather-card h-20 animate-pulse" />
-              <div className="weather-card h-32 animate-pulse" />
-              <div className="weather-card h-12 animate-pulse" />
-            </div>
-          }>
-            <BelowTheFoldEvidence
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              recordDate={homepage.reportShell.recordDateLabel}
-              recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-              operateHref={operateHref}
-            />
-          </Suspense>
+          <BelowTheFoldEvidence
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+            recordDate={homepage.reportShell.recordDateLabel}
+            recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
+            operateHref={operateHref}
+          />
         </div>
 
         <div className="space-y-4 border-t border-slate-800/70 pt-6">

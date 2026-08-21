@@ -57,7 +57,7 @@ const validateDraft = (draft: ThresholdDraft): ThresholdErrorMap => {
     errors.baseRateTightness = "Base rate threshold must be between 0 and 10.";
   }
   if (Number.isNaN(tightness) || tightness < 0 || tightness > 100) {
-    errors.tightnessRegime = "Tightness threshold must be between 0 and 100.";
+    errors.tightnessRegime = "Funding-pressure threshold must be between 0 and 100.";
   }
   if (Number.isNaN(risk) || risk < 0 || risk > 100) {
     errors.riskAppetiteRegime = "Risk appetite threshold must be between 0 and 100.";
@@ -339,7 +339,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-risk"
                     name={THRESHOLD_PARAM_KEYS.risk}
-                    label="Investor-appetite score line"
+                    label="Risk-appetite score line"
                     min={0}
                     max={100}
                     step={0.01}
@@ -391,7 +391,7 @@ export const ThresholdsPanel = ({
                 <span className="mono text-slate-100">{formattedCurrent.baseRateTightness}%</span>
               </p>
               <p>
-                Tightness threshold:{" "}
+                Funding-pressure threshold:{" "}
                 <span className="mono text-slate-100">{formattedCurrent.tightnessRegime}</span>
               </p>
               <p>

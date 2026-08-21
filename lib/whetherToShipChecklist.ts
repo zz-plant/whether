@@ -79,7 +79,7 @@ export const scoreWhetherToShipChecklist = (input: ChecklistInput, assessment: R
 
   const reversalTrigger =
     verdict === "go"
-      ? "Pause this if risk appetite drops below its threshold, or cash availability tightens above its threshold, on the next refresh."
+      ? "Pause this if risk appetite drops below its threshold, or funding pressure rises above its threshold, on the next refresh."
       : "Re-run this once the evidence reaches high and either blast radius or reversibility improves by one level.";
 
   return {

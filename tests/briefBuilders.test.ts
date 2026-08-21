@@ -24,7 +24,7 @@ const assessment: RegimeAssessment = {
     weakReadCount: 0,
     twoWeakReadsWarning: false,
   },
-  description: "",
+  description: "Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
   constraints: ["Constraint one", "Constraint two", "Constraint three"],
   tightnessExplanation: "",
   riskAppetiteExplanation: "",
@@ -123,6 +123,52 @@ const macros: MacroSeriesReading[] = [
 ];
 
 describe("buildSlackBrief", () => {
+  it("gives each bounded-decision slot content of its own shape", () => {
+    // With no modeled payload — the /share page and the CLI artifact both call it
+    // this way — the slots used to fall back to `assessment.constraints`, which is
+    // a list of actions. That put an action in "Pause if" and "Re-open when", and
+    // printed constraints[0] under both "Posture" and "Do now".
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros);
+    const slot = (label: string) =>
+      brief.match(new RegExp(`• ${label}: (.+)`))?.[1] ?? "";
+
+    const posture = slot("Posture");
+    const doNow = slot("Do now");
+    const pauseIf = slot("Pause if");
+    const reopenWhen = slot("Re-open when");
+
+    for (const [label, value] of Object.entries({ posture, doNow, pauseIf, reopenWhen })) {
+      assert.ok(value.length > 0, `${label} slot is empty`);
+    }
+
+    assert.notEqual(posture, doNow, "Posture and Do now print the same sentence");
+    assert.ok(
+      !assessment.constraints.includes(pauseIf),
+      "Pause if is being filled from the operating-constraints list",
+    );
+    assert.ok(
+      !assessment.constraints.includes(reopenWhen),
+      "Re-open when is being filled from the operating-constraints list",
+    );
+  });
+
+  it("resolves its change-course cross-reference to a label it actually prints", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros);
+    const referenced = brief.match(/Change-course trigger: see "([^"]+)"/)?.[1];
+    assert.ok(referenced, "no change-course cross-reference found");
+    assert.ok(
+      brief.includes(`• ${referenced}:`),
+      `cross-reference points at "${referenced}", which the brief never prints`,
+    );
+  });
+
+  it("names the rate signals the way the rest of the product does", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros);
+    assert.match(brief, /Fed interest rate:/);
+    assert.match(brief, /Recession warning gauge/);
+    assert.doesNotMatch(brief, /^Curve slope:/m);
+  });
+
   it("formats index values without the literal unit suffix", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
@@ -154,11 +200,11 @@ describe("buildSlackBrief", () => {
     });
 
     assert.match(brief, /Bounded decision \(Posture \/ Do now \/ Pause if \/ Re-open when\):/);
-    assert.match(brief, /• Posture: Constraint one/);
+    assert.match(brief, /• Posture: Capital is cheap and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
     assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
-    assert.ok(brief.indexOf("• Posture: Constraint one") < brief.indexOf("• Do now: Limit net new hiring."));
+    assert.ok(brief.indexOf("• Posture: Capital is cheap") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
     assert.match(brief, /Decision transmission check:/);

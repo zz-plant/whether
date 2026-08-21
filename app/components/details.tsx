@@ -2,22 +2,34 @@
 
 import type { ReactNode } from "react";
 
-type DetailsVariant = "surface" | "surface-secondary" | "auto-chevron";
+/**
+ * Shared disclosure.
+ *
+ * Every variant carries the chevron affordance. The previous default ("surface")
+ * rendered a summary with `list-style: none` and nothing else — no chevron, no
+ * 44px target, no focus ring — so a disclosure built with the default settings
+ * read as a static heading with its content simply missing. The one existing
+ * call site sidestepped that by passing `variant="auto-chevron"` explicitly,
+ * which is a default worth not having.
+ *
+ * `weather-auto-chevron` is one of the three equivalent opt-ins into the single
+ * disclosure contract in `app/styles/controls.css`.
+ */
+
+type DetailsVariant = "surface" | "surface-secondary";
 
 type DetailsProps = {
   children: ReactNode;
   summary: ReactNode;
   className?: string;
   open?: boolean;
-  defaultOpen?: boolean;
   id?: string;
   variant?: DetailsVariant;
 };
 
 const variantClasses: Record<DetailsVariant, string> = {
-  "surface": "weather-surface scroll-mt-28 px-4 py-4",
-  "surface-secondary": "weather-surface-secondary scroll-mt-28 px-4 py-4",
-  "auto-chevron": "weather-auto-chevron weather-surface scroll-mt-28 px-4 py-4",
+  "surface": "weather-surface",
+  "surface-secondary": "weather-surface-secondary",
 };
 
 export const Details = ({
@@ -25,21 +37,15 @@ export const Details = ({
   summary,
   className,
   open,
-  defaultOpen,
   id,
   variant = "surface",
-}: DetailsProps) => {
-  const base = variantClasses[variant];
-
-  return (
-    <details
-      id={id}
-      className={`${base} [&>summary]:cursor-pointer [&>summary]:list-none ${className ?? ""}`}
-      open={open}
-      data-default-open={defaultOpen}
-    >
-      <summary className="select-none">{summary}</summary>
-      <div className="mt-4">{children}</div>
-    </details>
-  );
-};
+}: DetailsProps) => (
+  <details
+    id={id}
+    className={`weather-auto-chevron ${variantClasses[variant]} scroll-mt-28 px-4 py-4 ${className ?? ""}`}
+    open={open}
+  >
+    <summary className="select-none">{summary}</summary>
+    <div className="mt-4">{children}</div>
+  </details>
+);

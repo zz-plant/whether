@@ -51,7 +51,7 @@ export function ThreeWhethersCard({
               <dt className="text-sm font-semibold tracking-tight text-white">{item.label}</dt>
               {/* State only. tightenDistanceLabel is derived from the shared lane
                   state, so it renders the same sentence on every lever — three
-                  identical copies of "Cash availability 0.0 pts to caution."
+                  identical copies of "Funding pressure 0.0 pts to caution."
                   reads as boilerplate rather than as data. */}
               {item.currentStateLabel ? (
                 <p className={`mt-1 text-fluid-nano font-semibold ${STATE_TONE[item.currentStateLabel]}`}>

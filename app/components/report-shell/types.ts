@@ -30,11 +30,6 @@ export type DecisionBanner = {
   evidenceHref?: string;
 };
 
-export type ActionSequence = {
-  title: string;
-  items: Array<{ title: string; detail: string; href: string; cta: string }>;
-};
-
 export type RoleSwitcher = {
   active: string;
   options: Array<{ key: string; label: string; href: Route }>;

@@ -121,8 +121,8 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
 
 const OPERATING_LEVER_FALLBACK = {
   areaActionNow: "Maintain current operating posture.",
-  triggerThreshold: "Pause if tightness exceeds 60 or risk appetite falls below 40.",
-  reversalCondition: "Resume expansion when tightness drops below 50 and risk appetite is above 50.",
+  triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
+  reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
 
 const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Unavailable — review thresholds manually.";
@@ -218,11 +218,11 @@ export type DecisionLaneState = {
 const stateLabelByStep = ["Closed", "Guarded", "Staged", "Open"] as const;
 const progressByStep = [12, 38, 70, 92] as const;
 
-const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Cash availability");
+const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Funding pressure");
 
 const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(
-    /(cash availability|risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
+    /(funding pressure|risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
   );
 
   return Array.from(matches, (match) => ({

@@ -11,26 +11,59 @@ import {
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
+
+/**
+ * Macro stress adjustments.
+ *
+ * These sit on top of the rate-driven scores in `regimeEngineCore`: each pairs a
+ * threshold (the level at which a series starts counting as stress), a
+ * multiplier (how fast it accrues past that level), and a cap (the most it can
+ * move the score). Only one of the thresholds below is a convention rather than
+ * a product choice — see each note. The caps are all deliberately small: these
+ * are corroborating reads, and no single one should be able to flip a regime on
+ * its own.
+ */
+
+/** High-yield spread, in percentage points over Treasuries. 4.5% is near the
+ *  long-run median; below it, risk lending is not the constraint. */
 const HY_SPREAD_STRESS_THRESHOLD = 4.5;
 const HY_SPREAD_TIGHTNESS_MULTIPLIER = 6;
 const HY_SPREAD_TIGHTNESS_CAP = 15;
+/** Convention, not a product choice: the Chicago Fed's index is constructed so
+ *  that zero is average financial conditions and positive is tighter than
+ *  average. Do not "tune" this one — it would stop meaning anything. */
 const CHICAGO_FCI_TIGHTENING_THRESHOLD = 0;
 const CHICAGO_FCI_TIGHTNESS_MULTIPLIER = 10;
 const CHICAGO_FCI_TIGHTNESS_CAP = 10;
+/** VIX level above which expected turbulence starts subtracting from risk
+ *  appetite. 20 is the rough dividing line between calm and unsettled markets. */
 const VIX_SHOCK_THRESHOLD = 20;
 const VIX_RISK_APPETITE_MULTIPLIER = 1.5;
 const VIX_RISK_APPETITE_CAP = 20;
+/** Quarter-over-quarter percent change in venture funding flow. Anything worse
+ *  than -5% counts as a slowdown. Capped lower than the VIX haircut, so a soft
+ *  funding quarter cannot outweigh live market turbulence. */
 const VC_VELOCITY_SLOWDOWN_THRESHOLD = -5;
 const VC_VELOCITY_RISK_APPETITE_MULTIPLIER = 1.5;
 const VC_VELOCITY_RISK_APPETITE_CAP = 10;
+/** Level of the composite tech-layoff index above which layoffs count as
+ *  pressure. Index units from the composite layoff snapshot, not a percentage. */
 const LAYOFF_PRESSURE_THRESHOLD = 65;
 const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
 const LAYOFF_RISK_APPETITE_CAP = 12;
+
+/**
+ * Diagnostic bands, all measured in score points of distance from the nearest
+ * regime threshold. They govern how loudly the product speaks, never what the
+ * regime is: confidence wording, the transition-watch flag, and intensity.
+ */
 const DIAGNOSTIC_CONFIDENCE_HIGH_DELTA = 13;
 const DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA = 6;
 const DIAGNOSTIC_TRANSITION_WATCH_DELTA = 5;
 const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
 const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
+/** Two degraded signal reads in a row is the point at which the product warns
+ *  rather than silently serving a thinner model. */
 const TWO_WEAK_READS_WARNING_COUNT = 2;
 
 /**
@@ -202,7 +235,7 @@ export const buildSignalInfluence = ({
 }): RegimeSignalInfluence[] => [
   {
     key: "tightness",
-    label: "Cash availability",
+    label: "Funding pressure",
     influence: Math.abs(tightness - thresholds.tightnessRegime),
     unavailable: false,
   },
@@ -315,11 +348,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentTightnessThreshold,
     up: {
       code: "tightness-upshift",
-      message: `Cash availability crossed above ${currentTightnessThreshold}.`,
+      message: `Funding pressure crossed above ${currentTightnessThreshold}.`,
     },
     down: {
       code: "tightness-downshift",
-      message: `Cash availability fell below ${currentTightnessThreshold}.`,
+      message: `Funding pressure fell below ${currentTightnessThreshold}.`,
     },
   });
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
+import { UrlDetails } from "../components/ui/urlDetails";
+import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
 import {
   PRIMARY_AUDIENCE_ACTION,
@@ -22,7 +24,12 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether trust hub",
 });
 
-export default async function MethodPage() {
+export default async function MethodPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | undefined>>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const {
     reportData,
     isFallback,
@@ -252,17 +259,24 @@ export default async function MethodPage() {
       <FormulaReference />
 
       {!isFallback && warnings.length === 0 ? (
-        <details className="group mt-6 rounded-xl border border-white/[0.10] bg-slate-950/20 px-5 py-4">
-          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none">
-            <span>Detailed verification &amp; source board</span>
-            <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
-              ▾
-            </span>
-          </summary>
+        <UrlDetails
+          queryKey="sources"
+          initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "sources")}
+          className="group mt-6 rounded-xl border border-white/[0.10] bg-slate-950/20 px-5 py-4"
+          summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none"
+          summary={
+            <>
+              <span>Detailed verification &amp; source board</span>
+              <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
+                ▾
+              </span>
+            </>
+          }
+        >
           <div className="mt-6 space-y-8">
             {secondaryContent}
           </div>
-        </details>
+        </UrlDetails>
       ) : (
         secondaryContent
       )}

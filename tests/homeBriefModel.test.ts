@@ -169,7 +169,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
-    assert.equal(model.regimeSignalIndicators[0]?.label, "Cash availability");
+    assert.equal(model.regimeSignalIndicators[0]?.label, "Funding pressure");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
@@ -576,7 +576,7 @@ describe("buildHomeBriefModel", () => {
 
     const capitalRow = model.decisionMatrix.rows.find((row) => row.key === "capital");
     assert.ok(capitalRow);
-    assert.match(capitalRow?.cells.flip.text ?? "", /cash availability\s*</i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /funding pressure\s*</i);
     assert.match(capitalRow?.cells.flip.text ?? "", /and/i);
     assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
   });
@@ -702,7 +702,7 @@ describe("buildHomeBriefModel", () => {
       reportDynamics: { directionLabel: "stable", changedSignals: [], anomalySignals: [] },
     });
 
-    assert.match(model.guardrail, /cash availability.*76|risk appetite.*44/i);
+    assert.match(model.guardrail, /funding pressure.*76|risk appetite.*44/i);
     assert.doesNotMatch(model.guardrail, /trigger confirmation/i);
     assert.doesNotMatch(model.netConstraintSummary, /stay the course/i);
   });

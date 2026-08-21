@@ -390,7 +390,7 @@ Compressed the shell chrome and unified control vocabulary on `/`.
 
 Restructured `/` around scan speed and CTA hierarchy; desktop page height dropped ~570px.
 
-- **Hero metadata is cells, not prose.** The wrap-dependent metadata sentence (cash availability,
+- **Hero metadata is cells, not prose.** The wrap-dependent metadata sentence (funding pressure,
   risk appetite, deltas, regime in one flowing `<p>`) became three fixed signal cells with the delta
   glyph inside each cell. The 48px posture compass — 6px axis labels, unreadable at rendered size,
   duplicating the ThresholdLadder — was cut; its `pts to pause` counter moved into the
@@ -444,7 +444,7 @@ same thing, the earlier one keeps it.
   `/25` and below stay decorative. Light theme unaffected — it keeps its own earlier remap.
 - **Mobile signal readout collapses (DD-004).** The hero's three-cell readout renders twice behind a
   CSS split: a static grid on ≥640px, and on <640px a native `<details>` whose summary is one
-  tappable line carrying all three values (`Cash availability 52 · Risk appetite 59 · Sunny`,
+  tappable line carrying all three values (`Funding pressure 52 · Risk appetite 59 · Sunny`,
   ≥44px target, explicit chevron). Pure CSS on purpose: `<details>` toggles without JS and neither
   viewport shifts layout after hydration (an effect-driven open was tried and rejected for
   desktop pop-in). Glyph SVG ids are suffixed per render to stay unique. Nothing in the do-not-cut

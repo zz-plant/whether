@@ -1,5 +1,7 @@
 import { ActionLink } from "../components/ui/actionLink";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
+import { UrlDetails } from "../components/ui/urlDetails";
+import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
@@ -81,10 +83,13 @@ export default async function HistoryPage({
         </ul>
       </section>
 
-      <details className="group weather-panel px-5 py-4">
-        <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between gap-3 text-fluid-xs font-medium text-white/70 after:ml-auto after:pl-2 after:text-slate-400 after:content-['▾'] group-open:after:content-['▴']">
-          <span>Explore raw historical conditions</span>
-        </summary>
+      <UrlDetails
+        queryKey="explore"
+        initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
+        className="weather-auto-chevron weather-panel px-5 py-4"
+        summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
+        summary={<span>Explore raw historical conditions</span>}
+      >
         <div className="mt-4 space-y-5">
           <HistoryExplorer
             coverage={getTimeMachineMonthsByYear()}
@@ -94,11 +99,11 @@ export default async function HistoryPage({
           />
           <RegimeStats series={statsSeries} />
           <div className="grid gap-6 sm:grid-cols-2">
-            <HistoricalTrendChart label="Tightness" color="var(--color-semantic-tightening-border)" points={tightnessTrend} />
-            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive />
+            <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
+            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
           </div>
         </div>
-      </details>
+      </UrlDetails>
     </ReportShell>
   );
 }

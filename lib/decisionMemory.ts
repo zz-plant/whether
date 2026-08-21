@@ -14,7 +14,7 @@ export type DecisionMemoryEntryKind = "decision" | "posture-snapshot";
  * against the decision's own assumptions instead of against today's posture.
  */
 export type DecisionAssumptionSnapshot = {
-  /** Cash availability reading when the decision was recorded. */
+  /** Funding pressure reading when the decision was recorded. */
   tightness: number;
   /** Risk appetite reading when the decision was recorded. */
   riskAppetite: number;

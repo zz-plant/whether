@@ -120,7 +120,7 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   }
 
   bullets.push(
-    `Cash availability at ${tightness} against risk appetite at ${riskAppetite} holds conditions in ${REGIME_LABELS[assessment.regime]}.`
+    `Funding pressure at ${tightness} against risk appetite at ${riskAppetite} holds conditions in ${REGIME_LABELS[assessment.regime]}.`
   );
 
   return bullets;
@@ -128,7 +128,7 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
 
 const buildReversalTrigger = (assessment: RegimeAssessment) => {
   const { tightnessRegime, riskAppetiteRegime } = assessment.thresholds;
-  const cash = `cash availability (now ${assessment.scores.tightness})`;
+  const cash = `funding pressure (now ${assessment.scores.tightness})`;
   const risk = `risk appetite (now ${assessment.scores.riskAppetite})`;
   const hold = `for ${REGIME_REVERSAL_DAYS} straight days`;
 

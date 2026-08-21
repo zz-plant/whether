@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { ReportSection } from "../components/reportSection";
+import { GlossaryLink } from "../components/ui/plainLanguage";
+import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
   BASE_RATE_TIGHTNESS_MULTIPLIER,
   BASE_RATE_TIGHTNESS_THRESHOLD,
@@ -48,21 +50,71 @@ export function FormulaReference() {
       title="How the score is built"
       description="The full derivation, from public data series to the weekly call."
     >
+      {/* A reader who does not already know what a Treasury series or a credit
+          spread is cannot start at the formulas. This tier says what the score
+          does in words first; the grid below it stays exact. */}
+      <div className="weather-surface mb-3 space-y-3 rounded-lg px-4 py-4">
+        <p className="type-eyebrow">In plain language</p>
+        <ol className="space-y-2 text-sm text-slate-200">
+          <li>
+            <span className="font-semibold text-slate-100">1. Read two things off public U.S.
+            market data.</span>{" "}
+            <span className="text-slate-300">
+              {signalPlainEnglish.tightness.plainLabel} &mdash;{" "}
+              {signalPlainEnglish.tightness.whatItMeasures}{" "}
+              {signalPlainEnglish.riskAppetite.plainLabel} &mdash;{" "}
+              {signalPlainEnglish.riskAppetite.whatItMeasures}
+            </span>
+          </li>
+          <li>
+            <span className="font-semibold text-slate-100">2. Score each one 0&ndash;100.</span>{" "}
+            <span className="text-slate-300">
+              For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
+              appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
+              of each score; market-stress reads adjust it.
+            </span>
+          </li>
+          <li>
+            <span className="font-semibold text-slate-100">3. Turn the pair into one call.</span>{" "}
+            <span className="text-slate-300">
+              Where the two scores land relative to their thresholds picks the operating
+              environment, and the environment picks the week&rsquo;s recommendation. Close to a
+              threshold, a change has to repeat before it sticks, so one noisy week cannot flip
+              the call.
+            </span>
+          </li>
+        </ol>
+        <p className="text-xs text-slate-400">
+          The cards below give the exact arithmetic, including the market terms used in it.{" "}
+          <GlossaryLink>Look up a term</GlossaryLink>
+        </p>
+      </div>
+
       <div className="grid gap-3 lg:grid-cols-2">
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <span className="text-slate-400">Rates:</span> FRED daily series — DFF (fed funds; falls
               back to DGS1MO, then DGS3MO), DGS2, DGS10.
+              <span className="mt-1 block text-xs text-slate-400">
+                FRED is the Federal Reserve&rsquo;s free public data service; each code names one
+                published series. DFF is the Fed&rsquo;s policy rate, DGS2 the two-year Treasury
+                rate, DGS10 the ten-year.
+              </span>
             </li>
             <li>
               <span className="text-slate-400">Stress reads:</span> high-yield credit spread, Chicago
               Fed financial conditions index, VIX, VC funding velocity, tech layoff trend.
+              <span className="mt-1 block text-xs text-slate-400">
+                In order: the extra interest riskier companies pay to borrow, a Fed summary of
+                overall borrowing conditions, expected stock-market turbulence, the pace of venture
+                funding, and the tech layoff trend.
+              </span>
             </li>
           </ul>
         </FormulaCard>
 
-        <FormulaCard title="Tightness · 0–100 · cost of money">
+        <FormulaCard title="Funding pressure · 0–100 · cost of money">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <code className="text-sky-200">
@@ -105,14 +157,14 @@ export function FormulaReference() {
         <FormulaCard title="Regime, headline number, confidence">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Regime:</span> quadrant of tightness vs{" "}
+              <span className="text-slate-400">Regime:</span> quadrant of funding pressure vs{" "}
               {TIGHTNESS_REGIME_THRESHOLD} and risk appetite vs {RISK_APPETITE_REGIME_THRESHOLD}.
               Near a threshold or at MEDIUM confidence, a change must repeat on two consecutive
               reads before it commits; LOW confidence blocks the switch.
             </li>
             <li>
               <span className="text-slate-400">Boldness (homepage headline):</span>{" "}
-              <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − tightness)</code>
+              <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
             </li>
             <li>
               <span className="text-slate-400">Confidence:</span> distance to the nearest regime

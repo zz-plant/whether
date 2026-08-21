@@ -12,13 +12,38 @@ type HistoricalTrendChartProps = {
    * worsen (default); appetite-style scores rise when conditions improve.
    */
   increaseIsPositive?: boolean;
+  /**
+   * What one point on this chart is — "months", "weeks". Stated because the
+   * headline number here is the last point of a *history* series, which is not
+   * the same as the live score the rest of the page quotes; without the
+   * granularity and the as-of date, the two read as the page contradicting
+   * itself.
+   */
+  periodLabel?: string;
+};
+
+const asOfFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const formatAsOf = (date: string) => {
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.valueOf()) ? null : asOfFormatter.format(parsed);
 };
 
 const W = 100;
 const H = 32;
 const PAD_Y = 2;
 
-export function HistoricalTrendChart({ label, color, points, increaseIsPositive = false }: HistoricalTrendChartProps) {
+export function HistoricalTrendChart({
+  label,
+  color,
+  points,
+  increaseIsPositive = false,
+  periodLabel = "periods",
+}: HistoricalTrendChartProps) {
   if (points.length < 2) return null;
 
   const values = points.map((p) => p.value);
@@ -29,6 +54,8 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
   const pathD = buildSparklinePath(values, domain, W, H, PAD_Y);
 
   const currentVal = points[points.length - 1].value;
+  const asOf = formatAsOf(points[points.length - 1].date);
+  const periodSummary = `${points.length} ${periodLabel}${asOf ? ` · latest ${asOf}` : ""}`;
   const firstVal = points[0].value;
   const delta = currentVal - firstVal;
   const direction = trendDirectionFromDelta(delta);
@@ -49,7 +76,7 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
                 label,
                 delta,
                 current: currentVal,
-                period: `over ${points.length} periods`,
+                period: `over ${points.length} ${periodLabel}`,
               })}
             </span>
           </span>
@@ -61,11 +88,12 @@ export function HistoricalTrendChart({ label, color, points, increaseIsPositive 
         role="img"
         // The chart is autoscaled, so the range has to be stated or the shape
         // can't be decoded.
-        aria-label={`${label} over ${points.length} periods, ranging ${rangeLabel(domain)}. Latest ${currentVal}.`}
+        aria-label={`${label} over ${points.length} ${periodLabel}, ranging ${rangeLabel(domain)}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`}
       >
         <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         <circle cx={W} cy={H - PAD_Y - ((currentVal - min) / span) * (H - PAD_Y * 2)} r="2" fill={color} />
       </svg>
+      <p className="text-fluid-nano text-slate-400">{periodSummary}</p>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
+import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 
 export const runtime = "edge";
@@ -96,7 +97,7 @@ export default async function DecisionMemoryPage({
         <div id="ops-decision-memory">
           <DecisionMemoryPanel />
         </div>
-        <Suspense fallback={null}>
+        <Suspense fallback={<WorkstreamNavFallback />}>
           <OperationsWorkstreamNav currentPath="/planning/memory" />
         </Suspense>
       </div>

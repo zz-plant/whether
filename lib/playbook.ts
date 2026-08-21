@@ -44,8 +44,8 @@ const DEFAULT_START_ITEMS = ["Invest in margin-positive moves."];
 
 const CANONICAL_RULE_FALLBACK = {
   actionNow: formatDecisionAction("Maintain current posture and gate new commitments."),
-  triggerThreshold: formatDecisionThreshold("Pause if cash availability drops below 50 or risk appetite falls below 40."),
-  reversalCondition: formatDecisionReversal("Resume staged approvals when cash availability rises above 60 and risk appetite is above 50."),
+  triggerThreshold: formatDecisionThreshold("Pause if funding pressure rises above 60 or risk appetite falls below 40."),
+  reversalCondition: formatDecisionReversal("Resume staged approvals when funding pressure falls below 50 and risk appetite is above 50."),
 } satisfies Omit<PlaybookOperatingLever, "lever" | "label">;
 
 const DEFAULT_PLAYBOOK_RULE_CONTEXT = {

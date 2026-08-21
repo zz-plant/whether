@@ -116,21 +116,59 @@ export interface RegimeAssessment {
   signalInfluence?: RegimeSignalInfluence[];
 }
 
+/**
+ * Scoring calibration.
+ *
+ * None of these are canonical macroeconomics — they are this product's choices
+ * about where an operator's behavior should change, and they are annotated
+ * because a contributor without a macro background otherwise cannot tell which
+ * numbers are conventions and which are ours. All of them are ours. Treat the
+ * whole block as tunable-but-load-bearing: changing one moves every published
+ * call, so change it with a reason and update the fixtures.
+ *
+ * The three thresholds in `DEFAULT_THRESHOLDS` below are additionally
+ * user-overridable at /signals?advanced=1, so they must stay independently
+ * meaningful rather than encoding a hidden relationship to each other.
+ */
+
+/** Base rate below which rates contribute nothing to tightness. Roughly the
+ *  post-2000 U.S. average policy rate — a rate near here reads as "normal", not
+ *  as pressure. */
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 3.5;
+/** Ceiling on the rate component, leaving the remaining 10 points of headroom to
+ *  the inversion component and the macro stress add-ons. */
 export const TIGHTNESS_BASE_RATE_POINTS = 90;
+/** Ceiling on the inversion component. Deliberately a minority of the score:
+ *  inversion is a slow warning, not a funding cost. */
 export const TIGHTNESS_INVERSION_POINTS = 25;
 export const TIGHTNESS_CAP = 100;
+/** Ends of the 10Y-2Y slope range that risk appetite is mapped across. The range
+ *  is asymmetric because inversions are shallower than steepenings: -1.0% is
+ *  about as inverted as the U.S. curve has gone, +1.5% about as steep as a
+ *  normal expansion runs. */
 export const RISK_APPETITE_MIN_SLOPE = -1.0;
 export const RISK_APPETITE_MAX_SLOPE = 1.5;
+/** Regime quadrant boundaries: tightness above 70 counts as tight, risk appetite
+ *  above 50 as willing. Not the same as the 30/70 display bands in
+ *  `report/signalTranslations.ts`, which answer "is this reading unusual" rather
+ *  than "which quadrant are we in". */
 export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
+/** How long conditions must hold before a reversal is described as durable.
+ *  Product choice: one month is the shortest window a team can plan against. */
 export const REGIME_REVERSAL_DAYS = 30;
 export const TREASURY_SOURCE_LABEL = "FRED CSV (DFF, DGS1MO, DGS3MO, DGS2, DGS10)";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
 
+/** Points of tightness per percentage point of base rate above the threshold.
+ *  With the 90-point cap, the rate component saturates at 4.0% — i.e. the model
+ *  stops distinguishing between "expensive" and "very expensive" money above
+ *  that, because operator behavior stops changing there too. */
 export const BASE_RATE_TIGHTNESS_MULTIPLIER = 180;
+/** Points of tightness per percentage point of inversion depth. With the
+ *  25-point cap, saturates at a 0.5% inversion. */
 export const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
 
 export const REGIME_CONFIDENCE_NEAR_THRESHOLD = 5;

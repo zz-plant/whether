@@ -1,4 +1,5 @@
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
+import { CurveTermsKey } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 
 type YieldCurvePoint = {
@@ -99,8 +100,13 @@ export function SignalInversionPreview({
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
           Inversion timeline before you open the deeper evidence.
         </h2>
+        {/* The chart is labelled in bond-desk shorthand. This says what it is
+            before the reader has to decode the axes. */}
         <p className="text-sm text-slate-300">
-          Default view keeps the last 12 monthly spread reads visible so you can see whether inversion pressure is easing or deepening before opening detail mode.
+          Each line is the gap between what the U.S. government pays to borrow long-term and what it
+          pays short-term. When a line drops below zero, short-term borrowing costs more than
+          long-term &mdash; the pattern that has run ahead of most U.S. recessions. Last 12 monthly
+          reads, so you can see whether the pressure is easing or deepening.
         </p>
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
@@ -176,6 +182,12 @@ export function SignalInversionPreview({
             </span>
           ) : null}
         </div>
+        {/* Expands the axis shorthand. Without it, "10Y-2Y +14.2 bp" is
+            unreadable to anyone who has not traded bonds. */}
+        <CurveTermsKey
+          terms={["spread10Y2Y", "spread2Y3M", "bp"]}
+          className="mt-3 border-t border-slate-800/80 pt-3"
+        />
       </div>
     </section>
   );

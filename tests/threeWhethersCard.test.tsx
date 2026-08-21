@@ -10,8 +10,8 @@ const baseItem: ActionStripItem = {
   lever: "hiring-stance",
   label: "Hiring",
   areaActionNow: "Approve critical backfills.",
-  triggerThreshold: "Cash availability tightens above 70.",
-  reversalCondition: "Cash availability holds below 60.",
+  triggerThreshold: "Funding pressure tightens above 70.",
+  reversalCondition: "Funding pressure holds below 60.",
 };
 
 describe("ThreeWhethersCard", () => {

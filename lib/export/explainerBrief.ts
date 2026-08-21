@@ -45,7 +45,7 @@ export const buildExplainerBriefContent = ({
   // How to read section
   sections.push(
     "How to read this",
-    "• Cash availability = how hard it is to raise or borrow money right now.",
+    "• Funding pressure = how hard it is to raise or borrow money right now.",
     "• Risk appetite = how willing investors are to take risk on new bets.",
     "• Recession warning gauge = whether the yield curve warns of a slowdown.",
     `• ${publicDecisionLabels.call} = the weekly forecast for operating conditions.`,
@@ -70,7 +70,7 @@ export const buildExplainerBriefContent = ({
   sections.push("Need definitions?");
   sections.push("Open the glossary at /trust#beginner-glossary to translate any unfamiliar U.S. market terms.");
   sections.push("Or scan this quick reference:");
-  sections.push("• Cash availability: a score from 0-100. Higher = cash is harder to access → conserve.");
+  sections.push("• Funding pressure: a score from 0-100. Higher = cash is harder to access → conserve.");
   sections.push("• Risk appetite: a score from 0-100. Lower = investors are more cautious → de-risk.");
   sections.push("• Recession warning gauge: measures the yield curve. Inverted = favor short-payback bets.");
   sections.push("• Fed interest rate: the cost of borrowing. Higher = debt is more expensive.");
