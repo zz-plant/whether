@@ -15,7 +15,7 @@
     "clean:build": "bun scripts/clean-build-artifacts.mjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
-    "check": "bun run lint && bun run typecheck && bun run test && bun run assets:check && bun run review:hotspot-preflight",
+    "check": "bun scripts/run-checks.mjs",
     "typecheck": "tsc --noEmit",
     "test": "bun scripts/run-tests.mjs",
     "test:watch": "bun scripts/run-tests.mjs --watch",

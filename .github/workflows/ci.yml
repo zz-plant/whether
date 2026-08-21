@@ -26,8 +26,10 @@ jobs:
           restore-keys: |
             bun-${{ runner.os }}-
       - run: bun install --frozen-lockfile
-      - run: bun run lint
-      - run: bun run typecheck
-      - run: bun run test
-      - run: bun run assets:check
+      # lint/typecheck/test/assets are mutually independent; running them as
+      # separate steps just added their durations together. This runs them
+      # concurrently and reports every failure in one pass instead of stopping
+      # at the first. Named explicitly so review:hotspot-preflight stays owned by
+      # its own workflow, which needs a full-depth checkout.
+      - run: bun scripts/run-checks.mjs lint typecheck test assets
       - run: bun run build

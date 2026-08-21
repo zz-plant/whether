@@ -10,13 +10,14 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~50s | 670 tests / 160 files. Before commit, not per-edit. |
+| `bun run test` | ~40s | 800 tests / 166 files. Before commit, not per-edit. |
 | `bun run typecheck` | ~9s | Cheap. Run after any type-surface change. |
 | `bun run lint` | ~24s | Before commit. |
-| `bun run check` | ~90s | assets + preflight + lint + typecheck + test. Pre-merge only. |
+| `bun run check` | ~40s | lint + typecheck + test + assets + preflight, run concurrently. Pre-merge only. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
-pair while iterating; save `bun run check` for pre-merge.
+pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
+reports every failure in one pass; add `--serial` for fail-fast sequencing when debugging it.
 
 ### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
 

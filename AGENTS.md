@@ -45,7 +45,7 @@ Use targeted tests when possible before running full checks:
 - `bun run test tests/homeBriefModel.test.ts` — one file (~0.2s)
 - `bun run test -t "reversal trigger"` — filter by test name across the suite
 
-Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check` (~90s) for pre-merge.
+Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check` (~40s) for pre-merge.
 
 ## Architectural invariants
 
