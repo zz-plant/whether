@@ -70,8 +70,15 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
         <p className="text-sm text-slate-300">
-          Whether reads public US Treasury yield curve data via FRED and scores it into one of four operating
-          regimes. The scoring formulas, source list, refresh cadence, and stated limitations are published in full.
+          Whether reads public data from FRED across six signal families — Treasury yields, credit spreads,
+          inflation, labor, financial conditions, and volatility — and scores them into one of four operating
+          regimes. The two numbers the brief leads with are built from the Chicago Fed financial conditions
+          index and the VIX, not from the yield curve alone.
+        </p>
+        <p className="text-sm text-slate-300">
+          Startup-market inputs — funding velocity, layoff trend, SaaS multiples — come from a curated
+          snapshot rather than a live feed, and every surface that uses them says so. The scoring formulas,
+          source list, refresh cadence, and stated limitations are published in full.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href="/trust" variant="pill">

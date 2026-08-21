@@ -128,9 +128,19 @@ export const utilityLinks = [
     description: "Blank bounded-decision form",
   },
   {
+    href: "/share",
+    label: "Share",
+    description: "Pasteable brief for Slack, email, and agendas",
+  },
+  {
+    href: "/embed",
+    label: "Embed",
+    description: "Live brief widget for a dashboard or wiki",
+  },
+  {
     href: "/api-docs",
     label: "API Docs",
-    description: "Integration reference",
+    description: "MCP server, REST endpoints, CLI, widget",
   },
   {
     href: "/about",

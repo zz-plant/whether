@@ -215,6 +215,8 @@ export default function RootLayout({
               <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
               <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>
               <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</Link>
+              <Link href="/share" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Share</Link>
+              <Link href="/embed" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Embed</Link>
               <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">API</Link>
               <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</Link>
               <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">RSS</a>
