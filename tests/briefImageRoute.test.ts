@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { ImageResponse } from "next/og";
-import { isValidElement, type ReactElement, type ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "../lib/image/ogFonts";
@@ -81,11 +81,10 @@ describe("buildBriefImagePayload", () => {
  * rendering catches that, which is how it shipped unnoticed.
  */
 const findSatoriLayoutViolations = (node: ReactNode, path = "root"): string[] => {
-  if (!isValidElement(node)) return [];
+  if (!isValidElement<{ children?: ReactNode; style?: Record<string, unknown> }>(node)) return [];
 
-  const element = node as ReactElement<{ children?: ReactNode; style?: Record<string, unknown> }>;
-  const { children, style } = element.props;
-  const tag = typeof element.type === "string" ? element.type : "component";
+  const { children, style } = node.props;
+  const tag = typeof node.type === "string" ? node.type : "component";
   const here = `${path} > ${tag}`;
   const display = style?.display;
   const violations: string[] = [];

@@ -9,6 +9,8 @@
  * report ok:true with companyCount 0 -- an outage rendered as an empty basket.
  */
 
+import { z } from "zod";
+
 export const SAAS_BASKET = [
   "SNOW", "SHOP", "CRM", "HUBS", "MDB", "DDOG", "TEAM", "WDAY",
   "NOW", "ZS", "CFLT", "TOST", "GTLB", "NET", "FRSH",
@@ -21,20 +23,40 @@ export type SaaSValuationSnapshot = {
   fetchedAt: string;
 };
 
-type YahooQuote = {
-  price?: { regularMarketPrice?: number; marketCap?: number };
-  defaultKeyStatistics?: { sharesOutstanding?: number };
-  financialData?: {
-    totalRevenue?: number; revenueGrowth?: number;
-    totalDebt?: number; totalCash?: number;
-  };
-  cashflowStatementHistory?: {
-    cashflowStatements?: Array<{
-      operatingCashFlow?: { raw?: number };
-      capitalExpenditure?: { raw?: number };
-    }>;
-  };
-};
+/**
+ * Validated rather than asserted: this is an undocumented endpoint that already
+ * answers with rate-limit pages instead of quotes, so its body is not a shape to
+ * take on trust. Every field is optional because the upstream omits them freely.
+ */
+const yahooQuoteSchema = z.object({
+  price: z.object({
+    regularMarketPrice: z.number().optional(),
+    marketCap: z.number().optional(),
+  }).optional(),
+  defaultKeyStatistics: z.object({
+    sharesOutstanding: z.number().optional(),
+  }).optional(),
+  financialData: z.object({
+    totalRevenue: z.number().optional(),
+    revenueGrowth: z.number().optional(),
+    totalDebt: z.number().optional(),
+    totalCash: z.number().optional(),
+  }).optional(),
+  cashflowStatementHistory: z.object({
+    cashflowStatements: z.array(z.object({
+      operatingCashFlow: z.object({ raw: z.number().optional() }).optional(),
+      capitalExpenditure: z.object({ raw: z.number().optional() }).optional(),
+    })).optional(),
+  }).optional(),
+});
+
+const quoteResponseSchema = z.object({
+  quoteSummary: z.object({
+    result: z.array(yahooQuoteSchema).nonempty(),
+  }),
+});
+
+export type YahooQuote = z.infer<typeof yahooQuoteSchema>;
 
 /** Raised when the quote source itself is unreachable, not when a ticker is unknown. */
 export class QuoteSourceUnavailableError extends Error {
@@ -67,13 +89,17 @@ export async function fetchQuote(symbol: string): Promise<QuoteResult> {
   if (res.status === 404) return { status: "missing" };
   if (!res.ok) return { status: "unavailable", reason: `quote source returned ${res.status}` };
 
+  let body: unknown;
   try {
-    const data = (await res.json()) as { quoteSummary?: { result?: [YahooQuote] } };
-    const quote = data?.quoteSummary?.result?.[0];
-    return quote ? { status: "ok", quote } : { status: "missing" };
+    body = await res.json();
   } catch {
     return { status: "unavailable", reason: "quote source returned an unreadable body" };
   }
+
+  const parsed = quoteResponseSchema.safeParse(body);
+  return parsed.success
+    ? { status: "ok", quote: parsed.data.quoteSummary.result[0] }
+    : { status: "missing" };
 }
 
 export async function fetchSaaSValuations(): Promise<SaaSValuationSnapshot> {

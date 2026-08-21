@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it, afterEach } from "bun:test";
+import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
   QuoteSourceUnavailableError,
   fetchQuote,
@@ -7,11 +7,8 @@ import {
   SAAS_BASKET,
 } from "../lib/saasMultiples";
 
-const realFetch = globalThis.fetch;
-
 const stubFetch = (handler: (url: string) => Response) => {
-  globalThis.fetch = (async (input: RequestInfo | URL) =>
-    handler(input.toString())) as typeof fetch;
+  spyOn(globalThis, "fetch").mockImplementation(async (input) => handler(input.toString()));
 };
 
 const quoteBody = (revenue: number, growth: number) =>
@@ -28,7 +25,7 @@ const quoteBody = (revenue: number, growth: number) =>
   });
 
 afterEach(() => {
-  globalThis.fetch = realFetch;
+  mock.restore();
 });
 
 describe("fetchQuote", () => {
