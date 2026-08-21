@@ -2,6 +2,11 @@
  * SaaS valuation multiples — fetched directly from Yahoo Finance API.
  * No npm dependencies, no build-time bundling issues.
  * $0 cost — no API key required for basic quote data.
+ *
+ * The upstream is unofficial and currently answers 429 to unauthenticated
+ * callers, so every read must distinguish "the source turned us away" from
+ * "this company has no data". Collapsing the two is how /api/comps came to
+ * report ok:true with companyCount 0 -- an outage rendered as an empty basket.
  */
 
 export const SAAS_BASKET = [
@@ -31,15 +36,43 @@ type YahooQuote = {
   };
 };
 
-export async function fetchQuote(symbol: string): Promise<YahooQuote | null> {
+/** Raised when the quote source itself is unreachable, not when a ticker is unknown. */
+export class QuoteSourceUnavailableError extends Error {
+  constructor(reason: string) {
+    super(reason);
+    this.name = "QuoteSourceUnavailableError";
+  }
+}
+
+export type QuoteResult =
+  /** The source answered with data for this symbol. */
+  | { status: "ok"; quote: YahooQuote }
+  /** The source answered, and has nothing for this symbol. */
+  | { status: "missing" }
+  /** The source refused or never answered; nothing was learned about the symbol. */
+  | { status: "unavailable"; reason: string };
+
+export async function fetchQuote(symbol: string): Promise<QuoteResult> {
+  const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics,cashflowStatementHistory`;
+
+  let res: Response;
   try {
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics,cashflowStatementHistory`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) return null;
-    const data = await res.json() as { quoteSummary?: { result?: [YahooQuote] } };
-    return data?.quoteSummary?.result?.[0] ?? null;
+    res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+  } catch (error) {
+    return { status: "unavailable", reason: error instanceof Error ? error.message : "quote fetch failed" };
+  }
+
+  // 404 is a verdict about the symbol. Everything else -- 429 rate limiting,
+  // 401 crumb rejection, 5xx -- is the source declining to answer at all.
+  if (res.status === 404) return { status: "missing" };
+  if (!res.ok) return { status: "unavailable", reason: `quote source returned ${res.status}` };
+
+  try {
+    const data = (await res.json()) as { quoteSummary?: { result?: [YahooQuote] } };
+    const quote = data?.quoteSummary?.result?.[0];
+    return quote ? { status: "ok", quote } : { status: "missing" };
   } catch {
-    return null;
+    return { status: "unavailable", reason: "quote source returned an unreadable body" };
   }
 }
 
@@ -47,9 +80,18 @@ export async function fetchSaaSValuations(): Promise<SaaSValuationSnapshot> {
   const evValues: number[] = [];
   const growthValues: number[] = [];
 
-  for (const symbol of SAAS_BASKET) {
-    const quote = await fetchQuote(symbol);
-    if (!quote) continue;
+  // Concurrently: fifteen sequential reads at a 4s timeout each is a minute of
+  // edge request budget on the exact path where every read is timing out.
+  const results = await Promise.all(SAAS_BASKET.map((symbol) => fetchQuote(symbol)));
+  const unavailable = results.filter((result) => result.status === "unavailable");
+
+  if (unavailable.length === results.length) {
+    throw new QuoteSourceUnavailableError(unavailable[0]?.reason ?? "quote source unavailable");
+  }
+
+  for (const result of results) {
+    if (result.status !== "ok") continue;
+    const quote = result.quote;
 
     const price = quote.price?.regularMarketPrice ?? 0;
     const shares = quote.defaultKeyStatistics?.sharesOutstanding ?? 0;

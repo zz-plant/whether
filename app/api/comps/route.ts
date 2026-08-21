@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchSaaSValuations } from "../../../lib/saasMultiples";
+import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 
 export const runtime = "edge";
 
@@ -9,6 +9,16 @@ export async function GET() {
     const comps = await fetchSaaSValuations();
     return NextResponse.json({ ok: true, ...comps });
   } catch (error) {
+    // An unreachable source is not an empty basket. Reporting ok:true with
+    // companyCount 0 told every caller the multiples were genuinely absent.
+    if (error instanceof QuoteSourceUnavailableError) {
+      return NextResponse.json({
+        ok: false,
+        error: "quote_source_unavailable",
+        detail: error.message,
+      }, { status: 503 });
+    }
+
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),
