@@ -256,4 +256,53 @@ describe("signalOps", () => {
       "digest bullets lead with the verdict headline",
     );
   });
+
+  it("reports an alert older than the week as history, not as this week's call", () => {
+    const payload = buildSignalAlertPayload(
+      basePayload(assessment("EXPANSION", 49, 58), assessment("DEFENSIVE", 88, 44)),
+    );
+    const now = Date.parse("2026-08-21T00:00:00.000Z");
+    const stale: RegimeAlertEvent = {
+      eventId: "evt-stale",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
+      id: "1",
+      createdAt: "2026-06-13T21:35:01.967Z",
+      payload,
+    };
+
+    const digest = buildWeeklyDigest([stale], { now });
+
+    // Production served "DEFENSIVE regime as of 2026-04-09" from a single June
+    // alert while the live posture was EXPANSION. The digest may be quiet; it
+    // must never restate a months-old crossing as the current call.
+    assert.equal(digest.summary, "No regime-change alerts this week.");
+    assert.ok(
+      digest.bullets.some((bullet) => bullet.startsWith("Last recorded change: DEFENSIVE as of")),
+      "the older crossing is still reported, labelled as history",
+    );
+    assert.ok(
+      digest.bullets.every((bullet) => !bullet.startsWith("RECONSIDER")),
+      "a stale crossing does not issue this week's verdicts",
+    );
+  });
+
+  it("summarises an alert raised inside the week", () => {
+    const payload = buildSignalAlertPayload(
+      basePayload(assessment("EXPANSION", 49, 58), assessment("DEFENSIVE", 88, 44)),
+    );
+    const now = Date.parse("2026-08-21T00:00:00.000Z");
+    const fresh: RegimeAlertEvent = {
+      eventId: "evt-fresh",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
+      id: "2",
+      createdAt: "2026-08-19T12:00:00.000Z",
+      payload,
+    };
+
+    const digest = buildWeeklyDigest([fresh], { now });
+
+    assert.match(digest.summary, /^DEFENSIVE regime as of /);
+  });
 });
