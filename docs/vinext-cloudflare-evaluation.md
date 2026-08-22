@@ -12,13 +12,13 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 ## Active lane
 ### `current-vinext` (production baseline)
 - Dev/start/build/deploy: `bun run dev`, `bun run start`, `bun run build`, `bun run deploy:cloudflare`
-- Cloudflare path: Vinext + [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
+- Cloudflare path: Vinext + [`wrangler.toml`](../wrangler.toml)
 - Preview deploy wrapper: `bun run deploy:cloudflare:preview`
-- Vite/Vinext config: [`vite.config.ts`](/Users/kanav/Documents/GitHub/whether-app/vite.config.ts)
-- Cloudflare preview environment: `env.preview` in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
-- Worker entry: [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts)
-- Node preflight: [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) fails fast outside Node 22+.
-- Cloudflare env coordination: [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs) applies the same target environment to both build and deploy.
+- Vite/Vinext config: [`vite.config.ts`](../vite.config.ts)
+- Cloudflare preview environment: `env.preview` in [`wrangler.toml`](../wrangler.toml)
+- Worker entry: [`worker/index.ts`](../worker/index.ts)
+- Node preflight: [`scripts/vinext-run.mjs`](../scripts/vinext-run.mjs) fails fast outside Node 22+.
+- Cloudflare env coordination: [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs) applies the same target environment to both build and deploy.
 
 ## What upstream says now
 - Vinext is still explicitly experimental.

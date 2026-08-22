@@ -411,7 +411,7 @@ This section is important because it draws hard lines between data prep, decisio
 **Owner modules:**
 - `app/components/weeklyDecisionCard.tsx`
 - homepage sections under `app/components/home/*`
-- export components under `app/planning/components/*`
+- export components under `app/operate/components/*`
 
 **Tagged functions/components:**
 - `WeeklyDecisionCard` - decision card component

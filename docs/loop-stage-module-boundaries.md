@@ -55,7 +55,7 @@ This mapping uses existing modules first and documents ownership + dependency di
 **Owner modules**
 - `app/components/weeklyDecisionCard.tsx`
 - homepage sections/components under `app/components/home/*`
-- export components under `app/planning/components/*`
+- export components under `app/operate/components/*`
 - export builders under `lib/export/*`
 
 **Tagged functions/components**
