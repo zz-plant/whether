@@ -13,7 +13,8 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run test` | ~40s | 800 tests / 166 files. Before commit, not per-edit. |
 | `bun run typecheck` | ~9s | Cheap. Run after any type-surface change. |
 | `bun run lint` | ~24s | Before commit. |
-| `bun run check` | ~40s | lint + typecheck + test + assets + preflight, run concurrently. Pre-merge only. |
+| `bun run check` | ~40s | lint + typecheck + test + assets + audit + preflight, concurrently. Pre-merge only. |
+| `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
@@ -23,7 +24,8 @@ reports every failure in one pass; add `--serial` for fail-fast sequencing when 
 a guaranteed backstop — it goes dark whenever the account hits a billing hold, taking every
 workflow with it. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that this
 worktree is often shared with other sessions, so a pre-push failure may be someone else's in-flight
-edit rather than yours — check `git status` first.
+edit rather than yours — check `git status` first. The hook deliberately omits `audit`, which needs
+the network, so pushing offline still works; CI and the Cloudflare build both run it.
 
 ### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
 
