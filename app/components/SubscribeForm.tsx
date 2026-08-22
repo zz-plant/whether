@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
+import { requestSubscription } from "./subscribeRequest";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -10,32 +11,12 @@ export function SubscribeForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes("@")) {
-      setStatus("error");
-      setMessage("Please enter a valid email address.");
-      return;
-    }
-
     setStatus("loading");
-    try {
-      const res = await fetch("/api/email/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        setStatus("success");
-        setMessage("Check your email to verify your subscription.");
-        setEmail("");
-      } else {
-        setStatus("error");
-        setMessage(data.error || "Failed to subscribe. Please try again.");
-      }
-    } catch {
-      setStatus("error");
-      setMessage("A network error occurred. Please try again.");
-    }
+
+    const result = await requestSubscription(email);
+    setStatus(result.ok ? "success" : "error");
+    setMessage(result.message);
+    if (result.ok) setEmail("");
   };
 
   if (status === "success") {
