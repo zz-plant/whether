@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
-import { getSubscriberStore } from "../../lib/email/subscriberStore";
+import { requestSubscription } from "./subscribeRequest";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
 
 const STAGE_KEY = "whether-company-stage";
@@ -40,7 +39,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -89,22 +87,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
   const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!email || !email.includes("@")) {
-      setSubscribeMsg("Enter a valid email.");
-      return;
-    }
     setIsSubscribing(true);
-    try {
-      await getSubscriberStore().subscribe(email);
-      setSubscribed(true);
-      setSubscribeMsg("Subscribed! Check your inbox.");
-    } catch {
-      setSubscribeMsg("Subscription update failed.");
-    } finally {
-      setIsSubscribing(false);
-      setSaved(false);
-      setTimeout(() => setSubscribeMsg(""), 3000);
-    }
+    const result = await requestSubscription(email);
+    setSubscribed(result.ok);
+    setSubscribeMsg(result.message);
+    setIsSubscribing(false);
+    setSaved(false);
+    setTimeout(() => setSubscribeMsg(""), 6000);
   }, [email]);
 
   return (
@@ -223,29 +212,17 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 disabled={isSubscribing}
                 className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isSubscribing ? "…" : subscribed ? "Subscribed" : "Subscribe"}
+                {isSubscribing ? "…" : subscribed ? "Check inbox" : "Subscribe"}
               </button>
             </form>
             {subscribeMsg ? (
-              <p className="mt-1 text-fluid-micro text-emerald-200">{subscribeMsg}</p>
-            ) : null}
-          </fieldset>
-
-          <fieldset>
-            <legend className="type-eyebrow">Alerts</legend>
-            <p className="mt-1 text-xs leading-relaxed text-slate-400">
-              Get notified when the regime changes.
-            </p>
-            <label className="mt-2 flex items-center gap-2 text-sm text-slate-300">
-              <Switch.Root
-                checked={alertsEnabled}
-                onCheckedChange={setAlertsEnabled}
-                className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
+              <p
+                aria-live="polite"
+                className={`mt-1 text-fluid-micro ${subscribed ? "text-emerald-200" : "text-rose-300"}`}
               >
-                <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
-              </Switch.Root>
-              Regime change alerts
-            </label>
+                {subscribeMsg}
+              </p>
+            ) : null}
           </fieldset>
         </div>
 
