@@ -41,6 +41,12 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 | Whether — weekly Slack brief refresh | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md` |
 | Whether — weekly brief freeze | Thu 13:00 | the week appended to `data/published_briefs.json` |
 
+The site no longer waits on any of them to show a current month. The Worker cron records the month
+in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), and the read path
+merges it over the bundled snapshot, so the month rail stays current between deploys. The regime
+history routine still regenerates the canonical month-end series and the archive the scripts own —
+it is the rebuild, not the critical path.
+
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
 same from the repo. Every one of these jobs previously failed at its PR step while reporting green,
