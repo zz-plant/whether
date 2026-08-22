@@ -1,143 +1,133 @@
 /**
- * Panel for reviewing logged regime alert changes.
+ * Alert history for logged regime changes, with a copyable summary per alert.
+ *
+ * This panel used to carry a "Deliver latest alert" control. It POSTed
+ * /api/alert-deliveries, whose unauthenticated branch appends a log row marked "sent" for
+ * every enabled channel without contacting a single channel, and the panel then reported
+ * "Delivered to N channels" and listed those rows back. Nothing was ever sent. Alert mail
+ * goes out from the cron path in lib/alert/alertDelivery.ts, to verified subscribers only,
+ * and there is no Slack or webhook destination stored per operator profile at all.
+ *
+ * What is left is what the panel can actually do: show the history that
+ * /api/regime-alerts serves, let a reader copy one, and record which channels they would
+ * want it on — labelled as the preference it is rather than as delivery.
  */
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePersistentClientId } from "./clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
-import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
+import type { RegimeChangeReason } from "../../lib/regimeEngine";
 
-type ServerAlert = {
+/** Only the fields /api/regime-alerts actually carries. The previous shape claimed a whole
+ *  RegimeAssessment and cast a bare `{ regime }` into it at each call site. */
+type AlertRecord = {
   id: string;
-  createdAt: string;
-  payload: {
-    previousRecordDate: string;
-    currentRecordDate: string;
-    previousAssessment: { regime: string };
-    currentAssessment: { regime: string };
-    reasons: Array<{ code: string; message: string }>;
-    timeMachineHref?: string;
-  };
+  loggedAt: string;
+  previous: { recordDate: string; regime: string };
+  current: { recordDate: string; regime: string };
+  reasons: RegimeChangeReason[];
+  timeMachineHref?: string;
 };
 
 type DeliveryChannel = "slack" | "email" | "webhook";
+type ChannelPreferences = Record<DeliveryChannel, boolean>;
 
-type DeliveryEvent = {
-  id: string;
-  alertId: string;
-  channel: DeliveryChannel;
-  deliveredAt: string;
-  status: "sent" | "skipped";
-  summary: string;
-};
-
-type DeliveryPreferences = Record<DeliveryChannel, boolean>;
+const CHANNELS: DeliveryChannel[] = ["slack", "email", "webhook"];
 
 const formatTimestamp = (value: string) => formatTimestampUTC(value);
 const formatRecordDate = (value: string) => formatDateUTC(value);
 
-const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
+const buildAlertCopyText = (entry: AlertRecord) => {
   const { previous, current, reasons, loggedAt, timeMachineHref } = entry;
 
   return [
     "Whether Change Alerts",
     `Logged at: ${formatTimestamp(loggedAt)}`,
-    `Previous record: ${formatRecordDate(previous.recordDate)} — ${previous.assessment.regime}`,
-    `Current record: ${formatRecordDate(current.recordDate)} — ${current.assessment.regime}`,
+    `Previous record: ${formatRecordDate(previous.recordDate)} — ${previous.regime}`,
+    `Current record: ${formatRecordDate(current.recordDate)} — ${current.regime}`,
     "Reasons:",
     ...reasons.map((reason) => `• ${reason.code}: ${reason.message}`),
     timeMachineHref ? `Time Machine: ${timeMachineHref}` : "",
   ].filter(Boolean).join("\n");
 };
 
-const mapServerAlerts = (alerts: ServerAlert[]): RegimeAlertLogEntry[] =>
-  alerts.map((entry) => ({
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isReason = (value: unknown): value is RegimeChangeReason =>
+  isRecord(value) && typeof value.code === "string" && typeof value.message === "string";
+
+/** Narrow the wire payload instead of asserting it. An alert whose shape does not hold is
+ *  dropped, so a malformed row renders as one missing entry rather than as `undefined →
+ *  undefined` in the history. */
+const toAlertRecord = (entry: unknown): AlertRecord | null => {
+  if (!isRecord(entry) || typeof entry.id !== "string" || typeof entry.createdAt !== "string") {
+    return null;
+  }
+
+  const payload = entry.payload;
+  if (!isRecord(payload)) return null;
+
+  const previous = payload.previousAssessment;
+  const current = payload.currentAssessment;
+  if (!isRecord(previous) || !isRecord(current)) return null;
+  if (typeof previous.regime !== "string" || typeof current.regime !== "string") return null;
+  if (typeof payload.previousRecordDate !== "string") return null;
+  if (typeof payload.currentRecordDate !== "string") return null;
+
+  return {
     id: entry.id,
     loggedAt: entry.createdAt,
-    previous: {
-      recordDate: entry.payload.previousRecordDate,
-      assessment: {
-        regime: entry.payload.previousAssessment.regime,
-      } as RegimeAlertLogEntry["previous"]["assessment"],
-    },
-    current: {
-      recordDate: entry.payload.currentRecordDate,
-      assessment: {
-        regime: entry.payload.currentAssessment.regime,
-      } as RegimeAlertLogEntry["current"]["assessment"],
-    },
-    reasons: entry.payload.reasons,
-    timeMachineHref: entry.payload.timeMachineHref,
-  }));
+    previous: { recordDate: payload.previousRecordDate, regime: previous.regime },
+    current: { recordDate: payload.currentRecordDate, regime: current.regime },
+    reasons: Array.isArray(payload.reasons) ? payload.reasons.filter(isReason) : [],
+    timeMachineHref: typeof payload.timeMachineHref === "string" ? payload.timeMachineHref : undefined,
+  };
+};
+
+const parseAlertRecords = (payload: unknown): AlertRecord[] => {
+  if (!isRecord(payload) || !Array.isArray(payload.alerts)) return [];
+  return payload.alerts.map(toAlertRecord).filter((entry): entry is AlertRecord => entry !== null);
+};
+
+const parseChannelPreferences = (payload: unknown): ChannelPreferences | null => {
+  if (!isRecord(payload) || !isRecord(payload.preferences)) return null;
+
+  const source = payload.preferences;
+  const parsed: ChannelPreferences = { slack: false, email: false, webhook: false };
+  for (const channel of CHANNELS) {
+    const value = source[channel];
+    if (typeof value !== "boolean") return null;
+    parsed[channel] = value;
+  }
+  return parsed;
+};
 
 export const RegimeAlertsPanel = () => {
-  const [alerts, setAlerts] = useState<RegimeAlertLogEntry[]>([]);
-  const [deliveries, setDeliveries] = useState<DeliveryEvent[]>([]);
-  const [deliveryStatus, setDeliveryStatus] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<DeliveryPreferences>({
-    slack: true,
-    email: true,
+  const [alerts, setAlerts] = useState<AlertRecord[]>([]);
+  const [preferences, setPreferences] = useState<ChannelPreferences>({
+    slack: false,
+    email: false,
     webhook: false,
   });
   const { activeTarget, copiedTarget, status, error, copyToClipboard } = useClipboardCopy();
   const clientId = usePersistentClientId();
 
-  const latestAlertId = useMemo(() => alerts[0]?.id, [alerts]);
-
-  const loadAlerts = useCallback(() => {
-    try {
-      const stored = window.localStorage.getItem(regimeAlertsStorageKey);
-      if (!stored) {
-        setAlerts([]);
-        return;
-      }
-      const parsed = JSON.parse(stored) as RegimeAlertLogEntry[];
-      setAlerts(Array.isArray(parsed) ? parsed : []);
-    } catch {
-      setAlerts([]);
-    }
-  }, []);
-
-  const loadDeliveries = useCallback(() => {
-    if (!clientId) {
-      setDeliveries([]);
-      return;
-    }
-
-    void fetch(`/api/alert-deliveries?clientId=${encodeURIComponent(clientId)}`)
-      .then(async (response) => {
-        if (!response.ok) {
-          return;
-        }
-        const payload = (await response.json()) as { deliveries?: DeliveryEvent[] };
-        setDeliveries(Array.isArray(payload.deliveries) ? payload.deliveries : []);
-      })
-      .catch(() => {
-        setDeliveries([]);
-      });
-  }, [clientId]);
-
   useEffect(() => {
-    if (!clientId) {
-      return;
-    }
+    if (!clientId) return;
 
     void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(clientId)}`, {
       headers: { "x-whether-client-id": clientId },
     })
       .then(async (response) => {
-        if (!response.ok) {
-          return;
-        }
-        const payload = (await response.json()) as { preferences?: DeliveryPreferences };
-        if (payload.preferences) {
-          setPreferences(payload.preferences);
-        }
+        if (!response.ok) return;
+        const parsed = parseChannelPreferences(await response.json());
+        if (parsed) setPreferences(parsed);
       })
       .catch(() => {
-        // Keep defaults.
+        // Keep the defaults; an unreachable preference read is not worth a visible error.
       });
   }, [clientId]);
 
@@ -146,37 +136,22 @@ export const RegimeAlertsPanel = () => {
 
     void fetch("/api/regime-alerts")
       .then(async (response) => {
-        if (!response.ok) {
-          return;
-        }
-        const payload = (await response.json()) as { alerts?: ServerAlert[] };
-        if (!active || !Array.isArray(payload.alerts) || payload.alerts.length === 0) {
-          return;
-        }
-        setAlerts(mapServerAlerts(payload.alerts));
+        if (!response.ok) return;
+        const parsed = parseAlertRecords(await response.json());
+        if (active) setAlerts(parsed);
       })
       .catch(() => {
-        loadAlerts();
+        if (active) setAlerts([]);
       });
 
-    loadDeliveries();
-    loadAlerts();
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === regimeAlertsStorageKey) {
-        loadAlerts();
-      }
-    };
-    window.addEventListener("storage", handleStorage);
     return () => {
       active = false;
-      window.removeEventListener("storage", handleStorage);
     };
-  }, [loadAlerts, loadDeliveries]);
+  }, []);
 
   const togglePreference = (channel: DeliveryChannel) => {
-    if (!clientId) {
-      return;
-    }
+    if (!clientId) return;
+
     const next = { ...preferences, [channel]: !preferences[channel] };
     setPreferences(next);
     void fetch("/api/alert-preferences", {
@@ -186,34 +161,6 @@ export const RegimeAlertsPanel = () => {
     }).catch(() => {
       // Keep the optimistic toggle and avoid noisy fetch errors in the console.
     });
-  };
-
-  const deliverLatestAlert = () => {
-    if (!clientId) {
-      setDeliveryStatus("Preparing your delivery profile.");
-      return;
-    }
-    if (!latestAlertId) {
-      setDeliveryStatus("No alert available to deliver.");
-      return;
-    }
-    setDeliveryStatus("Delivering alert…");
-    void fetch("/api/alert-deliveries", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ clientId, alertId: latestAlertId }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          setDeliveryStatus("Delivery failed.");
-          return;
-        }
-        const payload = (await response.json()) as { deliveries?: DeliveryEvent[] };
-        const sent = (payload.deliveries ?? []).filter((item) => item.status === "sent").length;
-        setDeliveryStatus(`Delivered to ${sent} channel${sent === 1 ? "" : "s"}.`);
-        loadDeliveries();
-      })
-      .catch(() => setDeliveryStatus("Delivery failed."));
   };
 
   return (
@@ -227,19 +174,19 @@ export const RegimeAlertsPanel = () => {
           <div>
             <p className="type-label text-slate-400">Change alerts</p>
             <h3 id="regime-alert-log-title" className="type-section text-slate-100">
-              Alert history and shareable summaries
+              Alert history
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Review major environment-change alerts and send them by Slack, email, or webhook.
-            </p>
-            <p className="mt-2 text-xs text-slate-400">
-              Delivery preferences and logs are scoped to this device&apos;s operator profile.
+              Every logged environment change and the reasons behind it. Copy one to paste into a
+              thread or a board doc.
             </p>
           </div>
           <div className="weather-surface space-y-2 p-3">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Delivery channels</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Where you would want these
+            </p>
             <div className="flex flex-wrap gap-2">
-              {(["slack", "email", "webhook"] as DeliveryChannel[]).map((channel) => (
+              {CHANNELS.map((channel) => (
                 <button
                   key={channel}
                   type="button"
@@ -257,23 +204,16 @@ export const RegimeAlertsPanel = () => {
                 </button>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={deliverLatestAlert}
-              disabled={!clientId}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em]"
-            >
-              Deliver latest alert
-            </button>
-            {!clientId ? <p className="text-xs text-slate-400">Loading delivery profile…</p> : null}
-            {deliveryStatus ? <p className="text-xs text-slate-300">{deliveryStatus}</p> : null}
+            <p className="text-xs text-slate-400">
+              Push delivery is not live yet. This records the channel against this device&apos;s
+              operator profile; nothing is sent from here.
+            </p>
           </div>
         </div>
         {alerts.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
-              No alert history yet. Open reports again after a new Treasury record lands to log the
-              first alert.
+              No changes logged yet. An alert lands here when the regime shifts between records.
             </p>
           </div>
         ) : (
@@ -291,7 +231,7 @@ export const RegimeAlertsPanel = () => {
                         Alert logged {formatTimestamp(entry.loggedAt)}
                       </p>
                       <p className="mt-2 text-sm text-slate-100">
-                        {entry.previous.assessment.regime} → {entry.current.assessment.regime}
+                        {entry.previous.regime} → {entry.current.regime}
                       </p>
                       <p className="mt-1 text-xs text-slate-400">
                         Previous record: {formatRecordDate(entry.previous.recordDate)} · Current
@@ -335,19 +275,6 @@ export const RegimeAlertsPanel = () => {
             })}
           </div>
         )}
-
-        {deliveries.length > 0 ? (
-          <div className="mt-6 weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Recent deliveries</p>
-            <ul className="mt-3 space-y-2 text-xs text-slate-300">
-              {deliveries.slice(0, 6).map((delivery) => (
-                <li key={delivery.id}>
-                  {formatTimestamp(delivery.deliveredAt)} · {delivery.channel} · {delivery.status} · {delivery.summary}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
       </div>
     </section>
   );
