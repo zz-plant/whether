@@ -56,7 +56,7 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 The dry-run commands run both validation layers, because neither sees what the other does. They first build the selected environment, then run the adapter's own `--dry-run --skip-build`, which checks the adapter contract — router mode, ISR wiring, and the data and image adapters the routes require — and finally run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only a scaffold check, and an adapter-contract break reports itself as an adapter error instead of a later packaging failure.
 
-Upgrade Guardrails runs this production dry run on every pull request, so deploy packaging remains a mechanical gate rather than a manual-only check.
+This dry run is now a manual check: `bun run deploy:cloudflare:dry-run`. The workflow that used to run it on every pull request is dispatch-only, because the account stopped paying for Actions minutes on this private repo. Packaging is still exercised on every push by Cloudflare Workers Builds, which builds the Worker and fails the deploy on the same errors the dry run would surface — the difference is that it finds them after the merge rather than before it, so run the dry run by hand on anything that touches bindings, the adapter, or bundle size.
 
 ### Current toolchain notes
 

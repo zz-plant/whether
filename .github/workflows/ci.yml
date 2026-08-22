@@ -1,9 +1,16 @@
 name: CI
 
+# Manual only. This repo is private, so Actions minutes are billed, and the account
+# stopped paying for them: every automatic run since 2026-08-21 failed before its first
+# step with "The job was not started because recent account payments have failed or your
+# spending limit needs to be increased". A workflow that always fails is worse than no
+# workflow — it teaches every reader to ignore a red check, including the ones that mean
+# something. The gates moved to where they still run: .husky/pre-push for lint, typecheck,
+# tests, assets, and the review hotspot preflight, and Cloudflare Workers Builds for the
+# build and the deploy. Restore the push and pull_request triggers if the account starts
+# paying for Actions again, or if this repo goes public — public repos get standard
+# runners at no cost.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 # A newer push to the same PR/branch supersedes the running check.

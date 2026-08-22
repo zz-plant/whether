@@ -4,9 +4,9 @@ import { describe, it } from "bun:test";
 
 describe("Cloudflare deploy contracts", () => {
   const source = readFileSync(new URL("../scripts/cloudflare-run.mjs", import.meta.url), "utf8");
-  // The Cloudflare packaging step moved here when Upgrade Guardrails was folded
-  // into CI; the contract is that *some* CI workflow packages the dry run.
   const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const prePush = readFileSync(new URL("../.husky/pre-push", import.meta.url), "utf8");
+  const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
   it("uses the dedicated Cloudflare adapter instead of the deprecated vinext deploy shim", () => {
     assert.match(source, /node_modules[\s\S]*@vinext[\s\S]*cloudflare[\s\S]*dist[\s\S]*cli\.js/);
@@ -34,7 +34,36 @@ describe("Cloudflare deploy contracts", () => {
     assert.match(source, /if \(adapterStatus !== 0\)/, "a failed adapter validation stops the dry run");
   });
 
-  it("packages a production dry run in CI", () => {
+  // CI no longer runs on push or pull request — the workflows went manual-only when the
+  // account stopped paying for Actions minutes — so "CI packages the dry run" stopped being
+  // a gate the moment that changed. What still holds: the command exists, the workflow can
+  // still run it by hand, and Cloudflare Workers Builds packages every push whether or not
+  // anyone remembers to.
+  it("keeps the packaging dry run runnable by hand and by a restored workflow", () => {
+    assert.match(packageJson, /"deploy:cloudflare:dry-run":/);
     assert.match(workflow, /bun run deploy:cloudflare:dry-run/);
+  });
+
+  // The local hook is the only thing running the check list now, so it has to cover at
+  // least what the workflow would have. A task dropped here is a task nobody runs.
+  it("runs at least the workflow's check tasks in the local gate", () => {
+    const taskList = (source: string) =>
+      source.match(/bun scripts\/run-checks\.mjs ([^\n]+)/)?.[1].trim().split(/\s+/) ?? [];
+
+    const workflowTasks = taskList(workflow);
+    const hookTasks = taskList(prePush);
+
+    assert.ok(workflowTasks.length > 0, "the workflow names its check tasks");
+    assert.ok(hookTasks.length > 0, "the pre-push hook names its check tasks");
+
+    // `audit` is the one deliberate omission: it needs the network, and a hook that fails
+    // offline would just teach people to pass --no-verify. It runs in `bun run check`
+    // before a merge instead. Any other gap is a task nobody runs.
+    const missing = workflowTasks.filter((task) => task !== "audit" && !hookTasks.includes(task));
+    assert.deepEqual(missing, [], "every workflow check task except audit also runs before a push");
+    assert.ok(
+      hookTasks.includes("hotspot-preflight"),
+      "the preflight lost its own workflow, so the hook has to carry it",
+    );
   });
 });
