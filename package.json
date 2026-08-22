@@ -54,6 +54,7 @@
     "check:production-edge": "bash scripts/check_production_edge.sh",
     "setup": "mise trust && bun install",
     "assets:check": "bun run scripts/check-assets.ts",
+    "audit": "bun audit --audit-level=critical",
     "assets:generate": "bun run scripts/generate-scenes.ts"
   },
   "engines": {

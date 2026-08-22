@@ -24,6 +24,13 @@ const TASKS = [
   { name: "typecheck", script: "typecheck" },
   { name: "test", script: "test" },
   { name: "assets", script: "assets:check" },
+  // Gated at `critical` on purpose. There are currently 38 high advisories, all
+  // in transitive dev/build dependencies (picomatch via eslint-config-next and
+  // vinext) rather than anything the Worker ships. Blocking on those would make
+  // this permanently red, which is exactly how the old dependency-review check
+  // became worthless. `bun audit` still prints the full report, so the highs
+  // stay visible; only a critical advisory stops the build.
+  { name: "audit", script: "audit" },
   { name: "hotspot-preflight", script: "review:hotspot-preflight" },
 ];
 

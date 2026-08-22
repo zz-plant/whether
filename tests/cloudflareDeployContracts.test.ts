@@ -4,7 +4,9 @@ import { describe, it } from "bun:test";
 
 describe("Cloudflare deploy contracts", () => {
   const source = readFileSync(new URL("../scripts/cloudflare-run.mjs", import.meta.url), "utf8");
-  const workflow = readFileSync(new URL("../.github/workflows/upgrade-guardrails.yml", import.meta.url), "utf8");
+  // The Cloudflare packaging step moved here when Upgrade Guardrails was folded
+  // into CI; the contract is that *some* CI workflow packages the dry run.
+  const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
 
   it("uses the dedicated Cloudflare adapter instead of the deprecated vinext deploy shim", () => {
     assert.match(source, /node_modules[\s\S]*@vinext[\s\S]*cloudflare[\s\S]*dist[\s\S]*cli\.js/);
@@ -18,7 +20,7 @@ describe("Cloudflare deploy contracts", () => {
     assert.match(source, /runWranglerDryRun\(targetEnv, childEnv\)/);
   });
 
-  it("packages a production dry run in upgrade CI", () => {
+  it("packages a production dry run in CI", () => {
     assert.match(workflow, /bun run deploy:cloudflare:dry-run/);
   });
 });

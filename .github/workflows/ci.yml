@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 # A newer push to the same PR/branch supersedes the running check.
 concurrency:
@@ -26,10 +27,27 @@ jobs:
           restore-keys: |
             bun-${{ runner.os }}-
       - run: bun install --frozen-lockfile
+
       # lint/typecheck/test/assets are mutually independent; running them as
       # separate steps just added their durations together. This runs them
       # concurrently and reports every failure in one pass instead of stopping
       # at the first. Named explicitly so review:hotspot-preflight stays owned by
       # its own workflow, which needs a full-depth checkout.
-      - run: bun scripts/run-checks.mjs lint typecheck test assets
-      - run: bun run build
+      - run: bun scripts/run-checks.mjs lint typecheck test assets audit
+
+      # Absorbed from the former Upgrade Guardrails workflow. That job ran lint,
+      # typecheck, and test as steps and then ran `check:vinext` -- which is
+      # `bun run check`, i.e. the same three again -- before packaging the
+      # Worker. Only the packaging was unique to it, so only the packaging
+      # survives here. This also covers what the old `bun run build` step did.
+      - name: Package Cloudflare Worker deploy
+        run: |
+          mkdir -p artifacts
+          bun run deploy:cloudflare:dry-run 2>&1 | tee artifacts/cloudflare-deploy-dry-run.log
+
+      - name: Upload Cloudflare build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-build-artifacts
+          path: artifacts/
