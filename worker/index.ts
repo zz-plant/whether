@@ -7,6 +7,7 @@ import { withDeadline } from "../lib/withDeadline";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
+import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 
 interface Env {
   ASSETS: {
@@ -105,6 +106,14 @@ export default {
     if (!isDailyIngestion) {
       await runCronStep("email/send-weekly", sendWeeklyBrief);
     }
+
+    // Records the month in progress from the assessment the read path just computed, so the
+    // regime history gains months between deploys instead of waiting for a generator run
+    // and a merged pull request.
+    await runCronStep("summary-history", async () => {
+      const result = await refreshMonthlyRegimeHistory();
+      return { ok: result.ok, error: result.error };
+    });
 
     await runCronStep("check-regime-change", checkRegimeChange);
     await runCronStep("alert-deliveries", async () => {
