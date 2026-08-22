@@ -48,10 +48,19 @@ if (!parsed.skipBuild) {
   deployArgs.push("--skip-build");
 }
 
-// The adapter's --dry-run only validates scaffolding: it deliberately skips both
-// the build and Wrangler. Run Wrangler directly so this command catches invalid
-// bindings, oversized bundles, and other upload-time failures without publishing.
+// Two layers, because neither sees what the other does. The adapter's own --dry-run
+// checks the adapter contract — router mode, ISR wiring, the data and image adapters the
+// routes require — and skips both the build and Wrangler. Wrangler's dry run packages the
+// Worker and catches invalid bindings, oversized bundles, and other upload-time failures.
+// An adapter-contract break surfaces here as a clear adapter error rather than as a
+// confusing packaging failure, or as a real deploy that fails after CI went green.
 if (parsed.dryRun) {
+  // deployArgs already carries --dry-run and --skip-build, so this validates without
+  // building or publishing.
+  const adapterStatus = runCloudflareDeploy(deployArgs, childEnv);
+  if (adapterStatus !== 0) {
+    process.exit(adapterStatus);
+  }
   process.exit(runWranglerDryRun(targetEnv, childEnv));
 }
 
