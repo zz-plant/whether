@@ -51,6 +51,9 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
 const MS_PER_SECOND = 1000;
 const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+const MS_PER_DAY = 24 * MS_PER_HOUR;
+/** Mean Gregorian month, so a month bucket does not drift against calendar length. */
+const MS_PER_MONTH = 30.4375 * MS_PER_DAY;
 
 const formatUnitSuffix = (unit: string) => {
   if (unit === "bps") return " bps (basis points)";
@@ -96,25 +99,41 @@ export const formatWeekEndingUTC = (value: string) =>
 export const formatTimestampUTC = (value: string) =>
   formatDateValue(value, timestampFormatter);
 
-export const formatAgeHours = (value: string | null, now: Date) => {
+/**
+ * Coarse age, no trailing punctuation: "45s", "12m", "6h", "18d", "7mo".
+ *
+ * Buckets past hours because a genuinely stale source otherwise renders as a raw hour count
+ * — a curated snapshot last written in February reads as "4824h.", which is accurate and
+ * tells an operator nothing. Returns null when there is no parseable timestamp, so callers
+ * choose their own placeholder.
+ */
+export const formatAgeSpan = (value: string | null, now: Date): string | null => {
   if (!value) {
-    return "—";
+    return null;
   }
   const timestamp = parseDateValue(value);
   if (!timestamp) {
-    return "—";
+    return null;
   }
   const ageMs = Math.max(0, now.getTime() - timestamp.getTime());
   if (ageMs < MS_PER_MINUTE) {
-    const seconds = Math.round(ageMs / MS_PER_SECOND);
-    return `${seconds}s.`;
+    return `${Math.round(ageMs / MS_PER_SECOND)}s`;
   }
   if (ageMs < MS_PER_HOUR) {
-    const minutes = Math.round(ageMs / MS_PER_MINUTE);
-    return `${minutes}m.`;
+    return `${Math.round(ageMs / MS_PER_MINUTE)}m`;
   }
-  const hours = Math.round(ageMs / MS_PER_HOUR);
-  return `${hours}h.`;
+  if (ageMs < MS_PER_DAY) {
+    return `${Math.round(ageMs / MS_PER_HOUR)}h`;
+  }
+  if (ageMs < 60 * MS_PER_DAY) {
+    return `${Math.round(ageMs / MS_PER_DAY)}d`;
+  }
+  return `${Math.round(ageMs / MS_PER_MONTH)}mo`;
+};
+
+export const formatAgeHours = (value: string | null, now: Date) => {
+  const span = formatAgeSpan(value, now);
+  return span ? `${span}.` : "—";
 };
 
 export const formatNumberValue = (value: number | null) => {

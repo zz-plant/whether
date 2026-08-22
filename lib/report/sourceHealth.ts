@@ -1,3 +1,4 @@
+import { formatAgeSpan } from "../formatters";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -9,6 +10,8 @@ export type SourceHealthRow = {
   freshnessStatus: SourceFreshnessStatus;
   freshnessSlaHours: number;
   lastSuccessfulFetchAt: string | null;
+  /** Coarse age of lastSuccessfulFetchAt, stamped at build time so no consumer needs a clock. */
+  ageLabel: string | null;
   activeFallbackReason: string | null;
   mode: SourceModeStatus;
 };
@@ -228,6 +231,7 @@ const buildGroupedRow = ({
     freshnessStatus: classifyFreshness(lastSuccessfulFetchAt, group.freshnessSlaHours, now, group.useBusinessDays),
     freshnessSlaHours: group.freshnessSlaHours,
     lastSuccessfulFetchAt,
+    ageLabel: formatAgeSpan(lastSuccessfulFetchAt, now),
     activeFallbackReason: group.supportsLive
       ? buildLiveGroupFallbackReason({ group, relevantSeries, macroStatusLabel })
       : null,
@@ -250,7 +254,13 @@ export const formatSourceFreshnessLabel = (row: SourceHealthRow) => {
     return `Current · ${row.cadenceLabel}`;
   }
 
-  return `${row.freshnessStatus === "fresh" ? "Fresh" : "Stale"} · ${row.cadenceLabel}`;
+  if (row.freshnessStatus === "stale") {
+    // Say how stale. "Stale · Curated snapshot" reads the same whether a source is a day past
+    // its SLA or seven months past it, and those are not the same decision.
+    return row.ageLabel ? `Stale ${row.ageLabel} · ${row.cadenceLabel}` : `Stale · ${row.cadenceLabel}`;
+  }
+
+  return `Fresh · ${row.cadenceLabel}`;
 };
 
 export const buildSourceHealthRows = ({
@@ -274,6 +284,7 @@ export const buildSourceHealthRows = ({
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
+      ageLabel: formatAgeSpan(treasuryLastSuccessfulFetchAt, now),
       activeFallbackReason: treasuryFallbackReason,
       mode: treasuryFallbackReason ? "fallback" : treasury.isLive ? "live" : "snapshot",
     },

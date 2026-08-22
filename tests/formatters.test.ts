@@ -7,6 +7,8 @@ import {
   formatSignedDelta,
   formatMonthShortUtc,
   formatMonthLongYearUtc,
+  formatAgeSpan,
+  formatAgeHours,
 } from "../lib/formatters";
 import {
   formatQuarterLabel,
@@ -97,5 +99,41 @@ describe("month UTC formatting", () => {
   it("formats month and year long name deterministically", () => {
     assert.equal(formatMonthLongYearUtc(2026, 3), "March 2026");
     assert.equal(formatMonthLongYearUtc(2024, 11), "November 2024");
+  });
+});
+
+describe("age formatting", () => {
+  const now = new Date("2026-08-22T16:00:00.000Z");
+  const ago = (ms: number) => new Date(now.getTime() - ms).toISOString();
+
+  const SECOND = 1000;
+  const MINUTE = 60 * SECOND;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+
+  it("buckets short ages by second, minute, and hour", () => {
+    assert.equal(formatAgeSpan(ago(30 * SECOND), now), "30s");
+    assert.equal(formatAgeSpan(ago(12 * MINUTE), now), "12m");
+    assert.equal(formatAgeSpan(ago(6 * HOUR), now), "6h");
+  });
+
+  // A source frozen for months used to render as a raw hour count: the curated startup
+  // snapshot, last written 2026-02-02, read as "4824h." on a live dashboard.
+  it("buckets long ages by day and month instead of counting hours", () => {
+    assert.equal(formatAgeSpan(ago(18 * DAY), now), "18d");
+    assert.equal(formatAgeSpan(ago(45 * DAY), now), "45d");
+    assert.equal(formatAgeSpan("2026-02-02T00:00:00.000Z", now), "7mo");
+    assert.doesNotMatch(formatAgeSpan("2026-02-02T00:00:00.000Z", now) ?? "", /h$/);
+  });
+
+  it("returns null for a missing or unparseable timestamp", () => {
+    assert.equal(formatAgeSpan(null, now), null);
+    assert.equal(formatAgeSpan("not-a-date", now), null);
+  });
+
+  it("keeps the trailing-period form callers already render", () => {
+    assert.equal(formatAgeHours(ago(12 * MINUTE), now), "12m.");
+    assert.equal(formatAgeHours("2026-02-02T00:00:00.000Z", now), "7mo.");
+    assert.equal(formatAgeHours(null, now), "\u2014");
   });
 });
