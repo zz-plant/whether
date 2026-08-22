@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import currentMacroSnapshot from "../data/macro_snapshot.json";
+import { formatAgeSpan } from "../lib/formatters";
 import { loadMacroSeries } from "../lib/macroSnapshot";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
@@ -96,6 +97,35 @@ const buildMacroFallbackPayload = (
   }),
 });
 
+/**
+ * Series this run could not refresh, with the age of the timestamp each one kept.
+ *
+ * A series with no live fetcher keeps the timestamp it arrived with, which is correct. What is
+ * not obvious is that the payload's top-level fetched_at is stamped fresh regardless, so a run
+ * that refreshed none of them still reports the file as updated with a current timestamp.
+ * Naming them is what stops the next person chasing a stale-source warning from running this
+ * and concluding the stale data is now current.
+ */
+export const summarizeCarriedForward = (
+  payload: MacroSnapshotPayload,
+  // Only the identity and liveness of each refreshed series matters here, so take that shape
+  // rather than the loader's full return type — callers and tests need not build a whole reading.
+  refreshedSeries: ReadonlyArray<{ id: string; isLive: boolean }>,
+  now: Date = new Date(payload.fetched_at),
+): Array<{ id: string; fetchedAt: string | null; age: string | null }> => {
+  const refreshedIds = new Set<string>(
+    refreshedSeries.filter((series) => series.isLive).map((series) => series.id),
+  );
+
+  return payload.series
+    .filter((series) => !refreshedIds.has(series.id))
+    .map((series) => ({
+      id: series.id,
+      fetchedAt: series.fetched_at ?? null,
+      age: formatAgeSpan(series.fetched_at ?? null, now),
+    }));
+};
+
 export const main = async () => {
   const [treasury, macroSeries] = await Promise.all([
     fetchTreasuryData(),
@@ -111,6 +141,9 @@ export const main = async () => {
   ]);
 
   const refreshedLiveMacroCount = macroSeries.filter((series) => series.isLive).length;
+
+  const carriedForward = summarizeCarriedForward(macroFallback, macroSeries);
+
   console.log(JSON.stringify({
     updated: [
       {
@@ -122,9 +155,18 @@ export const main = async () => {
         file: "data/macro_snapshot.json",
         fetchedAt: macroFallback.fetched_at,
         refreshedLiveMacroSeries: refreshedLiveMacroCount,
+        carriedForward,
       },
     ],
   }, null, 2));
+
+  if (carriedForward.length > 0) {
+    console.warn(
+      `Not refreshed (no live source; values and timestamps carried forward): ${carriedForward
+        .map((series) => `${series.id} ${series.age ?? "age unknown"}`)
+        .join(", ")}`,
+    );
+  }
 };
 
 if (import.meta.main) {
