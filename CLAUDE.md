@@ -46,6 +46,12 @@ routine's run log there before assuming nothing changed — a quiet week and a f
 same from the repo. Every one of these jobs previously failed at its PR step while reporting green,
 so the routines are told to end a run with `FAILED` rather than claim success without a PR.
 
+These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
+needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
+Without the allowlist the first FRED fetch fails with `connect_rejected` — a 403 on CONNECT, not
+from FRED — and the run stops before touching a file. Three routines all reporting FAILED with a 403
+is the egress policy, not the data.
+
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
