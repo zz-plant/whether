@@ -264,7 +264,10 @@ export const deliverAlerts = async (
       continue;
     }
     for (const alert of alerts) {
-      const already = await wasAlreadyDelivered(sub.clientId, alert.type);
+      // Keyed on the address, not on the preference record. Two records can resolve to one
+      // inbox — the address itself and that subscriber's token — and a clientId key gave
+      // each of them its own "already delivered" marker, so the reader got two copies.
+      const already = await wasAlreadyDelivered(targetEmail, alert.type);
       if (already) {
         skipped++;
         continue;
@@ -277,7 +280,7 @@ export const deliverAlerts = async (
       );
       if (ok) {
         sent++;
-        await trackAlertDelivery(sub.clientId, alert.type);
+        await trackAlertDelivery(targetEmail, alert.type);
       } else {
         errors++;
       }

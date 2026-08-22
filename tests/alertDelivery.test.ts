@@ -41,16 +41,14 @@ const CONDITIONS = {
 };
 
 let store: SubscriberStore;
+let kv: FakeKv;
 
 /** Enroll an address in email alerts the way the API allows: a self-asserted clientId. */
 const enrollForAlerts = async (clientId: string) => {
   await getAlertPreferenceRepository().upsert(clientId, { slack: false, email: true, webhook: false });
   // listAlertSubscribers finds candidates by scanning KV keys, so the record has to exist
   // there too — the repository lookup alone would never be reached.
-  await (globalThis as { WHETHER_DURABLE_KV?: KvNamespace }).WHETHER_DURABLE_KV!.put(
-    `alert-pref:${clientId}`,
-    JSON.stringify({ slack: false, email: true, webhook: false }),
-  );
+  await kv.put(`alert-pref:${clientId}`, JSON.stringify({ slack: false, email: true, webhook: false }));
 };
 
 const subscribeVerified = async (email: string) => {
@@ -60,13 +58,14 @@ const subscribeVerified = async (email: string) => {
 };
 
 beforeEach(() => {
-  (globalThis as { WHETHER_DURABLE_KV?: KvNamespace }).WHETHER_DURABLE_KV = new FakeKv();
+  kv = new FakeKv();
+  Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
   store = resetSubscriberStore();
   resetAlertPreferenceRepository();
 });
 
 afterEach(() => {
-  delete (globalThis as { WHETHER_DURABLE_KV?: KvNamespace }).WHETHER_DURABLE_KV;
+  Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
   resetSubscriberStore();
   resetAlertPreferenceRepository();
 });
@@ -115,6 +114,22 @@ describe("deliverAlerts", () => {
     assert.equal(result.alerts.length, 1, "a first run with no prior state is a regime change");
     assert.equal(result.sent, 1);
     assert.equal(result.errors, 0);
+  });
+
+  // Two preference records can name one inbox: the address itself, and that subscriber's
+  // token. Delivery keyed the "already sent" record on the clientId rather than on the
+  // address it resolved to, so each record earned its own key and the subscriber got a
+  // second copy — and since anyone can write a preference record for a known address, the
+  // duplicate can be created deliberately.
+  it("sends one copy when two preference records resolve to the same inbox", async () => {
+    const subscriber = await subscribeVerified("reader@example.com");
+    await enrollForAlerts("reader@example.com");
+    await enrollForAlerts(subscriber.token);
+
+    const result = await deliverAlerts(CONDITIONS);
+
+    assert.equal(result.sent, 1, "one inbox, one copy");
+    assert.equal(result.skipped, 1, "the second record resolves to an address already sent to");
   });
 
   it("sends nothing when a preference record names an address that never consented", async () => {
