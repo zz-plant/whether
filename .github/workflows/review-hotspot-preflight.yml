@@ -1,8 +1,11 @@
 name: Review Hotspot Preflight
 
+# Manual only, for the same billing reason as ci.yml. The preflight itself did not stop:
+# .husky/pre-push runs it on every push, which is earlier than a pull request anyway. This
+# file stays because the check wants a full-depth checkout that the local hook gets for
+# free and a restored CI would need to ask for.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
+  workflow_dispatch:
 
 jobs:
   preflight:
