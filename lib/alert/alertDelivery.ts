@@ -114,12 +114,24 @@ const wasAlreadyDelivered = async (
 const isValidEmail = (raw: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(raw.trim());
 
-const resolveRecipientEmail = async (clientId: string): Promise<string | null> => {
-  if (isValidEmail(clientId)) return clientId.trim();
+/**
+ * Only a verified, still-active subscriber is a recipient.
+ *
+ * The clientId on an alert-pref record is self-asserted: POST /api/alert-preferences
+ * authorizes it by comparing the body's clientId to a header the same caller sets. This
+ * used to return an email-shaped clientId as its own recipient, so that unauthenticated
+ * write was enough to enroll any address in recurring alert mail — an address whose owner
+ * had never asked for it, and had no record to unsubscribe from. The subscriber record is
+ * the only evidence that the address consented, so require it on both lookups.
+ */
+export const resolveRecipientEmail = async (clientId: string): Promise<string | null> => {
   try {
     const store = getSubscriberStore();
-    const sub = (await store.getSubscriberByEmail(clientId)) ?? (await store.getSubscriberByToken(clientId));
-    return sub && sub.email && isValidEmail(sub.email) ? sub.email : null;
+    const subscriber =
+      (await store.getSubscriberByEmail(clientId)) ?? (await store.getSubscriberByToken(clientId));
+
+    if (!subscriber?.verified || !subscriber.active) return null;
+    return isValidEmail(subscriber.email) ? subscriber.email : null;
   } catch {
     return null;
   }
@@ -246,7 +258,9 @@ export const deliverAlerts = async (
   for (const sub of subscribers) {
     const targetEmail = await resolveRecipientEmail(sub.clientId);
     if (!targetEmail) {
-      errors++;
+      // Not a failure: a preference record whose clientId names no verified subscriber is
+      // simply not owed mail. Counting it as an error would bury real send failures.
+      skipped++;
       continue;
     }
     for (const alert of alerts) {
