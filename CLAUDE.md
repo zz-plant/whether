@@ -20,12 +20,34 @@ Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + 
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
 reports every failure in one pass; add `--serial` for fail-fast sequencing when debugging it.
 
-`check` also runs automatically on `git push` via `.husky/pre-push`, because GitHub Actions is not
-a guaranteed backstop — it goes dark whenever the account hits a billing hold, taking every
-workflow with it. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that this
-worktree is often shared with other sessions, so a pre-push failure may be someone else's in-flight
-edit rather than yours — check `git status` first. The hook deliberately omits `audit`, which needs
-the network, so pushing offline still works; CI and the Cloudflare build both run it.
+`check` also runs automatically on `git push` via `.husky/pre-push`, and since 2026-08-22 that hook
+is the check gate rather than a mirror of one: the GitHub workflows are manual-only, because this
+private repo's Actions minutes are billed and the account stopped paying for them. Skipping the hook
+means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that
+this worktree is often shared with other sessions, so a pre-push failure may be someone else's
+in-flight edit rather than yours — check `git status` first. The hook covers lint, typecheck, test,
+assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the network — run
+`bun run check` before a merge to pick that one up. Cloudflare Workers Builds still builds and
+deploys every push, which is the only remote gate left.
+
+### Scheduled automation
+
+The recurring data jobs run as scheduled Claude Code routines, not GitHub Actions. Each one runs
+the same scripts the old workflow did, opens a PR, and never merges it.
+
+| Routine | Cadence (UTC) | Produces |
+| --- | --- | --- |
+| Whether — regime history refresh | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
+| Whether — weekly Slack brief refresh | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md` |
+| Whether — weekly brief freeze | Thu 13:00 | the week appended to `data/published_briefs.json` |
+
+Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
+routine's run log there before assuming nothing changed — a quiet week and a failed run look the
+same from the repo. Every one of these jobs previously failed at its PR step while reporting green,
+so the routines are told to end a run with `FAILED` rather than claim success without a PR.
+
+The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
+a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
 ### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
 

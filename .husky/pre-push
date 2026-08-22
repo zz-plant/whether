@@ -1,9 +1,11 @@
-# Runs the same checks CI runs, before anything leaves the machine.
+# The check gate. Not a mirror of CI any more: as of 2026-08-22 the GitHub
+# workflows are manual-only, because this private repo's Actions minutes are
+# billed and the account stopped paying for them. Nothing else runs lint,
+# typecheck, tests, assets, or the review hotspot preflight on the way out, so a
+# skip here means the push is unverified. Cloudflare Workers Builds still builds
+# and deploys every push, which is the one remote gate left.
 #
-# GitHub Actions is not a guaranteed backstop -- it has gone dark on a billing
-# hold, taking every workflow on every branch with it -- so this is the one gate
-# that always runs. It is the same task list as .github/workflows/ci.yml, run
-# concurrently (~40s).
+# Runs concurrently, ~40s.
 #
 # Escape hatches:
 #   SKIP_PREPUSH=1 git push     # skip just this hook
@@ -14,4 +16,4 @@
 # than to what you are pushing. Check `git status` before assuming it is yours.
 [ "$SKIP_PREPUSH" = "1" ] && exit 0
 
-bun scripts/run-checks.mjs lint typecheck test assets
+bun scripts/run-checks.mjs lint typecheck test assets hotspot-preflight

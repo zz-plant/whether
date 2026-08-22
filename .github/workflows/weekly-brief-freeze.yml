@@ -4,10 +4,13 @@ name: Weekly Brief Freeze
 # Opens a PR rather than committing directly: a published brief is a citable record,
 # so a human confirms the snapshot before it becomes permanent.
 
+# The Thursday 13:00 UTC cadence — after the Monday/Wednesday Treasury prints have
+# settled — moved to a scheduled Claude Code routine when the account stopped paying for
+# Actions minutes: "Whether — weekly brief freeze",
+# https://claude.ai/code/routines/trig_01WrbhhT73Ve4bsFK83UNyu9
+# This file stays runnable by hand for a missed week or a restored Actions budget. If both
+# ever run, they open two PRs for the same week rather than colliding.
 on:
-  schedule:
-    # Thursday 13:00 UTC, after the Monday/Wednesday Treasury prints have settled.
-    - cron: "0 13 * * 4"
   workflow_dispatch:
 
 permissions:
