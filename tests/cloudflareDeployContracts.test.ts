@@ -20,6 +20,20 @@ describe("Cloudflare deploy contracts", () => {
     assert.match(source, /runWranglerDryRun\(targetEnv, childEnv\)/);
   });
 
+  // The adapter validator and Wrangler check different things: the adapter knows the
+  // router mode, ISR wiring, and which data/image adapters the routes require; Wrangler
+  // knows bindings and upload limits. Running only the second let an adapter-contract
+  // break reach a real deploy after the dry run went green.
+  it("validates the adapter contract before Wrangler packages the dry run", () => {
+    const dryRunBranch = source.slice(source.indexOf("if (parsed.dryRun)"));
+    const adapterIndex = dryRunBranch.indexOf("runCloudflareDeploy(deployArgs, childEnv)");
+    const wranglerIndex = dryRunBranch.indexOf("runWranglerDryRun(targetEnv, childEnv)");
+
+    assert.ok(adapterIndex >= 0, "dry run invokes the adapter validator");
+    assert.ok(wranglerIndex > adapterIndex, "Wrangler packages only after adapter validation");
+    assert.match(source, /if \(adapterStatus !== 0\)/, "a failed adapter validation stops the dry run");
+  });
+
   it("packages a production dry run in CI", () => {
     assert.match(workflow, /bun run deploy:cloudflare:dry-run/);
   });
