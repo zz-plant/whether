@@ -1,0 +1,17 @@
+# Runs the same checks CI runs, before anything leaves the machine.
+#
+# GitHub Actions is not a guaranteed backstop -- it has gone dark on a billing
+# hold, taking every workflow on every branch with it -- so this is the one gate
+# that always runs. It is the same task list as .github/workflows/ci.yml, run
+# concurrently (~40s).
+#
+# Escape hatches:
+#   SKIP_PREPUSH=1 git push     # skip just this hook
+#   git push --no-verify        # skip all hooks
+#
+# Caveat: this repo's working tree is often shared with other concurrent Claude
+# sessions, so a failure here can belong to someone else's in-flight edit rather
+# than to what you are pushing. Check `git status` before assuming it is yours.
+[ "$SKIP_PREPUSH" = "1" ] && exit 0
+
+bun scripts/run-checks.mjs lint typecheck test assets

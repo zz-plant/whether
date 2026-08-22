@@ -19,6 +19,12 @@ Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + 
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
 reports every failure in one pass; add `--serial` for fail-fast sequencing when debugging it.
 
+`check` also runs automatically on `git push` via `.husky/pre-push`, because GitHub Actions is not
+a guaranteed backstop — it goes dark whenever the account hits a billing hold, taking every
+workflow with it. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that this
+worktree is often shared with other sessions, so a pre-push failure may be someone else's in-flight
+edit rather than yours — check `git status` first.
+
 ### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
 
 | Command | What it does |
