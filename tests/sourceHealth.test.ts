@@ -93,6 +93,7 @@ describe("buildSourceHealthRows", () => {
         freshnessStatus: "fresh",
         freshnessSlaHours: 6,
         lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
+        ageLabel: "1d",
         activeFallbackReason: null,
         mode: "live",
       },
@@ -102,6 +103,7 @@ describe("buildSourceHealthRows", () => {
         freshnessStatus: "fresh",
         freshnessSlaHours: 1080,
         lastSuccessfulFetchAt: "2026-03-02T00:00:00.000Z",
+        ageLabel: "9d",
         activeFallbackReason: null,
         mode: "snapshot",
       },
@@ -111,6 +113,7 @@ describe("buildSourceHealthRows", () => {
         freshnessStatus: "unknown",
         freshnessSlaHours: 1080,
         lastSuccessfulFetchAt: null,
+        ageLabel: null,
         activeFallbackReason: "Labor unavailable; no series were loaded for this refresh.",
         mode: "fallback",
       },
@@ -123,5 +126,59 @@ describe("buildSourceHealthRows", () => {
       totalCount: 3,
       inputsComplete: false,
     });
+  });
+});
+
+describe("stale source disclosure states its age", () => {
+  const row = {
+    sourceName: "Startup/private markets",
+    cadenceLabel: "Curated snapshot",
+    freshnessSlaHours: 45 * 24,
+    lastSuccessfulFetchAt: "2026-02-02T00:00:00.000Z",
+    activeFallbackReason: null,
+    mode: "snapshot",
+  } as const;
+
+  // "Stale · Curated snapshot" read identically at one day past SLA and at seven months past
+  // it. In prod the curated block had been frozen since 2026-02-02 and still said only that.
+  it("names how stale a stale source is", () => {
+    assert.equal(
+      formatSourceFreshnessLabel({ ...row, freshnessStatus: "stale", ageLabel: "7mo" }),
+      "Stale 7mo · Curated snapshot",
+    );
+  });
+
+  it("falls back to the bare label when no age is known", () => {
+    assert.equal(
+      formatSourceFreshnessLabel({ ...row, freshnessStatus: "stale", ageLabel: null }),
+      "Stale · Curated snapshot",
+    );
+  });
+
+  it("leaves fresh and current wording alone", () => {
+    assert.equal(
+      formatSourceFreshnessLabel({ ...row, freshnessStatus: "fresh", ageLabel: "3d" }),
+      "Current · Curated snapshot",
+    );
+    assert.equal(
+      formatSourceFreshnessLabel({ ...row, mode: "live", freshnessStatus: "fresh", ageLabel: "3d" }),
+      "Fresh · Curated snapshot",
+    );
+  });
+
+  it("stamps a month-scale age on a curated block frozen since February", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury(),
+      macroSeries: [
+        buildMacroSeriesReading({ id: "VC_FUNDING_VELOCITY", fetched_at: "2026-02-02T00:00:00.000Z", isLive: false }),
+      ],
+      now: new Date("2026-08-22T16:00:00.000Z"),
+    });
+
+    const startup = rows.find((entry) => entry.sourceName === "Startup/private markets");
+
+    assert.equal(startup?.freshnessStatus, "stale");
+    assert.equal(startup?.ageLabel, "7mo");
+    assert.equal(formatSourceFreshnessLabel(startup!), "Stale 7mo · Curated snapshot");
   });
 });
