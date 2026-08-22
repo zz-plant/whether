@@ -8,7 +8,6 @@ export const STORAGE_KEYS = {
   displayMode: "whether-display-mode",
   homeOrientationDismissed: "whether.home.orientation.dismissed",
   reviewedRecordDates: "whether_reviewed",
-  regimeAlerts: "whether.regimeAlerts",
   decisionHistory: "whether_decision_history",
   commandCenterVisited: "whether_command_center_visited",
   companyStage: "whether_stage",
