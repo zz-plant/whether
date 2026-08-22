@@ -287,29 +287,51 @@ describe("decision memory and alert routes", () => {
     assert.equal(body.error, "invalid-payload");
   });
 
-  it("creates and lists alert deliveries", async () => {
+  /** Narrow the response instead of asserting a shape onto it. */
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
+
+  it("lists delivery events for one client without leaking another's", async () => {
     const repository = getRegimeAlertRepository();
-    const alert: RegimeAlertEvent = {
-      eventId: "alert-event",
+    const deliveryFor = (clientId: string, channel: AlertDeliveryEvent["channel"]): AlertDeliveryEvent => ({
+      eventId: `${clientId}-${channel}`,
       sourceVersion: "v1",
       canonicalTimestampSource: "request-received-at",
-      id: "alert-1",
-      createdAt: "2026-02-16T00:00:00.000Z",
-      payload: {
-        previousRecordDate: "2026-02-09",
-        currentRecordDate: "2026-02-16",
-        previousAssessment: { regime: "DEFENSIVE" } as RegimeAlertEvent["payload"]["previousAssessment"],
-        currentAssessment: { regime: "SCARCITY" } as RegimeAlertEvent["payload"]["currentAssessment"],
-        reasons: [{ code: "risk", message: "risk moved" }],
-        decisionDeltas: [],
-        triggerStates: {},
-        sourceUrls: [],
-        timeMachineHref: "/",
-      },
-    };
-    await repository.appendAlert(alert);
+      id: `${clientId}-${channel}`,
+      clientId,
+      alertId: "alert-1",
+      channel,
+      deliveredAt: "2026-02-16T00:00:00.000Z",
+      status: "sent",
+      summary: "regime moved",
+    });
 
-    const post = await postAlertDeliveriesRoute(
+    await repository.appendDelivery(deliveryFor("abc", "email"));
+    await repository.appendDelivery(deliveryFor("abc", "slack"));
+    await repository.appendDelivery(deliveryFor("other-client", "email"));
+
+    const get = await getAlertDeliveriesRoute(new Request("http://localhost/api/alert-deliveries?clientId=abc"));
+
+    assert.equal(get.status, 200);
+    const body: unknown = await get.json();
+    assert.ok(isRecord(body), "responds with an object");
+    assert.ok(Array.isArray(body.deliveries), "responds with a delivery list");
+    assert.equal(body.deliveries.length, 2);
+    assert.equal(body.count, 2);
+    assert.equal(body.clientId, "abc");
+    assert.ok(
+      body.deliveries.every((delivery) => isRecord(delivery) && delivery.clientId === "abc"),
+      "every listed delivery belongs to the requested client",
+    );
+  });
+
+  // The unauthenticated branch this replaces appended a row with status "sent" for every
+  // enabled channel without contacting one, so anyone could write delivery records for
+  // sends that never happened — and the panel read them back as "Delivered to N channels".
+  it("refuses to record deliveries for an unauthenticated caller", async () => {
+    const repository = getRegimeAlertRepository();
+
+    const response = await postAlertDeliveriesRoute(
       new Request("http://localhost/api/alert-deliveries", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -317,42 +339,10 @@ describe("decision memory and alert routes", () => {
       }),
     );
 
-    assert.equal(post.status, 200);
-    const postBody = (await post.json()) as { deliveries: Array<{ status: string; clientId: string }>; clientId: string };
-    assert.equal(postBody.deliveries.length, 3);
-    assert.equal(postBody.clientId, "abc");
-    assert.ok(postBody.deliveries.every((delivery) => delivery.clientId === "abc"));
+    assert.ok(response.status === 401 || response.status === 503, `refused, got ${response.status}`);
 
-    const secondPost = await postAlertDeliveriesRoute(
-      new Request("http://localhost/api/alert-deliveries", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ clientId: "other-client", alertId: "alert-1" }),
-      }),
-    );
-    assert.equal(secondPost.status, 200);
-
-    const get = await getAlertDeliveriesRoute(new Request("http://localhost/api/alert-deliveries?clientId=abc"));
-    assert.equal(get.status, 200);
-    const getBody = (await get.json()) as { deliveries: Array<{ clientId: string }>; count: number; clientId: string | null };
-    assert.equal(getBody.deliveries.length, 3);
-    assert.equal(getBody.count, 3);
-    assert.equal(getBody.clientId, "abc");
-    assert.ok(getBody.deliveries.every((delivery) => delivery.clientId === "abc"));
-  });
-
-  it("rejects invalid alert deliveries payload", async () => {
-    const response = await postAlertDeliveriesRoute(
-      new Request("http://localhost/api/alert-deliveries", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ clientId: "abc" }),
-      }),
-    );
-
-    assert.equal(response.status, 400);
-    const body = (await response.json()) as { error?: string };
-    assert.equal(body.error, "invalid-payload");
+    const listed = await repository.listDeliveries({ limit: 10 });
+    assert.deepEqual(listed.deliveries, [], "nothing was written");
   });
 
   it("keeps regime alert history readable by the browser without cron credentials", async () => {
