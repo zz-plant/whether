@@ -1,18 +1,7 @@
 import { NextResponse } from "next/server";
-import {
-  DEFAULT_ALERT_PREFERENCES,
-  getAlertPreferenceRepository,
-} from "../../../lib/storage/alertPreferenceRepository";
-import {
-  buildRegimeAlertLineage,
-  getRegimeAlertRepository,
-} from "../../../lib/storage/regimeAlertRepository";
-import {
-  buildDeliverySummary,
-  type AlertChannel,
-  type AlertDeliveryEvent,
-} from "../../../lib/signalOps";
+import { getRegimeAlertRepository } from "../../../lib/storage/regimeAlertRepository";
 import { runScheduledAlertDelivery } from "../../../lib/alert/alertDelivery";
+import { requireCronAuth } from "../../../lib/api/cronAuth";
 import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
@@ -54,128 +43,36 @@ export async function GET(request: Request) {
   });
 }
 
+/**
+ * Cron-only. This used to fall through to a "manual single-alert delivery from the UI"
+ * branch for unauthenticated callers, which appended a delivery row with status "sent" for
+ * every channel the preferences enabled — without contacting a single channel. The panel
+ * that called it reported "Delivered to N channels" off those rows until #1290 removed the
+ * control, which left an open endpoint whose only effect was writing delivery records for
+ * sends that never happened. Real delivery goes through runScheduledAlertDelivery, which
+ * mails verified subscribers and nobody else.
+ */
 export async function POST(request: Request) {
-  const authToken = request.headers
-    .get("authorization")
-    ?.replace("Bearer ", "");
-  const expectedToken = process.env.WHETHER_CRON_SECRET;
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
 
-  /* Cron-triggered automated alert evaluation and delivery. The cron trigger calls
-     runScheduledAlertDelivery() directly (worker/index.ts); this branch remains for
-     manual/authenticated runs. */
-  if (expectedToken && authToken && constantTimeCompare(authToken, expectedToken)) {
-    try {
-      const result = await runScheduledAlertDelivery();
-
-      return NextResponse.json({
-        ok: true,
-        sent: result.sent,
-        alerts: result.alerts,
-        errors: result.errors,
-      });
-    } catch (error) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        { status: 500 },
-      );
-    }
-  }
-
-  /* Manual single-alert delivery from the UI */
-  const repository = getRegimeAlertRepository();
-  const preferenceRepository = getAlertPreferenceRepository();
-  const degraded =
-    repository.backendStatus() === "local-fallback" ||
-    preferenceRepository.backendStatus() === "local-fallback";
-
-  let payload: unknown;
   try {
-    payload = await request.json();
-  } catch {
+    const result = await runScheduledAlertDelivery();
+
+    return NextResponse.json({
+      ok: true,
+      sent: result.sent,
+      skipped: result.skipped,
+      alerts: result.alerts,
+      errors: result.errors,
+    });
+  } catch (error) {
     return NextResponse.json(
       {
-        deliveries: [],
-        error: "invalid-json",
-        degraded,
-        backend: repository.backendStatus(),
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
       },
-      { status: 400 },
+      { status: 500 },
     );
   }
-
-  if (!payload || typeof payload !== "object") {
-    return NextResponse.json(
-      {
-        deliveries: [],
-        error: "invalid-payload",
-        degraded,
-        backend: repository.backendStatus(),
-      },
-      { status: 400 },
-    );
-  }
-
-  const candidate = payload as { clientId?: unknown; alertId?: unknown };
-  if (
-    typeof candidate.clientId !== "string" ||
-    !candidate.clientId ||
-    typeof candidate.alertId !== "string" ||
-    !candidate.alertId
-  ) {
-    return NextResponse.json(
-      {
-        deliveries: [],
-        error: "invalid-payload",
-        degraded,
-        backend: repository.backendStatus(),
-      },
-      { status: 400 },
-    );
-  }
-
-  const preferences =
-    (await preferenceRepository.get(candidate.clientId)) ??
-    DEFAULT_ALERT_PREFERENCES;
-  const alertList = await repository.listAlerts({ limit: 64 });
-  const alert =
-    alertList.alerts.find((item) => item.id === candidate.alertId) ?? null;
-
-  const channels: AlertChannel[] = ["slack", "email", "webhook"];
-  const created: AlertDeliveryEvent[] = [];
-
-  for (const channel of channels) {
-    const lineage = buildRegimeAlertLineage();
-    const event: AlertDeliveryEvent = {
-      ...lineage,
-      canonicalTimestampSource: "request-received-at",
-      id: lineage.eventId,
-      clientId: candidate.clientId,
-      alertId: candidate.alertId,
-      channel,
-      deliveredAt: new Date().toISOString(),
-      status: preferences[channel] ? "sent" : "skipped",
-      summary: alert
-        ? buildDeliverySummary(alert)
-        : `Alert ${candidate.alertId}`,
-    };
-    await repository.appendDelivery(event);
-    created.push(event);
-  }
-
-  const listed = await repository.listDeliveries({
-    limit: 128,
-    clientId: candidate.clientId,
-  });
-
-  return NextResponse.json({
-    created: true,
-    events: created,
-    deliveries: listed.deliveries,
-    clientId: candidate.clientId,
-    degraded,
-    backend: repository.backendStatus(),
-  });
 }
