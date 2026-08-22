@@ -18,9 +18,9 @@
 - **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Build & deployment pipeline
-- **Primary Vinext entry:** [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) wraps the Vinext CLI and enforces Node `>=22` for generic build/dev/start/check commands.
-- **Cloudflare deploy entry:** [`scripts/cloudflare-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/cloudflare-run.mjs) aligns `CLOUDFLARE_ENV` with both the Vinext build step and the subsequent deploy step.
-- **Cloudflare output wiring:** [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml) targets [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts) with asset and image bindings enabled.
+- **Primary Vinext entry:** [`scripts/vinext-run.mjs`](../scripts/vinext-run.mjs) wraps the Vinext CLI and enforces Node `>=22` for generic build/dev/start/check commands.
+- **Cloudflare deploy entry:** [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs) aligns `CLOUDFLARE_ENV` with both the Vinext build step and the subsequent deploy step.
+- **Cloudflare output wiring:** [`wrangler.toml`](../wrangler.toml) targets [`worker/index.ts`](../worker/index.ts) with asset and image bindings enabled.
 
 ## App Router usage & runtimes
 - **App Router layout:** `app/` directory with top-level `layout.tsx`, route segments, and API handlers under `app/api`.

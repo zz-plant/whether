@@ -135,7 +135,7 @@ Use these README files as entrypoints, then move to the linked canonical docs:
 - [lib/report/reportData.ts](lib/report/reportData.ts) for report assembly and sourcing
 - [lib/report/decisionKnobs.ts](lib/report/decisionKnobs.ts) for bounded operating rules
 - [lib/playbook.ts](lib/playbook.ts) for playbook logic
-- [app/planning/components/](app/planning/components/) for export and artifact surfaces
+- [app/operate/components/](app/operate/components/) for export and artifact surfaces
 
 ---
 

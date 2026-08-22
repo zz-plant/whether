@@ -1,4 +1,4 @@
-# `app/planning/components` agent guide
+# `app/operate/components` agent guide
 
 This directory owns the planning and artifact checkpoint after the weekly call.
 
