@@ -1,8 +1,10 @@
 name: Monthly Summary Refresh
 
+# The Monday 12:00 UTC cadence moved to a scheduled Claude Code routine when the account
+# stopped paying for Actions minutes: "Whether — regime history refresh",
+# https://claude.ai/code/routines/trig_016331bnhHUZx2SWjWew2z5m
+# Kept runnable by hand for a restored Actions budget or a one-off backfill.
 on:
-  schedule:
-    - cron: "0 12 * * 1"
   workflow_dispatch:
 
 permissions:

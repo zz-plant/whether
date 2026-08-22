@@ -1,8 +1,12 @@
 name: Weekly Slack Brief Artifact
 
+# The Monday 13:00 UTC cadence moved to a scheduled Claude Code routine when the account
+# stopped paying for Actions minutes: "Whether — weekly Slack brief refresh",
+# https://claude.ai/code/routines/trig_017b1YkXqvsje8pseMXcUftp
+# The routine cannot upload the artifacts/ text file — Actions artifacts have no equivalent
+# there — so it commits only docs/briefs/latest-weekly-slack-brief.md and treats the text
+# output as a generation check. Run this workflow by hand if you need the uploaded artifact.
 on:
-  schedule:
-    - cron: "0 13 * * 1"
   workflow_dispatch:
   workflow_call:
 

@@ -30,6 +30,25 @@ assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the
 `bun run check` before a merge to pick that one up. Cloudflare Workers Builds still builds and
 deploys every push, which is the only remote gate left.
 
+### Scheduled automation
+
+The recurring data jobs run as scheduled Claude Code routines, not GitHub Actions. Each one runs
+the same scripts the old workflow did, opens a PR, and never merges it.
+
+| Routine | Cadence (UTC) | Produces |
+| --- | --- | --- |
+| Whether — regime history refresh | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
+| Whether — weekly Slack brief refresh | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md` |
+| Whether — weekly brief freeze | Thu 13:00 | the week appended to `data/published_briefs.json` |
+
+Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
+routine's run log there before assuming nothing changed — a quiet week and a failed run look the
+same from the repo. Every one of these jobs previously failed at its PR step while reporting green,
+so the routines are told to end a run with `FAILED` rather than claim success without a PR.
+
+The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
+a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
+
 ### Agent-workflow tooling (`scripts/agent-workflow.mjs`)
 
 | Command | What it does |
