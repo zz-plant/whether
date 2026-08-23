@@ -2,19 +2,20 @@ import { NextResponse } from "next/server";
 import { getRegimeAlertRepository } from "../../../lib/storage/regimeAlertRepository";
 import { runScheduledAlertDelivery } from "../../../lib/alert/alertDelivery";
 import { requireCronAuth } from "../../../lib/api/cronAuth";
-import { constantTimeCompare } from "../../../lib/constantTimeCompare";
 
 export const runtime = "edge";
 
-/* GET requires authentication — exposes internal alert delivery data. */
+/**
+ * Cron-only, failing closed. This listed every client's delivery history, and its guard
+ * was written as "reject if a secret is configured and does not match" — so a deployment
+ * with no WHETHER_CRON_SECRET served the whole log to anyone who asked. An endpoint whose
+ * own comment says it exposes internal data should not be readable precisely when the
+ * environment is misconfigured. requireCronAuth answers 503 in that case, which is the
+ * rule /api/regime-alerts and the other cron routes already follow.
+ */
 export async function GET(request: Request) {
-  const authToken = request.headers
-    .get("authorization")
-    ?.replace("Bearer ", "");
-  const expectedToken = process.env.WHETHER_CRON_SECRET;
-  if (expectedToken && (!authToken || !constantTimeCompare(authToken, expectedToken))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authError = requireCronAuth(request);
+  if (authError) return authError;
 
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");

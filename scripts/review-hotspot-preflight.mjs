@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 const args = process.argv.slice(2);
 
@@ -61,62 +63,99 @@ function changedFiles(diffRange) {
   return output.split("\n").map((file) => file.trim()).filter(Boolean);
 }
 
+/**
+ * Line numbers (1-based) that sit inside a comment. Exported because the scanner reads
+ * comment state from the file rather than from the diff: tracking `/* *​/` across added
+ * lines alone only works when the opening `/**` is itself added, so editing the middle of
+ * an existing doc comment used to hand the matcher bare prose.
+ */
+export function blockCommentLines(source) {
+  const inside = new Set();
+  let inBlock = false;
+
+  source.split("\n").forEach((line, index) => {
+    const lineNumber = index + 1;
+    const trimmed = line.trim();
+
+    if (inBlock) {
+      inside.add(lineNumber);
+      if (trimmed.includes("*/")) inBlock = false;
+      return;
+    }
+
+    const opensBlock = trimmed.includes("/*") && !trimmed.includes("*/", trimmed.indexOf("/*") + 2);
+    if (opensBlock) {
+      inBlock = true;
+      inside.add(lineNumber);
+      return;
+    }
+
+    if (trimmed.startsWith("//") || (trimmed.startsWith("/*") && trimmed.includes("*/"))) {
+      inside.add(lineNumber);
+    }
+  });
+
+  return inside;
+}
+
+/** Whether one line of code carries a type assertion, ignoring comments and string prose. */
+export function isUnsafeAssertion(code) {
+  const withoutComments = code.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*/g, "");
+  // Quoted prose ("treats the window as unchanged") tripped the matcher too. A type
+  // assertion cannot occur inside a string literal, so blank those out.
+  // Template literals are left alone — `${...}` can hold real code.
+  const withoutStrings = withoutComments
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""');
+
+  // English prose false positives ("as of", "as in", etc.)
+  if (/\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(withoutStrings)) {
+    return false;
+  }
+
+  return /\sas\s+[A-Za-z_$<{\(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
+}
+
 function addedTypeAssertions(diffRange) {
   const diff = sh("git", ["diff", "--unified=0", diffRange, "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
-  const lines = diff.split("\n");
+  // Comment state comes from the file, not from the added lines. Tracking `/* */` across
+  // added lines alone only works when the opening `/**` is itself added: editing the middle
+  // of an existing doc comment hands the matcher bare prose, and every "renders as a
+  // header" in it reads as a type assertion. The diff's hunk headers carry each added
+  // line's number on the new side, so ask the file which lines are comments.
+  const commentLinesFor = (file) =>
+    existsSync(file) ? blockCommentLines(readFileSync(file, "utf8")) : new Set();
+
   const offenders = [];
+  let file = null;
+  let commentLines = new Set();
+  let newLineNumber = 0;
 
-  // Tracks /* */ state across added lines. Only `//` was stripped before, so
-  // block and JSX ({/* */}) comments reached the matcher and any prose using
-  // the English word "as" — "reads as boilerplate", "renders as a header" —
-  // was reported as an unsafe type assertion.
-  let inBlockComment = false;
-
-  const stripBlockComments = (code) => {
-    let out = "";
-    let index = 0;
-    while (index < code.length) {
-      if (inBlockComment) {
-        const end = code.indexOf("*/", index);
-        if (end === -1) return out;
-        inBlockComment = false;
-        index = end + 2;
-        continue;
-      }
-      const start = code.indexOf("/*", index);
-      if (start === -1) return out + code.slice(index);
-      out += code.slice(index, start);
-      inBlockComment = true;
-      index = start + 2;
-    }
-    return out;
-  };
-
-  for (const line of lines) {
-    if (!line.startsWith("+") || line.startsWith("+++")) continue;
-
-    const code = line.slice(1);
-    // Strip comments before matching to avoid false positives
-    const codeWithoutComments = stripBlockComments(code).replace(/\/\/.*/g, "");
-    // Same class of false positive the block-comment strip fixed, one level in:
-    // quoted prose ("treats the window as unchanged") tripped the matcher. A type
-    // assertion cannot occur inside a string literal, so blank those out too.
-    // Template literals are left alone — `${...}` can hold real code.
-    const codeWithoutStrings = codeWithoutComments
-      .replace(/'(?:[^'\\]|\\.)*'/g, "''")
-      .replace(/"(?:[^"\\]|\\.)*"/g, '""');
-    const nonTypeAssertionPrepostions = /\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(codeWithoutStrings);
-    if (nonTypeAssertionPrepostions) {
-      // English prose false positives ("as of", "as in", etc.)
+  for (const line of diff.split("\n")) {
+    if (line.startsWith("+++ b/")) {
+      file = line.slice("+++ b/".length);
+      commentLines = commentLinesFor(file);
       continue;
     }
-    const hasAssertion = /\sas\s+[A-Za-z_$<{\(]/.test(codeWithoutStrings);
-    const safePattern = /\sas\s+const\b/.test(codeWithoutStrings);
 
-    if (hasAssertion && !safePattern) {
-      offenders.push(code.trim());
+    const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
+    if (hunk) {
+      newLineNumber = Number(hunk[1]);
+      continue;
+    }
+
+    if (!line.startsWith("+") || line.startsWith("+++")) continue;
+
+    const lineNumber = newLineNumber;
+    newLineNumber += 1;
+
+    if (!file || commentLines.has(lineNumber)) continue;
+
+    const code = line.slice(1);
+    if (isUnsafeAssertion(code)) {
+      offenders.push(`${file}: ${code.trim()}`);
     }
   }
 
@@ -180,4 +219,8 @@ function main() {
   console.log("\nPreflight passed.");
 }
 
-main();
+// Run only when invoked as the command, so importing the helpers for a test does not run
+// a preflight as a side effect.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

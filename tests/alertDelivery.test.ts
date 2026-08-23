@@ -71,11 +71,14 @@ afterEach(() => {
 });
 
 describe("resolveRecipientEmail", () => {
-  it("resolves a verified, active subscriber by address", async () => {
+  // Knowing an address is not consent. Anyone can write a preference record naming any
+  // clientId, so accepting an address let a stranger sign a real subscriber up for alert
+  // mail that carries no unsubscribe link.
+  it("refuses a bare address, even a verified subscriber's", async () => {
     await subscribeVerified("operator@example.com");
 
-    assert.equal(await resolveRecipientEmail("operator@example.com"), "operator@example.com");
-    assert.equal(await resolveRecipientEmail("Operator@Example.COM"), "operator@example.com");
+    assert.equal(await resolveRecipientEmail("operator@example.com"), null);
+    assert.equal(await resolveRecipientEmail("Operator@Example.COM"), null);
   });
 
   it("resolves a verified subscriber by token", async () => {
@@ -105,9 +108,9 @@ describe("resolveRecipientEmail", () => {
 });
 
 describe("deliverAlerts", () => {
-  it("delivers to a verified subscriber", async () => {
-    await subscribeVerified("operator@example.com");
-    await enrollForAlerts("operator@example.com");
+  it("delivers to a verified subscriber enrolled by token", async () => {
+    const subscriber = await subscribeVerified("operator@example.com");
+    await enrollForAlerts(subscriber.token);
 
     const result = await deliverAlerts(CONDITIONS);
 
@@ -116,12 +119,10 @@ describe("deliverAlerts", () => {
     assert.equal(result.errors, 0);
   });
 
-  // Two preference records can name one inbox: the address itself, and that subscriber's
-  // token. Delivery keyed the "already sent" record on the clientId rather than on the
-  // address it resolved to, so each record earned its own key and the subscriber got a
-  // second copy — and since anyone can write a preference record for a known address, the
-  // duplicate can be created deliberately.
-  it("sends one copy when two preference records resolve to the same inbox", async () => {
+  // Belt and braces now. The delivered-marker is keyed on the resolved address rather than
+  // on the preference record, so two records naming one inbox still produce one copy. Since
+  // only the token record resolves, the address-keyed one lands as a skip.
+  it("sends one copy when an address record sits beside the subscriber's token record", async () => {
     const subscriber = await subscribeVerified("reader@example.com");
     await enrollForAlerts("reader@example.com");
     await enrollForAlerts(subscriber.token);
@@ -129,7 +130,7 @@ describe("deliverAlerts", () => {
     const result = await deliverAlerts(CONDITIONS);
 
     assert.equal(result.sent, 1, "one inbox, one copy");
-    assert.equal(result.skipped, 1, "the second record resolves to an address already sent to");
+    assert.equal(result.skipped, 1, "the address-keyed record names nobody");
   });
 
   it("sends nothing when a preference record names an address that never consented", async () => {
@@ -144,8 +145,8 @@ describe("deliverAlerts", () => {
   });
 
   it("sends nothing to a subscriber who has not verified yet", async () => {
-    await store.subscribe("pending@example.com");
-    await enrollForAlerts("pending@example.com");
+    const pending = await store.subscribe("pending@example.com");
+    await enrollForAlerts(pending.token);
 
     const result = await deliverAlerts(CONDITIONS);
 
