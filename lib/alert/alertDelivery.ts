@@ -115,20 +115,25 @@ const isValidEmail = (raw: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(raw.trim());
 
 /**
- * Only a verified, still-active subscriber is a recipient.
+ * Only a subscriber token can name a recipient.
  *
  * The clientId on an alert-pref record is self-asserted: POST /api/alert-preferences
- * authorizes it by comparing the body's clientId to a header the same caller sets. This
- * used to return an email-shaped clientId as its own recipient, so that unauthenticated
- * write was enough to enroll any address in recurring alert mail — an address whose owner
- * had never asked for it, and had no record to unsubscribe from. The subscriber record is
- * the only evidence that the address consented, so require it on both lookups.
+ * authorizes it by comparing the body's clientId to a header the same caller sets. Two
+ * rounds of narrowing got here. First this returned any email-shaped clientId as its own
+ * recipient, so one unauthenticated write enrolled any address at all. Then it required
+ * that address to belong to a verified, active subscriber — which still left knowing
+ * somebody's address as enough to sign them up for mail they never asked for, and the
+ * alert templates carry no unsubscribe link, so they could not easily stop it.
+ *
+ * A token closes that: it is generated at subscribe time and only ever reaches the
+ * subscriber's own inbox, so holding one is evidence of consent in a way that knowing an
+ * address is not. There is no self-serve alert enrollment either way — no surface writes
+ * these records — so this removes a hole rather than a capability.
  */
 export const resolveRecipientEmail = async (clientId: string): Promise<string | null> => {
   try {
     const store = getSubscriberStore();
-    const subscriber =
-      (await store.getSubscriberByEmail(clientId)) ?? (await store.getSubscriberByToken(clientId));
+    const subscriber = await store.getSubscriberByToken(clientId);
 
     if (!subscriber?.verified || !subscriber.active) return null;
     return isValidEmail(subscriber.email) ? subscriber.email : null;

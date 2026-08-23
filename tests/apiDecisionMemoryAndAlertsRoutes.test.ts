@@ -310,7 +310,13 @@ describe("decision memory and alert routes", () => {
     await repository.appendDelivery(deliveryFor("abc", "slack"));
     await repository.appendDelivery(deliveryFor("other-client", "email"));
 
-    const get = await getAlertDeliveriesRoute(new Request("http://localhost/api/alert-deliveries?clientId=abc"));
+    Object.assign(globalThis, { WHETHER_CRON_SECRET: "test-cron-secret" });
+    const get = await getAlertDeliveriesRoute(
+      new Request("http://localhost/api/alert-deliveries?clientId=abc", {
+        headers: { authorization: "Bearer test-cron-secret" },
+      }),
+    );
+    Reflect.deleteProperty(globalThis, "WHETHER_CRON_SECRET");
 
     assert.equal(get.status, 200);
     const body: unknown = await get.json();
@@ -323,6 +329,25 @@ describe("decision memory and alert routes", () => {
       body.deliveries.every((delivery) => isRecord(delivery) && delivery.clientId === "abc"),
       "every listed delivery belongs to the requested client",
     );
+  });
+
+  // The guard used to read "reject if a secret is configured and does not match", so a
+  // deployment without WHETHER_CRON_SECRET served every client's delivery history to
+  // anyone who asked. Misconfiguration should close this, not open it.
+  it("refuses to list deliveries without cron credentials, and when no secret is set", async () => {
+    const unconfigured = await getAlertDeliveriesRoute(
+      new Request("http://localhost/api/alert-deliveries?clientId=abc"),
+    );
+    assert.equal(unconfigured.status, 503, "fails closed when no secret is configured");
+
+    Object.assign(globalThis, { WHETHER_CRON_SECRET: "test-cron-secret" });
+    const wrongToken = await getAlertDeliveriesRoute(
+      new Request("http://localhost/api/alert-deliveries?clientId=abc", {
+        headers: { authorization: "Bearer not-the-secret" },
+      }),
+    );
+    Reflect.deleteProperty(globalThis, "WHETHER_CRON_SECRET");
+    assert.equal(wrongToken.status, 401);
   });
 
   // The unauthenticated branch this replaces appended a row with status "sent" for every
