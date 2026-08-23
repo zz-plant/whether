@@ -86,7 +86,10 @@ export function blockCommentLines(source) {
     const opensBlock = trimmed.includes("/*") && !trimmed.includes("*/", trimmed.indexOf("/*") + 2);
     if (opensBlock) {
       inBlock = true;
-      inside.add(lineNumber);
+      // Only excuse the line when the comment starts it. `const x = y as Foo; /* note`
+      // carries real code before the opener, and skipping the whole line would let an
+      // assertion through — a false negative in a gate is worse than a false positive.
+      if (trimmed.startsWith("/*")) inside.add(lineNumber);
       return;
     }
 
