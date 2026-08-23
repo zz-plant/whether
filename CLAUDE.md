@@ -58,6 +58,11 @@ Without the allowlist the first FRED fetch fails with `connect_rejected` — a 4
 from FRED — and the run stops before touching a file. Three routines all reporting FAILED with a 403
 is the egress policy, not the data.
 
+Cloudflare's build is the remote gate. `scripts/vinext-run.mjs` runs lint, typecheck, test, and
+assets before building **on preview builds only** — a pull request's build fails red if the suite
+does, while the production branch and any build with an unknown branch skip the gate, so a flaky
+test can never block a deploy. Every build logs which way it went (`[vinext-run] check gate: …`).
+
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
