@@ -31,6 +31,14 @@ describe("blockCommentLines", () => {
     assert.ok(inside.has(7));
     assert.ok(!inside.has(6) && !inside.has(8));
   });
+
+  it("does not excuse a line that carries code before the comment opener", () => {
+    const source = ["const x = value as Foo; /* trailing note", " * continues here", " */"].join("\n");
+    const inside = blockCommentLines(source);
+
+    assert.ok(!inside.has(1), "line 1 has real code on it");
+    assert.ok(inside.has(2) && inside.has(3), "the continuation is still comment");
+  });
 });
 
 describe("isUnsafeAssertion", () => {

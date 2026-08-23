@@ -20,13 +20,33 @@ const PRODUCTION_BRANCH = "main";
  * deploy is blocked, so the gate fails open — and says so, loudly, in the build log, since
  * a gate that quietly stops running is worse than no gate at all.
  */
-export function shouldRunChecks(env = process.env) {
-  const inCloudflareBuild = env.WORKERS_CI === "1" || Boolean(env.WORKERS_CI_BUILD_UUID);
-  if (!inCloudflareBuild) {
-    return { run: false, reason: "not a Cloudflare build" };
+export function resolveBranchFromGit() {
+  try {
+    const result = spawnSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { encoding: "utf8" });
+    const branch = (result.stdout ?? "").trim();
+    // A CI checkout is often detached, where this answers "HEAD" and tells us nothing.
+    return branch && branch !== "HEAD" ? branch : "";
+  } catch {
+    return "";
+  }
+}
+
+export function shouldRunChecks(env = process.env, gitBranch = resolveBranchFromGit) {
+  // Named variables first, git second. The gate was written against WORKERS_CI_BRANCH
+  // without being able to confirm the Cloudflare build environment sets it — and a gate
+  // that silently stops running is the failure mode to design against, so the branch is
+  // read from whatever answers.
+  const inRemoteBuild =
+    env.WORKERS_CI === "1" ||
+    Boolean(env.WORKERS_CI_BUILD_UUID) ||
+    env.CI === "1" ||
+    env.CI === "true";
+  if (!inRemoteBuild) {
+    return { run: false, reason: "not a remote build" };
   }
 
-  const branch = env.WORKERS_CI_BRANCH ?? env.CF_PAGES_BRANCH ?? "";
+  const branch =
+    env.WORKERS_CI_BRANCH ?? env.CF_PAGES_BRANCH ?? env.GITHUB_REF_NAME ?? gitBranch();
   if (!branch) {
     return { run: false, reason: "branch unknown — gate skipped rather than risk the deploy" };
   }
