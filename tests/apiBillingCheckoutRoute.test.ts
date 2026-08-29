@@ -29,7 +29,10 @@ describe("/api/billing/checkout", () => {
       new Request("http://localhost/api/billing/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ plan: "pro", source: "pricing_page" }),
+        // Any string outside PREMIUM_INTENT_SOURCES. It used to be "pricing_page",
+        // which became a real source when the pricing page shipped — the test was
+        // asserting a rejection the contract no longer makes.
+        body: JSON.stringify({ plan: "pro", source: "not_a_real_source" }),
       }),
     );
 

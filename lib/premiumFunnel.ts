@@ -14,6 +14,11 @@ export const PREMIUM_INTENT_SOURCES = [
   "integrations",
   "api_access",
   "team_workflow",
+  // The pricing page. Distinct from the five feature-located sources above:
+  // those record someone wanting a capability, this records someone wanting it
+  // after seeing what it costs, which is the only one of the six that speaks to
+  // willingness to pay.
+  "pricing_page",
 ] as const;
 
 export type PremiumIntentSource = (typeof PREMIUM_INTENT_SOURCES)[number];

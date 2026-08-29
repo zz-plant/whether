@@ -177,6 +177,7 @@ const emptySourceCounts = (): Record<PremiumIntentSource, number> => ({
   integrations: 0,
   api_access: 0,
   team_workflow: 0,
+  pricing_page: 0,
 });
 
 const emptyTypeCounts = (): Record<PremiumFunnelEventType, number> => ({

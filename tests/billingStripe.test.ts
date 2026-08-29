@@ -142,9 +142,10 @@ describe("checkout return path", () => {
   it("names a route the app actually serves", () => {
     const routes = collectStaticRoutes();
 
-    // The default was /pricing, which has never existed: every checkout that did
-    // not pass an explicit returnPath sent the customer to a 404 on both success
-    // and cancel. When a pricing page ships, move the constant and this passes.
+    // The default was /pricing before that page existed, so every checkout that
+    // did not pass an explicit returnPath sent the customer to a 404 on both
+    // success and cancel. It was parked on /operate until the page shipped; this
+    // assertion is what keeps the constant honest either way.
     assert.ok(
       routes.includes(CHECKOUT_RETURN_PATH),
       `${CHECKOUT_RETURN_PATH} is not a route; Stripe would return customers to a 404`,
@@ -165,8 +166,8 @@ describe("checkout return path", () => {
       plan: "team",
     });
 
-    assert.equal(success, "https://whether.work/operate?checkout=success&plan=pro");
+    assert.equal(success, "https://whether.work/pricing?checkout=success&plan=pro");
     // A protocol-relative path falls back rather than becoming an offsite redirect.
-    assert.equal(cancelled, "https://whether.work/operate?checkout=cancelled&plan=team");
+    assert.equal(cancelled, "https://whether.work/pricing?checkout=cancelled&plan=team");
   });
 });

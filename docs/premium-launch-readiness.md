@@ -2,13 +2,27 @@
 
 This checklist covers the minimum instrumentation and product plumbing to put in place **before** publicly announcing premium availability.
 
-Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet. Nothing in `app/` calls `POST /api/billing/checkout`, which is the intended pre-reveal state — the intent attributes on export and planning controls measure demand, they are not upgrade CTAs.
+Status note (updated 2026-08-29): billing is still pre-reveal plumbing — nothing in `app/` calls
+`POST /api/billing/checkout`, which remains the intended state. What changed is that the offer is now
+stated: `/pricing` publishes real prices (Pro $49/mo, Team $199/mo, source of truth `lib/pricing.ts`)
+and says in as many words that the paid plans are not buyable yet. Its CTA registers interest under
+the `pricing_page` intent source rather than starting a checkout.
 
-Return path (2026-08-21): the checkout return URL defaulted to `/pricing`, so any
-session created without an explicit `returnPath` sent the customer to a 404 on both
-success and cancel. It now defaults to `CHECKOUT_RETURN_PATH` in `lib/billingStripe.ts`,
-which `tests/billingStripe.test.ts` checks against the routes on disk. Move that
-constant to `/pricing` in the same change that ships the pricing page.
+That separation is the point. The five feature-located intent sources record someone wanting a
+capability; `pricing_page` records someone wanting it *after seeing what it costs*. Only the second
+speaks to willingness to pay, and the go/no-go below should weight it accordingly — a strong
+ungated-intent signal with no priced intent behind it is curiosity, not demand.
+
+The free tier is now a written promise (`FREE_FOREVER_PROMISE`): the weekly call, the API, MCP, and
+embeds are free permanently, and paid packages continuity and team ritual rather than access to the
+call. Treat that as load-bearing rather than as copy — it is asserted in `tests/pricing.test.ts`
+because walking it back later would cost more than any plan it could sell.
+
+Return path (resolved 2026-08-29): the checkout return URL defaulted to `/pricing` before that page
+existed, so any session created without an explicit `returnPath` sent the customer to a 404 on both
+success and cancel. It was parked on `/operate`; now that the page ships, `CHECKOUT_RETURN_PATH` in
+`lib/billingStripe.ts` points back at `/pricing`. `tests/billingStripe.test.ts` checks the constant
+against the routes on disk, so it cannot drift into a 404 again.
 
 Capture status (2026-08-21): funnel events are persisted durably by default. Until this date the
 only sink was `PREMIUM_FUNNEL_WEBHOOK_URL`, which has never been set in any environment, so every

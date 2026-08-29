@@ -61,7 +61,16 @@ export const isStripeBillingReady = () => {
  * not pass an explicit returnPath. Point this at /pricing on the day that page
  * lands; tests/billingStripe.test.ts fails if it names a route the app lacks.
  */
-export const CHECKOUT_RETURN_PATH = "/operate";
+/**
+ * Where Stripe sends a customer back on success or cancel.
+ *
+ * Was "/pricing" originally, which 404'd because no such route existed; it was
+ * moved to "/operate" as a holding position with a note to move it back in the
+ * change that shipped the page. That page now exists, and the pricing page is
+ * where a returning customer expects to land — it is the surface that states
+ * what they just bought or declined.
+ */
+export const CHECKOUT_RETURN_PATH = "/pricing";
 
 export const buildStripeCheckoutReturnUrl = ({
   appBaseUrl,
