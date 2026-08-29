@@ -45,6 +45,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 ### Product behavior
 
 - `one-screen-weekly-brief-spec.md` — primary weekly brief contract
+- `use-cases/operator-playbooks.md` — role-specific operator workflows, playbooks, and decision rules (canonical)
 - `feature-specs-current.md` — current product surface intent
 - `current-jtbd-click-paths.md` — current jobs-to-be-done inventory with click-level fulfillment paths
 - `policy-spec-alignment-plan.md` — current policy/spec reconciliation plan

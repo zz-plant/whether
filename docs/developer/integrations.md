@@ -48,8 +48,77 @@ Before posting to Slack/email/webhooks:
 2. Require healthy cadence alignment/no mismatched constraints.
 3. Include `recordDateLabel`, `generatedAt`, and provenance in the outgoing payload.
 
-## 4) Deployment notes
+## 4) Exemplary TypeScript Integration Client
 
-- Alert/posture primitives now use repository abstractions with durable KV bindings when available (`lib/storage/regimeAlertRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`).
+```typescript
+import { z } from "zod";
+
+const WeeklyBriefSchema = z.object({
+  version: z.string(),
+  degraded: z.boolean(),
+  recordDateLabel: z.string(),
+  summary: z.object({
+    regime: z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]),
+    operatingPosture: z.string(),
+    copy: z.string(),
+  }),
+  structured: z.object({
+    boundedNextActions: z.array(z.string()),
+    reversalConditions: z.array(z.string()),
+  }).optional(),
+});
+
+export async function fetchWeeklyOperatingCall(baseUrl = "https://whether.work") {
+  // 1. Health check preflight
+  const healthRes = await fetch(`${baseUrl}/api/health`);
+  const health = await healthRes.json();
+  if (health.status !== "ok") {
+    console.warn(`[Whether] Degraded data health: ${health.status}`);
+  }
+
+  // 2. Fetch and parse brief payload
+  const res = await fetch(`${baseUrl}/api/weekly`, {
+    headers: { Accept: "application/json" },
+  });
+  
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Whether brief: HTTP ${res.status}`);
+  }
+
+  const data = await res.json();
+  return WeeklyBriefSchema.parse(data);
+}
+```
+
+---
+
+## 5) Model Context Protocol (MCP) Integration Pattern
+
+When integrating Whether with Cursor, Claude Desktop, or custom agent runtimes:
+
+```json
+{
+  "mcpServers": {
+    "whether": {
+      "url": "https://whether.work/api/mcp"
+    }
+  }
+}
+```
+
+### Agent Prompt Template
+```text
+You have access to the 'whether' MCP server. Before generating recommendations for hiring,
+infrastructure refactoring, or budget allocations, call 'whether.get_weekly_brief' to obtain
+the current macroeconomic regime, Boldness Budget, and bounded decision rules.
+Enforce the retrieved payback and reversal triggers strictly in your output.
+```
+
+---
+
+## 6) Deployment & Persistence Notes
+
+- Alert/posture primitives use repository abstractions with durable KV bindings when available (`lib/storage/regimeAlertRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`).
 - Ingestion snapshots/materialized read models use the same pattern (`lib/ingestion/store.ts`) and automatically fall back to local file-backed storage in `.cache/ingestion` when durable KV is unavailable.
 - If durable KV bindings are unavailable or failing, repositories degrade to local fallback and report backend status (`durable` vs `local-fallback`) in API responses where relevant.
+- See [`docs/cloudflare-deployment-runbook.md`](../cloudflare-deployment-runbook.md) for Wrangler KV provisioning steps.

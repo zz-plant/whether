@@ -76,3 +76,66 @@ Recommended policy:
 1. Abort if health is not `ok`.
 2. Abort if cadence alignment is not healthy.
 3. Only then fetch and distribute the weekly brief.
+
+---
+
+## 7) Exemplary Recipe: Monday Morning Slack Webhook Bot
+
+Automate sending the weekly operating call into your team's Slack channel every Monday morning.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE_URL="${WHETHER_BASE_URL:-https://whether.work}"
+SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:?SLACK_WEBHOOK_URL required}"
+
+# 1. Check health gate
+HEALTH=$(curl -s "$BASE_URL/api/health" | jq -r '.status')
+if [ "$HEALTH" != "ok" ]; then
+  echo "⚠️ Whether health check failed ($HEALTH). Aborting send." >&2
+  exit 1
+fi
+
+# 2. Fetch Slack-formatted brief
+BRIEF_TEXT=$(curl -s "$BASE_URL/api/brief/slack" | jq -r '.brief')
+
+# 3. Post payload to Slack
+curl -s -X POST -H 'Content-type: application/json' \
+  --data "$(jq -n --arg text "$BRIEF_TEXT" '{text: $text}')" \
+  "$SLACK_WEBHOOK_URL"
+
+echo "✅ Weekly brief successfully dispatched to Slack."
+```
+
+---
+
+## 8) Exemplary Recipe: GitHub Actions Automated Brief Dispatch
+
+```yaml
+name: Monday Weekly Brief Dispatch
+
+on:
+  schedule:
+    - cron: '0 13 * * 1' # 9:00 AM Eastern every Monday
+  workflow_dispatch:
+
+jobs:
+  dispatch-brief:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch and Post Whether Brief
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_LEADERSHIP_WEBHOOK }}
+        run: |
+          HEALTH=$(curl -s "https://whether.work/api/health" | jq -r '.status')
+          if [ "$HEALTH" != "ok" ]; then
+            echo "Whether service degraded, skipping outbound send."
+            exit 0
+          fi
+          
+          BRIEF=$(curl -s "https://whether.work/api/brief/slack" | jq -r '.brief')
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$(jq -n --arg text "$BRIEF" '{text: $text}')" \
+            "$SLACK_WEBHOOK_URL"
+```

@@ -13,6 +13,7 @@
 <p align="center">
   <a href="https://whether.work"><strong>Explore Live Brief</strong></a> ·
   <a href="#quickstart">Quickstart</a> ·
+  <a href="docs/use-cases/operator-playbooks.md"><strong>Operator Playbooks</strong></a> ·
   <a href="#mcp--agent-integration">MCP &amp; Agent API</a> ·
   <a href="#why-whether-succeeds">Core Pillars</a> ·
   <a href="docs/README.md">Documentation</a>
@@ -213,6 +214,7 @@ whether/
 
 ## Documentation Links
 
+- **[docs/use-cases/operator-playbooks.md](docs/use-cases/operator-playbooks.md)**: Role-specific operator workflows, playbooks & recipes
 - **[docs/README.md](docs/README.md)**: Canonical documentation hub
 - **[docs/editorial-guardrails.md](docs/editorial-guardrails.md)**: Vocabulary, decision contracts, and tone
 - **[docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md)**: Core brief UI/UX specification
