@@ -113,7 +113,22 @@ curl -s "https://whether.work/api/weekly" | jq '.summary'
 
 ---
 
-## Quickstart
+## Visual Tour: Key Operator Surfaces
+
+<p align="center">
+  <em>The complete loop: from one-screen weekly briefs to operational checklists, verifiable trust, and historical track record.</em>
+</p>
+
+| Surface | Preview | Primary Job |
+| :--- | :--- | :--- |
+| **Weekly Brief** (`/`) | <img src="docs/assets/screens/weekly-brief-desktop.png" alt="Weekly Brief Desktop View" width="380" /> | 60-second leadership operating posture, Boldness Budget, and bounded decisions. |
+| **Mobile Brief** (`/` on mobile) | <img src="docs/assets/screens/weekly-brief-mobile.png" alt="Weekly Brief Mobile View" width="200" /> | Responsive, high-compression mobile layout for quick scanning before Monday standups. |
+| **Operations Hub** (`/operate`) | <img src="docs/assets/screens/operations-planning.png" alt="Operations Hub" width="380" /> | Role-based execution constraints, runway planners, and export generators. |
+| **Trust & Provenance** (`/trust`) | <img src="docs/assets/screens/trust-provenance.png" alt="Trust and Provenance Board" width="380" /> | Live feed status, freshness SLAs, formula reference, and active warning monitors. |
+| **Evidence Appendix** (`/signals`) | <img src="docs/assets/screens/evidence-sensors.png" alt="Evidence Appendix" width="380" /> | Deep sensor breakdown for Treasury yield curve, inflation, labor, and credit spreads. |
+| **Track Record** (`/history`) | <img src="docs/assets/screens/track-record-history.png" alt="Track Record History" width="380" /> | Multi-year historical replay, regime transition diffs, and calibration audit logs. |
+
+---
 
 ### 1) Run locally
 
