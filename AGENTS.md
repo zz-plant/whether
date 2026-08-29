@@ -117,6 +117,11 @@ Whether should increasingly feel like:
 - a Slack screenshot product
 - a citeable decision artifact (claims and recommendations can be traced to fresh sources)
 
+These are **internal framings for how the product should feel**, not copy. Outward surfaces use the
+one category line in `lib/seo.ts` (`canonicalPositioningLine`) — *the weekly operating call for
+startup leaders* — because a category that changes per surface does not survive being repeated by an
+operator in a Slack channel. See `docs/editorial-guardrails.md` -> Category line.
+
 It should feel less like:
 
 - a macro blog

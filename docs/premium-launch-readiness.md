@@ -2,18 +2,54 @@
 
 This checklist covers the minimum instrumentation and product plumbing to put in place **before** publicly announcing premium availability.
 
-Status note: billing is backend-heavy pre-reveal plumbing only. The repo has checkout, webhook, and telemetry support, but no first-class customer-facing pricing or paywall surface is shipped yet. Nothing in `app/` calls `POST /api/billing/checkout`, which is the intended pre-reveal state — the intent attributes on export and planning controls measure demand, they are not upgrade CTAs.
+Status note (updated 2026-08-29): billing is still pre-reveal plumbing — nothing in `app/` calls
+`POST /api/billing/checkout`, which remains the intended state. What changed is that the offer is now
+stated: `/pricing` publishes real prices (Pro $49/mo, Team $199/mo, source of truth `lib/pricing.ts`)
+and says in as many words that the paid plans are not buyable yet. Its CTA registers interest under
+the `pricing_page` intent source rather than starting a checkout.
 
-Return path (2026-08-21): the checkout return URL defaulted to `/pricing`, so any
-session created without an explicit `returnPath` sent the customer to a 404 on both
-success and cancel. It now defaults to `CHECKOUT_RETURN_PATH` in `lib/billingStripe.ts`,
-which `tests/billingStripe.test.ts` checks against the routes on disk. Move that
-constant to `/pricing` in the same change that ships the pricing page.
+That separation is the point. The five feature-located intent sources record someone wanting a
+capability; `pricing_page` records someone wanting it *after seeing what it costs*. Only the second
+speaks to willingness to pay, and the go/no-go below should weight it accordingly — a strong
+ungated-intent signal with no priced intent behind it is curiosity, not demand.
+
+The free tier is now a written promise (`FREE_FOREVER_PROMISE`): the weekly call, the API, MCP, and
+embeds are free permanently, and paid packages continuity and team ritual rather than access to the
+call. Treat that as load-bearing rather than as copy — it is asserted in `tests/pricing.test.ts`
+because walking it back later would cost more than any plan it could sell.
+
+Return path (resolved 2026-08-29): the checkout return URL defaulted to `/pricing` before that page
+existed, so any session created without an explicit `returnPath` sent the customer to a 404 on both
+success and cancel. It was parked on `/operate`; now that the page ships, `CHECKOUT_RETURN_PATH` in
+`lib/billingStripe.ts` points back at `/pricing`. `tests/billingStripe.test.ts` checks the constant
+against the routes on disk, so it cannot drift into a 404 again.
 
 Capture status (2026-08-21): funnel events are persisted durably by default. Until this date the
 only sink was `PREMIUM_FUNNEL_WEBHOOK_URL`, which has never been set in any environment, so every
 production event was silently discarded and the go/no-go checks below could not pass no matter how
 long they ran. Treat the event history as starting 2026-08-21, not at first deploy.
+
+## Activation precedes premium
+
+`lib/activationFunnel.ts` defines the funnel this document's premium-intent numbers should be read
+against: **visited → oriented → committed → returned**, where `returned` means the same browser came
+back in a later ISO week.
+
+The reason this matters here: premium intent measured on a base of visitors who never come back is
+measuring interest in an article, not demand for a subscription. For a weekly-ritual product, the
+week-2 return rate is the denominator that makes every intent number interpretable, and until this
+existed nothing recorded it.
+
+- **Instrumented at:** `ActivationTracker` on `/` (visited, returned), the first-run explainer's
+  dismiss (oriented), `ShareCopyControls` and `SubscribeForm` (committed).
+- **Sink:** `POST /api/telemetry/activation` → the `activation` analytics stream.
+- **Identity:** none. Return detection reads one localStorage key holding an ISO week slug and
+  reports a bucketed gap (`same_week` / `next_week` / `within_month` / `lapsed`). No id, no cookie,
+  nothing joinable to a person — the product advertises no trackers and the measurement is built to
+  keep that true rather than to be maximally informative.
+- **Read it as:** a weekly readout on the same cadence as the product. A `committed` rate that rises
+  while `returned` stays flat is a sharing product, not a ritual product, and would change what
+  premium should package.
 
 ## Goals
 - Preserve the free weekly posture ritual (`/`) as the acquisition and trust surface.

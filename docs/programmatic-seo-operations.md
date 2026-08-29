@@ -1,5 +1,21 @@
 # Programmatic SEO operations runbook
 
+> **Scope decision (2026-08-29, from `docs/product-marketing-review-2026-08-29.md`).** SEO is no
+> longer resourced as a growth channel in its own right. The corpus stands at 11 answer pages and 2
+> resource articles; that will not compound, and the fix is not to relax the thin-page guardrail,
+> which is correct and protects the brand more than the pages would earn.
+>
+> What stays: **decision-query answer pages** — "should we hire engineers right now" and its
+> neighbours. Those are the pages where the live posture makes the page non-thin automatically, which
+> is a durable advantage a static competitor cannot copy, and they satisfy this runbook's own quality
+> gates by construction.
+>
+> What is deprioritized: concept-explainer pages, resource-pillar breadth, and any page whose value
+> does not change when the call changes. The effort those would take goes to the share loop
+> (`lib/export/briefPermalink.ts`) instead, which is better matched to a weekly-ritual product.
+>
+> The sequence below still governs any page that *is* built.
+
 This runbook codifies the repo-standard sequence for scaling SEO without weakening decision transmission:
 
 1. Expand high-intent decision-answer coverage.

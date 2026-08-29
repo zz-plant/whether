@@ -50,6 +50,7 @@ const truncateBlob = (value: string) => {
 export type TelemetryStream =
   | "web-vitals"
   | "operator-workflow"
+  | "activation"
   | "content-measurement"
   | "premium-funnel"
   | "ingest-pipeline"

@@ -3,10 +3,12 @@ import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimeStats } from "../components/history/RegimeStats";
+import { TrackRecord } from "../components/history/TrackRecord";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
+import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
@@ -23,6 +25,7 @@ export default async function HistoryPage({
   const tightnessTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
   const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
+  const trackRecord = buildTrackRecord(statsSeries);
 
   return (
     <ReportShell
@@ -33,6 +36,8 @@ export default async function HistoryPage({
         chrome: { sidebarVariant: "full" },
       }}
     >
+      <TrackRecord record={trackRecord} />
+
       {publishedBriefs.length > 0 ? (
         <section className="weather-panel space-y-4 px-5 py-5">
           <div>

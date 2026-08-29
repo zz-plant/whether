@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
 
 type ShareCopyControlsProps = {
   recordDate: string;
@@ -16,6 +17,13 @@ const copyLabels: Record<CopyTarget, string> = {
   slack: "Slack brief",
   email: "Email brief",
   meeting: "Meeting pack",
+};
+
+/** Copying an artifact is the act with intent — the funnel's `committed` step. */
+const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
+  slack: "copied_slack",
+  email: "copied_email",
+  meeting: "copied_meeting",
 };
 
 const nextMondayIsoDate = () => {
@@ -52,6 +60,7 @@ export function ShareCopyControls({
     try {
       await navigator.clipboard.writeText(text);
       setCopiedTarget(target);
+      trackActivationEvent({ step: "committed", path: "/share", commitment: copyCommitments[target] });
     } catch {
       setCopiedTarget(null);
       setCopyError("Clipboard access failed. Select the preview text and copy it manually.");

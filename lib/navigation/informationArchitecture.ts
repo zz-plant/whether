@@ -143,6 +143,11 @@ export const utilityLinks = [
     description: "MCP server, REST endpoints, CLI, widget",
   },
   {
+    href: "/pricing",
+    label: "Pricing",
+    description: "What is free forever, and what Pro and Team add",
+  },
+  {
     href: "/about",
     label: "About",
     description: "Product philosophy & team",

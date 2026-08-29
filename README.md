@@ -2,7 +2,9 @@
 
 **How aggressively should your company hire, spend, raise, and expand this week?**
 
-Whether turns public macro and capital-market signals into a weekly operating posture: what to do now, what would make the call tighten, and what conditions would justify opening back up.
+Whether turns public macro and capital-market signals into a **weekly operating call** for startup
+leaders: what to do now, what would make the call tighten, and what conditions would justify opening
+back up.
 
 `signals → posture → decisions → artifact`
 

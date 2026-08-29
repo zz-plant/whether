@@ -9,7 +9,10 @@ import {
   isPublishedBriefSlug,
   latestPublishedBrief,
   parsePublishedBriefs,
+  publishedBriefAgeInDays,
   publishedBriefStaticParams,
+  PUBLISHED_BRIEF_STALE_AFTER_DAYS,
+  selectCitablePermalinkBrief,
 } from "../lib/report/publishedBriefs";
 import { formatIsoWeekSlug, getIsoWeekInfo, parseIsoWeekSlug } from "../lib/isoWeek";
 
@@ -101,5 +104,40 @@ describe("published briefs", () => {
 
   it("returns no neighbours for an unknown week rather than the ends of the list", () => {
     assert.deepEqual(findAdjacentPublishedBriefs("1999-w01"), { previous: undefined, next: undefined });
+  });
+});
+
+describe("citable permalink recency gate", () => {
+  const latest = latestPublishedBrief;
+
+  const shiftDays = (isoDate: string, days: number) =>
+    new Date(Date.parse(isoDate) + days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  it("measures the archive gap in days against the live record date", () => {
+    assert.equal(publishedBriefAgeInDays(latest, latest.recordDate), 0);
+    assert.equal(publishedBriefAgeInDays(latest, shiftDays(latest.recordDate, 7)), 7);
+  });
+
+  it("treats an unparseable record date as unvouchable rather than fresh", () => {
+    assert.equal(publishedBriefAgeInDays(latest, "not-a-date"), null);
+    assert.equal(selectCitablePermalinkBrief("not-a-date"), undefined);
+  });
+
+  it("offers the frozen week while the archive is keeping up", () => {
+    assert.equal(selectCitablePermalinkBrief(latest.recordDate)?.slug, latest.slug);
+    assert.equal(
+      selectCitablePermalinkBrief(shiftDays(latest.recordDate, PUBLISHED_BRIEF_STALE_AFTER_DAYS))?.slug,
+      latest.slug,
+    );
+  });
+
+  it("withholds the permalink once the freeze job has fallen behind", () => {
+    // The failure this guards: the archive stops being written, and the homepage
+    // keeps date-stamping itself with the last week that was frozen.
+    assert.equal(
+      selectCitablePermalinkBrief(shiftDays(latest.recordDate, PUBLISHED_BRIEF_STALE_AFTER_DAYS + 1)),
+      undefined,
+    );
+    assert.equal(selectCitablePermalinkBrief(shiftDays(latest.recordDate, 60)), undefined);
   });
 });

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { trackActivationEvent } from "../../lib/activationFunnel";
 
 const DISMISS_KEY = "whether.home.orientation.dismissed";
 
@@ -51,6 +52,10 @@ export function FirstVisitExplainer() {
     }
     document.documentElement.dataset.homeOrientationDismissed = "true";
     setDismissed(true);
+    // Dismissing is the cheapest available proof that someone read the line and
+    // knew what they were looking at, which is the step between arriving and
+    // doing anything deliberate.
+    trackActivationEvent({ step: "oriented", path: "/" });
   };
 
   return (
@@ -74,6 +79,13 @@ export function FirstVisitExplainer() {
       </Link>
       <Link href="/trust#beginner-glossary" className={orientationLinkClass}>
         Glossary
+      </Link>
+      {/* "How is this not a horoscope" is the first objection a cold visitor
+          forms, and the method page answers a different one — that the number is
+          derived. What answers this one is the record of held and changed calls,
+          which /history owns. */}
+      <Link href="/history#track-record-heading" className={orientationLinkClass}>
+        Track record
       </Link>
       <a
         href="https://github.com/zz-plant/whether"

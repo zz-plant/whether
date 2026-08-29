@@ -3,9 +3,20 @@ import { siteUrl } from "./siteUrl";
 import { decisionTransmissionSearchDescription } from "./report/decisionTransmissionCopy";
 
 export const organizationName = "Whether";
-export const websiteName = "Whether — Weekly Operating Brief for Leadership Teams";
+/**
+ * The category line, and the single source for it.
+ *
+ * Two nouns are load-bearing and neither may be substituted on an outward
+ * surface: the product is the **Whether Weekly Brief**, and what it delivers is
+ * the **weekly operating call**. Marketing surfaces kept minting third options
+ * ("operating posture", "pacing authority", "decision-translation layer"), which
+ * is fine internally and costly outwardly — this product spreads by someone
+ * repeating it in a Slack channel, and a phrase that changes per surface does not
+ * survive the retelling. See docs/editorial-guardrails.md -> Category line.
+ */
+export const websiteName = "Whether — Weekly Operating Call for Startup Leaders";
 export const canonicalPositioningLine =
-  "Whether translates macro conditions into a weekly operating brief for leadership teams.";
+  "Whether turns macro conditions into a weekly operating call for startup leaders.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 export const defaultSocialImagePath = "/api/og?template=report";
