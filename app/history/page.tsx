@@ -10,6 +10,7 @@ import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { formatDateUTC } from "../../lib/formatters";
+import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
@@ -44,6 +45,14 @@ export default async function HistoryPage({
         chrome: { sidebarVariant: "full" },
       }}
     >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h1 className="text-display font-bold tracking-tight text-white">Historical Track Record</h1>
+          <p className="text-xs text-slate-400 mt-1">Multi-year posture logs, regime splits, and governance audit trails.</p>
+        </div>
+        <ExportBoardAnnexButton record={trackRecord} />
+      </div>
+
       <TrackRecord record={trackRecord} />
 
       {publishedBriefs.length > 0 ? (

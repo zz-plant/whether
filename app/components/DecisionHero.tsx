@@ -21,6 +21,10 @@ import {
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
+import { CopySlackBriefButton } from "./CopySlackBriefButton";
+import { PresentModeButton } from "./PresentModeButton";
+import { ThresholdProximityBar } from "./ThresholdProximityBar";
+import { DeveloperQuickAccess } from "./DeveloperQuickAccess";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
 type Props = {
@@ -404,6 +408,11 @@ export function DecisionHero({
                   </span>
                 ) : null}
               </div>
+
+              {thresholdBusinessConsequence ? (
+                <ThresholdProximityBar consequence={thresholdBusinessConsequence} className="my-1" />
+              ) : null}
+
               <dl className="space-y-1.5 text-fluid-xs">
                 {/* Three rows previously carried three unrelated hues (amber,
                     rose, sky), which ranked nothing — they were labels, not
@@ -433,7 +442,16 @@ export function DecisionHero({
             </div>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <CopySlackBriefButton
+              weeklyCall={weeklyCall ?? postureLabel}
+              regime={regimeDisplay}
+              boldnessScore={boldnessScore}
+              recordDate={recordDate}
+              guardrail={guardrail}
+              reversalTrigger={reversalTrigger}
+              lines={shareLines}
+            />
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <DecisionMemoryButton
               regime={regime}
@@ -447,27 +465,35 @@ export function DecisionHero({
               tightnessThreshold={tightnessThreshold}
               riskAppetiteThreshold={riskAppetiteThreshold}
             />
+            <PresentModeButton />
           </div>
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-fluid-micro text-white/50">
-            <span className="inline-flex items-center gap-1.5">
-              {/* Shape carries the state alongside color: circle = fully live feed, square =
-                  static input present (snapshot or cached/degraded sources). */}
-              {isDegradedData ? (
-                <StatusStaticIcon className="size-2 text-amber-300/90" />
-              ) : (
-                <StatusLiveIcon className="size-2 text-emerald-300/90 motion-safe:animate-pulse" />
-              )}
-              <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
-            </span>
-            {/* Source, date and confidence stay on mobile. They were behind
-                `hidden sm:inline`, which left the phone showing only "Snapshot"
-                — dropping provenance exactly where the brief gets screenshotted
-                and shared, and losing Confidence, a required field of the
-                screenshot contract. Only the longer trust-status sentence is
-                held back to keep the line from dominating a narrow column. */}
-            <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
-            {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-micro text-white/50">
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="inline-flex items-center gap-1.5">
+                {/* Shape carries the state alongside color: circle = fully live feed, square =
+                    static input present (snapshot or cached/degraded sources). */}
+                {isDegradedData ? (
+                  <StatusStaticIcon className="size-2 text-amber-300/90" />
+                ) : (
+                  <StatusLiveIcon className="size-2 text-emerald-300/90 motion-safe:animate-pulse" />
+                )}
+                <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
+              </span>
+              {/* Source, date and confidence stay on mobile. They were behind
+                  `hidden sm:inline`, which left the phone showing only "Snapshot"
+                  — dropping provenance exactly where the brief gets screenshotted
+                  and shared, and losing Confidence, a required field of the
+                  screenshot contract. Only the longer trust-status sentence is
+                  held back to keep the line from dominating a narrow column. */}
+              <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
+              {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
+            </p>
+            <DeveloperQuickAccess
+              regime={regimeDisplay}
+              boldnessScore={boldnessScore}
+              weeklyCall={weeklyCall ?? postureLabel}
+            />
+          </div>
         </div>
 
         <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1">
