@@ -2,6 +2,27 @@
 
 Prepared 2026-08-10. Target: front page via Show HN, linking https://whether.work.
 
+## Hold condition (added 2026-08-29)
+
+**Do not post yet.** Show HN is a one-shot channel with a multi-year cooldown, and the landing
+experience currently converts a spike into a flat retention curve. Four things gate the post, from
+`docs/product-marketing-review-2026-08-29.md`:
+
+| Gate | State |
+| --- | --- |
+| The homepage does not advertise a stale permalink | Done — gated on archive recency |
+| A track record exists for a visitor to inspect | Done — `/history` |
+| The share loop returns a reader to the product | Done — permalink line on every artifact |
+| There is a stated offer (`/pricing`, including what is free forever) | **Outstanding** |
+
+The first three shipped on 2026-08-29. The fourth is open. The reason it gates a *launch* and not
+just a funnel: the strongest thing this product can say on HN is "the weekly call is free forever,
+here is the scoring, here is the API" — and that claim is only credible in writing, on a page,
+before the traffic arrives. Saying it in a comment thread after someone asks "what's the catch"
+is a weaker version of the same answer.
+
+Everything below is ready to use once that gate clears.
+
 ## Why this can work on HN
 
 Whether already has the three things HN rewards and rarely gets in one product: no signup, a
