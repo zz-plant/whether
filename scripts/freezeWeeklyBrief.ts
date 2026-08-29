@@ -10,7 +10,7 @@ import { appendFile, readFile, writeFile } from "node:fs/promises";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
 import { parsePublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
-import { assessFreezeReadiness } from "../lib/report/briefFreezeGuard";
+import { assessPublishReadiness } from "../lib/report/briefPublishGuard";
 
 const OUTPUT_PATH = new URL("../data/published_briefs.json", import.meta.url);
 
@@ -29,7 +29,7 @@ const recordDate = reportData.treasury.record_date ?? reportData.treasury.fetche
  * record date and exited 0 — a permanently wrong citable record, written by the
  * guard that exists to prevent exactly that.
  */
-const readiness = assessFreezeReadiness({
+const readiness = assessPublishReadiness({
   degraded,
   isFallback: snapshot.isFallback,
   isLive: reportData.treasury.isLive,

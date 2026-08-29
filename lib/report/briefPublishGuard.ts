@@ -1,5 +1,10 @@
 /**
- * What must be true before a week can be frozen into the permanent record.
+ * What must be true before current-week data may be published.
+ *
+ * Two writers ask this: `scripts/freezeWeeklyBrief.ts`, which appends to the
+ * permanent record, and `scripts/generateWeeklySlackBrief.ts`, which publishes
+ * the brief people paste into a channel. Both take live data and stamp it with
+ * the current week, so both are wrong in the same way when the data is not live.
  *
  * `data/published_briefs.json` is append-only and citable: a brief someone
  * quoted in a board deck has to still say what it said that day. That makes a
@@ -24,9 +29,9 @@
  *
  * Matches PUBLISHED_BRIEF_STALE_AFTER_DAYS: the same threshold that decides
  * whether the archive is current enough for the homepage to advertise it should
- * decide whether a reading is current enough to enter that archive.
+ * decide whether a reading is current enough to be published as this week.
  */
-export const FREEZE_MAX_RECORD_AGE_DAYS = 10;
+export const PUBLISH_MAX_RECORD_AGE_DAYS = 10;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -42,7 +47,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const startOfUtcDay = (value: Date) =>
   Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate());
 
-export type FreezeReadinessInput = {
+export type PublishReadinessInput = {
   /** `!reportResult.ok` — report assembly failed outright. */
   degraded: boolean;
   /** Treasury data came from the bundled snapshot rather than a live fetch. */
@@ -50,25 +55,25 @@ export type FreezeReadinessInput = {
   /** Explicit liveness flag when the provider sets one. */
   isLive?: boolean | null;
   fallbackReason?: string | null;
-  /** The record date the frozen week would be dated by. */
+  /** The record date the published week would be dated by. */
   recordDate: string;
   now: Date;
 };
 
-export type FreezeReadiness =
+export type PublishReadiness =
   | { ok: true }
   | { ok: false; reason: string };
 
-export const assessFreezeReadiness = ({
+export const assessPublishReadiness = ({
   degraded,
   isFallback,
   isLive,
   fallbackReason,
   recordDate,
   now,
-}: FreezeReadinessInput): FreezeReadiness => {
+}: PublishReadinessInput): PublishReadiness => {
   if (degraded) {
-    return { ok: false, reason: "Report assembly failed; there is nothing sound to freeze." };
+    return { ok: false, reason: "Report assembly failed; there is nothing sound to publish." };
   }
 
   if (isFallback || isLive === false) {
@@ -76,7 +81,7 @@ export const assessFreezeReadiness = ({
       ok: false,
       reason: `Data is a fallback snapshot, not a live reading${
         fallbackReason ? ` (${fallbackReason})` : ""
-      }. Freezing it would stamp a stale reading with the current week and publish it permanently.`,
+      }. Publishing it would stamp a stale reading with the current week.`,
     };
   }
 
@@ -88,10 +93,10 @@ export const assessFreezeReadiness = ({
 
   const ageDays = (startOfUtcDay(now) - startOfUtcDay(new Date(recordTime))) / MS_PER_DAY;
 
-  if (ageDays > FREEZE_MAX_RECORD_AGE_DAYS) {
+  if (ageDays > PUBLISH_MAX_RECORD_AGE_DAYS) {
     return {
       ok: false,
-      reason: `Record date ${recordDate} is ${Math.floor(ageDays)} days old (limit ${FREEZE_MAX_RECORD_AGE_DAYS}). The week derived from it is not the week being published.`,
+      reason: `Record date ${recordDate} is ${Math.floor(ageDays)} days old (limit ${PUBLISH_MAX_RECORD_AGE_DAYS}). The week derived from it is not the week being published.`,
     };
   }
 

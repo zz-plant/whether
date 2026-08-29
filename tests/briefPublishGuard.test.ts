@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
-import { FREEZE_MAX_RECORD_AGE_DAYS, assessFreezeReadiness } from "../lib/report/briefFreezeGuard";
+import { PUBLISH_MAX_RECORD_AGE_DAYS, assessPublishReadiness } from "../lib/report/briefPublishGuard";
 
 const NOW = new Date("2026-08-29T04:00:00Z");
 
-const ready = (overrides: Partial<Parameters<typeof assessFreezeReadiness>[0]> = {}) =>
-  assessFreezeReadiness({
+const ready = (overrides: Partial<Parameters<typeof assessPublishReadiness>[0]> = {}) =>
+  assessPublishReadiness({
     degraded: false,
     isFallback: false,
     isLive: true,
@@ -15,7 +16,7 @@ const ready = (overrides: Partial<Parameters<typeof assessFreezeReadiness>[0]> =
     ...overrides,
   });
 
-describe("freeze readiness", () => {
+describe("publish readiness", () => {
   it("allows a live, current reading through", () => {
     assert.deepEqual(ready(), { ok: true });
   });
@@ -51,7 +52,7 @@ describe("freeze readiness", () => {
   });
 
   it("allows a record date right at the staleness limit", () => {
-    const atLimit = new Date(NOW.getTime() - FREEZE_MAX_RECORD_AGE_DAYS * 24 * 60 * 60 * 1000);
+    const atLimit = new Date(NOW.getTime() - PUBLISH_MAX_RECORD_AGE_DAYS * 24 * 60 * 60 * 1000);
     assert.equal(ready({ recordDate: atLimit.toISOString().slice(0, 10) }).ok, true);
   });
 
@@ -77,7 +78,7 @@ describe("staleness boundary", () => {
     for (const hour of ["T00:00:00Z", "T12:00:00Z", "T23:59:59Z"]) {
       const now = new Date(`2026-08-29${hour}`);
       assert.equal(
-        assessFreezeReadiness({
+        assessPublishReadiness({
           degraded: false,
           isFallback: false,
           isLive: true,
@@ -93,7 +94,7 @@ describe("staleness boundary", () => {
   it("rejects the day past the limit at any hour", () => {
     for (const hour of ["T00:00:00Z", "T23:59:59Z"]) {
       assert.equal(
-        assessFreezeReadiness({
+        assessPublishReadiness({
           degraded: false,
           isFallback: false,
           isLive: true,
@@ -104,5 +105,31 @@ describe("staleness boundary", () => {
         `accepted at ${hour}`,
       );
     }
+  });
+});
+
+describe("wiring", () => {
+  it("is consulted by both writers that publish a current-week artifact", async () => {
+    // The audit that produced this guard found the same defect in two scripts and
+    // verified the other two data writers fail loudly. This asserts the two that
+    // needed it keep it — a future edit that drops the import is the regression.
+    for (const script of [
+      "scripts/freezeWeeklyBrief.ts",
+      "scripts/generateWeeklySlackBrief.ts",
+    ]) {
+      const source = await readFile(script, "utf8");
+      assert.ok(
+        source.includes("assessPublishReadiness"),
+        `${script} no longer checks publish readiness`,
+      );
+      assert.ok(source.includes("process.exit(1)"), `${script} no longer fails the run`);
+    }
+  });
+
+  it("keeps the record-age limit aligned with the homepage permalink gate", async () => {
+    // Same threshold, deliberately: what may enter the archive and what the
+    // homepage will advertise from it are the same judgment.
+    const { PUBLISHED_BRIEF_STALE_AFTER_DAYS } = await import("../lib/report/publishedBriefs");
+    assert.equal(PUBLISH_MAX_RECORD_AGE_DAYS, PUBLISHED_BRIEF_STALE_AFTER_DAYS);
   });
 });
