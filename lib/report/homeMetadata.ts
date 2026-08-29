@@ -9,7 +9,10 @@ import { decisionTransmissionSearchDescription } from "./decisionTransmissionCop
 
 export type { HomePageSearchParams };
 
-const HOME_TITLE = "Weekly Macro Brief for Leadership Teams";
+// Keeps "macro" (the search term people actually type) while leading with the
+// ruled stance noun and naming the operator this is built for rather than
+// "leadership teams", which describes a buying committee nobody has met yet.
+const HOME_TITLE = "Weekly Macro Operating Call for Startup Leaders";
 const HOME_DESCRIPTION = decisionTransmissionSearchDescription;
 
 const buildImageParams = (searchParams: HomePageSearchParams | undefined) => {

@@ -87,6 +87,19 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   (`buildDecisionVerdictHeadline` in `lib/alerts/decisionDeltaRules.ts`: RECONSIDER / WATCH
   + decision area). Do not mint synonyms like "attention needed" or "review now" for these
   verdict labels.
+- **The category line has one source: `canonicalPositioningLine` / `websiteName` in
+  `lib/seo.ts`.** Whether is *the weekly operating call for startup leaders*. Outward
+  surfaces — homepage title and metadata, README, launch copy, sales decks, answer pages —
+  consume that constant or restate it verbatim; they do not describe the product in their
+  own words. Three coinages are **internal only** and must not appear on an outward
+  surface: "pacing authority" and "meeting shorthand" (`AGENTS.md` product stance) and
+  "decision-translation layer" (`docs/sales-competitive-messaging.md`). "Operating posture"
+  stays the label for the stance itself, not a description of what the product is. The cost
+  of drift here is not tidiness: this product spreads by an operator repeating it in a Slack
+  channel, and a category that changes per surface does not survive that retelling.
+- **The metric noun is "Boldness Budget"** — the one proper noun in this vocabulary a
+  competitor cannot use, so it is spelled out on first mention rather than shortened to
+  "the score". `buildBoldnessScore` in `lib/report/weeklyLeadershipBrief.ts` is the source.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
   shareable, and metadata surfaces must not print "Whether Report".

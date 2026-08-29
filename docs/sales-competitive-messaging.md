@@ -2,12 +2,51 @@
 
 Use this page for internal sales enablement, demo prep, and objection handling.
 
+## Who this is for (read before using any battlecard below)
+
+This pack addresses two different buyers, and only one of them has been validated. Blending them is
+how enterprise framing ends up steering the homepage and the roadmap.
+
+### Primary ICP — validated, and what every outward surface should target
+
+The seed-to-Series-B operator: VP Product, VP Engineering, Chief of Staff, or founder-CEO at roughly
+20–200 people, with no macro analyst on staff, who runs or preps a Monday leadership meeting.
+
+They are not switching off a competitor. They are doing this by hand — skimming Fed headlines and a
+macro newsletter on Sunday night and guessing at the translation. **The manual briefing stack is the
+real competitor**, which makes the last row of the table below the most important one, not the least.
+The product shape matches this buyer: free, no signup, self-serve, open source, and shareable into a
+Slack channel full of the same people.
+
+Lead with this. "You're doing this by hand and it degrades under pressure" is a pain the buyer can
+confirm from memory in one sentence.
+
+### Secondary ICP — aspirational, unvalidated, do not steer product from it
+
+The enterprise macro/strategy buyer for the terminal, research-subscription, FP&A, and research-
+workflow rows below. These are real segments and the differentiation arguments hold, but no such
+buyer has been sold, and the product has no seat model, no admin surface, no procurement story, and
+no paid tier. Treat those rows as preparation for a motion that does not exist yet.
+
+Two consequences, both binding:
+
+- Do not use these rows to justify homepage copy, roadmap sequencing, or feature scope.
+- Do not read the absence of an enterprise feature as a gap. It is a segment the product has not
+  chosen yet.
+
+**"Decision-translation layer" is internal vocabulary** and stays in this document. Outward surfaces
+use the single category line in `lib/seo.ts` — *the weekly operating call for startup leaders*. See
+`docs/editorial-guardrails.md` -> Category line.
+
 ## Why now (20-second talk track)
 - Operating tempo is now macro-sensitive week to week, so static quarterly planning assumptions decay faster.
 - Leadership teams need one weekly pacing call they can align on quickly, not a fragmented set of dashboards and memos.
 - Whether converts public macro signals into a bounded weekly operating posture and a shareable decision artifact.
 
 ## Competitor battlecard
+
+Ordered as written for historical reasons, not by priority. The **manual substitute** row is the one
+that matches the primary ICP; the four enterprise rows serve the secondary, unvalidated one.
 
 | Segment | Primary buyer | Strongest claim | Weakest point vs Whether | Homepage copy angle |
 | --- | --- | --- | --- | --- |
@@ -79,3 +118,12 @@ Use this page for internal sales enablement, demo prep, and objection handling.
 
 ## External-ready one-liner
 From macro signals to one weekly operating call—bounded, shareable, and ready for Monday leadership sync.
+
+## Primary-ICP talk track (use this one by default)
+
+1. Someone on your team is already doing this by hand every Sunday night — reading the Fed news and
+   guessing what it means for the two open reqs.
+2. Whether does that translation from published data on a fixed cadence, with the thresholds that
+   would flip the call written down.
+3. It is free, there is no signup, and the scoring is published — so the argument in your Monday
+   meeting is about the decision, not about where the number came from.
