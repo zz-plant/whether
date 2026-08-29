@@ -55,8 +55,44 @@ so the routines are told to end a run with `FAILED` rather than claim success wi
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
 Without the allowlist the first FRED fetch fails with `connect_rejected` — a 403 on CONNECT, not
-from FRED — and the run stops before touching a file. Three routines all reporting FAILED with a 403
-is the egress policy, not the data.
+from FRED. Three routines all reporting FAILED with a 403 is the egress policy, not the data.
+
+**"The run stops before touching a file" was not true of the brief freeze** (corrected 2026-08-29).
+Every FRED fetch 403s, `loadReportDataSafe` falls back to the bundled snapshot, and report assembly
+*succeeds* — so `degraded`, which is `!reportResult.ok`, stays false. `scripts/freezeWeeklyBrief.ts`
+guarded only on `degraded`, so it ran to completion on stale data: a live run on 2026-08-29 froze
+week `2026-w25` from a `2026-06-17` record date, ten weeks old, and exited 0. A wrong record in
+`data/published_briefs.json` is not recoverable in the way that matters — the archive is append-only
+and citable, so the correction is visible forever.
+
+`lib/report/briefPublishGuard.ts` now judges readiness on the flags that actually move under an
+outage — `isFallback`, `isLive`, and the age of the record date — and exits non-zero, so the routine
+reports FAILED instead of publishing a stale week. **If you are debugging a routine that writes data,
+check what it does on fallback, not only what it does on error.**
+
+All four data-writing scripts were audited against a real outage on 2026-08-29 (FRED returning 403
+for every series). Two shared the defect; two were already correct:
+
+| Script | Behavior under a total live-data outage | |
+| --- | --- | --- |
+| `scripts/freezeWeeklyBrief.ts` | wrote week `2026-w25` from a `2026-06-17` record date, exit 0 | fixed |
+| `scripts/generateWeeklySlackBrief.ts` | wrote the June snapshot under a "Weekly Brief" heading, exit 0 | fixed |
+| `scripts/generateMonthlySummaries.ts` | throws on the first FRED failure, exit 1, no writes | already safe |
+| `scripts/refreshFallbackSnapshots.ts` | `fetchTreasuryData()` without `snapshotFallback` throws, exit 1, no writes | already safe |
+
+The two safe ones fetch FRED directly, so a 403 is an error. The two broken ones went through
+`loadReportData`, where falling back to the bundled snapshot is a *success*. That is the tell: a
+script is at risk exactly when it reads through a loader that degrades gracefully.
+
+`generateWeeklySlackBrief.ts` takes `--allow-fallback` for local or offline artifact generation,
+which writes but stamps the output `NOT LIVE DATA` with the reason. The scheduled routine passes no
+flag, so it fails loudly.
+
+Why `data/published_briefs.json` holds a single week: the routine has not completed a good run since.
+That archive is **not backfilled**, deliberately. Its value is that it is evidence the call was
+published every week; writing retroactive `publishedAt` stamps for weeks that were never published
+would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
+visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate. `scripts/vinext-run.mjs` runs lint, typecheck, test, and
 assets before building **on preview builds only** — a pull request's build fails red if the suite

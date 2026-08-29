@@ -275,6 +275,29 @@ produced one entry. The recency gate means a stalled routine no longer damages t
 archive is still the citable corpus and the permalink target for every shared artifact, so it needs
 an owner rather than a guard.
 
+**Update (same day).** Investigating that routine found the cause, and it was not the missing merge
+owner. `scripts/freezeWeeklyBrief.ts` refused to freeze only when `degraded` was set — which is
+`!reportResult.ok`, and stays false through a total live-data outage, because falling back to the
+bundled snapshot is a *successful* load. A live run reproduced it: every FRED fetch 403'd, and the
+script froze week `2026-w25` from a `2026-06-17` record date and exited 0. The freeze job's real
+failure mode was writing a permanently wrong citable record while reporting success — worse than not
+running, on an append-only archive whose whole purpose is that a cited brief still says what it said.
+
+`lib/report/briefPublishGuard.ts` now judges readiness on `isFallback`, `isLive`, and record-date age,
+and exits non-zero so the routine reports FAILED. An audit of all four data-writing scripts found the
+same defect in `scripts/generateWeeklySlackBrief.ts` — which is why
+`docs/briefs/latest-weekly-slack-brief.md` sat on a 2026-06-17 snapshot for ten weeks while looking
+like a current brief — and confirmed the other two fail loudly as they should. Both affected scripts
+now share the guard.
+
+What remains genuinely open is the egress allowlist (`fred.stlouisfed.org`, `home.treasury.gov`,
+`query1.finance.yahoo.com`) that would let a real run through, and the merge owner for the PR it
+opens. Neither is a code change.
+
+The archive is deliberately **not** backfilled. Retroactive `publishedAt` stamps for weeks that were
+never published would fabricate the cadence the archive exists to prove — and `/history` now shows
+those numbers to visitors as a track record. It fills forward or not at all.
+
 ## Suggested sequence
 
 | # | Change | Effort | Why this order |
