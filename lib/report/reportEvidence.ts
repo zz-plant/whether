@@ -3,6 +3,7 @@ import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { formatConfidencePlainLabel } from "./reportFormatting";
+import { formatScoreValue } from "../formatters";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildActionStripItems } from "./operatingCalls";
 import type {
@@ -64,19 +65,19 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     const hasCurrentValue = typeof now === "number" && Number.isFinite(now);
     const alreadyTriggered = hasCurrentValue && (direction === "riseAbove" ? now > threshold : now <= threshold);
     const crossingCopy = direction === "riseAbove"
-      ? `climbs above ${threshold.toFixed(1)}`
-      : `falls to or below ${threshold.toFixed(1)}`;
+      ? `climbs above ${formatScoreValue(threshold)}`
+      : `falls to or below ${formatScoreValue(threshold)}`;
     const holdCopy = direction === "riseAbove"
-      ? `above ${threshold.toFixed(1)}`
-      : `at or below ${threshold.toFixed(1)}`;
+      ? `above ${formatScoreValue(threshold)}`
+      : `at or below ${formatScoreValue(threshold)}`;
 
     if (!hasCurrentValue) {
       return `${label} flips this call if it ${crossingCopy}.`;
     }
 
     return alreadyTriggered
-      ? `${label} is already in the flip zone at ${now.toFixed(1)} and only has to stay ${holdCopy}.`
-      : `${label} flips this call if it ${crossingCopy}, from ${now.toFixed(1)} today.`;
+      ? `${label} is already in the flip zone at ${formatScoreValue(now)} and only has to stay ${holdCopy}.`
+      : `${label} flips this call if it ${crossingCopy}, from ${formatScoreValue(now)} today.`;
   };
 
   const tightnessDirection: "riseAbove" | "fallToOrBelow" =
@@ -185,8 +186,8 @@ const signalImmediateImplication = (
   const curveLine = assessment.scores.curveSlope ?? 0;
   const paybackCap = curveLine > 0 ? 12 : 9;
   return delta > 0
-    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and funding pressure stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`
-    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and funding pressure stays below ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
+    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and funding pressure stays below ${formatScoreValue(assessment.thresholds.tightnessRegime)}.`
+    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and funding pressure stays below ${formatScoreValue(assessment.thresholds.tightnessRegime)}.`;
 };
 
 export const buildReportEvidenceItems = ({

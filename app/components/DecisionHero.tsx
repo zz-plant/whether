@@ -349,7 +349,7 @@ export function DecisionHero({
               <p className="text-fluid-xs font-semibold text-slate-100">
                 What needs reconsideration this week?
               </p>
-              <span className={`shrink-0 text-fluid-nano font-mono font-semibold uppercase ${revisitDecisions ? "text-amber-300" : "text-emerald-300"}`}>
+              <span className={`shrink-0 text-fluid-nano font-semibold uppercase tracking-[0.08em] ${revisitDecisions ? "text-semantic-caution-fg" : "text-semantic-easing-fg"}`}>
                 {revisitDecisions ? `${revisitQueue.length} need attention` : "No change"}
               </span>
             </div>
