@@ -81,6 +81,8 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 
 Use these when shaping follow-on work, not as sole implementation truth:
 
+- `layout-architecture-plan.md`
+- `ui-facelift-plan.md`
 - `frontend-v2-spec.md`
 - `prd-next-level.md`
 - `specs-next-level.md`
