@@ -65,11 +65,28 @@ week `2026-w25` from a `2026-06-17` record date, ten weeks old, and exited 0. A 
 `data/published_briefs.json` is not recoverable in the way that matters — the archive is append-only
 and citable, so the correction is visible forever.
 
-`lib/report/briefFreezeGuard.ts` now judges readiness on the flags that actually move under an
+`lib/report/briefPublishGuard.ts` now judges readiness on the flags that actually move under an
 outage — `isFallback`, `isLive`, and the age of the record date — and exits non-zero, so the routine
 reports FAILED instead of publishing a stale week. **If you are debugging a routine that writes data,
-check what it does on fallback, not only what it does on error.** The freeze is the one that got
-caught; the same shape of bug is available to any job whose loader degrades gracefully.
+check what it does on fallback, not only what it does on error.**
+
+All four data-writing scripts were audited against a real outage on 2026-08-29 (FRED returning 403
+for every series). Two shared the defect; two were already correct:
+
+| Script | Behavior under a total live-data outage | |
+| --- | --- | --- |
+| `scripts/freezeWeeklyBrief.ts` | wrote week `2026-w25` from a `2026-06-17` record date, exit 0 | fixed |
+| `scripts/generateWeeklySlackBrief.ts` | wrote the June snapshot under a "Weekly Brief" heading, exit 0 | fixed |
+| `scripts/generateMonthlySummaries.ts` | throws on the first FRED failure, exit 1, no writes | already safe |
+| `scripts/refreshFallbackSnapshots.ts` | `fetchTreasuryData()` without `snapshotFallback` throws, exit 1, no writes | already safe |
+
+The two safe ones fetch FRED directly, so a 403 is an error. The two broken ones went through
+`loadReportData`, where falling back to the bundled snapshot is a *success*. That is the tell: a
+script is at risk exactly when it reads through a loader that degrades gracefully.
+
+`generateWeeklySlackBrief.ts` takes `--allow-fallback` for local or offline artifact generation,
+which writes but stamps the output `NOT LIVE DATA` with the reason. The scheduled routine passes no
+flag, so it fails loudly.
 
 Why `data/published_briefs.json` holds a single week: the routine has not completed a good run since.
 That archive is **not backfilled**, deliberately. Its value is that it is evidence the call was
