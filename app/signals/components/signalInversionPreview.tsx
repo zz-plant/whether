@@ -94,7 +94,7 @@ export function SignalInversionPreview({
   const hasGaps = spread10Y2YSeries.missingColumns.length > 0 || spread2Y3MSeries.missingColumns.length > 0;
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
+    <section id="curve-context" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
       <header className="space-y-2">
         <p className="type-eyebrow">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
@@ -135,21 +135,18 @@ export function SignalInversionPreview({
           {spread2Y3MSeries.paths.map((path, index) => (
             <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="1.6" />
           ))}
+          {/* Endpoint dots, no in-plot text. The series labels that sat here were
+              anchored to each line's last point at the right edge — exactly where
+              the lines terminate — so they printed on top of the data, and when the
+              two spreads converged they printed on top of each other. Both series
+              are named twice directly below: in the colour-matched inversion chips
+              and again in the definitions row. The dots keep the direct anchor; the
+              chips carry the names. */}
           {spread10Y2YSeries.lastPoint ? (
-            <>
-              <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-easing-border)" />
-              <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">
-                10Y-2Y
-              </text>
-            </>
+            <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-easing-border)" />
           ) : null}
           {spread2Y3MSeries.lastPoint ? (
-            <>
-              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
-              <text x="98" y={Math.min(42, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="6" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">
-                2Y-3M
-              </text>
-            </>
+            <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
           ) : null}
         </svg>
         <div className="mt-2 flex items-center justify-between type-eyebrow">

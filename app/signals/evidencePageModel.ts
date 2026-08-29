@@ -195,13 +195,22 @@ export const buildSignalsPageModel = async (
     activeSignalsView === "detail"
       ? [
           { href: "#decision-summary", label: "Decision summary" },
+          { href: "#trends", label: "Trends" },
           { href: "#evidence-priorities", label: "Evidence priorities" },
           { href: "#current-scores", label: "Current scores" },
+          { href: "#team-context", label: "What this means for your team" },
           { href: "#advanced-controls", label: "Advanced controls" },
         ]
-      : [
+      : // Short read listed two of the page's sections. The sidebar is a fixed
+        // column beside a ~4,000px page, so a two-item contents list left it
+        // empty for almost the whole scroll while claiming the width. Every
+        // section a reader can actually land on is now listed.
+        [
           { href: "#decision-summary", label: "What this means now" },
+          { href: "#trends", label: "Trends" },
           { href: "#current-scores", label: "Current scores" },
+          { href: "#team-context", label: "What this means for your team" },
+          { href: "#curve-context", label: "Curve context" },
         ];
 
   const prioritizedSignalsByFocus: Record<

@@ -159,7 +159,11 @@ describe("buildReportEvidenceItems", () => {
 
     assert.match(curveSlopeItem?.immediateImplication ?? "", /12-month payback/i);
     assert.match(curveSlopeItem?.immediateImplication ?? "", /curve remains above 0\.0%/i);
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /funding pressure stays below 70\.0/i);
+    // Score thresholds render as whole numbers, matching the guardrail line and
+    // every other surface that formats a score. The trailing ".0" this used to
+    // assert claimed a precision the model does not carry.
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /funding pressure stays below 70\b/i);
+    assert.doesNotMatch(curveSlopeItem?.immediateImplication ?? "", /stays below 70\.0/i);
   });
 });
 

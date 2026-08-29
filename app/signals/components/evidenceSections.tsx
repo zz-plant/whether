@@ -306,8 +306,15 @@ export const SignalsDecisionSummarySection = ({
         <h3 className="text-lg font-semibold text-slate-100">
           What founders should do this week
         </h3>
-        <div className="rounded-md border border-emerald-800/60 bg-emerald-950/20 p-3">
-          <p className="type-eyebrow text-sky-200">
+        {/* Two tinted boxes stood here, inside this card, inside the section —
+            the same three-level nesting that was flattened out of the decision
+            summary one screen above, left behind on the first pass. A ruled
+            group carries the same distinction with one level, and the direction
+            now sits on the label rather than on a box around it. Both labels
+            also shared the same sky eyebrow, which told the reader nothing about
+            which list was which. */}
+        <div className="border-l-2 border-semantic-easing-border pl-3">
+          <p className="type-eyebrow text-semantic-easing-fg">
             Lean in here
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
@@ -316,8 +323,8 @@ export const SignalsDecisionSummarySection = ({
             ))}
           </ul>
         </div>
-        <div className="rounded-md border border-rose-800/60 bg-rose-950/20 p-3">
-          <p className="type-eyebrow text-sky-200">
+        <div className="border-l-2 border-semantic-tightening-border pl-3">
+          <p className="type-eyebrow text-semantic-tightening-fg">
             Hold or gate
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
@@ -333,23 +340,25 @@ export const SignalsDecisionSummarySection = ({
       </article>
       {/* Starts at the second callout. The first one's `why` is already the
           Main pressure cell in the summary above, word for word, so listing it
-          again here was the same sentence twice on one screen. Numbering keeps
-          its true rank so "Top mover 2" still means second. */}
+          again here was the same sentence twice on one screen.
+
+          The per-item rank label is gone. It was truthful — "Top mover 2" really
+          was the second — but the first never appears under that name, so a list
+          opening at 2 reads to the reader as one with an item missing. The card
+          is titled "Also moved" and its items are in rank order, which carries
+          the same information without implying an absent row. */}
       {topDiagnosticCallouts.length > 1 ? (
         <article className="weather-surface space-y-3 p-5">
           <p className="type-eyebrow text-sky-200">
             Also moved
           </p>
           <ul className="space-y-3" aria-label="Top mover callouts">
-            {topDiagnosticCallouts.slice(1).map((item, index) => (
+            {topDiagnosticCallouts.slice(1).map((item) => (
               <li
                 key={item.label}
                 className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
               >
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                  Top mover {index + 2}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
+                <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
                 <p className="mt-1 text-sm text-slate-200">{item.why}</p>
               </li>
             ))}
@@ -442,10 +451,16 @@ export const SignalsCurrentScoresSection = ({
                             style={{ left: `${meterState.currentPercent}%` }}
                           />
                         </div>
-                        <div className="mt-1 flex items-center justify-between type-eyebrow">
-                          <span>{meterState.leftLabel}</span>
-                          <span>Watch line</span>
-                          <span>{meterState.rightLabel}</span>
+                        {/* Endpoint labels only. A centred "Watch line" sat between
+                            these two, which put three uppercase letterspaced phrases
+                            in one narrow row with no separators — they read as a
+                            single sentence that does not parse ("MORE PRESSURE WATCH
+                            LINE MORE ROOM"). It also did not mark the threshold's
+                            position, and the line below already names the watch line
+                            with its actual value. */}
+                        <div className="mt-1 flex items-start justify-between gap-4 type-eyebrow">
+                          <span className="text-left">{meterState.leftLabel}</span>
+                          <span className="text-right">{meterState.rightLabel}</span>
                         </div>
                         <p className="mt-2 text-fluid-xs text-slate-400">
                           Watch line: <span className="text-slate-200">{card.thresholdLabel}</span>
@@ -474,18 +489,12 @@ export const SignalsNeedMoreProofSection = ({
   <section className="weather-panel space-y-3 px-6 py-5">
     {/* The Depth switcher near the top already explains the short-vs-deep choice — this is
         the same switch repeated at the end of the page, so it carries the action only. */}
-    <div className="space-y-2">
-      <h2 className="text-lg font-semibold text-slate-100">Need more detail?</h2>
-      <p className="text-sm text-slate-300">
-        Use the deeper view when someone asks why this moved, whether a past regime looked similar,
-        or what would make the outlook wrong.
-      </p>
-    </div>
-      <a
-        href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
-        className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
-      >
-        Open deeper evidence
+    <h2 className="text-lg font-semibold text-slate-100">Need more detail?</h2>
+    <a
+      href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
+      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+    >
+      Open deeper evidence
     </a>
   </section>
 );
