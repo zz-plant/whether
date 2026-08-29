@@ -454,6 +454,25 @@ export function TimelineBar({
         ))}
       </div>
 
+      {/* The band is the most visually dominant element above the brief and was
+          the least explained: four colours encoding regime, with only the
+          currently selected one named, in the chip above. Without this a reader
+          can see that something changed in 2024 without being able to say what
+          it changed to. Public labels, so the legend matches the word the rest
+          of the page uses for the same state. */}
+      <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-fluid-nano text-slate-400">
+        {Object.entries(REGIME_HEX_COLORS).map(([regime, hex]) => (
+          <li key={regime} className="inline-flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: hex }}
+            />
+            {getRegimePublicLabel(regime)}
+          </li>
+        ))}
+      </ul>
+
       {/* Detailed Variant Info (Optional) */}
       {variant === "detailed" && currentEntry ? (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-micro text-slate-400">

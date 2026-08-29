@@ -101,9 +101,13 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
       />
 
-      <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
+      {/* `pill`, not `primary`. DD-005 settled Copy Brief in the hero as the one
+          canonical primary action on this page; a second full-weight blue button
+          further down competed with it and gave the reader no way to rank them.
+          §X reserves `pill` for exactly this — a secondary navigation CTA. */}
+      <div className="mt-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <ActionLink href={props.operateHref ?? "/operate"} variant="primary">
+          <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
             Build this week&apos;s plan →
           </ActionLink>
           <RitualCheck
