@@ -22,8 +22,8 @@ Meanwhile `contentPageShell.tsx` and several pages render a bare `<main>` with n
 
 | Dead skip link | Cause |
 | --- | --- |
-| `/answer/ship-checklist`, `/history/2025`, `/resources/decision-shield-overview` | `ContentPageShell` sets no id (11 routes total use it) |
-| `/about`, `/contact` | bare `<main>`, no id |
+| `/answer/ship-checklist`, `/history/2025` | `ContentPageShell` sets no id (11 routes total use it) |
+| `/about`, `/contact`, `/resources/decision-shield-overview` | bare `<main>`, no id — all three carry the same `max-w-3xl` chain longhand |
 | `/search`, `/template` | no `<main>` reaches the output |
 | `/embed` | bare `<main>`; arguably correct — see non-goals |
 
@@ -67,9 +67,20 @@ this plan. A tenth shell is only an improvement if the set has a stated shape.
 
 ## Target: three layers, each with one owner
 
-1. **Chrome** — exactly one component renders `<main id="main-content">`, and it is `PageShell`.
-   Every other shell composes *inside* it and renders a plain element. This is the invariant the
-   skip link depends on, and the only one worth enforcing mechanically.
+1. **Chrome** — **exactly one element per rendered route carries `id="main-content"`.** The
+   invariant is about the route's output, not about which component produces it.
+
+   An earlier draft of this plan said the owner must be `PageShell` specifically, and then Phase 1
+   assigned the id to `ContentPageShell` as well while leaving `Shell` and `secondaryPageShell`
+   rendering their own — three independent owners, which is the condition this document blames for
+   the defect. That inconsistency was real, and the fix is to weaken the invariant rather than the
+   phase: routing every page through `PageShell` would force its chrome (climate backdrop, web
+   vitals, display mode, footer) onto pages that deliberately opt out, which is a larger and less
+   defensible change than the defect warrants.
+
+   Per-route uniqueness is what the skip link actually depends on, it is what Phase 3 can check, and
+   it permits `PageShell`, `Shell`, `secondaryPageShell` and `ContentPageShell` to each own the
+   landmark on the routes they serve — provided no route gets two and none gets zero.
 2. **Measure** — a named, closed set. Long-form prose, standard content, and wide data surfaces are
    genuinely different problems and deserve three names, not five ad-hoc `max-w` values.
 3. **Section** — `ReportSection` and friends, unchanged. Already scoped, already documented in §XI.
@@ -78,10 +89,17 @@ this plan. A tenth shell is only an improvement if the set has a stated shape.
 
 ### Phase 1 — give the landmark one owner (accessibility, small, mechanical)
 
-- `ContentPageShell` renders `id="main-content"`. It already renders the only `<main>` on all 11 of
-  its routes, verified — no page combines it with `PageShell`, and the `signals`/`operate` route
-  layouts are pass-through, so there is nothing to nest with.
-- `/about` and `/contact` adopt `ContentPageShell` at the prose measure (see Phase 2).
+- `ContentPageShell` renders `id="main-content"`, and **stops accepting an `id` from callers**. It
+  already renders the only `<main>` on all 11 of its routes, verified — no page combines it with
+  `PageShell`, and the `signals`/`operate` route layouts are pass-through, so there is nothing to
+  nest with.
+- **Relocate the `top` anchor first.** `app/resources/[slug]/page.tsx` passes `id="top"` into the
+  shell and links back to `#top` from its sections. Leaving `id` overridable keeps the skip link
+  dead on those routes; silently overriding it breaks the back-to-top links. Move `top` onto a
+  wrapper inside the shell, then close the prop.
+- `/about`, `/contact` and `/resources/decision-shield-overview` adopt `ContentPageShell` at the
+  prose measure (see Phase 2). The third is a standalone page with its own bare `<main>`, not a
+  `ContentPageShell` consumer, so it needs its own migration rather than coming along for free.
 - `/search` and `/template` get individual attention: neither currently reaches a `<main>` in the
   output despite `/template` importing `PageShell`, which wants explaining before it is changed.
 - Resolve the loading-fallback duplicate by making the fallback path not re-render the chrome layer,
