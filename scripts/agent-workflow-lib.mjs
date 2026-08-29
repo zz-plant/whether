@@ -110,7 +110,8 @@ const TASK_PROFILES = [
     targets: [
       "app/page.tsx",
       "app/components/home/",
-      "app/components/weekly-card/",
+      "app/components/DecisionHero.tsx",
+      "app/components/ThreeWhethersCard.tsx",
     ],
     checks: [
       "bun run lint",
