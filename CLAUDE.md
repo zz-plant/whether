@@ -55,8 +55,27 @@ so the routines are told to end a run with `FAILED` rather than claim success wi
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
 Without the allowlist the first FRED fetch fails with `connect_rejected` — a 403 on CONNECT, not
-from FRED — and the run stops before touching a file. Three routines all reporting FAILED with a 403
-is the egress policy, not the data.
+from FRED. Three routines all reporting FAILED with a 403 is the egress policy, not the data.
+
+**"The run stops before touching a file" was not true of the brief freeze** (corrected 2026-08-29).
+Every FRED fetch 403s, `loadReportDataSafe` falls back to the bundled snapshot, and report assembly
+*succeeds* — so `degraded`, which is `!reportResult.ok`, stays false. `scripts/freezeWeeklyBrief.ts`
+guarded only on `degraded`, so it ran to completion on stale data: a live run on 2026-08-29 froze
+week `2026-w25` from a `2026-06-17` record date, ten weeks old, and exited 0. A wrong record in
+`data/published_briefs.json` is not recoverable in the way that matters — the archive is append-only
+and citable, so the correction is visible forever.
+
+`lib/report/briefFreezeGuard.ts` now judges readiness on the flags that actually move under an
+outage — `isFallback`, `isLive`, and the age of the record date — and exits non-zero, so the routine
+reports FAILED instead of publishing a stale week. **If you are debugging a routine that writes data,
+check what it does on fallback, not only what it does on error.** The freeze is the one that got
+caught; the same shape of bug is available to any job whose loader degrades gracefully.
+
+Why `data/published_briefs.json` holds a single week: the routine has not completed a good run since.
+That archive is **not backfilled**, deliberately. Its value is that it is evidence the call was
+published every week; writing retroactive `publishedAt` stamps for weeks that were never published
+would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
+visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate. `scripts/vinext-run.mjs` runs lint, typecheck, test, and
 assets before building **on preview builds only** — a pull request's build fails red if the suite
