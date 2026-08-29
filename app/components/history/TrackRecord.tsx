@@ -11,6 +11,21 @@ import { formatDateUTC } from "../../../lib/formatters";
  * be scored on being right; what it can be scored on is holding a call and
  * showing its work, which is what the numbers below say.
  */
+const renderDelta = (delta: number | null) => {
+  if (delta === null) {
+    return <span className="text-slate-600">—</span>;
+  }
+
+  const tone = delta > 0 ? "text-emerald-300" : delta < 0 ? "text-rose-300" : "text-slate-400";
+
+  return (
+    <span className={tone}>
+      {delta > 0 ? "+" : ""}
+      {delta.toLocaleString("en-US")}
+    </span>
+  );
+};
+
 export function TrackRecord({ record }: { record: TrackRecordModel | null }) {
   if (!record) {
     return null;
@@ -66,8 +81,12 @@ export function TrackRecord({ record }: { record: TrackRecordModel | null }) {
         expected state and a change is the event worth reading.
       </p>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[26rem] border-collapse text-left text-fluid-xs">
+      {/* No min-width and no horizontal scroll. The table was min-w-[26rem]
+          inside overflow-x-auto, so on a 430px viewport the Change column sat
+          off-screen behind a scroll nobody discovers — and the delta is the most
+          scannable thing here. It now folds into the Boldness cell below sm. */}
+      <div>
+        <table className="w-full border-collapse text-left text-fluid-xs">
           <caption className="sr-only">
             Monthly operating call history, newest first, with the boldness score behind each call.
           </caption>
@@ -76,41 +95,38 @@ export function TrackRecord({ record }: { record: TrackRecordModel | null }) {
               <th scope="col" className="py-2 pr-3 font-medium">Month</th>
               <th scope="col" className="py-2 pr-3 font-medium">Call</th>
               <th scope="col" className="py-2 pr-3 text-right font-medium">Boldness</th>
-              <th scope="col" className="py-2 text-right font-medium">Change</th>
+              <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
             </tr>
           </thead>
           <tbody>
+            {/* A changed row is the only event in a run of held ones, so it is
+                marked as one. Twelve rows reading "Sunny" with a grey badge on
+                the seventh made the transition the least visible thing in a
+                table whose subject is transitions. */}
             {record.rows.map((row) => (
-              <tr key={row.recordDate} className="border-b border-slate-800/40 last:border-0">
+              <tr
+                key={row.recordDate}
+                className={`border-b border-slate-800/40 last:border-0${
+                  row.changed ? " bg-slate-900/40" : ""
+                }`}
+              >
                 <td className="py-2 pr-3 font-mono text-slate-400">{formatDateUTC(row.recordDate)}</td>
                 <td className="py-2 pr-3 text-slate-200">
-                  {row.regimeLabel}
+                  <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
+                    {row.regimeLabel}
+                  </span>
                   {row.changed ? (
-                    <span className="ml-2 type-badge text-fluid-micro rounded-sm bg-slate-800 px-1.5 py-0.5 text-slate-200">
+                    <span className="ml-2 type-badge text-fluid-micro rounded-sm bg-sky-500/15 px-1.5 py-0.5 text-sky-200">
                       changed
                     </span>
                   ) : null}
                 </td>
                 <td className="py-2 pr-3 text-right font-mono text-slate-200">
                   {row.boldness.toLocaleString("en-US")}
+                  <span className="ml-2 sm:hidden">{renderDelta(row.boldnessDelta)}</span>
                 </td>
-                <td className="py-2 text-right font-mono">
-                  {row.boldnessDelta === null ? (
-                    <span className="text-slate-600">—</span>
-                  ) : (
-                    <span
-                      className={
-                        row.boldnessDelta > 0
-                          ? "text-emerald-300"
-                          : row.boldnessDelta < 0
-                            ? "text-rose-300"
-                            : "text-slate-400"
-                      }
-                    >
-                      {row.boldnessDelta > 0 ? "+" : ""}
-                      {row.boldnessDelta.toLocaleString("en-US")}
-                    </span>
-                  )}
+                <td className="hidden py-2 text-right font-mono sm:table-cell">
+                  {renderDelta(row.boldnessDelta)}
                 </td>
               </tr>
             ))}
