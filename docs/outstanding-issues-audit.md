@@ -16,40 +16,35 @@ It is intentionally **source-bound** (only items that are explicitly unchecked/o
 
 ## Consolidated open-issue register
 
-| Priority | Issue | Status evidence | Why it matters | Mitigation (next step) |
+| Priority | Issue | Status evidence | Why it matters | Current status / mitigation |
 | --- | --- | --- | --- | --- |
-| P0 | Promote export/share actions into Overview header | Open in implementation tracker + roadmap carry-over + Milestone 9 + acquisition checklist | Blocks fastest path from insight to shareable artifact | Ship header-level CTA with event telemetry and success threshold |
-| P0 | Launch executive briefing pack | Open in Milestone 9 | Limits leadership distribution workflows | Implement MVP pack (Slack/email/slide-ready) using existing summary primitives |
-| P0 | Add weekly digest output | Open in immediate backlog + Milestone 9 | Limits habitual recurrence and outbound delivery cadence | Publish digest payload contract and delivery channel pilot |
-| P0 | Add regime-shift alerts with reason codes + Time Machine links | Open in immediate backlog + Milestone 9 | Alerts are less actionable/auditable without causal context | Add reason-code schema + deep-link generator + alert QA fixtures |
-| P1 | Live macro fetchers for CPI/unemployment/BBB spreads | Open in immediate backlog + Milestone 11 + acquisition checklist | Snapshot-only behavior increases staleness risk | Roll out live fetchers behind feature flags with fallback parity tests |
-| P1 | Source health panel for stale/failed feeds | Open in immediate backlog + Milestone 11 + acquisition checklist | Users cannot quickly assess live vs degraded data state | Add source health panel with freshness SLA markers + fallback reasons |
-| P1 | Offline archive materialization for historical `structured` fields | Open in implementation tracker | Risks historical output inconsistency in offline/deterministic modes | Add archive materialization job + fixture-backed regression tests |
-| P1 | API contract tests for `/api/weekly` + `/api/monthly` | Open in implementation tracker | Raises risk of downstream integration breakage | Add JSON schema/contract assertions to CI |
-| P1 | Stack modernization near-/mid-term checklist items | Multiple unchecked items in tracker | Platform drag may increase delivery risk and migration uncertainty | Complete baseline evidence, canary findings, and compatibility report before migration |
-| P2 | Monthly section expansion toward weekly parity | Open in implementation tracker | Output asymmetry for operators across cadences | Identify parity targets and deliver in increments |
-| P2 | Decision Memory + Scenario Studio (Milestone 10) | Entire milestone open | Missing immutable audit trail + scenario planning system | Sequence design spike, then thin-slice implementation |
-| P2 | Evidence + data reliability expansion (Milestone 11) | Entire milestone open | Missing final reliability/evidence layer for operator trust | Stage work after P0/P1 closure with explicit acceptance gates |
-| P2 | Acquisition readiness checklist | Entire section open | Signals GTM/readiness commitments are incomplete | Track as a release gate with binary pass/fail criteria |
+| P0 | Promote export/share actions into Overview header | Shipped | Blocks fastest path from insight to shareable artifact | **Shipped:** Top header format picker, hero primary Copy Brief CTA, and persistent sticky call strip. |
+| P0 | Launch executive briefing pack | Shipped | Limits leadership distribution workflows | **Shipped:** Slide/Slack/email-ready briefs with sources, citations, and reason codes via `lib/briefBuilders.ts`. |
+| P0 | Add weekly digest output | Shipped | Limits habitual recurrence and outbound delivery cadence | **Shipped:** Automated digest payload and cron delivery in `lib/alertDelivery.ts` and `worker/index.ts`. |
+| P0 | Add regime-shift alerts with reason codes + Time Machine links | Shipped | Alerts are less actionable/auditable without causal context | **Shipped:** Deterministic reason-code schema, deep link generator, and test fixtures in `tests/alertDelivery.test.ts`. |
+| P1 | Live macro fetchers for CPI/unemployment/BBB spreads | Shipped | Snapshot-only behavior increases staleness risk | **Shipped:** Live FRED fetchers with YoY computation, range bounds, and fallback parity in `lib/macroSnapshot.ts`. |
+| P1 | Source health panel for stale/failed feeds | Shipped | Users cannot quickly assess live vs degraded data state | **Shipped:** System status and Source board on `/trust` with freshness timestamps, source URLs, and fallback status. |
+| P1 | Offline archive materialization for historical `structured` fields | Shipped | Risks historical output inconsistency in offline/deterministic modes | **Shipped:** Materialized summary archive in `lib/summaryArchive.ts` with deterministic regression coverage. |
+| P1 | API contract tests for `/api/weekly` + `/api/monthly` | Shipped | Raises risk of downstream integration breakage | **Shipped:** Contract assertions in `tests/apiSummaryContracts.test.ts` and `tests/cliContracts.test.ts`. |
+| P1 | Stack modernization near-/mid-term checklist items | Shipped | Platform drag may increase delivery risk and migration uncertainty | **Shipped:** Migrated to Vinext on Cloudflare Workers with Tailwind v4 and clean typecheck/test suite. |
+| P1 | Runtime KV persistence provisioning (`WHETHER_DURABLE_KV`) | Open configuration | State (alerts/events) operates in `local-fallback` when unprovisioned in Wrangler | Documented runbook provisioning steps in `docs/cloudflare-deployment-runbook.md`. |
+| P2 | Monthly section expansion toward weekly parity | In progress | Output asymmetry for operators across cadences | Monthly `planningLanguage` structured parity shipped; additional section depth planned. |
+| P2 | Decision Memory + Scenario Studio (Milestone 10) | Open | Missing immutable audit trail + scenario planning system | Sequence design spike, then thin-slice implementation. |
+| P2 | Evidence + data reliability expansion (Milestone 11) | In progress | Missing final reliability/evidence layer for operator trust | Core live fetchers and trust panels shipped; fossil record view planned. |
+| P2 | Acquisition readiness checklist | In progress | Signals GTM/readiness commitments are incomplete | Shipped core briefing pack, APIs, and live fetchers; tracking remaining items. |
 
-## Duplicate tracking overlaps (mitigate with single workstreams)
+## Duplicate tracking overlaps (resolved)
 
-The same deliverables are currently repeated across multiple checklist sections. Track each as a single epic with shared acceptance criteria:
+Key overlapping deliverables across checklist sections have now been unified and shipped:
+1. **Overview export/share CTA:** Unified across header, hero, and sticky strip.
+2. **Live macro fetchers:** Unified under `lib/macroSnapshot.ts`.
+3. **Source health & trust panel:** Unified on `/trust` with shared system status and source boards.
 
-1. **Overview export/share CTA**
-   - Appears in implementation tracker, Milestone 5 carry-over, Milestone 9, and acquisition readiness.
-2. **Live macro fetchers**
-   - Appears in immediate backlog, Milestone 11, and acquisition readiness.
-3. **Source health panel**
-   - Appears in immediate backlog, Milestone 11, and acquisition readiness.
+## Open Focus Areas
 
-## Recommended 2-week mitigation slice
-
-1. **P0 closure:** Ship Overview header export/share CTA and verify click-through from first viewport.
-2. **P0 closure:** Add alert reason codes + Time Machine deep links with deterministic payload tests.
-3. **P1 hardening:** Add API contract tests for weekly/monthly endpoints in CI.
-4. **P1 hardening:** Land live macro fetchers + source health panel behind feature flags with fallback parity validation.
-5. **P1 risk reduction:** Complete modernization baseline outputs, canary findings, and Pages compatibility write-up.
+1. **Durable KV binding:** Provision `WHETHER_DURABLE_KV` in production/preview deployments when multi-isolate persistence is required.
+2. **Milestone 10:** Decision Memory and Scenario Studio thin-slice implementation.
+3. **Egress allowlist & Archive freeze:** Ensure automated freeze jobs have egress network access in production pipelines.
 
 ## Ownership lanes (for planning handoff)
 

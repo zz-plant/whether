@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { Search, CornerRightUp, Maximize2, Download, Archive } from "lucide-react";
@@ -19,6 +19,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const filteredRef = useRef<CommandItem[]>([]);
+  const selectedIndexRef = useRef(0);
 
   const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
@@ -83,6 +86,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     );
   }, [query, commands]);
 
+  filteredRef.current = filtered;
+  selectedIndexRef.current = selectedIndex;
+
   useEffect(() => {
     setSelectedIndex(0);
   }, [query]);
@@ -91,18 +97,18 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
+        setSelectedIndex((i) => Math.min(i + 1, filteredRef.current.length - 1));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((i) => Math.max(i - 1, 0));
       } else if (e.key === "Enter") {
         e.preventDefault();
-        filtered[selectedIndex]?.action();
+        filteredRef.current[selectedIndexRef.current]?.action();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [filtered, selectedIndex]);
+  }, []);
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>

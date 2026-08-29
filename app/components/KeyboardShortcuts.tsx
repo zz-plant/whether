@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
 
 const SHORTCUTS: Record<string, string> = {
@@ -13,6 +14,7 @@ const SHORTCUTS: Record<string, string> = {
 };
 
 export function KeyboardShortcuts() {
+  const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
@@ -56,13 +58,13 @@ export function KeyboardShortcuts() {
 
       const href = SHORTCUTS[e.key.toLowerCase()];
       if (href && document.activeElement === document.body) {
-        window.location.href = href;
+        router.push(href);
       }
     };
 
     window.addEventListener("keydown", handle);
     return () => window.removeEventListener("keydown", handle);
-  }, []);
+  }, [router]);
 
   const openHelp = () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
