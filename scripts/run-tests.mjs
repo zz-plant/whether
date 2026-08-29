@@ -45,7 +45,24 @@ if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
 // outside for long enough to accumulate 14 cases against a core model, none of
 // which the suite executed. Fail loudly instead: a stray file is either misplaced
 // or a duplicate, and both want a decision rather than silence.
-const STRAY_SEARCH_ROOTS = ['app', 'lib', 'scripts', 'worker'];
+//
+// Scanned from the repository root rather than from a list of source roots. An
+// allowlist of roots reproduces the bug it is meant to catch, because the next
+// stray file lands in the directory nobody thought to list — this repo has src/,
+// packages/, e2e/, types/, tasks/ and content/ alongside the obvious ones. Only
+// build output, vendored code and generated artifacts are skipped; a genuine
+// second suite (a Playwright project, say) belongs in SKIP_DIRECTORIES with a
+// note, so excluding it stays a decision on the record.
+const SKIP_DIRECTORIES = new Set([
+  'node_modules',
+  'tests', // the suite the runner already executes
+  'artifacts', // generated capture output
+  'coverage',
+  'dist',
+  'build',
+  'out',
+  'public',
+]);
 
 async function collectStrayTestFiles(dir, found = []) {
   let entries;
@@ -59,7 +76,8 @@ async function collectStrayTestFiles(dir, found = []) {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      // Dot-directories are tooling and caches (.next, .wrangler, .git, .husky).
+      if (entry.name.startsWith('.') || SKIP_DIRECTORIES.has(entry.name)) continue;
       await collectStrayTestFiles(fullPath, found);
       continue;
     }
@@ -72,17 +90,14 @@ async function collectStrayTestFiles(dir, found = []) {
   return found;
 }
 
-const strayTestFiles = (
-  await Promise.all(
-    STRAY_SEARCH_ROOTS.map((root) => collectStrayTestFiles(path.resolve(root))),
-  )
-).flat();
+const strayTestFiles = await collectStrayTestFiles(process.cwd());
 
 if (strayTestFiles.length > 0) {
   console.error(
     `[test-guard] Test files found outside ./tests, which the runner never executes:\n` +
       strayTestFiles.map((file) => `  - ${file}`).join('\n') +
-      `\nMove them under ./tests (fixing their relative imports) or delete them if superseded.`,
+      `\nMove them under ./tests (fixing their relative imports), delete them if superseded,` +
+      `\nor add their directory to SKIP_DIRECTORIES if they are a separate suite with its own runner.`,
   );
   process.exit(1);
 }
