@@ -209,6 +209,33 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     || spread2Y3MSeries.missingColumns.length > 0;
   const zeroLineY = 36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36;
 
+  // Each series label was pinned to its own last point. When the two spreads
+  // converge at the right edge — which is exactly what they do when the curve
+  // flattens, the case a reader most needs to read — the labels landed on top of
+  // each other and on the lines. Keep them anchored, but hold them apart by at
+  // least a line's height, pushing the lower one down and clamping to the box.
+  const spreadLabelPositions = (() => {
+    const MIN_GAP = 6;
+    const tenTwoRaw = spread10Y2YSeries.lastPoint
+      ? Math.max(5, spread10Y2YSeries.lastPoint.y - 2)
+      : null;
+    const twoThreeRaw = spread2Y3MSeries.lastPoint
+      ? Math.min(34, spread2Y3MSeries.lastPoint.y + 5)
+      : null;
+    if (tenTwoRaw === null || twoThreeRaw === null) {
+      return { tenTwo: tenTwoRaw, twoThree: twoThreeRaw };
+    }
+    // Preserve which series actually sits higher, so the labels never cross.
+    const [upper, lower] = tenTwoRaw <= twoThreeRaw
+      ? [tenTwoRaw, twoThreeRaw]
+      : [twoThreeRaw, tenTwoRaw];
+    const separatedLower = Math.min(34, Math.max(lower, upper + MIN_GAP));
+    const separatedUpper = Math.max(5, Math.min(upper, separatedLower - MIN_GAP));
+    return tenTwoRaw <= twoThreeRaw
+      ? { tenTwo: separatedUpper, twoThree: separatedLower }
+      : { tenTwo: separatedLower, twoThree: separatedUpper };
+  })();
+
   const topShocks = yieldCurveSeries
     .map((point, index) => {
       if (index === 0) return null;
@@ -407,8 +434,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {spread2Y3MSeries.paths.map((path, index) => (
                 <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="1.4" />
               ))}
-              {spread10Y2YSeries.lastPoint ? <text x="98" y={Math.max(5, spread10Y2YSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">10Y-2Y</text> : null}
-              {spread2Y3MSeries.lastPoint ? <text x="98" y={Math.min(34, spread2Y3MSeries.lastPoint.y + 5)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">2Y-3M</text> : null}
+              {spreadLabelPositions.tenTwo !== null ? <text x="98" y={spreadLabelPositions.tenTwo} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-emerald-200 uppercase tracking-[0.12em]">10Y-2Y</text> : null}
+              {spreadLabelPositions.twoThree !== null ? <text x="98" y={spreadLabelPositions.twoThree} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-amber-200 uppercase tracking-[0.12em]">2Y-3M</text> : null}
             </svg>
             <div className="mt-2 flex items-center justify-between type-eyebrow">
               <span>{points[0]?.label ?? "Start"}</span>

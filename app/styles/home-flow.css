@@ -223,3 +223,11 @@
   }
 }
 
+
+/* §IX: the stagger animates opacity + translateY under a `both` fill, so
+   dropping the animation lands each item on its natural end state at once. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-list-stagger > * {
+    animation: none;
+  }
+}
