@@ -27,11 +27,14 @@ export const sendWeeklyBrief = async (): Promise<SendWeeklyBriefResult> => {
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const summary = (brief as any).summary;
+      /* `action` and `recordDate` do not exist on WeeklySummary; an `as any`
+         hid that, so every subject line said "Hold current posture" and every
+         body said "this week" regardless of the call. The real fields are
+         `guidance` and `recordDateLabel`. */
+      const summary = brief.summary;
       const regime = String(summary?.regime ?? "Stable");
-      const actionNow = String(summary?.action ?? "Hold current posture");
-      const recordDate = String(summary?.recordDate ?? "this week");
+      const actionNow = String(summary?.guidance ?? "Hold current posture");
+      const recordDate = String(summary?.recordDateLabel ?? "this week");
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regime}: ${actionNow}`
         : `Whether Brief — ${regime}`;
@@ -121,10 +124,9 @@ export const sendWeeklyBrief = async (): Promise<SendWeeklyBriefResult> => {
   let slackOk = false;
   if (slackWebhook) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const summary = (brief as any).summary;
+      const summary = brief.summary;
       const regime = String(summary?.regime ?? "");
-      const actionNow = String(summary?.action ?? "");
+      const actionNow = String(summary?.guidance ?? "");
       const blocks = [
         { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief` } },
         { type: "section", text: { type: "mrkdwn", text: `*Regime:* ${regime}\n*Action:* ${actionNow}` } },

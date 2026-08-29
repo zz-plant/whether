@@ -6,10 +6,15 @@ export const revalidate = 3600;
 export async function GET() {
   try {
     const brief = await buildAgentInterfaceResponse("weekly");
-    const summary = (brief as any).summary ?? {};
+    /* These read `summary.action` and `summary.recordDate` through an `as any`,
+       and neither field exists on WeeklySummary — so every item in this public
+       feed published "Hold" as the action and the generation date as the record
+       date, whatever the week actually said. The real fields are `guidance` and
+       `recordDateLabel`. */
+    const summary = brief.summary;
     const regime = String(summary.regime ?? "Stable");
-    const action = String(summary.action ?? "Hold");
-    const recordDate = String(summary.recordDate ?? new Date().toISOString().split("T")[0]);
+    const action = String(summary.guidance ?? "Hold");
+    const recordDate = String(summary.recordDateLabel ?? new Date().toISOString().split("T")[0]);
     const confidence = String(summary.confidence ?? "MED");
 
     const pubDate = new Date(recordDate).toUTCString();

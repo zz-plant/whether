@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildAgentInterfaceResponse } from "../../../lib/agentInterface";
+import { buildAgentInterfaceResponse, isAgentCadence } from "../../../lib/agentInterface";
 import { getRegimeContext, getRegimeProjection } from "../../../lib/report/regimeContext";
 import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlow";
 import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
@@ -96,19 +96,29 @@ export async function GET(request: Request) {
     }
 
     /* Default: get the brief */
-    const cadence = searchParams.get("cadence") ?? "weekly";
-    const brief = await buildAgentInterfaceResponse(cadence as "weekly" | "monthly" | "quarterly" | "yearly");
-    const summary = (brief as any).summary ?? {};
+    /* The cadence arrived from the query string and was cast straight into the
+       union, so `?cadence=bogus` fell through every branch of the builder to the
+       yearly summary and came back labelled with whatever the caller sent. Use
+       the same guard `/api/agent` and the stdio MCP server already use.
+
+       Fields are then read with `in` narrowing rather than `as any`: only the
+       weekly and monthly summaries carry an action or a record date, and the
+       cast was reporting them as null for the cadences that do have them under
+       a different name. */
+    const requestedCadence = searchParams.get("cadence") ?? "weekly";
+    const cadence = isAgentCadence(requestedCadence) ? requestedCadence : "weekly";
+    const brief = await buildAgentInterfaceResponse(cadence);
+    const summary = brief.summary;
 
     return NextResponse.json({
       ok: true,
       tool: "get_brief",
       cadence,
-      regime: summary.regime ?? null,
-      action: summary.action ?? null,
-      recordDate: summary.recordDate ?? null,
-      confidence: summary.confidence ?? null,
-      posture: summary.postureLabel ?? null,
+      regime: "regime" in summary ? summary.regime : null,
+      action: "guidance" in summary ? summary.guidance : null,
+      recordDate: "recordDateLabel" in summary ? summary.recordDateLabel : null,
+      confidence: "confidence" in summary ? summary.confidence : null,
+      posture: "regimeLabel" in summary ? summary.regimeLabel : null,
       links: {
         full_brief: "https://whether.work",
         history: "https://whether.work/history",

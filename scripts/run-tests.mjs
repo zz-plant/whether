@@ -39,6 +39,54 @@ if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
   process.exit(1);
 }
 
+// The runner only ever looks under ./tests, so a test file written anywhere else
+// is silently never run — and reads as coverage in review because it is a real
+// suite that passes when invoked directly. lib/report/forecastModel.test.ts sat
+// outside for long enough to accumulate 14 cases against a core model, none of
+// which the suite executed. Fail loudly instead: a stray file is either misplaced
+// or a duplicate, and both want a decision rather than silence.
+const STRAY_SEARCH_ROOTS = ['app', 'lib', 'scripts', 'worker'];
+
+async function collectStrayTestFiles(dir, found = []) {
+  let entries;
+
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      await collectStrayTestFiles(fullPath, found);
+      continue;
+    }
+
+    if (entry.isFile() && TEST_FILE_PATTERN.test(entry.name)) {
+      found.push(path.relative(process.cwd(), fullPath));
+    }
+  }
+
+  return found;
+}
+
+const strayTestFiles = (
+  await Promise.all(
+    STRAY_SEARCH_ROOTS.map((root) => collectStrayTestFiles(path.resolve(root))),
+  )
+).flat();
+
+if (strayTestFiles.length > 0) {
+  console.error(
+    `[test-guard] Test files found outside ./tests, which the runner never executes:\n` +
+      strayTestFiles.map((file) => `  - ${file}`).join('\n') +
+      `\nMove them under ./tests (fixing their relative imports) or delete them if superseded.`,
+  );
+  process.exit(1);
+}
+
 // Flags that consume the following argv entry as their value, so we do not
 // mistake that value for a test path filter.
 const VALUE_FLAGS = new Set(['-t', '--test-name-pattern', '--timeout', '--reporter', '--reporter-outfile']);

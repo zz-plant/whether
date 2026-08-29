@@ -15,7 +15,23 @@ export type AgentCadence = (typeof supportedAgentCadences)[number];
 export const isAgentCadence = (value: string): value is AgentCadence =>
   (supportedAgentCadences as readonly string[]).includes(value);
 
-export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
+/* The four cadences build four differently shaped summaries. Without this map the
+   return type is their union, so every caller that reads a weekly-only field —
+   the RSS feed, the weekly email, the MCP brief tool — reached for `as any` to
+   get at it. That cast disables checking on the whole object, which is how a
+   change to the weekly summary shape could break the feed and the customer-facing
+   email without the compiler noticing. Keying the summary to the cadence means a
+   caller passing the "weekly" literal gets the weekly shape and real checking. */
+type SummaryByCadence = {
+  weekly: ReturnType<typeof buildWeeklySummary>;
+  monthly: ReturnType<typeof buildMonthlySummary>;
+  quarterly: ReturnType<typeof buildQuarterlySummary>;
+  yearly: ReturnType<typeof buildYearlySummary>;
+};
+
+export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
+  cadence: Cadence,
+) => {
   const {
     assessment,
     actionNowShort,
@@ -36,32 +52,40 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
     reportDynamics,
   });
 
-  const summary =
-    cadence === "weekly"
-      ? buildWeeklySummary({
-          assessment,
-          provenance: treasuryProvenance,
-          recordDateLabel: weeklyRecordDateLabel,
-        })
-      : cadence === "monthly"
-        ? buildMonthlySummary({
-            assessment,
-            provenance: treasuryProvenance,
-            recordDateLabel,
-          })
-        : cadence === "quarterly"
-          ? buildQuarterlySummary({
-              assessment,
-              provenance: treasuryProvenance,
-              recordDateLabel,
-              periodLabel: getQuarterLabel(treasury.record_date) ?? recordDateLabel,
-            })
-          : buildYearlySummary({
-              assessment,
-              provenance: treasuryProvenance,
-              recordDateLabel,
-              periodLabel: getYearLabel(treasury.record_date) ?? recordDateLabel,
-            });
+  /* A record of thunks rather than a conditional chain. Indexing a mapped type
+     with the generic cadence preserves the key/value relationship, so the call
+     returns the matching summary shape with no type assertion — a conditional
+     expression cannot narrow against a generic and would need one. */
+  const summaryBuilders: { [C in AgentCadence]: () => SummaryByCadence[C] } = {
+    weekly: () =>
+      buildWeeklySummary({
+        assessment,
+        provenance: treasuryProvenance,
+        recordDateLabel: weeklyRecordDateLabel,
+      }),
+    monthly: () =>
+      buildMonthlySummary({
+        assessment,
+        provenance: treasuryProvenance,
+        recordDateLabel,
+      }),
+    quarterly: () =>
+      buildQuarterlySummary({
+        assessment,
+        provenance: treasuryProvenance,
+        recordDateLabel,
+        periodLabel: getQuarterLabel(treasury.record_date) ?? recordDateLabel,
+      }),
+    yearly: () =>
+      buildYearlySummary({
+        assessment,
+        provenance: treasuryProvenance,
+        recordDateLabel,
+        periodLabel: getYearLabel(treasury.record_date) ?? recordDateLabel,
+      }),
+  };
+
+  const summary = summaryBuilders[cadence]();
 
   const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries, {
     decisionSupport: {
