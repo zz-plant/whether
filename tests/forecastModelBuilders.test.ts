@@ -1,11 +1,11 @@
 import { describe, it } from "bun:test";
 import assert from "node:assert/strict";
 
-import { evaluateRegime } from "../regimeEngine";
-import rawArchive from "../../data/summary_archive.json";
-import type { MacroSeriesReading, TreasuryData } from "../types";
-import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
-import { buildReportDynamics } from "./reportData";
+import { evaluateRegime } from "../lib/regimeEngine";
+import rawArchive from "../data/summary_archive.json";
+import type { MacroSeriesReading, TreasuryData } from "../lib/types";
+import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import { buildReportDynamics } from "../lib/report/reportData";
 import {
   buildFallbackForecastModel,
   buildForecastModel,
@@ -13,7 +13,7 @@ import {
   classifyBoundaryMomentum,
   classifyCrossingRisk,
   toMonthlyRegimePoints,
-} from "./forecastModel";
+} from "../lib/report/forecastModel";
 
 const buildTreasury = ({
   baseRate,
