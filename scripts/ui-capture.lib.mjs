@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -279,10 +280,41 @@ export const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEO
   return previous;
 };
 
+/**
+ * Playwright resolves a browser build number pinned to its own version. A managed
+ * container (Claude Code on the web) ships a Chromium that predates the pinned build
+ * and cannot download the matching one, so the default launch fails with "Executable
+ * doesn't exist" even though a perfectly usable Chromium is installed.
+ *
+ * Fall back to that binary rather than failing the capture. Local runs, where the
+ * pinned build is present, keep the default resolution and never see this path.
+ */
+const resolveExecutableOverride = () => {
+  const explicit = process.env.WHETHER_CHROMIUM_PATH;
+  if (explicit) return existsSync(explicit) ? explicit : undefined;
+  const browsersPath = process.env.PLAYWRIGHT_BROWSERS_PATH;
+  if (!browsersPath) return undefined;
+  const candidate = path.join(browsersPath, "chromium");
+  return existsSync(candidate) ? candidate : undefined;
+};
+
+const launchChromium = async () => {
+  try {
+    return await chromium.launch();
+  } catch (error) {
+    const executablePath = resolveExecutableOverride();
+    if (!executablePath) throw error;
+    console.warn(
+      `[ui-capture] pinned Chromium build unavailable; falling back to ${executablePath}`,
+    );
+    return chromium.launch({ executablePath });
+  }
+};
+
 export const captureTargets = async ({ baseUrl, outDir, targets }) => {
   await mkdir(outDir, { recursive: true });
 
-  const browser = await chromium.launch();
+  const browser = await launchChromium();
   const captures = [];
 
   try {
