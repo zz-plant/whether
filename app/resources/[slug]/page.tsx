@@ -39,6 +39,7 @@ import {
   noindexRobots,
 } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 type Params = { slug: string };
 const RESOURCES_RETURN_HREF = "/operate" as const;
@@ -196,9 +197,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const midpointIndex = Math.floor(page.sections.length / 2);
 
   return (
-    <main
+    <ContentPageShell
       id="top"
-      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
       data-content-measurement-root={`/resources/${page.slug}`}
     >
       <ContentMeasurementTracker
@@ -309,6 +309,6 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         sourceSlug={page.slug}
         downloadLabel="Download Capital Posture Template"
       />
-    </main>
+    </ContentPageShell>
   );
 }

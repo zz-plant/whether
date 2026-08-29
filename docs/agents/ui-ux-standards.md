@@ -60,7 +60,7 @@
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
 
 ## IX. Homepage weekly brief motion guardrails
-- Scope: `app/page.tsx` weekly brief modules and supporting components (`RevealOnView`, decision chips, citation action controls).
+- Scope: `app/page.tsx` weekly brief modules and supporting components (reveal/stagger wrappers, decision chips, citation action controls).
 - Allowed reveal motion: `transform` + `opacity` only (e.g., `translateY` + fade). Do not animate layout properties (height, width, margin, padding, top/left).
 - JS interaction rule: avoid JavaScript layout read/write loops (`getBoundingClientRect`, `offset*`, forced sync reflow) for reveal/chip transitions; use CSS transitions and IntersectionObserver-only visibility toggles.
 - Accessibility floor for interactive controls in dark cards:

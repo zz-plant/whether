@@ -9,6 +9,7 @@ import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { ReportCta } from "../../../components/reportCta";
+import { ContentPageShell } from "../../../components/ui/contentPageShell";
 
 const signalScenarioIntentBySlug = {
   hiring: "cfo",
@@ -122,8 +123,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
   });
 
   return (
-    <main
-      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
+    <ContentPageShell
       data-content-measurement-root={pagePath}
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="authority" intent={contentIntent} />
@@ -194,6 +194,6 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           <Link href="/planning#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Planning handoff</Link>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

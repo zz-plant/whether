@@ -21,7 +21,6 @@
 
 Check local `AGENTS.md` files before editing these directories:
 - `lib/report/` — canonical report semantics, trust states, and shared decision copy
-- `app/components/weekly-card/` — surviving weekly-card pieces (diagnostics section, decision-support copy); the top fold itself renders from `app/page.tsx`
 - `app/components/home/` — homepage orchestration and route handoffs
-- `app/planning/components/` — planning/export checkpoint behavior
-- `app/evidence/` — evidence-route scope and signal diagnostics
+- `app/operate/components/` — planning/export checkpoint behavior
+- `app/signals/` — evidence-route scope and signal diagnostics

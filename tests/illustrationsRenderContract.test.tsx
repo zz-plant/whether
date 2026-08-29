@@ -2,10 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { PostureDial } from "../app/components/illustrations/PostureDial";
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
 import { RegimeGlyph } from "../app/components/illustrations/RegimeGlyph";
-import { AttributionFan } from "../app/components/illustrations/AttributionFan";
 import { DeltaGlyph } from "../app/components/illustrations/DeltaGlyph";
 import type { RegimeKey } from "../lib/types";
 
@@ -21,36 +19,6 @@ const assertTokensWrapped = (html: string) => {
 const assertNoNaN = (html: string) => {
   assert.equal(html.includes("NaN"), false, "geometry produced NaN");
 };
-
-describe("PostureDial", () => {
-  it("renders without NaN geometry when there is no prior reading", () => {
-    const html = renderToStaticMarkup(<PostureDial idPrefix="d1" value={0.4} label="Tighten" />);
-    assertNoNaN(html);
-    assertTokensWrapped(html);
-    assert.match(html, /No prior reading to compare\./);
-  });
-
-  it("colors the delta band by direction of travel", () => {
-    const tightened = renderToStaticMarkup(
-      <PostureDial idPrefix="d2" value={0.6} previous={0.1} label="Tighten" />,
-    );
-    assert.match(tightened, /Moved toward tighten since last week\./);
-    assert.match(tightened, /stroke="var\(--color-semantic-tightening-fg\)"/);
-
-    const loosened = renderToStaticMarkup(
-      <PostureDial idPrefix="d3" value={-0.6} previous={0.1} label="Loosen" />,
-    );
-    assert.match(loosened, /Moved toward loosen since last week\./);
-    assert.match(loosened, /stroke="var\(--color-semantic-easing-fg\)"/);
-  });
-
-  it("clamps out-of-range and non-finite values", () => {
-    const html = renderToStaticMarkup(
-      <PostureDial idPrefix="d4" value={99} previous={Number.NaN} label="Tighten" />,
-    );
-    assertNoNaN(html);
-  });
-});
 
 describe("ThresholdLadder", () => {
   it("renders nothing for an inverted domain", () => {
@@ -151,60 +119,5 @@ describe("DeltaGlyph", () => {
       ),
       "",
     );
-  });
-});
-
-describe("AttributionFan", () => {
-  const contributions = [
-    { label: "Loose signal", weight: -3 },
-    { label: "Tight signal", weight: 5 },
-    { label: "Mild tighten", weight: 2 },
-  ];
-
-  it("renders nothing when every contribution is zero or non-finite", () => {
-    assert.equal(
-      renderToStaticMarkup(
-        <AttributionFan
-          idPrefix="f1"
-          postureLabel="Hold"
-          contributions={[{ label: "a", weight: 0 }, { label: "b", weight: Number.NaN }]}
-        />,
-      ),
-      "",
-    );
-  });
-
-  it("groups tightening pressure ahead of loosening in the legend", () => {
-    const html = renderToStaticMarkup(
-      <AttributionFan idPrefix="f2" postureLabel="Tighten" contributions={contributions} />,
-    );
-    assertNoNaN(html);
-    assertTokensWrapped(html);
-    const order = ["Tight signal", "Mild tighten", "Loose signal"].map((l) => html.indexOf(l));
-    assert.deepEqual(
-      order,
-      [...order].sort((a, b) => a - b),
-      "legend must run tightening first, then loosening",
-    );
-  });
-
-  it("fills the right column contiguously across the full span", () => {
-    const html = renderToStaticMarkup(
-      <AttributionFan idPrefix="f3" postureLabel="Tighten" contributions={contributions} />,
-    );
-    const slices = [...html.matchAll(/x="310" y="([\d.]+)" width="10" height="([\d.]+)"/g)];
-    assert.equal(slices.length, contributions.length);
-    const covered = slices.reduce((sum, m) => sum + Number(m[2]), 0);
-    assert.ok(Math.abs(covered - 152) < 0.001, `right column covered ${covered}, expected 152`);
-    assert.ok(Math.abs(Number(slices[0][1]) - 20) < 0.001, "right column must start at y=20");
-  });
-
-  it("shows each contribution's share of the total", () => {
-    const html = renderToStaticMarkup(
-      <AttributionFan idPrefix="f4" postureLabel="Tighten" contributions={contributions} />,
-    );
-    assert.match(html, /50%/);
-    assert.match(html, /30%/);
-    assert.match(html, /20%/);
   });
 });

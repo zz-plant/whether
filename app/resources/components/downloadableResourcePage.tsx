@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 export type DownloadableResourceMetadataConfig = {
   title: string;
@@ -81,8 +82,7 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
   const ListTag = config.heroItemsOrdered ? "ol" : "ul";
 
   return (
-    <main
-      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
+    <ContentPageShell
       data-resource-path={config.metadata.path}
     >
       <section
@@ -119,6 +119,6 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
       </section>
 
       <InternalLinksPanel links={config.internalLinks} />
-    </main>
+    </ContentPageShell>
   );
 }

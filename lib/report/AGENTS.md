@@ -39,9 +39,8 @@ Prefer editing these sources before changing consumers:
 
 Typical downstream renderers:
 - `app/page.tsx` (top fold: `DecisionHero`, `ThreeWhethersCard`)
-- `app/components/weekly-card/DiagnosticsSection.tsx`
 - `app/components/home/*`
-- `app/planning/components/*`
+- `app/operate/components/*`
 
 ## Working rules
 
