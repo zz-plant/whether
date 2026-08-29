@@ -9,6 +9,7 @@ import { decideCanonicalClusterStaticParams, findDecideClusterRoute } from "../.
 import { findDecisionScenario } from "../../../seoRouteClusters";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../../components/ui/contentPageShell";
 
 type Params = { slug: string; cluster: string };
 
@@ -78,7 +79,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
   const payload = payloadRecord.payload;
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{roleDefinition.title}: {scenarioDefinition.title}</h1>
         <p className="text-sm text-slate-300">Role/scenario normalization for weekly decision transmission.</p>
@@ -101,6 +102,6 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
           <ActionLink href="/toolkits/focus" variant="pill">Decision toolkit</ActionLink>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

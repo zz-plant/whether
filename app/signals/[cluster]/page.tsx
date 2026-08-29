@@ -4,6 +4,7 @@ import { DecisionContractBlock } from "../../components/decisionContractBlock";
 import { buildPageMetadata } from "../../../lib/seo";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } from "../clusterRoutes";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 type Params = { cluster: string };
 
@@ -42,7 +43,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
         <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>
@@ -54,6 +55,6 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
         reversal={reportData.flipThreshold}
         evidence={clusterDefinition.evidence}
       />
-    </main>
+    </ContentPageShell>
   );
 }

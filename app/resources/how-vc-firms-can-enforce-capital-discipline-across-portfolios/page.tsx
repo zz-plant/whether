@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "How VC firms can enforce capital discipline across portfolios",
@@ -19,8 +20,7 @@ export default function Page() {
   const pagePath = "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios";
 
   return (
-    <main
-      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10"
+    <ContentPageShell
       data-content-measurement-root={pagePath}
       data-page-cluster="vc"
       data-page-intent="vc-partner"
@@ -78,6 +78,6 @@ export default function Page() {
           <Link href="/planning#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="request">Open board-pack exports</Link>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

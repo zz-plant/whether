@@ -4,6 +4,7 @@ import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 export const runtime = "edge";
 
@@ -35,7 +36,7 @@ export default async function ShipChecklistPage({
   const result = scoreWhetherToShipChecklist(input, assessment);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Whether to ship checklist</h1>
         <p className="text-sm text-slate-300">Score launch readiness against the current regime and get a go/wait/kill recommendation.</p>
@@ -79,6 +80,6 @@ export default async function ShipChecklistPage({
       <Link href="/answer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         Back to decide hub
       </Link>
-    </main>
+    </ContentPageShell>
   );
 }

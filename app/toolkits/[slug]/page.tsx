@@ -6,6 +6,7 @@ import { buildPageMetadata } from "../../../lib/seo";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -38,7 +39,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
   const decisionPaths = findDecisionPathsForToolkit(toolkit.slug);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <Link href="/answer#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         ← Back to Decision Tools toolkit library
       </Link>
@@ -130,6 +131,6 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           ))}
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }
