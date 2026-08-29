@@ -72,14 +72,6 @@ export function HistoryExplorer({
           showZoomControls
           variant="detailed"
         />
-        <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-fluid-micro text-slate-400 border-t border-slate-900">
-          {(["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"] as const).map((regime) => (
-            <span key={regime} className="inline-flex items-center gap-1.5">
-              <span className={`inline-block size-2 rounded-full ${REGIME_COLORS[regime] ?? "bg-slate-500"}`} aria-hidden="true" />
-              {getRegimePublicLabel(regime)}
-            </span>
-          ))}
-        </div>
       </div>
 
       {/* Quick Month / Year Selector */}
