@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { ActionLink } from "./components/ui/actionLink";
-import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -62,16 +62,23 @@ export default async function Page({
 /**
  * This view changes every week under one URL, so it cannot be cited or indexed as
  * a dated article. Point at the frozen copy of the week instead.
+ *
+ * Gated on how far the archive has fallen behind. When the freeze job stops
+ * running this module keeps rendering the last week it managed to write, which
+ * stamps an old date onto the one screen whose entire claim is that it is
+ * current — the module then argues against the page it sits on. Rendering
+ * nothing is the safer failure.
  */
-function CanonicalWeekPermalink() {
-  if (!latestPublishedBrief) return null;
+function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: string }) {
+  const brief = selectCitablePermalinkBrief(currentRecordDate);
+  if (!brief) return null;
 
   return (
     <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md space-y-2.5 px-4 py-3.5 shadow-md">
       <p className="text-fluid-xs text-slate-300">
-        This week is published as a permanent record dated <span className="font-medium text-white">{latestPublishedBrief.recordDateLabel}</span>.
+        This week is published as a permanent record dated <span className="font-medium text-white">{brief.recordDateLabel}</span>.
       </p>
-      <ActionLink href={buildPublishedBriefPath(latestPublishedBrief.slug)} variant="pill">
+      <ActionLink href={buildPublishedBriefPath(brief.slug)} variant="pill">
         Citable permalink
       </ActionLink>
     </section>
@@ -319,7 +326,7 @@ async function PageContent({
 
         <div className="space-y-4 border-t border-slate-800/70 pt-6">
           <SubscribeForm />
-          <CanonicalWeekPermalink />
+          <CanonicalWeekPermalink currentRecordDate={reportData.treasury.record_date} />
         </div>
       </div>
 

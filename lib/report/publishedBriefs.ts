@@ -95,6 +95,57 @@ export const findAdjacentPublishedBriefs = (slug: string) => {
   return { previous: chronological[index - 1], next: chronological[index + 1] };
 };
 
+/**
+ * How far the newest frozen week may trail the live record date before the
+ * homepage stops advertising it.
+ *
+ * The archive is this product's proof of cadence, so a gap in it is itself a
+ * claim: past roughly a week and a half, the newest frozen week has stopped
+ * being evidence that the brief ships every week and started being evidence
+ * that it stopped. Ten days covers a normal weekly cadence plus slack for the
+ * Thursday freeze slipping a day or two.
+ */
+export const PUBLISHED_BRIEF_STALE_AFTER_DAYS = 10;
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Days between the live record date and a frozen week. Returns null when either
+ * date is unparseable, which callers treat as "cannot vouch for it".
+ */
+export const publishedBriefAgeInDays = (brief: PublishedBrief, currentRecordDate: string) => {
+  const current = Date.parse(currentRecordDate);
+  const published = Date.parse(brief.recordDate);
+
+  if (!Number.isFinite(current) || !Number.isFinite(published)) {
+    return null;
+  }
+
+  return (current - published) / MS_PER_DAY;
+};
+
+/**
+ * The frozen week the live brief may point at as its citable permalink, or
+ * undefined when the archive has fallen far enough behind that linking it would
+ * date-stamp the homepage with a week that is no longer this one.
+ *
+ * A missing module is neutral. A stale date sitting under a hero whose whole
+ * claim is freshness is a negative claim, so absence is the safer failure.
+ */
+export const selectCitablePermalinkBrief = (currentRecordDate: string): PublishedBrief | undefined => {
+  if (!latestPublishedBrief) {
+    return undefined;
+  }
+
+  const age = publishedBriefAgeInDays(latestPublishedBrief, currentRecordDate);
+
+  if (age === null || age > PUBLISHED_BRIEF_STALE_AFTER_DAYS) {
+    return undefined;
+  }
+
+  return latestPublishedBrief;
+};
+
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });

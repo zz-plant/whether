@@ -75,6 +75,13 @@ export function FirstVisitExplainer() {
       <Link href="/trust#beginner-glossary" className={orientationLinkClass}>
         Glossary
       </Link>
+      {/* "How is this not a horoscope" is the first objection a cold visitor
+          forms, and the method page answers a different one — that the number is
+          derived. What answers this one is the record of held and changed calls,
+          which /history owns. */}
+      <Link href="/history#track-record-heading" className={orientationLinkClass}>
+        Track record
+      </Link>
       <a
         href="https://github.com/zz-plant/whether"
         target="_blank"
