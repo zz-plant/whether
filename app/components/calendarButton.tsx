@@ -2,7 +2,7 @@
 
 export function buildMondayCalendarUrl(
   title = "Whether Weekly Posture Sync",
-  description = "Review weekly macro regime & posture delta: https://whether.app",
+  description = "Review weekly macro regime & posture delta: https://whether.work",
 ) {
   const now = new Date();
   const year = now.getFullYear();

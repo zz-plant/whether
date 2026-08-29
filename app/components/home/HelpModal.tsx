@@ -13,14 +13,16 @@ type HelpModalProps = {
 };
 
 const SHORTCUTS = [
+  ["C", "Copy Slack brief"],
+  ["F", "Toggle presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],
-  ["E", "Evidence page"],
-  ["P", "Planning page"],
-  ["H", "History page"],
-  ["T", "Trust page"],
-  ["R", "Resolve page"],
-  ["/", "Search"],
+  ["E", "Evidence & signals"],
+  ["P", "Planning & operations"],
+  ["H", "History & track record"],
+  ["T", "Trust & provenance"],
+  ["R", "Resolve & methodology"],
+  ["/", "Search & command palette"],
   ["?", "Show this help"],
 ];
 

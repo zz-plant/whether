@@ -3,7 +3,7 @@
  *
  * Usage:
  *   <div data-whether-embed="brief" data-whether-ticker="GOOGL" data-whether-stage="growth"></div>
- *   <script async src="https://whether.app/embed.js"></script>
+ *   <script async src="https://whether.work/embed.js"></script>
  *
  * The script finds all [data-whether-embed] elements, fetches the brief from the API,
  * and replaces each element with the rendered HTML.

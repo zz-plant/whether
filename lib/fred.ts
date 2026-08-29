@@ -4,7 +4,7 @@ export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
 
 export const FRED_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
-  "user-agent": "WhetherDataBot/1.0 (+https://whether.app)",
+  "user-agent": "WhetherDataBot/1.0 (+https://whether.work)",
 } as const;
 
 const isTestRuntime = () =>

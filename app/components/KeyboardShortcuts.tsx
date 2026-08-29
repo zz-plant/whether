@@ -56,6 +56,15 @@ export function KeyboardShortcuts() {
         return;
       }
 
+      if (e.key === "c" || e.key === "C") {
+        const copyBtn = document.querySelector<HTMLButtonElement>('[data-testid="copy-slack-brief-button"]');
+        if (copyBtn) {
+          e.preventDefault();
+          copyBtn.click();
+          return;
+        }
+      }
+
       const href = SHORTCUTS[e.key.toLowerCase()];
       if (href && document.activeElement === document.body) {
         router.push(href);

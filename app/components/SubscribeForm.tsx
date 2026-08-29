@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Calendar } from "lucide-react";
 import { requestSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
+import { buildMondayCalendarUrl } from "./calendarButton";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -78,6 +79,22 @@ export function SubscribeForm() {
           {message}
         </p>
       )}
+
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-fluid-nano text-slate-400">
+        <span>Prefer calendar holds over email?</span>
+        <a
+          href={buildMondayCalendarUrl(
+            "Whether Weekly Posture Sync",
+            "Review weekly macro regime & posture delta: https://whether.work",
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"
+        >
+          <Calendar className="size-3" aria-hidden="true" />
+          <span>Add Monday Calendar Hold (9:00 AM)</span>
+        </a>
+      </div>
     </div>
   );
 }

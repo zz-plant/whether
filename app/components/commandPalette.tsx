@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
-import { Search, CornerRightUp, Maximize2, Download, Archive } from "lucide-react";
-import { primaryNavigationLayers, navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal } from "lucide-react";
+import { navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { buildMondayCalendarUrl } from "./calendarButton";
 
 type CommandItem = {
   id: string;
@@ -34,23 +35,52 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   }, [router, onClose]);
 
   const commands: CommandItem[] = useMemo(() => {
-    const navCommands: CommandItem[] = navigationLayers.map((layer) => ({
-      id: `nav-${layer.key}`,
-      label: layer.label,
-      description: layer.description,
-      icon: CornerRightUp,
-      action: () => navigateTo(layer.href),
-      shortcut: layer.navLabel,
-    }));
-
     const actionCommands: CommandItem[] = [
       {
+        id: "copy-slack",
+        label: "Copy Slack brief",
+        description: "Copy 60-second weekly call formatted for Slack",
+        icon: Copy,
+        action: () => {
+          const btn = document.querySelector<HTMLButtonElement>('[data-testid="copy-slack-brief-button"]');
+          if (btn) {
+            btn.click();
+          }
+          onClose();
+        },
+        shortcut: "C",
+      },
+      {
         id: "focus",
-        label: "Toggle focus mode",
-        description: "Presentation mode for meetings",
+        label: "Toggle focus / present mode",
+        description: "Presentation mode for Zoom & leadership standups",
         icon: Maximize2,
         action: toggleFocusMode,
         shortcut: "F",
+      },
+      {
+        id: "calendar-hold",
+        label: "Add Monday calendar reminder",
+        description: "Add recurring 9:00 AM sync to Google Calendar",
+        icon: Calendar,
+        action: () => {
+          window.open(buildMondayCalendarUrl(), "_blank", "noopener,noreferrer");
+          onClose();
+        },
+      },
+      {
+        id: "board-annex",
+        label: "Export Board Governance Annex",
+        description: "Copy multi-quarter stance audit memo for Directors",
+        icon: FileText,
+        action: () => navigateTo("/history"),
+      },
+      {
+        id: "agent-mcp",
+        label: "Agent & MCP setup",
+        description: "Inspect MCP server config and developer API endpoints",
+        icon: Terminal,
+        action: () => navigateTo("/api-docs"),
       },
       {
         id: "export",
@@ -65,15 +95,24 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
       {
         id: "history",
-        label: "View history",
-        description: "Browse past briefs and compare epochs",
+        label: "View history & track record",
+        description: "Browse past briefs and audited historical timeline",
         icon: Archive,
         action: () => navigateTo("/history"),
         shortcut: "H",
       },
     ];
 
-    return [...navCommands, ...actionCommands];
+    const navCommands: CommandItem[] = navigationLayers.map((layer) => ({
+      id: `nav-${layer.key}`,
+      label: layer.label,
+      description: layer.description,
+      icon: CornerRightUp,
+      action: () => navigateTo(layer.href),
+      shortcut: layer.navLabel,
+    }));
+
+    return [...actionCommands, ...navCommands];
   }, [navigateTo, toggleFocusMode, onClose]);
 
   const filtered = useMemo(() => {

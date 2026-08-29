@@ -59,7 +59,7 @@ export GITHUB_TOKEN="<token-with-minimum-required-scopes>"
 export BRAVE_API_KEY="<optional-search-provider-key>"
 
 # Whether CLI auth for agents/CI
-export WHETHER_API_URL="https://api.whether.app"
+export WHETHER_API_URL="https://whether.work"
 export WHETHER_API_KEY="<whether-api-key>"
 
 # Preflight (machine-readable)
