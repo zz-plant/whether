@@ -11,6 +11,7 @@ import {
   isSituationUseCaseSlug,
 } from "../../../lib/decisionDomainCatalog";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 type Params = { slug: string };
 
@@ -56,7 +57,7 @@ export default async function DecideDetailPage({
 
   if (role) {
     return (
-      <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <ContentPageShell>
         <section className="weather-panel space-y-4 px-6 py-6">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
           <p className="text-sm text-slate-300">Current decisions</p>
@@ -100,12 +101,12 @@ export default async function DecideDetailPage({
             })}
           </div>
         </section>
-      </main>
+      </ContentPageShell>
     );
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">The strongest paths for this decision.</p>
@@ -150,6 +151,6 @@ export default async function DecideDetailPage({
           <ActionLink href="/trust" variant="pill">Trust</ActionLink>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

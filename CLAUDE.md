@@ -153,8 +153,7 @@ snapshots, `docs/` specs.
 
 ## Nested AGENTS.md — check before editing these
 
-`lib/report/` · `app/components/weekly-card/` · `app/components/home/` ·
-`app/operate/components/` · `app/signals/`
+`lib/report/` · `app/components/home/` · `app/operate/components/` · `app/signals/`
 
 ## Docs routing
 

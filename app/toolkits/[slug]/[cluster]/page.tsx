@@ -8,6 +8,7 @@ import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitCanonicalClusterStaticParams } from "../../clusterRoutes";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../../lib/seo/indexationPolicy";
+import { ContentPageShell } from "../../../components/ui/contentPageShell";
 
 type Params = { slug: string; cluster: string };
 
@@ -77,7 +78,7 @@ export default async function ToolkitClusterPage({ params }: { params: Promise<P
   const payload = payloadRecord.payload;
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
         <p className="text-sm text-slate-300">Macro context: {context.title}</p>
@@ -99,6 +100,6 @@ export default async function ToolkitClusterPage({ params }: { params: Promise<P
           <Link href="/resolve/ceo/capital-raising" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision Tools page</Link>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

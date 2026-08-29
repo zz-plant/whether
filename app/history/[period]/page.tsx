@@ -26,6 +26,7 @@ import {
   postureArchiveYears,
   type PostureArchivePeriod,
 } from "../../../lib/summary/postureArchive";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 type Params = { period: string };
 
@@ -108,7 +109,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleStructuredData) }} />
 
@@ -305,6 +306,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           Open this week&apos;s brief
         </ActionLink>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

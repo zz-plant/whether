@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ActionLink } from "../components/ui/actionLink";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
@@ -66,8 +67,16 @@ export default async function MethodPage({
               <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.timestampLabel}</li>
             </ul>
             <div className="flex flex-wrap gap-2 text-xs">
-              <a href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Treasury source</a>
-              <a href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Macro source</a>
+              {/* Both source URLs are optional. As bare <a href={undefined}> these
+                  rendered a pill that looked clickable but was neither a link nor
+                  keyboard-focusable; the typed href on the shared primitive is what
+                  surfaced it. Render the affordance only when there is somewhere to go. */}
+              {reportData.treasuryProvenance.sourceUrl ? (
+                <ActionLink href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Treasury source</ActionLink>
+              ) : null}
+              {reportData.macroProvenance.sourceUrl ? (
+                <ActionLink href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Macro source</ActionLink>
+              ) : null}
             </div>
           </article>
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
@@ -76,8 +85,8 @@ export default async function MethodPage({
               Check whether the weekly call is current enough to share or approve against.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Full freshness check</Link>
-              <Link href="#meeting-snippet" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Meeting snippet</Link>
+              <ActionLink href="#sources-freshness" variant="pill">Full freshness check</ActionLink>
+              <ActionLink href="#meeting-snippet" variant="pill">Meeting snippet</ActionLink>
             </div>
           </article>
         </div>
@@ -94,8 +103,8 @@ export default async function MethodPage({
             <p className="text-sm text-slate-200">{citationLine}</p>
             <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <Link href="#trust-snapshot" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Snapshot</Link>
-              <Link href="#formula-reference" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Formula notes</Link>
+              <ActionLink href="#trust-snapshot" variant="pill">Snapshot</ActionLink>
+              <ActionLink href="#formula-reference" variant="pill">Formula notes</ActionLink>
             </div>
           </article>
         </div>
@@ -122,8 +131,8 @@ export default async function MethodPage({
               If a warning or revisit trigger fires, confirm freshness before moving ahead.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <Link href="#sources-freshness" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Recheck freshness</Link>
-              <Link href="#revisit-call" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold text-slate-100">Revisit triggers</Link>
+              <ActionLink href="#sources-freshness" variant="pill">Recheck freshness</ActionLink>
+              <ActionLink href="#revisit-call" variant="pill">Revisit triggers</ActionLink>
             </div>
           </article>
         </div>
