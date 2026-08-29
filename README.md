@@ -1,32 +1,115 @@
 # Whether
 
-**How aggressively should your company hire, spend, raise, and expand this week?**
+<p align="center">
+  <img src="docs/assets/whether-badge.png" alt="Whether Badge" width="120" />
+</p>
 
-Whether turns public macro and capital-market signals into a **weekly operating call** for startup
-leaders: what to do now, what would make the call tighten, and what conditions would justify opening
-back up.
-
-`signals → posture → decisions → artifact`
+<h3 align="center">The weekly operating call for startup leaders</h3>
 
 <p align="center">
-  <img src="docs/assets/whether-demo.gif" alt="whether demo animation" width="720">
+  How aggressively should your company hire, spend, raise, and expand this week?
 </p>
 
 <p align="center">
-  <img src="docs/assets/whether-dashboard.png" alt="Whether signal dashboard showing CPI, Fed Rate, VIX, and operating posture" width="720">
+  <a href="https://whether.work"><strong>Explore Live Brief</strong></a> ·
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#mcp--agent-integration">MCP &amp; Agent API</a> ·
+  <a href="#why-whether-succeeds">Core Pillars</a> ·
+  <a href="docs/README.md">Documentation</a>
 </p>
 
-Everything in this repo should make that loop faster to understand, easier to trust, and easier to share.
+<p align="center">
+  <img src="docs/assets/whether-demo.gif" alt="Whether interactive weekly brief demo animation" width="760" style="border-radius: 8px; max-width: 100%;" />
+</p>
 
 ---
 
-## Boldness Budget
+## The Core Operating Loop
 
-**Boldness Budget** — a weekly measure of how much operating aggressiveness current conditions support.
+Whether turns public macro and capital-market data into a **weekly operating call** for startup and product leaders:
 
-Higher budget → faster approvals, more experimentation, greater willingness to hire and expand.
+$$\text{signals} \longrightarrow \text{posture} \longrightarrow \text{decisions} \longrightarrow \text{artifact}$$
 
-Lower budget → shorter payback requirements, greater reversibility, tighter fixed-cost commitments.
+Everything in this product is designed for **decision transmission** — enabling an operator to scan the brief, choose an operating posture, and share a meeting-ready artifact in **under 60 seconds**.
+
+<p align="center">
+  <img src="docs/assets/whether-dashboard.png" alt="Whether cockpit dashboard showing CPI, Fed Rate, VIX, and operating posture" width="760" style="border-radius: 8px; max-width: 100%;" />
+</p>
+
+---
+
+## Why Whether Succeeds
+
+### 1. The 60-Second Operating Call & Boldness Budget
+
+Instead of raw market charts or macroeconomic commentary, Whether compresses market physics into a single stance:
+
+- **Operating Regimes**: Freezing / Cloudy / Stormy / Sunny (translated into operating stances: *Contraction*, *Transitional Mixed*, *Guarded Expansion*, *Expansion*).
+- **Boldness Budget (0–100)**: A calibrated weekly score of how much operating aggressiveness current capital-market conditions support.
+  - **Higher budget** $\rightarrow$ faster approvals, more experimentation, greater willingness to hire and expand fixed costs.
+  - **Lower budget** $\rightarrow$ shorter payback requirements, greater reversibility, tighter commitments.
+
+```
++-----------------------------------------------------------------------------+
+|  REGIME: GUARDED EXPANSION (Sunny)                 BOLDNESS BUDGET: 62/100  |
+|  "Stage decisions. Avoid irreversible fixed-cost commitments."              |
++-----------------------------------------------------------------------------+
+```
+
+---
+
+### 2. Bounded Decisions over Generic Advice
+
+Generic advice says *"be cautious."* Whether delivers **bounded decisions** — explicit triplets containing an **Action**, a **Threshold/Trigger**, and a **Reversal Condition**:
+
+| Decision Area | Do now (Action) | Stop / tighten if (Threshold) | Open back up when (Reversal) |
+| :--- | :--- | :--- | :--- |
+| **Engineering & Product** | Fund initiatives with &lt;6-month payback | Yield curve inversion deepens &gt; 15 bps | 2 consecutive refreshes with stable spreads |
+| **Hiring & Headcount** | Backfill revenue-critical roles only | BBB spreads widen &gt; 220 bps | Cash availability index returns above 65 |
+| **Fundraising & Runway** | Maintain 18+ months forward runway | VIX stays &gt; 28 for &gt; 10 trading days | Volatility subsides and rate cuts materialize |
+
+---
+
+### 3. Meeting-Ready & Slack-Ready Artifacts
+
+Decision clarity is incomplete without frictionless distribution. Every brief generates copy-ready, permalink-backed artifacts for Monday morning rituals:
+
+<p align="center">
+  <img src="docs/assets/whether-unfurl.png" alt="Whether Slack unfurl and rich share artifact preview" width="720" style="border-radius: 8px; max-width: 100%;" />
+</p>
+
+- **Slack Brief**: Markdown-ready summary formatted for executive and team channels (`whether brief slack`).
+- **Leadership Pack**: Formatted slides and bulleted recaps for board and leadership syncs.
+- **Attributable Permalinks**: Every shared artifact links to a permanent, frozen citable record (`https://whether.work/brief/2026-w34`).
+
+<p align="center">
+  <img src="docs/assets/whether-email.png" alt="Whether email briefing view" width="600" style="border-radius: 8px; max-width: 100%;" />
+</p>
+
+---
+
+### 4. Compact Trust & Data Provenance (`/trust`)
+
+No black boxes. Every calculation is auditable in real-time with compact trust indicators:
+
+- **Live Sensor Feeds**: Direct public series links to the Federal Reserve (FRED) and US Treasury (Yield Curve, CPI, Unemployment, BBB Spreads, Chicago FCI, VIX).
+- **Formula Transparency**: Published math and hysteresis thresholds at [`/trust#formula-reference`](https://whether.work/trust#formula-reference).
+- **Graceful Degradation**: Clear visual markers (`isLive`, `isFallback`) when upstream feeds degrade, ensuring offline safety and zero silent failures.
+
+---
+
+### 5. First-Class Agent & Developer Platform
+
+Whether is designed from the ground up to be consumed by human operators and AI agents alike:
+
+- **Native Model Context Protocol (MCP)**: Query the live brief directly within Cursor, Claude Desktop, Antigravity, or any MCP client via `https://whether.work/api/mcp`.
+- **JSON API Endpoints**: Deterministic payloads for scripts, dashboards, and automated workflows.
+- **Terminal CLI (`whether`)**: Full terminal workflow for engineers and operators.
+
+```bash
+# Query the live weekly operating brief
+curl -s "https://whether.work/api/weekly" | jq '.summary'
+```
 
 ---
 
@@ -39,121 +122,92 @@ bun install
 bun run dev
 ```
 
-Then open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000) to view the local weekly brief.
 
-### 2) Validate a change
-
-```bash
-bun run lint
-bun run test
-```
-
-Use `bun run check` for broad or cross-cutting changes.
-
-### 3) Pull a machine-readable weekly brief
+### 2) Run from the CLI
 
 ```bash
-curl -s "http://localhost:3000/api/agent?cadence=weekly" \
-  | jq '{cadence, generatedAt, recordDateLabel, summaryHash}'
-```
-
-See [docs/developer/quickstart.md](docs/developer/quickstart.md) for the full integration flow.
-
-### 4) Read the call from the terminal
-
-```bash
+# Read current status
 bun run cli:whether -- status
+
+# Generate Slack brief
+bun run cli:whether -- brief slack
+
+# Watch for regime changes
+bun run cli:whether -- watch --changes-only
 ```
 
-`whether brief slack`, `whether export pdf`, `whether watch --changes-only`, and
-`whether explain flip` cover the common operator paths. Full command list:
-[docs/cli-command-reference.md](docs/cli-command-reference.md).
+See [docs/cli-command-reference.md](docs/cli-command-reference.md) for all CLI commands.
 
-### 5) Connect an MCP client
+### 3) Connect MCP (Model Context Protocol)
 
-Point any MCP client at `https://whether.work/api/mcp` (streamable HTTP) to query the weekly call
-as a tool. `bun run mcp:whether` starts the same interface over stdio against your local checkout.
+Add Whether to your MCP client configuration:
 
----
+```json
+{
+  "mcpServers": {
+    "whether": {
+      "url": "https://whether.work/api/mcp"
+    }
+  }
+}
+```
 
-## Product intent
+Or run locally over stdio:
 
-### What Whether does
-
-- Converts macro market signals into a current operating posture.
-- Compresses posture into bounded decisions (action, threshold, reversal condition) for startup and product leaders.
-- Produces artifacts that can be pasted into Slack, meetings, and planning reviews.
-- Preserves trust with provenance, freshness markers, and degraded-state behavior.
-
-### What Whether is not
-
-- A macro blog.
-- A prediction engine.
-- A substitute for leadership judgment.
-- A platform for explanation-first dashboards.
+```bash
+bun run mcp:whether
+```
 
 ---
 
-## Development commands
+## Development & Testing
 
-| Task | Command |
-| --- | --- |
-| Install dependencies | `bun install` |
-| Start local dev server | `bun run dev` |
-| Build production bundle | `bun run build` |
-| Lint | `bun run lint` |
-| Typecheck | `bun run typecheck` |
-| Test | `bun run test` |
-| Full checks | `bun run check` |
-
-Runtime expectations:
-
-- Bun `1.3.x`
-- Node `>=22`
+| Task | Command | Description |
+| :--- | :--- | :--- |
+| **Dev Server** | `bun run dev` | Starts local dev server with hot reload |
+| **Lint** | `bun run lint` | Runs ESLint across all app and lib files |
+| **Typecheck** | `bun run typecheck` | Validates TypeScript contracts |
+| **Targeted Test** | `bun test tests/homeBriefModel.test.ts` | Runs single test file (~0.2s) |
+| **Full Test Suite** | `bun run test` | Runs entire regression suite |
+| **Build** | `bun run build` | Builds production Worker bundle via Vinext |
+| **Full Gate** | `bun run check` | Runs lint, typecheck, tests, and assets |
 
 ---
 
-## Contributor paths
+## Architecture & Codebase Map
 
-- Human workflow: [CONTRIBUTING.md](CONTRIBUTING.md)
-- Agent workflow: [AGENTS.md](AGENTS.md)
-- Documentation map: [docs/README.md](docs/README.md)
-
-## README guide
-
-Use these README files as entrypoints, then move to the linked canonical docs:
-
-- `README.md` (this file): repo mission, local commands, and high-signal code areas.
-- `docs/README.md`: canonical documentation map and source-of-truth boundaries.
-- `docs/agents/README.md`: task-routed instructions for coding agents.
-- `docs/developer/README.md`: external integration path for API and delivery workflows.
-
----
-
-## High-signal repo areas
-
-- [app/](app/) for routes, UI, and primary product surfaces
-- [lib/report/homeBriefModel.ts](lib/report/homeBriefModel.ts) for weekly brief modeling
-- [lib/report/reportData.ts](lib/report/reportData.ts) for report assembly and sourcing
-- [lib/report/decisionKnobs.ts](lib/report/decisionKnobs.ts) for bounded operating rules
-- [lib/playbook.ts](lib/playbook.ts) for playbook logic
-- [app/operate/components/](app/operate/components/) for export and artifact surfaces
+```
+whether/
+├── app/                  # Next.js / Vinext routes and UI surfaces
+│   ├── page.tsx          # Homepage: The one-screen Weekly Brief
+│   ├── operate/          # Operations hub, scenario planning & action checklists
+│   ├── signals/          # Evidence appendix & sensor breakdown
+│   ├── trust/            # Data provenance, freshness SLAs & formulas
+│   └── api/              # JSON API routes, MCP server & webhook handlers
+├── lib/
+│   ├── report/           # Brief data assembly, Boldness Budget, and knobs
+│   ├── regimeEngine.ts   # Core macro scoring & regime classification
+│   ├── macroSnapshot.ts  # Live FRED / Treasury feed ingestion & fallback
+│   ├── briefBuilders.ts  # Slack, email, and meeting artifact formatting
+│   └── navigation/       # Information architecture & routing definitions
+└── docs/                 # Product specs, editorial guardrails & agent guides
+```
 
 ---
 
-## Documentation entry points
+## Documentation Links
 
-- [docs/README.md](docs/README.md) for the canonical docs map
-- [docs/development-playbook.md](docs/development-playbook.md) for engineering workflow
-- [docs/architecture.md](docs/architecture.md) for system boundaries
-- [docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md) for the core brief contract
-- [docs/developer/README.md](docs/developer/README.md) for integration docs
-- [docs/agents/README.md](docs/agents/README.md) for agent-specific guidance
+- **[docs/README.md](docs/README.md)**: Canonical documentation hub
+- **[docs/editorial-guardrails.md](docs/editorial-guardrails.md)**: Vocabulary, decision contracts, and tone
+- **[docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md)**: Core brief UI/UX specification
+- **[docs/developer/quickstart.md](docs/developer/quickstart.md)**: Integration guide and API reference
+- **[AGENTS.md](AGENTS.md)**: Guidelines for AI pair programming
 
 ---
 
-## Product and platform notes
+## Stance & Philosophy
 
-- Whether provides operating guidance, not investment advice.
-- Preserve provenance, freshness, and fallback markers whenever extending data or export surfaces.
-- Prefer strengthening existing decision artifacts over creating adjacent product surfaces.
+- **Operating guidance, not financial advice**: Whether is built to pace organizational hiring, burn, and expansion — not pick stocks.
+- **Delta first**: We emphasize what changed, what that flips in your decisions, and what would reverse the call.
+- **Artifacts over dashboards**: The end state of an analysis is a shared decision in Slack or a meeting, not an unread portal.
