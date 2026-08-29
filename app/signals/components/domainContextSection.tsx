@@ -27,7 +27,7 @@ export function DomainContextSection({ regime }: { regime?: string }) {
   if (!regime || !DOMAIN_INSIGHTS[regime]) return null;
 
   return (
-    <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="domain-context-title">
+    <section id="team-context" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="domain-context-title">
       <p id="domain-context-title" className="type-eyebrow">
         What this means for your team
       </p>

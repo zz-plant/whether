@@ -94,7 +94,7 @@ export function SignalInversionPreview({
   const hasGaps = spread10Y2YSeries.missingColumns.length > 0 || spread2Y3MSeries.missingColumns.length > 0;
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
+    <section id="curve-context" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
       <header className="space-y-2">
         <p className="type-eyebrow">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">

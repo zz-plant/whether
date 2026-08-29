@@ -132,7 +132,7 @@ export default async function SignalsPage({
         openPanelHref={model.timeMachineHref}
       />
 
-      <div className="weather-panel space-y-4 px-5 py-5">
+      <div id="trends" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
         <p className="type-eyebrow">Trends</p>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
