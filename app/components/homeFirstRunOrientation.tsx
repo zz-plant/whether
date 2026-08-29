@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { trackActivationEvent } from "../../lib/activationFunnel";
 
 const DISMISS_KEY = "whether.home.orientation.dismissed";
 
@@ -51,6 +52,10 @@ export function FirstVisitExplainer() {
     }
     document.documentElement.dataset.homeOrientationDismissed = "true";
     setDismissed(true);
+    // Dismissing is the cheapest available proof that someone read the line and
+    // knew what they were looking at, which is the step between arriving and
+    // doing anything deliberate.
+    trackActivationEvent({ step: "oriented", path: "/" });
   };
 
   return (

@@ -7,6 +7,7 @@ import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
 } from "../../lib/export/weeklyOperatorBrief";
+import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
 import { loadReportData } from "../../lib/report/reportData";
 
 export const runtime = "edge";
@@ -51,7 +52,7 @@ const buildCurrentShareArtifact = async () => {
       "Citation",
       citation,
       "",
-      "Full brief: https://whether.work",
+      buildBriefPermalinkLine(treasury.record_date),
     ].join("\n"),
     meetingPack,
     calendarDetails: [

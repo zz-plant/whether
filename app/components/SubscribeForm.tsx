@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { requestSubscription } from "./subscribeRequest";
+import { trackActivationEvent } from "../../lib/activationFunnel";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,10 @@ export function SubscribeForm() {
     const result = await requestSubscription(email);
     setStatus(result.ok ? "success" : "error");
     setMessage(result.message);
-    if (result.ok) setEmail("");
+    if (result.ok) {
+      setEmail("");
+      trackActivationEvent({ step: "committed", path: "/", commitment: "subscribed" });
+    }
   };
 
   if (status === "success") {

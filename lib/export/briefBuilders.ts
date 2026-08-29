@@ -1,6 +1,7 @@
 import { formatNumberWithUnit } from "../formatters";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
+import { buildBriefPermalinkLine } from "./briefPermalink";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
@@ -298,6 +299,8 @@ export const buildSlackBrief = (
     "Citations:",
     ...citations,
     "",
+    buildBriefPermalinkLine(treasury.record_date),
+    "",
     ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
@@ -330,6 +333,7 @@ export const buildConstraintHeadlines = (
     ...constraints,
     "",
     `Source: ${treasury.source}`,
+    buildBriefPermalinkLine(treasury.record_date),
     "",
     ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
@@ -345,5 +349,6 @@ export const buildCallCitation = (
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,
   `Source note: ${treasury.source}`,
+  buildBriefPermalinkLine(treasury.record_date),
   ...buildInterpretationLayerBlock(options),
 ].join("\n");

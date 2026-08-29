@@ -15,6 +15,28 @@ only sink was `PREMIUM_FUNNEL_WEBHOOK_URL`, which has never been set in any envi
 production event was silently discarded and the go/no-go checks below could not pass no matter how
 long they ran. Treat the event history as starting 2026-08-21, not at first deploy.
 
+## Activation precedes premium
+
+`lib/activationFunnel.ts` defines the funnel this document's premium-intent numbers should be read
+against: **visited → oriented → committed → returned**, where `returned` means the same browser came
+back in a later ISO week.
+
+The reason this matters here: premium intent measured on a base of visitors who never come back is
+measuring interest in an article, not demand for a subscription. For a weekly-ritual product, the
+week-2 return rate is the denominator that makes every intent number interpretable, and until this
+existed nothing recorded it.
+
+- **Instrumented at:** `ActivationTracker` on `/` (visited, returned), the first-run explainer's
+  dismiss (oriented), `ShareCopyControls` and `SubscribeForm` (committed).
+- **Sink:** `POST /api/telemetry/activation` → the `activation` analytics stream.
+- **Identity:** none. Return detection reads one localStorage key holding an ISO week slug and
+  reports a bucketed gap (`same_week` / `next_week` / `within_month` / `lapsed`). No id, no cookie,
+  nothing joinable to a person — the product advertises no trackers and the measurement is built to
+  keep that true rather than to be maximally informative.
+- **Read it as:** a weekly readout on the same cadence as the product. A `committed` rate that rises
+  while `returned` stays flat is a sharing product, not a ritual product, and would change what
+  premium should package.
+
 ## Goals
 - Preserve the free weekly posture ritual (`/`) as the acquisition and trust surface.
 - Measure where users hit premium intent (exports, integrations, API/data, planning depth).

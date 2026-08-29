@@ -13,6 +13,7 @@ import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { CompareStrip } from "./components/CompareStrip";
+import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { CadenceCallCardFallback } from "./components/suspenseFallbacks";
@@ -224,6 +225,7 @@ async function PageContent({
   return (
     <>
       <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
+      <ActivationTracker path="/" />
       <FreshnessDot
         label={homepage.reportShell.fetchedAtLabel}
         recordDate={homepage.reportShell.recordDateLabel}
