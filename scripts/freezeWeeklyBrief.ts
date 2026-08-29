@@ -10,6 +10,7 @@ import { appendFile, readFile, writeFile } from "node:fs/promises";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
 import { parsePublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
+import { assessFreezeReadiness } from "../lib/report/briefFreezeGuard";
 
 const OUTPUT_PATH = new URL("../data/published_briefs.json", import.meta.url);
 
@@ -17,13 +18,31 @@ const force = process.argv.includes("--force");
 
 const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "brief:freeze" });
 
-if (degraded) {
-  console.error("Refusing to freeze a degraded snapshot — the record would be wrong forever. Retry when live data returns.");
-  process.exit(1);
-}
-
 const { homeBriefModel } = snapshot;
 const recordDate = reportData.treasury.record_date ?? reportData.treasury.fetched_at;
+
+/*
+ * Checked against the fallback and freshness flags, not only `degraded`.
+ * `degraded` is `!reportResult.ok`, which stays false through a total live-data
+ * outage: every FRED fetch 403s, the loader falls back to the bundled snapshot,
+ * and assembly succeeds. That path once froze week 2026-w25 from a 2026-06-17
+ * record date and exited 0 — a permanently wrong citable record, written by the
+ * guard that exists to prevent exactly that.
+ */
+const readiness = assessFreezeReadiness({
+  degraded,
+  isFallback: snapshot.isFallback,
+  isLive: reportData.treasury.isLive,
+  fallbackReason: reportData.treasury.fallback_reason,
+  recordDate,
+  now: new Date(),
+});
+
+if (!readiness.ok) {
+  console.error(`Refusing to freeze: ${readiness.reason}`);
+  console.error("The published archive is append-only, so a wrong record cannot be withdrawn. Retry when live data returns.");
+  process.exit(1);
+}
 const isoWeek = getIsoWeekInfo(new Date(recordDate));
 const slug = formatIsoWeekSlug(isoWeek);
 
