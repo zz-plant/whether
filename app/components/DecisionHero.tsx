@@ -319,23 +319,23 @@ export function DecisionHero({
           >
             {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
           </h2>
-        </div>
-
-        <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-start-1 sm:row-start-2">
-          {showActionNow ? (
-            <p className="text-fluid-sm font-medium text-slate-100">
-              <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
-            </p>
-          ) : null}
-          {/* On a flat week the delta label reads "no change vs last week", which the
-              score block below already states next to the number it describes. The
-              direction word alone carries it here; the delta returns when it moves. */}
+          {/* Sits with the call it describes, and fills the space the score block
+              opens beside a two-line headline. On a flat week the delta reads "no
+              change vs last week", which the score states next to the number it
+              describes; the direction word alone carries it here. */}
           <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>
             {boldnessDelta === 0
               ? DIRECTION_LABEL[signalDirection]
               : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
           </p>
+        </div>
 
+        <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-span-2 sm:col-start-1 sm:row-start-2">
+          {showActionNow ? (
+            <p className="text-fluid-sm font-medium text-slate-100">
+              <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
+            </p>
+          ) : null}
           <section
             data-testid="weekly-top-fold"
             aria-label="What needs reconsideration this week"
@@ -470,7 +470,7 @@ export function DecisionHero({
           </p>
         </div>
 
-        <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1 sm:row-span-2">
+        <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1">
           <SignalWaterfall data={signalData ?? {}} indicators={signalIndicators}>
             <div className="inline-flex items-baseline justify-center gap-1">
               <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">

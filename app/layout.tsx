@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
+import { navigationLayers } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
@@ -206,20 +207,28 @@ export default function RootLayout({
         </ToastProviderRoot>
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8">
           <div className="mx-auto max-w-4xl space-y-4">
+            {/* Two tiers, because thirteen links in one flat row ranked nothing:
+                the five surfaces the product is actually about sat level with
+                Embed and RSS. The primary row derives from
+                lib/navigation/informationArchitecture — that module asks callers
+                not to maintain a parallel ordering elsewhere, and this footer was
+                doing exactly that. Note navigationLayers, not
+                primaryNavigationLayers: only the weekly brief carries the
+                "primary" tier, so that filter renders a one-link footer. */}
             <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-fluid-sm text-[var(--footer-link)]">
-              <Link href="/" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Brief</Link>
-              <Link href="/signals" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Evidence</Link>
-              <Link href="/operate" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Plan</Link>
-              <Link href="/answer" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Resolve</Link>
-              <Link href="/trust" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Trust</Link>
-              <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Framework</Link>
-              <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Template</Link>
-              <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Search</Link>
-              <Link href="/share" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Share</Link>
-              <Link href="/embed" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">Embed</Link>
-              <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">API</Link>
-              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">About</Link>
-              <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">RSS</a>
+              {navigationLayers.map((layer) => (
+                <Link key={layer.href} href={layer.href} className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">{layer.navLabel ?? layer.label}</Link>
+              ))}
+            </nav>
+            <nav aria-label="Tools and reference" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
+              <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Framework</Link>
+              <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Template</Link>
+              <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Search</Link>
+              <Link href="/share" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Share</Link>
+              <Link href="/embed" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Embed</Link>
+              <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">API</Link>
+              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">About</Link>
+              <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">RSS</a>
             </nav>
             <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
               <Link href="/acceptable-use-policy" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</Link>
