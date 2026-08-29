@@ -12,6 +12,15 @@ const liveRoutes = [
   { slug: "planning", label: "Planning", path: "/operate" },
   { slug: "resolve", label: "Resolve", path: "/answer" },
   { slug: "trust", label: "Trust", path: "/trust" },
+  // Added 2026-08-29. These four were never captured, so the UI facelift that
+  // reviewed the five above could not have seen them — and three are now on the
+  // path a launch visitor actually walks: /brief is where every shared artifact
+  // links, /history carries the track record that answers "is this a horoscope",
+  // and /pricing states the offer. /share is where the artifacts are copied.
+  { slug: "history", label: "History", path: "/history" },
+  { slug: "brief", label: "Published brief", path: "/brief/2026-w31" },
+  { slug: "pricing", label: "Pricing", path: "/pricing" },
+  { slug: "share", label: "Share", path: "/share" },
 ];
 
 const liveTargets = liveRoutes.flatMap(({ slug, label, path }) => [
