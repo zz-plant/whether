@@ -127,7 +127,36 @@ screenshot gets taken and shared. AGENTS.md rule 4 asks for trust to be *compact
 
 Ordered so each phase unblocks the next. Phases 0 and 3 are independently shippable at any time.
 
-### Phase 0 — Retire the patch layer (foundation, no intended visual change)
+### Phase 0 — Retire the patch layer — **not done; the premise was wrong**
+
+**Status (2026-08-29): abandoned after investigation, and the plan below is kept only as the record
+of what was attempted.** This was the flip condition this document named, and it tripped.
+
+The remap cannot be done the way this plan assumed, because `@theme inline` binds a colour token
+globally while the `!important` patches it would replace are **role-scoped** — they set only `color`,
+only `outline-color`, only `background-color`. Remapping the token therefore changes strictly more
+than the patch does, and two documented carve-outs sit directly in the blast radius:
+
+- The regime shells in `lib/regimePresentation.ts` are built from `border-emerald-400/40`,
+  `via-emerald-400/10`, `from-rose-600/20` and siblings — **the same 100–400 hue shades the patches
+  flatten** — and must stay dark in both themes. The patches miss them today only because they set
+  `color` and the shells use `background-image` and `border-color`. A token remap would not miss them.
+- `regimeTimelinePanel.tsx` uses `from-slate-950/80 via-slate-950/35` as a scrim under
+  `text-slate-100`. Remapping the slate surface scale inverts a contrast-critical overlay.
+
+So the honest conclusion is the opposite of the sequencing claim above: **the patch layer cannot be
+retired by token remapping at all** until the regime shells and that scrim are first decoupled onto
+their own tokens. That is a real piece of work with real visual risk, and it buys no user-visible
+improvement on its own.
+
+What survives is the *goal* — new UI should be theme-correct by construction rather than depending on
+the patch layer — and that is achieved more cheaply by using `--color-semantic-*` and the already
+theme-bound slate scale in new code, which is what Phase 1 did. The patch layer is currently correct;
+it is fragile in principle, not broken in practice. Leave it until something forces the issue.
+
+<details>
+<summary>Original Phase 0 plan (superseded)</summary>
+
 
 Extend the proven `@theme inline` remap to the hues, surfaces, and rings; delete the corresponding
 `!important` attribute-selector rules.
@@ -144,6 +173,11 @@ is unchanged or better. Verify by capturing both themes before and after.
 
 **Risk:** medium and well-bounded — it is a find/replace at the token layer, not at 1,022 call sites.
 The carve-outs are the only real trap, and both are already commented in place.
+
+</details>
+
+*(The risk assessment above is exactly what proved wrong: the carve-outs were not a trap to step
+around, they were disqualifying.)*
 
 ### Phase 1 — Re-register the weekly brief (the visible facelift)
 
@@ -186,6 +220,27 @@ checked, not asserted.
 - Fix the curve-context label collision (offset labels or move to an inline legend).
 - Correct §VIII/§XI route names in `docs/agents/ui-ux-standards.md` to `/signals`, `/operate`,
   `/answer`; note that `/learn` no longer exists.
+
+## Outcome (2026-08-29)
+
+Phases 1–3 shipped; Phase 0 was abandoned for the reason recorded above.
+
+| Claim | Result |
+| --- | --- |
+| Phase 0 retires the patch layer | **Not done.** Premise disproved — see above. |
+| Bounded rules leave monospace | Done. `BoundedValue` renders them in the text face, weighting numerals only. |
+| No bounded-decision line wraps at 430px | **Not met, and not meetable.** A 70-character rule cannot occupy one line at 430px in any face. Wrapping went from three monospace rows to two, and the numbers are now scannable without reading the sentence — which was the actual goal. The spec's no-wrap rule binds the Slack screenshot card's top half, not every rule row. |
+| Hue reduced to posture semantics | Done on `/` and on the `/signals` decision summary. Hue moved to labels; values are neutral. |
+| Mobile keeps source · date · confidence | Done. Was bare `Snapshot`. |
+| `/signals` under ~3200px | **Not met.** 4546px → 4236px (−310px). The duplicate state grid was the single clean win; the rest of the page's length is content, not repetition. |
+| `/` mobile under ~2600px | **Not met.** Measured 3112px against a 3066px baseline, but the two captures do not contain the same page: the later one renders a timeline rail the baseline lacks. Page height here is data-dependent and is not a reliable regression signal at this granularity — the same caveat DD-004 records. |
+| Reduced-motion coverage | Done. 5/14 stylesheets → 9/14; the four files holding 27 unguarded transitions now have blocks. |
+
+Two of the plan's numeric targets were set before the work and missed. They were estimates from
+de-duplication, and the honest read is that `/signals` and `/` are long because they carry a lot of
+content, not mainly because they repeat themselves — one page's worth of repetition existed and it
+has been removed. Further compression is a content-scope decision, not a styling one, and should be
+taken deliberately rather than smuggled into a facelift.
 
 ## Verification
 

@@ -568,3 +568,13 @@
 
 }
 
+
+/* §IX: reduced-motion users get the end state, not a slower version of the
+   animation. These shells transition transform/border/background/shadow. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-hub-link-card,
+  .weather-hub-chip,
+  .weather-route-card {
+    transition: none;
+  }
+}

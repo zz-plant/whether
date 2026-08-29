@@ -125,3 +125,13 @@ summary:focus-visible {
   text-wrap: pretty;
 }
 
+
+/* §IX: end state immediately, not a slowed reveal. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-step-panel {
+    animation: none;
+  }
+  .weather-disclosure-trigger-indicator {
+    transition: none;
+  }
+}

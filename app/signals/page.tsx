@@ -115,11 +115,6 @@ export default async function SignalsPage({
         reversalCondition={model.reversalCondition}
         showMicroDecisionRows={model.showMicroDecisionRows}
         regimeLabel={model.regimeLabel}
-        trustStatusLabel={model.trust.trustStatusLabel}
-        recordDateLabel={model.recordDateLabel}
-        fetchedAtLabel={model.fetchedAtLabel}
-        nextRefreshLabel={model.nextRefreshLabel}
-        freshnessSummaryLabel={model.freshnessSummaryLabel}
         actionNowShort={model.actionNowShort}
         startItems={model.startItems}
         stopItems={model.stopItems}

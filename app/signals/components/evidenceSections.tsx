@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
 import { ReportSection } from "../../components/reportSection";
+import { BoundedValue } from "../../components/ui/boundedValue";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
 import {
@@ -171,11 +172,6 @@ export const SignalsDecisionSummarySection = ({
   reversalCondition,
   showMicroDecisionRows,
   regimeLabel,
-  trustStatusLabel,
-  recordDateLabel,
-  fetchedAtLabel,
-  nextRefreshLabel,
-  freshnessSummaryLabel,
   actionNowShort,
   startItems,
   stopItems,
@@ -186,11 +182,6 @@ export const SignalsDecisionSummarySection = ({
   reversalCondition: string;
   showMicroDecisionRows: boolean;
   regimeLabel: string;
-  trustStatusLabel: string;
-  recordDateLabel: string;
-  fetchedAtLabel: string;
-  nextRefreshLabel: string;
-  freshnessSummaryLabel: string;
   actionNowShort?: string;
   startItems: string[];
   stopItems: string[];
@@ -222,7 +213,7 @@ export const SignalsDecisionSummarySection = ({
       </p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="type-eyebrow text-sky-200">
+          <p className="text-xs font-semibold text-slate-400">
             Current outlook
           </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
@@ -230,7 +221,7 @@ export const SignalsDecisionSummarySection = ({
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="type-eyebrow text-sky-200">
+          <p className="text-xs font-semibold text-slate-400">
             Main pressure
           </p>
           {topDiagnosticCallouts[0] ? (
@@ -249,24 +240,24 @@ export const SignalsDecisionSummarySection = ({
           )}
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="type-eyebrow text-sky-200">
+          <p className="text-xs font-semibold text-slate-400">
             What would change this
           </p>
           {showMicroDecisionRows ? (
-            <div className="mt-2 space-y-2 text-sm text-slate-200">
-              <div className="rounded-md border border-amber-400/20 bg-amber-500/8 px-2 py-1.5">
-                <p className="type-eyebrow text-sky-200">
-                  Wrong if
-                </p>
-                <p className="mt-1">{triggerCondition}</p>
+            /* Was two tinted cards nested inside this card, inside the section
+               card — three containment levels for two sentences. Labelled rows
+               carry the same distinction with one level, and the hue now sits on
+               the label rather than on a box around it. */
+            <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="shrink-0 font-semibold text-semantic-caution-fg">Wrong if:</dt>
+                <dd className="min-w-0"><BoundedValue>{triggerCondition}</BoundedValue></dd>
               </div>
-              <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-2 py-1.5">
-                <p className="type-eyebrow text-sky-200">
-                  Safe again when
-                </p>
-                <p className="mt-1">{reversalCondition}</p>
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="shrink-0 font-semibold text-semantic-easing-fg">Safe again when:</dt>
+                <dd className="min-w-0"><BoundedValue>{reversalCondition}</BoundedValue></dd>
               </div>
-            </div>
+            </dl>
           ) : (
             <p className="mt-2 text-sm text-slate-200">
               <span className="mr-1 type-eyebrow text-amber-200">
@@ -287,35 +278,15 @@ export const SignalsDecisionSummarySection = ({
         </div>
       </div>
     </article>
-    <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div>
-        <p className="type-eyebrow text-sky-200">
-          Current environment
-        </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
-      </div>
-      <div>
-        <p className="type-eyebrow text-sky-200">
-          Confidence
-        </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
-      </div>
-      <div>
-        <p className="type-eyebrow text-sky-200">
-          Decision as-of
-        </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
-      </div>
-      <div>
-        <p className="type-eyebrow text-sky-200">
-          Freshness
-        </p>
-        <p className="mt-1 text-sm font-semibold text-slate-100">{freshnessSummaryLabel}</p>
-        <p className="mt-1 text-xs text-slate-300">
-          Updated {fetchedAtLabel} · Next {nextRefreshLabel}
-        </p>
-      </div>
-    </div>
+    {/* The four-cell state grid that stood here — Current environment,
+        Confidence, Decision as-of, Freshness — restated, word for word, what the
+        report shell's own intro block already says one screen above ("Sunny ·
+        Trust constrained · As of Jun 17, 2026 · Cached snapshot", then "Updated
+        … · 15m cadence"). §XI of docs/agents/ui-ux-standards.md says never to
+        stack repeated state summaries ahead of the first task block; this page
+        stated its posture and freshness four times before any evidence
+        appeared. State belongs on the earliest layer that carries it, so the
+        shell keeps it and this section starts with the evidence. */}
     {/* The "Big picture" card that stood here held one data-driven line (the
         regime headline, now promoted to this section heading) wrapped in four
         blocks of copy that never changed with the data: a "the sections below

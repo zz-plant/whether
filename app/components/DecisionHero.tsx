@@ -12,6 +12,7 @@ import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCal
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
+import { BoundedValue } from "./ui/boundedValue";
 import {
   SCORE_BAND_LABELS,
   classifyScoreBand,
@@ -392,7 +393,7 @@ export function DecisionHero({
           {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
             <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-fluid-nano font-mono type-eyebrow">
+                <p className="text-fluid-nano type-eyebrow">
                   {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
                 </p>
                 {thresholdBusinessConsequence ? (
@@ -404,22 +405,28 @@ export function DecisionHero({
                 ) : null}
               </div>
               <dl className="space-y-1.5 text-fluid-xs">
+                {/* Three rows previously carried three unrelated hues (amber,
+                    rose, sky), which ranked nothing — they were labels, not
+                    directions. Hue now tracks posture: guardrail and reversal
+                    are the tighten side, flip watch is neutral. The semantic
+                    tokens also invert correctly in light mode on their own,
+                    unlike the raw text-<hue>-300 classes these replace. */}
                 {guardrail ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-amber-300/80">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
-                    <dd className="text-white/60">{guardrail}</dd>
+                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
+                    <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
                   </div>
                 ) : null}
                 {reversalTrigger ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-rose-300/80">{DECISION_CONTRACT_LABELS.reversal.reversal}:</dt>
-                    <dd className="text-white/60">{reversalTrigger}</dd>
+                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.reversal.reversal}:</dt>
+                    <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
                   </div>
                 ) : null}
                 {flipConditions && flipConditions.length > 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-sky-300/80">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</dt>
-                    <dd className="text-white/60">{flipConditions.join(" · ")}</dd>
+                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</dt>
+                    <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
                   </div>
                 ) : null}
               </dl>
@@ -452,7 +459,14 @@ export function DecisionHero({
               )}
               <span className={isDegradedData ? "text-amber-300" : "text-emerald-300"}>{dataStatus}</span>
             </span>
-            <span className="hidden sm:inline">{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}{trustStatusLabel ? ` · ${trustStatusLabel}` : ""}</span>
+            {/* Source, date and confidence stay on mobile. They were behind
+                `hidden sm:inline`, which left the phone showing only "Snapshot"
+                — dropping provenance exactly where the brief gets screenshotted
+                and shared, and losing Confidence, a required field of the
+                screenshot contract. Only the longer trust-status sentence is
+                held back to keep the line from dominating a narrow column. */}
+            <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
+            {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
           </p>
         </div>
 
