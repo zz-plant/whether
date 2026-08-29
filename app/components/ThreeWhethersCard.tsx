@@ -1,5 +1,6 @@
 import type { ActionStripItem } from "../../lib/report/operatingCalls";
 import { ACTION_STRIP_DISPLAY_COPY } from "../../lib/report/reportCopy";
+import { BoundedValue } from "./ui/boundedValue";
 
 const STATE_TONE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
   Closed: "text-semantic-tightening-fg",
@@ -32,8 +33,8 @@ export function ThreeWhethersCard({
           which is a fact about the week rather than about any one lever. */}
       {sharedFlipCorridor ? (
         <p className="mb-3 text-fluid-nano text-slate-300">
-          <span className="font-semibold text-slate-400">All three clear on the same lines:</span>{" "}
-          <span className="font-mono text-semantic-easing-fg">{sharedFlipCorridor}</span>
+          <span className="font-semibold text-semantic-easing-fg">All three clear on the same lines:</span>{" "}
+          <BoundedValue>{sharedFlipCorridor}</BoundedValue>
         </p>
       ) : null}
 
@@ -68,17 +69,22 @@ export function ThreeWhethersCard({
                   </span>
                   <span>{item.areaActionNow}</span>
                 </p>
+                {/* Hue sits on the label, which is the part that names a
+                    direction (tighten vs. loosen). The rule itself is ordinary
+                    text with its numbers weighted — colouring the whole sentence
+                    made green ambiguous between "this is good" and "this is a
+                    value". */}
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="shrink-0 font-semibold text-slate-400">
+                  <span className="shrink-0 font-semibold text-semantic-caution-fg">
                     {ACTION_STRIP_DISPLAY_COPY.threshold}:
                   </span>
-                  <span className="font-mono text-semantic-caution-fg">{item.triggerThreshold}</span>
+                  <BoundedValue>{item.triggerThreshold}</BoundedValue>
                 </p>
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="shrink-0 font-semibold text-slate-400">
+                  <span className="shrink-0 font-semibold text-semantic-easing-fg">
                     {ACTION_STRIP_DISPLAY_COPY.reversal}:
                   </span>
-                  <span className="font-mono text-semantic-easing-fg">{item.reversalCondition}</span>
+                  <BoundedValue>{item.reversalCondition}</BoundedValue>
                 </p>
               </div>
             </dd>

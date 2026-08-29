@@ -125,3 +125,17 @@
   content-visibility: auto;
 }
 
+
+/* §IX: the looping shimmer and pulse are the most costly motion on the page for
+   a motion-sensitive reader, because they never end. The static gradient still
+   reads as a placeholder, and the reveals land on their end state. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-skeleton__shimmer,
+  .weather-loading-progress::after {
+    animation: none;
+  }
+  .weather-stream-reveal,
+  .weather-section-stage {
+    animation: none;
+  }
+}
