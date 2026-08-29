@@ -70,7 +70,10 @@ export function CommandCenterNavBlock({
   const introMetaLine = [
     statusLabel,
     trustStatusLabel,
-    `As of ${recordDateLabel}`,
+    // Interpolated only when there is a date. `As of ${x}` is a truthy string
+    // even when x is "", so the filter below could never drop it, and a caller
+    // passing no record date printed a bare "As of" with nothing after it.
+    recordDateLabel ? `As of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
   ].filter(Boolean).join(" • ");
   const decisionDeltaLine = decisionDiffs?.map((item) => item.label).join(" • ");

@@ -9,6 +9,7 @@ import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../li
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
+import { formatDateUTC } from "../../lib/formatters";
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
@@ -30,7 +31,14 @@ export default async function HistoryPage({
   return (
     <ReportShell
       model={{
-        status: { statusLabel: "Historical", recordDateLabel: "", fetchedAtLabel: "", treasurySource: "https://fred.stlouisfed.org" },
+        // The newest month the record actually covers. This was an empty string,
+        // which rendered a dangling "As of" on the one page whose subject is dates.
+        status: {
+          statusLabel: "Historical",
+          recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
+          fetchedAtLabel: "",
+          treasurySource: "https://fred.stlouisfed.org",
+        },
         page: { pageTitle: "History", pageSummary: "The permanent record of past weekly calls.", sectionLinks: [], currentPath: "/history" },
         trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
         chrome: { sidebarVariant: "full" },

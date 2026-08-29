@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { Tag } from "../../components/ui/tag";
+import { BoundedValue } from "../../components/ui/boundedValue";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import {
   buildBreadcrumbList,
@@ -140,6 +141,16 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               <span className="font-semibold">Correction:</span> {brief.correction}
             </p>
           ) : null}
+          {/* Every shared artifact links here, so most arrivals are cold and land
+              on a frozen week rather than the live call. The route onward existed
+              only at the foot of the page, past the full brief. A visitor should
+              not have to scroll a dated record to find out it is dated. */}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-800/60 pt-3 text-xs text-slate-400">
+            <span>This is a frozen record of one week.</span>
+            <ActionLink href="/" variant="inline">
+              Read this week&apos;s call
+            </ActionLink>
+          </p>
         </header>
 
         <section className="weather-panel space-y-3 px-6 py-6">
@@ -153,10 +164,12 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What would flip the call</h2>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Guardrail:</span> {brief.guardrailThreshold}
+            <span className="font-semibold text-slate-100">Guardrail:</span>{" "}
+            <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
           </p>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Reversal:</span> {brief.flipThreshold}
+            <span className="font-semibold text-slate-100">Reversal:</span>{" "}
+            <BoundedValue>{brief.flipThreshold}</BoundedValue>
           </p>
         </section>
 
@@ -169,8 +182,20 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                   <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
                   <p className="text-sm text-slate-300">{decision.call}</p>
                   {decision.doNow ? <p className="text-sm text-slate-300">Do now: {decision.doNow}</p> : null}
-                  <p className="text-xs text-slate-400">Threshold: {decision.pauseTrigger}</p>
-                  <p className="text-xs text-slate-400">Reversal: {decision.resumeTrigger}</p>
+                  {/* Same size and weight as the rule above, not a tier below it.
+                      Phase 1 of the facelift moved bounded rules out of small grey
+                      prose on `/` and emphasized the numerals, because the number
+                      is what a reader scans for. That never reached this page —
+                      which is the one every shared link lands on, and the one
+                      quoted in board decks. */}
+                  <p className="text-sm text-slate-300">
+                    <span className="font-semibold text-slate-100">Threshold:</span>{" "}
+                    <BoundedValue>{decision.pauseTrigger}</BoundedValue>
+                  </p>
+                  <p className="text-sm text-slate-300">
+                    <span className="font-semibold text-slate-100">Reversal:</span>{" "}
+                    <BoundedValue>{decision.resumeTrigger}</BoundedValue>
+                  </p>
                 </li>
               ))}
             </ul>
