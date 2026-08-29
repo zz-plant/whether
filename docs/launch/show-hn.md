@@ -13,15 +13,26 @@ experience currently converts a spike into a flat retention curve. Four things g
 | The homepage does not advertise a stale permalink | Done — gated on archive recency |
 | A track record exists for a visitor to inspect | Done — `/history` |
 | The share loop returns a reader to the product | Done — permalink line on every artifact |
-| There is a stated offer (`/pricing`, including what is free forever) | **Outstanding** |
+| There is a stated offer (`/pricing`, including what is free forever) | Done — prices stated, checkout unwired |
 
-The first three shipped on 2026-08-29. The fourth is open. The reason it gates a *launch* and not
-just a funnel: the strongest thing this product can say on HN is "the weekly call is free forever,
-here is the scoring, here is the API" — and that claim is only credible in writing, on a page,
-before the traffic arrives. Saying it in a comment thread after someone asks "what's the catch"
-is a weaker version of the same answer.
+All four closed on 2026-08-29. The reason the fourth gated a *launch* and not just a funnel: the
+strongest thing this product can say on HN is "the weekly call is free forever, here is the scoring,
+here is the API" — and that claim is only credible in writing, on a page, before the traffic
+arrives. Saying it in a comment thread after someone asks "what's the catch" is a weaker version of
+the same answer. `/pricing` now states it, and `FREE_FOREVER_PROMISE` is asserted in tests so it
+cannot quietly erode before the post goes up.
 
-Everything below is ready to use once that gate clears.
+Two additions to the post text worth making before submitting, both now true and both answering
+objections the kit already anticipates:
+
+- **The track record.** `/history` publishes every call the engine has made, how long the current one
+  has held, and how often the regime changed. The prepared defense against "macro horoscope" was
+  method transparency; this is the stronger half of that answer, because it invites scrutiny of the
+  output rather than only the derivation.
+- **Free forever, in writing.** Link `/pricing` rather than asserting it in a comment. HN reads a
+  published free-tier promise very differently from a founder saying "we'll always have a free tier".
+
+The remaining checklist below still applies.
 
 ## Why this can work on HN
 

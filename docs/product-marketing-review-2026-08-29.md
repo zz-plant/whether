@@ -241,6 +241,40 @@ published" is worse than no counter.
 
 ---
 
+## Implementation status (2026-08-29)
+
+Every finding below was actioned in the same branch as this review. What shipped, and where the
+recommendation was changed by contact with the code:
+
+| # | Outcome |
+| --- | --- |
+| 1 | `selectCitablePermalinkBrief` gates the module at 10 days; the freeze routine still needs a merge owner (open) |
+| 2 | `lib/report/trackRecord.ts` + a Track record panel on `/history`, linked from the first-run explainer |
+| 3 | `canonicalPositioningLine` in `lib/seo.ts` is now the enforced single source; two guardrail rows added |
+| 4 | Sales pack states the validated seed–Series B ICP first and marks the enterprise rows aspirational |
+| 5 | `/pricing` ships with real prices and unwired checkout; free tier is a tested promise |
+| 6 | `lib/activationFunnel.ts` defines visited → oriented → committed → returned and instruments it |
+| 7 | `buildBriefPermalinkLine` on every copyable artifact; copy and subscribe emit `committed` |
+| 8 | SEO scoped to decision-query answer pages in the ops runbook; the rest folded into the share loop |
+| 9 | Show HN hold recorded; all four gates now closed |
+| 10 | Delivered *as* the track-record panel rather than as a separate stats line — see below |
+
+Two recommendations changed on contact with the code, both worth recording:
+
+- **#3 needed less invention than the review implied.** `lib/seo.ts` already held a
+  `canonicalPositioningLine`, and `docs/editorial-guardrails.md` already ruled "weekly operating call"
+  for cold surfaces and "Whether Weekly Brief" as the product noun. The drift was that outward
+  surfaces did not consume either. The fix was to make the existing constant binding and mark the
+  competing coinages internal — not to mint new vocabulary on top of a vocabulary system.
+- **#10 folded into #2.** A separate stats line would have put a second numeric claim on the homepage,
+  against the one-screen compression rule, and the honest numbers (months on record, current hold
+  streak) are the same ones the track-record panel already carries. The panel is the stats line.
+
+Still open, and not code: the weekly freeze routine that writes `data/published_briefs.json` has
+produced one entry. The recency gate means a stalled routine no longer damages the homepage, but the
+archive is still the citable corpus and the permalink target for every shared artifact, so it needs
+an owner rather than a guard.
+
 ## Suggested sequence
 
 | # | Change | Effort | Why this order |
