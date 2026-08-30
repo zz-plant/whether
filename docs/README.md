@@ -8,8 +8,8 @@ Use this file to find the current source of truth without reading the whole `doc
 
 - `one-screen-weekly-brief-spec.md` for the primary brief contract
 - `feature-specs-current.md` for shipped product intent
-- `architecture.md` for system boundaries and extension points
-- `architecture-improved.md` for comprehensive diagrams, data flows, and module breakdowns (recommended for onboarding)
+- `architecture.md` for system boundaries, data flows, and extension points
+- `use-cases/operator-playbooks.md` for concrete operator workflows and automation recipes
 
 ### If you are changing contributor workflow
 
@@ -28,6 +28,7 @@ Use this file to find the current source of truth without reading the whole `doc
 - `developer/README.md` for the external docs entrypoint
 - `developer/quickstart.md` for first integration
 - `developer/api-reference.md` for endpoint contracts
+- `developer/integrations.md` for webhook & SDK recipes
 
 ## Document types
 
@@ -48,14 +49,12 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `use-cases/operator-playbooks.md` — role-specific operator workflows, playbooks, and decision rules (canonical)
 - `feature-specs-current.md` — current product surface intent
 - `current-jtbd-click-paths.md` — current jobs-to-be-done inventory with click-level fulfillment paths
-- `policy-spec-alignment-plan.md` — current policy/spec reconciliation plan
 - `editorial-guardrails.md` — copy, claims, and long-form guardrails
 
 ### Engineering workflow
 
 - `development-playbook.md` — day-to-day engineering workflow and validation depth
-- `architecture.md` — modules, data flow, and extension points (canonical)
-- `architecture-improved.md` — comprehensive diagrams, data flows, and module breakdowns (recommended for onboarding)
+- `architecture.md` — modules, data flow, diagrams, and extension points (canonical)
 - `stack-compatibility-matrix.md` — runtime and platform constraints
 - `domain-and-deployment.md` — deployment topology and domain model
 - `cloudflare-deployment-runbook.md` — deploy expectations and evidence capture
@@ -82,46 +81,45 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 
 Use these when shaping follow-on work, not as sole implementation truth:
 
-- `layout-architecture-plan.md`
-- `ui-facelift-plan.md`
-- `frontend-v2-spec.md`
-- `prd-next-level.md`
-- `specs-next-level.md`
-- `design-improvements-priority.md`
-- `agent-accelerated-prioritization-spec.md`
-- `information-architecture-proposal.md`
-- `implementation-status.md`
-- `premium-launch-readiness.md`
-- `seo/roadmap.md`
-- `seo/quality-gates.md`
-- `seo/measurement-model.md`
-- `seo/refresh-loop.md`
-- `programmatic-seo-operations.md`
+- `layout-architecture-plan.md` — landmark consolidation and container width standards
+- `ui-facelift-plan.md` — typography and color token consistency
+- `design-improvements-priority.md` — prioritized UI improvements
+- `design-debt-prioritized.md` — UI/UX and IA design debt tracker (DD-001–DD-009)
+- `implementation-status.md` — implementation status and milestone tracker
+- `premium-launch-readiness.md` — launch readiness for pricing/billing
+- `product-marketing-review-2026-08-29.md` — PMM review and launch checks
+- `seo/roadmap.md` — SEO content roadmap
+- `seo/quality-gates.md` — publish gates and QA checklist
+- `seo/measurement-model.md` — analytics and event schema
+- `seo/refresh-loop.md` — refresh trigger criteria
+
+## Historical specs and proposals
+
+These documents describe earlier architectures, retired routes, or proposals that have been absorbed or superseded:
+
+- `frontend-v2-spec.md` — proposed `/briefing` / `/playbook` routes (superseded by rationalized IA)
+- `prd-next-level.md` & `specs-next-level.md` — Signal Ops & briefing pack specs (shipped in M9)
+- `agent-accelerated-prioritization-spec.md` — Decision delta and one-screen brief backlog (shipped)
+- `policy-spec-alignment-plan.md` — statistical 10-year rolling z-score proposal (unadopted)
+- `adoption-driven-change-plan.md` — early adoption analysis (absorbed into AGENTS.md)
+- `concepts-enhancements.md` — proposed `/concepts` hub (retired and redirected to `/trust`)
+- `solutions-enhancements.md` — proposed `/solutions` hub (retired and redirected to `/answer`)
+- `toolkits-rewrite-enhancement-audit.md` — standalone `/toolkits` index (redirected to `/`)
+- `yield-curve-terminal-layout.md` — Bloomberg-style terminal proposal (unimplemented)
 
 ## Evidence and research docs
 
 Use these to explain why a decision was made or to support a new proposal:
 
 - `research/*.md`
-- `research/2026-04-14-i18n-user-facing-string-audit.md` for the current i18n-readiness audit of user-facing strings
+- `research/2026-04-14-i18n-user-facing-string-audit.md` for i18n-readiness audit
 - `evidence/**`
-- audits such as `frontend-inefficiencies-audit.md`, `outstanding-issues-audit.md`, and similar review notes
-
-If you promote a finding from one of these documents into product or workflow behavior, update the relevant canonical doc in the same change.
+- audits such as `outstanding-issues-audit.md` and similar review notes
 
 ## Maintenance rules
 
 - Prefer updating an existing canonical doc over creating a near-duplicate.
 - Link every new active doc from this file and the most relevant audience entrypoint.
-- Collapse or delete stale proposal docs once their decisions are absorbed elsewhere.
+- Mark historical proposal docs clearly once their decisions are absorbed elsewhere.
 - Keep evidence logs clearly separate from behavioral guidance.
 - When in doubt, optimize for shorter paths to the right document, not more documentation volume.
-
-## README alignment checklist
-
-When docs structure changes, update all README entrypoints in the same change:
-
-- `../README.md` for repo-level orientation
-- `README.md` (this file) for canonical source mapping
-- `agents/README.md` for agent routing paths
-- `developer/README.md` for external integration paths

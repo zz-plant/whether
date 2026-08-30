@@ -1,214 +1,377 @@
 # Architecture overview
 
-> **Note**: For comprehensive diagrams, detailed module breakdowns, and visual data flows, see [`architecture-improved.md`](./architecture-improved.md). This file serves as a concise reference with essential system boundaries.
+> **Status**: Canonical architecture document for Whether. Describes system boundaries, deterministic pipelines, module responsibilities, and extension points.
 
-Whether (Regime Station) is a Next.js App Router product that turns Treasury macro data into
-operational guidance. The system is organized around a small number of deterministic pipelines:
-fetch/normalize data, score the regime, generate guidance, and render reports.
+---
 
-## One-screen architecture diagram
+## What this system does in plain English
+
+Whether is not a generic macro dashboard.
+
+It pulls in a small set of public market and macro signals, decides what kind of operating environment those signals imply, translates that into practical guidance, and packages the result into a brief that a founder or product leader can read quickly and share with a team.
+
+In simple terms, the product answers four questions:
+
+- What changed this week?
+- What kind of environment are we in?
+- What should we tighten, loosen, or revisit?
+- What can we share in a meeting or Slack without rewriting it from scratch?
+
+The architecture is built around that flow:
+
+**signals → posture → decisions → shareable artifact**
+
+---
+
+## System overview
+
+Whether turns public macro signals into a weekly operating read for startup and product leaders.
+
+The system is not mainly trying to teach macroeconomics. It is trying to help an operator make a faster call about what to do next.
+
+At a high level, the product works like this:
+
+1. Collect market and macro signals.
+2. Turn those signals into a simple read on the current environment.
+3. Map that environment to operating guidance.
+4. Render the result as a brief, decision card, answer page, or export.
+
+The architecture is optimized for **decision transmission**: turning noisy inputs into a recommendation that can be scanned quickly, acted on, and shared with other people.
+
+---
+
+## High-level architecture diagram
+
+This diagram shows the core path through the system. Data comes in, the core logic interprets the environment, report builders shape that interpretation into something presentable, and the app turns it into pages and exports.
+
 ```mermaid
-flowchart LR
-  subgraph Ingestion["1) Ingestion + normalization"]
-    A1["Treasury API + macro sources"] --> A2["treasuryClient.ts\n(snapshot-aware fetch + source metadata)"]
-    A2 --> A3["treasuryNormalizer.ts\ncanonical typed payloads"]
-    A3 --> A4["sensors.ts\ntimestamped readings + derived measures"]
-  end
-
-  subgraph Decisioning["2) Regime + bounded decisioning"]
-    A4 --> B1["regimeEngine.ts\nregime score + constraints"]
-    B1 --> B2["playbook.ts\nposture recommendation"]
-    U1["Operator decision input\n(lifecycle + category + action)"] --> B3["decisionShield.ts\naction + threshold + reversal checks"]
-    B1 --> B3
-  end
-
-  subgraph Artifact["3) Parallel artifact assembly"]
-    B1 --> C1["report/reportData.ts\nreport dataset + trust framing"]
-    B2 --> C1
-    B1 --> C2["summary/* builders\nweekly/monthly/quarterly/yearly structured sections"]
-    B2 --> C2
-    C1 --> C4["app/* routes\nhome brief + signals + operations"]
-    C2 --> C3["app/api/*\nweekly/monthly/quarterly/yearly payloads"]
-    C2 --> C4
-    B3 --> C4
-    C3 --> C5["Transmission artifacts\nSlack-ready copy + meeting citation paths"]
-    C4 --> C5
-  end
-
-  subgraph Resilience["Trust + continuity overlays"]
-    D1["snapshot_fallback.json"] --> A2
-    D2["time_machine_cache.json"] --> C1
-    D3["summary_archive.json"] --> C2
-    D4["report/trustStatus.ts\nfreshness + fallback state"] --> C4
-    D4 --> C3
-  end
+graph TB
+    subgraph "Data Ingestion Layer"
+        A1[Treasury API] -->|Yields + Data| A2[treasuryClient.ts]
+        A3[Macro Sources] -->|Signals| A4[snapshot.ts]
+        A2 --> A5[treasuryNormalizer.ts]
+        A4 --> A5
+        A5 --> A6[sensors.ts]
+    end
+    
+    subgraph "Core Logic Layer"
+        A6 --> B1[regimeEngine.ts]
+        B1 -->|Regime Assessment| B2[playbook.ts]
+        B2 -->|Operating Levers| B3[boundedDecisionRules.ts]
+        B1 -->|Diagnostics| B4[homeBriefModel.ts]
+    end
+    
+    subgraph "Report Assembly Layer"
+        B3 --> C1[homePageAssembler.ts]
+        B4 --> C1
+        B1 --> C2[reportData.ts]
+        C2 --> C3[summary/* builders]
+        C3 --> C4[weekly/monthly/quarterly/yearly]
+    end
+    
+    subgraph "App Layer"
+        C1 --> D1[/app/page.tsx - Weekly Brief]
+        C2 --> D2[/signals - Evidence]
+        C3 --> D3[/answer - Resolve]
+        C4 --> D4[/api/* endpoints]
+    end
+    
+    subgraph "Artifact Layer"
+        D1 --> E1[Weekly Brief UI]
+        D2 --> E2[Signals Explorer]
+        D3 --> E3[Decision Answer Pages]
+        D4 --> E4[API Exports]
+        E1 --> E5[Slack Brief / Board Annex Export]
+        E2 --> E5
+        E3 --> E5
+        E4 --> E5
+    end
+    
+    style B1 fill:#e1f5ff
+    style B2 fill:#e1f5ff
+    style C1 fill:#fff4e6
+    style D1 fill:#fff4e6
 ```
 
-### Decision transmission path (operator view)
+---
+
+## Data flow: Signals → Posture → Decision → Artifact
+
+This is the product's main loop in plain English: gather signals, classify the moment, map that to action, and hand the user something usable.
+
 ```mermaid
-flowchart TD
-  W["What changed this week?"] --> P["Recommended posture"]
-  P --> A["Choose action\n(team decision input)"]
-  A --> D["Decision shield verdict\nsafe/risky/dangerous + reversal trigger"]
-  D --> R["Revisit queue\nwhat to re-open now"]
-  R --> S["Shareable artifact\nAPI/brief/export copy"]
+sequenceDiagram
+    participant D as Data Layer
+    participant E as Regime Engine
+    participant P as Playbook
+    participant H as Home Builder
+    participant A as App Layer
+    
+    D->>E: Treasury + Macro Data
+    Note over E: Score tightness/risk<br/>Classify Regime
+    E->>E: Regime Assessment
+    E->>P: Regime + Thresholds
+    P->>P: Map to Operating Levers
+    P-->>E: Bounded Decision Rules
+    
+    E->>H: Assessment + Rules
+    H->>H: Build Home Brief Model
+    H->>A: WeeklyDecisionCard ViewModel
+    
+    A->>A: Render ReportShell
+    A->>A: Render Decision Card
+    A-->>User: Weekly Brief Artifact
 ```
 
-## Runtime data flow
-1. **Treasury fetch** via `lib/treasury/treasuryClient.ts`, with snapshot fallback and
-   source metadata attached.
-2. **Normalization** in `lib/treasury/treasuryNormalizer.ts` to map API payloads into
-   typed, consistent shapes.
-3. **Sensor construction** in `lib/sensors.ts` (yield curve slope, base rate, macro snapshots)
-   to produce source+timestamp annotated readings.
-4. **Regime scoring** in `lib/regimeEngine.ts`, producing the market climate and constraints.
-5. **Guidance selection** in `lib/playbook.ts` and **action validation** in
-   `lib/decisionShield.ts` for operator decisions.
-6. **Report assembly** in `lib/report/reportData.ts` and summary generators in `lib/summary/*`.
-7. **UI rendering** through `app/` routes (overview, signals, operations) backed by API
-   endpoints under `app/api/*`.
+---
 
-## Core domains and modules
-- **Data acquisition**: `lib/treasury/*`, `lib/macroSnapshot.ts`, `lib/snapshot.ts`.
-- **Scoring + classification**: `lib/regimeEngine.ts`, `lib/thresholds.ts`.
-- **Decision support**: `lib/decisionShield.ts`, `lib/decisionShieldConfig.ts`.
-- **Guidance content**: `lib/playbook.ts`, `data/recommendations.ts`.
-- **Historical analysis**: `lib/timeMachine/*`, `data/time_machine_cache.json`.
-- **Report generation**: `lib/report/*`, `lib/summary/*`.
-- **Navigation + UX framing**: `lib/navigation/*`, `lib/operatorRequests.ts`.
+## Regime classification logic
 
-## Summary structure pipeline (weekly/monthly)
+This is the central compression step in the system. Instead of asking the user to interpret raw macro data directly, Whether converts that data into a smaller set of operating environments.
+
 ```mermaid
-flowchart TD
-  A[Treasury + macro inputs] --> B[Regime assessment
-lib/regimeEngine.ts]
-  B --> C[Structured summary builders
-lib/summary/weeklySummary.ts
-lib/summary/monthlySummary.ts]
-  C --> D[Copy renderer
-(summary.copy derived from structured)]
-  C --> E[/api/weekly + /api/monthly
-structured + provenance + copy/]
-  F[data/summary_archive.json] --> G[parseSummaryArchive
-legacy hydration]
-  G --> C
+graph TD
+    A[Treasury Data] --> B[Compute Base Rate]
+    A --> C[Compute Curve Slope]
+    
+    B --> D[Calculate Tightness Score]
+    C --> E[Calculate Risk Appetite Score]
+    
+    D --> F[Apply Macro Adjustments]
+    E --> F
+    
+    F --> G{Regime Thresholds}
+    G -->|Tightness > 70| H[SCARCITY]
+    G -->|Risk < 50 & Tightness > 50| I[DEFENSIVE]
+    G -->|High Volatility| J[VOLATILE]
+    G -->|Loose Conditions| K[EXPANSION]
+    
+    H --> L[Posture: Burn Discipline]
+    I --> L
+    J --> L
+    K --> L
+    
+    L --> M[Action Strip Items]
+    M --> N[Bounded Decision Rules]
 ```
 
-### Core formulas (deterministic)
-- **Constraint continuity check (weekly vs monthly):**
+### Regime definitions
 
-  $$
-  \text{unchanged} = W \cap M, \quad
-  \text{added} = M \setminus W, \quad
-  \text{removed} = W \setminus M
-  $$
+| Regime | Tightness | Risk Appetite | Plain-English meaning | Default posture |
+|--------|-----------|---------------|-----------------------|-----------------|
+| SCARCITY | > 70 | Any | Capital is expensive and conditions are tight | Tighten aggressively |
+| DEFENSIVE | 50-70 | < 50 | Conditions are not broken, but they do not justify relaxed bets | Preserve capital and be selective |
+| VOLATILE | Any | High variance | Signals are moving around enough that confidence should stay lower | Monitor closely and avoid overcommitting |
+| EXPANSION | < 50 | > 50 | Conditions support more forward movement and investment | Loosen selectively and invest |
 
-- **Summary-hash stability input:**
+---
 
-  \[
-  H = \operatorname{hash}(\{title, summary, regime, regimeLabel, guidance, constraints, recordDateLabel, provenance\})
-  \]
+## Core module breakdown
 
-These formulas keep archive hydration, API output, and UI rendering deterministic across current and historical summaries.
+These modules form the core reasoning path of the product. They matter more than the UI because this is where raw signals become posture, guidance, and final output.
 
-## Caches and snapshots
-- `data/snapshot_fallback.json` provides an offline baseline for the latest Treasury reading.
-- `data/macro_snapshot.json` stores expanded macro signals with explicit sources.
-- `data/time_machine_cache.json` and `data/summary_archive.json` accelerate historical queries
-  and summary generation.
+### `lib/regimeEngine.ts`
 
-## API routes
-Summary APIs live under `app/api/*` and mirror the time horizon they serve:
-- `/api/weekly`, `/api/monthly`, `/api/quarterly`, `/api/yearly`
-  - weekly/monthly payloads expose structured sections plus copy/provenance fields for UI and automation reuse
-- `/api/summary-delta` for change detection
-- `/api/treasury` for direct Treasury-derived data access
+The core classification engine. It takes normalized market inputs and decides what kind of environment the operator is in.
 
-Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and only falls back to hydration when legacy records are encountered.
+**Key Functions:**
+- `evaluateRegime()` — Main scoring function
+- `computeTightnessScore()` — Base rate + curve slope → tightness
+- `computeRiskAppetiteScore()` — Curve slope → risk appetite
+- `applyMacroAdjustments()` — Apply macro signal adjustments
 
-Default brief assembly should stay on the smaller derived history paths: `data/summary_memory_rail_weekly.json` + `lib/summary/weeklyPostureHistory.ts` for the homepage memory rail and `data/summary_monthly_regime_history.json` + `lib/summary/monthlyRegimeHistory.ts` for forecast-history regime points. Keep `lib/summary/summaryArchive.ts` as the canonical full-history loader for advanced `/evidence` historical views and Time Machine playback, not the default path for homepage or forecast assembly.
+**Outputs:**
+```typescript
+{
+  regime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
+  scores: { tightness: number; riskAppetite: number; baseRate?: number; curveSlope?: number | null };
+}
+```
 
-Use `bun run summary-archive:migrate-structured` to materialize `structured` blocks into the checked-in archive and keep runtime hydration as fallback-only behavior.
+### `lib/playbook.ts`
 
-## Prioritized refactor backlog (structured summaries)
-1. **P0 — Centralize copy rendering contracts** ✅ Implemented
-   - Weekly/monthly copy assembly now routes through shared renderer helpers keyed by structured sections.
-   - Implemented in `lib/summary/summaryCopyRenderer.ts` with shared contracts in `lib/summary/summaryTypes.ts`.
-   - Goal: remove formatting drift risk between builders and UI/export surfaces.
-2. **P1 — Formalize archive migration step** ✅ Implemented
-   - Added `scripts/migrateSummaryArchiveStructured.ts` and Bun scripts to materialize `structured` into historical weekly/monthly archive records.
-   - Added `tests/summaryArchiveMigration.test.ts` to prevent regressions where archive entries lose `summary.structured`.
-   - Goal: keep runtime hydration fallback-only and simplify validation paths.
-3. **P1 — Strengthen contract tests at API boundary**
-   - Add route-level tests that assert `/api/weekly` and `/api/monthly` include structured/copy/provenance invariants.
-   - Goal: catch schema regressions before UI consumers break.
-4. **P2 — Normalize section taxonomy across cadences** ✅ Implemented
-   - Monthly structured summaries now include posture, bounded next actions, top reversals, execution constraints, and provenance.
-   - Goal: make cross-cadence tooling simpler.
-5. **P2 — Persist SummaryCard raw-text toggle preference**
-   - Store per-cadence toggle state in local storage.
-   - Goal: improve repeat-operator UX without changing default structured-first behavior.
+Maps each regime to practical operating guidance. This is the layer that turns environmental assessment into advice about how to behave.
 
-## Extension points
-- **New sensors**: add a normalized source in `lib/treasury/*` or `lib/macroSnapshot.ts`, then
-  wire it into `lib/sensors.ts`.
-- **New guidance**: update `data/recommendations.ts` and extend `lib/playbook.ts` mappings.
-- **New report lanes**: add a route under `app/` plus corresponding builders in `lib/report/*`.
+**Key Functions:**
+- `buildPlaybookGuidance()` — Get stop/start/fence guidance for a regime
+- `buildCanonicalBoundedDecisionRules()` — Create threshold-based rules
 
-## Component hierarchy
+**Operating Levers:**
+```typescript
+type OperatingLeverKey = 
+  | "burn-discipline"
+  | "capital-raising"
+  | "expansion-bets"
+  | "hiring"
+  | "product-tempo";
+```
+
+### `lib/report/homeBriefModel.ts`
+
+Builds the main homepage brief model. It combines the regime call, operating guidance, and recent context into a structure the UI can render cleanly.
+
+**Key Functions:**
+- `buildHomeBriefModel()` — Core assembly function
+- `buildWeeklyDecisionCardViewModel()` — UI view model builder
+
+### `lib/report/homePageAssembler.ts`
+
+Composes the full homepage. It coordinates data loading, model assembly, and section-level output so the weekly brief arrives as one coherent page.
+
+**Key Functions:**
+- `assembleHomePage()` — Full page assembly
+- `buildCommandBarPayload()` — Command center data
+
+---
+
+## App layer structure
+
+The app layer delivers the outputs of the reasoning system across the primary workflow routes:
 
 ```
 app/
-├── layout.tsx                    # Global shell (metadata, skip link, header)
-├── page.tsx                      # Homepage (weekly brief)
-│   ├── ReportShell               # Page shell wrapper
-│   │   ├── reportShellHeader     # Header with regime badge + date
-│   │   └── homeBriefSections     # Main brief content
-│   │       ├── HomeWhatChangedSection
-│   │       ├── HomeDecisionSection
-│   │       └── HomeRevisitFlipSection
-│   └── weeklyDecisionCard        # Decision card component
-│       ├── HistorySection
-│       ├── InputInfluenceSection
-│       └── YearAgoComparator
-├── [legacySlug]/                 # Legacy route handling
-├── about/                        # About pages
-├── answers/[slug]/               # Short-form answer pages
-├── decide/[slug]/                # Decision answer pages
-│   ├── clusterRoutes.ts          # Cluster-based routing
-│   └── decisionAnswerPageContent.tsx
-├── concepts/[slug]/              # Concept explainer pages
-├── learn/failure-modes/[slug]    # Failure mode learning
-├── guides/                       # Stage/stakeholder guides
-├── operations/                   # Operations workflow
-│   ├── components/
-│   │   ├── decisionShieldPanel.tsx
-│   │   ├── exportBriefPanel.tsx
-│   │   └── operationsWorkflowProgress.tsx
-├── signals/                      # Signal monitoring
-├── sources/                      # Data source info
-└── mockups/                      # UI testing pages
-
-lib/
-├── report/                       # Report generation
-│   ├── homeBriefModel.ts         # Home page data model
-│   ├── homePageAssembler.ts      # Page composition
-│   ├── decisionKnobs.ts          # Operating levers
-│   ├── boundedDecisionRules.ts   # Threshold-based rules
-│   └── operatingCalls.ts         # Actionable guidance
-├── regimeEngine.ts               # Regime classification
-├── playbook.ts                   # Regime → operations mapping
-└── summary/                      # Summary builders
-    ├── weeklySummary.ts
-    ├── monthlySummary.ts
-    ├── quarterlySummary.ts
-    └── yearlySummary.ts
+├── page.tsx                          # Homepage (Weekly Brief: /)
+├── operate/                          # Plan workflow (/operate)
+│   └── page.tsx                      # 4-step progressive execution stepper
+├── signals/                          # Evidence workflow (/signals)
+│   └── page.tsx                      # Dual-mode sensor array & diagnostics
+├── answer/                           # Resolve workflow (/answer)
+│   └── page.tsx                      # Action-first role translation & toolkits
+├── trust/                            # Trust hub (/trust)
+│   └── page.tsx                      # System status, source board, formula ref
+├── history/                          # Archive & compare (/history)
+│   └── page.tsx                      # Multi-quarter timeline & board annex export
+├── api/                              # JSON, agent, and cadence endpoints
+│   ├── weekly/                       # Weekly summary payload
+│   ├── monthly/                      # Monthly summary payload
+│   ├── agent/                        # Agent-formatted brief API
+│   ├── mcp/                          # MCP streamable-HTTP transport (JSON-RPC)
+│   └── og/                           # Live Open Graph preview generator
+└── components/                       # Shared UI components
+    ├── DecisionHero.tsx              # Primary weekly decision card + shortcuts
+    ├── ThreeWhethersCardClient.tsx   # Bounded decisions with role lens filters
+    ├── ThresholdProximityBar.tsx     # Visual tightening buffer indicator
+    ├── DeveloperQuickAccess.tsx      # Inline MCP/API popover
+    ├── commandPalette.tsx            # Cmd+K palette
+    └── KeyboardShortcuts.tsx         # Global keyboard handlers
 ```
 
-## Client provider placement (global vs scoped)
-- Keep `app/layout.tsx` server-first and limit it to true shell concerns (document metadata, skip link, and shared header).
-- Scope client providers to the smallest route subtree that needs them:
-  - `app/evidence/layout.tsx` wraps only the signals experience with `ToastProviderRoot` because summary-copy toasts are rendered from the time machine summary cards.
-  - `app/operate/layout.tsx` wraps operations routes; `ToastProviderRoot` lives in the root layout because operations panels emit toast notifications.
-- `PremiumFunnelTracker` is the deliberate exception to the scoping rule: it mounts once in `app/layout.tsx`. Premium-intent CTAs now span `/api-docs`, the alerts panel, and the operate panels, and scoping it to one subtree left the acquisition surface (`/`) unmeasured. Mount it in exactly one place — two instances attach two document listeners and double-count every click.
-- Avoid attaching interaction trackers or toast infrastructure to unrelated routes; this reduces client-side work on pages that do not present those interactions.
+---
+
+## API layer
+
+The API layer exposes the same core reasoning in machine-readable form.
+
+### Summary APIs (`/api/*`)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/weekly` | GET | Weekly summary copy + structured fields |
+| `/api/monthly` | GET | Monthly summary with structured output |
+| `/api/quarterly` | GET | Quarterly summary payload |
+| `/api/yearly` | GET | Yearly summary payload |
+| `/api/summary-delta` | GET | Structured diff between cadences |
+
+### Decision & Alert APIs
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/regime-alerts` | GET, POST | Read/create regime alert events |
+| `/api/decision-memory` | GET, POST | List/create decision memory entries |
+| `/api/alert-preferences` | GET, POST | Manage delivery preferences |
+| `/api/decision-events` | GET | Retrieve regime transition events |
+
+### Integration & Agent APIs
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/mcp` | POST | MCP streamable-HTTP transport (JSON-RPC 2.0) |
+| `/api/agent` | GET | Plain JSON weekly posture for LLM context |
+| `/api/integrations/weekly-mandate` | GET | Destination-specific weekly mandate payload |
+| `/brief.md` | GET | Markdown-formatted operator brief |
+| `/api/billing/checkout` | POST | Create Stripe Checkout sessions |
+| `/api/billing/webhook` | POST | Stripe webhook receiver |
+
+---
+
+## Data layer
+
+The data layer uses structured files, live fetchers with fallback caches, and KV persistence.
+
+### Primary data files (`/data/`)
+
+| File | Purpose |
+|------|---------|
+| `macro_snapshot.json` | Current macro indicators with sources |
+| `weekly_summaries_2018_2026.json` | Historical weekly briefs |
+| `monthly_summaries_2012_2025.json` | Monthly summaries |
+| `summary_archive_weekly.json` | Materialized weekly archive |
+| `recommendations.ts` | Playbook insight database |
+
+### Cache & fallback files
+
+| File | Purpose |
+|------|---------|
+| `snapshot_fallback.json` | Offline baseline for latest Treasury reading |
+| `time_machine_cache.json` | Accelerates historical queries |
+
+---
+
+## Summary structure pipeline
+
+```mermaid
+flowchart TD
+    A[Treasury + macro inputs] --> B[Regime assessment<br/>lib/regimeEngine.ts]
+    B --> C[Structured summary builders<br/>lib/summary/weeklySummary.ts<br/>lib/summary/monthlySummary.ts]
+    C --> D[Copy renderer<br/>summary.copy derived from structured]
+    C --> E[/api/weekly + /api/monthly<br/>structured + provenance + copy/]
+    F[data/summary_archive_weekly.json] --> G[parseSummaryArchive<br/>materialized hydration]
+    G --> C
+```
+
+---
+
+## Loop stage module boundaries
+
+Hard lines between data prep, decision logic, and presentation:
+
+### 1) Signals (normalize and readiness)
+- **Owner modules:** `lib/report/reportData.ts`, `lib/fred.ts`, `lib/sensors.ts`
+- **What this layer does:** fetch, clean, and normalize signals; prepare data for downstream scoring
+- **Must not depend on:** React UI modules, route rendering
+
+### 2) Posture + decision derivation
+- **Owner modules:** `lib/report/homeBriefModel.ts`, `lib/report/decisionKnobs.ts`, `lib/report/operatingCalls.ts`, `lib/playbook.ts`
+- **What this layer does:** classify environment, derive posture and bounded rules, produce stable view models
+- **Must not depend on:** React UI modules
+
+### 3) Presentation + artifact transmission
+- **Owner modules:** `app/components/DecisionHero.tsx`, `app/components/ThreeWhethersCardClient.tsx`, `app/operate/components/*`
+- **What this layer does:** render the brief, decision card, and export surfaces; make the output fast to scan, copy, and share
+- **Must not do:** threshold scoring, regime classification
+
+---
+
+## Deployment architecture
+
+```mermaid
+graph LR
+    A[Code] -->|bun run build| B[Vinext Build]
+    B --> C{Deployment Target}
+    C -->|Cloudflare Workers| D[Production Worker]
+    C -->|Local Dev| E[Vinext Vite Server]
+    
+    F[Data Layer] -->|Static JSON / Snapshots| A
+    G[API Routes] -->|Edge Runtime| A
+```
+
+---
+
+## Related documentation
+
+- [`one-screen-weekly-brief-spec.md`](./one-screen-weekly-brief-spec.md) — Weekly brief layout contract
+- [`feature-specs-current.md`](./feature-specs-current.md) — As-built feature specifications
+- [`developer/api-reference.md`](./developer/api-reference.md) — API endpoint contracts
+- [`developer/quickstart.md`](./developer/quickstart.md) — External developer quickstart
+- [`use-cases/operator-playbooks.md`](./use-cases/operator-playbooks.md) — Role-specific operator workflows
