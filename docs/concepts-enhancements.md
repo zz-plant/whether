@@ -1,5 +1,7 @@
 # /concepts enhancement opportunities
 
+> **⚠️ HISTORICAL** — `/concepts` was retired and permanently redirects to `/trust`. See `docs/feature-specs-current.md` §1.6 for the current Trust hub spec.
+
 This note captures product and UX improvements for the `/concepts` timeline and article pages.
 
 ## Quick wins

@@ -75,7 +75,7 @@ These items track the highest-value deltas between current shipped behavior and 
 - [x] Add an executive decision brief block with a single recommendation + risk badge.
 - [x] Add a “what changed since last read” delta panel on Overview with a Time Machine link.
 - [x] Add inline “signal translation” helpers for jargon-heavy metrics.
-- [ ] Promote export/share actions (copy-ready leadership brief) to the Overview header. (See audit.)
+- [x] Promote export/share actions (copy-ready leadership brief) to the Overview header. Shipped: `CopySlackBriefButton` and `PresentModeButton` in `DecisionHero` header (2026-08-29).
 
 ## Milestone 6 — Reliability + Regression Tests (Week 6)
 - [x] Unit tests for:
@@ -112,7 +112,7 @@ These items track the highest-value deltas between current shipped behavior and 
   - [x] Planning memo generator for leadership syncs with copy-ready language.
 
 ## Milestone 9 — Signal Ops + Briefing Pack (Week 9)
-- [ ] Promote export/share actions (copy-ready leadership brief) to the Overview header.
+- [x] Promote export/share actions (copy-ready leadership brief) to the Overview header. Shipped (2026-08-29).
 - [x] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
 - [x] Add regime-shift alerting with reason codes and Time Machine deep links.
 - [x] Add weekly digest output with “what changed” delta summary.
@@ -153,10 +153,10 @@ These items track the highest-value deltas between current shipped behavior and 
 
 ## Acquisition readiness (Reforge)
 Track these items to present Whether as a Reforge-grade operating system.
-- [ ] Executive brief CTA is primary in the Overview header.
-- [ ] Weekly/monthly briefing APIs are stable and copy-ready with citations.
+- [x] Executive brief CTA is primary in the Overview header. Shipped: `CopySlackBriefButton` is the primary hero action (2026-08-29).
+- [x] Weekly/monthly briefing APIs are stable and copy-ready with citations. Shipped: `/api/weekly`, `/api/monthly`, `/brief.md`, and `/api/integrations/weekly-mandate` (2026-08).
 - [ ] Insight Database includes precedent case studies per regime.
 - [ ] Decision Memory logs are immutable and exportable.
 - [ ] Role-based presets ship for CFO/COO/CTO/CPO workflows.
 - [ ] Source health panel surfaces stale or failed data feeds.
-- [ ] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs.
+- [x] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs. Shipped: live FRED fetchers in `lib/fred.ts` (2026-08).

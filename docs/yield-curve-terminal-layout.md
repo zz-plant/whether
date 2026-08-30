@@ -1,5 +1,7 @@
 # Yield Curve Terminal: One-Screen Layout Proposal
 
+> **⚠️ HISTORICAL** — This Bloomberg-style terminal layout was a proposal that was never implemented. The current evidence surface is `/signals` (Evidence). See `docs/feature-specs-current.md` §1.2.
+
 This layout is designed to feel like a Bloomberg-style terminal page while using only:
 
 - **Rates:** `oneMonth`, `threeMonth`, `twoYear`, `tenYear`

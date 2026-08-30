@@ -5,7 +5,9 @@ This document consolidates delivery status across product roadmap audits, known 
 ## Snapshot
 
 - Milestones 5–8 are complete.
+- Milestone 9 (Signal Ops + Briefing Pack) is substantially complete: export/share actions shipped in the hero, briefing pack with Slack/Notion/Linear integrations live, regime-shift alerting live with reason codes. Role-specific alert routing remains open.
 - Summary-system follow-ups are mostly complete; monthly `planningLanguage` parity is now shipped, while broader monthly section expansion remains open.
+- Operator workflow enhancements (2026-08-29): 1-click Slack copy, present mode, threshold proximity bar, developer quick-access, role lens filters, board annex export, command palette actions, calendar ritual integration, and keyboard shortcuts.
 - Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.41` with a repo-local install repair.
 
 ## Product roadmap (milestones 5–8)

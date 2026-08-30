@@ -1,5 +1,7 @@
 # Repo Boundaries
 
+> **⚠️ HISTORICAL** — This document references `content/concepts/*` and other directories that no longer exist. The current architecture is documented in `docs/architecture.md` and `docs/feature-specs-current.md`.
+
 This repo is moving toward three explicit systems:
 
 1. `decision-engine`

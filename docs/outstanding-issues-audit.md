@@ -1,4 +1,4 @@
-# Outstanding issues audit (2026-03-02)
+# Outstanding issues audit (2026-03-02, updated 2026-08-29)
 
 This document reconciles open work tracked in `docs/implementation-status.md` and `ROADMAP.md`.
 It is intentionally **source-bound** (only items that are explicitly unchecked/open in those trackers).
@@ -31,7 +31,7 @@ It is intentionally **source-bound** (only items that are explicitly unchecked/o
 | P2 | Monthly section expansion toward weekly parity | In progress | Output asymmetry for operators across cadences | Monthly `planningLanguage` structured parity shipped; additional section depth planned. |
 | P2 | Decision Memory + Scenario Studio (Milestone 10) | Open | Missing immutable audit trail + scenario planning system | Sequence design spike, then thin-slice implementation. |
 | P2 | Evidence + data reliability expansion (Milestone 11) | In progress | Missing final reliability/evidence layer for operator trust | Core live fetchers and trust panels shipped; fossil record view planned. |
-| P2 | Acquisition readiness checklist | In progress | Signals GTM/readiness commitments are incomplete | Shipped core briefing pack, APIs, and live fetchers; tracking remaining items. |
+| P2 | Acquisition readiness checklist | In progress | Signals GTM/readiness commitments are incomplete | Core briefing pack, APIs, and live fetchers shipped. 2026-08-29: added 1-click Slack copy, present mode, threshold proximity bar, developer quick-access popover, role lens filters, board annex export, command palette actions, calendar ritual integration, keyboard shortcuts, and operator playbook docs. Remaining: public repo, Show HN launch gate, role-specific alert routing. |
 
 ## Duplicate tracking overlaps (resolved)
 

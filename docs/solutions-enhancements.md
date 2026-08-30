@@ -1,5 +1,7 @@
 # /solutions and /solutions/career-paths enhancement opportunities
 
+> **⚠️ HISTORICAL** — `/solutions` was retired and permanently redirects to `/resolve` and `/answer`. See `docs/feature-specs-current.md` §4.1 for the current Decision Tools spec.
+
 This note captures product and UX improvements for the solutions discovery surface and the dedicated career-path workflows.
 
 ## /solutions (hub-level) opportunities

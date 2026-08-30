@@ -127,6 +127,59 @@ decision, flip condition, and core rate context instead of falling back to a gen
 Cold opens into `/` now use a share-card-aligned loading state before the full report resolves, so
 social clicks land on the same action-first artifact structure rather than a generic skeleton.
 
+### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
+The Decision Hero header now embeds four progressive-disclosure operator shortcuts:
+
+- **CopySlackBriefButton** (`app/components/CopySlackBriefButton.tsx`): 1-click clipboard copy of the
+  Slack-formatted weekly brief. Also wired to the `C` keyboard shortcut and command palette
+  (`Cmd+K → Copy Slack brief`). Visual confirmation on success.
+- **PresentModeButton** (`app/components/PresentModeButton.tsx`): fullscreen focus mode for
+  leadership syncs and Zoom meetings. Triggered by the `F` keyboard shortcut or command palette.
+  Strips navigation and secondary chrome so the Decision Hero fills the viewport.
+- **ThresholdProximityBar** (`app/components/ThresholdProximityBar.tsx`): visual tightening buffer
+  indicator (`[████████░░] 14 pts buffer remaining`) replacing buried microtext. Color-coded with
+  emerald (safe) / amber (watch) / rose (near threshold) semantic zones.
+- **DeveloperQuickAccess** (`app/components/DeveloperQuickAccess.tsx`): inline `</> MCP / API`
+  popover chip in the provenance line with 1-click copy for MCP config URL
+  (`https://whether.work/api/mcp`), curl command, and LLM prompt context snippet.
+
+These sit inside the hero's action bar and secondary provenance row, following a routine-first
+hierarchy: the Slack copy button is the primary visible action, while Present, developer access,
+and threshold detail are progressive disclosures.
+
+### 1.1.2 Role lens filter tabs (2026-08-29)
+The Bounded Decisions ledger (`ThreeWhethersCard`) now delegates rendering to
+`ThreeWhethersCardClient` (`app/components/ThreeWhethersCardClient.tsx`), which adds role lens
+filter pills: `All Levers | 🛠️ Engineering | 👥 Hiring | 💰 Runway & Burn`. Selecting a lens
+filters the bounded-decision items to the relevant operating area. The `All Levers` default shows
+all items. Role filtering is client-side only and does not change the underlying data model.
+
+### 1.1.3 Board Governance Annex export (2026-08-29)
+The `/history` page now includes an `ExportBoardAnnexButton`
+(`app/components/history/ExportBoardAnnexButton.tsx`) in the header action bar. One click compiles
+multi-quarter regime history and bounded decisions into an auditable Markdown memo suitable for
+board packets and governance documentation. Also available via `Cmd+K → Export Board Governance Annex`.
+
+### 1.1.4 Command palette and keyboard shortcuts (2026-08-29)
+The command palette (`Cmd+K`) now includes quick actions beyond navigation:
+- `Copy Slack brief` (shortcut: `C`)
+- `Toggle focus / present mode` (shortcut: `F`)
+- `Add Monday calendar reminder`
+- `Export Board Governance Annex`
+- `Agent & MCP setup`
+- `Share brief` (shortcut: `⇧S`)
+- `View history & track record` (shortcut: `H`)
+
+Plus navigation commands for all primary and supporting routes. The `HelpModal` (`?` shortcut)
+documents the full keyboard shortcut set including section navigation (`j`/`k`), route shortcuts
+(`e`/`p`/`h`/`t`/`r`), and the new action shortcuts.
+
+### 1.1.5 Calendar ritual integration (2026-08-29)
+`SubscribeForm` (`app/components/SubscribeForm.tsx`) now offers a Google Calendar Monday Ritual
+Hold option alongside the email subscription. The CTA generates a recurring Monday 9:00 AM calendar
+event with a link back to `https://whether.work`, giving operators a weekly ritual trigger without
+requiring an email subscription.
+
 ### 1.2 Evidence report (/evidence)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

@@ -1,5 +1,7 @@
 # Frontend v2 specification
 
+> **⚠️ HISTORICAL** — This spec proposed `/briefing`, `/playbook`, and `/scenarios` routes that were never built. The app consolidated into `/` (Weekly Brief), `/operate` (Plan), `/signals` (Evidence), `/answer` (Resolve), `/trust`, and `/history`. See `docs/feature-specs-current.md` for the as-built spec.
+
 ## 1) Purpose
 Frontend v2 turns Whether into a workflow-first operating surface for product and engineering leaders.
 
