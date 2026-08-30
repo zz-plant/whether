@@ -141,6 +141,21 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(text, /Flip conditions:\n• Tightness < 65/);
   });
 
+  it("embeds customTeamNote when provided in plain text and Slack blocks", () => {
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "HIGH",
+      customTeamNote: "All-hands update: hold Q3 designer headcount open until Sep 15.",
+    });
+    const text = buildWeeklyOperatorBriefPlainText(payload);
+    const slackJson = buildWeeklyOperatorBriefSlackBlocks(payload);
+
+    assert.match(text, /Team context: All-hands update: hold Q3 designer headcount open until Sep 15\./);
+    assert.match(slackJson, /\*Team Context\*/);
+    assert.match(slackJson, /All-hands update: hold Q3 designer headcount open until Sep 15\./);
+  });
+
 });
 
 

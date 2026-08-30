@@ -26,13 +26,24 @@ export type DecisionAssumptionSnapshot = {
   assumptionLabels?: string[];
 };
 
+export type DecisionDepartment =
+  | "Engineering"
+  | "Sales"
+  | "Product"
+  | "Finance"
+  | "Executive"
+  | "Operations";
+
 export type DecisionMemoryEntry = {
   id: string;
   createdAt: string;
   /** Absent on entries written before snapshots existed; treat as "decision". */
   kind?: DecisionMemoryEntryKind;
+  department?: DecisionDepartment;
+  owner?: string;
   context: {
     clientId: string;
+    teamId?: string;
     recordDate: string;
   };
   /** Absent on posture snapshots. */
@@ -54,6 +65,9 @@ export type DecisionMemoryEntry = {
 
 export type DecisionMemoryPayload = {
   clientId?: string;
+  teamId?: string;
+  department?: DecisionDepartment;
+  owner?: string;
   recordDate: string;
   decision: DecisionInput;
   outcome: Pick<DecisionOutput, "verdict" | "summary" | "guardrail" | "reversalTrigger">;
@@ -63,6 +77,9 @@ export type DecisionMemoryPayload = {
 export type DecisionMemorySnapshotPayload = {
   kind: "posture-snapshot";
   clientId?: string;
+  teamId?: string;
+  department?: DecisionDepartment;
+  owner?: string;
   recordDate: string;
   regime: string;
   /** The weekly operating call, recorded as the entry summary. */
@@ -92,8 +109,11 @@ export const buildDecisionMemoryEntry = (payload: DecisionMemoryPayload): Decisi
     id: newEntryId(),
     createdAt: new Date().toISOString(),
     kind: "decision",
+    department: payload.department,
+    owner: payload.owner,
     context: {
       clientId: payload.clientId ?? "anonymous",
+      teamId: payload.teamId,
       recordDate: payload.recordDate,
     },
     decision: payload.decision,
@@ -134,8 +154,11 @@ export const buildDecisionMemorySnapshotEntry = (
     id: newEntryId(),
     createdAt: new Date().toISOString(),
     kind: "posture-snapshot",
+    department: payload.department,
+    owner: payload.owner,
     context: {
       clientId: payload.clientId ?? "anonymous",
+      teamId: payload.teamId,
       recordDate: payload.recordDate,
     },
     outcome: {
@@ -214,4 +237,58 @@ export const toDecisionMemoryCsv = (entries: DecisionMemoryEntry[]) => {
   ]);
 
   return [header, ...rows].map((row) => row.map((value) => escapeCsvCell(String(value))).join(",")).join("\n");
+};
+
+export type DecisionAssumptionVerdict = "RECONSIDER" | "WATCH" | "STAND";
+
+export type DecisionAssumptionHealthResult = {
+  verdict: DecisionAssumptionVerdict;
+  reason: string;
+  tightnessDelta: number;
+  riskAppetiteDelta: number;
+};
+
+export const evaluateDecisionAssumptionHealth = ({
+  entry,
+  currentTightness,
+  currentRiskAppetite,
+}: {
+  entry: DecisionMemoryEntry;
+  currentTightness: number;
+  currentRiskAppetite: number;
+}): DecisionAssumptionHealthResult => {
+  const baseTightness = entry.assumptions?.tightness
+    ?? (typeof entry.regime.scores.tightness === "number" ? entry.regime.scores.tightness : currentTightness);
+  const baseRiskAppetite = entry.assumptions?.riskAppetite
+    ?? (typeof entry.regime.scores.riskAppetite === "number" ? entry.regime.scores.riskAppetite : currentRiskAppetite);
+
+  const tightnessDelta = currentTightness - baseTightness;
+  const riskAppetiteDelta = currentRiskAppetite - baseRiskAppetite;
+
+  // Significant deterioration: tightness jumped >= 10 points or risk appetite dropped >= 10 points
+  if (tightnessDelta >= 10 || riskAppetiteDelta <= -10) {
+    return {
+      verdict: "RECONSIDER",
+      reason: "Capital conditions and demand expectations have weakened relative to the assumptions recorded when you approved the plan.",
+      tightnessDelta,
+      riskAppetiteDelta,
+    };
+  }
+
+  // Moderate movement: tightness rose 5-9 pts or risk appetite dropped 5-9 pts
+  if (tightnessDelta >= 5 || riskAppetiteDelta <= -5) {
+    return {
+      verdict: "WATCH",
+      reason: "One supporting assumption has deteriorated, but conditions remain inside your original operating range.",
+      tightnessDelta,
+      riskAppetiteDelta,
+    };
+  }
+
+  return {
+    verdict: "STAND",
+    reason: "Macro conditions remain consistent with the assumptions recorded at approval.",
+    tightnessDelta,
+    riskAppetiteDelta,
+  };
 };

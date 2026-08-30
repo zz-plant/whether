@@ -75,6 +75,53 @@
   }
 }
 
+/* Hero card elevation with radiant specular gradient */
+.weather-hero-card {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 60% at 85% 15%, rgba(56, 189, 248, 0.09), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
+    color-mix(in srgb, var(--bg-body) 42%, transparent);
+  border-color: rgba(125, 211, 252, 0.22);
+  box-shadow:
+    var(--elev-3),
+    0 0 32px rgba(56, 189, 248, 0.06),
+    inset 0 1px 0 var(--edge-highlight);
+}
+
+/* Lever decision micro-card for visual rhythm */
+.weather-lever-card {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1rem 1.25rem;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weather-lever-card:hover {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(125, 211, 252, 0.28);
+  transform: translateX(2px);
+}
+
+/* Glow aura for key scores and metric accents */
+.weather-glow-aura {
+  position: relative;
+}
+
+.weather-glow-aura::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* New surface system: typographic hierarchy over container hierarchy.
    Sections replace stacked cards — pure spacing + optional top border.
    Labels replace uppercase kickers with sentence case.
@@ -323,3 +370,68 @@ button .weather-chip:active,
   }
 }
 
+/* Print & PDF optimization --------------------------------------------- */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+  }
+
+  nav,
+  header,
+  footer,
+  aside,
+  button,
+  input,
+  select,
+  details summary,
+  .no-print {
+    display: none !important;
+  }
+
+  .weather-surface,
+  .weather-card,
+  .weather-panel {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: #0f172a !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .type-eyebrow,
+  .type-data,
+  h1, h2, h3, h4, p, span, dt, dd {
+    color: #0f172a !important;
+  }
+
+  .text-slate-400,
+  .text-slate-500,
+  .text-slate-300 {
+    color: #475569 !important;
+  }
+
+  .text-sky-200,
+  .text-sky-400 {
+    color: #0369a1 !important;
+  }
+
+  .text-emerald-300,
+  .text-emerald-400 {
+    color: #047857 !important;
+  }
+
+  .text-amber-300,
+  .text-amber-400 {
+    color: #b45309 !important;
+  }
+
+  .text-rose-300,
+  .text-rose-400 {
+    color: #b91c1c !important;
+  }
+}

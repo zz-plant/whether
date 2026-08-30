@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePersistentClientId } from "../../components/clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
-import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
+import {
+  type DecisionMemoryEntry,
+  evaluateDecisionAssumptionHealth,
+} from "../../../lib/decisionMemory";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { CopyIcon, DownloadIcon } from "../../components/uiIcons";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
@@ -32,7 +35,13 @@ const buildEntryCopyText = (entry: DecisionMemoryEntry) =>
     .filter((line): line is string => line !== null)
     .join("\n");
 
-export const DecisionMemoryPanel = () => {
+export const DecisionMemoryPanel = ({
+  currentTightness,
+  currentRiskAppetite,
+}: {
+  currentTightness?: number;
+  currentRiskAppetite?: number;
+}) => {
   const [entries, setEntries] = useState<DecisionMemoryEntry[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const { copyToClipboard, status, activeTarget, copiedTarget } = useClipboardCopy();
@@ -208,54 +217,79 @@ export const DecisionMemoryPanel = () => {
           </div>
         ) : (
           <div className="mt-6 relative border-l-2 border-slate-800/80 ml-4 pl-6 space-y-8">
-            {entries.slice(0, 8).map((entry) => (
-              <div key={entry.id} className="relative">
-                <div className="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full border-2 border-slate-900 bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
-                
-                <div className="weather-surface p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                        Captured {formatTimestampUTC(entry.createdAt)}
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-slate-100">
-                        {entry.decision
-                          ? `${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`
-                          : "Weekly operating posture"}
-                      </p>
-                      <p className="mt-1 text-xs text-sky-200">
-                        {entry.regime.label} regime
-                        {entry.outcome.verdict ? (
-                          <> · verdict: <span className="font-semibold">{entry.outcome.verdict}</span></>
-                        ) : null}
-                      </p>
+            {entries.slice(0, 8).map((entry) => {
+              const health = currentTightness !== undefined && currentRiskAppetite !== undefined
+                ? evaluateDecisionAssumptionHealth({ entry, currentTightness, currentRiskAppetite })
+                : null;
+
+              const healthBadgeClass =
+                health?.verdict === "RECONSIDER"
+                  ? "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                  : health?.verdict === "WATCH"
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300";
+
+              return (
+                <div key={entry.id} className="relative">
+                  <div className="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full border-2 border-slate-900 bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+                  
+                  <div className="weather-surface p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                            Captured {formatTimestampUTC(entry.createdAt)}
+                          </p>
+                          {health ? (
+                            <span className={`inline-flex items-center rounded border px-2 py-0.5 text-fluid-nano font-semibold tracking-wider ${healthBadgeClass}`}>
+                              {health.verdict}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-2 text-sm font-semibold text-slate-100">
+                          {entry.decision
+                            ? `${entry.decision.lifecycle} · ${entry.decision.category} · ${entry.decision.action}`
+                            : "Weekly operating posture"}
+                        </p>
+                        <p className="mt-1 text-xs text-sky-200">
+                          {entry.regime.label} regime
+                          {entry.outcome.verdict ? (
+                            <> · verdict: <span className="font-semibold">{entry.outcome.verdict}</span></>
+                          ) : null}
+                        </p>
+                      </div>
+                      <ClipboardActionRow
+                        label={<span className="inline-flex items-center gap-1"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy entry</span>}
+                        state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
+                        buttonVariant="pill"
+                        compact
+                        onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}
+                      />
                     </div>
-                    <ClipboardActionRow
-                      label={<span className="inline-flex items-center gap-1"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy entry</span>}
-                      state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
-                      buttonVariant="pill"
-                      compact
-                      onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}
-                    />
-                  </div>
-                  <p className="mt-3 text-sm text-slate-300 break-words leading-relaxed">{entry.outcome.summary}</p>
-                  <div className="mt-4 pt-3 border-t border-slate-800/50 grid gap-2 text-xs">
-                    <p className="text-slate-400"><span className="font-medium text-slate-400">Guardrail:</span> {entry.outcome.guardrail}</p>
-                    <p className="text-slate-400"><span className="font-medium text-slate-400">Reversal:</span> {entry.outcome.reversalTrigger}</p>
-                    {entry.sources.length > 0 && (
-                      <p className="text-slate-400 break-all">
-                        <span className="font-medium">Sources:</span>{" "}
-                        {entry.sources.map((src, i) => (
-                          <a key={src} href={src} target="_blank" rel="noreferrer" className="text-sky-400/80 hover:text-sky-300 hover:underline mr-2">
-                            [{i + 1}]
-                          </a>
-                        ))}
+                    {health?.reason ? (
+                      <p className="mt-2 text-xs text-slate-400 italic">
+                        {health.reason}
                       </p>
-                    )}
+                    ) : null}
+                    <p className="mt-3 text-sm text-slate-300 break-words leading-relaxed">{entry.outcome.summary}</p>
+                    <div className="mt-4 pt-3 border-t border-slate-800/50 grid gap-2 text-xs">
+                      <p className="text-slate-400"><span className="font-medium text-slate-400">Guardrail:</span> {entry.outcome.guardrail}</p>
+                      <p className="text-slate-400"><span className="font-medium text-slate-400">Reversal:</span> {entry.outcome.reversalTrigger}</p>
+                      {entry.sources.length > 0 && (
+                        <p className="text-slate-400 break-all">
+                          <span className="font-medium">Sources:</span>{" "}
+                          {entry.sources.map((src, i) => (
+                            <a key={src} href={src} target="_blank" rel="noreferrer" className="text-sky-400/80 hover:text-sky-300 hover:underline mr-2">
+                              [{i + 1}]
+                            </a>
+                          ))}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

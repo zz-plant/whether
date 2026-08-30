@@ -1,12 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildDecisionMemoryEntry, toDecisionMemoryCsv } from "../lib/decisionMemory";
+import {
+  buildDecisionMemoryEntry,
+  toDecisionMemoryCsv,
+  evaluateDecisionAssumptionHealth,
+} from "../lib/decisionMemory";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 
 describe("decisionMemory", () => {
-  it("builds entries with deduplicated source URLs", () => {
+  it("builds entries with deduplicated source URLs and assigns department, owner, teamId", () => {
     const entry = buildDecisionMemoryEntry({
       clientId: "client-1",
+      teamId: "team-acme",
+      department: "Engineering",
+      owner: "@sarah",
       recordDate: "2026-02-16",
       decision: {
         lifecycle: "GROWTH",
@@ -65,6 +72,9 @@ describe("decisionMemory", () => {
     });
 
     assert.equal(entry.context.clientId, "client-1");
+    assert.equal(entry.context.teamId, "team-acme");
+    assert.equal(entry.department, "Engineering");
+    assert.equal(entry.owner, "@sarah");
     assert.deepEqual(entry.sources, ["https://example.com/treasury", "https://example.com/fred"]);
   });
 
@@ -107,4 +117,60 @@ describe("decisionMemory", () => {
     assert.match(csv, /"SCARCITY"/);
     assert.match(csv, /"https:\/\/example.com\/source"/);
   });
+
+  it("evaluates decision assumption health with RECONSIDER, WATCH, and STAND verdicts", () => {
+    const baseEntry = buildDecisionMemoryEntry({
+      clientId: "client-1",
+      recordDate: "2026-02-16",
+      decision: {
+        lifecycle: "GROWTH",
+        category: "HIRING",
+        action: "HIRE",
+      },
+      outcome: {
+        verdict: "SAFE",
+        summary: "Plan approved under moderate conditions.",
+        guardrail: "Maintain 18m runway buffer.",
+        reversalTrigger: "tightness increases by 10 points",
+      },
+      assessment: {
+        regime: "DEFENSIVE",
+        scores: {
+          tightness: 65,
+          riskAppetite: 55,
+          baseRate: 4.8,
+          curveSlope: 0.1,
+          baseRateUsed: "1M",
+        },
+        thresholds: DEFAULT_THRESHOLDS,
+        inputs: [],
+      },
+    });
+
+    // 1. Unchanged conditions -> STAND
+    const standResult = evaluateDecisionAssumptionHealth({
+      entry: baseEntry,
+      currentTightness: 66,
+      currentRiskAppetite: 54,
+    });
+    assert.equal(standResult.verdict, "STAND");
+
+    // 2. Mild movement (tightness +6) -> WATCH
+    const watchResult = evaluateDecisionAssumptionHealth({
+      entry: baseEntry,
+      currentTightness: 71,
+      currentRiskAppetite: 55,
+    });
+    assert.equal(watchResult.verdict, "WATCH");
+
+    // 3. Significant deterioration (tightness +12, risk appetite -12) -> RECONSIDER
+    const reconsiderResult = evaluateDecisionAssumptionHealth({
+      entry: baseEntry,
+      currentTightness: 77,
+      currentRiskAppetite: 43,
+    });
+    assert.equal(reconsiderResult.verdict, "RECONSIDER");
+    assert.match(reconsiderResult.reason, /Capital conditions and demand expectations have weakened/);
+  });
 });
+

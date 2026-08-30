@@ -15,6 +15,9 @@ import { buildAgentInterfaceResponse, isAgentCadence } from "../agentInterface";
 import { getRegimeContext, getRegimeProjection } from "../report/regimeContext";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { fetchSaaSValuations } from "../saasMultiples";
+import { stressTestDecisionPlan } from "../decisionShield";
+import { getHistoricalAnalogPlaybook } from "../analogPlaybook";
+import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 
 export const MCP_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26"] as const;
 
@@ -144,6 +147,61 @@ const TOOLS: ToolDefinition[] = [
     description: "Available historical data coverage by year and month.",
     inputSchema: { type: "object", properties: {} },
     execute: async () => ({ coverage: getTimeMachineMonthsByYear() }),
+  },
+  {
+    name: "stress_test_plan",
+    title: "Stress-test a planned decision against live macro posture",
+    description:
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against current macro tightness and risk appetite, outputting fragile assumptions, bounded guardrails, and reversal triggers.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        planText: { type: "string", description: "The planned decision or initiative in plain English." },
+        lifecycle: {
+          type: "string",
+          enum: ["DISCOVERY", "GROWTH", "SCALE", "MATURE"],
+          description: "Company lifecycle stage; defaults to GROWTH.",
+        },
+      },
+      required: ["planText"],
+    },
+    execute: async (args) => {
+      const planText = typeof args.planText === "string" ? args.planText : "";
+      if (!planText.trim()) throw new Error("Missing required argument: planText");
+      const lifecycle = (args.lifecycle as any) ?? "GROWTH";
+      const { snapshot } = await loadWeeklyBriefSnapshot();
+      return stressTestDecisionPlan(snapshot.reportData.assessment, { planText, lifecycle });
+    },
+  },
+  {
+    name: "lint_commitment",
+    title: "Lint engineering PRD / RFC / contract specs against live macro constraints",
+    description:
+      "Scans technical specifications or contract terms for fixed capital lock-in (multi-year reservations, high upfront cash commitments) and provides macro-safe reversible alternatives.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        specText: { type: "string", description: "The PRD, RFC, or procurement specification text." },
+      },
+      required: ["specText"],
+    },
+    execute: async (args) => {
+      const specText = typeof args.specText === "string" ? args.specText : "";
+      if (!specText.trim()) throw new Error("Missing required argument: specText");
+      const { snapshot } = await loadWeeklyBriefSnapshot();
+      return stressTestDecisionPlan(snapshot.reportData.assessment, { planText: specText });
+    },
+  },
+  {
+    name: "get_analog_playbook",
+    title: "Get historical analog playbook and consensus trap",
+    description:
+      "Matches current macro conditions against historical analogs (e.g. Q3 2007, Q4 2018, Q2 2022) to return what peer startups got wrong and what winners executed.",
+    inputSchema: { type: "object", properties: {} },
+    execute: async () => {
+      const { snapshot } = await loadWeeklyBriefSnapshot();
+      return getHistoricalAnalogPlaybook(snapshot.reportData.assessment);
+    },
   },
 ];
 

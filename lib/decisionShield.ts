@@ -164,3 +164,209 @@ export const evaluateDecision = (
     reversalTrigger: buildReversalTrigger(assessment),
   };
 };
+
+export interface CompanyFinancialProfile {
+  runwayMonths?: number;
+  cashBalanceUsd?: number;
+  businessModel?: "VC_BACKED" | "BOOTSTRAPPED";
+  grossMarginPct?: number;
+}
+
+export interface PlanStressTestRequest {
+  planText: string;
+  lifecycle?: LifecycleStage;
+  category?: DecisionCategory;
+  companyProfile?: CompanyFinancialProfile;
+}
+
+export interface PlanStressTestResult {
+  verdict: DecisionVerdict;
+  headline: string;
+  detectedCategory: DecisionCategory;
+  detectedAction: DecisionAction;
+  fragileAssumptions: string[];
+  boundedGuardrail: string;
+  reversalTrigger: string;
+  reversibleAlternative: string;
+  financialImpactSummary?: string;
+}
+
+export interface PlanComparisonResult {
+  planA: PlanStressTestResult;
+  planB: PlanStressTestResult;
+  preferredPlan: "A" | "B" | "TIE";
+  comparativeRecommendation: string;
+}
+
+const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): { category: DecisionCategory; action: DecisionAction } => {
+  if (categoryOverride) {
+    if (categoryOverride === "HIRING") return { category: "HIRING", action: "HIRE" };
+    if (categoryOverride === "INFRASTRUCTURE") return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+    if (categoryOverride === "PRICING") return { category: "PRICING", action: "DISCOUNT" };
+    if (categoryOverride === "ROADMAP") return { category: "ROADMAP", action: "REWRITE" };
+    if (categoryOverride === "M_AND_A") return { category: "M_AND_A", action: "ACQUIRE" };
+    if (categoryOverride === "GEOGRAPHIC_EXPANSION") return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
+    return { category: "RESTRUCTURING", action: "RESTRUCTURE" };
+  }
+
+  const lower = text.toLowerCase();
+  if (/\b(hire|hiring|headcount|recruiting|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
+    return { category: "HIRING", action: "HIRE" };
+  }
+  if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+  }
+  if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+  }
+  if (/\b(discount|pricing|price|deal|contract discount|payment term)\b/.test(lower)) {
+    return { category: "PRICING", action: "DISCOUNT" };
+  }
+  if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
+    return { category: "M_AND_A", action: "ACQUIRE" };
+  }
+  if (/\b(rewrite|refactor|architecture|rebuild|v2 migration)\b/.test(lower)) {
+    return { category: "ROADMAP", action: "REWRITE" };
+  }
+  if (/\b(expand|international|europe|asia|new market|geo)\b/.test(lower)) {
+    return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
+  }
+
+  return { category: "HIRING", action: "HIRE" };
+};
+
+export const stressTestDecisionPlan = (
+  assessment: RegimeAssessment,
+  request: PlanStressTestRequest
+): PlanStressTestResult => {
+  const lifecycle = request.lifecycle ?? "GROWTH";
+  const { category, action } = detectCategoryAndAction(request.planText, request.category);
+  const profile = request.companyProfile;
+
+  const baseEvaluation = evaluateDecision(assessment, {
+    lifecycle,
+    category,
+    action,
+    context: request.planText,
+  });
+
+  const { tightness, riskAppetite, baseRate, curveSlope } = assessment.scores;
+  const regimeLabel = REGIME_LABELS[assessment.regime];
+
+  let verdict = baseEvaluation.verdict;
+  const fragileAssumptions: string[] = [];
+  let financialImpactSummary: string | undefined = undefined;
+
+  if (profile) {
+    if (profile.runwayMonths !== undefined && profile.runwayMonths < 12 && (assessment.regime === "DEFENSIVE" || assessment.regime === "SCARCITY")) {
+      verdict = "DANGEROUS";
+      fragileAssumptions.push(
+        `Critical runway constraint: With only ${profile.runwayMonths} months cash buffer, capital markets in ${regimeLabel} severely penalize refinancing.`
+      );
+      financialImpactSummary = `Current runway (${profile.runwayMonths}m) is below the 15-month safe threshold for ${regimeLabel} conditions.`;
+    } else if (profile.businessModel === "BOOTSTRAPPED" && profile.grossMarginPct && profile.grossMarginPct >= 70) {
+      if (verdict === "RISKY") {
+        verdict = "SAFE";
+      }
+      financialImpactSummary = `Bootstrapped profile with high gross margins (${profile.grossMarginPct}%) mitigates external equity market tightness.`;
+    } else if (profile.runwayMonths !== undefined) {
+      financialImpactSummary = `Runway buffer (${profile.runwayMonths}m) evaluated against ${regimeLabel} posture baseline.`;
+    }
+  }
+
+  const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|monthly rolling|on-demand|convertible|short-term|reversible)\b/i.test(request.planText);
+  if (isExplicitlyReversible && verdict === "RISKY") {
+    verdict = "SAFE";
+  }
+
+  if (tightness > 60 && profile?.businessModel !== "BOOTSTRAPPED") {
+    fragileAssumptions.push(
+      `Assumes capital and debt refinancing remain cheap while funding pressure is elevated (${tightness}/100).`
+    );
+  }
+  if (curveSlope !== null && curveSlope < 0) {
+    fragileAssumptions.push(
+      `Assumes steady customer procurement velocity despite inverted yield curve (${curveSlope.toFixed(2)}%), which historically stretches enterprise sales cycles.`
+    );
+  }
+  if (riskAppetite < 50) {
+    fragileAssumptions.push(
+      `Assumes investor and market risk tolerance supports aggressive capital burn (current risk appetite is subdued at ${riskAppetite}/100).`
+    );
+  }
+  if (fragileAssumptions.length === 0) {
+    fragileAssumptions.push(
+      `Macro conditions are relatively accommodative, but monitor sudden Fed base rate shifts above ${baseRate.toFixed(2)}%.`
+    );
+  }
+
+  let reversibleAlternative = "";
+  if (category === "HIRING") {
+    reversibleAlternative =
+      "Cap permanent full-time hiring to 50% of the planned reqs; convert remainder to 6-month contract-to-hire with milestone-gated conversion.";
+  } else if (category === "INFRASTRUCTURE") {
+    reversibleAlternative =
+      "Avoid multi-year upfront reservations; use 6-to-12 month convertible commitments or monthly rolling tiers to preserve liquidity.";
+  } else if (category === "PRICING") {
+    reversibleAlternative =
+      "Condition discounts strictly on 100% annual upfront cash collection to generate non-dilutive working capital.";
+  } else if (category === "ROADMAP") {
+    reversibleAlternative =
+      "Stage the technical refactor in 2-week vertical slices rather than a monolithic multi-month lock-in.";
+  } else {
+    reversibleAlternative =
+      "Structure agreement with 90-day review windows and explicit break clauses tied to quarterly revenue targets.";
+  }
+
+  return {
+    verdict,
+    headline: `${formatDecisionAction(action)} is considered ${verdict} in ${regimeLabel} conditions.`,
+    detectedCategory: category,
+    detectedAction: action,
+    fragileAssumptions,
+    boundedGuardrail: baseEvaluation.guardrail,
+    reversalTrigger: baseEvaluation.reversalTrigger,
+    reversibleAlternative,
+    financialImpactSummary,
+  };
+};
+
+export const compareDecisionPlans = (
+  assessment: RegimeAssessment,
+  planAText: string,
+  planBText: string,
+  companyProfile?: CompanyFinancialProfile
+): PlanComparisonResult => {
+  const planA = stressTestDecisionPlan(assessment, { planText: planAText, companyProfile });
+  const planB = stressTestDecisionPlan(assessment, { planText: planBText, companyProfile });
+
+  const scoreMap: Record<DecisionVerdict, number> = {
+    SAFE: 3,
+    RISKY: 2,
+    DANGEROUS: 1,
+  };
+
+  const scoreA = scoreMap[planA.verdict];
+  const scoreB = scoreMap[planB.verdict];
+
+  let preferredPlan: "A" | "B" | "TIE" = "TIE";
+  let comparativeRecommendation = "";
+
+  if (scoreA > scoreB) {
+    preferredPlan = "A";
+    comparativeRecommendation = `Plan A (${planA.verdict}) carries significantly lower macro risk than Plan B (${planB.verdict}) under current ${REGIME_LABELS[assessment.regime]} posture.`;
+  } else if (scoreB > scoreA) {
+    preferredPlan = "B";
+    comparativeRecommendation = `Plan B (${planB.verdict}) is structurally safer than Plan A (${planA.verdict}) by preserving higher reversibility.`;
+  } else {
+    preferredPlan = "TIE";
+    comparativeRecommendation = `Both plans carry equivalent macro risk profiles (${planA.verdict}). Prioritize the option with shorter commitment duration.`;
+  }
+
+  return {
+    planA,
+    planB,
+    preferredPlan,
+    comparativeRecommendation,
+  };
+};

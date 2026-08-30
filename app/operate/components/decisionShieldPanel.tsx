@@ -15,10 +15,13 @@ import { usePathname, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
   formatDecisionAction,
+  stressTestDecisionPlan,
+  compareDecisionPlans,
   type DecisionAction,
   type DecisionCategory,
   type DecisionOutput,
   type LifecycleStage,
+  type CompanyFinancialProfile,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";

@@ -25,6 +25,7 @@ export type WeeklyOperatorBriefPayload = {
   whyCouldBeWrong: string;
   flipTrigger: string;
   flipConditionLabels: string[];
+  customTeamNote?: string;
 };
 
 export type WeeklyCallSnapshotPayload = {
@@ -59,6 +60,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   canonicalDecisionCopy,
   weeklyCall,
   weeklyLeadershipSummary,
+  customTeamNote,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
@@ -75,6 +77,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     boldnessDelta: number;
     shorthandLine: string;
   };
+  customTeamNote?: string;
 }): WeeklyOperatorBriefPayload => {
   const boldnessBudget = weeklyLeadershipSummary
     ? {
@@ -98,6 +101,7 @@ export const buildWeeklyOperatorBriefPayload = ({
       whyCouldBeWrong: weeklyCall.whyCouldBeWrong,
       flipTrigger: weeklyCall.changeCourseIf,
       flipConditionLabels: weeklyCall.flipConditionLabels,
+      customTeamNote,
     };
   }
 
@@ -163,6 +167,7 @@ export const buildWeeklyOperatorBriefPayload = ({
         : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.",
     flipTrigger: resolvedFlipTrigger,
     flipConditionLabels: resolvedFlipConditionLabels,
+    customTeamNote,
   };
 };
 
@@ -183,6 +188,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     payload.boldnessBudget?.line ? `Budget signal: ${payload.boldnessBudget.line}` : null,
     `Posture: ${payload.regimeStage}`,
     `Confidence: ${payload.confidence}`,
+    payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
     `${publicDecisionLabels.call}: ${payload.currentCall}`,
     `${publicDecisionLabels.action}: ${payload.actionNow}`,
@@ -218,6 +224,17 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],
         },
+        ...(payload.customTeamNote
+          ? [
+              {
+                type: "section",
+                text: {
+                  type: "mrkdwn" as const,
+                  text: `*Team Context*\n${payload.customTeamNote}`,
+                },
+              },
+            ]
+          : []),
         {
           type: "section",
           text: {

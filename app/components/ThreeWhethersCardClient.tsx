@@ -5,11 +5,18 @@ import type { ActionStripItem } from "../../lib/report/operatingCalls";
 import { ACTION_STRIP_DISPLAY_COPY } from "../../lib/report/reportCopy";
 import { BoundedValue } from "./ui/boundedValue";
 
-const STATE_TONE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
-  Closed: "text-semantic-tightening-fg",
-  Guarded: "text-semantic-caution-fg",
-  Staged: "text-semantic-unchanged-fg",
-  Open: "text-semantic-easing-fg",
+const STATE_BADGE_STYLE: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
+  Closed: "bg-rose-500/15 border border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.15)]",
+  Guarded: "bg-amber-500/15 border border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.15)]",
+  Staged: "bg-slate-800/80 border border-slate-700 text-slate-300",
+  Open: "bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]",
+};
+
+const STATE_BORDER_ACCENT: Record<NonNullable<ActionStripItem["currentStateLabel"]>, string> = {
+  Closed: "border-l-rose-500",
+  Guarded: "border-l-amber-500",
+  Staged: "border-l-slate-600",
+  Open: "border-l-emerald-500",
 };
 
 type RoleLens = "all" | "engineering" | "hiring" | "runway";
@@ -58,7 +65,7 @@ export function ThreeWhethersCardClient({
         <div
           role="tablist"
           aria-label="Role lenses"
-          className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/40 p-1"
+          className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/60 p-1 backdrop-blur-sm"
         >
           {LENS_CHIPS.map((chip) => {
             const isSelected = activeLens === chip.key;
@@ -89,45 +96,52 @@ export function ThreeWhethersCardClient({
         </p>
       ) : null}
 
-      <dl className="border-t border-slate-800/60">
-        {decisions.map((item) => (
-          <div
-            key={item.lever}
-            className="grid gap-x-6 gap-y-2 border-b border-slate-800/60 py-4 sm:grid-cols-[minmax(11rem,15rem)_minmax(0,1fr)]"
-          >
-            <div className="min-w-0">
-              <dt className="text-sm font-semibold tracking-tight text-white">{item.label}</dt>
-              {item.currentStateLabel ? (
-                <p className={`mt-1 text-fluid-nano font-semibold ${STATE_TONE[item.currentStateLabel]}`}>
-                  {ACTION_STRIP_DISPLAY_COPY.state[item.currentStateLabel]}
-                </p>
-              ) : null}
-            </div>
+      <dl className="grid gap-3">
+        {decisions.map((item) => {
+          const accentClass = item.currentStateLabel
+            ? STATE_BORDER_ACCENT[item.currentStateLabel]
+            : "border-l-slate-700";
 
-            <dd className="min-w-0 space-y-2">
-              <div className="space-y-1 text-fluid-nano text-slate-300">
-                <p className="flex flex-wrap items-baseline gap-x-2 text-fluid-xs leading-relaxed text-slate-200">
-                  <span className="shrink-0 font-semibold text-slate-400">
-                    {ACTION_STRIP_DISPLAY_COPY.action}:
+          return (
+            <div
+              key={item.lever}
+              className={`weather-lever-card border-l-[3px] ${accentClass} grid gap-x-6 gap-y-3 sm:grid-cols-[minmax(11rem,14rem)_minmax(0,1fr)]`}
+            >
+              <div className="min-w-0 flex sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-2">
+                <dt className="text-sm font-semibold tracking-tight text-white">{item.label}</dt>
+                {item.currentStateLabel ? (
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-fluid-nano font-semibold ${STATE_BADGE_STYLE[item.currentStateLabel]}`}>
+                    <span className="size-1.5 rounded-full bg-current" />
+                    {ACTION_STRIP_DISPLAY_COPY.state[item.currentStateLabel]}
                   </span>
-                  <span>{item.areaActionNow}</span>
-                </p>
-                <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="shrink-0 font-semibold text-semantic-caution-fg">
-                    {ACTION_STRIP_DISPLAY_COPY.threshold}:
-                  </span>
-                  <BoundedValue>{item.triggerThreshold}</BoundedValue>
-                </p>
-                <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="shrink-0 font-semibold text-semantic-easing-fg">
-                    {ACTION_STRIP_DISPLAY_COPY.reversal}:
-                  </span>
-                  <BoundedValue>{item.reversalCondition}</BoundedValue>
-                </p>
+                ) : null}
               </div>
-            </dd>
-          </div>
-        ))}
+
+              <dd className="min-w-0 space-y-2">
+                <div className="space-y-1.5 text-fluid-nano text-slate-300">
+                  <p className="flex flex-wrap items-baseline gap-x-2 text-fluid-xs leading-relaxed text-slate-100 font-medium">
+                    <span className="shrink-0 rounded bg-slate-800/80 px-1.5 py-0.5 text-fluid-nano font-semibold text-slate-300 border border-slate-700/60">
+                      {ACTION_STRIP_DISPLAY_COPY.action}
+                    </span>
+                    <span>{item.areaActionNow}</span>
+                  </p>
+                  <p className="flex flex-wrap items-baseline gap-x-2 text-slate-300">
+                    <span className="shrink-0 rounded bg-amber-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-caution-fg border border-amber-500/25">
+                      {ACTION_STRIP_DISPLAY_COPY.threshold}
+                    </span>
+                    <BoundedValue>{item.triggerThreshold}</BoundedValue>
+                  </p>
+                  <p className="flex flex-wrap items-baseline gap-x-2 text-slate-300">
+                    <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-easing-fg border border-emerald-500/25">
+                      {ACTION_STRIP_DISPLAY_COPY.reversal}
+                    </span>
+                    <BoundedValue>{item.reversalCondition}</BoundedValue>
+                  </p>
+                </div>
+              </dd>
+            </div>
+          );
+        })}
       </dl>
     </section>
   );

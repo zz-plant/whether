@@ -308,7 +308,7 @@ export function DecisionHero({
   );
 
   return (
-    <section className="weather-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
+    <section className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
       {/* Three siblings, not two columns of one. Stacked, the score used to land
           after the whole left column — guardrails, flip watch and all — which put
           it off-screen at 375px, so the call and the number it is scored by never
@@ -343,17 +343,22 @@ export function DecisionHero({
           <section
             data-testid="weekly-top-fold"
             aria-label="What needs reconsideration this week"
-            className={`rounded-lg border px-3 py-2.5 ${
+            className={`rounded-xl border p-3.5 backdrop-blur-sm transition-all ${
               revisitDecisions
-                ? "border-amber-500/35 bg-amber-500/10"
-                : "border-emerald-500/25 bg-emerald-500/[0.06]"
+                ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
+                : "border-emerald-500/30 bg-emerald-500/[0.07] shadow-[0_0_20px_rgba(16,185,129,0.06)]"
             }`}
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-fluid-xs font-semibold text-slate-100">
+              <p className="text-fluid-xs font-semibold text-slate-100 flex items-center gap-1.5">
+                <span className={`inline-block size-2 rounded-full ${revisitDecisions ? "bg-amber-400" : "bg-emerald-400"}`} />
                 What needs reconsideration this week?
               </p>
-              <span className={`shrink-0 text-fluid-nano font-semibold uppercase tracking-[0.08em] ${revisitDecisions ? "text-semantic-caution-fg" : "text-semantic-easing-fg"}`}>
+              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.08em] border ${
+                revisitDecisions
+                  ? "border-amber-500/40 bg-amber-500/20 text-semantic-caution-fg"
+                  : "border-emerald-500/40 bg-emerald-500/20 text-semantic-easing-fg"
+              }`}>
                 {revisitDecisions ? `${revisitQueue.length} need attention` : "No change"}
               </span>
             </div>
@@ -498,8 +503,8 @@ export function DecisionHero({
 
         <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1">
           <SignalWaterfall data={signalData ?? {}} indicators={signalIndicators}>
-            <div className="inline-flex items-baseline justify-center gap-1">
-              <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums">
+            <div className="weather-glow-aura inline-flex items-baseline justify-center gap-1">
+              <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
                 {boldnessScore}
               </span>
               <span className="text-fluid-xs font-semibold text-white/40">/100</span>

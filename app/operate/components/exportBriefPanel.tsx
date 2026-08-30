@@ -20,6 +20,7 @@ import {
   buildWeeklyOperatorBriefPlainText,
   buildWeeklyOperatorBriefSlackBlocks,
 } from "../../../lib/export/weeklyOperatorBrief";
+import { buildStakeholderBriefs, type StakeholderRole } from "../../../lib/export/stakeholderBriefs";
 import { buildExplainerBriefContent } from "../../../lib/export/explainerBrief";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { formatRegimeLabel } from "../../../lib/regimeFormat";
@@ -135,6 +136,7 @@ export const ExportBriefPanel = ({
   const [overrideIndicator, setOverrideIndicator] = useState("");
   const [overrideOwner, setOverrideOwner] = useState("");
   const [overrideReversal, setOverrideReversal] = useState("");
+  const [customTeamNote, setCustomTeamNote] = useState("");
   const fallbackActive = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const hasOverride = [overrideReason, overrideIndicator, overrideOwner, overrideReversal].every(
     (value) => value.trim().length > 0,
@@ -184,7 +186,8 @@ export const ExportBriefPanel = ({
     actionStripItems: decisionModel?.actionStripItems,
     flipConditionLabels: decisionModel?.compactFlipConditionLabels,
     canonicalDecisionCopy: decisionModel?.canonicalDecisionCopy,
-  }), [assessment, treasury, weeklyOperatorDate, decisionModel]);
+    customTeamNote: customTeamNote.trim() ? customTeamNote.trim() : undefined,
+  }), [assessment, treasury, weeklyOperatorDate, decisionModel, customTeamNote]);
   const weeklyOperatorPlainText = useMemo(
     () => buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload),
     [weeklyOperatorPayload],
@@ -195,6 +198,11 @@ export const ExportBriefPanel = ({
   );
   const weeklyOperatorCardText = useMemo(
     () => buildWeeklyOperatorBriefCardText(weeklyOperatorPayload),
+    [weeklyOperatorPayload],
+  );
+  const [activeStakeholderRole, setActiveStakeholderRole] = useState<StakeholderRole>("board");
+  const stakeholderBriefs = useMemo(
+    () => buildStakeholderBriefs(weeklyOperatorPayload),
     [weeklyOperatorPayload],
   );
   const citation = useMemo(
@@ -359,6 +367,19 @@ export const ExportBriefPanel = ({
         <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
           <p className="type-eyebrow text-sky-200">Share-ready brief</p>
           <p className="mt-1 text-fluid-xs text-slate-400">One click copies everything your team needs in a Slack-ready format.</p>
+          <div className="mt-3">
+            <label htmlFor="custom-team-note" className="block text-fluid-xs font-medium text-slate-300">
+              Add note or company context (optional)
+            </label>
+            <input
+              id="custom-team-note"
+              type="text"
+              value={customTeamNote}
+              onChange={(e) => setCustomTeamNote(e.target.value)}
+              placeholder="e.g. All-hands note: holding Q3 hiring open until review"
+              className="mt-1 w-full rounded border border-slate-700 bg-slate-900/90 px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-sky-400 focus:outline-none"
+            />
+          </div>
           <div className="mt-3">
             <ClipboardActionRow
               label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-4 w-4" aria-hidden="true" />Copy share-ready brief</span>}
@@ -538,6 +559,63 @@ export const ExportBriefPanel = ({
             </p>
           </div>
         </details>
+
+        {/* Multi-Stakeholder Transmission Synthesizer */}
+        <div className="weather-surface mt-6 p-5 border border-sky-500/30 bg-slate-900/60 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <p className="type-label text-sky-400 font-semibold">AI Transmission Synthesizer</p>
+              <h4 className="text-base font-bold text-slate-100">
+                1-Click Multi-Stakeholder Briefs
+              </h4>
+              <p className="text-fluid-xs text-slate-400 mt-0.5">
+                One verified macro call synthesized into 5 ready-to-send role perspectives.
+              </p>
+            </div>
+            <ClipboardActionRow
+              label={`Copy ${stakeholderBriefs[activeStakeholderRole].title}`}
+              state={clipboardState(stakeholderBriefs[activeStakeholderRole].title)}
+              disabled={isCopyDisabled(stakeholderBriefs[activeStakeholderRole].title)}
+              buttonVariant="pill"
+              onClick={() => void handleCopy(applyOverride(stakeholderBriefs[activeStakeholderRole].plainText), stakeholderBriefs[activeStakeholderRole].title)}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-1.5 border-b border-slate-800 pb-3 mb-4">
+            {(["board", "engineering", "sales", "allHands", "cfo"] as const).map((role) => {
+              const brief = stakeholderBriefs[role];
+              const isSelected = activeStakeholderRole === role;
+              return (
+                <button
+                  key={role}
+                  type="button"
+                  onClick={() => setActiveStakeholderRole(role)}
+                  className={`rounded-md px-3 py-1.5 text-fluid-micro font-medium transition-all ${
+                    isSelected
+                      ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm font-semibold"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                >
+                  {brief.title}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-fluid-nano text-slate-400 font-semibold uppercase tracking-wider">
+                Recipient: {stakeholderBriefs[activeStakeholderRole].recipientLabel}
+              </span>
+              <span className="text-fluid-nano text-slate-500 font-mono">
+                {stakeholderBriefs[activeStakeholderRole].summaryText}
+              </span>
+            </div>
+            <pre className="text-fluid-xs text-slate-200 font-mono whitespace-pre-wrap leading-relaxed">
+              {applyOverride(stakeholderBriefs[activeStakeholderRole].plainText)}
+            </pre>
+          </div>
+        </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">

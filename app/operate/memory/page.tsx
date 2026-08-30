@@ -95,7 +95,10 @@ export default async function DecisionMemoryPage({
           This audit ledger displays saved operating postures and overrides, stamped with exact macro signals at evaluation time. Use it to maintain governance compliance.
         </p>
         <div id="ops-decision-memory">
-          <DecisionMemoryPanel />
+          <DecisionMemoryPanel
+            currentTightness={assessment.scores.tightness}
+            currentRiskAppetite={assessment.scores.riskAppetite}
+          />
         </div>
         <Suspense fallback={<WorkstreamNavFallback />}>
           <OperationsWorkstreamNav currentPath="/planning/memory" />
