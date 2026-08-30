@@ -43,6 +43,7 @@
     "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
     "archive:index": "bun scripts/generatePostureArchiveIndex.ts",
     "brief:freeze": "bun scripts/freezeWeeklyBrief.ts",
+    "brief:backfill": "bun scripts/backfillPublishedBriefs.ts",
     "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
     "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs",
     "seo:answers:launch-readiness": "bun scripts/seo-answer-launch-readiness.ts",

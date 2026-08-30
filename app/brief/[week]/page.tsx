@@ -14,12 +14,16 @@ import {
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
 import {
+  buildPublishedBriefEmailUpdate,
   buildPublishedBriefPath,
+  buildPublishedBriefSlackUpdate,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
+  labelForArea,
   publishedBriefStaticParams,
   type PublishedBrief,
 } from "../../../lib/report/publishedBriefs";
+import { PublishedBriefCopyControls } from "./publishedBriefCopyControls";
 
 type Params = { week: string };
 
@@ -33,16 +37,6 @@ export const revalidate = false;
 export function generateStaticParams() {
   return publishedBriefStaticParams;
 }
-
-const decisionAreaLabels: Record<string, string> = {
-  hiring: "Hiring",
-  "product-tempo": "Product tempo",
-  "capital-raising": "Capital raising",
-  "burn-discipline": "Burn discipline",
-  "expansion-bets": "Expansion bets",
-};
-
-const labelForArea = (area: string) => decisionAreaLabels[area] ?? area;
 
 const briefTitle = (brief: PublishedBrief) =>
   `${brief.postureLabel}: the operating call for the week of ${brief.recordDateLabel}`;
@@ -86,6 +80,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
+  const slackUpdate = buildPublishedBriefSlackUpdate(brief);
+  const emailUpdate = buildPublishedBriefEmailUpdate(brief);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -152,6 +148,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             </ActionLink>
           </p>
         </header>
+
+        <PublishedBriefCopyControls
+          recordDateLabel={brief.recordDateLabel}
+          slackUpdate={slackUpdate}
+          emailUpdate={emailUpdate}
+          permanentUrl={canonicalUrl}
+        />
 
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>

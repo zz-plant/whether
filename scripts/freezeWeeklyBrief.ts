@@ -56,8 +56,9 @@ if (process.env.GITHUB_OUTPUT) {
 }
 
 const existing = parsePublishedBriefs(JSON.parse(await readFile(OUTPUT_PATH, "utf8")));
+const existingRecord = existing.find((brief) => brief.slug === slug);
 
-if (existing.some((brief) => brief.slug === slug) && !force) {
+if (existingRecord && !force) {
   console.log(`Week ${slug} is already published; leaving it unchanged. Pass --force to overwrite.`);
   process.exit(0);
 }
@@ -66,7 +67,7 @@ const record: PublishedBrief = {
   slug,
   year: isoWeek.year,
   week: isoWeek.week,
-  publishedAt: new Date(recordDate).toISOString(),
+  publishedAt: existingRecord?.publishedAt ?? new Date(recordDate).toISOString(),
   recordDate,
   recordDateLabel: reportData.recordDateLabel,
   headline: `${homeBriefModel.postureWithStageLabel} — week of ${reportData.recordDateLabel}`,
@@ -93,7 +94,7 @@ const record: PublishedBrief = {
   sourceLabel: reportData.treasuryProvenance?.statusLabel ?? "US Treasury via FRED",
   sourceUrl: reportData.treasury.source,
   freshnessLabel: reportData.fetchedAtLabel,
-  correction: null,
+  correction: existingRecord?.correction ?? null,
 };
 
 const next = [...existing.filter((brief) => brief.slug !== slug), record].sort((a, b) =>

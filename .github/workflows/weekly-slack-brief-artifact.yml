@@ -1,11 +1,8 @@
-name: Weekly Slack Brief Artifact
+name: Weekly Brief Refresh & Freeze
 
-# The Monday 13:00 UTC cadence moved to a scheduled Claude Code routine when the account
-# stopped paying for Actions minutes: "Whether — weekly Slack brief refresh",
-# https://claude.ai/code/routines/trig_017b1YkXqvsje8pseMXcUftp
-# The routine cannot upload the artifacts/ text file — Actions artifacts have no equivalent
-# there — so it commits only docs/briefs/latest-weekly-slack-brief.md and treats the text
-# output as a generation check. Run this workflow by hand if you need the uploaded artifact.
+# The Monday 13:00 UTC cadence generates the Slack brief artifact and freezes the same
+# healthy weekly snapshot into data/published_briefs.json in one PR.
+# Refuses degraded snapshots, preserves append-only records, and uploads the handoff artifact.
 on:
   workflow_dispatch:
   workflow_call:
@@ -15,7 +12,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  generate-brief:
+  publish-weekly-brief:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,11 +26,18 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Freeze current week brief
+        id: freeze
+        run: bun run brief:freeze
+
       - name: Generate weekly Slack brief artifact
         run: bun run brief:weekly:artifact
 
       - name: Generate latest weekly Slack brief markdown
         run: bun scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown
+
+      - name: Verify frozen record and export integrity
+        run: bun run test tests/publishedBriefs.test.ts tests/briefPublishGuard.test.ts tests/publishedBriefExport.test.ts
 
       - name: Upload weekly Slack brief artifact
         uses: actions/upload-artifact@v4
@@ -41,27 +45,35 @@ jobs:
           name: weekly-slack-brief
           path: artifacts/weekly-slack-brief.txt
 
-      # No continue-on-error, for the same reason as the sibling automations:
-      # this step fails with "GitHub Actions is not permitted to create or approve
-      # pull requests" while the job reports success, so the committed brief goes
-      # stale with nothing to show for it.
-      - name: Open pull request with latest weekly brief
+      # No continue-on-error: an unmerged week must fail loudly rather than
+      # silently going stale.
+      - name: Open pull request with weekly brief and frozen snapshot
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: automation/weekly-slack-brief
+          branch: automation/weekly-brief-${{ steps.freeze.outputs.slug || 'latest' }}
           delete-branch: true
-          title: "chore: refresh latest weekly Slack brief"
-          commit-message: "chore: refresh latest weekly Slack brief"
+          title: "chore: publish weekly brief and freeze ${{ steps.freeze.outputs.slug }}"
+          commit-message: "chore: publish weekly brief and freeze to permanent dated record"
           body: |
             ## Summary
-            - Regenerates `docs/briefs/latest-weekly-slack-brief.md` from the latest weekly report data.
-            - Keeps the downloadable Slack brief artifact current for operational handoff.
+            - Freezes the current healthy weekly snapshot to `data/published_briefs.json` (`/brief/${{ steps.freeze.outputs.slug }}`).
+            - Regenerates `docs/briefs/latest-weekly-slack-brief.md` for operational Slack and channel handoffs.
+            - Keeps the downloadable Slack brief artifact current.
+
+            ## Review before merging
+            - Posture, thresholds, and evidence are frozen once merged.
+            - The freeze and Slack generation refuse to run on degraded or fallback snapshots.
 
             ## Validation
+            - `bun run brief:freeze`
             - `bun run brief:weekly:artifact`
             - `bun scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown`
+            - `bun run test tests/publishedBriefs.test.ts tests/briefPublishGuard.test.ts tests/publishedBriefExport.test.ts`
           labels: |
             automation
             briefs
+            content
           add-paths: |
+            data/published_briefs.json
             docs/briefs/latest-weekly-slack-brief.md
+

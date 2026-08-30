@@ -7,17 +7,19 @@ import { loadOgFonts } from "../../../lib/image/ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
+import { renderCompareOgImage } from "./compareTemplate";
 import { renderStaticOgImage } from "./staticTemplate";
+import { loadComparePreview } from "../../../lib/image/compareImagePayload";
 import postureTimeline from "../../../data/posture_og_timeline.json";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 
-type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart";
+type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare";
 
 /** Lens templates, i.e. every one that is not data-driven. */
-type StaticOgTemplate = Exclude<OgTemplate, "report" | "brief-chart">;
+type StaticOgTemplate = Exclude<OgTemplate, "report" | "brief-chart" | "compare">;
 
 const regimeKeys = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
@@ -62,6 +64,7 @@ const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
     case "solutions":
     case "guides":
     case "brief-chart":
+    case "compare":
       return template;
     default:
       return "report";
@@ -91,6 +94,20 @@ export async function GET(request: Request) {
       }),
       imageOptions,
     );
+
+    image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
+
+    return image;
+  }
+
+  if (template === "compare") {
+    const preview = await loadComparePreview({
+      yearA: searchParams.get("yearA") ?? undefined,
+      monthA: searchParams.get("monthA") ?? undefined,
+      yearB: searchParams.get("yearB") ?? undefined,
+      monthB: searchParams.get("monthB") ?? undefined,
+    });
+    const image = new ImageResponse(renderCompareOgImage(preview), imageOptions);
 
     image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
 

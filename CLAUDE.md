@@ -38,8 +38,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 | Routine | Cadence (UTC) | Produces |
 | --- | --- | --- |
 | Whether — regime history refresh | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
-| Whether — weekly Slack brief refresh | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md` |
-| Whether — weekly brief freeze | Thu 13:00 | the week appended to `data/published_briefs.json` |
+| Whether — weekly brief refresh & freeze | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md`, `artifacts/weekly-slack-brief.txt`, and current week appended to `data/published_briefs.json` |
 
 The site no longer waits on any of them to show a current month. The Worker cron records the month
 in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), and the read path

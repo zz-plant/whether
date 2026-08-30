@@ -12,6 +12,8 @@
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug } from "../isoWeek";
+import { buildCanonicalUrl } from "../seo";
+import { publicDecisionLabels } from "./reportFormatting";
 
 const PublishedBriefDecisionSchema = z.object({
   area: z.string(),
@@ -149,3 +151,100 @@ export const selectCitablePermalinkBrief = (currentRecordDate: string): Publishe
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
+
+export const decisionAreaLabels: Record<string, string> = {
+  hiring: "Hiring",
+  "product-tempo": "Product tempo",
+  "capital-raising": "Capital raising",
+  "burn-discipline": "Burn discipline",
+  "expansion-bets": "Expansion bets",
+};
+
+export const labelForArea = (area: string) => decisionAreaLabels[area] ?? area;
+
+/**
+ * Generates a date-pinned Slack update constructed strictly from PublishedBrief.
+ * Never fetches live report data or external endpoints.
+ */
+export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string => {
+  const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const decisions = brief.decisions.map((decision) =>
+    [
+      `• ${labelForArea(decision.area)}: ${decision.call}`,
+      `  ${publicDecisionLabels.action}: ${decision.doNow}`,
+      `  ${publicDecisionLabels.threshold}: ${decision.pauseTrigger}`,
+      `  ${publicDecisionLabels.reversal}: ${decision.resumeTrigger}`,
+    ].join("\n"),
+  );
+
+  const evidenceLines = brief.evidence.map((item) => `• ${item.title} — ${item.detail}`);
+
+  return [
+    `Whether Weekly Brief — ${brief.recordDateLabel}`,
+    `Posture: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
+    "",
+    "Summary:",
+    `• ${brief.summary}`,
+    `• What changed: ${brief.whatChanged}`,
+    "",
+    `Bounded decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `• ${publicDecisionLabels.call}: ${brief.summary}`,
+    `• ${publicDecisionLabels.action}: ${brief.actionNow}`,
+    `• ${publicDecisionLabels.threshold}: ${brief.guardrailThreshold}`,
+    `• ${publicDecisionLabels.reversal}: ${brief.flipThreshold}`,
+    ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
+    ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
+    ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
+    "",
+    "Provenance:",
+    `Record date ${brief.recordDateLabel} · ${brief.sourceLabel} · captured ${brief.freshnessLabel}`,
+    ...(brief.sourceUrl ? [`Source: ${brief.sourceUrl}`] : []),
+    "",
+    `Permanent URL: ${permalinkUrl}`,
+  ].join("\n");
+};
+
+/**
+ * Generates a date-pinned Email leadership update constructed strictly from PublishedBrief.
+ * Never fetches live report data or external endpoints.
+ */
+export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string => {
+  const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const decisions = brief.decisions.map((decision) =>
+    [
+      `• ${labelForArea(decision.area)}: ${decision.call}`,
+      `  - Action: ${decision.doNow}`,
+      `  - Pause if: ${decision.pauseTrigger}`,
+      `  - Resume when: ${decision.resumeTrigger}`,
+    ].join("\n"),
+  );
+
+  const evidenceLines = brief.evidence.map((item) => `• ${item.title}: ${item.detail}`);
+
+  return [
+    `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
+    "",
+    `Posture: ${brief.postureLabel}`,
+    `Confidence: ${brief.confidenceLabel} confidence`,
+    `Executive summary: ${brief.summary}`,
+    "",
+    "What changed this week:",
+    brief.whatChanged,
+    "",
+    "Operating call & bounded thresholds:",
+    `• Action now: ${brief.actionNow}`,
+    `• Guardrail threshold: ${brief.guardrailThreshold}`,
+    `• Reversal condition: ${brief.flipThreshold}`,
+    ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
+    ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
+    ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),
+    "",
+    "Provenance & citations:",
+    `• Record date: ${brief.recordDateLabel}`,
+    `• Source: ${brief.sourceLabel}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
+    `• Freshness: ${brief.freshnessLabel}`,
+    "",
+    `Permanent URL: ${permalinkUrl}`,
+  ].join("\n");
+};
+

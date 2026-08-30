@@ -50,18 +50,39 @@ export const renderBriefChartOgImage = ({
 
   return (
     <div style={frameStyle}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <GlyphMotif tone={accent} size={34} />
-        <div style={{ display: "flex", fontSize: 26, fontWeight: 600, letterSpacing: "0.14em", color: OG_TEXT_MUTED }}>
-          WHETHER
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <GlyphMotif tone={accent} size={34} />
+          <div style={{ display: "flex", fontSize: 26, fontWeight: 600, letterSpacing: "0.14em", color: OG_TEXT_MUTED }}>
+            WHETHER
+          </div>
         </div>
+        {weekLabel ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "6px 14px",
+              borderRadius: 6,
+              background: "rgba(56, 189, 248, 0.12)",
+              border: "1px solid rgba(56, 189, 248, 0.3)",
+              fontSize: 16,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: "#38bdf8",
+              textTransform: "uppercase",
+            }}
+          >
+            {`Dated Record · ${weekLabel}`}
+          </div>
+        ) : null}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 24 }}>
         <div style={{ display: "flex", fontSize: 62, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, color: accent, lineHeight: 1.05 }}>
           {posture}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: "#cbd5e1", marginTop: 10 }}>{weekLabel}</div>
+        <div style={{ display: "flex", fontSize: 30, color: "#cbd5e1", marginTop: 10 }}>{weekLabel ? `Week of ${weekLabel}` : "Operating Posture"}</div>
       </div>
 
       <div

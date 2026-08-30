@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import type { Metadata } from "next";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
@@ -64,5 +65,45 @@ describe("hub route social assets", () => {
     });
 
     assert.equal(readFirstImageUrl(metadata), buildSocialImageUrl("/social/answers.svg"));
+  });
+});
+
+/**
+ * Every imagePath that a page points at must resolve to a real file under public/.
+ * This is what historically let a missing history.svg ship as a 404 og:image
+ * while every referenced hub asset still resolved. The test scans the page
+ * sources rather than hand-listing routes, so a new imagePath cannot drift.
+ */
+describe("referenced social assets resolve to files on disk", () => {
+  const referencedPaths = new Set<string>();
+  const collectImagePaths = (dir: string, files: string[]) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const abs = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) collectImagePaths(abs, files);
+      else if (entry.isFile() && /\.tsx?$/.test(entry.name)) files.push(abs);
+    }
+  };
+
+  const pageFiles: string[] = [];
+  collectImagePaths("app", pageFiles);
+
+  for (const file of pageFiles) {
+    const source = readFileSync(file, "utf8");
+    for (const match of source.matchAll(/imagePath:\s*["'`]([^"'`]+)["'`]/g)) {
+      referencedPaths.add(match[1]);
+    }
+  }
+
+  for (const imagePath of [...referencedPaths].sort()) {
+    it(`${imagePath} exists under public/`, () => {
+      assert.ok(
+        existsSync(`public${imagePath}`),
+        `${imagePath} is referenced in page metadata but missing from public/`,
+      );
+    });
+  }
+
+  it("discovered at least one social asset reference", () => {
+    assert.ok(referencedPaths.size > 0, "expected to find imagePath references");
   });
 });

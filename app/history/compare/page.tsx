@@ -9,13 +9,49 @@ import { DateSelector, type DateOption } from "./DateSelector";
 
 export const runtime = "edge";
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "Compare Epochs — Side-by-Side Signal Diffs",
-  description: "Side-by-side comparison of historical macro regimes, boldness scores, and playbook rules.",
-  path: "/history/compare",
-  imageAlt: "Whether historical compare tool",
-  imagePath: "/social/history.svg",
-});
+type CompareSearchParams = {
+  yearA?: string;
+  monthA?: string;
+  yearB?: string;
+  monthB?: string;
+};
+
+const toImageParam = (value: string | undefined) =>
+  value && /^\d+$/.test(value) ? value : undefined;
+
+const buildCompareImageParams = (searchParams?: Partial<CompareSearchParams>) => {
+  const params: Record<string, string> = { template: "compare" };
+  const yearA = toImageParam(searchParams?.yearA);
+  const monthA = toImageParam(searchParams?.monthA);
+  if (yearA && monthA) {
+    params.yearA = yearA;
+    params.monthA = monthA;
+  }
+  const yearB = toImageParam(searchParams?.yearB);
+  const monthB = toImageParam(searchParams?.monthB);
+  if (yearB && monthB) {
+    params.yearB = yearB;
+    params.monthB = monthB;
+  }
+  return params;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<Partial<CompareSearchParams>>;
+}): Promise<Metadata> {
+  const resolved = searchParams ? await searchParams : undefined;
+  const imageParams = buildCompareImageParams(resolved);
+
+  return buildPageMetadata({
+    title: "Compare Epochs — Side-by-Side Signal Diffs",
+    description: "Side-by-side comparison of historical macro regimes, boldness scores, and playbook rules.",
+    path: "/history/compare",
+    imageAlt: "Whether historical epoch comparison",
+    imageParams,
+  });
+}
 
 const getCurveSpread = (yields: any) => {
   if (typeof yields?.tenYear === "number" && typeof yields?.twoYear === "number") {

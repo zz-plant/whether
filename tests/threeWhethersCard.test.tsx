@@ -19,9 +19,9 @@ describe("ThreeWhethersCard", () => {
     const html = renderToStaticMarkup(<ThreeWhethersCard items={[baseItem]} />);
 
     assert.match(html, /What can we do this week\?/);
-    assert.match(html, /Do now:/);
-    assert.match(html, /Stop or tighten if:/);
-    assert.match(html, /Open up again when:/);
+    assert.match(html, />Do now</);
+    assert.match(html, />Stop or tighten if</);
+    assert.match(html, />Open up again when</);
     assert.ok(!html.includes("Canonical rules"));
   });
 

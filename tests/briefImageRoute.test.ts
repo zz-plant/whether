@@ -155,3 +155,24 @@ describe("brief decision card render", () => {
     assert.deepEqual([...new Uint8Array(body.slice(0, 4))], [0x89, 0x50, 0x4e, 0x47]);
   });
 });
+
+describe("brief chart OG template", () => {
+  it("renders a dated record badge and week label when week is provided", async () => {
+    const { renderBriefChartOgImage } = await import("../app/api/og/briefChartTemplate");
+    const chart = renderBriefChartOgImage({
+      posture: "Guarded Expansion — Late",
+      weekLabel: "2026-w31",
+      regime: "EXPANSION",
+      points: [
+        { label: "2026-Q1", regime: "EXPANSION", intensity: 0.8 },
+        { label: "2026-Q2", regime: "EXPANSION", intensity: 0.7 },
+      ],
+    });
+
+    const text = collectText(chart);
+    assert.match(text, /Dated Record · 2026-w31/);
+    assert.match(text, /Week of 2026-w31/);
+    assert.match(text, /Guarded Expansion — Late/);
+  });
+});
+
