@@ -7,7 +7,7 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
 
 1. **Mobile global nav discoverability is weak (content appears clipped, requires hidden horizontal scroll behavior).**
    - **Why it matters:** On first load, primary destinations look truncated rather than intentionally scrollable, which increases wayfinding friction at the top of every page.
-   - **UI evidence:** Mobile captures show only partial visibility of tabs like "Evidence appendix".
+   - **UI evidence:** Mobile captures show only partial visibility of tabs like "Evidence".
    - **Code signals:** The top nav is implemented as a horizontal overflow rail (`overflow-x-auto`, `snap-x`) without an affordance pattern (fade edge, explicit chevron, or progress hint).
    - **Recommendation:** Add explicit horizontal-scroll affordance and active-tab visibility cues; ensure first render makes the pattern self-evident.
 
@@ -22,14 +22,14 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
 | DD-005 | P2 | Consolidate duplicate CTA patterns on primary pages | Product + Frontend | Shipped (2026-08-07) — canonical action on `/`: hero `Copy Brief` is the one-tap primary, header `Export` is the format picker, `StickyCallStrip` is its on-scroll persistence. Duplicate `ShareBriefButton` in `ThreeWhethersCard` removed. All five primary routes then swept for repeated copy/controls — see DD-009. |
 | DD-009 | P2 | Cross-route duplication sweep (`/`, `/signals`, `/operate`, `/answer`, `/trust`) | Frontend | Shipped (2026-08-07) — audited each route for repeated leaf text, repeated headings, and duplicate controls. Fixed: `/trust` disclaimer sentence printed twice in one paragraph; `/trust` Sources card header concatenating the two status labels its own list itemizes; `/signals` per-item boilerplate repeated 3× inside a `.map()`; `/signals` second copy of the short-vs-deep explanation at page end (kept the CTA, dropped the restated rationale); 17× visible "Select to expand or collapse" on glossary rows; `/operate` step label/title/description restated by nested `ReportSection`s and by the checklist. `/operate` 5386→4994px, `/signals` 6398→6200px. Not a defect: `/trust`'s high heading count is glossary content inside a closed `<details>`; `/operate`'s "Raw summary text" duplication is a deliberate copyable artifact behind a disclosure. |
 | DD-006 | P2 | Improve dark-theme secondary text contrast tokens | Design system + Frontend | Shipped (2026-08-11) — system-wide token pass in `app/styles/tokens.css`: `--app-text-muted #94a3b8 → #a7b3c4`, `--app-text-secondary #cbd5e1 → #d7dee8` (574 `text-slate-400/500` call sites alias to these), border alphas 0.065/0.085/0.14 → 0.10/0.13/0.19, surface ladder widened (panel/surface/raised `#13161b`/`#181b21`/`#1f232a`), and a dark-theme floor remapping `text-white/30–55` (the /40 tier measured ~3.7:1, under AA) to the muted role. Light theme verified unaffected. See "Contrast & mobile compression pass (2026-08-11)" in `docs/one-screen-weekly-brief-spec.md`. |
-| DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Shipped (2026-08-11) — canonical labels (Weekly Brief / Evidence / Plan / Resolve / Trust) all derive from `lib/navigation/informationArchitecture.ts`; swept for stragglers and fixed the last two: structured-data description "Evidence appendix" → "Evidence" (`app/signals/evidencePageModel.ts`) and the `/signals` curve-context heading "…the full appendix" → "…the deeper evidence" (matches the page's own Short read / Deeper evidence terms). No user-facing "Signals" labels remain. |
+| DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Shipped (2026-08-11) — canonical labels (Weekly Brief / Evidence / Plan / Resolve / Trust) all derive from `lib/navigation/informationArchitecture.ts`; swept for stragglers and fixed the last two: structured-data description "Evidence" → "Evidence" (`app/signals/evidencePageModel.ts`) and the `/signals` curve-context heading "…the full appendix" → "…the deeper evidence" (matches the page's own Short read / Deeper evidence terms). No user-facing "Signals" labels remain. |
 | DD-008 | P3 | Toolkit search feedback affordances | Frontend | Shipped (2026-08-11) — the audit predates the toolkit library's move into `/answer` (`app/answer/components/toolkitLibraryPanels.tsx`), which already implements the recommendation: result count beside the input, suggested-intent chips, active-query Clear affordance, and an empty state with closest-match and recovery links. Verified live; internal links also updated `/resolve# → /answer#` to skip the 308 redirect hop. |
 
 ## Priority 1 — High leverage
 
 2. **Information architecture drift between intended hub model and surfaced navigation labels/routes.**
    - **Why it matters:** Product framing previously emphasized a retired Command Center (`/start`) and clear layer boundaries, but primary nav currently favors `/` + `/evidence` naming and omits several decision surfaces from top-level navigation.
-   - **UI evidence:** Header hubs are `Weekly Capital Posture Brief`, `Evidence appendix`, `Operations`, `Resources`, `Reference`.
+   - **UI evidence:** Header hubs are `Weekly Capital Posture Brief`, `Evidence`, `Operations`, `Resources`, `Reference`.
    - **Code signals:** `primaryNavigation` defines only the five hubs above, while major user journeys also live in `/evidence`, `/resolve`, `/toolkits`, `/learn`, `/trust`.
    - **Recommendation:** Align global navigation taxonomy with IA boundaries and make the homepage weekly path prominence explicit.
    - **Status (2026-08-02):** Largely resolved. Nav order, labels, next-step cues, and report-shell routes now all derive from `lib/navigation/informationArchitecture.ts`; the desktop header shows all five primary hubs (it previously filtered to Brief + Plan via a stale step list).
@@ -63,7 +63,7 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
 
 7. **Inconsistent naming between "Evidence" and "Signals" concepts across routes and copy.**
    - **Why it matters:** The same conceptual layer is referred to by multiple labels, increasing comprehension cost for returning users.
-   - **Code signals:** Navigation and page-link icon maps include both `Evidence appendix` and `Evidence` labels while route-level user journeys also refer to `/evidence`.
+   - **Code signals:** Navigation and page-link icon maps include both `Evidence` and `Evidence` labels while route-level user journeys also refer to `/evidence`.
    - **Recommendation:** Standardize one user-facing term and map legacy aliases only as redirects/metadata, not visible nav labels.
 
 8. **Search/filter UX on Toolkits is functional but low-feedback.**

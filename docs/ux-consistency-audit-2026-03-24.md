@@ -1,5 +1,7 @@
 # UX Consistency Opportunities (Operations + Method)
 
+> **⚠️ HISTORICAL** — Issues identified here were addressed by IA rationalization and design-debt passes. See `docs/design-debt-prioritized.md` for current status.
+
 Date: 2026-03-24  
 Scope reviewed: `/planning`, `/trust` mobile captures plus shared shell components.
 

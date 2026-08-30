@@ -1,5 +1,7 @@
 # Adoption-Driven Change Plan
 
+> **⚠️ HISTORICAL** — This adoption analysis predates the IA rationalization and feature consolidation shipped in mid-2026. Key decisions are now codified in `AGENTS.md` and `docs/feature-specs-current.md`.
+
 This plan converts the whether.work adoption analysis into concrete repo changes. It maps
 every "sunset candidate," "keep as evidence," and "make the product" item to real files and
 routes so the work can be executed and verified surface by surface.

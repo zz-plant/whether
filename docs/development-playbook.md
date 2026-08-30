@@ -134,7 +134,7 @@ Rule of thumb: product-owned links must always point to canonical routes, and re
 
 ## 11) Noun discipline glossary (primary surfaces)
 
-Use these canon terms across `/` and `/planning` unless a section is explicitly documenting a different semantic layer.
+Use these canon terms across `/` and `/operate` unless a section is explicitly documenting a different semantic layer.
 
 | Surface type | Preferred noun | Meaning | Avoid drift terms |
 | --- | --- | --- | --- |

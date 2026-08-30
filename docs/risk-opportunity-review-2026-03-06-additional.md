@@ -1,5 +1,7 @@
 # Additional risk & opportunity review (10 more items)
 
+> **⚠️ HISTORICAL** — Companion to the 2026-03-06 risk review. All actionable items have been resolved.
+
 This addendum captures 10 **additional** risks/opportunities beyond the first review, with emphasis on decisions that improve weekly operator speed, bounded calls, and shareable artifacts.
 
 ## 1) URL-only threshold overrides can reduce continuity across weekly rituals

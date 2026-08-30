@@ -1,5 +1,7 @@
 # PRD — Next-Level Signal Ops + Decision Memory
 
+> **⚠️ HISTORICAL** — This PRD for Signal Ops and briefing pack features has been superseded. Milestone 9 items are shipped; remaining Milestone 10 work is tracked in `ROADMAP.md`.
+
 ## Summary
 Whether’s next-level release hardens the product into an operator-grade briefing system.
 The focus is on: (1) signal delivery (alerts + digests), (2) executive briefing packs,

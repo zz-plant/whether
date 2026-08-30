@@ -38,7 +38,7 @@ Focus page generation on concrete operator questions that imply an action now, a
 
 Why this works here:
 - It matches existing answer-page semantics and avoids thin SEO pages.
-- It reuses the same decision language operators already see in `/` and `/resolve`.
+- It reuses the same decision language operators already see in `/` and `/answer`.
 
 ### 2) Reuse canonical evidence and trust metadata on every generated page
 
@@ -82,8 +82,8 @@ Use link architecture that moves readers toward action and the canonical weekly 
 
 - Link from each answer page to:
   - the relevant weekly brief section,
-  - the matching `/resolve` role view,
-  - the operational guardrail page in `/planning` when applicable.
+  - the matching `/answer` role view,
+  - the operational guardrail page in `/operate` when applicable.
 - Keep one clear next action CTA above the fold.
 - Avoid unrelated "related articles" grids that diffuse operator intent.
 
@@ -114,11 +114,11 @@ Use this shortlist before creating any additional long-tail pages.
 
 | Cluster | Example query intent | Recommended page/output contract | Primary CTA |
 | --- | --- | --- | --- |
-| Hiring pace | "Should we freeze hiring this quarter?" | Current posture + role-specific action + trigger + reversal condition + citation timestamp | Go to `/planning` hiring guardrails |
+| Hiring pace | "Should we freeze hiring this quarter?" | Current posture + role-specific action + trigger + reversal condition + citation timestamp | Go to `/operate` hiring guardrails |
 | Burn discipline | "How much should we cut burn now?" | Bounded burn action with threshold bands and explicit revisit date | Open weekly brief decision delta on `/` |
-| GTM efficiency | "Should we prioritize efficiency over growth?" | Current efficiency/growth call + threshold that flips posture + what to pause | Go to `/resolve` role lens |
+| GTM efficiency | "Should we prioritize efficiency over growth?" | Current efficiency/growth call + threshold that flips posture + what to pause | Go to `/answer` role lens |
 | Pricing posture | "Can we raise prices in this macro regime?" | Action now + customer risk trigger + rollback condition + source freshness | Copy/share weekly posture artifact |
-| Runway planning | "How many months runway should we target now?" | Target runway band + assumptions + reversal trigger + source confidence | Open operator checklist in `/planning` |
+| Runway planning | "How many months runway should we target now?" | Target runway band + assumptions + reversal trigger + source confidence | Open operator checklist in `/operate` |
 
 Selection rule:
 - Expand a cluster only when it can map to the bounded-decision contract above.
@@ -165,7 +165,7 @@ Ship only when all checks pass:
 2. **Bounded rule:** page contains action, trigger, and reversal condition.
 3. **Trust compactness:** freshness/provenance/confidence/fallback are visible in-line or one click away.
 4. **Artifact readiness:** page has screenshot-safe summary bullets and copyable decision text.
-5. **Canonical progression:** page links to `/` and the relevant `/resolve` or `/planning` destination.
+5. **Canonical progression:** page links to `/` and the relevant `/answer` or `/operate` destination.
 6. **No thin duplication:** page has distinct intent and does not restate nearby content without added decision value.
 
 Failure policy:

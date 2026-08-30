@@ -18,14 +18,14 @@ as supporting layers, deep links, or URL-driven states of `/`:
 - `/history`, `/history/compare`: supporting archive and scrub/playback
 
 Supporting surfaces are intentionally subordinate:
-- `/toolkits` is a supporting instrument library under **Decision Tools**
+- `/toolkits` is a supporting instrument library under **Resolve**
 - `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
 - `/guides`, `/resources/*`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary libraries such as `/guides`, `/toolkits`, `/posture`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
-- `/guides` now acts as a compatibility redirect into query-selected translation states on `/resolve`, so role and stage translation live inside the canonical Decision Tools workflow rather than on a parallel library page.
-- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/resolve`, so toolkit search and browse state live inside the canonical Decision Tools workflow rather than as a standalone library route.
+- `/guides` now acts as a compatibility redirect into query-selected translation states on `/answer`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
+- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/answer`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
 - `/posture` now acts as a compatibility redirect back to the Weekly Brief. Live posture reference no longer ships as a standalone workflow.
 - `/search` now acts as a command-only redirect into the next canonical workflow state instead of rendering its own browse surface.
 - `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
@@ -36,7 +36,7 @@ Supporting surfaces are intentionally subordinate:
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
-Report-shell routes (`/evidence`, `/planning`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
+Report-shell routes (`/signals`, `/operate`, `/answer`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
 Primary navigation now keeps the Weekly Brief as the only primary destination. Plan,
 Evidence, Resolve, and Trust are supporting layers under the brief, reachable from the mobile
 drawer, command palette, and in-flow CTAs (`Build this week's plan`) — never as equal-weight
@@ -104,10 +104,10 @@ engines stay internal (see section 8). The only remaining below-fold company con
 `Your numbers` panel (`CompanyMetricsPanel`) feeding company-adjusted guidance.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
-ownership for `/evidence` and `/trust` instead of reproducing those workflows inline.
+ownership for `/signals` and `/trust` instead of reproducing those workflows inline.
 The shared report shell no longer inserts extra homepage header / command chrome ahead of the weekly card, so the canonical brief remains the first major decision block.
 The planning handoff compresses the weekly action, guardrail, and finance/share summary before
-deeper review in `/planning`. Historical replay now belongs to `/evidence` rather than running as
+deeper review in `/operate`. Historical replay now belongs to `/signals` rather than running as
 an inline home interaction. Role, situation, and toolkit paths are handled as explicit downstream
 surfaces after planning rather than as a parallel home workflow.
 The default post-brief path is now Planning; Evidence and Trust are framed as exception checks when
@@ -118,7 +118,7 @@ The optional `?view=evidence` mode still renders the high-density analytical mat
 labels, embedded threshold context, and restrained accent usage for outlier conditions.
 
 Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
-Route summaries and hero copy favor user-job phrasing over internal product nouns, especially on Evidence, Planning, Decision Tools, and Trust.
+Route summaries and hero copy favor user-job phrasing over internal product nouns, especially on Evidence, Planning, Resolve, and Trust.
 
 Weekly Brief URLs now emit week-specific Open Graph and Twitter preview cards. Shared links for the
 current brief or a historical Time Machine selection preview the selected week’s posture, immediate
@@ -180,7 +180,7 @@ Hold option alongside the email subscription. The CTA generates a recurring Mond
 event with a link back to `https://whether.work`, giving operators a weekly ritual trigger without
 requiring an email subscription.
 
-### 1.2 Evidence report (/evidence)
+### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
 - Macro signal snapshot (CPI, unemployment, BBB spreads)
@@ -192,7 +192,7 @@ Advanced controls remain available for threshold tuning and diagnostics expansio
 replay is no longer treated as an expert-only action.
 The entry sequence now opens with a compact `what this means now` summary before the denser
 diagnostic stack so cold visitors get the operating implication before the appendix depth.
-`/evidence` now also supports two explicit evidence modes:
+`/signals` now also supports two explicit evidence modes:
 - `What this means now` for action-first implication reading and compact scorecards
 - `Evidence detail` for prioritized diagnostics, replay, threshold tuning, and advanced controls
 
@@ -207,7 +207,7 @@ missing. The deeper yield-curve diagnostics now direct-label multi-series lines,
 instead of connecting through missing data, and encode scatterplot recency through a chronological
 path plus a highlighted latest point.
 
-### 1.3 Planning overview (/planning)
+### 1.3 Plan overview (/operate)
 Planning is the detailed execution depth page for the home workspace. The default surface is a
 four-step progressive flow:
 - weekly plan,
@@ -223,14 +223,14 @@ The share step now also houses the operator follow-through surfaces that were pr
 - per-profile alert delivery controls and recent send history,
 - Decision Memory export and latest-entry recall,
 - share artifacts, explainer mode, board/governance repackaging, company-specific exceptions, delivery controls, and audit history in one checkpoint before the brief leaves the room.
-`/planning` now exposes the same mixed-literacy translation model as the Weekly Brief: a
+`/operate` now exposes the same mixed-literacy translation model as the Weekly Brief: a
 top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
 assist panels explain only the planning layer the user needs. The execution stepper itself now shows
 owner, approval state, and `reopen when` metadata on both the active step and collapsed summaries.
 Shared report-shell routes now avoid stacking a separate trust summary panel ahead of the first task block; trust status stays compressed inside the intro layer unless a route explicitly promotes a deeper trust section.
 
 ### 1.4 Planning workstreams
-- **Weekly plan** (`/planning`): the default execution
+- **Weekly plan** (`/operate`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
 
 ### 1.5 Home and glossary support (`/`, `/trust#beginner-glossary`)
@@ -260,9 +260,9 @@ Failure-mode diagnostics are now handled through the Trust and Planning workflow
 ### 1.7 Share-preview assets for canonical hubs
 High-priority hub routes now ship dedicated static SVG social preview assets for:
 - `/posture`
-- `/evidence`
-- `/planning`
-- `/resolve`
+- `/signals`
+- `/operate`
+- `/answer`
 - `/resources`
 - `/startup-macro-posture` and `/startup-macro-posture/index`
 - `/guides`
@@ -270,12 +270,12 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 
 Secondary hubs (`/guides`, `/resources`, `/toolkits`) now lead with immediate value and
 focused next actions while reinforcing their parent workflow hub. `/answers` now redirects directly
-back into the canonical Decision Tools quick-answer path instead of maintaining a separate hub shell.
+back into the canonical Resolve quick-answer path instead of maintaining a separate hub shell.
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/resolve/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/resolve` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
-The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Decision Tools answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
+`/answer/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/answer` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
+The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Resolve answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
@@ -378,13 +378,13 @@ This pilot remains additive at the scoring layer, but refusal is now binding at 
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-Decisions is an active first-class workflow surface in shipped navigation (`/resolve`) with an
+Decisions is an active first-class workflow surface in shipped navigation (`/answer`) with an
 action-first top fold anchored to the live weekly call:
 - one recommended next path derived from the live weekly call,
 - direct-answer and team-translation alternatives at lower visual weight,
 - then ship checklist, Planning handoff, and role/situation browsing below the primary chooser.
 
-`/toolkits` remains available as the supporting instrument library for Decision Tools, but it is no longer treated as a peer primary hub in navigation.
+`/toolkits` remains available as the supporting instrument library for Resolve, but it is no longer treated as a peer primary hub in navigation.
 
 Decision Shield logic/components remain integrated through decision and operations surfaces.
 

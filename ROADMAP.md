@@ -6,23 +6,14 @@ plain‑English operational constraints with traceable sources.
 Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 
 ## Immediate priority backlog (live-gap focused)
-These items track the highest-value deltas between current shipped behavior and desired operator workflow quality.
+All five items shipped as of 2026-08-29.
 
-1. **Promote export/share to the Overview header**
-   - Move leadership brief actions to the top-level report header as a primary CTA.
-   - Success signal: operators can copy or share a briefing from the first screen without scrolling.
-2. **Ship source health panel (stale/failed feed visibility)**
-   - Surface per-source freshness, fallback reasons, and last successful fetch metadata.
-   - Success signal: operators can immediately see whether guidance is live, stale, or degraded.
-3. **Harden API contracts for summary and Signal Ops payloads**
-   - Add contract tests for `/api/weekly`, `/api/monthly`, `/api/regime-alerts`, and `/api/weekly-digest`.
-   - Success signal: schema drift is caught pre-merge for operator and integration consumers.
-4. **Finish historical structured archive materialization**
-   - Persist structured summary fields in archives instead of relying on runtime hydration.
-   - Success signal: historical playback works without dynamic backfill and remains deterministic.
-5. **Consolidate operations IA around live routes**
-   - Remove stale references to non-shipped workstream paths and keep route/docs parity.
-   - Success signal: every nav or roadmap link resolves to a currently shipped page.
+1. ~~**Promote export/share to the Overview header**~~ — Shipped: `CopySlackBriefButton` and `PresentModeButton` in `DecisionHero` header (2026-08-29).
+2. ~~**Ship source health panel (stale/failed feed visibility)**~~ — Shipped: System status and Source board on `/trust` with per-source freshness, fallback reasons, and fetch metadata.
+3. ~~**Harden API contracts for summary and Signal Ops payloads**~~ — Shipped: `tests/apiSummaryContracts.test.ts` and `tests/cliContracts.test.ts` provide contract coverage for `/api/weekly`, `/api/monthly`, alerts, and digest.
+4. ~~**Finish historical structured archive materialization**~~ — Shipped: `lib/summary/summaryArchive.ts` with deterministic regression coverage.
+5. ~~**Consolidate operations IA around live routes**~~ — Shipped: `lib/navigation/informationArchitecture.ts` consolidates live routes (`/`, `/operate`, `/signals`, `/answer`, `/trust`, `/history`).
+
 
 ## Milestone 0 — Repo scaffolding (Week 0)
 - [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
@@ -128,8 +119,8 @@ These items track the highest-value deltas between current shipped behavior and 
 ## Milestone 11 — Evidence + Data Reliability (Week 11)
 - [x] Live macro fetchers for CPI, unemployment, and BBB spreads with source URLs.
 - [ ] Evidence pack upgrades: Insight Database citations and Fossil Record view.
-- [ ] Data freshness health checks with explicit fallback reasons.
-- [ ] Add a “source health” panel that surfaces stale/failed data feeds.
+- [x] Data freshness health checks with explicit fallback reasons. Shipped: freshness timestamps and fallback status on `/trust` Source board.
+- [x] Add a "source health" panel that surfaces stale/failed data feeds. Shipped: System status and Source board on `/trust`.
 
 ---
 
@@ -158,5 +149,5 @@ Track these items to present Whether as a Reforge-grade operating system.
 - [ ] Insight Database includes precedent case studies per regime.
 - [ ] Decision Memory logs are immutable and exportable.
 - [ ] Role-based presets ship for CFO/COO/CTO/CPO workflows.
-- [ ] Source health panel surfaces stale or failed data feeds.
+- [x] Source health panel surfaces stale or failed data feeds. Shipped: System status and Source board on `/trust`.
 - [x] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs. Shipped: live FRED fetchers in `lib/fred.ts` (2026-08).

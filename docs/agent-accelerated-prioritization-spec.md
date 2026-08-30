@@ -1,5 +1,7 @@
 # Agent-accelerated prioritized feature spec
 
+> **⚠️ HISTORICAL** — All Tier 1–3 deliverables in this spec (Decision Delta, One-Screen Brief, Bounded Decisions, Answer Pages, Cite-this-call, Regime History) have shipped. See `docs/feature-specs-current.md` for the as-built spec.
+
 This document converts the requested backlog into an implementation sequence that assumes coding-agent support for delivery speed.
 
 ## Re-baseline (post home-brief hardening)

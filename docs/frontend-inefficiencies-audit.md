@@ -1,5 +1,7 @@
 # Front-end inefficiencies and anti-patterns audit
 
+> **⚠️ HISTORICAL** — Issues identified here were resolved by the Vinext migration (2026-03) and subsequent component refactors. See `docs/implementation-status.md` for the stack modernization record.
+
 Date: 2026-03-12
 Scope: `app/` front-end surfaces
 

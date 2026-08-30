@@ -6,8 +6,8 @@ This backlog tracks the six mobile-first improvements. P0/P1 items are now imple
 
 If we only pick three areas for the next UX/design cycle, prioritize these:
 
-1. **Decision Tools chooser compression**
-   - Why rethink: `/resolve` is clearer than before, but advanced browse paths still compete with the recommended path when a user only needs one next move.
+1. **Resolve chooser compression**
+   - Why rethink: `/answer` is clearer than before, but advanced browse paths still compete with the recommended path when a user only needs one next move.
    - Rethink direction: keep one recommended path primary, keep alternatives secondary, and push the full library behind explicit browse intent.
 
 2. **Planning state board**
@@ -52,7 +52,7 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
    - The strip now also adapts its framing and jump targets to the user’s saved literacy focus so it behaves more like “what changed for me,” not just “what changed globally.”
 
 7. **P0/P1 — Mixed-literacy translation support across core routes** ✅ Implemented
-   - Added a lightweight “what do you need translated?” router on the Weekly Brief and Decision Tools, then extended the same selective-assistance model into Planning.
+   - Added a lightweight “what do you need translated?” router on the Weekly Brief and Resolve, then extended the same selective-assistance model into Planning.
    - Added persisted section-level translation helpers for evidence, decision, trust, and sharing instead of one global beginner mode.
    - Added `Operator brief` and `Explainer brief` share modes so artifact density can match the audience.
    - Split Evidence into `What this means now` and `Evidence detail` so action-first users are not dropped into the full appendix by default.

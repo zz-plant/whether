@@ -1,5 +1,7 @@
 # Policy-spec alignment plan (proposed)
 
+> **⚠️ HISTORICAL** — This proposed a 10-year rolling z-score statistical regime engine that was not adopted. The production engine uses deterministic scoring in `lib/regimeEngine.ts`. See `docs/feature-specs-current.md` §3 for the as-built spec.
+
 This document scopes the implementation work needed to align the current regime engine with the proposed policy specification:
 
 > "A Transparent Mapping From Observable Macro Signals to Firm-Level Decision Parameter Adjustment"

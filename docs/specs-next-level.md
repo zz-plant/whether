@@ -1,5 +1,7 @@
 # Specs — Next-Level Signal Ops + Decision Memory
 
+> **⚠️ HISTORICAL** — Milestone 9 features (alerts, digest, briefing pack) are shipped. Milestone 10 (Decision Memory) is tracked in `ROADMAP.md`. See `docs/feature-specs-current.md` for the as-built spec.
+
 ## 1) Signal Ops
 ### Alert triggers
 - Trigger only on:

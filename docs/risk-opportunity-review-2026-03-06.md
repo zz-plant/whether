@@ -1,5 +1,7 @@
 # Risk & opportunity review (10 items)
 
+> **⚠️ HISTORICAL** — All 10 tracked risks (API tests, archive materialization, route sprawl) have been resolved and shipped. See `docs/outstanding-issues-audit.md`.
+
 This review flags product and engineering risks paired with concrete opportunities to improve decision transmission in the core loop (`signals → posture → decision → artifact`).
 
 ## 1) Route sprawl can dilute the weekly brief as the canonical surface
