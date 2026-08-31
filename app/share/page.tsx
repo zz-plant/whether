@@ -8,7 +8,7 @@ import {
   buildWeeklyOperatorBriefPlainText,
 } from "../../lib/export/weeklyOperatorBrief";
 import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -19,13 +19,31 @@ export const metadata: Metadata = {
 };
 
 const buildCurrentShareArtifact = async () => {
-  const { assessment, treasury, sensors, macroSeries } = await loadReportData();
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/share" });
+  const { assessment, treasury, sensors, macroSeries } = reportData;
+  const exportOptions = {
+    postureWithStageLabel: snapshot.weeklyCall.regimeStage,
+    operatingStanceLine: snapshot.weeklyCall.currentCall,
+    modeledDecision: {
+      postureWithStageLabel: snapshot.weeklyCall.regimeStage,
+      currentCall: snapshot.weeklyCall.currentCall,
+      actionNow: snapshot.weeklyCall.actionNow,
+      guardrailThreshold: snapshot.weeklyCall.pauseIf,
+      reversalTrigger: snapshot.weeklyCall.changeCourseIf,
+    },
+  };
   const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(
-    buildWeeklyOperatorBriefPayload({ assessment, treasury }),
+    buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      weeklyCall: snapshot.weeklyCall,
+    }),
   );
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
-  const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries);
-  const citation = buildCallCitation(assessment, treasury);
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportOptions);
+  const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportOptions);
+  const citation = buildCallCitation(assessment, treasury, {
+    postureWithStageLabel: snapshot.weeklyCall.regimeStage,
+  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,

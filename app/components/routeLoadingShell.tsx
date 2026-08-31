@@ -1,34 +1,26 @@
 import { Skeleton } from "./skeleton";
-import { ReportShell } from "./reportShell";
 
-export function RouteLoadingShell({
-  label = "Weekly brief",
-  description = "Macro conditions translated into operating decisions for leadership teams.",
-  currentPath = "/",
-  pageTitle = "Weekly Brief",
-}: {
+type RouteLoadingShellProps = {
   label?: string;
   description?: string;
   currentPath?: string;
   pageTitle?: string;
-}) {
+};
+
+export function RouteLoadingShell({
+  label = "Weekly brief",
+  description = "Macro conditions translated into operating decisions for leadership teams.",
+  pageTitle = "Weekly Brief",
+}: RouteLoadingShellProps) {
   return (
-    <ReportShell
-      statusLabel={label}
-      regime="NEUTRAL"
-      recordDateLabel="Updating now"
-      fetchedAtLabel="Updating data"
-      treasurySource="fiscaldata.treasury.gov"
-      pageTitle={pageTitle}
-      pageSummary={description}
-      sectionLinks={[]}
-      trustStatusLabel="Update in progress"
-      trustStatusDetail="Evidence checks are in progress."
-      trustStatusAction="Keep this page open while the latest brief is prepared."
-      trustStatusTone="stable"
-      currentPath={currentPath}
-    >
-      <section aria-label="Preparing page" aria-live="polite" aria-busy="true" className="space-y-4">
+    <div className="weather-shell weather-page-enter relative isolate min-h-screen overflow-x-clip text-slate-100">
+      <div className="tv-rail-safe relative z-10 mx-auto w-full max-w-[96rem] px-[var(--weather-shell-pad-inline)] pb-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:pt-4">
+        <section
+          aria-label={`Preparing ${pageTitle}`}
+          aria-live="polite"
+          aria-busy="true"
+          className="mx-auto w-full max-w-[72rem] space-y-4"
+        >
         <div className="flex flex-wrap items-center gap-2 type-eyebrow">
           <span className="rounded-sm border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
           <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
@@ -70,7 +62,9 @@ export function RouteLoadingShell({
             </div>
           ))}
         </div>
-      </section>
-    </ReportShell>
+        <p className="sr-only">{description}</p>
+        </section>
+      </div>
+    </div>
   );
 }
