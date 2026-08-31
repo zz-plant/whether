@@ -31,6 +31,23 @@ export type BoundedDecisionRule = {
 
 export type StartupVariantMode = "seed" | "series-a" | "series-b" | "growth" | "public" | "bootstrapped";
 
+const VALID_STARTUP_VARIANT_MODES = new Set<string>([
+  "seed",
+  "series-a",
+  "series-b",
+  "growth",
+  "public",
+  "bootstrapped",
+]);
+
+export const isStartupVariantMode = (value: unknown): value is StartupVariantMode =>
+  typeof value === "string" && VALID_STARTUP_VARIANT_MODES.has(value);
+
+export const resolveStartupVariantMode = (
+  value: string | null | undefined,
+  fallback: StartupVariantMode = "series-a",
+): StartupVariantMode => (isStartupVariantMode(value) ? value : fallback);
+
 export type ScopedVariantDecisionAdjustment = {
   mode: StartupVariantMode;
   label: string;

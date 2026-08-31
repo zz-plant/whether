@@ -12,6 +12,7 @@ import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
+import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
 import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
@@ -153,6 +154,7 @@ async function PageContent({
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
+  const activeStage = homepage.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode;
 
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
@@ -303,6 +305,12 @@ async function PageContent({
               noChangeAreas={noChangeAreas}
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
               signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
+              activeStage={activeStage}
+            />
+
+            <DecisionPlanStressTester
+              assessment={reportData.assessment}
+              recordDate={homepage.reportShell.recordDateLabel}
             />
 
             <ThreeWhethersCard

@@ -2,6 +2,21 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { buildHomeBriefModel } from "./homeBriefModel";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import { buildFlipConditionsWithoutTriggerDuplication } from "./canonicalDecisionCopy";
+import {
+  buildScopedVariantDecisionAdjustment,
+  startupVariantModes,
+  type StartupVariantMode,
+} from "./boundedDecisionRules";
+
+export type StageScopedAdjustment = {
+  mode: StartupVariantMode;
+  label: string;
+  actionNow: string;
+  pauseIf: string;
+  changeCourseIf: string;
+  doNowBullets: string[];
+  thresholdEmphasis: string;
+};
 
 export type WeeklyCallContract = {
   regimeStage: string;
@@ -14,6 +29,7 @@ export type WeeklyCallContract = {
   whyCouldBeWrong: string;
   policyOverrideActive: boolean;
   policyOverrideReason: string | null;
+  stageScopedAdjustments?: Record<StartupVariantMode, StageScopedAdjustment>;
 };
 
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
@@ -55,10 +71,12 @@ export const buildWeeklyCallContract = ({
   assessment,
   homeBriefModel,
   canonicalDecisionCopy,
+  startupVariantMode,
 }: {
   assessment: RegimeAssessment;
   homeBriefModel: HomeBriefModel;
   canonicalDecisionCopy?: CanonicalDecisionCopy | null;
+  startupVariantMode?: StartupVariantMode;
 }): WeeklyCallContract => {
   const actionStripItems = homeBriefModel.actionStripItems ?? [];
   const policyOverrideActive = assessment.policyAssessment.refusal.refused;
@@ -88,20 +106,57 @@ export const buildWeeklyCallContract = ({
     ?? homeBriefModel.compactFlipConditionLabels[0]
     ?? FALLBACK_CHANGE_COURSE_IF;
 
+  // Build stage-scoped adjustment copy for every stage up front. These swap the
+  // brief's decision bullets per selected stage; the macro regime call stays
+  // stage-agnostic. Only the selected stage's copy feeds the primary contract.
+  const buildStageAdjustment = (mode: StartupVariantMode, label: string): StageScopedAdjustment => {
+    const adj = buildScopedVariantDecisionAdjustment({
+      mode,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+    });
+    return {
+      mode,
+      label,
+      actionNow: adj.doNowAdjustments[0] ?? FALLBACK_CURRENT_CALL,
+      pauseIf: adj.watchAdjustments[0] ?? FALLBACK_PAUSE_IF,
+      changeCourseIf: adj.reversalTriggerDiscipline ?? FALLBACK_CHANGE_COURSE_IF,
+      doNowBullets: dedupeLines([...adj.doNowAdjustments, ...adj.avoidAdjustments], 3),
+      thresholdEmphasis: adj.thresholdEmphasis,
+    };
+  };
+  const stageScopedAdjustments: Record<StartupVariantMode, StageScopedAdjustment> = {
+    seed: buildStageAdjustment("seed", "Seed"),
+    "series-a": buildStageAdjustment("series-a", "Series A"),
+    "series-b": buildStageAdjustment("series-b", "Series B"),
+    growth: buildStageAdjustment("growth", "Growth"),
+    public: buildStageAdjustment("public", "Public"),
+    bootstrapped: buildStageAdjustment("bootstrapped", "Bootstrapped"),
+  };
+
+  // Stage-scoped scaling: when an operator has picked a startup stage, swap the
+  // brief's decision bullets for that stage's calibrated language while keeping
+  // the macro regime call itself stage-agnostic. The adjustment lives on the
+  // same contract and only changes what an operator can act on, not the signals.
+  const stageAdj = startupVariantMode
+    ? stageScopedAdjustments[startupVariantMode] ?? stageScopedAdjustments["series-a"]
+    : undefined;
+
   const currentCall = policyOverrideActive
     ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
     : defaultCurrentCall;
   const actionNow = policyOverrideActive
     ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
-    : defaultActionNow;
+    : stageAdj?.actionNow ?? defaultActionNow;
   const pauseIf = policyOverrideActive
     ? "Pause irreversible approvals while the policy override remains active."
-    : defaultPauseIf;
+    : stageAdj?.pauseIf ?? defaultPauseIf;
   const changeCourseIf = policyOverrideActive
     ? "Resume normal posture changes only after policy disagreement clears and the weekly flip thresholds recover."
-    : defaultChangeCourseIf;
+    : stageAdj?.changeCourseIf ?? defaultChangeCourseIf;
   const doNowBullets = policyOverrideActive
     ? dedupeLines([actionNow, ...buildPolicyOverrideActionLines(assessment)], 3)
+    : stageAdj?.doNowBullets ? dedupeLines(stageAdj.doNowBullets, 3)
     : dedupeLines(
         canonicalDecisionCopy?.doNowLines.length
           ? canonicalDecisionCopy.doNowLines
@@ -146,5 +201,6 @@ export const buildWeeklyCallContract = ({
     whyCouldBeWrong,
     policyOverrideActive,
     policyOverrideReason,
+    stageScopedAdjustments,
   };
 };

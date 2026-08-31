@@ -1,0 +1,49 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getOperatingSnapshotStore } from "../../../../lib/operatingState/snapshotStore";
+import { loadCanonicalReportInputs } from "../../../../lib/ingestion/materialized";
+import { buildOperatingSnapshot } from "../../../../lib/operatingState/snapshot";
+import {
+  extractMeetingSlidePayload,
+  formatMeetingSlideSvg,
+} from "../../../../lib/export/meetingSlideExport";
+import {
+  isStartupVariantMode,
+  type StartupVariantMode,
+} from "../../../../lib/report/boundedDecisionRules";
+
+export const runtime = "edge";
+export const revalidate = 3600;
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const rawStage = searchParams.get("stage") ?? "seed";
+  const stage: StartupVariantMode = isStartupVariantMode(rawStage) ? rawStage : "seed";
+
+  const store = getOperatingSnapshotStore();
+  let snapshot = await store.readLatest();
+
+  if (!snapshot) {
+    const inputs = await loadCanonicalReportInputs({ refresh: "none" });
+    if (inputs) {
+      snapshot = buildOperatingSnapshot({
+        treasury: inputs.treasury,
+        macroSeries: inputs.macroSeries,
+      });
+    }
+  }
+
+  if (!snapshot) {
+    return new NextResponse("Operating snapshot unavailable", { status: 503 });
+  }
+
+  const payload = extractMeetingSlidePayload(snapshot, stage);
+  const svg = formatMeetingSlideSvg(payload);
+
+  return new NextResponse(svg, {
+    status: 200,
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
+}

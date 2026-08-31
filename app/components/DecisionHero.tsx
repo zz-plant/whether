@@ -22,10 +22,14 @@ import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopySlackBriefButton } from "./CopySlackBriefButton";
+import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { PresentModeButton } from "./PresentModeButton";
+import type { MeetingSlidePayload } from "../../lib/export/meetingSlideExport";
 import { ThresholdProximityBar } from "./ThresholdProximityBar";
 import { DeveloperQuickAccess } from "./DeveloperQuickAccess";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
+import { StagePersonaSelector } from "./StagePersonaSelector";
+import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 
 type Props = {
   tightness: number;
@@ -68,6 +72,7 @@ type Props = {
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
   /** Server-resolved from `?why=1`, so a shared link opens on the same panel. */
   signalBreakdownOpen?: boolean;
+  activeStage?: StartupVariantMode;
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -114,6 +119,7 @@ export function DecisionHero({
   thresholdBusinessConsequence,
   signalBreakdownOpen = false,
   signalData,
+  activeStage = "series-a",
 }: Props) {
   const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
@@ -315,24 +321,25 @@ export function DecisionHero({
           shared a viewport. Mobile orders them call → score → detail; sm+ restores
           the original two-column grid with the score spanning both rows. */}
       <div className="flex flex-col gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
-        <div className="order-1 min-w-0 space-y-1 sm:col-start-1 sm:row-start-1">
-          <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
-          <h2
-            id="weekly-call-title"
-            className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
-          >
-            {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
-          </h2>
-          {/* Sits with the call it describes, and fills the space the score block
-              opens beside a two-line headline. On a flat week the delta reads "no
-              change vs last week", which the score states next to the number it
-              describes; the direction word alone carries it here. */}
-          <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>
-            {boldnessDelta === 0
-              ? DIRECTION_LABEL[signalDirection]
-              : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
-          </p>
-        </div>
+          <div className="order-1 min-w-0 space-y-1 sm:col-start-1 sm:row-start-1">
+            <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>Weekly operating call</p>
+            <h2
+              id="weekly-call-title"
+              className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
+            >
+              {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
+            </h2>
+            {/* Sits with the call it describes, and fills the space the score block
+                opens beside a two-line headline. On a flat week the delta reads "no
+                change vs last week", which the score states next to the number it
+                describes; the direction word alone carries it here. */}
+            <p className={`text-fluid-xs font-medium ${DIRECTION_COLOR[signalDirection]}`}>
+              {boldnessDelta === 0
+                ? DIRECTION_LABEL[signalDirection]
+                : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
+            </p>
+            <StagePersonaSelector activeStage={activeStage} className="pt-1.5" />
+          </div>
 
         <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-span-2 sm:col-start-1 sm:row-start-2">
           {showActionNow ? (
@@ -456,6 +463,20 @@ export function DecisionHero({
               guardrail={guardrail}
               reversalTrigger={reversalTrigger}
               lines={shareLines}
+            />
+            <CopyMeetingSlideButton
+              payload={{
+                recordDate,
+                regime: regimeDisplay,
+                stageLabel: "Startup",
+                actionNow: actionNow ?? weeklyCall ?? postureLabel,
+                pauseIf: guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
+                changeCourseIf: reversalTrigger ?? "Resume staged approvals when conditions ease.",
+                tightness,
+                riskAppetite: riskAppetite ?? 50,
+                confidence: confidenceLabel ?? "MED",
+                provenance: treasurySource ?? "U.S. Treasury",
+              }}
             />
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <DecisionMemoryButton

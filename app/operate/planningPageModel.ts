@@ -309,7 +309,9 @@ export async function buildPlanningPageModel(
       h("p", { className: "rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400" },
         "This page turns the weekly call from the ",
         h(Link, { href: "/", className: "font-semibold text-sky-200 hover:text-sky-100" }, "homepage brief"),
-        " into a plan with guardrails, finance direction, and share-ready formats.",
+        " into a plan with guardrails, finance direction, and share-ready formats. Red-team a specific hire, pricing, or infra move under ",
+        h(Link, { href: "#ops-decision-shield", className: "font-semibold text-sky-200 hover:text-sky-100" }, "Test a decision"),
+        ".",
       ),
       !historicalSelection && isFallback
         ? h(LiveDataFallbackAlert, {

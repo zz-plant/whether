@@ -221,6 +221,8 @@ export default function RootLayout({
               ))}
             </nav>
             <nav aria-label="Tools and reference" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
+              <Link href="/comps" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">SaaS Multiples</Link>
+              <Link href="/history/compare" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Macro Analogs</Link>
               <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Framework</Link>
               <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Template</Link>
               <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Search</Link>

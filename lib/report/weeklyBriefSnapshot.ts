@@ -10,6 +10,7 @@ import { buildTrustStatus } from "./trustStatus";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 import type { OperatorContext } from "./operatorContext";
+import type { StartupVariantMode } from "./boundedDecisionRules";
 
 export type WeeklyBriefSnapshot = {
   reportData: ReportData | ReportDataFallback;
@@ -39,6 +40,7 @@ type BuildWeeklyBriefSnapshotArgs = {
   overlaySector?: SectorKey;
   postureState?: PostureStateContract | null;
   operatorContext?: OperatorContext;
+  startupVariantMode?: StartupVariantMode;
 };
 
 const defaultTrustStatusCopy = {
@@ -83,11 +85,12 @@ export const buildWeeklyBriefSnapshot = ({
   overlaySector = "b2b-saas",
   postureState = null,
   operatorContext,
+  startupVariantMode,
 }: BuildWeeklyBriefSnapshotArgs): WeeklyBriefSnapshot => {
   const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
   const homeBriefModel = buildHomeBriefModel(
     buildHomeBriefInput(reportData, postureState),
-    { overlaySector, operatorContext },
+    { overlaySector, operatorContext, startupVariantMode },
   );
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: reportData.fetchedAtLabel,
@@ -123,6 +126,7 @@ export const buildWeeklyBriefSnapshot = ({
     assessment: reportData.assessment,
     homeBriefModel,
     canonicalDecisionCopy,
+    startupVariantMode,
   });
   const callCitation = buildCallCitation(reportData.assessment, reportData.treasury, {
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,

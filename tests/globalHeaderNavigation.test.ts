@@ -33,7 +33,7 @@ describe("global header navigation helpers", () => {
   it("labels utility routes without adding them to the operator loop", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/threshold"), "Framework");
     assert.equal(resolveGlobalHeaderRouteLabel("/template"), "Template");
-    assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API Docs");
+    assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API & MCP");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");
     assert.equal(resolveGlobalHeaderRouteLabel("/about/"), "About");
 

@@ -262,7 +262,11 @@ export const buildHomeBriefModelInternal = (
     postureState,
   } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
+  // The selected mode drives the pill highlight and defaults to series-a for
+  // display. Stage-scoped copy is applied only when the operator explicitly
+  // picked a stage, so an untouched brief keeps its canonical action line.
   const startupVariantMode = options?.startupVariantMode ?? "series-a";
+  const explicitStartupVariantMode = options?.startupVariantMode;
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
@@ -510,7 +514,10 @@ export const buildHomeBriefModelInternal = (
 
   const conciseActionNow = policyOverrideActive
     ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
-    : actionNowShort?.trim();
+    : explicitStartupVariantMode
+      ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
+        || actionNowShort?.trim()
+      : actionNowShort?.trim();
   const canonicalFlipConditions: CanonicalFlipCondition[] = decisionRules.flatMap((rule) =>
     rule.flipConditions.map((condition) => ({
       area: rule.area,

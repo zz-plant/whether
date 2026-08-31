@@ -400,3 +400,42 @@ export const evaluateDecisionAssumptionHealth = ({
     moved: staleness.moved,
   };
 };
+
+export type CohortDecisionAuditResult = {
+  stand: DecisionMemoryEntry[];
+  watch: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }>;
+  reconsider: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }>;
+  totalAudited: number;
+};
+
+export const auditCohortDecisions = (
+  entries: DecisionMemoryEntry[],
+  currentSignals: { tightness: number; riskAppetite: number },
+): CohortDecisionAuditResult => {
+  const stand: DecisionMemoryEntry[] = [];
+  const watch: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }> = [];
+  const reconsider: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }> = [];
+
+  for (const entry of entries) {
+    const health = evaluateDecisionAssumptionHealth({
+      entry,
+      currentTightness: currentSignals.tightness,
+      currentRiskAppetite: currentSignals.riskAppetite,
+    });
+
+    if (health.verdict === "RECONSIDER") {
+      reconsider.push({ entry, health });
+    } else if (health.verdict === "WATCH") {
+      watch.push({ entry, health });
+    } else {
+      stand.push(entry);
+    }
+  }
+
+  return {
+    stand,
+    watch,
+    reconsider,
+    totalAudited: entries.length,
+  };
+};

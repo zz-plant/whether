@@ -1,0 +1,194 @@
+/**
+ * Meeting Slide & Notion Block Exporter for Whether.
+ * Turns the weekly operating call into copyable Notion blocks,
+ * rich-text HTML for Keynote/Google Slides, and 16:9 standalone SVG slide cards.
+ */
+
+import type { OperatingSnapshot } from "../operatingState/types";
+import type { StartupVariantMode } from "../report/boundedDecisionRules";
+
+export interface MeetingSlidePayload {
+  recordDate: string;
+  regime: string;
+  stageLabel: string;
+  actionNow: string;
+  pauseIf: string;
+  changeCourseIf: string;
+  tightness: number;
+  riskAppetite: number;
+  confidence: string;
+  provenance: string;
+}
+
+export function extractMeetingSlidePayload(
+  snapshot: OperatingSnapshot,
+  stage: StartupVariantMode = "seed"
+): MeetingSlidePayload {
+  const weeklyCall = snapshot.weeklyCall;
+  const stageAdj = weeklyCall.stageScopedAdjustments?.[stage];
+
+  const actionNow = stageAdj?.actionNow ?? weeklyCall.actionNow;
+  const pauseIf = stageAdj?.pauseIf ?? weeklyCall.pauseIf;
+  const changeCourseIf = stageAdj?.changeCourseIf ?? weeklyCall.changeCourseIf;
+  const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : "Startup");
+
+  return {
+    recordDate: snapshot.provenance.recordDateLabel,
+    regime: snapshot.assessment.regime,
+    stageLabel,
+    actionNow,
+    pauseIf,
+    changeCourseIf,
+    tightness: snapshot.assessment.scores.tightness,
+    riskAppetite: snapshot.assessment.scores.riskAppetite,
+    confidence: snapshot.assessment.diagnostics.confidence,
+    provenance: snapshot.provenance.sourceLabel || "U.S. Treasury",
+  };
+}
+
+/**
+ * Generates formatted Markdown / Notion Callout Block
+ */
+export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
+  return [
+    `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
+    `> **Regime**: \`${payload.regime}\` · **Stage**: \`${payload.stageLabel}\``,
+    `>`,
+    `> 🎯 **ACTION NOW**: ${payload.actionNow}`,
+    `> ⚠️ **PAUSE IF**: ${payload.pauseIf}`,
+    `> 🔄 **CHANGE COURSE IF**: ${payload.changeCourseIf}`,
+    `>`,
+    `> *Signals: Tightness ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}*`,
+  ].join("\n");
+}
+
+/**
+ * Generates Rich HTML for clipboard paste into Google Slides, Keynote, Notion, Docs
+ */
+export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
+  const isDefensive = payload.regime === "DEFENSIVE" || payload.regime === "SCARCITY";
+  const badgeBg = isDefensive ? "#ef4444" : "#10b981";
+
+  return `
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090d16; color: #f1f5f9; padding: 24px; border-radius: 12px; border: 1px solid #1e293b; max-width: 680px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
+    <div>
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">Executive Stance — ${payload.stageLabel} Stage</h2>
+    </div>
+    <div style="text-align: right;">
+      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${payload.regime}</span>
+      <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">${payload.recordDate}</p>
+    </div>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+    <tr>
+      <td style="padding: 12px; background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #38bdf8; letter-spacing: 0.08em;">1. Action Now</span>
+        <div style="font-size: 13px; font-weight: 600; color: #ffffff; margin-top: 2px;">${payload.actionNow}</div>
+      </td>
+    </tr>
+    <tr><td style="height: 8px;"></td></tr>
+    <tr>
+      <td style="padding: 12px; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.08em;">2. Pause If</span>
+        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.pauseIf}</div>
+      </td>
+    </tr>
+    <tr><td style="height: 8px;"></td></tr>
+    <tr>
+      <td style="padding: 12px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 4px 8px 8px 4px;">
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. Change Course If</span>
+        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.changeCourseIf}</div>
+      </td>
+    </tr>
+  </table>
+
+  <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; padding-top: 8px;">
+    <span>Macro: Tightness <b>${payload.tightness.toFixed(0)}</b> · Risk Appetite <b>${payload.riskAppetite.toFixed(0)}</b></span>
+    <span>Source: ${payload.provenance} · whether.work</span>
+  </div>
+</div>
+`.trim();
+}
+
+/**
+ * Generates a standalone 16:9 1200x675 SVG presentation slide
+ */
+export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
+  const isDefensive = payload.regime === "DEFENSIVE" || payload.regime === "SCARCITY";
+  const badgeColor = isDefensive ? "#f43f5e" : "#10b981";
+
+  // Escape XML entities
+  const esc = (text: string) =>
+    text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  
+  <!-- Subtle Grid Accent -->
+  <circle cx="1100" cy="80" r="220" fill="#38bdf8" opacity="0.04"/>
+  <circle cx="100" cy="600" r="300" fill="#10b981" opacity="0.03"/>
+
+  <!-- Header Container -->
+  <g transform="translate(80, 70)">
+    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING CALL</text>
+    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">Monday Executive Stance (${esc(payload.stageLabel)})</text>
+    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · Source: ${esc(payload.provenance)}</text>
+    
+    <!-- Regime Badge -->
+    <g transform="translate(880, 10)">
+      <rect x="0" y="0" width="160" height="42" rx="21" fill="${badgeColor}" fill-opacity="0.15" stroke="${badgeColor}" stroke-width="1.5"/>
+      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(payload.regime)}</text>
+    </g>
+  </g>
+
+  <!-- 3 Decision Cards -->
+  <!-- Card 1: Action Now -->
+  <g transform="translate(80, 190)">
+    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <rect width="6" height="110" rx="3" fill="#38bdf8"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="1.5">1. ACTION NOW</text>
+    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="700" fill="#ffffff">${esc(payload.actionNow)}</text>
+  </g>
+
+  <!-- Card 2: Pause If -->
+  <g transform="translate(80, 320)">
+    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <rect width="6" height="110" rx="3" fill="#f59e0b"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF (GUARDRAIL)</text>
+    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
+  </g>
+
+  <!-- Card 3: Change Course If -->
+  <g transform="translate(80, 450)">
+    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <rect width="6" height="110" rx="3" fill="#10b981"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF (REVERSAL TRIGGER)</text>
+    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.changeCourseIf)}</text>
+  </g>
+
+  <!-- Footer Stats -->
+  <g transform="translate(80, 600)">
+    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
+      Funding Tightness: <tspan fill="#f1f5f9">${payload.tightness.toFixed(0)}</tspan>  ·  Risk Appetite: <tspan fill="#f1f5f9">${payload.riskAppetite.toFixed(0)}</tspan>  ·  Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
+    </text>
+    <text x="1040" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
+      whether.work
+    </text>
+  </g>
+</svg>`;
+}

@@ -41,6 +41,8 @@ export const sendWeeklyBrief = async (options?: {
 
   const regime = snapshot?.assessment.regime ?? "DEFENSIVE";
   const actionNow = weeklyCall?.actionNow ?? weeklyCall?.currentCall ?? "Hold bounded operating discipline.";
+  const pauseIf = weeklyCall?.pauseIf ?? "Pause irreversible commitments if funding tightness rises.";
+  const changeCourseIf = weeklyCall?.changeCourseIf ?? "Resume staged approvals when conditions stabilize.";
   const recordDate = snapshot?.provenance.recordDateLabel ?? "this week";
   const adapter = createCloudflareEmailAdapter();
 
@@ -56,14 +58,16 @@ export const sendWeeklyBrief = async (options?: {
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
         `Regime: ${regime}`,
-        `Action: ${actionNow}`,
+        `Action Now: ${actionNow}`,
+        `Pause If: ${pauseIf}`,
+        `Change Course If: ${changeCourseIf}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         `---`,
         `Whether · weekly operating brief`,
       ].join("\n");
 
-      /* Regime-adaptive email: contraction = short, expansion = rich */
+      /* Regime-adaptive email */
       const sections = [];
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
@@ -75,8 +79,12 @@ export const sendWeeklyBrief = async (options?: {
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">Action</p>`,
-        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">${actionNow}</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#38bdf8;margin:0 0 6px;">Action Now</p>`,
+        `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${actionNow}</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">Pause If</p>`,
+        `<p style="font-size:0.9rem;margin:0 0 12px;color:#cbd5e1;">${pauseIf}</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">Change Course If</p>`,
+        `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${changeCourseIf}</p>`,
         `</td></tr></table>`
       );
 
@@ -136,9 +144,25 @@ export const sendWeeklyBrief = async (options?: {
   if (slackWebhook) {
     try {
       const blocks = [
-        { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief` } },
-        { type: "section", text: { type: "mrkdwn", text: `*Regime:* ${regime}\n*Action:* ${actionNow}` } },
-        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View full brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+        { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief — ${recordDate}` } },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*Regime:* ${regime}\n*Action Now:* ${actionNow}\n*Pause If:* ${pauseIf}\n*Change Course If:* ${changeCourseIf}`,
+          },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              text: { type: "plain_text", text: "View Full Brief" },
+              url: "https://whether.work",
+              action_id: "open_brief",
+            },
+          ],
+        },
       ];
       await fetch(slackWebhook, { method: "POST", body: JSON.stringify({ blocks }) });
       slackOk = true;

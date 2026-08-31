@@ -195,6 +195,44 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         >
           <span>API</span>
         </Link>
+        {/* Utility links surfaced one level up instead of buried in the mobile
+            drawer or footer: SaaS multiples, macro analogs, framework, template,
+            pricing. Kept native (details) so it works without JS and costs nothing
+            until opened. */}
+        <details className="group relative">
+          <summary
+            tabIndex={0}
+            className="list-none cursor-pointer rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"
+          >
+            <span>More</span>
+            <span aria-hidden="true" className="text-slate-500 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-slate-800/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-lg">
+            {utilityLinks.map((link: UtilityLink) => {
+              const isActive = pathMatchesLink(link.href, resolvedPathname);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={(event) => {
+                    // Close the disclosure after navigating.
+                    const details = event.currentTarget.closest("details");
+                    details?.removeAttribute("open");
+                  }}
+                  className={`flex flex-col gap-0.5 rounded-md px-3 py-2 text-fluid-xs no-underline transition-colors ${
+                    isActive
+                      ? "bg-sky-500/14 text-sky-100 font-semibold"
+                      : "text-slate-300 hover:bg-slate-800/60 hover:text-slate-100"
+                  }`}
+                >
+                  <span className="font-medium">{link.label}</span>
+                  <span className="text-fluid-micro text-slate-500">{link.description}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </details>
       </nav>
 
       <Drawer.Root open={showMobile} onOpenChange={setShowMobile}>

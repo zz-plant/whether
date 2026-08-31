@@ -1,0 +1,1125 @@
+[
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Confirmed freezing net-new growth marketing hires for Q3 given Defensive posture.",
+      "signal_referenced": "Tightness 72, Defensive Regime"
+    },
+    "discarded_recommendation": {
+      "recommendation": "Review debt refinancing covenants",
+      "reason_code": "IRRELEVANT_STAGE",
+      "context": "We are Seed stage and do not hold venture debt or covenant-bearing instruments."
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 45
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "ALTERED",
+      "decision_category": "VENDOR_COMMITMENT",
+      "context": "Re-negotiated our annual Datadog/AWS commit down from 2-year upfront to quarterly flexible billing.",
+      "signal_referenced": "Funding tightness > 70 with curve inversion"
+    },
+    "discarded_recommendation": {
+      "recommendation": "Explore aggressive M&A distressed targets",
+      "reason_code": "IRRELEVANT_STAGE",
+      "context": "At Series A we do not have bandwidth or capital reserves for acquisitions."
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 38
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "ROADMAP",
+      "context": "Confirmed prioritization of retention and migration tooling over speculative greenfield product expansions.",
+      "signal_referenced": "Risk appetite compression"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 28
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Reviewed posture for board prep, but ongoing infrastructure sprint was already locked.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": {
+      "recommendation": "Institute company-wide discretionary spend pauses",
+      "reason_code": "TOO_GENERIC",
+      "context": "Needs bounded threshold numbers for engineering compute versus general G&A."
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 52
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Maintained 24-month minimum cash buffer target instead of stepping on hiring accelerator.",
+      "signal_referenced": "Tightness 72"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 35
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "ALTERED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Postponed planned $150k paid customer acquisition experiment until tightness eases below 65.",
+      "signal_referenced": "Capital tightness > 70 guardrail"
+    },
+    "discarded_recommendation": {
+      "recommendation": "Review executive compensation indexing",
+      "reason_code": "IRRELEVANT_STAGE",
+      "context": "We are a 4-person seed team."
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 40
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Supported CEO in holding back 2 unallocated AE requisitions for Q3.",
+      "signal_referenced": "Defensive operating stance"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 25
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 1,
+    "date": "2026-07-20",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Checked brief to ensure no macro shocks, operating cash-flow positive unaffected.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": {
+      "recommendation": "Prepare runway scenario models for 12 months",
+      "reason_code": "CONTRADICTED_INTERNAL_DATA",
+      "context": "Profitable and cash-flow positive; VC runway framing is inapplicable."
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 30
+    }
+  },
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Maintained single engineering hire focus while keeping general headcount freeze.",
+      "signal_referenced": "Defensive Stance maintained"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "PRICING",
+      "context": "Held firm on annual contract discounting floor of max 10% during enterprise renewals.",
+      "signal_referenced": "Capital tightness high, preserve cash margin"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 22
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "No roadmap shifts this week; posture stable.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 18
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "ROADMAP",
+      "context": "Approved cloud optimization initiative aimed at cutting monthly cluster burn by $18k.",
+      "signal_referenced": "Tightness > 70"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 30
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Kept treasury cash invested in 1-month T-Bills yielding 5.2% rather than illiquid instruments.",
+      "signal_referenced": "Base rate 5.2% high yield posture"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 25
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Focused on product launch demo, no new budget decisions.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 15
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Confirmed setting quarterly burn cap at $160k/mo for remainder of H2.",
+      "signal_referenced": "Defensive posture call"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 22
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 2,
+    "date": "2026-07-27",
+    "reviewed_brief": false,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Did not review brief this Monday due to offsite.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": false,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": null
+    }
+  },
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Shared weekly brief with lead seed investor during monthly check-in to justify holding headcount steady.",
+      "signal_referenced": "Tightness 73"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 30
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Passed Decision Shield verdict to hiring committee to enforce 'mission-critical only' gate.",
+      "signal_referenced": "Defensive hiring threshold"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 25
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "ROADMAP",
+      "context": "Maintained focus on core enterprise security tier instead of experimental consumer plugin.",
+      "signal_referenced": "Risk appetite 46"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "No decisions changed; checked flip meter.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 18
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "ALTERED",
+      "decision_category": "PRICING",
+      "context": "Accelerated planned 8% price increase on legacy enterprise accounts to protect gross margins before Q4.",
+      "signal_referenced": "Tightness increase + inflation sticky signal"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 40
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Continued holding back on paid channels; relying exclusively on developer word-of-mouth.",
+      "signal_referenced": "Tightness 73"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Reviewed brief, assumptions held steady.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 16
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 3,
+    "date": "2026-08-03",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Approved hiring 1 senior customer success lead because it is directly revenue-funded.",
+      "signal_referenced": "Self-sustaining unit economics rule"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 25
+    }
+  },
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Presented Whether 3-bullet stance directly to board of directors in Q3 meeting.",
+      "signal_referenced": "Executive stance summary"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 25
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Held engineering headcount level at 12 devs.",
+      "signal_referenced": "Defensive posture"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 19
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Brief reviewed, no product strategy shifts.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 15
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "VENDOR_COMMITMENT",
+      "context": "Required rollback and kill criteria on a new $50k observability tool trial.",
+      "signal_referenced": "Policy override: reversible only rule"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 28
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Maintained 24-month runway benchmark, deferring venture debt inquiry.",
+      "signal_referenced": "Tightness 72"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "No change.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 14
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Kept H2 operating reserves locked in money-market funds.",
+      "signal_referenced": "High yield baseline"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 18
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 4,
+    "date": "2026-08-10",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Steady state operations.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 17
+    }
+  },
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Maintained hiring gate; shared brief screenshot with co-founder.",
+      "signal_referenced": "Defensive call"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 22
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Denied offsite expansion budget increase, holding to $15k cap.",
+      "signal_referenced": "Tightness 72"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Product roadmap proceeding as planned.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 16
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "No changes.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Confirmed maintaining 24-month runway policy.",
+      "signal_referenced": "Defensive posture"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 18
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Reviewed brief in 15 seconds, posture unchanged.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 15
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Confirmed holding hiring pause across G&A functions.",
+      "signal_referenced": "Defensive hiring gate"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 17
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 5,
+    "date": "2026-08-17",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "No changes.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_01",
+    "name": "Sarah Chen",
+    "company": "KitePay",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Adopted Whether brief as permanent Monday morning executive team ritual.",
+      "signal_referenced": "Weekly operating call"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": true,
+      "seconds_to_read": 20
+    }
+  },
+  {
+    "operator_id": "op_02",
+    "name": "Marcus Vance",
+    "company": "OrbitFlow",
+    "stage": "Series A",
+    "role": "COO",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Integrated Whether CLI into Monday automated ops report generation.",
+      "signal_referenced": "WeeklyCall contract via CLI"
+    },
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 18
+    }
+  },
+  {
+    "operator_id": "op_03",
+    "name": "Elena Rostova",
+    "company": "Synthex Dev",
+    "stage": "Series A",
+    "role": "Head of Product",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Quarterly sprint planning completed; brief used for macro sanity check.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 14
+    }
+  },
+  {
+    "operator_id": "op_04",
+    "name": "David Kim",
+    "company": "VitalsAI",
+    "stage": "Series B",
+    "role": "VP Eng",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "HIRING",
+      "context": "Filled 1 critical senior security engineer role while preserving overall freeze on general requisitions.",
+      "signal_referenced": "Tightness 72"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": false,
+      "seconds_to_read": 22
+    }
+  },
+  {
+    "operator_id": "op_05",
+    "name": "Maya Patel",
+    "company": "CartForge",
+    "stage": "Series B",
+    "role": "CFO",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "RUNWAY",
+      "context": "Maintained 24-month runway discipline as standard company hurdle rate.",
+      "signal_referenced": "Defensive posture"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": true,
+      "slack_shared": true,
+      "seconds_to_read": 16
+    }
+  },
+  {
+    "operator_id": "op_06",
+    "name": "Liam Thorne",
+    "company": "AgenticLoop",
+    "stage": "Seed",
+    "role": "CEO",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Preserved capital discipline.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 12
+    }
+  },
+  {
+    "operator_id": "op_07",
+    "name": "Alex Rivera",
+    "company": "SecureMesh",
+    "stage": "Series A",
+    "role": "VP Finance",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "CONFIRMED",
+      "decision_category": "CAPITAL_DEPLOYMENT",
+      "context": "Maintained H2 spending guardrails across all departments.",
+      "signal_referenced": "Defensive posture"
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 15
+    }
+  },
+  {
+    "operator_id": "op_08",
+    "name": "Rachel Bloom",
+    "company": "YardOps",
+    "stage": "Bootstrapped",
+    "role": "CEO",
+    "week_number": 6,
+    "date": "2026-08-24",
+    "reviewed_brief": true,
+    "decision_influence": {
+      "type": "NONE",
+      "decision_category": "OTHER",
+      "context": "Steady state profitable operations.",
+      "signal_referenced": null
+    },
+    "discarded_recommendation": null,
+    "engagement_metrics": {
+      "brief_opened": true,
+      "cli_or_api_accessed": false,
+      "slack_shared": false,
+      "seconds_to_read": 18
+    }
+  }
+]
