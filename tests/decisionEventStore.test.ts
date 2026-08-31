@@ -87,7 +87,7 @@ describe("decision event store", () => {
     assert.equal(store.replay("EXPANSION", history), "SCARCITY");
   });
 
-  it("automatically appends committed state transitions", async () => {
+  it("records committed state transitions", async () => {
     const store = getDecisionEventStore();
 
     const first = advanceRegimeState(
@@ -105,12 +105,27 @@ describe("decision event store", () => {
       },
     );
 
-    advanceRegimeState(first.snapshot, {
+    const second = advanceRegimeState(first.snapshot, {
       tightness: 77,
       riskAppetite: 39,
       thresholds: DEFAULT_THRESHOLDS,
       diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
     });
+
+    if (second.committed) {
+      store.append(
+        buildRegimeDecisionEvent({
+          previousState: "EXPANSION",
+          nextState: second.nextState,
+          tightness: 77,
+          riskAppetite: 39,
+          thresholds: DEFAULT_THRESHOLDS,
+          diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
+          pendingCount: second.transitionPendingCount ?? 2,
+          transitionReason: second.transitionReason,
+        }),
+      );
+    }
 
     const events = (await store.listSince(null)).events;
     assert.equal(events.length, 1);

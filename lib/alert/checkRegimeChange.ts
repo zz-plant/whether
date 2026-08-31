@@ -1,6 +1,9 @@
 import { loadReportData } from "../report/reportData";
 import { getRegimeProjection } from "../report/regimeContext";
 import { getWhetherKv } from "../runtime/kv";
+import type { OperatingSnapshot } from "../operatingState/types";
+import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 
 export type CheckRegimeChangeResult = {
   ok: boolean;
@@ -16,14 +19,30 @@ export type CheckRegimeChangeResult = {
 /**
  * Check regime, distance-to-flip velocity, and confidence against KV last-known state,
  * pushing Slack alerts on transitions. Shared by the cron trigger (direct call from
- * worker/index.ts) and POST /api/check-regime-change, mirroring the executeIngest
- * pattern so the cron never fetches its own public endpoint.
+ * worker/index.ts) and POST /api/check-regime-change, projecting the authoritative OperatingSnapshot.
  */
-export const checkRegimeChange = async (): Promise<CheckRegimeChangeResult> => {
+export const checkRegimeChange = async (options?: {
+  snapshot?: OperatingSnapshot;
+  weeklyCall?: WeeklyCallContract;
+}): Promise<CheckRegimeChangeResult> => {
   const kv = getWhetherKv();
   if (!kv) return { ok: false, error: "KV not available" };
 
-  const { assessment, reportDynamics } = await loadReportData({});
+  let assessment;
+  let reportDynamics;
+
+  if (options?.snapshot) {
+    assessment = options.snapshot.assessment;
+  } else {
+    const stored = await getOperatingSnapshotStore().readLatest();
+    if (stored) {
+      assessment = stored.assessment;
+    } else {
+      const data = await loadReportData({});
+      assessment = data.assessment;
+      reportDynamics = data.reportDynamics;
+    }
+  }
   const currentRegime = assessment.regime;
   const slackWebhook = process.env.SLACK_WEBHOOK_URL;
 

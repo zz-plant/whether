@@ -111,6 +111,12 @@ export function isUnsafeAssertion(code) {
     .replace(/'(?:[^'\\]|\\.)*'/g, "''")
     .replace(/"(?:[^"\\]|\\.)*"/g, '""');
 
+  // Import renaming uses the same `as Name` tokens as a type assertion, but it does
+  // not override or narrow a runtime value.
+  if (/^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings)) {
+    return false;
+  }
+
   // English prose false positives ("as of", "as in", etc.)
   if (/\sas\s+(?:of|in|on|at|to|for|with|by|an|if|the|a|well|part|per|long|soon|far|much|late|early|such)\b/.test(withoutStrings)) {
     return false;

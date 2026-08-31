@@ -5,6 +5,7 @@ import { buildPostureStateContract } from "../lib/report/postureStateContract";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
 import { buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { buildWeeklyMandateEnvelope } from "../lib/integrationBriefs";
+import { buildPostureTransitionEvent } from "../lib/storage/postureTransitionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
@@ -76,17 +77,15 @@ describe("posture state contract consumers", () => {
       recordDate: treasury.record_date,
       postureLabel: "Contraction",
       decisionEventStore: [
-        {
-          eventId: "evt_1",
-          sourceVersion: "v1",
-          canonicalTimestampSource: "request-received-at",
+        buildPostureTransitionEvent({
+          id: "evt_1",
           recordedAt: "2026-03-01T10:00:00Z",
           effectiveRecordDate: treasury.record_date,
           idempotencyKey: `${treasury.record_date}:DEFENSIVE`,
           fromState: "VOLATILE",
           toState: "DEFENSIVE",
           reason: "Tightness crossed above 70.",
-        },
+        }),
       ],
     });
 

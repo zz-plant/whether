@@ -95,6 +95,119 @@ export type DecisionMemorySnapshotPayload = {
   riskAppetiteThreshold?: number;
 };
 
+const DECISION_MEMORY_KINDS = new Set(["decision", "posture-snapshot"]);
+const DECISION_DEPARTMENTS = new Set([
+  "Engineering",
+  "Sales",
+  "Product",
+  "Finance",
+  "Executive",
+  "Operations",
+]);
+const LIFECYCLE_STAGES = new Set(["DISCOVERY", "GROWTH", "SCALE", "MATURE"]);
+const DECISION_CATEGORIES = new Set([
+  "HIRING",
+  "ROADMAP",
+  "PRICING",
+  "INFRASTRUCTURE",
+  "M_AND_A",
+  "GEOGRAPHIC_EXPANSION",
+  "RESTRUCTURING",
+]);
+const DECISION_ACTIONS = new Set([
+  "HIRE",
+  "REWRITE",
+  "LAUNCH",
+  "DISCOUNT",
+  "EXPAND",
+  "ACQUIRE",
+  "DIVEST",
+  "INFRA_SPEND",
+  "REGIONAL_EXPANSION",
+  "RESTRUCTURE",
+]);
+const DECISION_VERDICTS = new Set(["SAFE", "RISKY", "DANGEROUS"]);
+const BASE_RATE_SOURCES = new Set(["FED", "1M", "3M", "MISSING"]);
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isOptionalString = (value: unknown): boolean =>
+  value === undefined || typeof value === "string";
+
+const isOptionalNumber = (value: unknown): boolean =>
+  value === undefined || typeof value === "number";
+
+const isThresholds = (value: unknown): boolean => {
+  if (!isRecord(value)) return false;
+  return typeof value.baseRateTightness === "number"
+    && typeof value.tightnessRegime === "number"
+    && typeof value.riskAppetiteRegime === "number";
+};
+
+const isDecisionInput = (value: unknown): boolean => {
+  if (!isRecord(value)) return false;
+  return typeof value.lifecycle === "string"
+    && LIFECYCLE_STAGES.has(value.lifecycle)
+    && typeof value.category === "string"
+    && DECISION_CATEGORIES.has(value.category)
+    && typeof value.action === "string"
+    && DECISION_ACTIONS.has(value.action)
+    && isOptionalString(value.context);
+};
+
+const isAssumptionSnapshot = (value: unknown): boolean => {
+  if (!isRecord(value)) return false;
+  return typeof value.tightness === "number"
+    && typeof value.riskAppetite === "number"
+    && typeof value.tightnessThreshold === "number"
+    && typeof value.riskAppetiteThreshold === "number"
+    && (value.assumptionLabels === undefined
+      || (Array.isArray(value.assumptionLabels) && value.assumptionLabels.every((label) => typeof label === "string")));
+};
+
+export const isDecisionMemoryEntry = (value: unknown): value is DecisionMemoryEntry => {
+  if (!isRecord(value) || !isRecord(value.context) || !isRecord(value.outcome) || !isRecord(value.regime)) {
+    return false;
+  }
+  if (!isRecord(value.regime.scores)) return false;
+
+  const scores = value.regime.scores;
+  const scoresAreValid = isOptionalNumber(scores.tightness)
+    && isOptionalNumber(scores.riskAppetite)
+    && isOptionalNumber(scores.baseRate)
+    && isOptionalNumber(scores.boldnessScore)
+    && (scores.curveSlope === undefined || scores.curveSlope === null || typeof scores.curveSlope === "number")
+    && (scores.baseRateUsed === undefined
+      || (typeof scores.baseRateUsed === "string" && BASE_RATE_SOURCES.has(scores.baseRateUsed)));
+
+  return typeof value.id === "string"
+    && typeof value.createdAt === "string"
+    && (value.kind === undefined
+      || (typeof value.kind === "string" && DECISION_MEMORY_KINDS.has(value.kind)))
+    && (value.department === undefined
+      || (typeof value.department === "string" && DECISION_DEPARTMENTS.has(value.department)))
+    && isOptionalString(value.owner)
+    && typeof value.context.clientId === "string"
+    && isOptionalString(value.context.teamId)
+    && typeof value.context.recordDate === "string"
+    && (value.decision === undefined || isDecisionInput(value.decision))
+    && typeof value.outcome.summary === "string"
+    && typeof value.outcome.guardrail === "string"
+    && typeof value.outcome.reversalTrigger === "string"
+    && (value.outcome.verdict === undefined
+      || (typeof value.outcome.verdict === "string" && DECISION_VERDICTS.has(value.outcome.verdict)))
+    && typeof value.regime.label === "string"
+    && scoresAreValid
+    && (value.regime.thresholds === undefined || isThresholds(value.regime.thresholds))
+    && Array.isArray(value.sources)
+    && value.sources.every((source) => typeof source === "string")
+    && (value.assumptions === undefined || isAssumptionSnapshot(value.assumptions));
+};
+
+export const parseDecisionMemoryEntry = (value: unknown): DecisionMemoryEntry | null =>
+  isDecisionMemoryEntry(value) ? value : null;
+
 const newEntryId = () =>
   typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`;
 
@@ -239,13 +352,20 @@ export const toDecisionMemoryCsv = (entries: DecisionMemoryEntry[]) => {
   return [header, ...rows].map((row) => row.map((value) => escapeCsvCell(String(value))).join(",")).join("\n");
 };
 
-export type DecisionAssumptionVerdict = "RECONSIDER" | "WATCH" | "STAND";
+import {
+  assessDecisionStaleness,
+  type MovedAssumption,
+  type StalenessVerdict,
+} from "./report/decisionStaleness";
+
+export type DecisionAssumptionVerdict = StalenessVerdict;
 
 export type DecisionAssumptionHealthResult = {
   verdict: DecisionAssumptionVerdict;
   reason: string;
   tightnessDelta: number;
   riskAppetiteDelta: number;
+  moved?: MovedAssumption[];
 };
 
 export const evaluateDecisionAssumptionHealth = ({
@@ -257,38 +377,26 @@ export const evaluateDecisionAssumptionHealth = ({
   currentTightness: number;
   currentRiskAppetite: number;
 }): DecisionAssumptionHealthResult => {
-  const baseTightness = entry.assumptions?.tightness
-    ?? (typeof entry.regime.scores.tightness === "number" ? entry.regime.scores.tightness : currentTightness);
-  const baseRiskAppetite = entry.assumptions?.riskAppetite
-    ?? (typeof entry.regime.scores.riskAppetite === "number" ? entry.regime.scores.riskAppetite : currentRiskAppetite);
+  const assumptions: DecisionAssumptionSnapshot = entry.assumptions ?? {
+    tightness: typeof entry.regime.scores.tightness === "number" ? entry.regime.scores.tightness : currentTightness,
+    riskAppetite: typeof entry.regime.scores.riskAppetite === "number" ? entry.regime.scores.riskAppetite : currentRiskAppetite,
+    tightnessThreshold: entry.regime.thresholds?.tightnessRegime ?? 70,
+    riskAppetiteThreshold: entry.regime.thresholds?.riskAppetiteRegime ?? 50,
+  };
 
-  const tightnessDelta = currentTightness - baseTightness;
-  const riskAppetiteDelta = currentRiskAppetite - baseRiskAppetite;
+  const tightnessDelta = currentTightness - assumptions.tightness;
+  const riskAppetiteDelta = currentRiskAppetite - assumptions.riskAppetite;
 
-  // Significant deterioration: tightness jumped >= 10 points or risk appetite dropped >= 10 points
-  if (tightnessDelta >= 10 || riskAppetiteDelta <= -10) {
-    return {
-      verdict: "RECONSIDER",
-      reason: "Capital conditions and demand expectations have weakened relative to the assumptions recorded when you approved the plan.",
-      tightnessDelta,
-      riskAppetiteDelta,
-    };
-  }
-
-  // Moderate movement: tightness rose 5-9 pts or risk appetite dropped 5-9 pts
-  if (tightnessDelta >= 5 || riskAppetiteDelta <= -5) {
-    return {
-      verdict: "WATCH",
-      reason: "One supporting assumption has deteriorated, but conditions remain inside your original operating range.",
-      tightnessDelta,
-      riskAppetiteDelta,
-    };
-  }
+  const staleness = assessDecisionStaleness(assumptions, {
+    tightness: currentTightness,
+    riskAppetite: currentRiskAppetite,
+  });
 
   return {
-    verdict: "STAND",
-    reason: "Macro conditions remain consistent with the assumptions recorded at approval.",
+    verdict: staleness.verdict,
+    reason: staleness.why,
     tightnessDelta,
     riskAppetiteDelta,
+    moved: staleness.moved,
   };
 };

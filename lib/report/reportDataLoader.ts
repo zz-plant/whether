@@ -1,8 +1,7 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment, RegimeThresholds, RegimeTrend } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
-import { writeRegimeTransitionAlert } from "../signalOps";
-import { loadRegimeMachineSnapshot, saveRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore";
+import { loadRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore";
 import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
@@ -325,10 +324,6 @@ export const loadReportDataUncachedInternal = async ({
   const sensors = deps.buildSensorReadings(treasury);
   const previousMachineSnapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
   const assessment = deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot);
-  const assessmentSnapshot = assessment.regimeTransition?.snapshot;
-  if (assessmentSnapshot) {
-    void saveRegimeMachineSnapshot(assessmentSnapshot);
-  }
   const liveAssessment = shouldLoadHistoricalLiveComparison
     ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries, previousMachineSnapshot)
     : null;
@@ -342,15 +337,6 @@ export const loadReportDataUncachedInternal = async ({
   const previousAssessment = previousSnapshot
     ? deps.evaluateRegime(previousSnapshot, thresholds)
     : null;
-  if (!historicalSelection && previousAssessment && assessment.regime !== previousAssessment.regime) {
-    void writeRegimeTransitionAlert(
-      previousAssessment,
-      assessment,
-      previousSnapshot?.record_date,
-      treasury.record_date,
-      "/signals?advanced=1#time-machine",
-    );
-  }
   const lastYearAssessment = lastYearSnapshot ? deps.evaluateRegime(lastYearSnapshot, thresholds) : null;
   const confidenceLabel = historicalSelection
     ? "Simulated (low)"

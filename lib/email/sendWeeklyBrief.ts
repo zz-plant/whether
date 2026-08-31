@@ -1,4 +1,7 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
+import type { OperatingSnapshot } from "../operatingState/types";
+import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { buildAgentInterfaceResponse } from "../agentInterface";
 
 export type SendWeeklyBriefResult = {
@@ -13,28 +16,36 @@ export type SendWeeklyBriefResult = {
 /**
  * Send the weekly brief to all active subscribers, and mirror it to Slack when a
  * webhook is configured. Shared by the cron trigger (direct call from worker/index.ts)
- * and the POST /api/email/send-weekly route, mirroring the executeIngest pattern so the
- * cron never has to fetch its own public endpoint.
+ * and the POST /api/email/send-weekly route, projecting the authoritative OperatingSnapshot.
  */
-export const sendWeeklyBrief = async (): Promise<SendWeeklyBriefResult> => {
+export const sendWeeklyBrief = async (options?: {
+  snapshot?: OperatingSnapshot;
+  weeklyCall?: WeeklyCallContract;
+}): Promise<SendWeeklyBriefResult> => {
   const subscriptions = await getActiveSubscriptions();
   if (subscriptions.length === 0) {
     return { ok: true, sent: 0, errors: 0, total: 0, slackPosted: false, message: "No active subscriptions." };
   }
 
-  const brief = await buildAgentInterfaceResponse("weekly");
+  let snapshot = options?.snapshot;
+  let weeklyCall = options?.weeklyCall;
+
+  if (!snapshot || !weeklyCall) {
+    const store = getOperatingSnapshotStore();
+    const stored = await store.readLatest();
+    if (stored) {
+      snapshot = stored;
+      weeklyCall = stored.weeklyCall;
+    }
+  }
+
+  const regime = snapshot?.assessment.regime ?? "DEFENSIVE";
+  const actionNow = weeklyCall?.actionNow ?? weeklyCall?.currentCall ?? "Hold bounded operating discipline.";
+  const recordDate = snapshot?.provenance.recordDateLabel ?? "this week";
   const adapter = createCloudflareEmailAdapter();
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
-      /* `action` and `recordDate` do not exist on WeeklySummary; an `as any`
-         hid that, so every subject line said "Hold current posture" and every
-         body said "this week" regardless of the call. The real fields are
-         `guidance` and `recordDateLabel`. */
-      const summary = brief.summary;
-      const regime = String(summary?.regime ?? "Stable");
-      const actionNow = String(summary?.guidance ?? "Hold current posture");
-      const recordDate = String(summary?.recordDateLabel ?? "this week");
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regime}: ${actionNow}`
         : `Whether Brief — ${regime}`;
@@ -124,9 +135,6 @@ export const sendWeeklyBrief = async (): Promise<SendWeeklyBriefResult> => {
   let slackOk = false;
   if (slackWebhook) {
     try {
-      const summary = brief.summary;
-      const regime = String(summary?.regime ?? "");
-      const actionNow = String(summary?.guidance ?? "");
       const blocks = [
         { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief` } },
         { type: "section", text: { type: "mrkdwn", text: `*Regime:* ${regime}\n*Action:* ${actionNow}` } },

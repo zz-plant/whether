@@ -1,6 +1,7 @@
 import type { DecisionAssumptionSnapshot } from "../decisionMemory";
 
-export type StalenessVerdict = "RECONSIDER" | "WATCH" | "no-change";
+export type StalenessVerdict = "STAND" | "WATCH" | "RECONSIDER";
+export type DecisionStalenessVerdict = StalenessVerdict;
 
 export type StalenessDimension = "capital" | "risk";
 
@@ -48,7 +49,7 @@ const riskMoved = (
   current: CurrentStalenessConditions,
 ): boolean => current.riskAppetite < Math.min(recorded.riskAppetite, recorded.riskAppetiteThreshold);
 
-const buildMovedAssumptions = (
+export const buildMovedAssumptions = (
   recorded: DecisionAssumptionSnapshot,
   current: CurrentStalenessConditions,
 ): MovedAssumption[] => {
@@ -86,7 +87,7 @@ const composeWhy = (moved: MovedAssumption[]): string => {
  * Verdict rules (bounded):
  *   RECONSIDER  — two supporting assumptions moved outside the recorded range
  *   WATCH       — one supporting assumption moved outside the recorded range
- *   no-change   — all supporting assumptions remain inside the recorded range
+ *   STAND       — all supporting assumptions remain inside the recorded range
  */
 export const assessDecisionStaleness = (
   recorded: DecisionAssumptionSnapshot,
@@ -97,7 +98,7 @@ export const assessDecisionStaleness = (
   const verdict: StalenessVerdict =
     moved.length >= 2 ? "RECONSIDER"
       : moved.length === 1 ? "WATCH"
-        : "no-change";
+        : "STAND";
 
   return {
     verdict,
@@ -106,13 +107,20 @@ export const assessDecisionStaleness = (
   };
 };
 
-export const stalenessVerdictLabel = (verdict: StalenessVerdict): string => {
+export const DecisionStalenessEngine = {
+  assess: assessDecisionStaleness,
+};
+
+export const stalenessVerdictLabel = (verdict: StalenessVerdict | "no-change"): string => {
   switch (verdict) {
     case "RECONSIDER":
       return "RECONSIDER";
     case "WATCH":
       return "WATCH";
+    case "STAND":
+    case "no-change":
+      return "STAND";
     default:
-      return "No change";
+      return "STAND";
   }
 };

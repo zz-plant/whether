@@ -12,6 +12,9 @@ import {
   type AlertPreferences,
 } from "../storage/alertPreferenceRepository";
 import { getSubscriberStore } from "../email/subscriberStore";
+import type { OperatingSnapshot } from "../operatingState/types";
+import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
@@ -217,18 +220,37 @@ export const trackAlertDelivery = async (
 /**
  * Cron entry point: derive current alert conditions from report data and deliver.
  * Shared by the cron trigger (direct call from worker/index.ts) and the authenticated
- * branch of POST /api/alert-deliveries, so the cron never fetches its own endpoint.
+ * branch of POST /api/alert-deliveries, projecting the authoritative OperatingSnapshot.
  */
-export const runScheduledAlertDelivery = async (): Promise<DeliveryResult> => {
-  const reportResult = await loadReportData();
-  const { assessment } = reportResult;
+export const runScheduledAlertDelivery = async (options?: {
+  snapshot?: OperatingSnapshot;
+  weeklyCall?: WeeklyCallContract;
+}): Promise<DeliveryResult> => {
+  let assessment;
+
+  let recordDate = new Date().toISOString();
+
+  if (options?.snapshot) {
+    assessment = options.snapshot.assessment;
+    recordDate = options.snapshot.provenance.recordDateLabel;
+  } else {
+    const stored = await getOperatingSnapshotStore().readLatest();
+    if (stored) {
+      assessment = stored.assessment;
+      recordDate = stored.provenance.recordDateLabel;
+    } else {
+      const reportResult = await loadReportData();
+      assessment = reportResult.assessment;
+      recordDate = reportResult.recordDateLabel;
+    }
+  }
 
   const conditions: AlertConditions = {
     regime: assessment.regime,
     tightness: assessment.scores.tightness,
     riskAppetite: assessment.scores.riskAppetite,
     posture: assessment.description,
-    recordDate: reportResult.recordDateLabel ?? new Date().toISOString(),
+    recordDate,
   };
 
   return deliverAlerts(conditions);

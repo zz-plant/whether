@@ -17,6 +17,7 @@ import {
   formatDecisionAction,
   stressTestDecisionPlan,
   compareDecisionPlans,
+  isBusinessModel,
   type DecisionAction,
   type DecisionCategory,
   type DecisionOutput,
@@ -123,6 +124,28 @@ export const DecisionShieldPanel = ({
 
   const clientId = usePersistentClientId();
   const presetStorageKey = clientId ? `whether.decisionShieldPresets:${clientId}` : null;
+
+  const [planMode, setPlanMode] = useState<"dropdown" | "natural_language" | "compare">("natural_language");
+  const [planText, setPlanText] = useState("We want to hire 3 senior full-stack engineers ($540k annual burn) and sign a 2-year cloud reservation.");
+  const [planBText, setPlanBText] = useState("We want to hire 2 contractors for 6 months on milestone deliverables and use monthly rolling compute.");
+  const [runwayMonths, setRunwayMonths] = useState<number | undefined>(14);
+  const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">("VC_BACKED");
+
+  const companyProfile = useMemo<CompanyFinancialProfile>(() => ({
+    runwayMonths,
+    businessModel,
+    grossMarginPct: 75,
+  }), [runwayMonths, businessModel]);
+
+  const stressTestResult = useMemo(
+    () => stressTestDecisionPlan(assessment, { planText, lifecycle, companyProfile }),
+    [assessment, planText, lifecycle, companyProfile]
+  );
+
+  const comparisonResult = useMemo(
+    () => compareDecisionPlans(assessment, planText, planBText, companyProfile),
+    [assessment, planText, planBText, companyProfile]
+  );
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -433,39 +456,235 @@ export const DecisionShieldPanel = ({
           ) : null}
         </div>
 
-        <div className="mt-6 space-y-4">
-          <div className="weather-surface p-4">
-            <p className="type-label text-slate-400">
-              Weekly call context → Decision verdict → Why now → {publicDecisionLabels.threshold} → {publicDecisionLabels.reversal}
-            </p>
+        <div className="mt-6 space-y-5">
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+            <button
+              type="button"
+              onClick={() => setPlanMode("natural_language")}
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                planMode === "natural_language"
+                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              }`}
+            >
+              ⚡ Stress-Test Freeform Plan
+            </button>
+            <button
+              type="button"
+              onClick={() => setPlanMode("compare")}
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                planMode === "compare"
+                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              }`}
+            >
+              ⚖️ Compare Plan A vs Plan B
+            </button>
+            <button
+              type="button"
+              onClick={() => setPlanMode("dropdown")}
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                planMode === "dropdown"
+                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              }`}
+            >
+              🎛️ Standard Selectors
+            </button>
           </div>
-          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
-            <Fieldset.Legend className="sr-only">Choose the lifecycle, category, and action for this decision</Fieldset.Legend>
-            <LabeledSelectField
-              label="Lifecycle"
-              value={lifecycle}
-              onValueChange={(value) => setField("lifecycle", value)}
-              options={lifecycleSelectOptions}
-              placeholder="Select lifecycle"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
-            />
-            <LabeledSelectField
-              label="Category"
-              value={category}
-              onValueChange={(value) => setField("category", value)}
-              options={categorySelectOptions}
-              placeholder="Select category"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
-            />
-            <LabeledSelectField
-              label="Action"
-              value={action}
-              onValueChange={(value) => setField("action", value)}
-              options={actionSelectOptions}
-              placeholder="Select action"
-              triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
-            />
-          </Fieldset.Root>
+
+          {planMode === "natural_language" && (
+            <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-100">AI Plan Stress-Tester</h4>
+                  <p className="text-fluid-xs text-slate-400">
+                    Paste any planned hiring, infra, or contract decision. Tested against live macro tightness &amp; curve slope.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 text-fluid-xs text-slate-300">
+                    <span className="text-slate-400">Runway:</span>
+                    <select
+                      value={runwayMonths ?? 14}
+                      onChange={(e) => setRunwayMonths(Number(e.target.value))}
+                      className="bg-slate-800 text-slate-200 rounded px-2 py-1 text-xs border border-slate-700 font-mono"
+                    >
+                      <option value={6}>6 mos (&lt;12m warning)</option>
+                      <option value={10}>10 mos (tight)</option>
+                      <option value={14}>14 mos (standard)</option>
+                      <option value={18}>18 mos (safe)</option>
+                      <option value={24}>24+ mos (buffered)</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-fluid-xs text-slate-300">
+                    <span className="text-slate-400">Model:</span>
+                    <select
+                      value={businessModel}
+                      onChange={(event) => {
+                        if (isBusinessModel(event.target.value)) {
+                          setBusinessModel(event.target.value);
+                        }
+                      }}
+                      className="bg-slate-800 text-slate-200 rounded px-2 py-1 text-xs border border-slate-700"
+                    >
+                      <option value="VC_BACKED">VC-Backed</option>
+                      <option value="BOOTSTRAPPED">Bootstrapped</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <textarea
+                value={planText}
+                onChange={(e) => setPlanText(e.target.value)}
+                rows={3}
+                className="weather-input w-full p-3 font-mono text-xs text-slate-100 placeholder-slate-500 rounded-lg border border-slate-700 bg-slate-950/80 focus:border-sky-500 focus:outline-none"
+                placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
+              />
+
+              {/* Stress Test Audit Output */}
+              <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
+                      stressTestResult.verdict === "SAFE"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                        : stressTestResult.verdict === "RISKY"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                        : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                    }`}>
+                      {stressTestResult.verdict}
+                    </span>
+                    <span className="text-fluid-xs text-slate-300 font-semibold">
+                      Category: {stressTestResult.detectedCategory}
+                    </span>
+                  </div>
+                  {stressTestResult.financialImpactSummary && (
+                    <span className="text-fluid-nano text-slate-400 font-mono">
+                      {stressTestResult.financialImpactSummary}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">Fragile Assumptions Identified:</p>
+                  <ul className="space-y-1">
+                    {stressTestResult.fragileAssumptions.map((assumption, idx) => (
+                      <li key={idx} className="text-fluid-xs text-amber-200/90 flex items-start gap-1.5">
+                        <span className="text-amber-400 font-bold">•</span>
+                        <span>{assumption}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">Bounded Guardrail:</p>
+                    <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
+                  </div>
+                  <div>
+                    <p className="text-fluid-nano text-sky-400 uppercase font-semibold tracking-wider">Macro-Safe Staging Compromise:</p>
+                    <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {planMode === "compare" && (
+            <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
+              <div>
+                <h4 className="text-sm font-bold text-slate-100">Side-by-Side Plan Comparison</h4>
+                <p className="text-fluid-xs text-slate-400">
+                  Audit two alternative initiatives to determine which path carries lower macro vulnerability.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-300">Plan A</label>
+                  <textarea
+                    value={planText}
+                    onChange={(e) => setPlanText(e.target.value)}
+                    rows={3}
+                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 rounded-lg border border-slate-700 bg-slate-950/80"
+                  />
+                  <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
+                    <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
+                      comparisonResult.planA.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
+                    }`}>
+                      Verdict: {comparisonResult.planA.verdict}
+                    </span>
+                    <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planA.reversibleAlternative}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-300">Plan B</label>
+                  <textarea
+                    value={planBText}
+                    onChange={(e) => setPlanBText(e.target.value)}
+                    rows={3}
+                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 rounded-lg border border-slate-700 bg-slate-950/80"
+                  />
+                  <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
+                    <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
+                      comparisonResult.planB.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
+                    }`}>
+                      Verdict: {comparisonResult.planB.verdict}
+                    </span>
+                    <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planB.reversibleAlternative}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-sky-950/30 border border-sky-500/30 rounded-lg flex items-center justify-between">
+                <span className="text-fluid-xs text-sky-300 font-semibold">
+                  🏆 Recommendation: {comparisonResult.comparativeRecommendation}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {planMode === "dropdown" && (
+            <>
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">
+                  Weekly call context → Decision verdict → Why now → {publicDecisionLabels.threshold} → {publicDecisionLabels.reversal}
+                </p>
+              </div>
+              <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
+                <Fieldset.Legend className="sr-only">Choose the lifecycle, category, and action for this decision</Fieldset.Legend>
+                <LabeledSelectField
+                  label="Lifecycle"
+                  value={lifecycle}
+                  onValueChange={(value) => setField("lifecycle", value)}
+                  options={lifecycleSelectOptions}
+                  placeholder="Select lifecycle"
+                  triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                />
+                <LabeledSelectField
+                  label="Category"
+                  value={category}
+                  onValueChange={(value) => setField("category", value)}
+                  options={categorySelectOptions}
+                  placeholder="Select category"
+                  triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                />
+                <LabeledSelectField
+                  label="Action"
+                  value={action}
+                  onValueChange={(value) => setField("action", value)}
+                  options={actionSelectOptions}
+                  placeholder="Select action"
+                  triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                />
+              </Fieldset.Root>
+            </>
+          )}
 
           <div className="weather-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">

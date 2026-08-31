@@ -24,20 +24,24 @@ export type KvNamespace = {
   list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<KvListResult>;
 };
 
+export const isKvNamespace = (value: unknown): value is KvNamespace =>
+  typeof value === "object"
+  && value !== null
+  && typeof Reflect.get(value, "get") === "function"
+  && typeof Reflect.get(value, "put") === "function"
+  && typeof Reflect.get(value, "list") === "function";
+
 /**
  * Resolve the durable KV binding installed by worker/index.ts, preferring the shared
  * namespace and falling back to a legacy per-domain binding name when provided.
  */
 export const getWhetherKv = (legacyBindingName?: string): KvNamespace | null => {
-  const scope = globalThis as Record<string, unknown>;
-  const candidate = (scope.WHETHER_DURABLE_KV ?? (legacyBindingName ? scope[legacyBindingName] : undefined)) as
-    | KvNamespace
-    | undefined;
-  if (
-    !candidate
-    || typeof candidate.get !== "function"
-    || typeof candidate.put !== "function"
-  ) {
+  const sharedBinding: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
+  const legacyBinding: unknown = legacyBindingName
+    ? Reflect.get(globalThis, legacyBindingName)
+    : undefined;
+  const candidate: unknown = sharedBinding ?? legacyBinding;
+  if (!isKvNamespace(candidate)) {
     return null;
   }
   return candidate;

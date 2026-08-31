@@ -16,13 +16,13 @@ const MEMORY_CAP = 16;
 const VERDICT_TONE: Record<StalenessVerdict, string> = {
   RECONSIDER: "text-rose-300",
   WATCH: "text-amber-300",
-  "no-change": "text-emerald-300",
+  STAND: "text-emerald-300",
 };
 
 const VERDICT_BADGE: Record<StalenessVerdict, string> = {
   RECONSIDER: "border-rose-500/30 bg-rose-500/10 text-rose-200",
   WATCH: "border-amber-500/30 bg-amber-500/10 text-amber-200",
-  "no-change": "border-emerald-500/25 bg-emerald-500/[0.06] text-emerald-200",
+  STAND: "border-emerald-500/25 bg-emerald-500/[0.06] text-emerald-200",
 };
 
 type StalenessEntry = {
@@ -72,7 +72,7 @@ export function DecisionStalenessPanel({
     return entries.flatMap((entry) => {
       if (!entry.assumptions) return [];
       const result = assessDecisionStaleness(entry.assumptions, conditions);
-      if (result.verdict === "no-change") return [];
+      if (result.verdict === "STAND") return [];
       return [{
         id: entry.id,
         label: entryLabel(entry),

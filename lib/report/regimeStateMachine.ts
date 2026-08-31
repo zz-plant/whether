@@ -1,5 +1,4 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
-import { buildRegimeDecisionEvent, getDecisionEventStore } from "../events/decisionEventStore";
 
 export type RegimeState = RegimeKey;
 
@@ -156,28 +155,4 @@ const advanceRegimeStateBase = (
   };
 };
 
-export const advanceRegimeState = (
-  previousState: RegimeMachineSnapshot | null,
-  currentSignals: RegimeMachineSignals,
-): RegimeStateTransition => {
-  const transition = advanceRegimeStateBase(previousState, currentSignals);
-  if (
-    previousState &&
-    transition.committed &&
-    transition.nextState !== previousState.committedState
-  ) {
-    getDecisionEventStore().append(
-      buildRegimeDecisionEvent({
-        previousState: previousState.committedState,
-        nextState: transition.nextState,
-        tightness: currentSignals.tightness,
-        riskAppetite: currentSignals.riskAppetite,
-        thresholds: currentSignals.thresholds,
-        diagnostics: currentSignals.diagnostics,
-        pendingCount: transition.transitionPendingCount ?? 0,
-        transitionReason: transition.transitionReason,
-      }),
-    );
-  }
-  return transition;
-};
+export const advanceRegimeState = advanceRegimeStateBase;

@@ -170,7 +170,7 @@ describe("decisionMemory", () => {
       currentRiskAppetite: 43,
     });
     assert.equal(reconsiderResult.verdict, "RECONSIDER");
-    assert.match(reconsiderResult.reason, /Capital conditions and demand expectations have weakened/);
+    assert.match(reconsiderResult.reason, /Capital conditions and Demand expectations/);
   });
 });
 

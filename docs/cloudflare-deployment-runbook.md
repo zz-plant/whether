@@ -94,9 +94,11 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 `[observability] enabled = true` is set on both lanes so tail logs and runtime errors land in the Workers dashboard for the active deploy without extra plumbing. `head_sampling_rate` is `1` (no sampling) until invocation volume warrants tuning.
 
-### Optional: durable KV (`WHETHER_DURABLE_KV`)
+### Durable KV (`WHETHER_DURABLE_KV`)
 
-Several repositories (`lib/storage/regimeAlertRepository.ts`, `lib/storage/alertPreferenceRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/events/decisionEventStore.ts`, `lib/ingestion/store.ts`) probe `globalThis.WHETHER_DURABLE_KV` and silently fall back to in-memory storage when the binding is missing. The fallback is per-isolate and is lost on every redeploy, so any feature that depends on durable history (regime alert history, decision events, decision memory, alert preferences, ingestion snapshots) operates as `backend: "local-fallback"` until the binding is provisioned.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/storage/alertPreferenceRepository.ts`, `lib/ingestion/store.ts`) connect through `lib/runtime/boundary.ts` to `WHETHER_DURABLE_KV`.
+
+The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Read paths perform zero writes.
 
 To provision once and enable durable persistence:
 
@@ -110,7 +112,7 @@ bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview
 bunx wrangler kv namespace create WHETHER_DURABLE_KV --env preview --preview
 ```
 
-Then paste the returned IDs into the commented `[[kv_namespaces]]` and `[[env.preview.kv_namespaces]]` blocks in `wrangler.toml` and uncomment them. After deploy, `/api/regime-alerts` and `/api/decision-events` should report `backend: "durable"` instead of `local-fallback`.
+Then paste the returned IDs into the commented `[[kv_namespaces]]` and `[[env.preview.kv_namespaces]]` blocks in `wrangler.toml` and uncomment them. After deploy, `/api/regime-alerts` and `/api/decision-events` report `backend: "durable"`. In production, write operations strictly require durable storage and refuse silent local fallback.
 
 The binding is intentionally left commented out by default so CI deploys do not fail wrangler validation when the namespace IDs have not yet been provisioned.
 

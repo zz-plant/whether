@@ -172,6 +172,11 @@ export interface CompanyFinancialProfile {
   grossMarginPct?: number;
 }
 
+export const isBusinessModel = (
+  value: string,
+): value is NonNullable<CompanyFinancialProfile["businessModel"]> =>
+  value === "VC_BACKED" || value === "BOOTSTRAPPED";
+
 export interface PlanStressTestRequest {
   planText: string;
   lifecycle?: LifecycleStage;

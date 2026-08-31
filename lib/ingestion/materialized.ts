@@ -420,11 +420,11 @@ export const buildCanonicalMacroSeriesFromReadModel = (
 const BACKGROUND_REFRESH_LOCK_TTL_SECONDS = 120;
 
 export const loadCanonicalReportInputs = async (
-  options?: { fetcher?: typeof fetch; store?: IngestionStore; refresh?: "inline" | "background" },
+  options?: { fetcher?: typeof fetch; store?: IngestionStore; refresh?: "inline" | "background" | "none" },
 ) => {
   const store = options?.store ?? getDefaultIngestionStore();
   let model = await loadMaterializedSignals(store);
-  const familiesToRefresh = resolveSignalFamiliesToRefresh(model);
+  const familiesToRefresh = options?.refresh === "none" ? [] : resolveSignalFamiliesToRefresh(model);
 
   if (familiesToRefresh.length > 0) {
     if (model && options?.refresh === "background") {

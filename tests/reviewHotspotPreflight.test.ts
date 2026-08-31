@@ -51,6 +51,13 @@ describe("isUnsafeAssertion", () => {
     assert.equal(isUnsafeAssertion('  const modes = ["auto", "tv"] as const;'), false);
   });
 
+  it("allows import aliases", () => {
+    assert.equal(
+      isUnsafeAssertion('import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";'),
+      false,
+    );
+  });
+
   it("ignores English prose, quoted or not", () => {
     assert.equal(isUnsafeAssertion("  // this renders as a header"), false);
     assert.equal(isUnsafeAssertion('  const label = "treats the window as unchanged";'), false);

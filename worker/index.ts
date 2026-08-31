@@ -1,6 +1,6 @@
 import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
-import { executeIngest } from "../lib/ingestion/executeIngest";
+import { refreshOperatingState } from "../lib/operatingState/refreshOperatingState";
 import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
 import { installWaitUntil } from "../lib/runtime/backgroundWork";
 import { withDeadline } from "../lib/withDeadline";
@@ -91,11 +91,14 @@ export default {
 
     const isDailyIngestion = event.cron === "0 2 * * *";
 
-    /* Always ingest fresh signals to KV — call directly instead of self-fetch */
-    const ingestResult = await executeIngest();
-    if (!ingestResult.ok) {
-      console.error("[cron] ingest failed", ingestResult.error);
+    /* Always refresh operating state to KV with fresh signals */
+    const refreshResult = await refreshOperatingState({ forceIngest: true });
+    if (!refreshResult.ok) {
+      console.error("[cron] refreshOperatingState failed", refreshResult.error);
     }
+
+    const snapshot = refreshResult.ok ? refreshResult.snapshot : null;
+    const weeklyCall = refreshResult.ok ? refreshResult.weeklyCall : null;
 
     /* Both crons evaluate bounded-rule tripwires against the fresh signals, so a
        regime flip or threshold crossing pushes the day it lands instead of waiting
@@ -103,8 +106,8 @@ export default {
        daily runs stay silent unless something actually crossed. The brief email
        remains weekly-only — the cadence promise is weekly; only rule firings
        break cadence. */
-    if (!isDailyIngestion) {
-      await runCronStep("email/send-weekly", sendWeeklyBrief);
+    if (!isDailyIngestion && snapshot && weeklyCall) {
+      await runCronStep("email/send-weekly", () => sendWeeklyBrief({ snapshot, weeklyCall }));
     }
 
     // Records the month in progress from the assessment the read path just computed, so the
@@ -115,11 +118,13 @@ export default {
       return { ok: result.ok, error: result.error };
     });
 
-    await runCronStep("check-regime-change", checkRegimeChange);
-    await runCronStep("alert-deliveries", async () => {
-      const result = await runScheduledAlertDelivery();
-      return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
-    });
+    if (snapshot && weeklyCall) {
+      await runCronStep("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall }));
+      await runCronStep("alert-deliveries", async () => {
+        const result = await runScheduledAlertDelivery({ snapshot, weeklyCall });
+        return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
+      });
+    }
   },
 
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {

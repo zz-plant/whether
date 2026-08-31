@@ -15,11 +15,11 @@ const baseSnapshot = {
 };
 
 describe("decision staleness", () => {
-  it("returns no-change when conditions remain inside the recorded range", () => {
+  it("returns STAND when conditions remain inside the recorded range", () => {
     const result = assessDecisionStaleness(baseSnapshot, { tightness: 64, riskAppetite: 52 });
-    assert.equal(result.verdict, "no-change");
+    assert.equal(result.verdict, "STAND");
     assert.equal(result.moved.length, 0);
-    assert.equal(stalenessVerdictLabel(result.verdict), "No change");
+    assert.equal(stalenessVerdictLabel(result.verdict), "STAND");
   });
 
   it("watches when one supporting assumption moves outside the recorded range", () => {
@@ -47,7 +47,7 @@ describe("decision staleness", () => {
 
   it("does not treat improving conditions as moved", () => {
     const result = assessDecisionStaleness(baseSnapshot, { tightness: 52, riskAppetite: 70 });
-    assert.equal(result.verdict, "no-change");
+    assert.equal(result.verdict, "STAND");
     assert.equal(result.moved.length, 0);
   });
 
