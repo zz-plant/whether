@@ -233,7 +233,7 @@
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
     .weather-surface-secondary, .weather-surface-utility
   )
   :is(
@@ -242,7 +242,7 @@
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
     .weather-surface-secondary, .weather-surface-utility
   ) {
   box-shadow: none;
@@ -260,7 +260,7 @@
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
     .weather-surface-secondary, .weather-surface-utility
   )
   :is(
@@ -269,7 +269,7 @@
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
     .weather-surface-secondary, .weather-surface-utility
   )
   :is(
@@ -278,7 +278,7 @@
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
     .weather-surface-secondary, .weather-surface-utility
   ):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
