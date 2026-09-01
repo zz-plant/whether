@@ -139,7 +139,22 @@ export const BeginnerGlossaryPanel = () => (
           <p className="mt-1 text-xs text-slate-400">U.S. market terms, then constraints</p>
         </div>
       </div>
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+      {/* Collapsed by default. This is reference — you look one term up, you do
+          not read 26 — and expanded it was 4,888px, two-fifths of /trust on a
+          phone. §XII collapses the evidence behind a claim and never the claim,
+          and nothing here is needed to judge this week's call. The six links
+          that point at #beginner-glossary still open it: AnchorFeedback expands
+          a disclosure containing the anchor before scrolling to it. */}
+      <details className="weather-auto-chevron mt-6 group">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 rounded-md text-sm text-slate-200">
+          <span>
+            Open the glossary
+            <span className="ml-2 text-xs text-slate-400">
+              {BEGINNER_GLOSSARY_ENTRIES.length} terms, each with what it changes for you
+            </span>
+          </span>
+        </summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
         <aside className="weather-surface p-4" aria-label="Glossary sidebar">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary terms</p>
           <Accordion.Root multiple className="mt-3 space-y-3 text-sm text-slate-300">
@@ -204,7 +219,8 @@ export const BeginnerGlossaryPanel = () => (
             </div>
           ))}
         </div>
-      </div>
+        </div>
+      </details>
     </div>
   </section>
 );

@@ -43,7 +43,12 @@ export function PageShell({
       <WebVitalsTracker />
       {structuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} /> : null}
       {enableTvAmbientMode ? <DisplayModeManager /> : null}
-      {enableTvAmbientMode ? <AnchorFeedback /> : null}
+      {/* Not TV-only. It renders nothing and only acts when the hash matches one
+          of its target ids, and it is now what opens a collapsed panel that an
+          anchor points into — the /trust glossary is linked from six places.
+          Gated on ambient mode, both that and the anchor flash were dead for
+          every ordinary visit. */}
+      <AnchorFeedback />
       {enableTvAmbientMode ? <DisplayGuardian /> : null}
 
       {/* 2rem, not 8rem. The 8rem reserved room for a fixed bottom bar, but the
