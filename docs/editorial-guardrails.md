@@ -73,13 +73,14 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Do not add synonyms (outlook/conditions) for the forward estimate. The command bar's
   "{regime} outlook" chip is a pass-through descriptor of current conditions, not a
   forecast synonym.
-- **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS` and
-  `ACTION_STRIP_DISPLAY_COPY`** (`lib/report/reportCopy.ts`): general imperative forms on
-  screens are Do now / Pause if / Change course if; the homepage scan ledger uses Do now /
-  Stop or tighten if / Open up again when. Noun slots in exports remain Action / Threshold /
-  Reversal. Consume these exports instead of hardcoding slot words in components. The homepage
-  ledger also translates structured lane states into actions: Keep this closed / Proceed with
-  guardrails / Stage the next move / Move ahead now.
+- **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
+  (`lib/report/reportCopy.ts`): general imperative forms on screens are Do now / Pause if /
+  Change course if. Noun slots in exports remain Action / Threshold / Reversal. Consume these
+  exports instead of hardcoding slot words in components. Per-area bounded rules now render on
+  `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
+  (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
+  reintroduce Stop or tighten if / Open up again when, or the Keep this closed / Proceed with
+  guardrails / Stage the next move / Move ahead now lane states.
 - **Decision-attention verdicts are `RECONSIDER` / `WATCH` / `No change`** (single source:
   `lib/report/decisionStaleness.ts`). These label recorded decisions whose supporting
   assumptions have moved: RECONSIDER when two assumptions moved outside the recorded range,
