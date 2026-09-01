@@ -38,7 +38,7 @@ Prefer editing these sources before changing consumers:
 - `lib/report/decisionKnobs.ts`
 
 Typical downstream renderers:
-- `app/page.tsx` (top fold: `DecisionHero`, `ThreeWhethersCard`)
+- `app/page.tsx` (top fold: `DecisionHero`; non-weekly cadences lead with `CadenceCallCard`)
 - `app/components/home/*`
 - `app/operate/components/*`
 

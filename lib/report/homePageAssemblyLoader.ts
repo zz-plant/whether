@@ -3,9 +3,11 @@ import { assembleHomePage } from "./homePageAssembler";
 import type { HomePageSearchParams } from "./homeMetadata";
 import { parseOperatorContextFromCookies } from "./operatorContext";
 
-// Cadence data intentionally does NOT load here: the homepage renders it behind
-// Suspense (`AsyncCadenceSection`), so fetching it on this blocking path would
-// defeat the streaming boundary and duplicate the posture-state work.
+// Cadence data does not load here either — but it no longer needs to. The non-weekly
+// lead is derived from this assembly's own `assessment` and provenance
+// (`lib/report/cadenceCallModel.ts`), so it costs no extra fetch and renders under
+// fallback. It used to await the whole agent-interface payload behind Suspense, whose
+// failure was swallowed, which is why every cadence tab served the same page.
 export async function loadHomePageAssembly(
   searchParams?: HomePageSearchParams,
 ) {

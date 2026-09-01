@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { ActionLink } from "./components/ui/actionLink";
@@ -16,11 +15,10 @@ import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
-import { CadenceCallCardFallback } from "./components/suspenseFallbacks";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
-import { buildAgentInterfaceResponse, isAgentCadence, type AgentCadence } from "../lib/agentInterface";
+import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
@@ -96,6 +94,9 @@ type BelowTheFoldEvidenceProps = {
   recordDate: string;
   recentRecordDates: string[];
   operateHref?: string;
+  /** Named for the selected cadence, so the one plan CTA on the page matches the
+   *  horizon the reader is looking at. */
+  planLabel?: string;
 };
 
 function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
@@ -112,7 +113,7 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
       <div className="mt-4 border-t border-white/[0.06] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
-            Build this week&apos;s plan →
+            {props.planLabel ?? "Build this week’s plan →"}
           </ActionLink>
           <RitualCheck
             recordDate={props.recordDate}
@@ -124,11 +125,12 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   );
 }
 
-async function AsyncCadenceSection({ cadence }: { cadence: Exclude<AgentCadence, "weekly"> }) {
-  const cadenceData = await buildAgentInterfaceResponse(cadence).catch(() => null);
-  if (!cadenceData) return null;
-  return <CadenceCallCard cadence={cadence} data={cadenceData} />;
-}
+/** Only the horizons the cadence selector offers. `yearly` is a valid agent cadence but
+ *  has no tab, so an arbitrary ?cadence= value falls back to the weekly default. */
+const HOME_CADENCE_HORIZONS: readonly CadenceCallHorizon[] = ["monthly", "quarterly"];
+
+const resolveHomeCadence = (value: string | undefined): CadenceCallHorizon | "weekly" =>
+  HOME_CADENCE_HORIZONS.find((horizon) => horizon === value) ?? "weekly";
 
 async function PageContent({
   searchParams,
@@ -137,7 +139,7 @@ async function PageContent({
   searchParams?: HomePageSearchParams;
   regimeHistory: ReturnType<typeof getMonthlyRegimeHistory>;
 }) {
-  const activeCadence = searchParams?.cadence && isAgentCadence(searchParams.cadence) ? searchParams.cadence : "weekly";
+  const activeCadence = resolveHomeCadence(searchParams?.cadence);
 
   let data: Awaited<ReturnType<typeof loadHomePageAssembly>>;
 
@@ -179,6 +181,21 @@ async function PageContent({
         }]
       : [],
   );
+
+  // Built here rather than fetched: the previous card awaited the whole agent-interface
+  // payload behind Suspense and swallowed its failure, which is why every cadence tab
+  // rendered the same page. Everything it needs is already loaded and in hand.
+  const cadenceCall =
+    activeCadence === "weekly"
+      ? null
+      : buildCadenceCallModel({
+          horizon: activeCadence,
+          assessment: reportData.assessment,
+          recordDate: reportData.treasury.record_date,
+          recordDateLabel: homepage.reportShell.recordDateLabel,
+          regimeHistory: alignedRegimeHistory,
+          planHref: operateHref,
+        });
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
@@ -232,7 +249,11 @@ async function PageContent({
 
   return (
     <>
-      <h1 className="sr-only" id="share-ready-artifact">Weekly Brief</h1>
+      <h1 className="sr-only" id="share-ready-artifact">
+        {cadenceCall
+          ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
+          : "Weekly Brief"}
+      </h1>
       <ActivationTracker path="/" />
       <FreshnessDot
         label={homepage.reportShell.fetchedAtLabel}
@@ -270,11 +291,7 @@ async function PageContent({
               };
             })}
           >
-            {activeCadence !== "weekly" ? (
-              <Suspense fallback={<CadenceCallCardFallback />}>
-                <AsyncCadenceSection cadence={activeCadence} />
-              </Suspense>
-            ) : null}
+            {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
             <DecisionHero
               tightness={tightness}
               tightnessDelta={tightnessDelta}
@@ -332,6 +349,7 @@ async function PageContent({
             recordDate={homepage.reportShell.recordDateLabel}
             recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
             operateHref={operateHref}
+            planLabel={cadenceCall?.planLabel}
           />
         </div>
 

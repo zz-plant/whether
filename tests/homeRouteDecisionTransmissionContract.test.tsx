@@ -23,11 +23,21 @@ describe("home route render contract", () => {
   it("keeps one canonical copy action in the homepage body", () => {
     // `DecisionHero` owns the one-tap `Copy Brief`. The header `Export` menu is the format picker and
     // `StickyCallStrip` is its on-scroll persistence — no third in-body copy button.
+    //
+    // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
+    // which is now deleted. The DD-005 rule it protected is unchanged, so it moves to the
+    // one other body surface that carries a copy control: the non-weekly cadence lead.
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
-    const rulesSource = readFileSync("app/components/ThreeWhethersCard.tsx", "utf8");
+    const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
     assert.ok(heroSource.includes("<ShareBriefButton"), "decision hero owns the canonical copy action");
-    assert.ok(!rulesSource.includes("ShareBriefButton"), "bounded rules card must not duplicate the hero copy action");
+    // The cadence lead copies a different artifact — the month's or quarter's call, not the
+    // week's — so it earns its own control. What DD-005 rules out is a second button under
+    // the hero's name, which is why this one has to pass its own label.
+    assert.ok(
+      cadenceSource.includes("label={model.shareLabel}"),
+      "cadence lead must name the artifact it copies rather than reusing 'Copy Brief'",
+    );
   });
 
   it("keeps transition forecasting internal and off the hero surface", () => {
