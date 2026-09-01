@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
+import { findPublishedVersionId } from "../scripts/cloudflare-run.mjs";
 
 describe("Cloudflare deploy contracts", () => {
   const source = readFileSync(new URL("../scripts/cloudflare-run.mjs", import.meta.url), "utf8");
@@ -65,5 +66,56 @@ describe("Cloudflare deploy contracts", () => {
       hookTasks.includes("hotspot-preflight"),
       "the preflight lost its own workflow, so the hook has to carry it",
     );
+  });
+
+  /**
+   * On 2026-09-01 `bun run deploy:cloudflare` exited 0 without deploying: Wrangler printed
+   * the module table, uploaded nothing, and exited 0. The adapter runs Wrangler through
+   * execFileSync — which throws only on a non-zero exit — then scans for a workers.dev URL
+   * and, finding none, returns "(URL not detected in wrangler output)" and resolves
+   * normally. Production stayed on the previous version and the command reported success.
+   * The captured output of both runs is the fixture here.
+   */
+  const PUBLISHED_RUN = [
+    "  Total Upload: 6715.93 KiB / gzip: 2093.33 KiB",
+    "  Uploaded whether (7.01 sec)",
+    "  Current Version ID: de266f59-b3d4-4507-97e0-24150149713c",
+    "  Deployed to: https://whether.kanavj.workers.dev",
+  ].join("\n");
+
+  const SILENT_NO_OP_RUN = [
+    "  │ Total (465 modules)                    │               │ 6413.89 KiB │",
+    "  └────────────────────────────────────────┴───────────────┴─────────────┘",
+    "  Deployed to: (URL not detected in wrangler output)",
+  ].join("\n");
+
+  it("recognizes a deploy that actually published", () => {
+    assert.equal(findPublishedVersionId(PUBLISHED_RUN), "de266f59-b3d4-4507-97e0-24150149713c");
+  });
+
+  it("refuses to call the 2026-09-01 silent no-op a deploy", () => {
+    assert.equal(findPublishedVersionId(SILENT_NO_OP_RUN), null);
+    // The footer alone must never count as evidence: it is printed either way.
+    assert.match(SILENT_NO_OP_RUN, /Deployed to:/);
+  });
+
+  it("treats empty or absent output as not deployed", () => {
+    assert.equal(findPublishedVersionId(""), null);
+    assert.equal(findPublishedVersionId(undefined), null);
+  });
+
+  it("fails the deploy when no published version is reported", () => {
+    const deployBranch = source.slice(source.indexOf("runCloudflareDeployCaptured(deployArgs, childEnv)"));
+    assert.match(deployBranch, /findPublishedVersionId\(output\)/);
+    assert.match(deployBranch, /if \(!versionId\)[\s\S]*process\.exit\(1\)/);
+  });
+
+  it("streams the deploy rather than buffering it, so the slowest step stays visible", () => {
+    assert.match(source, /stdio: \["inherit", "pipe", "pipe"\]/);
+    assert.match(source, /sink\.write\(chunk\)/);
+  });
+
+  it("does not run a deploy when imported", () => {
+    assert.match(source, /import\.meta\.url === pathToFileURL\(process\.argv\[1\]\)\.href/);
   });
 });
