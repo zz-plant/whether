@@ -6,7 +6,6 @@ const TARGET_IDS = new Set([
   "current-scores",
   "thresholds",
   "ops-workstreams",
-  "first-time-guide",
   "beginner-glossary",
   "ops-playbook",
   "sensor-array",
