@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
@@ -74,7 +75,7 @@ export default async function ShipChecklistPage({
         <ul className="space-y-2 text-sm text-slate-200">
           {result.reasons.map((reason) => <li key={reason}>• {reason}</li>)}
         </ul>
-        <p className="text-sm text-slate-300">Change course if: {result.reversalTrigger}</p>
+        <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: {result.reversalTrigger}</p>
       </section>
 
       <Link href="/answer" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">

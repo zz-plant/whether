@@ -7,6 +7,7 @@ import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
 import {
+  DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_ACTION,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
@@ -121,7 +122,7 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
               <li><span className="text-slate-400">This recommendation breaks if:</span> {reportData.flipThreshold}</li>
-              <li><span className="text-slate-400">Pause if:</span> {reportData.guardrailThreshold}</li>
+              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>
             </ul>
           </article>

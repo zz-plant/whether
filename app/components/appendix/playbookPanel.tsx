@@ -1,6 +1,7 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import type { PlaybookEntry } from "../../../lib/playbook";
 import type { ActionStripItem } from "../../../lib/report/operatingCalls";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { CollapsibleDeepDive } from "../collapsibleDeepDive";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
 
@@ -74,10 +75,10 @@ export const PlaybookPanel = ({
                 className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2"
               >
                 <p className="font-semibold text-slate-100">{item.label}</p>
-                <p className="mt-1 text-emerald-100">Action now: {item.areaActionNow}</p>
-                <p className="mt-1 text-amber-100">Pause if: {item.triggerThreshold}</p>
+                <p className="mt-1 text-emerald-100">{DECISION_CONTRACT_LABELS.action.actionNow}: {item.areaActionNow}</p>
+                <p className="mt-1 text-amber-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}: {item.triggerThreshold}</p>
                 <p className="mt-1 text-sky-100">
-                  Change course if: {item.reversalCondition}
+                  {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: {item.reversalCondition}
                 </p>
               </li>
             ))}

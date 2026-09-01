@@ -1,4 +1,5 @@
 import type { CompactFreshnessMeta } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 
@@ -490,12 +491,12 @@ export const buildTrustStatus = ({
       : "All signals aligned. Proceed with normal approvals.";
 
   const action = historicalSelection
-    ? `${historicalAction} Clears when: switch to current live data before changing spending pace.`
+    ? `${historicalAction} ${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: switch to current live data before changing spending pace.`
     : isFallback
-      ? `${fallbackAction} Clears when: live data updates and verifies across all sources.`
+      ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: live data updates and verifies across all sources.`
       : policyRefusalActive
-        ? `Keep approvals reversible. Clears when: signals reconcile and the contradictions resolve.`
-      : `${stableAction} Clears when: confidence remains above LOW or transition risk drops.`;
+        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: signals reconcile and the contradictions resolve.`
+      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: confidence remains above LOW or transition risk drops.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

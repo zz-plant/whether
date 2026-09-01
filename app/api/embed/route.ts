@@ -12,6 +12,7 @@ import {
   buildWeeklyOperatorBriefCopyText,
 } from "../../../lib/report/home/artifactPayload";
 import { buildWeeklyTrustCueLine } from "../../../lib/report/trustStatus";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -110,7 +111,7 @@ export async function GET(request: Request) {
         ``,
         `Operating call: ${operatingCall}`,
         `Decision now: ${actionNow}`,
-        ...(doNowItems.length > 0 ? [`Do now: ${doNowItems.join(", ")}`] : []),
+        ...(doNowItems.length > 0 ? [`${DECISION_CONTRACT_LABELS.action.doNow}: ${doNowItems.join(", ")}`] : []),
         ...(flipTrigger ? [`Watch: ${flipTrigger}`] : []),
         ``,
         `Get your own weekly brief: ${briefData.attributionUrl}`,
@@ -210,7 +211,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
     <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(operatingCall)}</p>
   </div>
   <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:12px 0;"><strong style="color:rgba(255,255,255,0.8);">Decision now:</strong> ${escapeHtml(actionNow)}</p>
-  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">Do now</p>${doNowHtml}</div>` : ""}
+  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
   ${flipTrigger ? `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">Watch:</strong> ${escapeHtml(flipTrigger)}</div>` : ""}
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">
     <span>Macro brief by <a href="${escapeAttribute(attributionUrl)}" style="color:rgba(56,189,248,0.8);text-decoration:underline;font-weight:600;">Whether</a></span>

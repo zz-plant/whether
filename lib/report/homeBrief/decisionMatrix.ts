@@ -1,4 +1,5 @@
 import { buildWeeklyLockCommitment } from "../decisionKnobs";
+import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import {
   extractCompactClause,
   formatBoundedDecisionAction,
@@ -97,7 +98,7 @@ export const buildDecisionMatrixPayload = ({
     columns: [
       { key: "approve", label: "Approve" },
       { key: "delay", label: "Delay" },
-      { key: "flip", label: "Change course if" },
+      { key: "flip", label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf },
     ],
     rows,
   };

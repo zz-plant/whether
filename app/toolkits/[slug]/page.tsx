@@ -54,8 +54,8 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Bounded operating rules</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li>• <span className="font-semibold text-slate-100">Do now in tighter conditions:</span> {toolkit.tightenNow}</li>
-          <li>• <span className="font-semibold text-slate-100">Do now in easier conditions:</span> {toolkit.loosenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action} in tighter conditions:</span> {toolkit.tightenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action} in easier conditions:</span> {toolkit.loosenNow}</li>
           <li>• <span className="font-semibold text-slate-100">Proceed threshold:</span> {toolkit.proceedThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {toolkit.stopTrigger}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {toolkit.reversalTrigger}</li>

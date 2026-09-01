@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
 export const metadata: Metadata = {
   title: "Bounded Decisions — Action, Threshold, Reversal | Whether",
@@ -26,15 +27,15 @@ export default function ThresholdPage() {
           <h2 className="type-eyebrow">The three parts</h2>
           <div className="grid gap-4">
             <div className="weather-surface px-4 py-4 space-y-2">
-              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-sky-200">Action</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-sky-200">{DECISION_CONTRACT_LABELS.slot.action}</p>
               <p className="text-sm text-slate-200">What you will do now, given current conditions. Not what you hope to do — what the evidence supports doing right now.</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
-              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-amber-200">Threshold</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-amber-200">{DECISION_CONTRACT_LABELS.slot.threshold}</p>
               <p className="text-sm text-slate-200">The specific, measurable condition that would cause you to pause the action. Not a feeling — a number. &ldquo;Pause if funding pressure exceeds 76.&rdquo;</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
-              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-emerald-200">Reversal</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-emerald-200">{DECISION_CONTRACT_LABELS.slot.reversal}</p>
               <p className="text-sm text-slate-200">The condition that would clear the threshold and allow the action to resume. Without this, the threshold is a permanent stop, not a pause.</p>
             </div>
           </div>
@@ -56,9 +57,9 @@ export default function ThresholdPage() {
         <section className="space-y-4">
           <h2 className="type-eyebrow">In practice</h2>
           <div className="weather-surface px-4 py-4 space-y-2">
-            <p className="text-sm text-slate-200 font-semibold">Action: Gate net-new hiring to short-payback roles only.</p>
-            <p className="text-sm text-slate-300">Threshold: Pause all hiring if credit conditions tighten above 76.</p>
-            <p className="text-sm text-slate-300">Reversal: Resume staged approvals when credit conditions ease below 64.</p>
+            <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Gate net-new hiring to short-payback roles only.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if credit conditions tighten above 76.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume staged approvals when credit conditions ease below 64.</p>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             The threshold makes the decision concrete. The reversal makes it temporary. Together they make the decision safe to start.

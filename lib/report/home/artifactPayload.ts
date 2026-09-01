@@ -6,6 +6,7 @@ import {
   buildWeeklyOperatorBriefPlainText,
 } from "../../export/weeklyOperatorBrief";
 import { buildCanonicalDecisionCopy } from "../canonicalDecisionCopy";
+import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { buildInterpretationLayer, type InterpretationView } from "../interpretationLayer";
 import type { buildHomeBriefModel } from "../homeBriefModel";
 import type { buildPostureState } from "../postureStateSource";
@@ -58,8 +59,8 @@ const buildDeltaOnlyBriefText = ({
     "Revisit now",
     ...revisitLines,
     "",
-    `Pause if: ${homeBriefModel.guardrail}`,
-    `Change course if: ${canonicalDecisionCopy.flipTrigger}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${homeBriefModel.guardrail}`,
+    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${canonicalDecisionCopy.flipTrigger}`,
     `Trust: ${homeBriefModel.decisionReadiness.detail}`,
     `Data refreshed: ${freshnessLabel}`,
     "",

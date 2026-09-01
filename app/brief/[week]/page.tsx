@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
@@ -160,18 +161,18 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
           <p className="text-sm text-slate-300">{brief.whatChanged}</p>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Do now:</span> {brief.actionNow}
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {brief.actionNow}
           </p>
         </section>
 
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What would flip the call</h2>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Guardrail:</span>{" "}
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
             <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
           </p>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Reversal:</span>{" "}
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
             <BoundedValue>{brief.flipThreshold}</BoundedValue>
           </p>
         </section>
@@ -184,7 +185,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                 <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
                   <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
                   <p className="text-sm text-slate-300">{decision.call}</p>
-                  {decision.doNow ? <p className="text-sm text-slate-300">Do now: {decision.doNow}</p> : null}
+                  {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {decision.doNow}</p> : null}
                   {/* Same size and weight as the rule above, not a tier below it.
                       Phase 1 of the facelift moved bounded rules out of small grey
                       prose on `/` and emphasized the numerals, because the number
@@ -192,11 +193,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                       which is the one every shared link lands on, and the one
                       quoted in board decks. */}
                   <p className="text-sm text-slate-300">
-                    <span className="font-semibold text-slate-100">Threshold:</span>{" "}
+                    <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.slot.threshold}:</span>{" "}
                     <BoundedValue>{decision.pauseTrigger}</BoundedValue>
                   </p>
                   <p className="text-sm text-slate-300">
-                    <span className="font-semibold text-slate-100">Reversal:</span>{" "}
+                    <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
                     <BoundedValue>{decision.resumeTrigger}</BoundedValue>
                   </p>
                 </li>

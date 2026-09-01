@@ -12,6 +12,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import { ContentMeasurementTracker } from "../components/contentMeasurementTracker";
 import { ReportCta } from "../components/reportCta";
@@ -62,9 +63,9 @@ export async function DecisionAnswerPageContent({
     page.title,
     `Short answer: ${liveShortAnswer}`,
     `Current call: ${payload.currentCall}`,
-    `Action now: ${payload.immediateAction}`,
-    `Pause if: ${payload.triggerThreshold}`,
-    `Change course if: ${payload.reversalCondition}`,
+    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
+    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${payload.reversalCondition}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
   ].join("\n");

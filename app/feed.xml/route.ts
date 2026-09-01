@@ -1,4 +1,5 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
 export const runtime = "edge";
 export const revalidate = 3600;
@@ -33,10 +34,10 @@ export async function GET() {
       <link>${link}</link>
       <guid isPermaLink="false">whether-brief-${recordDate}</guid>
       <pubDate>${pubDate}</pubDate>
-      <description>Regime: ${regime}. Action: ${action}. Confidence: ${confidence}.</description>
+      <description>Regime: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.</description>
       <content:encoded><![CDATA[
         <p><strong>Regime:</strong> ${regime}</p>
-        <p><strong>Action:</strong> ${action}</p>
+        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${action}</p>
         <p><strong>Confidence:</strong> ${confidence}</p>
         <p><strong>Record date:</strong> ${recordDate}</p>
         <p><a href="${link}">View full brief →</a></p>

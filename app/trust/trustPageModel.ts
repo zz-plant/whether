@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 import type { ReportShell } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
@@ -49,7 +50,7 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
+  const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
   const revisitBullets: Array<{ label: string; detail?: string; href: string }> = [
     {

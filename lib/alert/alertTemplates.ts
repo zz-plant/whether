@@ -3,6 +3,8 @@
  * Each template returns { subject, html, text } for use with the email adapter.
  */
 
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+
 export type EmailContent = {
   subject: string;
   html: string;
@@ -76,8 +78,8 @@ export const decisionVerdictEmail = ({
     `Whether Decision Alert`,
     headline,
     why,
-    `Action: ${actionNow}`,
-    `Reversal: ${reversal}`,
+    `${DECISION_CONTRACT_LABELS.slot.action}: ${actionNow}`,
+    `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${reversal}`,
     ``,
     `View full brief: https://whether.work`,
     `---`,
@@ -91,10 +93,13 @@ export const decisionVerdictEmail = ({
       sectionBlock("Why", why),
       `</div>`,
       `<div style="margin-top:12px;">`,
+      // "Action Now" is this template's own casing, not
+      // DECISION_CONTRACT_LABELS.action.actionNow ("Action now"). Reconciling the
+      // two is a copy change to sent email, not this refactor.
       sectionBlock("Action Now", actionNow),
       `</div>`,
       `<div style="margin-top:12px;">`,
-      sectionBlock("Reversal", reversal, "#94a3b8", "#f1f5f9"),
+      sectionBlock(DECISION_CONTRACT_LABELS.reversal.reversal, reversal, "#94a3b8", "#f1f5f9"),
       `</div>`,
     ].join("\n"),
   );

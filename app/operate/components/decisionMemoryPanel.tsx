@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePersistentClientId } from "../../components/clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import {
   type DecisionMemoryEntry,
   evaluateDecisionAssumptionHealth,
@@ -28,8 +29,8 @@ const buildEntryCopyText = (entry: DecisionMemoryEntry) =>
       : "Decision: Weekly operating posture",
     entry.outcome.verdict ? `Verdict: ${entry.outcome.verdict}` : null,
     `Summary: ${entry.outcome.summary}`,
-    entry.outcome.guardrail ? `Guardrail: ${entry.outcome.guardrail}` : null,
-    entry.outcome.reversalTrigger ? `Reversal trigger: ${entry.outcome.reversalTrigger}` : null,
+    entry.outcome.guardrail ? `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${entry.outcome.guardrail}` : null,
+    entry.outcome.reversalTrigger ? `${DECISION_CONTRACT_LABELS.reversal.reversal} trigger: ${entry.outcome.reversalTrigger}` : null,
     `Sources: ${entry.sources.join(", ") || "None"}`,
   ]
     .filter((line): line is string => line !== null)
@@ -273,8 +274,8 @@ export const DecisionMemoryPanel = ({
                     ) : null}
                     <p className="mt-3 text-sm text-slate-300 break-words leading-relaxed">{entry.outcome.summary}</p>
                     <div className="mt-4 pt-3 border-t border-slate-800/50 grid gap-2 text-xs">
-                      <p className="text-slate-400"><span className="font-medium text-slate-400">Guardrail:</span> {entry.outcome.guardrail}</p>
-                      <p className="text-slate-400"><span className="font-medium text-slate-400">Reversal:</span> {entry.outcome.reversalTrigger}</p>
+                      <p className="text-slate-400"><span className="font-medium text-slate-400">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span> {entry.outcome.guardrail}</p>
+                      <p className="text-slate-400"><span className="font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span> {entry.outcome.reversalTrigger}</p>
                       {entry.sources.length > 0 && (
                         <p className="text-slate-400 break-all">
                           <span className="font-medium">Sources:</span>{" "}

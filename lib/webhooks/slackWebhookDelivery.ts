@@ -5,6 +5,7 @@
 import type { WeeklyOperatorBriefPayload } from "../export/weeklyOperatorBrief";
 import { buildWeeklyOperatorBriefSlackBlocks } from "../export/weeklyOperatorBrief";
 import type { DecisionAssumptionVerdict, DecisionMemoryEntry } from "../decisionMemory";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 export interface SlackWebhookDeliveryOptions {
   webhookUrl: string;
@@ -106,7 +107,7 @@ export async function dispatchAssumptionAlertSlackWebhook(
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Audit Reason:* ${alert.reason}\n*Guardrail:* ${guardrail}`,
+        text: `*Audit Reason:* ${alert.reason}\n*${DECISION_CONTRACT_LABELS.threshold.guardrail}:* ${guardrail}`,
       },
     },
   ];

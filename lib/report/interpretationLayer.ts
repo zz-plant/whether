@@ -1,6 +1,7 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import {
   buildCompanyAdjustedRules,
   type CompanyProfile,
@@ -45,7 +46,14 @@ const compactClause = (value: string, max = 120) => {
   return `${normalized.slice(0, max - 1).trimEnd()}…`;
 };
 
-const boundedLine = (label: "Action" | "Trigger" | "Reverse", value: string) =>
+// "Reverse" is this layer's compact form and has no matching value in
+// DECISION_CONTRACT_LABELS; widening it to "Reversal" would change output.
+type BoundedLineLabel =
+  | typeof DECISION_CONTRACT_LABELS.slot.action
+  | typeof DECISION_CONTRACT_LABELS.threshold.trigger
+  | "Reverse";
+
+const boundedLine = (label: BoundedLineLabel, value: string) =>
   `${label}: ${compactClause(value)}`;
 
 const boundedTriplet = ({
@@ -58,8 +66,8 @@ const boundedTriplet = ({
   reverse: string;
 }) =>
   [
-    boundedLine("Action", action),
-    boundedLine("Trigger", trigger),
+    boundedLine(DECISION_CONTRACT_LABELS.slot.action, action),
+    boundedLine(DECISION_CONTRACT_LABELS.threshold.trigger, trigger),
     boundedLine("Reverse", reverse),
   ].join(" | ");
 
@@ -136,8 +144,8 @@ export const buildInterpretationLayer = ({
   isFallback?: boolean;
 }): InterpretationLayer => {
   const canonicalBullets = [
-    boundedLine("Action", homeBriefModel.decisionShiftSummary),
-    boundedLine("Trigger", homeBriefModel.guardrail),
+    boundedLine(DECISION_CONTRACT_LABELS.slot.action, homeBriefModel.decisionShiftSummary),
+    boundedLine(DECISION_CONTRACT_LABELS.threshold.trigger, homeBriefModel.guardrail),
     boundedLine("Reverse", homeBriefModel.reversalTrigger),
   ];
 
@@ -173,8 +181,8 @@ export const buildInterpretationLayer = ({
       label: "Sector view",
       summary: `This sector reads as ${adjusted.adjustedPostureLabel}. ${paceCopy}`,
       bullets: formatBullets([
-        boundedLine("Action", sectorAction),
-        boundedLine("Trigger", homeBriefModel.guardrail),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, sectorAction),
+        boundedLine(DECISION_CONTRACT_LABELS.threshold.trigger, homeBriefModel.guardrail),
         boundedLine("Reverse", adjusted.reversalCondition),
       ]),
     };
@@ -236,9 +244,9 @@ export const buildInterpretationLayer = ({
       summary:
         "This week's call, translated into runway: how fast to spend, when to raise, and how far burn can move.",
       bullets: formatBullets([
-        boundedLine("Action", actionPhrase),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, actionPhrase),
         boundedLine(
-          "Trigger",
+          DECISION_CONTRACT_LABELS.threshold.trigger,
           `Open the raise between month ${plan.raiseTimingRecommendation.startMonth} and ${plan.raiseTimingRecommendation.endMonth}; safe runway is ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months out.`,
         ),
         boundedLine(
@@ -289,9 +297,9 @@ export const buildInterpretationLayer = ({
       summary:
         "How likely this call is to flip if the current momentum holds.",
       bullets: formatBullets([
-        boundedLine("Action", `Operate for ${topRegime[0]} while the current posture holds — it carries ${topRegime[1]}% of the next-90-day weight.`),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} while the current posture holds — it carries ${topRegime[1]}% of the next-90-day weight.`),
         boundedLine(
-          "Trigger",
+          DECISION_CONTRACT_LABELS.threshold.trigger,
           `${forecast.boundaryPressure.distance} points separate this call from its ${closestDimension.toLowerCase()} boundary, at ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()} crossing risk.`,
         ),
         boundedLine("Reverse", dynamicMomentum),

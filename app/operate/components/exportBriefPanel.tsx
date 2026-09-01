@@ -45,7 +45,7 @@ import {
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { WorkAppLabel } from "../../components/workAppIcon";
 import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
-import { PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -546,7 +546,7 @@ export const ExportBriefPanel = ({
                 />
               </label>
               <label className="space-y-1">
-                <span className="type-eyebrow text-amber-100/80">Change course if</span>
+                <span className="type-eyebrow text-amber-100/80">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</span>
                 <input
                   className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
                   value={overrideReversal}

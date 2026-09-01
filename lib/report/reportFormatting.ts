@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue } from "../formatters";
 import { REGIME_LABELS } from "../regimePresentation";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
@@ -12,10 +13,13 @@ export type DecisionPhraseTriplet = {
   reversal: string;
 };
 
+// action/threshold are the contract's imperative forms — read them from the one
+// vocabulary rather than restating them. call/reversal/evidence are this
+// surface's own words and have no slot in DECISION_CONTRACT_LABELS.
 export const publicDecisionLabels = {
   call: "Posture",
-  action: "Do now",
-  threshold: "Pause if",
+  action: DECISION_CONTRACT_LABELS.action.doNow,
+  threshold: DECISION_CONTRACT_LABELS.threshold.pauseIf,
   reversal: "Re-open when",
   evidence: "Evidence",
 } as const;

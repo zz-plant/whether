@@ -14,6 +14,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug } from "../isoWeek";
 import { buildCanonicalUrl } from "../seo";
 import { publicDecisionLabels } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 const PublishedBriefDecisionSchema = z.object({
   area: z.string(),
@@ -213,8 +214,8 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
   const decisions = brief.decisions.map((decision) =>
     [
       `• ${labelForArea(decision.area)}: ${decision.call}`,
-      `  - Action: ${decision.doNow}`,
-      `  - Pause if: ${decision.pauseTrigger}`,
+      `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${decision.doNow}`,
+      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${decision.pauseTrigger}`,
       `  - Resume when: ${decision.resumeTrigger}`,
     ].join("\n"),
   );
@@ -232,9 +233,9 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     brief.whatChanged,
     "",
     "Operating call & bounded thresholds:",
-    `• Action now: ${brief.actionNow}`,
-    `• Guardrail threshold: ${brief.guardrailThreshold}`,
-    `• Reversal condition: ${brief.flipThreshold}`,
+    `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
+    `• ${DECISION_CONTRACT_LABELS.threshold.guardrail} threshold: ${brief.guardrailThreshold}`,
+    `• ${DECISION_CONTRACT_LABELS.reversal.reversal} condition: ${brief.flipThreshold}`,
     ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),

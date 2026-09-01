@@ -5,6 +5,7 @@ import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "../../../../lib/report/reportCopy";
 import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
@@ -31,9 +32,9 @@ const buildSignalDecisionBrief = ({
   [
     `${signalTitle} — ${scenarioTitle}`,
     `Current call: ${payload.currentCall}`,
-    `Action now: ${payload.immediateAction}`,
-    `Pause if: ${payload.triggerThreshold}`,
-    `Change course if: ${payload.reversalCondition}`,
+    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
+    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${payload.reversalCondition}`,
     `Freshness: ${payload.freshness}`,
     `Trust: ${payload.trustSummary}`,
     `Citation: ${payload.citationMeta}`,

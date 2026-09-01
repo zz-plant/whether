@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { TemplateActions } from "./templateActions";
 
 export const metadata: Metadata = {
@@ -32,19 +33,19 @@ export default function TemplatePage() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-amber-200 uppercase">Action</p>
+            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-amber-200 uppercase">{DECISION_CONTRACT_LABELS.slot.action}</p>
             <p className="text-xs text-slate-400">What will you do now, given current conditions? Be specific — not a direction, a commitment.</p>
             <div className="h-12 border-b border-slate-700/50" />
           </div>
 
           <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-rose-200 uppercase">Threshold</p>
+            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-rose-200 uppercase">{DECISION_CONTRACT_LABELS.slot.threshold}</p>
             <p className="text-xs text-slate-400">What specific, measurable condition would cause you to pause the action. Name the number, date, or event.</p>
             <div className="h-12 border-b border-slate-700/50" />
           </div>
 
           <div className="space-y-2">
-            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-emerald-200 uppercase">Reversal</p>
+            <p className="text-fluid-xs font-semibold tracking-[0.08em] text-emerald-200 uppercase">{DECISION_CONTRACT_LABELS.slot.reversal}</p>
             <p className="text-xs text-slate-400">What condition would clear the threshold and allow the action to resume? Without this, the threshold is a permanent stop.</p>
             <div className="h-12 border-b border-slate-700/50" />
           </div>
