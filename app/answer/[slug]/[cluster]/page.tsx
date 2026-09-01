@@ -75,7 +75,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
 
   if (!routeDefinition || !roleDefinition || !scenarioDefinition) notFound();
 
-  const payloadRecord = await readProgrammaticPayload(`/resolve/${slug}/${cluster}`);
+  const payloadRecord = await readProgrammaticPayload(`/answer/${slug}/${cluster}`);
   const payload = payloadRecord.payload;
 
   return (

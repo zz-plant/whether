@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!signal || !scenario) return {};
 
-  const payloadRecord = await readProgrammaticPayload(`/evidence/${cluster}/${decisionScenario}`).catch(() => undefined);
+  const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`).catch(() => undefined);
 
   return buildSignalDecisionScenarioMetadata({
     cluster,
@@ -112,7 +112,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
   if (!signal || !scenario) notFound();
 
   const pagePath = `/evidence/${cluster}/${decisionScenario}`;
-  const payloadRecord = await readProgrammaticPayload(`/evidence/${cluster}/${decisionScenario}`);
+  const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`);
   const payload = payloadRecord.payload;
   const contentIntent =
     signalScenarioIntentBySlug[decisionScenario as keyof typeof signalScenarioIntentBySlug] ?? "board";

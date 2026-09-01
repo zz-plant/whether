@@ -224,13 +224,33 @@ const buildProgrammaticSnapshotRequest = (): {
   };
 };
 
+/**
+ * Refuse to persist a stale payload.
+ *
+ * This guards the artifact write, not the render. A payload that falls back to
+ * the bundled snapshot is marked `noindex`, which is already the right answer
+ * for a page served during a data outage — it renders, and asks not to be
+ * indexed. Applying this to the read path instead turned "the data is stale"
+ * into a 500 on three routes. Baking that same staleness into a published
+ * artifact is a different matter, and still fails loudly here.
+ */
 const assertGenerationContracts = (record: ProgrammaticPayloadRecord) => {
   if (record.payload.noindex) {
     throw new Error(`SEO payload generation failed for ${record.url}: payload is stale or missing contract fields (${record.payload.noindexReasons?.join(", ") ?? "unknown"}).`);
   }
 };
 
-export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version: string; records: ProgrammaticPayloadRecord[] }> => {
+/**
+ * Build every route's record from the current snapshot. Pure with respect to the
+ * filesystem — the artifacts on disk are a cache of exactly this, which is what
+ * makes the in-memory fallback in `readProgrammaticPayload` sound rather than a
+ * second, drifting source of truth.
+ */
+const computeProgrammaticRecords = async (): Promise<{
+  version: string;
+  records: ProgrammaticPayloadRecord[];
+  generatedAtIso: string;
+}> => {
   const snapshotRequest = buildProgrammaticSnapshotRequest();
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(
     snapshotRequest.searchParams,
@@ -240,15 +260,7 @@ export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version:
   const isFallbackSnapshot = degraded;
   const version = versionFromReportData(reportData);
   const routes = enumerateProgrammaticRoutes();
-  const outputDir = join(ARTIFACT_ROOT, version);
-
-  await mkdir(outputDir, { recursive: true });
-
-  const manifest: z.infer<typeof manifestSchema> = {
-    version,
-    generatedAtIso: `${reportData.treasury.record_date}T00:00:00.000Z`,
-    urls: {},
-  };
+  const generatedAtIso = `${reportData.treasury.record_date}T00:00:00.000Z`;
 
   const preliminaryRecords = routes.map((route) => buildRecordForRoute(route, {
     reportData,
@@ -273,10 +285,21 @@ export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version:
         evidenceTitles: candidate.payload.evidence.map((item) => item.title),
       }));
 
-    const rebuilt = buildRecordForRoute(route, { reportData, isFallbackSnapshot, snapshot }, siblings);
-    assertGenerationContracts(rebuilt);
-    return rebuilt;
+    return buildRecordForRoute(route, { reportData, isFallbackSnapshot, snapshot }, siblings);
   });
+
+  return { version, records, generatedAtIso };
+};
+
+export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version: string; records: ProgrammaticPayloadRecord[] }> => {
+  const { version, records, generatedAtIso } = await computeProgrammaticRecords();
+  const manifest: z.infer<typeof manifestSchema> = { version, generatedAtIso, urls: {} };
+
+  for (const record of records) {
+    assertGenerationContracts(record);
+  }
+
+  await mkdir(join(ARTIFACT_ROOT, version), { recursive: true });
 
   for (const record of records) {
     const fileName = toRouteFileName(record.url);
@@ -294,21 +317,39 @@ const readManifest = async () => {
   return manifestSchema.parse(JSON.parse(content));
 };
 
+/**
+ * The record for one programmatic route, from the artifact cache when it is
+ * readable and from a fresh computation when it is not.
+ *
+ * The previous fallback regenerated the artifacts, which meant writing to disk
+ * on a cache miss. That works during a build — Node, real filesystem — and
+ * cannot work anywhere these routes render at request time: the Workers runtime
+ * has no writable filesystem, so `mkdir` fails with "operation not permitted"
+ * and the whole route dies. It took down three routes in dev, and the same path
+ * is reachable in production, where `revalidate = 900` and `dynamicParams` let
+ * these pages render outside the build.
+ *
+ * Computing in memory is not a degraded answer here: the artifacts are a cache
+ * of this exact computation, so the fallback returns the same record the file
+ * would have held, and simply does not persist it.
+ */
 export const readProgrammaticPayload = async (url: string): Promise<ProgrammaticPayloadRecord> => {
-  let manifest: z.infer<typeof manifestSchema>;
-
   try {
-    manifest = await readManifest();
+    const manifest = await readManifest();
+    const relativePath = manifest.urls[url];
+    if (relativePath) {
+      const content = await readFile(join(ARTIFACT_ROOT, relativePath), "utf8");
+      return payloadRecordSchema.parse(JSON.parse(content));
+    }
   } catch {
-    await generateProgrammaticPayloadArtifacts();
-    manifest = await readManifest();
+    // Cache unreadable — missing, stale, or an unwritable runtime. Fall through.
   }
 
-  const relativePath = manifest.urls[url];
-  if (!relativePath) {
+  const { records } = await computeProgrammaticRecords();
+  const record = records.find((candidate) => candidate.url === url);
+  if (!record) {
     throw new Error(`No programmatic SEO payload artifact found for URL: ${url}`);
   }
 
-  const content = await readFile(join(ARTIFACT_ROOT, relativePath), "utf8");
-  return payloadRecordSchema.parse(JSON.parse(content));
+  return record;
 };

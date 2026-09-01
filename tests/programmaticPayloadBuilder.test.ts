@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
   enumerateProgrammaticRoutes,
   generateProgrammaticPayloadArtifacts,
@@ -42,6 +43,43 @@ describe("programmatic payload builder", () => {
       const clusterRecord = output.records.find((candidate) => candidate.url === url);
       assert.ok(clusterRecord, `expected generated record for ${url}`);
       assert.equal(clusterRecord.payload.noindex, false);
+    }
+  });
+});
+
+/*
+ * The pages look their payload up by URL string. A route rename left two of
+ * them asking for `/resolve/...` and `/evidence/...` — prefixes the enumerator
+ * had stopped producing and which 404 as routes — so those pages threw on every
+ * request. Nothing caught it, because the mismatch is between a literal in a
+ * page and a literal in the builder.
+ */
+describe("programmatic payload lookups match enumerated routes", () => {
+  const CALLERS = [
+    "app/answer/[slug]/[cluster]/page.tsx",
+    "app/signals/[cluster]/[decision-scenario]/page.tsx",
+    "app/toolkits/[slug]/[cluster]/page.tsx",
+  ];
+
+  it("asks only for URL prefixes the builder emits", () => {
+    const enumerated = new Set(
+      enumerateProgrammaticRoutes().map((route) => route.url.split("/")[1]),
+    );
+    assert.ok(enumerated.size > 0);
+
+    for (const caller of CALLERS) {
+      const source = readFileSync(new URL(`../${caller}`, import.meta.url), "utf8");
+      const requested = [...source.matchAll(/readProgrammaticPayload\(`\/([^/`]+)\//g)].map(
+        (match) => match[1],
+      );
+
+      assert.ok(requested.length > 0, `${caller} no longer looks up a payload`);
+      for (const prefix of requested) {
+        assert.ok(
+          enumerated.has(prefix),
+          `${caller} requests /${prefix}/..., which enumerateProgrammaticRoutes never emits (it emits: ${[...enumerated].join(", ")})`,
+        );
+      }
     }
   });
 });
