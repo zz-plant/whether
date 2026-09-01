@@ -16,6 +16,15 @@ type CommandItem = {
   shortcut?: string;
 };
 
+/**
+ * Where a free-text guidance query goes from the palette.
+ *
+ * Exported so the routing is testable without rendering the dialog, matching
+ * `buildToolkitLibraryHref`'s shape in the same test file.
+ */
+export const buildGuidanceSearchHref = (query: string) =>
+  `/search?q=${encodeURIComponent(query.trim())}`;
+
 export function CommandPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -115,15 +124,40 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     return [...actionCommands, ...navCommands];
   }, [navigateTo, toggleFocusMode, onClose]);
 
+  /*
+   * A typed query always offers guidance search, not only the fixed command list.
+   *
+   * The palette filtered navigation entries and actions by substring and nothing
+   * else, so "hiring plan" — a guidance query, not a page name — returned "No
+   * matching commands". That was survivable while the header also carried a
+   * free-text field submitting to /search, and stopped being survivable when
+   * that field was hidden on mobile to fix the document overflow. This is the
+   * only path to /search on a phone now, so it is always present when there is
+   * something to search for.
+   */
   const filtered = useMemo(() => {
-    if (!query.trim()) return commands;
-    const q = query.toLowerCase();
-    return commands.filter(
+    const trimmed = query.trim();
+    if (!trimmed) return commands;
+
+    const q = trimmed.toLowerCase();
+    const matches = commands.filter(
       (c) =>
         c.label.toLowerCase().includes(q) ||
         c.description?.toLowerCase().includes(q),
     );
-  }, [query, commands]);
+
+    const searchCommand: CommandItem = {
+      id: "search-guidance",
+      label: `Search guidance for “${trimmed}”`,
+      description: "Open full search results",
+      icon: Search,
+      action: () => navigateTo(buildGuidanceSearchHref(trimmed)),
+    };
+
+    // First when nothing else matched, so Enter runs it; otherwise last, so an
+    // exact page match still wins the default selection.
+    return matches.length ? [...matches, searchCommand] : [searchCommand];
+  }, [query, commands, navigateTo]);
 
   filteredRef.current = filtered;
   selectedIndexRef.current = selectedIndex;

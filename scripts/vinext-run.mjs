@@ -87,8 +87,15 @@ function main() {
     console.log(`[vinext-run] check gate: ${gate.run ? "running" : "skipped"} — ${gate.reason}`);
 
     if (gate.run) {
+      // WHETHER_DEPLOY_GATE tells the test runner it is inside the deploy path,
+      // so it leaves out tests/tools/ — suites that drive external interpreters
+      // the build image does not guarantee — and drops to conservative worker and
+      // timeout defaults, because this container is smaller than a dev machine
+      // (see scripts/run-tests.mjs). Those tests still run on every
+      // `bun run check` and on pre-push; what they must not do is block a deploy
+      // over a dependency that cannot affect the built artifact.
       const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets", "landmarks"], {
-        env: process.env,
+        env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
         stdio: "inherit",
       });
 

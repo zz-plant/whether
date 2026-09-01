@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 describe("Operator Feedback Ingestion & Analytics Tool", () => {
   const scriptPath = resolve(process.cwd(), "scripts/ingest_operator_feedback.py");
@@ -52,15 +53,24 @@ describe("Operator Feedback Ingestion & Analytics Tool", () => {
       { operator_id: "op_err", name: "Incomplete Record" }
     ]);
 
-    const tempFile = resolve(process.cwd(), "scratch/invalid_feedback.json");
+    // The temp file went to scratch/, which is gitignored and was purged in
+    // Aug 2026, so on any fresh clone writeFileSync threw before the assertions
+    // ran and this test failed for a reason unrelated to what it checks.
+    // CLAUDE.md's repo-gotchas section says exactly this: scratch output goes to
+    // a temp dir, not the repo.
+    const tempFile = join(tmpdir(), "whether-invalid-feedback.json");
     writeFileSync(tempFile, invalidJson, "utf-8");
 
-    const result = spawnSync("python3", [scriptPath, "--input", tempFile], {
-      encoding: "utf-8",
-    });
+    try {
+      const result = spawnSync("python3", [scriptPath, "--input", tempFile], {
+        encoding: "utf-8",
+      });
 
-    assert.equal(result.status, 1);
-    assert.ok(result.stderr.includes("Error ingesting operator feedback"));
+      assert.equal(result.status, 1);
+      assert.ok(result.stderr.includes("Error ingesting operator feedback"));
+    } finally {
+      rmSync(tempFile, { force: true });
+    }
   });
 
   it("runs counterfactual simulation comparing baseline vs post-upgrade metrics", () => {
