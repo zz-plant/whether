@@ -32,6 +32,8 @@ interface Env {
   WHETHER_CRON_SECRET?: string;
   SITE_URL?: string;
   WHETHER_DURABLE_KV: { get(key: string): Promise<string | null>; put(key: string, value: string): Promise<void> };
+  /* Read by lib/runtime/versionMetadata.ts so /api/health can name the running build. */
+  CF_VERSION_METADATA?: { id: string; tag: string; timestamp: string };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

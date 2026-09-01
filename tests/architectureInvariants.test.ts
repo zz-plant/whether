@@ -21,6 +21,10 @@ import { snapshotData } from "../lib/snapshot";
 import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";
 import { getRuntimeBoundary, resetRuntimeBoundary, setRuntimeBoundaryForTesting } from "../lib/runtime/boundary";
 import type { KvNamespace } from "../lib/runtime/kv";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 
 describe("Architecture Invariants", () => {
   beforeEach(() => {
@@ -224,5 +228,90 @@ describe("Architecture Invariants", () => {
     assert.equal(listBeta.entries.length, 1);
     assert.equal(listBeta.entries[0]?.context.clientId, "tenant-beta");
     assert.equal(listBeta.entries[0]?.outcome.summary, "Spending B");
+  });
+
+  /**
+   * Invariant 8 exists because the rule it enforces was already written down and broken
+   * anyway. `docs/editorial-guardrails.md` has told components to consume
+   * DECISION_CONTRACT_LABELS for a while; on 2026-09-01 a sweep found the words hardcoded
+   * in twenty surfaces, plus a second label map in reportFormatting.ts restating them
+   * verbatim for ~30 call sites. A doc that says "don't hardcode this" is a request. This
+   * is the guarantee.
+   *
+   * Only the multi-word labels are checked. The noun slots (Action / Threshold / Reversal
+   * / Trigger / Guardrail) are ordinary English that appears legitimately in prose, type
+   * names, and domain content, and a rule that cries wolf on those gets deleted rather
+   * than obeyed. Matching is exact — "Pause if" fails, "Pause if funding pressure rises
+   * above 60." does not, because the latter is a threshold's value, not its label.
+   */
+  const SLOT_LABELS = [
+    DECISION_CONTRACT_LABELS.action.actionNow,
+    DECISION_CONTRACT_LABELS.action.doNow,
+    DECISION_CONTRACT_LABELS.threshold.pauseIf,
+    DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+    DECISION_CONTRACT_LABELS.reversal.clearsWhen,
+    DECISION_CONTRACT_LABELS.watch.flipWatch,
+    DECISION_CONTRACT_LABELS.watch.watchThisWeek,
+    DECISION_CONTRACT_LABELS.watch.watchNext,
+  ];
+
+  /** Deliberate exceptions, each a different vocabulary that happens to share a phrase. */
+  const SLOT_LABEL_ALLOWLIST = new Map<string, string>([
+    [
+      "lib/agentSkills.ts:Flip watch",
+      "names a capability in the agent skill catalog, peer to 'Constraint translation' and 'PM question log' — not a decision slot, and it must not follow a rename of one",
+    ],
+  ]);
+
+  it("Invariant 8: Bounded-decision slot labels are never hardcoded outside reportCopy.ts", () => {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matchers = SLOT_LABELS.map((label) => {
+      const e = escape(label);
+      return {
+        label,
+        patterns: [
+          // "Pause if" / "Pause if:" as a whole string literal, not a longer sentence.
+          new RegExp(`(["'])${e}:?\\s*\\1`),
+          // `Pause if: ${value}` — the label prefixing an interpolated value.
+          new RegExp("`" + e + ":"),
+          // >Pause if:</span> — a JSX text node that is only the label.
+          new RegExp(`>\\s*${e}:?\\s*[<{]`),
+          // A JSX text node on its own line, immediately before an expression.
+          new RegExp(`^\\s*${e}:\\s*\\{`),
+        ],
+      };
+    });
+
+    const collect = (dir: string, out: string[] = []): string[] => {
+      for (const name of readdirSync(dir)) {
+        if (name === "node_modules" || name.startsWith(".")) continue;
+        const full = join(dir, name);
+        if (statSync(full).isDirectory()) collect(full, out);
+        else if (/\.tsx?$/.test(full)) out.push(full);
+      }
+      return out;
+    };
+
+    const files = [...collect(join(repoRoot, "app")), ...collect(join(repoRoot, "lib"))]
+      .filter((file) => !file.endsWith("lib/report/reportCopy.ts"));
+
+    const violations: string[] = [];
+    for (const file of files) {
+      const rel = relative(repoRoot, file);
+      readFileSync(file, "utf8").split("\n").forEach((line, index) => {
+        const trimmed = line.trim();
+        // Comments discussing the vocabulary are documentation, not drift.
+        if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return;
+        for (const { label, patterns } of matchers) {
+          if (SLOT_LABEL_ALLOWLIST.has(`${rel}:${label}`)) continue;
+          if (patterns.some((pattern) => pattern.test(line))) {
+            violations.push(`${rel}:${index + 1} hardcodes "${label}" — read it from DECISION_CONTRACT_LABELS`);
+          }
+        }
+      });
+    }
+
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
   });
 });

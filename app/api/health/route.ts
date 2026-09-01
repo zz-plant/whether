@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { withDeadline } from "../../../lib/withDeadline";
+import { getDeployedVersion } from "../../../lib/runtime/versionMetadata";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -32,6 +33,11 @@ const probeReportData = async (): Promise<DependencyState> => {
 export async function GET() {
   const now = new Date();
   const reportData = await probeReportData();
+  /* `version` is this endpoint's schema version and says nothing about what is running.
+     `deployedVersion` is the Worker actually serving the request, so "is production
+     current?" can be answered without trusting the pipeline that claims to have shipped
+     it. Null off Cloudflare, where the binding does not exist. */
+  const deployedVersion = getDeployedVersion();
 
   return NextResponse.json(
     {
@@ -39,6 +45,7 @@ export async function GET() {
       service: "whether",
       generatedAt: now.toISOString(),
       version: "v1",
+      deployedVersion,
       dependencies: {
         reportData,
       },
