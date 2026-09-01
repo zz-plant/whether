@@ -5,6 +5,7 @@ import {
   resolveOperationsExecutionStepActionLabel,
   resolveOperationsExecutionStepId,
   resolveOperationsExecutionStepIdFromLocation,
+  resolveInitialOpenStepIds,
 } from "../app/operate/components/planningExecutionStepper";
 
 describe("resolveOperationsExecutionStepId", () => {
@@ -94,5 +95,37 @@ describe("resolveOperationsExecutionStepId", () => {
       }),
       "ops-monthly-action-summary",
     );
+  });
+});
+
+/*
+ * The panel used to render one body at a time, so every step but the first was
+ * a header until clicked — including the per-area rules, which is the content
+ * this page owns and the weekly brief was carrying a second copy of.
+ */
+describe("resolveInitialOpenStepIds", () => {
+  const steps = [
+    { id: "first", label: "A", title: "A", description: "A", children: null },
+    { id: "middle", label: "B", title: "B", description: "B", children: null },
+    { id: "rules", label: "C", title: "C", description: "C", defaultOpen: true, children: null },
+  ];
+
+  it("opens the first step and anything marked defaultOpen", () => {
+    assert.deepEqual(resolveInitialOpenStepIds({ steps }), ["first", "rules"]);
+  });
+
+  it("adds a hash target without closing the defaults", () => {
+    assert.deepEqual(
+      resolveInitialOpenStepIds({ steps, hash: "#middle" }),
+      ["first", "rules", "middle"],
+    );
+  });
+
+  it("ignores a hash that matches no step", () => {
+    assert.deepEqual(resolveInitialOpenStepIds({ steps, hash: "#nope" }), ["first", "rules"]);
+  });
+
+  it("never lists a step twice when the hash targets a default", () => {
+    assert.deepEqual(resolveInitialOpenStepIds({ steps, hash: "#rules" }), ["first", "rules"]);
   });
 });

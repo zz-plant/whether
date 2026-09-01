@@ -12,6 +12,9 @@ type OperationsExecutionStep = {
   approvalStatus?: string;
   changeSignal?: string;
   hashAliases?: string[];
+  /** Expanded on arrival, without a click. Reserved for the steps a reader has
+   *  to act on this week — see resolveInitialOpenStepIds. */
+  defaultOpen?: boolean;
   children: ReactNode;
 };
 
@@ -34,6 +37,37 @@ export const resolveOperationsExecutionStepId = ({
   return matchingStep?.id ?? firstStepId;
 };
 
+/**
+ * Which steps are expanded on arrival.
+ *
+ * The panel used to render exactly one body — whichever step was active — so
+ * every other section on this page was a header until clicked. That is right
+ * for a checklist you work top to bottom, and wrong for the rules you have to
+ * read before committing: those were two interactions deep on the page that
+ * owns them. Steps opt in with defaultOpen, and a deep link opens its target
+ * without closing anything.
+ */
+export const resolveInitialOpenStepIds = ({
+  steps,
+  hash = "",
+}: {
+  steps: OperationsExecutionStep[];
+  hash?: string;
+}): string[] => {
+  const firstStepId = steps[0]?.id ?? "";
+  const open = new Set<string>();
+  if (firstStepId) open.add(firstStepId);
+  for (const step of steps) {
+    if (step.defaultOpen) open.add(step.id);
+  }
+  const hashId = hash.replace(/^#/, "");
+  if (hashId) {
+    const target = steps.find((step) => step.id === hashId || step.hashAliases?.includes(hashId));
+    if (target) open.add(target.id);
+  }
+  return [...open];
+};
+
 export const resolveOperationsExecutionStepIdFromLocation = ({
   hash,
   firstStepId,
@@ -53,7 +87,11 @@ export function OperationsExecutionStepper({
   steps: OperationsExecutionStep[];
 }) {
   const firstStepId = steps[0]?.id ?? "";
-  const [activeStepId, setActiveStepId] = useState(firstStepId);
+  // Openness is a set; `currentStepId` stays singular because aria-current is.
+  const [openStepIds, setOpenStepIds] = useState<Set<string>>(
+    () => new Set(resolveInitialOpenStepIds({ steps })),
+  );
+  const [currentStepId, setCurrentStepId] = useState(firstStepId);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -62,11 +100,14 @@ export function OperationsExecutionStepper({
     }
 
     const syncFromLocation = () => {
-      setActiveStepId(resolveOperationsExecutionStepIdFromLocation({
+      const targeted = resolveOperationsExecutionStepIdFromLocation({
         hash: window.location.hash,
         firstStepId,
         steps,
-      }));
+      });
+      setCurrentStepId(targeted);
+      // Additive: following a link to one step no longer collapses the others.
+      setOpenStepIds((prev) => (prev.has(targeted) ? prev : new Set(prev).add(targeted)));
     };
 
     syncFromLocation();
@@ -86,6 +127,15 @@ export function OperationsExecutionStepper({
       } else {
         next.add(stepId);
       }
+      return next;
+    });
+  };
+
+  const toggleOpen = (stepId: string) => {
+    setOpenStepIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(stepId)) next.delete(stepId);
+      else next.add(stepId);
       return next;
     });
   };
@@ -113,7 +163,7 @@ export function OperationsExecutionStepper({
 
         <ol className="space-y-1">
           {steps.map((step) => {
-            const isActive = step.id === activeStepId;
+            const isActive = step.id === currentStepId;
             const isCompleted = completedSteps.has(step.id);
             const stepHref = buildOperationsExecutionStepHref(step.id);
 
@@ -157,8 +207,9 @@ export function OperationsExecutionStepper({
 
       <div className="space-y-6">
         {steps.map((step) => {
-          const isActive = step.id === activeStepId;
-          const activeClass = isActive
+          const isOpen = openStepIds.has(step.id);
+          const isActive = step.id === currentStepId;
+          const activeClass = isOpen
             ? "ring-1 ring-sky-500/30 border-sky-500/20 bg-slate-900/10"
             : "border-white/[0.04] bg-slate-950/[0.05]";
 
@@ -172,29 +223,34 @@ export function OperationsExecutionStepper({
                   drew a divider with nothing under it. */}
               <div
                 className={`relative overflow-hidden flex flex-wrap items-start justify-between gap-3 ${
-                  isActive ? "pb-4 border-b border-white/[0.04]" : ""
+                  isOpen ? "pb-4 border-b border-white/[0.04]" : ""
                 }`}
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
                 <div className="space-y-1">
                   <p className="type-eyebrow">{step.label}</p>
-                  {/* An inactive step renders as a header with no body, but nothing
-                      about it was clickable — only the checklist above could open
-                      it, so five of the six sections on this page looked
-                      interactive and were not. The title now carries the same
-                      hash link the checklist uses. */}
-                  {isActive ? (
-                    <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em] text-slate-100">{step.title}</h3>
-                  ) : (
-                    <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em]">
-                      <a
-                        href={buildOperationsExecutionStepHref(step.id)}
-                        className="inline-flex min-h-11 items-center text-slate-100 no-underline hover:text-sky-100"
+                  {/* A toggle, not a link: with steps opening independently the
+                      title's job is expand/collapse, which §IV says is a button.
+                      Deep links still arrive through the checklist above and
+                      through the section id, and they open a step without
+                      closing the others. */}
+                  <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em]">
+                    <button
+                      type="button"
+                      onClick={() => toggleOpen(step.id)}
+                      aria-expanded={isOpen}
+                      aria-controls={`${step.id}-body`}
+                      className="inline-flex min-h-11 items-center gap-2 text-left text-slate-100 hover:text-sky-100"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`text-slate-500 transition-transform ${isOpen ? "rotate-90" : ""}`}
                       >
-                        {step.title}
-                      </a>
-                    </h3>
-                  )}
+                        ›
+                      </span>
+                      {step.title}
+                    </button>
+                  </h3>
                   <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {step.owner ? (
@@ -224,8 +280,8 @@ export function OperationsExecutionStepper({
                   </span>
                 )}
               </div>
-              {isActive && (
-                <div className="mt-4">
+              {isOpen && (
+                <div id={`${step.id}-body`} className="mt-4">
                   {step.children}
                 </div>
               )}

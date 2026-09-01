@@ -11,7 +11,6 @@ import { RitualCheck } from "./components/RitualCheck";
 import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
-import { ThreeWhethersCard } from "./components/ThreeWhethersCard";
 import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
 import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
@@ -196,26 +195,6 @@ async function PageContent({
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
-  const actionStripItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
-  const sharedFlipCorridor = homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor;
-
-  /*
-   * The levers section states the shared corridor a screen below, under a line
-   * that explains why all three cards clear on it. Repeating the same two
-   * thresholds in the card's watch row is the stacked-card restatement §XI
-   * forbids — measured at 467px apart. Display only: briefShareLines below
-   * keeps the full set, because the pasted brief has no levers section to
-   * carry them.
-   */
-  const corridorParts = new Set(
-    actionStripItems.length > 0 && sharedFlipCorridor
-      ? sharedFlipCorridor.split("·").map((part) => part.trim()).filter(Boolean)
-      : [],
-  );
-  const visibleFlipConditions = flipConditionLabels.filter(
-    (label) => !corridorParts.has(label.trim()),
-  );
-
   const revisitQueue = homepage.weeklyDecisionCardModel.decision.revisitQueue;
   const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));
   const noChangeAreas = homepage.weeklyDecisionCardModel.decision.decisionRules
@@ -315,7 +294,7 @@ async function PageContent({
               isFallback={homepage.reportShell.showOfflineBadge}
               signalData={v2HeroSignalData}
               signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-              flipConditions={visibleFlipConditions}
+              flipConditions={flipConditionLabels}
               guardrail={guardrailLabel}
               reversalTrigger={reversalTriggerLabel}
               shareLines={briefShareLines}
@@ -330,11 +309,6 @@ async function PageContent({
             <DecisionPlanStressTester
               assessment={reportData.assessment}
               recordDate={homepage.reportShell.recordDateLabel}
-            />
-
-            <ThreeWhethersCard
-              items={actionStripItems}
-              sharedFlipCorridor={sharedFlipCorridor}
             />
 
             <CompareStrip

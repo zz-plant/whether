@@ -441,6 +441,11 @@ export async function buildPlanningPageModel(
           },
           {
             id: "ops-playbook",
+            // Open on arrival: these are the per-area guardrails a reader has to
+            // read before committing, and this page owns them. Behind a click
+            // they were effectively unreachable, which is why the weekly brief
+            // still carries its own copy.
+            defaultOpen: true,
             label: "Rules",
             title: "Rules before you commit",
             description: "Do, don't, and limit rules for new commitments.",
