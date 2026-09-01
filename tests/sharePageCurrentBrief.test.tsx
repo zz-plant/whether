@@ -1,7 +1,37 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import SharePage from "../app/share/page";
+import { macroSeries } from "../lib/macroSnapshot";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
+import { snapshotData } from "../lib/snapshot";
+
+const originalFetch = globalThis.fetch;
+
+beforeEach(async () => {
+  globalThis.fetch = async () => {
+    throw new Error("The current share artifact must not fetch around its OperatingSnapshot.");
+  };
+  const snapshot = buildOperatingSnapshot({
+    treasury: snapshotData,
+    macroSeries,
+    now: new Date("2026-08-31T12:00:00.000Z"),
+  });
+  snapshot.weeklyCall = {
+    ...snapshot.weeklyCall,
+    currentCall: "Share the persisted call exactly.",
+    actionNow: "Transmit the committed action.",
+    pauseIf: "Pause if the snapshot cannot be read.",
+    changeCourseIf: "Re-open only from the next committed snapshot.",
+  };
+  await resetOperatingSnapshotStore().write(snapshot);
+});
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+  resetOperatingSnapshotStore();
+});
 
 describe("/share current weekly artifact", () => {
   it("renders real weekly brief exports instead of placeholder marketing copy", async () => {
@@ -13,6 +43,10 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Pause if/);
     assert.match(html, /Re-open when/);
     assert.match(html, /Meeting pack/);
+    assert.match(html, /Share the persisted call exactly\./);
+    assert.match(html, /Transmit the committed action\./);
+    assert.match(html, /Pause if the snapshot cannot be read\./);
+    assert.match(html, /Re-open only from the next committed snapshot\./);
     assert.doesNotMatch(html, /Macro signals.*operating posture/);
     assert.doesNotMatch(html, /Current regime and operating posture for the period/);
   });

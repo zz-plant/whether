@@ -27,6 +27,6 @@ describe("search index", () => {
   it("routes governance-artifact queries back into Planning rather than the retired resources hub shell", () => {
     const resourceDoc = buildSearchIndex().find((entity) => entity.id === "doc-resources");
 
-    assert.equal(resourceDoc?.href, "/planning#ops-export-briefs");
+    assert.equal(resourceDoc?.href, "/operate#ops-export-briefs");
   });
 });

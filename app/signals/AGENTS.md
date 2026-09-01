@@ -1,8 +1,8 @@
-# `app/evidence` agent guide
+# `app/signals` agent guide
 
 This directory owns the evidence surface for the weekly call.
 
-Use this guide when editing `/evidence`, evidence-mode routing, threshold tuning, replay, or signal diagnostics.
+Use this guide when editing `/signals`, evidence-mode routing, threshold tuning, replay, or signal diagnostics.
 
 ## What this directory owns
 
@@ -19,7 +19,7 @@ Use this guide when editing `/evidence`, evidence-mode routing, threshold tuning
 
 ## Evidence rules
 
-- `/evidence` should answer: what moved, how close are we to the watch lines, and what would change if the evidence crossed them.
+- `/signals` should answer: what moved, how close are we to the watch lines, and what would change if the evidence crossed them.
 - Explanation should support action. It should not become a parallel recommendation engine.
 - Threshold and replay tools should stay explicitly subordinate to the current weekly call.
 - Advanced controls are allowed, but implication-first reading should remain viable for a first pass.
@@ -31,7 +31,7 @@ Treat these as upstream:
 - `lib/report/trustStatus.ts`
 - `lib/report/homeBrief/signalIndicators.ts`
 - `lib/report/decisionKnobs.ts`
-- `app/evidence/evidencePageModel.ts`
+- `app/signals/evidencePageModel.ts`
 
 ## Working rules
 

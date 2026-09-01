@@ -100,7 +100,7 @@ const keyDocs: SearchEntity[] = [
     recommendedHubHref: "/operate",
     recommendedHubLabel: "Planning",
     title: "Prepare a board-ready artifact",
-    href: "/planning#ops-export-briefs",
+    href: "/operate#ops-export-briefs",
     summary: "Planning's artifact checkpoint when leadership needs a board-ready export after the weekly plan is set.",
     intentLabel: "Prepare governance artifact",
     keywords: ["resources", "board", "artifact", "template", "operations"],

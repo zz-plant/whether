@@ -233,11 +233,11 @@ export const buildHomeWorkspaceModel = ({
       summary: reportData.historicalSelection
         ? `Viewing ${reportData.historicalSelection.banner}. Use Weekly Brief as the source of truth before approving live commitments.`
         : "Choose any date to swap the home workspace to the closest cached monthly snapshot.",
-      openFullHref: "/evidence?advanced=1#time-machine",
+      openFullHref: "/signals?advanced=1#time-machine",
       preview: replayPreview,
     },
     operations: {
-      continueHref: "/planning#ops-monthly-action-summary",
+      continueHref: "/operate#ops-monthly-action-summary",
       approvalHeadline: weeklyDecisionCardModel.decision.immediateDecision,
       approvalDetail: resolveApprovalDetail({
         regimeKey: weeklyDecisionCardModel.status.regimeKey,
@@ -259,18 +259,18 @@ export const buildHomeWorkspaceModel = ({
         reversalCondition: item.reversalCondition,
       })),
       exportActions: [
-        { href: "/planning#ops-export-briefs", label: "Open share brief" },
+        { href: "/operate#ops-export-briefs", label: "Open share brief" },
       ],
     },
     translate: {
       primaryPath: {
-        href: `/resolve/${currentSituationPath.slug}`,
+        href: `/answer/${currentSituationPath.slug}`,
         title: currentSituationPath.title,
         detail: resolvePrimaryPathDetail(currentSituationPath.slug),
         kicker: "Recommended unresolved path",
       },
       fallbackUtility: {
-        href: "/resolve/ship-checklist",
+        href: "/answer/ship-checklist",
         title: "Whether to ship checklist",
         detail: "Score one go / wait / kill launch decision against the current regime.",
       },

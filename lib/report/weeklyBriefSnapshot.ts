@@ -122,12 +122,14 @@ export const buildWeeklyBriefSnapshot = ({
         postureState,
       })
     : null;
-  const weeklyCall = buildWeeklyCallContract({
-    assessment: reportData.assessment,
-    homeBriefModel,
-    canonicalDecisionCopy,
-    startupVariantMode,
-  });
+  const weeklyCall = reportData.projectsOperatingSnapshot && reportData.operatingSnapshot
+    ? reportData.operatingSnapshot.weeklyCall
+    : buildWeeklyCallContract({
+        assessment: reportData.assessment,
+        homeBriefModel,
+        canonicalDecisionCopy,
+        startupVariantMode,
+      });
   const callCitation = buildCallCitation(reportData.assessment, reportData.treasury, {
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
   });

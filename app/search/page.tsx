@@ -58,7 +58,7 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
     return "/planning#ops-monthly-action-summary";
   }
 
-  return "/evidence#decision-summary";
+  return "/signals#decision-summary";
 };
 
 const searchIntentPrompts = [

@@ -4,7 +4,7 @@ import { operationsSectionLinks, operationsWorkstreamLinks } from "../lib/naviga
 
 describe("operations navigation", () => {
   it("keeps operations focused on the weekly plan route", () => {
-    assert.deepEqual(operationsWorkstreamLinks.map((link) => link.href), ["/operate", "/planning/financial", "/planning/memory"]);
+    assert.deepEqual(operationsWorkstreamLinks.map((link) => link.href), ["/operate", "/operate/financial", "/operate/memory"]);
   });
 
   it("keeps planning navigation centered on plan execution and sharing checkpoints", () => {

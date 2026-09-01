@@ -12,7 +12,7 @@ Use this guide when editing:
 ## What this directory owns
 
 - Canonical report semantics and typed contracts
-- Decision transmission copy that should stay consistent across `/`, `/planning`, `/resolve`, exports, and SEO surfaces
+- Decision transmission copy that should stay consistent across `/`, `/operate`, `/answer`, exports, and SEO surfaces
 - Trust-state labels and degraded/fallback behavior
 - Home-brief model assembly and view-model contracts
 - Shared formatting helpers for bounded decision phrasing

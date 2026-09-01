@@ -15,7 +15,7 @@ describe("expansion controls rendering", () => {
   it("persists /planning expansion state through query params", () => {
     const href = buildActionsExpansionHref({ year: "2025", month: "2" }, true);
 
-    assert.equal(href, "/planning?year=2025&month=2&actions=all#ops-playbook");
+    assert.equal(href, "/operate?year=2025&month=2&actions=all#ops-playbook");
   });
 
   it("renders PlaybookPanel collapsed by default behind disclosure", () => {

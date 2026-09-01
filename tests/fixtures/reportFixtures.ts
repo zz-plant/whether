@@ -243,6 +243,8 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     },
     sourceHealth: [],
     materializedSignals: null,
+    operatingSnapshot: null,
+    projectsOperatingSnapshot: false,
   };
 
   return {

@@ -197,10 +197,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const midpointIndex = Math.floor(page.sections.length / 2);
 
   return (
-    <ContentPageShell
-      id="top"
-      data-content-measurement-root={`/resources/${page.slug}`}
-    >
+    <ContentPageShell data-content-measurement-root={`/resources/${page.slug}`}>
       <ContentMeasurementTracker
         pagePath={`/resources/${page.slug}`}
         cluster={page.cluster}
@@ -294,7 +291,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
             ) : null}
 
             <p className="pt-1 type-eyebrow">
-              <Link href="#top" className="text-slate-300 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">
+              <Link href="#main-content" className="text-slate-300 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">
                 Back to top
               </Link>
             </p>

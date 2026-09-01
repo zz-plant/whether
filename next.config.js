@@ -15,14 +15,14 @@ const buildPermanentRedirects = (pairs) =>
 export const solutionRedirectPairs = [
   ["/solutions/engineering-capacity", "/toolkits/ops-capacity"],
   ["/solutions/product-roadmapping", "/toolkits/focus"],
-  ["/solutions/market-regime-playbook", "/resolve/ops-risk"],
-  ["/solutions/career-paths", "/resolve/product"],
-  ["/solutions/career-paths/senior-product-manager", "/resolve/product"],
-  ["/solutions/career-paths/group-product-manager", "/resolve/product"],
-  ["/solutions/career-paths/director-of-product", "/resolve/product"],
-  ["/solutions/career-paths/vp-product", "/resolve/ceo"],
-  ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
-  ["/solutions/:path*", "/resolve"],
+  ["/solutions/market-regime-playbook", "/answer/ops-risk"],
+  ["/solutions/career-paths", "/answer/product"],
+  ["/solutions/career-paths/senior-product-manager", "/answer/product"],
+  ["/solutions/career-paths/group-product-manager", "/answer/product"],
+  ["/solutions/career-paths/director-of-product", "/answer/product"],
+  ["/solutions/career-paths/vp-product", "/answer/ceo"],
+  ["/solutions/career-paths/product-strategy-chief-of-staff", "/answer/ops-risk"],
+  ["/solutions/:path*", "/answer"],
 ];
 
 export const canonicalSurfaceRedirectPairs = [
@@ -39,7 +39,7 @@ export const canonicalSurfaceRedirectPairs = [
   ["/sources", "/trust#sources-freshness"],
   ["/confidence", "/trust#confidence-limits"],
   // Decision answer root → Decide hub
-  ["/answers", "/resolve#direct-answers"],
+  ["/answers", "/answer#direct-answers"],
   // Nav-label aliases — the header/footer say Evidence/Plan/Resolve but the
   // filesystem routes are /signals, /operate, /answer. People retype the labels.
   ["/evidence", "/signals"],
@@ -52,20 +52,30 @@ export const canonicalSurfaceRedirectPairs = [
   // Concepts (all paths) → Trust hub
   ["/concepts/:path*", "/trust"],
   // Decide redirect stubs
-  ["/resolve/team-context", "/planning#ops-monthly-action-summary"],
+  ["/resolve/team-context", "/operate#ops-monthly-action-summary"],
+  // Operations sub-pages flattened. These must precede the /planning wildcard
+  // below: /operate has only financial and memory, so a wildcard would send
+  // /planning/data to /operate/data, which does not exist.
+  ["/planning/data", "/operate"],
+  ["/planning/cli", "/operate"],
+  ["/planning/integrations", "/operate"],
+  // The same aliases one level down. Matching only the bare path left every
+  // legacy sub-path a 404 — /resolve/ceo and /evidence/capital-tightness-watch
+  // among them — so external links and anything still pointing at the old names
+  // died silently. Must stay below the specific /resolve/* rules above, which a
+  // wildcard would otherwise shadow.
+  ["/resolve/:path*", "/answer/:path*"],
+  ["/evidence/:path*", "/signals/:path*"],
+  ["/planning/:path*", "/operate/:path*"],
   // Resources root → Planning
-  ["/resources", "/planning#ops-export-briefs"],
+  ["/resources", "/operate#ops-export-briefs"],
   // Guides staging redirects
   ["/guides/stage/:stage", "/guides?stage=:stage"],
   ["/guides/stage", "/guides?library=stages"],
   ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
-  // Operations sub-pages flattened
-  ["/planning/data", "/planning"],
-  ["/planning/cli", "/planning"],
-  ["/planning/integrations", "/planning"],
   // Retrofit redirects (links that soft-404)
   ["/settings", "/"],
-  ["/decision-tools", "/resolve"],
+  ["/decision-tools", "/answer"],
   ["/toolkits", "/"],
 ];
 
@@ -152,7 +162,7 @@ const nextConfig = {
         headers: trustCacheHeaders,
       },
       {
-        source: "/evidence",
+        source: "/signals",
         headers: evidenceCacheHeaders,
       },
       {

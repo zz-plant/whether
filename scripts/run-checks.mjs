@@ -32,6 +32,10 @@ const TASKS = [
   // stay visible; only a critical advisory stops the build.
   { name: "audit", script: "audit" },
   { name: "hotspot-preflight", script: "review:hotspot-preflight" },
+  // Boots a dev server and fetches every route: the skip-link target is
+  // assembled from layouts and shells at request time, so nothing cheaper sees
+  // a duplicated or missing <main>.
+  { name: "landmarks", script: "check:landmarks" },
 ];
 
 const args = process.argv.slice(2);

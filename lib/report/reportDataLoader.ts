@@ -14,6 +14,7 @@ import type {
   WeeklyConfidencePoint,
 } from "./reportDataTypes";
 import type { TimeMachineRegimeEntry, TimeMachineYieldCurveEntry } from "../timeMachine/timeMachineCache";
+import type { OperatingSnapshot } from "../operatingState/types";
 
 type ReportSearchParams = {
   month?: string;
@@ -57,6 +58,7 @@ type ReportDataLoaderDependencies = {
     macroSeries: MacroSeriesReading[];
     materializedSignals: unknown;
   } | null>;
+  loadLatestOperatingSnapshot: () => Promise<OperatingSnapshot | null>;
   withDependencyContext: (dependency: "treasury" | "macro" | "report", error: unknown) => Error;
   formatDateUTC: (value: string) => string;
   formatWeekEndingUTC: (value: string) => string;
@@ -168,6 +170,13 @@ const getLatestRecordDate = (dates: Array<string | null | undefined>) => {
 
 const toUtcDateMs = (value: string) => Date.parse(`${value}T00:00:00.000Z`);
 
+const hasThresholdOverrides = (searchParams?: ReportSearchParams) =>
+  Boolean(
+    searchParams?.baseRateThreshold
+    || searchParams?.tightnessThreshold
+    || searchParams?.riskThreshold,
+  );
+
 const alignMacroSeriesToAsOf = (macroSeries: MacroSeriesReading[], asOf: string) => {
   const asOfMs = toUtcDateMs(asOf);
 
@@ -257,17 +266,25 @@ export const loadReportDataUncachedInternal = async ({
   const requestedSelection = deps.parseTimeMachineRequest(searchParams);
   const shouldLoadHistoricalLiveComparison =
     options?.includeHistoricalLiveComparison !== false && Boolean(historicalSelection);
-  const canonicalInputs = historicalSelection
+  const operatingSnapshot = historicalSelection
+    ? null
+    : await deps.loadLatestOperatingSnapshot();
+  const projectsOperatingSnapshot = Boolean(operatingSnapshot && !hasThresholdOverrides(searchParams));
+  const canonicalInputs = historicalSelection || operatingSnapshot
     ? null
     : await deps.loadCanonicalReportInputsIfAvailable({ fetcher: liveFetcher });
-  const treasuryPromise = canonicalInputs
+  const treasuryPromise = operatingSnapshot
+    ? Promise.resolve(operatingSnapshot.treasury)
+    : canonicalInputs
     ? Promise.resolve(canonicalInputs.treasury)
     : deps.fetchTreasuryData({
         fetcher: liveFetcher,
         snapshotFallback: deps.snapshotData,
         asOf: historicalSelection?.asOf,
       });
-  const liveTreasuryPromise = canonicalInputs
+  const liveTreasuryPromise = operatingSnapshot
+    ? Promise.resolve(operatingSnapshot.treasury)
+    : canonicalInputs
     ? Promise.resolve(canonicalInputs.treasury)
     : shouldLoadHistoricalLiveComparison
       ? deps.fetchTreasuryData({ snapshotFallback: deps.snapshotData, fetcher: liveFetcher })
@@ -282,15 +299,23 @@ export const loadReportDataUncachedInternal = async ({
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
-  const thresholds = deps.parseThresholdsFromSearchParams(searchParams);
+  const thresholds = projectsOperatingSnapshot && operatingSnapshot
+    ? operatingSnapshot.assessment.thresholds
+    : deps.parseThresholdsFromSearchParams(searchParams);
   const regimeSeries = deps.getTimeMachineRegimeSeries(deps.DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = deps.getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const timeMachineSnapshots = deps.getTimeMachineSnapshots();
   const [treasuryResult, liveTreasuryResult, macroResult, snapshotResult] = await Promise.allSettled([
     treasuryPromise,
     liveTreasuryPromise ?? Promise.resolve(null),
-    canonicalInputs ? Promise.resolve(canonicalInputs.macroSeries) : deps.loadMacroSeries(liveFetcher),
-    loadRegimeMachineSnapshot(),
+    operatingSnapshot
+      ? Promise.resolve(operatingSnapshot.macroSeries)
+      : canonicalInputs
+        ? Promise.resolve(canonicalInputs.macroSeries)
+        : deps.loadMacroSeries(liveFetcher),
+    operatingSnapshot
+      ? Promise.resolve(operatingSnapshot.machineState)
+      : loadRegimeMachineSnapshot(),
   ]);
 
   if (treasuryResult.status === "rejected") {
@@ -323,7 +348,9 @@ export const loadReportDataUncachedInternal = async ({
   const treasuryAgeLabel = deps.formatAgeHours(treasury.fetched_at, now);
   const sensors = deps.buildSensorReadings(treasury);
   const previousMachineSnapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
-  const assessment = deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot);
+  const assessment = projectsOperatingSnapshot && operatingSnapshot
+    ? operatingSnapshot.assessment
+    : deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot);
   const liveAssessment = shouldLoadHistoricalLiveComparison
     ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries, previousMachineSnapshot)
     : null;
@@ -340,13 +367,14 @@ export const loadReportDataUncachedInternal = async ({
   const lastYearAssessment = lastYearSnapshot ? deps.evaluateRegime(lastYearSnapshot, thresholds) : null;
   const confidenceLabel = historicalSelection
     ? "Simulated (low)"
-    : canonicalInputs
+    : operatingSnapshot || canonicalInputs
       ? "Canonical snapshot (high confidence)"
       : treasury.isLive
         ? "Live (high confidence)"
         : "Cached (medium)";
   const treasuryProvenance = {
-    sourceLabel: canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)",
+    sourceLabel: operatingSnapshot?.provenance.sourceLabel
+      ?? (canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)"),
     sourceUrl: treasury.source,
     recordDateLabel,
     timestampLabel: fetchedAtLabel,
@@ -371,7 +399,7 @@ export const loadReportDataUncachedInternal = async ({
         : alignedHistoricalMacro?.coverage.mode === "historical-partial"
           ? "Historical aligned (partial)"
           : "Treasury-only (low)"
-      : canonicalInputs
+      : operatingSnapshot || canonicalInputs
         ? "Canonical snapshot (high confidence)"
         : macroSeries.some((signal) => Boolean((signal as { isLive?: boolean }).isLive))
           ? "Live (high confidence)"
@@ -523,6 +551,8 @@ export const loadReportDataUncachedInternal = async ({
     treasuryProvenance,
     sourceHealth,
     materializedSignals: canonicalInputs?.materializedSignals ?? null,
+    operatingSnapshot,
+    projectsOperatingSnapshot,
   };
 };
 
@@ -633,6 +663,8 @@ export const buildFallbackReportDataInternal = ({
     thresholds,
     treasury: fallbackTreasury,
     materializedSignals: null,
+    operatingSnapshot: null,
+    projectsOperatingSnapshot: false,
     sourceHealth,
     treasuryProvenance: {
       sourceLabel: "Federal Reserve Economic Data (FRED)",

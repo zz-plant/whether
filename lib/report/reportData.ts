@@ -73,6 +73,7 @@ import {
 } from "./reportHistory";
 import { withDeadline } from "../withDeadline";
 import { primeMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
+import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import type {
   AnalogScoreDimensions,
   ConfidenceTrendFraming,
@@ -223,6 +224,7 @@ const loadReportDataUncached = async (
       findTimeMachineSnapshot,
       DEFAULT_REGIME_SERIES_MONTHS,
       loadCanonicalReportInputsIfAvailable,
+      loadLatestOperatingSnapshot: () => getOperatingSnapshotStore().readLatest(),
       withDependencyContext,
       formatDateUTC,
       formatWeekEndingUTC,
@@ -345,6 +347,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
       findTimeMachineSnapshot,
       DEFAULT_REGIME_SERIES_MONTHS,
       loadCanonicalReportInputsIfAvailable,
+      loadLatestOperatingSnapshot: () => getOperatingSnapshotStore().readLatest(),
       withDependencyContext,
       formatDateUTC,
       formatWeekEndingUTC,

@@ -14,12 +14,12 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     description: "Default: review the weekly plan before you change team pace, spend, or priorities.",
   },
   {
-    href: "/planning/financial",
+    href: "/operate/financial",
     label: "Financial strategy",
     description: "CFO runway planning, burn adjustments, and budget planning board memo exporter.",
   },
   {
-    href: "/planning/memory",
+    href: "/operate/memory",
     label: "Decision memory",
     description: "Immutable timeline registry of committed posture overrides and audit checks.",
   },

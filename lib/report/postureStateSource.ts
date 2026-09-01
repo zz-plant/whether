@@ -73,6 +73,34 @@ export const appendCommittedPostureEvent = async ({
   return { appended: true as const, event: entry, backend: repository.backendStatus() };
 };
 
+/**
+ * The committed-transition log, or nothing if it cannot be read.
+ *
+ * This log is supplementary: `buildPostureStateContract` already has a
+ * first-class path for an empty store, reporting the last change from the state
+ * machine instead. Letting a read failure propagate meant a durable-store
+ * outage took down every page that renders the weekly brief — nine routes at
+ * once, none of which needed the log to say anything true about posture.
+ *
+ * Only reads degrade. `appendCommittedPostureEvent` still fails loudly, because
+ * it decides whether to append by first reading; treating a failed read as "no
+ * event found" there would write duplicate transitions into a durable log.
+ */
+const readDecisionEvents = async (
+  repository: PostureDecisionEventRepository,
+): Promise<PostureDecisionEvent[]> => {
+  try {
+    return (await repository.list({ limit: 64 })).events;
+  } catch (error) {
+    console.warn(
+      `[postureState] Decision event store unavailable (${
+        error instanceof Error ? error.message : String(error)
+      }); reporting the last change from the state machine instead.`,
+    );
+    return [];
+  }
+};
+
 export const buildPostureState = async ({
   recordDate,
   assessment,
@@ -93,9 +121,7 @@ export const buildPostureState = async ({
     transitionWatch: assessment.diagnostics.transitionWatch,
   });
 
-  const listedEvents = decisionEvents
-    ? decisionEvents
-    : (await repository.list({ limit: 64 })).events;
+  const listedEvents = decisionEvents ?? (await readDecisionEvents(repository));
 
   const postureState: PostureStateContract = buildPostureStateContract({
     assessment,

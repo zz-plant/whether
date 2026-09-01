@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { TemplateActions } from "./templateActions";
 
 export const metadata: Metadata = {
   title: "Bounded Decision Template — Action / Threshold / Reversal | Whether",
@@ -55,45 +56,7 @@ export default function TemplatePage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="weather-button-primary min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
-          >
-            Print this page
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const text = [
-                "# Bounded Decision Template",
-                "",
-                "## Decision",
-                "",
-                "",
-                "## Action",
-                "",
-                "",
-                "## Threshold (pause if)",
-                "",
-                "",
-                "## Reversal (clears when)",
-                "",
-                "",
-                "## Review cadence",
-                "",
-                "",
-                "---",
-                "From whether.work/template",
-              ].join("\n");
-              navigator.clipboard.writeText(text);
-            }}
-            className="weather-button min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
-          >
-            Copy as text
-          </button>
-        </div>
+        <TemplateActions />
 
         <p className="text-fluid-micro text-slate-400 italic">
           No signup required. No data collected. This template is free to use, copy, and share.

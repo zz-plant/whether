@@ -63,14 +63,14 @@ export default async function DecidePage({
   };
   const recommendedPath = shouldStartWithChecker
     ? {
-        href: "/resolve/ship-checklist" as Route,
+        href: "/answer/ship-checklist",
         kicker: "Best next step",
         title: "Start with one decision check",
         detail: "This week moved enough to check one decision before opening broader guidance.",
         cta: "Open decision check",
       }
     : {
-        href: `/resolve/${recommendedSituation.slug}` as Route,
+        href: `/answer/${recommendedSituation.slug}`,
         kicker: "Best next step",
         title: `Start with ${recommendedSituation.title}`,
         detail: "Go straight to the decision that fits.",
@@ -215,7 +215,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">More team help</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
-                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
+                  <Link key={role.slug} href={`/answer/${role.slug}`} className="weather-chip">
                     {role.title}
                   </Link>
                 ))}
@@ -225,7 +225,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">More situation help</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
-                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">
+                  <Link key={situation.slug} href={`/answer/${situation.slug}`} className="weather-chip">
                     {situation.title}
                   </Link>
                 ))}
