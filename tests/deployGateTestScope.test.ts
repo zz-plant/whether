@@ -46,3 +46,26 @@ describe("deploy gate test scope", () => {
     assert.ok(!checks.includes("WHETHER_DEPLOY_GATE"), "bun run check must not inherit the exclusion");
   });
 });
+
+describe("deploy gate resource defaults", () => {
+  it("runs fewer workers and allows longer tests inside the gate", async () => {
+    // The build container is smaller than a dev machine, and this repo already
+    // documents that its suite fails under CPU contention. Defaults tuned for a
+    // workstation buy contention there, not speed.
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.match(runner, /inDeployGate \? '2' : '8'/);
+    assert.match(runner, /inDeployGate \? "120000" : "60000"/);
+  });
+
+  it("leaves both overridable, so a slow box can be tuned without a code change", async () => {
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.ok(runner.includes("process.env.BUN_TEST_CONCURRENCY ??"));
+    assert.ok(runner.includes("process.env.BUN_TEST_TIMEOUT_MS ??"));
+  });
+
+  it("does not change a local run", async () => {
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    // The gate signal is the only thing that shifts the defaults.
+    assert.ok(runner.includes("const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1'"));
+  });
+});

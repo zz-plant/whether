@@ -6,7 +6,20 @@ import { spawn } from 'node:child_process';
 const TEST_ROOT_ARG = './tests';
 const TEST_ROOT = path.resolve(TEST_ROOT_ARG);
 const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
-const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? "60000";
+/*
+ * The deploy gate runs inside the Cloudflare build container, which is smaller
+ * than a dev machine. This repo already documents the consequence — vinext-run's
+ * own comment notes "the flakiness in this repo is real: whetherCli tests fail
+ * under CPU contention" — and the suite has grown past a thousand tests. Eight
+ * workers and a 60s ceiling are tuned for a workstation, not for that box, where
+ * they buy contention rather than speed.
+ *
+ * So the gate gets conservative defaults: fewer workers, a longer ceiling. It is
+ * slower and it is not flaky, which is the right trade for the only remote signal
+ * this repo has. Both stay overridable, and neither changes a local run.
+ */
+const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1';
+const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? (inDeployGate ? "120000" : "60000");
 
 async function hasDiscoveredTestFiles(dir) {
   let entries;
@@ -162,7 +175,7 @@ async function collectTestFiles(dir, found = []) {
 }
 
 const extraArgs = process.argv.slice(2);
-const excludeToolTests = process.env.WHETHER_DEPLOY_GATE === '1' && !hasPathFilter(extraArgs);
+const excludeToolTests = inDeployGate && !hasPathFilter(extraArgs);
 
 let defaultTargets = [TEST_ROOT_ARG];
 
@@ -181,7 +194,7 @@ if (excludeToolTests) {
 }
 
 const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, ...defaultTargets];
-const concurrency = process.env.BUN_TEST_CONCURRENCY ?? '8';
+const concurrency = process.env.BUN_TEST_CONCURRENCY ?? (inDeployGate ? '2' : '8');
 const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...targetArgs], {
   stdio: 'inherit',
   env: process.env,
