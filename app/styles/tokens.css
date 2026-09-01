@@ -752,7 +752,10 @@ html[data-theme="light"] [class^="text-amber-4"], html[data-theme="light"] [clas
 html[data-theme="light"] [class^="text-sky-1"], html[data-theme="light"] [class*=" text-sky-1"],
 html[data-theme="light"] [class^="text-sky-2"], html[data-theme="light"] [class*=" text-sky-2"],
 html[data-theme="light"] [class^="text-sky-3"], html[data-theme="light"] [class*=" text-sky-3"],
-html[data-theme="light"] [class^="text-sky-4"], html[data-theme="light"] [class*=" text-sky-4"] { color: #0369a1 !important; }
+/* sky-800, not sky-700: #0369a1 measures 4.42:1 on the active cadence tab's
+   own bg-sky-500/14 tint, just under AA. On the page ground it passed either
+   way, so the tint is what decides it. Hover drops to sky-900 below. */
+html[data-theme="light"] [class^="text-sky-4"], html[data-theme="light"] [class*=" text-sky-4"] { color: #075985 !important; }
 
 html[data-theme="light"] [class^="text-rose-1"], html[data-theme="light"] [class*=" text-rose-1"],
 html[data-theme="light"] [class^="text-rose-2"], html[data-theme="light"] [class*=" text-rose-2"],
@@ -762,7 +765,7 @@ html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class
 /* Hover lands one step darker so the state stays readable as a change. */
 html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !important; }
 html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #78350f !important; }
-html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #075985 !important; }
+html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #0c4a6e !important; }
 html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
 
 /* Focus rings are authored as sky-200/300/400 (51 usages) — bright cyan that

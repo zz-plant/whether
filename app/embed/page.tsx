@@ -61,8 +61,11 @@ export default function EmbedPage() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_14rem]">
-          <div className="space-y-5">
+        {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
+            the embed snippet's <pre> pushed its column to 520px inside a 358px
+            grid and the page scrolled sideways on a phone. */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_14rem]">
+          <div className="min-w-0 space-y-5">
             <div className="weather-card">
               <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Live preview
@@ -84,7 +87,7 @@ export default function EmbedPage() {
             </div>
           </div>
 
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <div className="weather-card">
               <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Configure
