@@ -1,8 +1,32 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DecisionHero } from "../app/components/DecisionHero";
 import type { ThresholdBusinessConsequence } from "../lib/report/operatingCalls";
+
+const mockAny: any = mock;
+
+/* DecisionHero renders a descendant that reads the app router, and
+   renderToStaticMarkup mounts no router, so the render throws "invariant expected
+   app router to be mounted".
+
+   These three cases still passed for months, because `mock.module` patches the
+   module registry process-wide and two other suites install this exact mock —
+   whichever of them bun loaded first left the router standing for this file. That
+   is luck, not isolation: the file failed on its own, so `bun run test <path>` on
+   it never worked, and Cloudflare's build ordered the suite differently and went
+   red on every commit for two days while the local gate stayed green.
+
+   Installing it here makes the file answer for its own dependencies. */
+mockAny.module("next/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({
+    push: () => {},
+    replace: () => {},
+    prefetch: () => {},
+  }),
+}));
 
 const renderHero = (thresholdBusinessConsequence: ThresholdBusinessConsequence) => renderToStaticMarkup(
   <DecisionHero

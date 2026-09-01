@@ -1,8 +1,28 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DecisionHero } from "../app/components/DecisionHero";
+
+const mockAny: any = mock;
+
+/* This file renders a component whose descendant reads the app router, and
+   renderToStaticMarkup mounts none, so the render throws "invariant expected app
+   router to be mounted" — but only when this file runs without one of the suites
+   that installs this mock. `mock.module` patches the registry process-wide, so a
+   full run left the router standing here by ordering luck. Installing it here
+   makes the file answer for its own dependencies. See
+   decisionHeroThresholdConsequence.test.tsx, where that luck ran out. */
+mockAny.module("next/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({
+    push: () => {},
+    replace: () => {},
+    prefetch: () => {},
+  }),
+}));
+
 
 describe("DecisionHero signal breakdown", () => {
   it("keeps the Funding pressure score, threshold, and direction together in Why this call", () => {
