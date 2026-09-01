@@ -2,7 +2,6 @@ import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDel
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
-import { buildAgentInterfaceResponse } from "../agentInterface";
 
 export type SendWeeklyBriefResult = {
   ok: boolean;

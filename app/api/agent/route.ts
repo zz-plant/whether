@@ -27,7 +27,9 @@ export async function GET(request: Request) {
     );
   }
 
-  const payload = await buildAgentInterfaceResponse(requestedCadence);
+  const payload = await buildAgentInterfaceResponse(requestedCadence, {
+    route: "/api/agent",
+  });
 
   return NextResponse.json(payload, {
     headers: agentApiCorsHeaders,

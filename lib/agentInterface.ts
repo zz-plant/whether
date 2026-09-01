@@ -1,5 +1,5 @@
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
-import { loadReportData } from "./report/reportData";
+import { loadReportRouteContext } from "./api/reportRoute";
 import { buildPostureState } from "./report/postureStateSource";
 import { buildSummaryHash } from "./summary/summaryHash";
 import { buildMonthlySummary } from "./summary/monthlySummary";
@@ -29,9 +29,25 @@ type SummaryByCadence = {
   yearly: ReturnType<typeof buildYearlySummary>;
 };
 
+/* This read through `loadReportData`, which throws when report assembly fails, and nothing
+   here caught it — so a durable-store read failure inside the loader answered every cadence
+   of this public endpoint with a 500 and an empty body, while `/api/weekly` and its siblings
+   kept serving. They go through `loadReportRouteContext`, which catches the failure, logs
+   which dependency degraded, and returns the bundled snapshot behind a flag.
+
+   `degraded` carries the same meaning here as on those sibling routes and no more:
+   `!reportResult.ok`, assembly failed outright. It is deliberately not a freshness signal.
+   Under a total live-data outage treasury and macro fall back to their own snapshots,
+   assembly succeeds, and this flag stays false — the trap CLAUDE.md records, where a script
+   read through a gracefully degrading loader and froze a ten-week-old brief while exiting 0.
+   `lib/report/briefPublishGuard.ts` is what judges publish readiness, on the fallback and
+   record-age flags that do move under an outage. Anything that writes from this payload
+   gates there, not on this flag. Every caller today only reads. */
 export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
   cadence: Cadence,
+  { route = "agent-interface" }: { route?: string } = {},
 ) => {
+  const { reportData, degraded } = await loadReportRouteContext({ route });
   const {
     assessment,
     actionNowShort,
@@ -44,8 +60,7 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     treasuryProvenance,
     recordDateLabel,
     weeklyRecordDateLabel,
-  } =
-    await loadReportData();
+  } = reportData;
   const postureState = await buildPostureState({
     recordDate: treasury.record_date,
     assessment,
@@ -106,6 +121,7 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
+    degraded,
     agentHandoff: {
       payload: agentPayload,
       prompt: agentPrompt,
