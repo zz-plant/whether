@@ -196,6 +196,25 @@ async function PageContent({
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
+  const actionStripItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
+  const sharedFlipCorridor = homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor;
+
+  /*
+   * The levers section states the shared corridor a screen below, under a line
+   * that explains why all three cards clear on it. Repeating the same two
+   * thresholds in the card's watch row is the stacked-card restatement §XI
+   * forbids — measured at 467px apart. Display only: briefShareLines below
+   * keeps the full set, because the pasted brief has no levers section to
+   * carry them.
+   */
+  const corridorParts = new Set(
+    actionStripItems.length > 0 && sharedFlipCorridor
+      ? sharedFlipCorridor.split("·").map((part) => part.trim()).filter(Boolean)
+      : [],
+  );
+  const visibleFlipConditions = flipConditionLabels.filter(
+    (label) => !corridorParts.has(label.trim()),
+  );
 
   const revisitQueue = homepage.weeklyDecisionCardModel.decision.revisitQueue;
   const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));
@@ -296,7 +315,7 @@ async function PageContent({
               isFallback={homepage.reportShell.showOfflineBadge}
               signalData={v2HeroSignalData}
               signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-              flipConditions={flipConditionLabels}
+              flipConditions={visibleFlipConditions}
               guardrail={guardrailLabel}
               reversalTrigger={reversalTriggerLabel}
               shareLines={briefShareLines}
@@ -314,8 +333,8 @@ async function PageContent({
             />
 
             <ThreeWhethersCard
-              items={homepage.weeklyDecisionCardModel.decision.actionStripItems ?? []}
-              sharedFlipCorridor={homepage.weeklyDecisionCardModel.decision.sharedFlipCorridor}
+              items={actionStripItems}
+              sharedFlipCorridor={sharedFlipCorridor}
             />
 
             <CompareStrip
