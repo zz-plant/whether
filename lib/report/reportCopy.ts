@@ -57,18 +57,20 @@ export const DECISION_CONTRACT_LABELS = {
   },
 } as const;
 
-/** Plain-language copy for the homepage's scan-first bounded-decision ledger. */
-export const ACTION_STRIP_DISPLAY_COPY = {
-  heading: "What can we do this week?",
-  action: "Do now",
-  threshold: "Stop or tighten if",
-  reversal: "Open up again when",
-  state: {
-    Closed: "Keep this closed",
-    Guarded: "Proceed with guardrails",
-    Staged: "Stage the next move",
-    Open: "Move ahead now",
-  },
+/**
+ * The call when the policy engine refuses to support a posture change.
+ *
+ * Every horizon has to say the same thing here. The regime-derived guidance keeps
+ * reading "scale proven bets" through a refusal, so a surface that renders it while
+ * the weekly call says "slow approvals" puts two opposite instructions on one screen.
+ * Both the weekly contract and the cadence lead read these.
+ */
+export const POLICY_OVERRIDE_CALL = {
+  currentCall: "Hold posture changes and keep approvals reversible until policy signals reconcile.",
+  actionNow: "Slow approvals, require reversible bets, and cap new experiments until disagreement clears.",
+  pauseIf: "Pause irreversible approvals while the policy override remains active.",
+  changeCourseIf:
+    "Resume normal posture changes only after policy disagreement clears and the weekly flip thresholds recover.",
 } as const;
 
 /**

@@ -1,0 +1,289 @@
+/**
+ * View model for the homepage's non-weekly cadence lead.
+ *
+ * The cadence selector used to change nothing an operator could see. The card it drove
+ * pulled the whole agent-interface payload — posture-state repository reads, the full
+ * macro series, the agent handoff prompt — to render four strings, and the call site
+ * swallowed the failure with `.catch(() => null)`, so weekly, monthly and quarterly
+ * served a byte-identical page. This model is built from the report data the page has
+ * already loaded, so the horizon renders under fallback too.
+ *
+ * It carries the call-level bounded triad, not a per-lever ledger: §VIII assigns
+ * operating guardrails to /operate, and 69221739 moved them there. The brief keeps the
+ * call, its guardrail and its reversal, which is what this is.
+ */
+import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
+import { getRegimeOperatorLabel } from "../regimeLabels";
+import { getMonthlyActionGuidance } from "../summary/monthlySummary";
+import { getQuarterlyActionGuidance } from "../summary/quarterlySummary";
+import {
+  buildHorizonOperatingRule,
+  type HorizonOperatingRule,
+} from "../summary/horizonOperatingRules";
+import { formatQuarterLabel } from "../summary/summaryFormatting";
+import { formatMonthYearShortFromValue } from "../formatters";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "./reportCopy";
+
+/** The two horizons the selector offers beside the weekly default. */
+export type CadenceCallHorizon = "monthly" | "quarterly";
+
+export type CadenceHistoryPoint = {
+  label: string;
+  regime: RegimeKey;
+  regimeLabel: string;
+  isCurrent: boolean;
+};
+
+export type CadenceCallModel = {
+  horizon: CadenceCallHorizon;
+  cadenceLabel: string;
+  periodLabel: string | null;
+  /** The horizon's job, as the sentence that leads the card. */
+  headline: string;
+  regime: RegimeKey;
+  regimeLabel: string;
+  description: string;
+  boundedRule: HorizonOperatingRule;
+  /** Set when the policy engine refuses to support a posture change, in which case the
+   *  call above is the hold, not the regime's guidance. */
+  overrideReason: string | null;
+  history: CadenceHistoryPoint[];
+  historyLabel: string;
+  /** What the run of periods says — how long this call has held, or what it replaced. */
+  historyDelta: string | null;
+  /** Names the weekly hero below this card, so the two do not read as competing calls. */
+  weeklyBridge: string;
+  planHref: string;
+  planLabel: string;
+  shareTitle: string;
+  /** Distinct from the hero's "Copy Brief". Both controls sit on `/` under a non-weekly
+   *  cadence and copy different artifacts, so each has to name the one it copies. */
+  shareLabel: string;
+  shareCopiedLabel: string;
+  shareLines: string[];
+};
+
+const HORIZON_COPY: Record<
+  CadenceCallHorizon,
+  {
+    cadenceLabel: string;
+    periodNoun: string;
+    periodNounPlural: string;
+    historyLabel: string;
+    weeklyBridge: string;
+    planLabel: string;
+    shareTitle: string;
+    shareLabel: string;
+    historyLength: number;
+  }
+> = {
+  monthly: {
+    cadenceLabel: "Monthly call",
+    periodNoun: "month",
+    periodNounPlural: "months",
+    historyLabel: "Regime by month",
+    weeklyBridge: "The weekly read behind this month's call",
+    planLabel: "Build this month's plan →",
+    shareTitle: "Whether Monthly Call",
+    shareLabel: "Copy monthly call",
+    historyLength: 6,
+  },
+  quarterly: {
+    cadenceLabel: "Quarterly call",
+    periodNoun: "quarter",
+    periodNounPlural: "quarters",
+    historyLabel: "Regime by quarter",
+    weeklyBridge: "The weekly read behind this quarter's call",
+    planLabel: "Build this quarter's plan →",
+    shareTitle: "Whether Quarterly Call",
+    shareLabel: "Copy quarterly call",
+    historyLength: 4,
+  },
+};
+
+/** The guidance maps are written as mid-sentence clauses ("scale proven bets, …")
+ *  because every other consumer embeds them. The lead needs the same clause as a
+ *  standalone imperative, which is a capital and a period — not new copy. */
+const asImperative = (guidance: string) =>
+  `${guidance.charAt(0).toUpperCase()}${guidance.slice(1)}.`;
+
+type RegimeHistoryEntry = { record_date: string; regime: RegimeKey };
+
+/**
+ * Sortable period key. The comparison has to be by period rather than by date: the
+ * history entries are month-end stamps and the report's record date is whatever day the
+ * source last published, so a plain `<=` on dates drops the current month and leaves the
+ * strip ending one period before the one the card is titled after.
+ */
+const periodKeyFor = (horizon: CadenceCallHorizon, recordDate: string) => {
+  if (horizon === "monthly") return recordDate.slice(0, 7);
+  const date = new Date(recordDate);
+  const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
+  return `${date.getUTCFullYear()}-Q${quarter}`;
+};
+
+/** One point per quarter, keeping the latest month in each — the series is monthly, and
+ *  a quarter drawn from three separate months would repeat itself three times. */
+const reduceToQuarters = (history: readonly RegimeHistoryEntry[]) => {
+  const byQuarter = new Map<string, RegimeHistoryEntry>();
+
+  for (const entry of history) {
+    const label = formatQuarterLabel(entry.record_date);
+    if (label) {
+      byQuarter.set(label, entry);
+    }
+  }
+
+  return [...byQuarter.entries()].map(([label, entry]) => ({ label, entry }));
+};
+
+const buildHistory = ({
+  horizon,
+  history,
+  length,
+  recordDate,
+}: {
+  horizon: CadenceCallHorizon;
+  history: readonly RegimeHistoryEntry[];
+  length: number;
+  recordDate: string;
+}): CadenceHistoryPoint[] => {
+  const currentKey = periodKeyFor(horizon, recordDate);
+  const upToNow = history.filter(
+    (entry) => periodKeyFor(horizon, entry.record_date) <= currentKey,
+  );
+  const points =
+    horizon === "quarterly"
+      ? reduceToQuarters(upToNow)
+      : upToNow.map((entry) => ({
+          label: formatMonthYearShortFromValue(entry.record_date),
+          entry,
+        }));
+
+  // Matched on the period, not on "is it last". The month in progress reaches the
+  // series only once the cron writes it, so the strip often ends a period behind the
+  // record date — highlighting that trailing chip would label July as where we are.
+  return points.slice(-length).map(({ label, entry }) => ({
+    label,
+    regime: entry.regime,
+    regimeLabel: getRegimeOperatorLabel(entry.regime),
+    isCurrent: periodKeyFor(horizon, entry.record_date) === currentKey,
+  }));
+};
+
+/**
+ * The delta the chips imply, stated. A run of identical chips and a run that just
+ * changed look alike at a glance, and which one it is decides whether the operator
+ * should re-plan. Counted over the rendered window only, so "6 months" means "every
+ * month shown", never a claim about history the card is not displaying.
+ */
+const buildHistoryDelta = ({
+  history,
+  periodNoun,
+  periodNounPlural,
+}: {
+  history: CadenceHistoryPoint[];
+  periodNoun: string;
+  periodNounPlural: string;
+}) => {
+  const current = history.at(-1);
+  if (!current) return null;
+
+  let run = 0;
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    if (history[index].regime !== current.regime) break;
+    run += 1;
+  }
+
+  const previous = history[history.length - run - 1];
+  if (previous) {
+    return `Moved to ${current.regimeLabel} from ${previous.regimeLabel} in ${history[history.length - run].label}.`;
+  }
+
+  const noun = run === 1 ? periodNoun : periodNounPlural;
+  return `${current.regimeLabel} for every ${periodNoun} shown — ${run} ${noun}.`;
+};
+
+export const buildCadenceCallModel = ({
+  horizon,
+  assessment,
+  recordDate,
+  recordDateLabel,
+  regimeHistory,
+  planHref = "/operate",
+}: {
+  horizon: CadenceCallHorizon;
+  assessment: RegimeAssessment;
+  recordDate: string;
+  recordDateLabel?: string | null;
+  regimeHistory: readonly RegimeHistoryEntry[];
+  planHref?: string;
+}): CadenceCallModel => {
+  const copy = HORIZON_COPY[horizon];
+  const guidance =
+    horizon === "monthly"
+      ? getMonthlyActionGuidance(assessment.regime)
+      : getQuarterlyActionGuidance(assessment.regime);
+
+
+  const periodLabel =
+    (horizon === "monthly"
+      ? formatMonthYearShortFromValue(recordDate)
+      : formatQuarterLabel(recordDate)) || recordDateLabel || null;
+
+  const history = buildHistory({
+    horizon,
+    history: regimeHistory,
+    length: copy.historyLength,
+    recordDate,
+  });
+
+  const overrideReason = assessment.policyAssessment.refusal.refused
+    ? assessment.policyAssessment.refusal.reasons[0] ?? "Policy signals disagree."
+    : null;
+
+  // `currentCall` up top, `actionNow` in the rule. The weekly hero directly below
+  // already leads with `actionNow` under a refusal, and leading with it here too put
+  // the identical sentence on screen twice. `currentCall` is the posture-level form of
+  // the same hold, which is the right altitude for a horizon card anyway.
+  const boundedRule: HorizonOperatingRule = overrideReason
+    ? {
+        action: POLICY_OVERRIDE_CALL.actionNow,
+        threshold: POLICY_OVERRIDE_CALL.pauseIf,
+        reversal: POLICY_OVERRIDE_CALL.changeCourseIf,
+      }
+    : buildHorizonOperatingRule({
+        assessment,
+        guidance,
+        horizon: horizon === "monthly" ? "month" : "quarter",
+      });
+
+  return {
+    horizon,
+    cadenceLabel: copy.cadenceLabel,
+    periodLabel,
+    headline: overrideReason ? POLICY_OVERRIDE_CALL.currentCall : asImperative(guidance),
+    regime: assessment.regime,
+    regimeLabel: getRegimeOperatorLabel(assessment.regime),
+    description: assessment.description,
+    boundedRule,
+    overrideReason,
+    history,
+    historyLabel: copy.historyLabel,
+    historyDelta: buildHistoryDelta({
+      history,
+      periodNoun: copy.periodNoun,
+      periodNounPlural: copy.periodNounPlural,
+    }),
+    weeklyBridge: copy.weeklyBridge,
+    planHref,
+    planLabel: copy.planLabel,
+    shareTitle: copy.shareTitle,
+    shareLabel: copy.shareLabel,
+    shareCopiedLabel: "Call copied",
+    shareLines: [
+      `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${boundedRule.threshold}`,
+      `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${boundedRule.reversal}`,
+    ],
+  };
+};
