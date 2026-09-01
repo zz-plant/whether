@@ -1,0 +1,48 @@
+import assert from "node:assert/strict";
+import { describe, it } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
+
+/**
+ * What the deploy gate is allowed to run.
+ *
+ * The Cloudflare build is the only remote signal this repo has, and its check
+ * gate runs inside the deploy path. Suites under tests/tools/ drive external
+ * interpreters the build image does not guarantee (today: python3), so a failure
+ * there blocks a deploy over something that cannot affect the deployed artifact.
+ * They are excluded from the gate and from nowhere else.
+ */
+describe("deploy gate test scope", () => {
+  it("excludes tests/tools from the gate run and says so", () => {
+    // Deliberately a different file: pointing the spawned runner at this one
+    // makes it re-run this test, which recurses until the timeout.
+    const result = spawnSync("bun", ["scripts/run-tests.mjs", "tests/trackRecord.test.ts"], {
+      encoding: "utf8",
+      env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
+    });
+
+    // An explicit path filter still wins, so a targeted run is never rewritten.
+    assert.equal(result.status, 0);
+    assert.ok(!result.stdout.includes("deploy gate: excluding"), "a filtered run must not be rescoped");
+  });
+
+  it("keeps the exclusion tied to the tests/tools directory, not a filename", async () => {
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.ok(runner.includes("TOOL_TEST_DIRECTORY"), "runner no longer scopes by directory");
+    assert.ok(
+      runner.includes("WHETHER_DEPLOY_GATE"),
+      "runner no longer honours the deploy-gate signal",
+    );
+  });
+
+  it("has the gate actually set the signal, or the exclusion never applies", async () => {
+    const gate = await readFile("scripts/vinext-run.mjs", "utf8");
+    assert.match(gate, /WHETHER_DEPLOY_GATE:\s*"1"/);
+  });
+
+  it("still runs the tool suite outside the gate", async () => {
+    // The rule this protects: excluded from the deploy path, not from the repo.
+    const checks = await readFile("scripts/run-checks.mjs", "utf8");
+    assert.ok(!checks.includes("WHETHER_DEPLOY_GATE"), "bun run check must not inherit the exclusion");
+  });
+});

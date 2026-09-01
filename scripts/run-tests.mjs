@@ -122,8 +122,65 @@ function hasPathFilter(args) {
   return false;
 }
 
+/*
+ * Tests that shell out to an interpreter this repo does not ship.
+ *
+ * tests/tools/ holds suites that drive external tooling — today the Python
+ * analytics script in scripts/. They are real tests and run on every
+ * `bun run test`, `bun run check`, and pre-push. What they must not do is gate a
+ * deploy: the Cloudflare build image guarantees Bun and Node, not python3, and
+ * the check gate in vinext-run.mjs runs inside the deploy path. A deploy that
+ * fails because the build image lacks an interpreter used by an analytics script
+ * is a deploy blocked by something that cannot affect the deployed artifact.
+ *
+ * So the gate excludes this directory and says so. Nothing is skipped or
+ * quarantined — the suite still runs everywhere a contributor runs tests.
+ */
+const TOOL_TEST_DIRECTORY = path.join(TEST_ROOT, 'tools');
+
+async function collectTestFiles(dir, found = []) {
+  let entries;
+
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await collectTestFiles(fullPath, found);
+      continue;
+    }
+    if (entry.isFile() && TEST_FILE_PATTERN.test(entry.name)) {
+      found.push(fullPath);
+    }
+  }
+
+  return found;
+}
+
 const extraArgs = process.argv.slice(2);
-const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, TEST_ROOT_ARG];
+const excludeToolTests = process.env.WHETHER_DEPLOY_GATE === '1' && !hasPathFilter(extraArgs);
+
+let defaultTargets = [TEST_ROOT_ARG];
+
+if (excludeToolTests) {
+  const allTests = await collectTestFiles(TEST_ROOT);
+  const kept = allTests.filter((file) => !file.startsWith(`${TOOL_TEST_DIRECTORY}${path.sep}`));
+  const excluded = allTests.length - kept.length;
+
+  console.log(
+    `[test-runner] deploy gate: excluding ${excluded} test file(s) under tests/tools/ ` +
+      `(they drive external interpreters the build image does not guarantee). ` +
+      `They still run on bun run test, bun run check, and pre-push.`,
+  );
+
+  defaultTargets = kept.map((file) => path.relative(process.cwd(), file));
+}
+
+const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, ...defaultTargets];
 const concurrency = process.env.BUN_TEST_CONCURRENCY ?? '8';
 const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...targetArgs], {
   stdio: 'inherit',
