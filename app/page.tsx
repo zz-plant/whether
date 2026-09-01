@@ -70,12 +70,16 @@ export default async function Page({
  * current — the module then argues against the page it sits on. Rendering
  * nothing is the safer failure.
  */
+/* The card carries no elevation: it sits inside the brief column, and a nested
+ * box that lifts off its own container is what the depth ladder in surfaces.css
+ * exists to prevent. That rule cannot reach a shadow written as a utility, so
+ * this one stays removed at the call site. */
 function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: string }) {
   const brief = selectCitablePermalinkBrief(currentRecordDate);
   if (!brief) return null;
 
   return (
-    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md space-y-2.5 px-4 py-3.5 shadow-md">
+    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md space-y-2.5 px-4 py-3.5">
       <p className="text-fluid-xs text-slate-300">
         This week is published as a permanent record dated <span className="font-medium text-white">{brief.recordDateLabel}</span>.
       </p>

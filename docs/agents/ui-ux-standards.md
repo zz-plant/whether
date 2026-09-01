@@ -136,3 +136,27 @@ Scope: every `<details>`, `Collapsible`, and `Accordion` in `app/`.
   sender had open sends the recipient a different page than the one that was shared.
 - Disclosures whose state is incidental — a copy-to-clipboard block, a template list — do not need a
   query key. Ask whether a colleague opening the link should see what you saw.
+
+## XIII. Depth and enclosure
+
+Scope: every element that draws a box — a border, a fill, or a lift — under `app/`.
+
+- MUST: let the outermost container own the elevation. A box nested inside another that casts its
+  own offset shadow reads as floating above the thing containing it, and enclosure stops meaning
+  grouping. The ladder at the end of `app/styles/surfaces.css` enforces this for boxes made from a
+  `weather-*` class; it cannot reach one written as Tailwind utilities, so that case is on the
+  author.
+- An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
+  `DecisionHero`'s reconsideration panel tints one amber or emerald by state, which carries meaning
+  rather than lifting the box.
+- MUST: add a new `weather-*` container class to the `:is(...)` lists in that ladder.
+  `tests/surfaceDepthLadder.test.ts` derives the set from the stylesheets and fails when one is
+  missing, so this is checked rather than remembered. Controls, chips, and the `-sky`/`-indigo`
+  tints are excluded there by name: a button inside a card is not a nested container.
+- SHOULD: stop at three levels of visible enclosure. Past that the frames stop separating anything —
+  a box inside a box inside a box is a list, and spacing and type carry it better. `/operate` sat at
+  five, and the fix was to drop frames rather than to restyle them.
+- Measuring this needs the browser, not a grep: computed colours arrive as `oklab()` for any
+  Tailwind `/opacity` modifier, so a regex looking for `rgb(` reports a page as clean when it is not.
+  Normalise colour through a canvas, and treat "is it positioned" as a question about the ancestor
+  chain — the popovers in this codebase carry their positioning on a parent.
