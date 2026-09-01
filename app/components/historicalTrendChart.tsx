@@ -54,6 +54,7 @@ export function HistoricalTrendChart({
   const pathD = buildSparklinePath(values, domain, W, H, PAD_Y);
 
   const currentVal = points[points.length - 1].value;
+  const dotY = H - PAD_Y - ((currentVal - min) / span) * (H - PAD_Y * 2);
   const asOf = formatAsOf(points[points.length - 1].date);
   const periodSummary = `${points.length} ${periodLabel}${asOf ? ` · latest ${asOf}` : ""}`;
   const firstVal = points[0].value;
@@ -84,14 +85,38 @@ export function HistoricalTrendChart({
       </div>
       <svg
         viewBox={`0 0 ${W} ${H}`}
+        // The box is w-full but the viewBox is 100x32, so the default
+        // xMidYMid meet scaled to the height and drew the line at its intrinsic
+        // 100px, centred, with the rest of the row empty — 310px of width
+        // carrying a 100px chart on a phone. `none` lets the series use the
+        // width it is given; the stroke and the end dot opt out of the stretch
+        // below so neither turns into an ellipse.
+        preserveAspectRatio="none"
         className="w-full h-8 overflow-visible"
         role="img"
         // The chart is autoscaled, so the range has to be stated or the shape
         // can't be decoded.
         aria-label={`${label} over ${points.length} ${periodLabel}, ranging ${rangeLabel(domain)}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`}
       >
-        <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={W} cy={H - PAD_Y - ((currentVal - min) / span) * (H - PAD_Y * 2)} r="2" fill={color} />
+        <path
+          d={pathD}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        {/* A zero-length round-capped stroke, not a circle: under a non-uniform
+            scale a circle renders as an ellipse, while a non-scaling stroke
+            keeps the dot the same size at every width. */}
+        <path
+          d={`M${W} ${dotY} L${W} ${dotY}`}
+          stroke={color}
+          strokeWidth="4"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
       <p className="text-fluid-nano text-slate-400">{periodSummary}</p>
     </div>
