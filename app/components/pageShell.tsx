@@ -46,7 +46,11 @@ export function PageShell({
       {enableTvAmbientMode ? <AnchorFeedback /> : null}
       {enableTvAmbientMode ? <DisplayGuardian /> : null}
 
-      <div className="tv-rail-safe relative z-10 mx-auto w-full max-w-[96rem] pb-[calc(env(safe-area-inset-bottom)+8rem)] pt-[calc(env(safe-area-inset-top)+0.5rem)] px-[var(--weather-shell-pad-inline)] sm:pb-8 sm:pt-4">
+      {/* 2rem, not 8rem. The 8rem reserved room for a fixed bottom bar, but the
+          only one is StickyCallStrip on the weekly brief, and that page renders
+          through Shell rather than this component — so every PageShell route was
+          ending in ~128px of nothing on mobile. */}
+      <div className="tv-rail-safe relative z-10 mx-auto w-full max-w-[96rem] pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+0.5rem)] px-[var(--weather-shell-pad-inline)] sm:pb-8 sm:pt-4">
         {children}
       </div>
     </main>

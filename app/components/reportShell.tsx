@@ -302,9 +302,14 @@ export const ReportShell = (props: ReportShellProps) => {
                 })}
               </div>
 
-              <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
-                {INTERNAL_USE_LABEL && <p>{INTERNAL_USE_LABEL}</p>}
-              </footer>
+              {/* INTERNAL_USE_LABEL is "" in lib/exportNotices, so this rendered
+                  a rule with nothing under it — 49px of margin, border and
+                  padding at the foot of every report route. */}
+              {INTERNAL_USE_LABEL ? (
+                <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
+                  <p>{INTERNAL_USE_LABEL}</p>
+                </footer>
+              ) : null}
             </div>
           </div>
 
