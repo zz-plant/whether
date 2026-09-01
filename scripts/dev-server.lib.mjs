@@ -110,21 +110,49 @@ export const waitForBaseUrl = async ({ baseUrl, timeoutMs, child, logPath, probe
   );
 };
 
+/**
+ * Signal the child's whole process group, falling back to the child alone.
+ *
+ * The negative pid is the group. Without it only the `bun run` wrapper is
+ * signalled and the dev server it spawned survives.
+ */
+const signalGroup = (child, signal) => {
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    try {
+      child.kill(signal);
+    } catch {
+      /* Already gone; nothing to signal. */
+    }
+  }
+};
+
 export const stopDevServer = async (child) => {
-  if (!child || child.exitCode != null) {
+  if (!child) {
     return;
   }
 
-  child.kill("SIGTERM");
-
-  const startedAt = Date.now();
-  while (child.exitCode == null && Date.now() - startedAt < 5000) {
-    await wait(100);
-  }
-
   if (child.exitCode == null) {
-    child.kill("SIGKILL");
+    signalGroup(child, "SIGTERM");
+
+    const startedAt = Date.now();
+    while (child.exitCode == null && Date.now() - startedAt < 5000) {
+      await wait(100);
+    }
+
+    if (child.exitCode == null) {
+      signalGroup(child, "SIGKILL");
+    }
   }
+
+  /*
+   * Destroyed even when the child had already exited: these are what kept the
+   * loop open, and an exited wrapper is no guarantee its grandchild released
+   * them. Cheap, and it makes the teardown independent of who died when.
+   */
+  child.stdout?.destroy();
+  child.stderr?.destroy();
 };
 
 /**
@@ -141,10 +169,20 @@ export const startDevServer = async ({ baseUrl, outDir, devScript, logName }) =>
 
   const logPath = path.resolve(process.cwd(), outDir, logName);
   const logStream = createWriteStream(logPath, { flags: "w" });
+  /*
+   * Detached so the child leads its own process group. `bun run dev` is a wrapper:
+   * the real dev server is its child, and it inherits these stdout/stderr pipes.
+   * Signalling only the wrapper leaves that grandchild alive holding the write
+   * ends, so the read ends never see EOF, Node's loop never drains, and a caller
+   * that sets `process.exitCode` instead of calling `process.exit()` hangs after
+   * finishing its work. A group leader can be signalled as a group, which is what
+   * stopDevServer does.
+   */
   const child = spawn("bun", ["run", devScript, "--", "--hostname", host, "--port", port], {
     cwd: process.cwd(),
     env: process.env,
     stdio: ["ignore", "pipe", "pipe"],
+    detached: true,
   });
 
   child.stdout.pipe(logStream);
