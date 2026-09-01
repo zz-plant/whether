@@ -75,6 +75,150 @@ describe("ThresholdLadder", () => {
     assert.match(html, /Trigger at 68\./);
     assert.equal(html.match(/0 = easier funding · 100 = harder funding/g)?.length, 2);
   });
+
+  it("runs an inverted rail backwards, ends included", () => {
+    const upright = renderToStaticMarkup(
+      <ThresholdLadder idPrefix="l5" min={0} max={100} current={25} trigger={40} signalLabel="S" />,
+    );
+    const flipped = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l5"
+        min={0}
+        max={100}
+        current={25}
+        trigger={40}
+        signalLabel="S"
+        invert
+      />,
+    );
+
+    assertNoNaN(flipped);
+    // 25 of 100 sits a quarter along an upright rail and three quarters along a flipped
+    // one; the shared inset makes those 66 and 174 in a 240-unit space.
+    assert.ok(upright.includes('cx="66"'), "upright reading should sit at a quarter");
+    assert.ok(flipped.includes('cx="174"'), "flipped reading should sit at three quarters");
+    // An inverted rail whose ends still read 0 then 100 mislabels every point on it.
+    assert.match(flipped, /textAnchor="start"|text-anchor="start"/);
+    assert.ok(flipped.indexOf(">100</text>") < flipped.indexOf(">0</text>"));
+  });
+
+  it("shades the hysteresis gap only when asked, and drops the distance wash for it", () => {
+    const props = {
+      idPrefix: "l6",
+      min: 0,
+      max: 100,
+      current: 20,
+      trigger: 80,
+      reversal: 60,
+      signalLabel: "S",
+    } as const;
+
+    const plain = renderToStaticMarkup(<ThresholdLadder {...props} />);
+    const banded = renderToStaticMarkup(<ThresholdLadder {...props} hysteresisBand />);
+
+    assertNoNaN(banded);
+    assertTokensWrapped(banded);
+    // The band spans reversal to trigger; the plain rail shades reading to trigger.
+    assert.ok(banded.includes('x1="141.6"') && banded.includes('x2="184.8"'));
+    assert.ok(plain.includes('x1="55.2"') && plain.includes('x2="184.8"'));
+    // Both washes at once would bury the band under the run that crosses it.
+    assert.equal(banded.includes('x1="55.2"'), false);
+  });
+
+  it("lets the surface name the trigger without renaming it everywhere", () => {
+    const html = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7"
+        min={0}
+        max={100}
+        current={20}
+        trigger={80}
+        triggerLabel="Guardrail"
+        signalLabel="S"
+      />,
+    );
+
+    assert.match(html, />Guardrail</);
+    // The accessible description keeps the generic noun, which other copy quotes.
+    assert.match(html, /Trigger at 80\./);
+  });
+
+  it("does not read a signal that blew through the trigger as improving", () => {
+    // 70 → 82 against a trigger of 76 is 6 away either side, so a distance comparison
+    // scores it flat and paints the leg green on the one move that most deserves alarm.
+    const crossed = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l9"
+        min={0}
+        max={100}
+        current={82}
+        previous={70}
+        trigger={76}
+        reversal={66}
+        signalLabel="Funding pressure"
+      />,
+    );
+
+    assert.match(crossed, /Rose from 70, moving further past the trigger\./);
+    assert.equal(crossed.includes("var(--accent-success)"), true, "reversal notch is green");
+    // The movement leg is the wide one; it must not be the improving colour.
+    assert.doesNotMatch(crossed, /strokeWidth="2.5"[^>]*var\(--accent-success\)/);
+  });
+
+  it("reads a retreat from beyond the trigger as improving, without claiming it is clear", () => {
+    const retreating = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l10"
+        min={0}
+        max={100}
+        current={80}
+        previous={92}
+        trigger={76}
+        reversal={66}
+        signalLabel="Funding pressure"
+      />,
+    );
+
+    assert.match(retreating, /Fell from 92, moving back toward the trigger\./);
+  });
+
+  it("keeps the distance heuristic where no reversal names the trouble side", () => {
+    // Without a reversal the component cannot know which side of the trigger is bad,
+    // so it must not guess — this is the long-standing behaviour and stays put.
+    const html = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l11"
+        min={0}
+        max={100}
+        current={82}
+        previous={70}
+        trigger={76}
+        signalLabel="S"
+      />,
+    );
+
+    assert.match(html, /Rose from 70, moving away from the trigger\./);
+  });
+
+  it("keeps label size fixed against a widened coordinate space", () => {
+    const wide = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l8"
+        min={0}
+        max={100}
+        current={50}
+        trigger={80}
+        signalLabel="S"
+        viewBoxWidth={660}
+      />,
+    );
+
+    assertNoNaN(wide);
+    assert.match(wide, /viewBox="0 0 660 56"/);
+    // Same inset, so a wider space is more rail rather than bigger type.
+    assert.ok(wide.includes('x2="648"'));
+    assert.ok(wide.includes('fontSize="9"') || wide.includes('font-size="9"'));
+  });
 });
 
 describe("RegimeGlyph", () => {

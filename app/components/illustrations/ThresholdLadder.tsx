@@ -13,6 +13,12 @@ export type ThresholdLadderProps = {
   previous?: number;
   /** Crossing this fires the rule. */
   trigger: number;
+  /**
+   * What the surface calls the trigger. Defaults to "Trigger", but a card that chips
+   * the same threshold as a Guardrail has to label the rail the same way — one number
+   * carrying two names on one card reads as two rules.
+   */
+  triggerLabel?: string;
   /** Crossing this reverses the rule. Omit if the rule has no reversal condition. */
   reversal?: number;
   /** Unit suffix for the readout, e.g. "%" or "bps". */
@@ -21,14 +27,36 @@ export type ThresholdLadderProps = {
   signalLabel: string;
   /** Compact explanation of which end of the scale carries which meaning. */
   scaleDirection?: string;
+  /**
+   * Run the rail from `max` to `min` instead. A signal whose trigger sits at the low
+   * end draws its trouble on the left, so a pair of rails read in opposite directions
+   * and a reader has to re-orient between them. Inverting one puts the trigger on the
+   * right for both. The rail ends label themselves, so the flip stays visible.
+   */
+  invert?: boolean;
+  /**
+   * Shade the span between `reversal` and `trigger`. That span is the hysteresis gap —
+   * neither condition fires inside it — and it is the part of a bounded rule that
+   * prose can only imply by stating two thresholds and leaving the reader to subtract.
+   * Ignored when there is no `reversal` to bound it.
+   */
+  hysteresisBand?: boolean;
+  /**
+   * Width of the coordinate space, in user units. The rail renders at `width: 100%`, so
+   * this is really a type-scale control: label sizes are fixed in user units, and a
+   * viewBox narrower than the rendered element scales them up with everything else. Set
+   * it to roughly the pixel width the rail will occupy — the default suits the narrow
+   * column it was first drawn for, and a full-width row wants a much larger value.
+   */
+  viewBoxWidth?: number;
   className?: string;
 };
 
 const formatNumber = (v: number) =>
   new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(v);
 
-const RAIL_START = 12;
-const RAIL_END = 228;
+const RAIL_INSET = 12;
+const DEFAULT_VIEWBOX_WIDTH = 240;
 const RAIL_Y = 30;
 
 export function ThresholdLadder({
@@ -38,17 +66,25 @@ export function ThresholdLadder({
   current,
   previous,
   trigger,
+  triggerLabel = "Trigger",
   reversal,
   unit = "",
   signalLabel,
   scaleDirection,
+  invert = false,
+  hysteresisBand = false,
+  viewBoxWidth = DEFAULT_VIEWBOX_WIDTH,
   className,
 }: ThresholdLadderProps) {
   if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return null;
 
+  const RAIL_START = RAIL_INSET;
+  const RAIL_END = viewBoxWidth - RAIL_INSET;
+
   const clamp = (v: number) => (Number.isFinite(v) ? Math.min(Math.max(v, min), max) : min);
+  const fraction = (v: number) => (clamp(v) - min) / (max - min);
   const xFor = (v: number) =>
-    RAIL_START + ((clamp(v) - min) / (max - min)) * (RAIL_END - RAIL_START);
+    RAIL_START + (invert ? 1 - fraction(v) : fraction(v)) * (RAIL_END - RAIL_START);
 
   const currentValue = clamp(current);
   const triggerValue = clamp(trigger);
@@ -60,12 +96,52 @@ export function ThresholdLadder({
   const xTrigger = xFor(triggerValue);
   const xPrevious = previousValue === undefined ? undefined : xFor(previousValue);
 
+  // The three spans a bounded rule cuts the rail into: clear of the reversal, the gap
+  // where neither condition fires, and past the trigger. Which side is trouble follows
+  // the trigger rather than the reading, so this stays correct under `invert`.
+  const zones =
+    hysteresisBand && reversalValue !== undefined
+      ? (() => {
+          const xReversal = xFor(reversalValue);
+          const troubleIsRight = xTrigger >= xReversal;
+          return {
+            safe: troubleIsRight
+              ? ([RAIL_START, xReversal] as const)
+              : ([xReversal, RAIL_END] as const),
+            band: [Math.min(xReversal, xTrigger), Math.max(xReversal, xTrigger)] as const,
+            trouble: troubleIsRight
+              ? ([xTrigger, RAIL_END] as const)
+              : ([RAIL_START, xTrigger] as const),
+          };
+        })()
+      : null;
+
   // Only draw the movement when it is wide enough to read as a direction.
   const hasMovement = xPrevious !== undefined && Math.abs(xCurrent - xPrevious) > 1.5;
-  const movingToward =
+
+  /**
+   * How far past the trigger a reading sits, signed — negative while still clear of it.
+   *
+   * Distance *to* the trigger is symmetric around it, so a signal that blew through
+   * from 70 to 82 against a trigger of 76 scores 6 either side and reads as "moving
+   * away": the leg paints green on the one move that most deserves alarm. A reversal
+   * tells us which side of the trigger is the trouble side, so where there is one the
+   * comparison can be signed. Where there is none the side is genuinely unknown and the
+   * original distance heuristic stands.
+   */
+  const beyondTrigger =
+    reversalValue === undefined
+      ? undefined
+      : (v: number) => (triggerValue > reversalValue ? v - triggerValue : triggerValue - v);
+
+  const deteriorating =
     previousValue === undefined
       ? undefined
-      : Math.abs(currentValue - triggerValue) < Math.abs(previousValue - triggerValue);
+      : beyondTrigger
+        ? beyondTrigger(currentValue) > beyondTrigger(previousValue)
+        : Math.abs(currentValue - triggerValue) < Math.abs(previousValue - triggerValue);
+
+  const pastTrigger = beyondTrigger ? beyondTrigger(currentValue) > 0 : false;
 
   // No space before "%", a thin space before a word unit, nothing when unitless.
   const readout = `${formatNumber(currentValue)}${unit === "" ? "" : unit === "%" ? "" : " "}${unit}`;
@@ -80,17 +156,25 @@ export function ThresholdLadder({
       ? ""
       : previousValue === currentValue
         ? " Unchanged since last period."
-        : ` ${currentValue > previousValue ? "Rose" : "Fell"} from ${formatNumber(previousValue)}${unit}, ${movingToward ? "moving toward" : "moving away from"} the trigger.`;
+        : ` ${currentValue > previousValue ? "Rose" : "Fell"} from ${formatNumber(previousValue)}${unit}, ${
+            deteriorating
+              ? pastTrigger
+                ? "moving further past"
+                : "moving toward"
+              : pastTrigger
+                ? "moving back toward"
+                : "moving away from"
+          } the trigger.`;
 
   const directionDesc = scaleDirection ? ` Scale direction: ${scaleDirection}` : "";
   const desc = `${thresholdDesc}${directionDesc}${movementDesc}`;
 
   // Keep end-of-rail captions from spilling out of the viewBox.
-  const clampLabelX = (x: number) => Math.min(Math.max(x, 26), 214);
+  const clampLabelX = (x: number) => Math.min(Math.max(x, RAIL_START + 14), RAIL_END - 14);
 
   return (
     <svg
-      viewBox={`0 0 240 ${scaleDirection ? 68 : 56}`}
+      viewBox={`0 0 ${viewBoxWidth} ${scaleDirection ? 68 : 56}`}
       width="100%"
       style={{ height: "auto" }}
       role="img"
@@ -121,7 +205,45 @@ export function ThresholdLadder({
         strokeLinecap="round"
       />
 
-      {Math.abs(xCurrent - xTrigger) > 0.5 ? (
+      {/* Two ways to shade the rail, and they are alternatives rather than layers.
+          Without a hysteresis band the rail shades the run from the reading to the
+          trigger, which answers "how far". With one it shades the three zones the rule
+          actually defines, which answers "which of them am I in" — and that band would
+          disappear under the distance wash if both were drawn. */}
+      {zones ? (
+        <>
+          <line
+            x1={zones.safe[0]}
+            y1={RAIL_Y}
+            x2={zones.safe[1]}
+            y2={RAIL_Y}
+            stroke="var(--accent-success)"
+            strokeWidth={6}
+            strokeOpacity={0.32}
+            strokeLinecap="butt"
+          />
+          <line
+            x1={zones.band[0]}
+            y1={RAIL_Y}
+            x2={zones.band[1]}
+            y2={RAIL_Y}
+            stroke="var(--app-text-muted)"
+            strokeWidth={6}
+            strokeOpacity={0.14}
+            strokeLinecap="butt"
+          />
+          <line
+            x1={zones.trouble[0]}
+            y1={RAIL_Y}
+            x2={zones.trouble[1]}
+            y2={RAIL_Y}
+            stroke="var(--accent-warning)"
+            strokeWidth={6}
+            strokeOpacity={0.32}
+            strokeLinecap="butt"
+          />
+        </>
+      ) : Math.abs(xCurrent - xTrigger) > 0.5 ? (
         <line
           x1={xCurrent}
           y1={RAIL_Y}
@@ -149,7 +271,7 @@ export function ThresholdLadder({
         fill="var(--app-text-muted)"
         fontSize={9}
       >
-        Trigger
+        {triggerLabel}
       </text>
 
       {reversalValue !== undefined ? (
@@ -185,7 +307,7 @@ export function ThresholdLadder({
             y1={RAIL_Y}
             x2={xCurrent}
             y2={RAIL_Y}
-            stroke={movingToward ? "var(--accent-warning)" : "var(--accent-success)"}
+            stroke={deteriorating ? "var(--accent-warning)" : "var(--accent-success)"}
             strokeWidth={2.5}
             strokeLinecap="round"
           />
@@ -199,7 +321,7 @@ export function ThresholdLadder({
               <polyline
                 points={`${backX},${RAIL_Y - 3.5} ${tipX},${RAIL_Y} ${backX},${RAIL_Y + 3.5}`}
                 fill="none"
-                stroke={movingToward ? "var(--accent-warning)" : "var(--accent-success)"}
+                stroke={deteriorating ? "var(--accent-warning)" : "var(--accent-success)"}
                 strokeWidth={1.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -229,11 +351,13 @@ export function ThresholdLadder({
         {readout}
       </text>
 
+      {/* Follow the flip. An inverted rail whose ends still read 0 then 100 is a rail
+          that lies about every position on it. */}
       <text x={RAIL_START} y={RAIL_Y + 20} textAnchor="start" fill="var(--app-text-muted)" fontSize={8}>
-        {formatNumber(min)}
+        {formatNumber(invert ? max : min)}
       </text>
       <text x={RAIL_END} y={RAIL_Y + 20} textAnchor="end" fill="var(--app-text-muted)" fontSize={8}>
-        {formatNumber(max)}
+        {formatNumber(invert ? min : max)}
       </text>
     </svg>
   );

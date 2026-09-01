@@ -1,7 +1,70 @@
 import { ShareBriefButton } from "./shareBriefButton";
-import type { CadenceCallModel } from "../../lib/report/cadenceCallModel";
+import { ThresholdLadder } from "./illustrations/ThresholdLadder";
+import {
+  formatBandHeadroom,
+  formatBandReading,
+  type CadenceCallModel,
+} from "../../lib/report/cadenceCallModel";
+import type { HorizonSignalBand } from "../../lib/summary/horizonOperatingRules";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
+
+/**
+ * One signal's position against the two thresholds the sentences above it name.
+ *
+ * The triad states where the edges are; this states where we are. Without it the pair
+ * of sentences reads the same whether funding pressure is parked well clear of the
+ * guardrail or one print from it, which is the difference between a policy and a call.
+ *
+ * Both rails put the guardrail on the right, so risk appetite — which falls into
+ * trouble rather than rising into it — runs 100 → 0. The rail labels its own ends.
+ */
+function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix: string }) {
+  const { score, delta, towardGuardrail } = formatBandReading(band);
+
+  return (
+    <li className="space-y-1">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+        <p className="text-fluid-nano text-slate-400">
+          {band.label}{" "}
+          <span className="font-semibold tabular-nums text-slate-200">{score}</span>
+          <span className="text-white/35">/100</span>
+          {delta ? (
+            <span
+              className={`ml-1.5 tabular-nums ${
+                towardGuardrail ? "text-semantic-caution-fg" : "text-semantic-easing-fg"
+              }`}
+            >
+              {delta}
+            </span>
+          ) : null}
+        </p>
+        <p
+          className={`text-fluid-nano tabular-nums ${
+            band.pauseTripped || !band.resumeHolds ? "text-semantic-caution-fg" : "text-slate-400"
+          }`}
+        >
+          {formatBandHeadroom(band)}
+        </p>
+      </div>
+      <ThresholdLadder
+        idPrefix={`cadence-band-${band.key}-${idSuffix}`}
+        min={0}
+        max={100}
+        current={band.current}
+        previous={band.previous ?? undefined}
+        trigger={band.pause}
+        triggerLabel={DECISION_CONTRACT_LABELS.threshold.guardrail}
+        reversal={band.resume}
+        invert={band.pauseWhen === "below"}
+        hysteresisBand
+        viewBoxWidth={660}
+        signalLabel={band.label}
+        scaleDirection={band.directionLabel}
+      />
+    </li>
+  );
+}
 
 /**
  * The lead for a non-weekly cadence. It sits where the weekly call sits and carries the
@@ -69,6 +132,17 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
         </div>
       </dl>
       )}
+
+      {/* Sits under the triad, not beside it: the sentences say what the rule is, and
+          these say where the rule currently stands. Reading them the other way round
+          means meeting four numbers before learning what they gate. */}
+      {model.boundedBands.length > 0 ? (
+        <ul className="space-y-3">
+          {model.boundedBands.map((band) => (
+            <BoundedBandRail key={band.key} band={band} idSuffix={model.horizon} />
+          ))}
+        </ul>
+      ) : null}
 
       {model.history.length > 0 ? (
         <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
