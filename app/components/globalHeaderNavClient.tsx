@@ -165,7 +165,10 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         aria-label="Open navigation"
       >
         <MenuIcon className="size-4 text-slate-400" aria-hidden="true" />
-        <span>{activeRouteLabel}</span>
+        {/* The label is redundant below 400px, where the four 44px header
+            controls plus the wordmark already exceed the viewport. aria-label
+            carries the name either way, so this costs nothing but width. */}
+        <span className="hidden min-[400px]:inline">{activeRouteLabel}</span>
       </button>
 
       <nav aria-label="Primary" className="hidden md:flex items-center gap-1.5">

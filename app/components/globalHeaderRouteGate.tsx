@@ -55,7 +55,10 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
     return (
       <GlobalHeaderScrollWrapper>
         <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
-          <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
+          {/* px-2 under 360px: the wordmark, the drawer trigger and four 44px
+              controls leave no slack at that width, and the inset is the only
+              thing here that can give without shrinking a touch target. */}
+          <div className="flex items-center gap-1 min-[360px]:gap-2 px-2 min-[360px]:px-3 py-1.5 sm:gap-3">
             <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
@@ -93,10 +96,15 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
             {isReportRoute ? (
               <>
+                {/* Inline from sm up. Below that it moves to the rail below,
+                    for the same reason the search form did: a text CTA beside
+                    four 44px icon buttons has a min-content width this row
+                    cannot shrink below, so at 390px the document went to ~440px
+                    and every report route scrolled sideways — against §VI. */}
                 {reportHeaderAction ? (
                   <Link
                     href={reportHeaderAction.href}
-                    className="weather-button-primary inline-flex min-h-[44px] sm:min-h-[36px] flex-1 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
+                    className="weather-button-primary hidden sm:inline-flex sm:min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
                   >
                     {reportHeaderAction.label}
                   </Link>
@@ -128,6 +136,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
         <div className="flex items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5">
           <GlobalHeaderNavClient pathname={pathname} />
+          {isReportRoute && reportHeaderAction ? (
+            <Link
+              href={reportHeaderAction.href}
+              className="weather-button-primary inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:hidden"
+            >
+              {reportHeaderAction.label}
+            </Link>
+          ) : null}
         </div>
       </div>
     </GlobalHeaderScrollWrapper>
