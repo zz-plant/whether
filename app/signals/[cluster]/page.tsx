@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const metadata = buildPageMetadata({
     title: `${clusterDefinition.title} | Evidence`,
     description: clusterDefinition.summary,
-    path: `/evidence/${cluster}`,
+    path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
   });
 
@@ -39,7 +39,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
   const clusterDefinition = findSignalsCluster(cluster);
   if (!clusterDefinition) notFound();
 
-  const reportResult = await loadReportDataSafe(undefined, { route: `/evidence/${cluster}` });
+  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}` });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (

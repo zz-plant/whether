@@ -40,7 +40,7 @@ export const buildDecideClusterMetadata = ({
   const metadata = buildPageMetadata({
     title: `${roleTitle}: ${scenarioTitle} decision scenario`,
     description: roleDescription,
-    path: `/resolve/${slug}/${cluster}`,
+    path: `/answer/${slug}/${cluster}`,
     imageAlt: roleTitle,
   });
 
@@ -98,7 +98,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
           <ActionLink href="/answer#unresolved-question-router" variant="pill">Decision help</ActionLink>
-          <ActionLink href="/evidence/capital-tightness-watch" variant="pill">Evidence page</ActionLink>
+          <ActionLink href="/signals/capital-tightness-watch" variant="pill">Evidence page</ActionLink>
           <ActionLink href="/toolkits/focus" variant="pill">Decision toolkit</ActionLink>
         </div>
       </section>

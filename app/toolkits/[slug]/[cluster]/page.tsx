@@ -96,8 +96,8 @@ export default async function ToolkitClusterPage({ params }: { params: Promise<P
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href={`/evidence/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence page</Link>
-          <Link href="/resolve/ceo/capital-raising" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision Tools page</Link>
+          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence page</Link>
+          <Link href="/answer/ceo/capital-raising" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision Tools page</Link>
         </div>
       </section>
     </ContentPageShell>

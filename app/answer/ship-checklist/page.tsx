@@ -11,7 +11,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether to ship checklist",
   description: "Quick go / wait / kill recommendation calibrated to the current macro regime.",
-  path: "/resolve/ship-checklist",
+  path: "/answer/ship-checklist",
   imageAlt: "Whether to ship checklist",
 });
 
@@ -31,7 +31,7 @@ export default async function ShipChecklistPage({
 }) {
   const resolved = (searchParams ? await searchParams : {}) ?? {};
   const input = parseInput(resolved);
-  const reportResult = await loadReportDataSafe(undefined, { route: "/resolve/ship-checklist" });
+  const reportResult = await loadReportDataSafe(undefined, { route: "/answer/ship-checklist" });
   const { assessment } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const result = scoreWhetherToShipChecklist(input, assessment);
 
@@ -43,7 +43,7 @@ export default async function ShipChecklistPage({
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <form action="/resolve/ship-checklist" method="get" className="grid gap-3 sm:grid-cols-2">
+        <form action="/answer/ship-checklist" method="get" className="grid gap-3 sm:grid-cols-2">
           {([
             ["evidenceStrength", "Evidence strength", ["low", "medium", "high"]],
             ["reversibility", "Reversibility", ["hard", "moderate", "easy"]],

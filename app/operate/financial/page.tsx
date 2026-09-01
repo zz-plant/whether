@@ -13,7 +13,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Financial Strategy — Capital Posture This Week",
   description: "CFO and financial operating guardrails aligned with current interest rates and credit conditions.",
-  path: "/planning/financial",
+  path: "/operate/financial",
   imageAlt: "Whether financial strategy view",
   imagePath: "/social/planning.svg",
 });

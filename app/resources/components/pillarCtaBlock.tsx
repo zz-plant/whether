@@ -36,7 +36,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           {downloadLabel}
         </ActionLink>
         <ActionLink
-          href="/planning#ops-export-briefs"
+          href="/operate#ops-export-briefs"
           variant="pill"
           className="text-sm"
           data-conversion-event="request"

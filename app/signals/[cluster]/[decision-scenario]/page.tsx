@@ -75,7 +75,7 @@ export const buildSignalDecisionScenarioMetadata = ({
   const metadata = buildPageMetadata({
     title: `${signalTitle}: ${scenarioTitle} decisions`,
     description: payload ? `${payload.currentCall} Action: ${payload.immediateAction}` : signalSummary,
-    path: `/evidence/${cluster}/${decisionScenario}`,
+    path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
   });
 
@@ -111,7 +111,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
   const scenario = findDecisionScenario(decisionScenario);
   if (!signal || !scenario) notFound();
 
-  const pagePath = `/evidence/${cluster}/${decisionScenario}`;
+  const pagePath = `/signals/${cluster}/${decisionScenario}`;
   const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`);
   const payload = payloadRecord.payload;
   const contentIntent =
@@ -189,9 +189,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href={`/evidence/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence cluster</Link>
-          <Link href={`/resolve/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
-          <Link href="/planning#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Planning handoff</Link>
+          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence cluster</Link>
+          <Link href={`/answer/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
+          <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Planning handoff</Link>
         </div>
       </section>
     </ContentPageShell>

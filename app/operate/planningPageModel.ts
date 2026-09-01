@@ -75,7 +75,7 @@ export function buildActionsExpansionHref(
     params.set("actions", "all");
   }
   const query = params.toString();
-  return query ? `/planning?${query}#ops-playbook` : "/planning#ops-playbook";
+  return query ? `/operate?${query}#ops-playbook` : "/operate#ops-playbook";
 }
 
 export async function buildPlanningPageModel(
@@ -547,7 +547,7 @@ export async function buildPlanningPageModel(
         ),
         h("div", { className: "flex flex-wrap gap-2" },
           h(Link, { href: "/answer", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
-          h(Link, { href: "/planning#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
+          h(Link, { href: "/operate#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
         ),
       ),
       h("details", { className: "weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5" },

@@ -75,7 +75,7 @@ export default function Page() {
         </ul>
         <div className="flex flex-wrap gap-3 pt-2">
           <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download posture template</Link>
-          <Link href="/planning#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="request">Open board-pack exports</Link>
+          <Link href="/operate#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="request">Open board-pack exports</Link>
         </div>
       </section>
     </ContentPageShell>

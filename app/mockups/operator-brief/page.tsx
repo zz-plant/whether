@@ -191,7 +191,7 @@ export default async function OperatorBriefMockupPage({
 
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Link
-              href="/planning#ops-monthly-action-summary"
+              href="/operate#ops-monthly-action-summary"
               className="weather-button-primary inline-flex min-h-[46px] items-center justify-center rounded px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100"
             >
               Open planning handoff

@@ -13,7 +13,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Memory Ledger — What We Decided and Why",
   description: "Immutable board-ready record of all macro posture decisions and overrides.",
-  path: "/planning/memory",
+  path: "/operate/memory",
   imageAlt: "Whether decision memory view",
   imagePath: "/social/planning.svg",
 });
