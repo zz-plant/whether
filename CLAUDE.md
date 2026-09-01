@@ -93,10 +93,36 @@ published every week; writing retroactive `publishedAt` stamps for weeks that we
 would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
 visitors. The archive fills forward, once the allowlist lets a real run through.
 
-Cloudflare's build is the remote gate. `scripts/vinext-run.mjs` runs lint, typecheck, test, and
-assets before building **on preview builds only** — a pull request's build fails red if the suite
-does, while the production branch and any build with an unknown branch skip the gate, so a flaky
-test can never block a deploy. Every build logs which way it went (`[vinext-run] check gate: …`).
+Cloudflare's build is the remote gate, and it gates **production too**. The build command
+configured in Workers Builds is `bun run check:vinext`, which is just `bun run check` — so every
+push, `main` included, runs the whole gate (lint, typecheck, test, assets, audit,
+hotspot-preflight, landmarks) before anything is built or deployed. **A failing test does block a
+deploy.**
+
+This paragraph used to say the opposite — that the production branch skips the gate, so "a flaky
+test can never block a deploy" — and that sentence cost two days. Builds failed on all 27 commits
+from 2026-08-31 to 2026-09-01 while the doc said they couldn't, so nobody read the build log; the
+site served Aug-30 code for two days and the fix had to be deployed by hand. The confusion is that
+there are *two* gates. `scripts/vinext-run.mjs` does skip lint/typecheck/test/assets on the
+production branch, and still logs which way it went (`[vinext-run] check gate: …`) — but that gate
+guards `vinext-run build`, which CI only reaches *after* `bun run check` has already passed. The
+inner gate never decides whether a deploy happens.
+
+Two things that made a red build hard to read, both fixed 2026-09-01:
+
+- `run-checks.mjs` buffers each task's output until it exits, and had no per-task timeout, so one
+  hung task stalled the gate silently until Cloudflare's 30-minute ceiling — "Build took too long"
+  was the whole diagnosis. Tasks are now bounded (`CHECK_TASK_TIMEOUT_MS`, default 10m) and a
+  timeout reports a named failure with the child's output.
+- The landmarks audit fetched routes with no timeout, which is what hung. Bounded per route
+  (`--route-timeout-ms`, default 30s). A timed-out route fails the check rather than joining the
+  `unauditable` bucket, which only warns — otherwise a container that reaches no route at all would
+  report "0 violations" and go green.
+
+**If a local `check` passes and the remote build fails, suspect ordering or environment, not the
+doc.** `mock.module` patches the module registry process-wide, so a test file can pass only because
+another file ran first and installed its mock; CI orders the suite differently. Run the file alone
+(`bun run test <path>`) before concluding it is fine.
 
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
