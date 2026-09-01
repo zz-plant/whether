@@ -40,10 +40,18 @@ const DEFAULT_BASE_URL = process.env.LANDMARKS_BASE_URL ?? "http://127.0.0.1:300
 const baseUrl = readArgValue("--base-url", DEFAULT_BASE_URL);
 const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", "90000"), 10);
 const concurrency = Number.parseInt(readArgValue("--concurrency", "4"), 10);
+// Separate from --timeout-ms, which bounds dev-server readiness rather than a
+// single route. Tunable so a slow container can be given room without editing code.
+const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", "30000"), 10);
 
 if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
   console.error("`--timeout-ms` must be a positive integer.");
   process.exit(2);
+}
+
+if (!Number.isFinite(routeTimeoutMs) || routeTimeoutMs <= 0) {
+  console.error("`--route-timeout-ms` must be a positive integer.");
+  process.exit(1);
 }
 
 if (!Number.isFinite(concurrency) || concurrency <= 0) {
@@ -84,8 +92,9 @@ const reportResults = (results) => {
   // failing the skip-link gate on an unrelated outage is how a check earns a
   // reputation for crying wolf and stops being read.
   const unauditable = results.filter((result) => result.unauditable);
-  const violations = results.filter((result) => !result.ok && !result.unauditable);
-  const audited = results.length - unauditable.length;
+  const timedOut = results.filter((result) => result.timedOut);
+  const violations = results.filter((result) => !result.ok && !result.unauditable && !result.timedOut);
+  const audited = results.length - unauditable.length - timedOut.length;
 
   for (const violation of violations) {
     console.error(`\n✗ ${violation.route}  (${violation.finalUrl})`);
@@ -103,6 +112,23 @@ const reportResults = (results) => {
       console.warn(`    ${route.route}  (${reason})`);
     }
     console.warn("  Landmark coverage for these routes is unknown, not clean.");
+  }
+
+  /*
+   * Reported before violations, and fatal on its own. A route that never answered
+   * is not a clean route — if these were only warned about, a container that
+   * cannot reach the routes at all would produce "0 violations" and a green gate,
+   * which is a worse outcome than the timeout this bound replaced.
+   */
+  if (timedOut.length > 0) {
+    console.error(`\n✗ ${timedOut.length} route(s) never answered:`);
+    for (const route of timedOut) {
+      console.error(`    ${route.route}  (${route.issues[0]})`);
+    }
+    console.error(
+      "\nThe audit could not run for these routes, so their landmark coverage is unproven.",
+    );
+    return 1;
   }
 
   if (violations.length > 0) {
@@ -124,7 +150,7 @@ const run = async () => {
   console.log(`Auditing ${routes.length} routes for main-landmark ownership.`);
 
   const audit = async (readyBaseUrl) =>
-    auditMainContentRoutes({ baseUrl: readyBaseUrl, routes, concurrency });
+    auditMainContentRoutes({ baseUrl: readyBaseUrl, routes, concurrency, timeoutMs: routeTimeoutMs });
 
   if (hasFlag("--no-dev")) {
     const initialProbe = await probe(baseUrl);

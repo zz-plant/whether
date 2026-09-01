@@ -197,13 +197,26 @@ export const collectMainContentRouteSamples = async ({
   return [...new Set(routes)].sort((left, right) => left.localeCompare(right));
 };
 
-const auditRoute = async ({ baseUrl, route, fetchImpl }) => {
+/*
+ * A route that never answers used to park a worker forever: these fetches carried
+ * no timeout, and `Promise.all` over the workers cannot resolve while one is still
+ * waiting. Locally that never showed, because the dev server is already up and
+ * answers instantly. Inside the Cloudflare build container the routes render
+ * against upstreams the container cannot reach, and an egress that drops packets
+ * rather than refusing them leaves the socket open with nothing coming back — so
+ * this check ran for thirty minutes and the build was killed by the ceiling, with
+ * its own output still buffered and unprinted.
+ */
+const ROUTE_FETCH_TIMEOUT_MS = 30_000;
+
+const auditRoute = async ({ baseUrl, route, fetchImpl, timeoutMs = ROUTE_FETCH_TIMEOUT_MS }) => {
   const url = new URL(route, `${baseUrl.replace(/\/$/, "")}/`).toString();
 
   try {
     const response = await fetchImpl(url, {
       headers: { accept: "text/html" },
       redirect: "follow",
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const html = await response.text();
     const inspection = inspectMainContentHtml(html);
@@ -232,18 +245,32 @@ const auditRoute = async ({ baseUrl, route, fetchImpl }) => {
       issues,
     };
   } catch (error) {
+    /*
+     * A timeout is not the same as the outage `unauditable` exists to tolerate.
+     * That bucket only warns, so folding a timeout into it would turn this hang
+     * into something worse: a green check reporting "0 violations" precisely when
+     * it audited nothing. A route that answered with an error is still evidence;
+     * a route that never answered means the gate did not run, and says so.
+     */
+    const timedOut = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+
     return {
       route,
       url,
       finalUrl: url,
       status: null,
       ok: false,
-      unauditable: true,
+      unauditable: !timedOut,
+      timedOut,
       mainCount: 0,
       mainContentIdCount: 0,
       skipLinkCount: 0,
       nestedMain: false,
-      issues: [`Fetch failed: ${error instanceof Error ? error.message : String(error)}`],
+      issues: [
+        timedOut
+          ? `No response within ${Math.round(timeoutMs / 1000)}s.`
+          : `Fetch failed: ${error instanceof Error ? error.message : String(error)}`,
+      ],
     };
   }
 };
@@ -253,6 +280,7 @@ export const auditMainContentRoutes = async ({
   routes,
   fetchImpl = globalThis.fetch,
   concurrency = 4,
+  timeoutMs = ROUTE_FETCH_TIMEOUT_MS,
 }) => {
   const results = new Array(routes.length);
   let nextIndex = 0;
@@ -266,6 +294,7 @@ export const auditMainContentRoutes = async ({
         baseUrl,
         route: routes[index],
         fetchImpl,
+        timeoutMs,
       });
     }
   });
