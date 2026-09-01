@@ -115,6 +115,11 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
 /**
  * Utility links — framework, template, API docs, about.
  * These sit outside the operator loop. Single source for mobile sheet, footer, header dropdown.
+ *
+ * "Single source" is load-bearing: the footer used to hand-list its own copy of
+ * this row, and the copies drifted. /pricing was in here and not in the footer,
+ * so the one page that explains what costs money was reachable only from a
+ * header dropdown. Render this array; do not restate it.
  */
 export const utilityLinks = [
   {
@@ -156,6 +161,16 @@ export const utilityLinks = [
     href: "/pricing",
     label: "Pricing",
     description: "What is free forever, and what Pro and Team add",
+  },
+  {
+    href: "/state",
+    label: "Current regime",
+    description: "The call, both scores, and confidence on one glanceable page",
+  },
+  {
+    href: "/search",
+    label: "Search",
+    description: "Find a decision, signal, or past call",
   },
   {
     href: "/about",

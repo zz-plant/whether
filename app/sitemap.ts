@@ -116,6 +116,12 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/template", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
+    { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
+    // Indexable pages that were absent here. /state carries its own canonical and
+    // social metadata and is built to be landed on from search, so omitting it
+    // left a page optimized for discovery that nothing could discover.
+    { path: "/state", lastModified: reportLastModified, changeFrequency: "daily", priority: 0.6 },
+    { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },

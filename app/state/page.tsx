@@ -31,7 +31,7 @@ export default async function StatePage() {
 
 function ErrorView() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
+    <main className="flex flex-1 flex-col items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md space-y-6 text-center">
         <p className="type-eyebrow text-sky-200">
           WHETHER
@@ -58,7 +58,7 @@ function MarketStateView({ state }: { state: MarketState }) {
   const regimeDisplay = getRegimePublicLabel(state.regime);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-2xl space-y-6 text-center">
         <p className="type-eyebrow text-sky-200">
           WHETHER

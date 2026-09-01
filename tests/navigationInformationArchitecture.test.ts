@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import {
   navigationLayers,
@@ -6,6 +7,7 @@ import {
   navigationLabelByPath,
   primaryNavigationLayers,
   reportShellPaths,
+  utilityLinks,
 } from "../lib/navigation/informationArchitecture";
 
 describe("navigation information architecture", () => {
@@ -79,5 +81,43 @@ describe("navigation information architecture", () => {
     assert.ok(pathMatchesLink("/answer", "/answer"));
     assert.ok(pathMatchesLink("/answer", "/resolve"));
     assert.ok(pathMatchesLink("/answer", "/answers"));
+  });
+});
+
+/*
+ * The footer used to hand-list its own copy of the utility row. The copies
+ * drifted, and /pricing — the only page explaining what costs money — ended up
+ * in the IA but not in the footer, reachable solely from a header dropdown.
+ */
+describe("footer renders the whole utility set", () => {
+  it("links every utilityLink", () => {
+    const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
+
+    assert.match(
+      layout,
+      /utilityLinks\.map\(/,
+      "the footer should render utilityLinks rather than restating them",
+    );
+
+    for (const link of utilityLinks) {
+      assert.doesNotMatch(
+        layout,
+        new RegExp(`href="${link.href}"`),
+        `${link.href} is hard-coded in the footer; render it from utilityLinks instead`,
+      );
+    }
+  });
+
+  it("keeps every indexable utility page in the sitemap", () => {
+    const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+    // /search is deliberately noindex, so it is deliberately not in the sitemap.
+    const indexable = utilityLinks.filter((link) => link.href !== "/search");
+
+    for (const link of indexable) {
+      assert.ok(
+        sitemap.includes(`"${link.href}"`),
+        `${link.href} is linked in the footer but missing from the sitemap`,
+      );
+    }
   });
 });

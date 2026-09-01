@@ -36,7 +36,7 @@ export function PageShell({
     <main
       id="main-content"
       tabIndex={-1}
-      className={`weather-shell weather-page-enter relative isolate min-h-screen overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
+      className={`weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
     >
       {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}
       {backdropVariant === "default" ? <ClimateBackdrop regime={regime || "NEUTRAL"} /> : null}

@@ -1,5 +1,11 @@
+/*
+ * The stress tester was the one interactive thing on this page and was in no
+ * section list, so it could not be linked, jumped to with J/K, or found in the
+ * outline — a reader had to scroll past it to know it existed.
+ */
 export const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "Call" },
+  { href: "#stress-test", label: "Stress-test a plan" },
   { href: "#audit-this-call", label: "Evidence" },
   { href: "#approve-this-weeks-plan", label: "Planning" },
   { href: "#historical-replay-workspace", label: "Depth" },
@@ -7,6 +13,7 @@ export const homeSectionSequence = [
 
 export const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[number]["href"], string> = {
   "#weekly-posture-brief-title": "Call",
+  "#stress-test": "Stress-test",
   "#audit-this-call": "Evidence",
   "#approve-this-weeks-plan": "Planning",
   "#historical-replay-workspace": "Depth",

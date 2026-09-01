@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
-import { navigationLayers } from "../lib/navigation/informationArchitecture";
+import { navigationLayers, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
@@ -191,7 +191,7 @@ export default function RootLayout({
           async
         />
       </head>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <TooltipProvider>
         <ScrollProgressBar />
         <ToastProviderRoot>
@@ -220,16 +220,14 @@ export default function RootLayout({
                 <Link key={layer.href} href={layer.href} className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">{layer.navLabel ?? layer.label}</Link>
               ))}
             </nav>
+            {/* Derived from utilityLinks for the same reason the row above is
+                derived from navigationLayers: the hand-written copy that used to
+                live here drifted, and /pricing fell out of the footer entirely. */}
             <nav aria-label="Tools and reference" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
-              <Link href="/comps" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">SaaS Multiples</Link>
-              <Link href="/history/compare" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Macro Analogs</Link>
-              <Link href="/threshold" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Framework</Link>
-              <Link href="/template" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Template</Link>
-              <Link href="/search" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Search</Link>
-              <Link href="/share" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Share</Link>
-              <Link href="/embed" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Embed</Link>
-              <Link href="/api-docs" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">API</Link>
-              <Link href="/about" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">About</Link>
+              {utilityLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">{link.label}</Link>
+              ))}
+              {/* A file, not a page — stays an <a> and outside the link set. */}
               <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">RSS</a>
             </nav>
             <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">

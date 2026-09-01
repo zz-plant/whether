@@ -172,8 +172,13 @@ export const ReportShell = (props: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
+  /*
+   * A rail with no outline in it is just 13rem of empty column — /history asked
+   * for "full" while passing an empty sectionLinks array, and rendered a rail
+   * containing one static link. The outline is the reason the rail exists.
+   */
   const hasSidebar = resolvedSidebarVariant === "full";
-  const sidebarEnabled = hasSidebar;
+  const sidebarEnabled = hasSidebar && resolvedSectionLinks.length > 0;
   const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
   const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
@@ -238,8 +243,11 @@ export const ReportShell = (props: ReportShellProps) => {
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
           <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
+            {/* max-h, not h: as a grid item a fixed height forces the whole row
+                to a viewport tall, so any page whose content was shorter than the
+                rail ended in a screenful of empty space. */}
             {sidebarEnabled ? (
-              <aside className="hidden md:block md:sticky md:top-4 md:self-start md:h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <aside className="hidden md:block md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
                 <AppSidebar sectionLinks={resolvedSectionLinks} />
               </aside>
             ) : null}

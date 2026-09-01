@@ -100,6 +100,7 @@ export function DecisionPlanStressTester({
 
   return (
     <section
+      id="stress-test"
       aria-labelledby="decision-stress-test-heading"
       className={`rounded-xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md ${className}`}
     >
