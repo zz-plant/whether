@@ -87,7 +87,7 @@ function main() {
     console.log(`[vinext-run] check gate: ${gate.run ? "running" : "skipped"} — ${gate.reason}`);
 
     if (gate.run) {
-      const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets"], {
+      const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets", "landmarks"], {
         env: process.env,
         stdio: "inherit",
       });

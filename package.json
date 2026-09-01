@@ -29,6 +29,7 @@
     "review:comment-trends": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
     "review:comment-trends:update": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
     "review:hotspot-preflight": "bun scripts/review-hotspot-preflight.mjs",
+    "check:landmarks": "node scripts/check-main-content-landmarks.mjs",
     "agent:doctor": "node scripts/agent-workflow.mjs doctor",
     "agent:route": "node scripts/agent-workflow.mjs route",
     "agent:handoff": "node scripts/agent-workflow.mjs handoff",

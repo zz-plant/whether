@@ -23,11 +23,49 @@ const dynamicRouteSamples = {
 
 const countMatches = (value, pattern) => [...value.matchAll(pattern)].length;
 
+/*
+ * The skip link specifically — an anchor carrying the `skip-link` class — not
+ * every link pointing at #main-content. Content routes legitimately repeat a
+ * "Back to top" link per section (app/resources/[slug]/page.tsx), and counting
+ * those made one healthy page report 12 skip links. Attribute order varies, so
+ * both are matched by lookahead rather than by sequence.
+ */
+const SKIP_LINK =
+  /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bskip-link\b)(?=[^>]*\bhref\s*=\s*["']#main-content["'])[^>]*>/gi;
+
+/*
+ * Most routes here are client-streamed, so their landmark never reaches the
+ * response as literal markup — it arrives as an RSC flight row instead:
+ *
+ *   ["$","main",null,{"id":"main-content","tabIndex":-1,...}]
+ *
+ * embedded in a script, with the quotes backslash-escaped. Scanning only for
+ * `<main>` tags reported 21 of 40 routes as missing a landmark they in fact
+ * had. These patterns tolerate the escaping and the surrounding props.
+ */
+const FLIGHT_MAIN_WITH_TARGET =
+  /\\?"main\\?"\s*,\s*null\s*,\s*\{[^{}]*\\?"id\\?"\s*:\s*\\?"main-content\\?"/g;
+const FLIGHT_SKIP_LINK = /\\?"className\\?"\s*:\s*\\?"skip-link\\?"/g;
+
+/**
+ * What the flight payload claims about the landmark.
+ *
+ * Presence only, deliberately not counts. React re-emits a segment's rows when
+ * a stream resumes, so the same single landmark can legitimately appear twice —
+ * counting occurrences would invent duplicates. A streamed route is therefore
+ * checked for "declares its landmark and a link to it"; duplicate and nesting
+ * detection stay with the routes that ship literal markup.
+ */
+const inspectFlightPayload = (html) => ({
+  hasMainWithTarget: countMatches(html, FLIGHT_MAIN_WITH_TARGET) > 0,
+  hasSkipLink: countMatches(html, FLIGHT_SKIP_LINK) > 0,
+});
+
 export const inspectMainContentHtml = (html) => {
   const mainTags = [...html.matchAll(/<\/?main\b[^>]*>/gi)].map((match) => match[0]);
   const openingMainTags = mainTags.filter((tag) => !/^<\/main\b/i.test(tag));
   const mainContentIdCount = countMatches(html, /\bid\s*=\s*["']main-content["']/gi);
-  const skipLinkCount = countMatches(html, /\bhref\s*=\s*["']#main-content["']/gi);
+  const skipLinkCount = countMatches(html, SKIP_LINK);
   const mainWithTargetCount = openingMainTags.filter((tag) =>
     /\bid\s*=\s*["']main-content["']/i.test(tag),
   ).length;
@@ -42,6 +80,35 @@ export const inspectMainContentHtml = (html) => {
 
     if (mainDepth > 0) nestedMain = true;
     mainDepth += 1;
+  }
+
+  const devErrorBoundary = html.includes("__VINEXT_INITIAL_DEV_ERRORS__");
+
+  /*
+   * A streamed route's real landmark arrives in the flight payload. Some also
+   * flush a placeholder <main> first — /state ships a centered loading shell
+   * with no id — so the trigger is "the literal markup never produced a
+   * correctly-targeted landmark", not "there was no <main>". A route that does
+   * ship a targeted one in HTML is judged on that markup, so genuine duplicates
+   * and nesting still fail rather than being excused by the payload.
+   */
+  if (mainWithTargetCount === 0 && !devErrorBoundary) {
+    const flight = inspectFlightPayload(html);
+
+    if (flight.hasMainWithTarget) {
+      const flightIssues = [];
+      if (!flight.hasSkipLink) {
+        flightIssues.push("Streamed route declares no skip link to #main-content.");
+      }
+
+      return {
+        mainCount: 1,
+        mainContentIdCount: 1,
+        skipLinkCount: flight.hasSkipLink ? 1 : 0,
+        nestedMain: false,
+        issues: flightIssues,
+      };
+    }
   }
 
   const issues = [];
@@ -64,7 +131,7 @@ export const inspectMainContentHtml = (html) => {
   if (nestedMain) {
     issues.push("Found nested <main> landmarks.");
   }
-  if (html.includes("__VINEXT_INITIAL_DEV_ERRORS__")) {
+  if (devErrorBoundary) {
     issues.push("Vinext returned a development error boundary instead of the route.");
   }
 
@@ -146,12 +213,21 @@ const auditRoute = async ({ baseUrl, route, fetchImpl }) => {
       issues.unshift(`Fetch returned HTTP ${response.status}.`);
     }
 
+    /*
+     * A route that never rendered has no landmark to judge. Saying it violates
+     * the contract would be a guess, and would let an unrelated outage — a KV
+     * binding missing in dev is enough — read as an accessibility regression.
+     * Callers separate these from real violations rather than dropping them.
+     */
+    const unauditable = html.includes("__VINEXT_INITIAL_DEV_ERRORS__") || !response.ok;
+
     return {
       route,
       url,
       finalUrl: response.url || url,
       status: response.status,
       ok: issues.length === 0,
+      unauditable,
       ...inspection,
       issues,
     };
@@ -162,6 +238,7 @@ const auditRoute = async ({ baseUrl, route, fetchImpl }) => {
       finalUrl: url,
       status: null,
       ok: false,
+      unauditable: true,
       mainCount: 0,
       mainContentIdCount: 0,
       skipLinkCount: 0,

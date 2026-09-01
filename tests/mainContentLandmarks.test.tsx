@@ -4,7 +4,6 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ContentPageShell } from "../app/components/ui/contentPageShell";
-// @ts-ignore Runtime-only .mjs helper is validated by these tests.
 import {
   auditMainContentRoutes,
   collectMainContentRouteSamples,

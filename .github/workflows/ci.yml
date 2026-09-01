@@ -40,7 +40,7 @@ jobs:
       # concurrently and reports every failure in one pass instead of stopping
       # at the first. Named explicitly so review:hotspot-preflight stays owned by
       # its own workflow, which needs a full-depth checkout.
-      - run: bun scripts/run-checks.mjs lint typecheck test assets audit
+      - run: bun scripts/run-checks.mjs lint typecheck test assets audit landmarks
 
       # Absorbed from the former Upgrade Guardrails workflow. That job ran lint,
       # typecheck, and test as steps and then ran `check:vinext` -- which is
