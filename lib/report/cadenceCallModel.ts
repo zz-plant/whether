@@ -18,7 +18,9 @@ import { getMonthlyActionGuidance } from "../summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../summary/quarterlySummary";
 import {
   buildHorizonOperatingRule,
+  buildHorizonSignalBands,
   type HorizonOperatingRule,
+  type HorizonSignalBand,
 } from "../summary/horizonOperatingRules";
 import { formatQuarterLabel } from "../summary/summaryFormatting";
 import { formatMonthYearShortFromValue } from "../formatters";
@@ -44,6 +46,11 @@ export type CadenceCallModel = {
   regimeLabel: string;
   description: string;
   boundedRule: HorizonOperatingRule;
+  /**
+   * The same rule as numbers, for the rails beside it. Empty under a refusal, where the
+   * hold's thresholds are horizon-neutral and the card suppresses the triad anyway.
+   */
+  boundedBands: HorizonSignalBand[];
   /** Set when the policy engine refuses to support a posture change, in which case the
    *  call above is the hold, not the regime's guidance. */
   overrideReason: string | null;
@@ -100,6 +107,50 @@ const HORIZON_COPY: Record<
     historyLength: 4,
   },
 };
+
+const formatScore = (value: number) =>
+  new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value);
+
+const formatSignedScore = (value: number) =>
+  new Intl.NumberFormat(undefined, { maximumFractionDigits: 1, signDisplay: "always" }).format(
+    value,
+  );
+
+/**
+ * The two distances a rail carries, named with the same two words the sentences above
+ * it are chipped with. A rail that invented its own vocabulary for the edges would
+ * leave the reader matching "5 to no rule" against "Reopen broader scope when …" on
+ * their own; naming the edges Reversal and Guardrail makes the number and the sentence
+ * the same claim.
+ *
+ * A tripped edge is stated rather than measured — "0 to Guardrail" is a distance of
+ * zero and a condition that already fires, and those are not the same thing to act on.
+ */
+export const formatBandHeadroom = (band: HorizonSignalBand): string => {
+  if (band.pauseTripped) {
+    return `${DECISION_CONTRACT_LABELS.threshold.guardrail} tripped`;
+  }
+
+  const toPause = `${formatScore(band.toPause)} to ${DECISION_CONTRACT_LABELS.threshold.guardrail}`;
+
+  return band.resumeHolds
+    ? `${formatScore(band.toResume)} to ${DECISION_CONTRACT_LABELS.slot.reversal} · ${toPause}`
+    : `${DECISION_CONTRACT_LABELS.slot.reversal} short by ${formatScore(band.toResume)} · ${toPause}`;
+};
+
+/** The reading itself, and the move that produced it. Null movement stays null rather
+ *  than rendering a zero — "unchanged" and "we have no prior read" are different. */
+export const formatBandReading = (band: HorizonSignalBand) => ({
+  score: formatScore(band.current),
+  delta: band.previous === null ? null : formatSignedScore(band.current - band.previous),
+  /** True when the move is toward the guardrail, whichever direction that is. */
+  towardGuardrail:
+    band.previous === null
+      ? false
+      : band.pauseWhen === "above"
+        ? band.current > band.previous
+        : band.current < band.previous,
+});
 
 /** The guidance maps are written as mid-sentence clauses ("scale proven bets, …")
  *  because every other consumer embeds them. The lead needs the same clause as a
@@ -211,6 +262,7 @@ export const buildCadenceCallModel = ({
   recordDateLabel,
   regimeHistory,
   planHref = "/operate",
+  previousScores = null,
 }: {
   horizon: CadenceCallHorizon;
   assessment: RegimeAssessment;
@@ -218,6 +270,13 @@ export const buildCadenceCallModel = ({
   recordDateLabel?: string | null;
   regimeHistory: readonly RegimeHistoryEntry[];
   planHref?: string;
+  /**
+   * The prior read's composite scores, when the caller has them. Optional because the
+   * rails are readable without it — the movement leg is the only part that needs it,
+   * and a rail that cannot say which way the signal is heading is still a rail that
+   * says where it sits.
+   */
+  previousScores?: { tightness?: number | null; riskAppetite?: number | null } | null;
 }): CadenceCallModel => {
   const copy = HORIZON_COPY[horizon];
   const guidance =
@@ -267,6 +326,7 @@ export const buildCadenceCallModel = ({
     regimeLabel: getRegimeOperatorLabel(assessment.regime),
     description: assessment.description,
     boundedRule,
+    boundedBands: overrideReason ? [] : buildHorizonSignalBands({ assessment, previousScores }),
     overrideReason,
     history,
     historyLabel: copy.historyLabel,

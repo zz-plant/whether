@@ -28,18 +28,41 @@ const regimeHistory: Array<{ record_date: string; regime: RegimeKey }> = [
   { record_date: "2026-08-31", regime: "EXPANSION" },
 ];
 
-const render = (horizon: "monthly" | "quarterly", refused = false) =>
-  renderToStaticMarkup(
+const render = (
+  horizon: "monthly" | "quarterly",
+  refused = false,
+  previousScores?: { tightness: number; riskAppetite: number },
+  scores?: { tightness: number; riskAppetite: number },
+) => {
+  const base = withRefusal(refused, refused ? ["Signals disagree."] : []);
+
+  return renderToStaticMarkup(
     <CadenceCallCard
       model={buildCadenceCallModel({
         horizon,
-        assessment: withRefusal(refused, refused ? ["Signals disagree."] : []),
+        assessment: scores ? { ...base, scores: { ...base.scores, ...scores } } : base,
         recordDate: "2026-08-31",
         recordDateLabel: "Aug 31, 2026",
         regimeHistory,
+        previousScores,
       })}
     />,
   );
+};
+
+/** The bare fixture reads 100/28, which trips both guardrails. Cases about the distance
+ *  to an edge need a reading that still has one. */
+const midRange = { tightness: 61, riskAppetite: 56 };
+
+/** The end-of-rail captions, left then right. Picked by anchor rather than by position
+ *  in the markup, because the value readout prints a bare number too. */
+const railEnds = (rail: string) => [
+  rail.match(/text-anchor="start"[^>]*>([\d.]+)<\/text>/)?.[1],
+  rail.match(/text-anchor="end"[^>]*>([\d.]+)<\/text>/)?.[1],
+];
+
+const railFor = (html: string, key: string) =>
+  html.split("<svg").slice(1).find((rail) => rail.includes(`cadence-band-${key}`)) ?? "";
 
 describe("CadenceCallCard", () => {
   it("states the horizon's bounded triad when the call stands", () => {
@@ -89,5 +112,66 @@ describe("CadenceCallCard", () => {
     assert.notEqual(render("monthly"), render("quarterly"));
     assert.match(render("quarterly"), /Regime by quarter/);
     assert.doesNotMatch(render("quarterly"), /Regime by month/);
+  });
+
+  it("puts the reading on the scale the sentences only describe", () => {
+    const html = render("monthly", false, undefined, midRange);
+
+    // A rail per composite signal, each announcing itself rather than sitting mute.
+    assert.match(html, /id="cadence-band-tightness-monthly-title"/);
+    assert.match(html, /id="cadence-band-riskAppetite-monthly-title"/);
+    assert.match(html, /Funding pressure: 61/);
+    assert.match(html, /Risk appetite: 56/);
+    // Distance to each edge, in the same two words the chips above use.
+    assert.match(html, /5 to Reversal · 15 to Guardrail/);
+    assert.match(html, /2 to Reversal · 12 to Guardrail/);
+  });
+
+  it("states a tripped edge rather than measuring zero distance to it", () => {
+    // The bare fixture reads 100 against a 76 guardrail: already past it, not near it.
+    const html = render("monthly");
+
+    assert.match(html, /Guardrail tripped/);
+    assert.doesNotMatch(html, /0 to Guardrail/);
+  });
+
+  it("calls one threshold by one name across chip, rail, and readout", () => {
+    const html = render("monthly");
+
+    // The rail used to label this "Trigger" while the chip beside it said "Guardrail",
+    // which reads as two rules rather than one drawn twice.
+    assert.doesNotMatch(html, />Trigger</);
+  });
+
+  it("keeps the rails off the card under a refusal", () => {
+    const html = render("monthly", true);
+
+    assert.doesNotMatch(html, /cadence-band-tightness/);
+  });
+
+  it("draws the movement leg only when there is a prior read to draw it from", () => {
+    const without = render("monthly");
+    const with_ = render("monthly", false, { tightness: 20, riskAppetite: 80 });
+
+    assert.doesNotMatch(without, /Rose from|Fell from/);
+    assert.match(with_, /Rose from 20|Fell from 20/);
+  });
+
+  it("flips risk appetite so both rails put the guardrail on the right", () => {
+    const html = render("monthly", false, undefined, midRange);
+
+    // Funding pressure rises into trouble and risk appetite falls into it, so only one
+    // of the two can keep its natural direction if the guardrail is to stay on the right.
+    assert.deepEqual(railEnds(railFor(html, "tightness")), ["0", "100"]);
+    assert.deepEqual(railEnds(railFor(html, "riskAppetite")), ["100", "0"]);
+  });
+
+  it("sends both movement legs the same way when both signals deteriorate", () => {
+    // Funding pressure up and risk appetite down are the same news. On a flipped rail
+    // they are also the same direction, which is the whole point of flipping it.
+    const html = render("monthly", false, { tightness: 50, riskAppetite: 59 }, midRange);
+
+    assert.match(railFor(html, "tightness"), /Rose from 50, moving toward the trigger/);
+    assert.match(railFor(html, "riskAppetite"), /Fell from 59, moving toward the trigger/);
   });
 });

@@ -85,6 +85,75 @@ describe("buildCadenceCallModel", () => {
     assert.match(boundedRule.reversal, /\d/);
   });
 
+  it("carries the same thresholds as bands that the sentences quote as prose", () => {
+    const { boundedRule, boundedBands } = build("monthly");
+
+    assert.equal(boundedBands.length, 2);
+    const [funding, risk] = boundedBands;
+
+    assert.equal(funding.key, "tightness");
+    assert.equal(risk.key, "riskAppetite");
+    // Whatever the numbers are, the drawing and the paragraph have to agree on them.
+    assert.ok(boundedRule.threshold.includes(funding.pause.toFixed(1)));
+    assert.ok(boundedRule.threshold.includes(risk.pause.toFixed(1)));
+    assert.ok(boundedRule.reversal.includes(funding.resume.toFixed(1)));
+    assert.ok(boundedRule.reversal.includes(risk.resume.toFixed(1)));
+  });
+
+  it("points each band at the edge its own signal trips", () => {
+    const [funding, risk] = build("monthly").boundedBands;
+
+    // Funding pressure rises into trouble; risk appetite falls into it.
+    assert.equal(funding.pauseWhen, "above");
+    assert.equal(risk.pauseWhen, "below");
+    assert.ok(funding.pause > funding.resume);
+    assert.ok(risk.pause < risk.resume);
+  });
+
+  it("reports distance and state separately, so a tripped edge is not just a zero", () => {
+    const tripped = buildCadenceCallModel({
+      horizon: "monthly",
+      assessment: {
+        ...assessment,
+        scores: { ...assessment.scores, tightness: 99, riskAppetite: 1 },
+      },
+      recordDate: "2026-08-31",
+      regimeHistory: monthlyHistory,
+    });
+
+    for (const band of tripped.boundedBands) {
+      assert.equal(band.pauseTripped, true);
+      assert.equal(band.resumeHolds, false);
+      assert.ok(band.toPause > 0, "a tripped edge still has a measurable distance");
+    }
+  });
+
+  it("takes no prior read rather than inventing a flat one", () => {
+    const withoutPrevious = build("monthly");
+    const withPrevious = buildCadenceCallModel({
+      horizon: "monthly",
+      assessment,
+      recordDate: "2026-08-31",
+      regimeHistory: monthlyHistory,
+      previousScores: { tightness: 40, riskAppetite: 70 },
+    });
+
+    assert.ok(withoutPrevious.boundedBands.every((band) => band.previous === null));
+    assert.equal(withPrevious.boundedBands[0].previous, 40);
+    assert.equal(withPrevious.boundedBands[1].previous, 70);
+  });
+
+  it("drops the bands under a refusal, where the triad is suppressed too", () => {
+    const refused = buildCadenceCallModel({
+      horizon: "monthly",
+      assessment: withRefusal(true, ["Signals disagree."]),
+      recordDate: "2026-08-31",
+      regimeHistory: monthlyHistory,
+    });
+
+    assert.deepEqual(refused.boundedBands, []);
+  });
+
   it("labels the period by month or by quarter", () => {
     assert.equal(build("monthly").periodLabel, "Aug 2026");
     assert.equal(build("quarterly").periodLabel, "Q3 2026");

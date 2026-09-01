@@ -182,6 +182,23 @@ async function PageContent({
       : [],
   );
 
+  const signalDeltas = new Map(
+    homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
+  );
+  const tightnessDelta = signalDeltas.get("tightness") ?? 0;
+  const riskAppetiteDelta = signalDeltas.get("riskAppetite") ?? 0;
+
+  // Derived from `assessment.scores` rather than from the diagnostics copy so the prior
+  // read and the current one come off the same series. `changedSignals` is empty both
+  // when nothing moved and when there is no prior read at all, and the two are not the
+  // same claim — so an empty list yields no prior read rather than an invented flat one.
+  const cadencePreviousScores = signalDeltas.size > 0
+    ? {
+        tightness: reportData.assessment.scores.tightness - tightnessDelta,
+        riskAppetite: reportData.assessment.scores.riskAppetite - riskAppetiteDelta,
+      }
+    : null;
+
   // Built here rather than fetched: the previous card awaited the whole agent-interface
   // payload behind Suspense and swallowed its failure, which is why every cadence tab
   // rendered the same page. Everything it needs is already loaded and in hand.
@@ -195,17 +212,12 @@ async function PageContent({
           recordDateLabel: homepage.reportShell.recordDateLabel,
           regimeHistory: alignedRegimeHistory,
           planHref: operateHref,
+          previousScores: cadencePreviousScores,
         });
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
   const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
-
-  const signalDeltas = new Map(
-    homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
-  );
-  const tightnessDelta = signalDeltas.get("tightness") ?? 0;
-  const riskAppetiteDelta = signalDeltas.get("riskAppetite") ?? 0;
 
   const signalDirection: SignalDirection = (
     homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten"
