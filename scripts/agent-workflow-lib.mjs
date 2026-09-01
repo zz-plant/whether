@@ -111,7 +111,7 @@ const TASK_PROFILES = [
       "app/page.tsx",
       "app/components/home/",
       "app/components/DecisionHero.tsx",
-      "app/components/ThreeWhethersCard.tsx",
+      "app/components/CadenceCallCard.tsx",
     ],
     checks: [
       "bun run lint",

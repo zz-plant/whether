@@ -3,13 +3,9 @@ import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import {
-  CadenceCallCardFallback,
-  WorkstreamNavFallback,
-} from "../app/components/suspenseFallbacks";
+import { WorkstreamNavFallback } from "../app/components/suspenseFallbacks";
 
 const fallbacks = [
-  { name: "CadenceCallCardFallback", html: renderToStaticMarkup(<CadenceCallCardFallback />) },
   { name: "WorkstreamNavFallback", html: renderToStaticMarkup(<WorkstreamNavFallback />) },
 ];
 
@@ -34,8 +30,7 @@ describe("suspense fallbacks", () => {
   it("mirrors the wrapper of the component it stands in for", () => {
     // Height comes out right by construction when the fallback reuses the real
     // component's outer classes, rather than being guessed at with `h-28`.
-    assert.match(fallbacks[0].html, /class="weather-card space-y-3"/);
-    assert.match(fallbacks[1].html, /class="weather-panel px-4 py-4"/);
+    assert.match(fallbacks[0].html, /class="weather-panel px-4 py-4"/);
   });
 });
 

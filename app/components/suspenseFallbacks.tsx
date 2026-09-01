@@ -34,21 +34,6 @@ function LoadingRegion({
   );
 }
 
-/** Mirrors `CadenceCallCard`: eyebrow + badge row, headline, two detail lines. */
-export function CadenceCallCardFallback() {
-  return (
-    <LoadingRegion label="Loading the cadence call" className="weather-card space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Skeleton className="h-3 w-28 rounded-sm bg-slate-500/30" />
-        <Skeleton className="h-6 w-20 rounded-full bg-slate-500/24" />
-      </div>
-      <Skeleton className="h-6 w-3/4 rounded-md bg-slate-500/40" />
-      <Skeleton className="h-4 w-full rounded-sm bg-slate-500/24" />
-      <Skeleton className="h-3 w-2/3 rounded-sm bg-slate-500/20" />
-    </LoadingRegion>
-  );
-}
-
 /** Mirrors `OperationsWorkstreamNav`: intro pair, then a 4-up card grid. */
 export function WorkstreamNavFallback() {
   return (

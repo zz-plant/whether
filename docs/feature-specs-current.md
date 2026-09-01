@@ -147,12 +147,15 @@ These sit inside the hero's action bar and secondary provenance row, following a
 hierarchy: the Slack copy button is the primary visible action, while Present, developer access,
 and threshold detail are progressive disclosures.
 
-### 1.1.2 Role lens filter tabs (2026-08-29)
-The Bounded Decisions ledger (`ThreeWhethersCard`) now delegates rendering to
-`ThreeWhethersCardClient` (`app/components/ThreeWhethersCardClient.tsx`), which adds role lens
-filter pills: `All Levers | 🛠️ Engineering | 👥 Hiring | 💰 Runway & Burn`. Selecting a lens
-filters the bounded-decision items to the relevant operating area. The `All Levers` default shows
-all items. Role filtering is client-side only and does not change the underlying data model.
+### 1.1.2 Bounded decisions moved to Plan (2026-09-01)
+The per-lever bounded-decision ledger no longer renders on `/`. §VIII assigns operating
+guardrails to Plan, and it now ships as "Rules by area" in `app/components/appendix/playbookPanel.tsx`,
+open on arrival at `/operate`. The brief keeps the call-level guardrail and reversal in the hero.
+
+The role lens filter pills that shipped with the old homepage ledger (`All Levers | Engineering |
+Hiring | Runway & Burn`) were **not** carried over and no longer exist — `/operate` lists every
+area unfiltered. `ThreeWhethersCard` / `ThreeWhethersCardClient` sat unrendered from that move
+until they were deleted.
 
 ### 1.1.3 Board Governance Annex export (2026-08-29)
 The `/history` page now includes an `ExportBoardAnnexButton`

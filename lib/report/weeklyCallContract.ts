@@ -7,6 +7,7 @@ import {
   startupVariantModes,
   type StartupVariantMode,
 } from "./boundedDecisionRules";
+import { POLICY_OVERRIDE_CALL } from "./reportCopy";
 
 export type StageScopedAdjustment = {
   mode: StartupVariantMode;
@@ -143,16 +144,16 @@ export const buildWeeklyCallContract = ({
     : undefined;
 
   const currentCall = policyOverrideActive
-    ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
+    ? POLICY_OVERRIDE_CALL.currentCall
     : defaultCurrentCall;
   const actionNow = policyOverrideActive
-    ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
+    ? POLICY_OVERRIDE_CALL.actionNow
     : stageAdj?.actionNow ?? defaultActionNow;
   const pauseIf = policyOverrideActive
-    ? "Pause irreversible approvals while the policy override remains active."
+    ? POLICY_OVERRIDE_CALL.pauseIf
     : stageAdj?.pauseIf ?? defaultPauseIf;
   const changeCourseIf = policyOverrideActive
-    ? "Resume normal posture changes only after policy disagreement clears and the weekly flip thresholds recover."
+    ? POLICY_OVERRIDE_CALL.changeCourseIf
     : stageAdj?.changeCourseIf ?? defaultChangeCourseIf;
   const doNowBullets = policyOverrideActive
     ? dedupeLines([actionNow, ...buildPolicyOverrideActionLines(assessment)], 3)

@@ -250,7 +250,7 @@ app/
 │   └── og/                           # Live Open Graph preview generator
 └── components/                       # Shared UI components
     ├── DecisionHero.tsx              # Primary weekly decision card + shortcuts
-    ├── ThreeWhethersCardClient.tsx   # Bounded decisions with role lens filters
+    ├── CadenceCallCard.tsx           # Monthly/quarterly lead for the cadence selector
     ├── ThresholdProximityBar.tsx     # Visual tightening buffer indicator
     ├── DeveloperQuickAccess.tsx      # Inline MCP/API popover
     ├── commandPalette.tsx            # Cmd+K palette
@@ -347,7 +347,7 @@ Hard lines between data prep, decision logic, and presentation:
 - **Must not depend on:** React UI modules
 
 ### 3) Presentation + artifact transmission
-- **Owner modules:** `app/components/DecisionHero.tsx`, `app/components/ThreeWhethersCardClient.tsx`, `app/operate/components/*`
+- **Owner modules:** `app/components/DecisionHero.tsx`, `app/components/CadenceCallCard.tsx`, `app/operate/components/*`
 - **What this layer does:** render the brief, decision card, and export surfaces; make the output fast to scan, copy, and share
 - **Must not do:** threshold scoring, regime classification
 

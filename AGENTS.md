@@ -250,7 +250,7 @@ When making product-facing changes, start by checking these areas:
 ### Core brief / homepage
 - `app/page.tsx`
 - `app/components/DecisionHero.tsx`
-- `app/components/ThreeWhethersCard.tsx`
+- `app/components/CadenceCallCard.tsx`
 - `lib/report/homeBriefModel.ts`
 - `lib/report/reportData.ts`
 - `lib/report/decisionKnobs.ts`

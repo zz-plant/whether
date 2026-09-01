@@ -87,6 +87,30 @@ summary:focus-visible {
   text-decoration-color: rgba(125, 211, 252, 0.9);
 }
 
+/* A card-style link wraps a title and a line explaining it, and underlining
+   both makes one link read as two — on /answer every role and every stage
+   rendered as a pair of underlined lines.
+
+   The rule has to sit on the anchor. text-decoration propagates from an
+   ancestor into its in-flow descendants and cannot be switched off further
+   down, so `text-decoration: none` on the inner <p> does nothing at all. The
+   anchor drops the underline and the title takes it back, which is where the
+   affordance belonged. Measured across seven routes: 20 anchors pair a title
+   with a description and none is a lone paragraph, so nothing loses its only
+   underline here. */
+:where(.weather-panel a:has(p), .weather-surface a:has(p)) {
+  text-decoration: none;
+}
+
+:where(
+  .weather-panel a:has(p) > :first-child,
+  .weather-surface a:has(p) > :first-child
+) {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  text-decoration-color: rgba(56, 189, 248, 0.46);
+}
+
 .weather-meta-list__item {
   display: inline-flex;
   align-items: baseline;

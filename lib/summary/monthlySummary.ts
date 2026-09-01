@@ -4,6 +4,7 @@
  */
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
+import { buildHorizonOperatingRule, buildHorizonThresholdBands } from "./horizonOperatingRules";
 import { joinSentences } from "../report/reportFormatting";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
 import { formatConfidenceSentence, formatSourceLine } from "./summaryFormatting";
@@ -46,10 +47,8 @@ export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   monthlyActionGuidance[regime];
 
 export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructured["operatingRules"] => {
-  const tightnessPause = assessment.thresholds.tightnessRegime + 6;
-  const tightnessResume = Math.max(assessment.thresholds.tightnessRegime - 4, 0);
-  const riskPause = Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0);
-  const riskResume = Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100);
+  const { tightnessPause, tightnessResume, riskPause, riskResume } =
+    buildHorizonThresholdBands(assessment);
 
   if (assessment.regime === "VOLATILE") {
     return [
@@ -71,11 +70,13 @@ export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyS
     ];
   }
 
-  return [{
-    action: `Apply this month's priority: ${getMonthlyActionGuidance(assessment.regime)}.`,
-    threshold: `Pause broader commitments if funding pressure rises above ${tightnessPause.toFixed(1)} or risk appetite falls below ${riskPause.toFixed(1)}.`,
-    reversal: `Reopen broader scope when funding pressure is below ${tightnessResume.toFixed(1)} and risk appetite is above ${riskResume.toFixed(1)}.`,
-  }];
+  return [
+    buildHorizonOperatingRule({
+      assessment,
+      guidance: getMonthlyActionGuidance(assessment.regime),
+      horizon: "month",
+    }),
+  ];
 };
 
 export const buildMonthlyStructured = ({
