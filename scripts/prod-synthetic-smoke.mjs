@@ -37,6 +37,25 @@ const fail = (message) => {
   process.exit(1);
 };
 
+/**
+ * Fold typographic punctuation to ASCII before comparing markers.
+ *
+ * The markers above are hand-written with ASCII quotes; the pages render curly
+ * ones. On 2026-09-01 the homepage CTA became `Build this week’s plan` (U+2019)
+ * while this file still asked for `build this week's plan` (U+0027), and the check
+ * reported the marker missing on a page that was rendering it correctly — the one
+ * failure mode a post-deploy smoke test cannot afford, because it is indistinguishable
+ * from a real outage until someone diffs the bytes.
+ *
+ * Only quotes are folded. Dashes and ellipses are deliberately left alone: folding
+ * widens what counts as a match, and a smoke check earns its keep by being narrow.
+ */
+const normalizeForMatch = (value) =>
+  value
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u201a\u201b]/g, "'")
+    .replace(/[\u201c\u201d\u201e\u201f]/g, '"');
+
 const curl = (url) => {
   const command = spawnSync(
     "curl",
@@ -95,9 +114,9 @@ const run = async () => {
       fail(`${check.path} returned ${response.status} (expected 200)`);
     }
 
-    const html = response.body.toLowerCase();
+    const html = normalizeForMatch(response.body);
     for (const required of check.required) {
-      if (!html.includes(required.toLowerCase())) {
+      if (!html.includes(normalizeForMatch(required))) {
         fail(`${check.path} missing expected marker: ${required}`);
       }
     }
