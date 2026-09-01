@@ -107,28 +107,14 @@ export default async function SharePage() {
           meetingPack={artifact.meetingPack}
           calendarDetails={artifact.calendarDetails}
         />
+
+        <div>
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">
+            Return to weekly brief
+          </Link>
+        </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-white/60">What sharing produces</h2>
-        <div className="grid gap-3 md:grid-cols-3">
-          <div className="weather-surface space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold text-sky-200">Slack</p>
-            <p className="text-xs leading-relaxed text-white/60">A compact weekly operator brief with posture, action, pause condition, reversal condition, and why the call could be wrong.</p>
-          </div>
-          <div className="weather-surface space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold text-emerald-200">Email</p>
-            <p className="text-xs leading-relaxed text-white/60">The same current brief plus citation lines, ready for leadership updates or follow-up notes.</p>
-          </div>
-          <div className="weather-surface space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold text-amber-200">Meeting pack</p>
-            <p className="text-xs leading-relaxed text-white/60">Board note, call snapshot, weekly brief, board summary, and citation in one pasteable artifact.</p>
-          </div>
-        </div>
-        <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">
-          Return to weekly brief
-        </Link>
-      </section>
     </PageShell>
   );
 }

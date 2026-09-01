@@ -69,7 +69,10 @@ export function ShareCopyControls({
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* content-start: the preview column beside this one is tall, and without
+          it these four cards stretched to match, leaving a block of empty space
+          under each button. */}
+      <div className="grid gap-4 sm:grid-cols-2 content-start">
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-200">Slack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
@@ -96,7 +99,7 @@ export function ShareCopyControls({
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-amber-200">Meeting pack</h2>
-          <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, and citation.</p>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, board summary, and citation.</p>
           <button
             type="button"
             className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
