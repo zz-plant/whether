@@ -42,10 +42,12 @@ export function ThresholdProximityBar({ consequence, className = "" }: Props) {
             : `${pointsToThreshold} pts buffer remaining`}
         </span>
       </div>
+      {/* scaleX rather than an animated width: §I bans animating layout
+          properties, and transition-all on an inline width did exactly that. */}
       <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-900/80">
         <div
-          className={`h-full transition-all duration-500 rounded-full ${tone.bar}`}
-          style={{ width: `${isCrossed ? 100 : bufferPercent}%` }}
+          className={`h-full w-full origin-left rounded-full transition-transform duration-500 ${tone.bar}`}
+          style={{ transform: `scaleX(${isCrossed ? 1 : bufferPercent / 100})` }}
         />
       </div>
     </div>

@@ -698,6 +698,25 @@ html[data-theme="light"] .weather-tab {
    gradient via background-image and must stay dark in both themes. */
 html[data-theme="light"] [class^="bg-slate-950"], html[data-theme="light"] [class*=" bg-slate-950"],
 html[data-theme="light"] [class^="bg-slate-900"], html[data-theme="light"] [class*=" bg-slate-900"] { background-color: rgba(0,0,0,0.035) !important; }
+
+/* The same inversion for the semantic 900/950 tints, which the slate rule above
+   does not cover: rose, amber and emerald at those tiers stayed dark in this
+   theme, so the threshold buffer bar composited a 40% near-black rose over the
+   cream ground and rendered as muddy mauve. Mapped to the matching 50-tier
+   rather than to the neutral grey the slate rule uses — these carry the warning
+   and all-clear roles, and flattening them to grey would turn meaning into
+   decoration. Class-boundary anchored like the rules above, so hover:/focus:
+   variants keep their own treatment. */
+html[data-theme="light"] [class^="bg-rose-950"], html[data-theme="light"] [class*=" bg-rose-950"],
+html[data-theme="light"] [class^="bg-rose-900"], html[data-theme="light"] [class*=" bg-rose-900"] { background-color: #fff1f2 !important; }
+html[data-theme="light"] [class^="bg-amber-950"], html[data-theme="light"] [class*=" bg-amber-950"],
+html[data-theme="light"] [class^="bg-amber-900"], html[data-theme="light"] [class*=" bg-amber-900"] { background-color: #fffbeb !important; }
+html[data-theme="light"] [class^="bg-emerald-950"], html[data-theme="light"] [class*=" bg-emerald-950"],
+html[data-theme="light"] [class^="bg-emerald-900"], html[data-theme="light"] [class*=" bg-emerald-900"] { background-color: #ecfdf5 !important; }
+html[data-theme="light"] [class^="bg-sky-950"], html[data-theme="light"] [class*=" bg-sky-950"],
+html[data-theme="light"] [class^="bg-sky-900"], html[data-theme="light"] [class*=" bg-sky-900"] { background-color: #f0f9ff !important; }
+html[data-theme="light"] [class^="bg-indigo-950"], html[data-theme="light"] [class*=" bg-indigo-950"],
+html[data-theme="light"] [class^="bg-indigo-900"], html[data-theme="light"] [class*=" bg-indigo-900"] { background-color: #eef2ff !important; }
 html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(0,0,0,0.05) !important; }
 html[data-theme="light"] [class^="border-slate-800"], html[data-theme="light"] [class*=" border-slate-800"],
 html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: rgba(0,0,0,0.10) !important; }
@@ -724,7 +743,11 @@ html[data-theme="light"] [class^="text-emerald-4"], html[data-theme="light"] [cl
 html[data-theme="light"] [class^="text-amber-1"], html[data-theme="light"] [class*=" text-amber-1"],
 html[data-theme="light"] [class^="text-amber-2"], html[data-theme="light"] [class*=" text-amber-2"],
 html[data-theme="light"] [class^="text-amber-3"], html[data-theme="light"] [class*=" text-amber-3"],
-html[data-theme="light"] [class^="text-amber-4"], html[data-theme="light"] [class*=" text-amber-4"] { color: #b45309 !important; }
+/* amber-800, not amber-700: #b45309 measured 4.49:1 on --bg-panel, which is
+   under AA by a hair — and amber is the warning role, so it is exactly the text
+   that must stay readable. Hover moves to amber-900 below to keep the state
+   change visible. */
+html[data-theme="light"] [class^="text-amber-4"], html[data-theme="light"] [class*=" text-amber-4"] { color: #92400e !important; }
 
 html[data-theme="light"] [class^="text-sky-1"], html[data-theme="light"] [class*=" text-sky-1"],
 html[data-theme="light"] [class^="text-sky-2"], html[data-theme="light"] [class*=" text-sky-2"],
@@ -738,7 +761,7 @@ html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class
 
 /* Hover lands one step darker so the state stays readable as a change. */
 html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !important; }
-html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #92400e !important; }
+html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #78350f !important; }
 html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #075985 !important; }
 html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
 
