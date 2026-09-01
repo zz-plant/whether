@@ -69,7 +69,12 @@ export function ReportSection({
           ) : null}
         </div>
         )}
-        <div className="rounded border border-slate-800/55 bg-slate-950/35 p-4 shadow-[0_18px_34px_-28px_rgba(2,6,23,0.75)] sm:p-5">
+        {/* No shadow: this body is always inside the report column, and on
+            /operate inside a step panel as well. A nested container that casts
+            its own shadow reads as floating above the thing containing it —
+            the depth ladder in surfaces.css exists to prevent exactly that, and
+            cannot see a bespoke one written as a utility. */}
+        <div className="rounded border border-slate-800/55 bg-slate-950/35 p-4 sm:p-5">
           <div className="space-y-6">{children}</div>
         </div>
       </section>

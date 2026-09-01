@@ -214,13 +214,37 @@
       app is almost always through a wrapper, so descendant is the correct
       relationship.
 
+   3. The list was three classes long while the app makes boxes out of eighteen.
+      Measured on /operate: a five-deep chain — weather-step-panel wrapping a
+      raw bordered div wrapping weather-auto-chevron wrapping weather-surface
+      wrapping a bordered card — where the second level kept its shadow and
+      floated above the panel containing it, which is the exact defect note 1
+      describes. A rule that names only three of the container classes cannot
+      see the nesting the other fifteen create.
+
    Only the depth cues are reset — shadow, blur, and the top-edge specular.
    Border and background are deliberately left alone: those slots carry the
    semantic tints (.weather-surface-amber, inline border-amber-400/20 and
    friends), and resetting them here would silently flatten meaning into
    decoration. Grouping comes from removing the float, not from bleaching. */
-:is(.weather-panel, .weather-surface, .weather-card)
-  :is(.weather-panel, .weather-surface, .weather-card) {
+:is(
+    .weather-panel, .weather-surface, .weather-card,
+    .weather-panel-static, .weather-step-panel,
+    .weather-hero-card, .weather-lever-card,
+    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-route-card, .weather-stat-card, .weather-forecast-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary, .weather-surface-utility
+  )
+  :is(
+    .weather-panel, .weather-surface, .weather-card,
+    .weather-panel-static, .weather-step-panel,
+    .weather-hero-card, .weather-lever-card,
+    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-route-card, .weather-stat-card, .weather-forecast-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary, .weather-surface-utility
+  ) {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -230,9 +254,33 @@
    the enclosure entirely and let spacing and type carry the structure. The
    :not() guards keep semantically tinted leaves boxed, since for those the
    border is the meaning. */
-:is(.weather-panel, .weather-surface, .weather-card)
-  :is(.weather-panel, .weather-surface, .weather-card)
-  :is(.weather-panel, .weather-surface, .weather-card):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+:is(
+    .weather-panel, .weather-surface, .weather-card,
+    .weather-panel-static, .weather-step-panel,
+    .weather-hero-card, .weather-lever-card,
+    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-route-card, .weather-stat-card, .weather-forecast-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary, .weather-surface-utility
+  )
+  :is(
+    .weather-panel, .weather-surface, .weather-card,
+    .weather-panel-static, .weather-step-panel,
+    .weather-hero-card, .weather-lever-card,
+    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-route-card, .weather-stat-card, .weather-forecast-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary, .weather-surface-utility
+  )
+  :is(
+    .weather-panel, .weather-surface, .weather-card,
+    .weather-panel-static, .weather-step-panel,
+    .weather-hero-card, .weather-lever-card,
+    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-route-card, .weather-stat-card, .weather-forecast-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary, .weather-surface-utility
+  ):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
 }

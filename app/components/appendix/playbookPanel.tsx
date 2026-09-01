@@ -60,7 +60,10 @@ export const PlaybookPanel = ({
             acts on this week — §XII collapses the evidence for a claim, never
             the thing to be done — and they are now the canonical home for the
             per-area guardrails the weekly brief used to restate. */}
-        <div className="weather-surface mt-4 p-4">
+        {/* A labelled group, not another box: this sits two containers deep
+            already and every card inside it is bordered, so a fourth frame here
+            only repeated the enclosure. Spacing and the label carry it. */}
+        <div className="mt-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Rules by area
           </p>
