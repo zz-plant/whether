@@ -56,6 +56,30 @@ export const PlaybookPanel = ({
             Align the team on what to stop, start, and keep limited before approvals move forward.
           </p>
         </div>
+        {/* Above the deep dive, not inside it. These are the rules the reader
+            acts on this week — §XII collapses the evidence for a claim, never
+            the thing to be done — and they are now the canonical home for the
+            per-area guardrails the weekly brief used to restate. */}
+        <div className="weather-surface mt-4 p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            Rules by area
+          </p>
+          <ul className="mt-3 space-y-2 text-xs text-slate-300">
+            {visibleActionStripItems.map((item) => (
+              <li
+                key={item.lever}
+                className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2"
+              >
+                <p className="font-semibold text-slate-100">{item.label}</p>
+                <p className="mt-1 text-emerald-100">Action now: {item.areaActionNow}</p>
+                <p className="mt-1 text-amber-100">Pause if: {item.triggerThreshold}</p>
+                <p className="mt-1 text-sky-100">
+                  Change course if: {item.reversalCondition}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
         <CollapsibleDeepDive
           label="Deep dive: rule summary and detailed lists"
           panelClassName="mt-4 space-y-6"
@@ -98,26 +122,6 @@ export const PlaybookPanel = ({
               </div>
             </div>
             <div className="grid gap-3">
-              <div className="weather-surface p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Rules by area
-                </p>
-                <ul className="mt-3 space-y-2 text-xs text-slate-300">
-                  {visibleActionStripItems.map((item) => (
-                    <li
-                      key={item.lever}
-                      className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2"
-                    >
-                      <p className="font-semibold text-slate-100">{item.label}</p>
-                      <p className="mt-1 text-emerald-100">Action now: {item.areaActionNow}</p>
-                      <p className="mt-1 text-amber-100">Pause if: {item.triggerThreshold}</p>
-                      <p className="mt-1 text-sky-100">
-                        Change course if: {item.reversalCondition}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
               <div className="weather-surface p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Weekly rule summary
