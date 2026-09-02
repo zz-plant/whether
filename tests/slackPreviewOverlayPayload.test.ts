@@ -27,7 +27,7 @@ describe("slack preview overlay payload", () => {
       { active: null },
       { activeee: true },
     ]) {
-      assert.equal(readActiveFlag(detail), null, `should reject ${JSON.stringify(detail) ?? String(detail)}`);
+      assert.equal(readActiveFlag(detail), null, `should reject ${JSON.stringify(detail) ?? typeof detail}`);
     }
   });
 

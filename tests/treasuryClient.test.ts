@@ -6,6 +6,10 @@ import { describe, it } from "bun:test";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
 import type { TreasuryData } from "../lib/types";
 
+/** The URL a fetch stub was asked for, whichever form the caller passed. */
+const requestUrl = (input: RequestInfo | URL) =>
+  typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
 const buildCsv = (seriesId: string, values: Array<{ date: string; value: string }>) => {
   const rows = values.map(({ date, value }) => `${date},${value}`).join("\n");
   return `DATE,${seriesId}\n${rows}`;
@@ -15,7 +19,7 @@ describe("treasury client", () => {
   it("returns live data when fetch succeeds", async () => {
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       requestedUrls.push(url);
 
       if (url.includes("DGS1MO")) {
@@ -65,7 +69,7 @@ describe("treasury client", () => {
 
   it("falls back to snapshot on fetch failure", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes("home.treasury.gov")) {
         return new Response("{}", { status: 500 });
       }
@@ -98,7 +102,7 @@ describe("treasury client", () => {
 
   it("falls back to snapshot when payload shape is invalid", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes("home.treasury.gov")) {
         return new Response("{}", { status: 500 });
       }
@@ -162,7 +166,7 @@ describe("treasury client", () => {
     const endpoint = "https://example.com/fredgraph.csv?cosd=2024-01-01&coed=2024-12-31&auth=token";
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
-      requestedUrls.push(input.toString());
+      requestedUrls.push(requestUrl(input));
       return new Response(
         buildCsv("DGS", [
           { date: "2026-02-01", value: "5.2" },
@@ -196,7 +200,7 @@ describe("treasury client", () => {
     const endpoint = "https://example.com/fredgraph.csv?cosd=2024-01-01&coed=2024-12-31&api_key=test";
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
-      requestedUrls.push(input.toString());
+      requestedUrls.push(requestUrl(input));
       return new Response(
         buildCsv("DGS", [
           { date: "2026-02-01", value: "5.2" },
@@ -223,7 +227,7 @@ describe("treasury client", () => {
   it("retries once when series requests abort", async () => {
     const attempts = new Map<string, number>();
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       const count = attempts.get(url) ?? 0;
       attempts.set(url, count + 1);
 
@@ -251,7 +255,7 @@ describe("treasury client", () => {
   it("retries series requests after transient 520 responses", async () => {
     const attempts = new Map<string, number>();
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       const count = attempts.get(url) ?? 0;
       attempts.set(url, count + 1);
 
@@ -302,7 +306,7 @@ describe("treasury client", () => {
 
   it("surfaces a clearer fallback reason when 520 persists across retries", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
 
       if (url.includes("fredgraph.csv?id=")) {
         return new Response("upstream unavailable", { status: 520 });
@@ -366,7 +370,7 @@ describe("treasury client", () => {
 
   it("uses Treasury daily rates CSV as a live backup when FRED is unavailable", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes("home.treasury.gov")) {
         return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "01/09/2026,4.12,4.23,4.31,4.56"].join("\n"));
       }
@@ -388,7 +392,7 @@ describe("treasury client", () => {
 
   it("uses the next newest Treasury CSV row when the latest row has placeholder tenor values", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes("home.treasury.gov")) {
         return new Response(
           [
@@ -416,7 +420,7 @@ describe("treasury client", () => {
 
   it("chooses the latest valid Treasury CSV row regardless of response ordering", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes("home.treasury.gov")) {
         return new Response(
           [
@@ -445,7 +449,7 @@ describe("treasury client", () => {
   it("requests the year-scoped daily rates file, not the empty /current/all path", async () => {
     const requested: string[] = [];
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       requested.push(url);
       if (url.includes("home.treasury.gov")) {
         return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "08/21/2026,3.80,3.88,4.24,4.74"].join("\n"));
@@ -470,7 +474,7 @@ describe("treasury client", () => {
   it("falls back to the previous year's file when the current year's is empty", async () => {
     const currentYear = new Date().getUTCFullYear();
     const fetcher: typeof fetch = async (input) => {
-      const url = input.toString();
+      const url = requestUrl(input);
       if (url.includes(`/${currentYear}/all`)) {
         // Early January: the new file exists but carries no sessions yet.
         return new Response("");

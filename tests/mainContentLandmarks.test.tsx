@@ -76,7 +76,7 @@ describe("fetch-based main-content guard", () => {
     ]);
     const fetchCalls: string[] = [];
     const fetchImpl = async (input: string | URL | Request) => {
-      const url = input.toString();
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       fetchCalls.push(url);
       return new Response(responses.get(url) ?? "Not found", { status: responses.has(url) ? 200 : 404 });
     };

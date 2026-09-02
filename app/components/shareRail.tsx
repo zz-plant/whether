@@ -50,7 +50,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   const copySlackText = useCallback(() => {
     const text = buildShareText();
     const slackFormatted = `*Whether Weekly Brief*\n\n${text}`;
-    copyToClipboard(slackFormatted, "slack");
+    void copyToClipboard(slackFormatted, "slack");
   }, [copyToClipboard, buildShareText]);
 
   const copyStatusMessage =
@@ -161,7 +161,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => {
-                  copyToClipboard(window.location.href, "link");
+                  void copyToClipboard(window.location.href, "link");
                 }}
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
@@ -174,7 +174,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 onClick={() => {
                   const decisionSection = document.querySelector('[data-share-section="decision"]');
                   const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
-                  copyToClipboard(text, "section");
+                  void copyToClipboard(text, "section");
                 }}
                 data-premium-intent="export_brief"
                 data-premium-cta="share_rail_copy_decision_card"

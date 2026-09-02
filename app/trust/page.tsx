@@ -8,7 +8,6 @@ import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
 import {
   DECISION_CONTRACT_LABELS,
-  PRIMARY_AUDIENCE_ACTION,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
@@ -37,7 +36,6 @@ export default async function MethodPage({
     isFallback,
     confidenceLabel,
     trustSummary,
-    sourceCoverage,
     citationLine,
     warnings,
     meetingSnippet,

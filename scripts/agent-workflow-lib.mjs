@@ -2,6 +2,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+// Explicit so the order is code-unit order on every runtime, not the default's string coercion.
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 const ROOT_AGENTS = "AGENTS.md";
 const ARTIFACTS_AGENT_DIR = path.join("artifacts", "agent");
 const INDEX_FILENAMES = {
@@ -411,7 +414,7 @@ export function findRelevantAgentFiles(repoRoot, inputPaths = []) {
     }
   }
 
-  return [...discovered].sort();
+  return [...discovered].sort(byCodeUnit);
 }
 
 function parseGitStatusShort(output) {
@@ -569,7 +572,7 @@ export function buildRepoIndex({ repoRoot } = {}) {
   const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
   const files = [];
   walkRepoFiles(cwd, cwd, files);
-  files.sort();
+  files.sort(byCodeUnit);
 
   const fileMap = {
     generatedAt: new Date().toISOString(),

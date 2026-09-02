@@ -377,10 +377,12 @@ const sanitizePdfText = (value) =>
     .replace(/“|”/g, "\"");
 
 const createPdfFromText = async (title, content, outputFile) => {
-  // pdf-lib costs ~56ms to evaluate — roughly half this CLI's startup — and only
-  // `export --format pdf` ever needs it. Loading it here keeps that cost on the
+  // The PDF library costs ~56ms to evaluate — roughly half this CLI's startup — and
+  // only `export --format pdf` ever needs it. Loading it here keeps that cost on the
   // one command that uses it instead of on every `status`, `ping`, or `call`.
-  const { PDFDocument, StandardFonts } = await import("pdf-lib");
+  // @cantoo/pdf-lib is the maintained fork of pdf-lib (same API; upstream has been
+  // unreleased since 2021).
+  const { PDFDocument, StandardFonts } = await import("@cantoo/pdf-lib");
 
   const pdfDoc = await PDFDocument.create();
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -390,7 +392,6 @@ const createPdfFromText = async (title, content, outputFile) => {
   const footerGap = 28;
   const defaultLineHeight = 15;
   const smallGap = 8;
-  const mediumGap = 14;
 
   let page = pdfDoc.addPage(pageSize);
   let currentPageNumber = 1;

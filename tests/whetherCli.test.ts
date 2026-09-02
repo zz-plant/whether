@@ -264,6 +264,7 @@ describe("whether cli", () => {
     assert.equal("variant" in parsed, false);
     assert.equal("rendered" in parsed, false);
     assert.equal(result.stderr, "");
+    // eslint-disable-next-line no-control-regex -- the escape byte is the point of the check
     assert.doesNotMatch(result.stdout, /\u001b\[/);
   });
 

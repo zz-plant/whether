@@ -5,7 +5,7 @@ import { writeFile } from "node:fs/promises";
 
 const args = process.argv.slice(2);
 
-function readArg(name, fallback = undefined) {
+function readArg(name, fallback) {
   const index = args.indexOf(name);
   if (index === -1) return fallback;
   return args[index + 1] ?? fallback;

@@ -25,8 +25,8 @@ const TASKS = [
   { name: "test", script: "test" },
   { name: "assets", script: "assets:check" },
   // Gated at `critical` on purpose. There are currently 38 high advisories, all
-  // in transitive dev/build dependencies (picomatch via eslint-config-next and
-  // vinext) rather than anything the Worker ships. Blocking on those would make
+  // in transitive dev/build dependencies (picomatch via vinext's glob chain, for
+  // one) rather than anything the Worker ships. Blocking on those would make
   // this permanently red, which is exactly how the old dependency-review check
   // became worthless. `bun audit` still prints the full report, so the highs
   // stay visible; only a critical advisory stops the build.
@@ -53,7 +53,7 @@ if (unknown.length > 0) {
 const selected = requested.length > 0 ? TASKS.filter((t) => requested.includes(t.name)) : TASKS;
 
 /*
- * eslint, tsc, and bun test are each CPU- and memory-hungry. Running more of them
+ * tsc and bun test are each CPU- and memory-hungry (oxlint finishes in seconds). Running more of them
  * at once than the box has cores trades wall clock for thrash, and on a small CI
  * container it is also the difference between fitting in memory and not.
  */
@@ -68,7 +68,7 @@ const childEnv = process.stdout.isTTY
 const running = new Set();
 let aborted = false;
 
-// Without this, Ctrl-C would detach the parent and leave eslint/tsc/bun test
+// Without this, Ctrl-C would detach the parent and leave oxlint/tsc/bun test
 // running in the background.
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => {
@@ -87,8 +87,8 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
  * was the entire diagnosis available.
  *
  * A bound turns that into a named failure with the child's output attached. Ten
- * minutes is far above any real task here (the slowest, lint, takes about 50s in
- * the build container) and far below the ceiling, so it only ever fires on a hang.
+ * minutes is far above any real task here (the slowest, the test suite, takes about
+ * 35s in the build container) and far below the ceiling, so it only ever fires on a hang.
  */
 const TASK_TIMEOUT_MS = Number.parseInt(process.env.CHECK_TASK_TIMEOUT_MS ?? "600000", 10);
 
