@@ -548,7 +548,7 @@ export const DecisionShieldPanel = ({
               <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
                       stressTestResult.verdict === "SAFE"
                         ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
                         : stressTestResult.verdict === "RISKY"

@@ -22,7 +22,7 @@ export const HistoricalBanner = ({
           {backwardHref ? (
             <Link
               href={backwardHref}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-cyan-400/60 bg-cyan-500/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-cyan-100 transition hover:border-cyan-300 hover:text-cyan-50"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-cyan-400/60 bg-cyan-500/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-cyan-100 transition hover:border-cyan-300 hover:text-cyan-50"
             >
               <ArrowRightIcon className="mr-1 h-3.5 w-3.5 rotate-180" aria-hidden="true" />View older snapshot
             </Link>
@@ -30,7 +30,7 @@ export const HistoricalBanner = ({
           {timeMachineHref ? (
             <Link
               href={timeMachineHref}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
             >
               <ArrowRightIcon className="mr-1 h-3.5 w-3.5" aria-hidden="true" />Choose another date
             </Link>
@@ -38,7 +38,7 @@ export const HistoricalBanner = ({
           {liveHref ? (
             <Link
               href={liveHref}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
             >
               <ArrowRightIcon className="mr-1 h-3.5 w-3.5" aria-hidden="true" />Back to live brief
             </Link>

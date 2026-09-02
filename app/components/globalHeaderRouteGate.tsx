@@ -104,14 +104,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 {reportHeaderAction ? (
                   <Link
                     href={reportHeaderAction.href}
-                    className="weather-button-primary hidden sm:inline-flex sm:min-h-[36px] items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
+                    className="weather-button-primary hidden sm:inline-flex sm:min-h-[36px] items-center justify-center px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:flex-none"
                   >
                     {reportHeaderAction.label}
                   </Link>
                 ) : null}
                 <Link
                   href={reportHeaderUtilityAction.href}
-                  className="weather-pill hidden min-h-[34px] items-center justify-center rounded-full px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
+                  className="weather-pill hidden min-h-[34px] items-center justify-center px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
                 >
                   {reportHeaderUtilityAction.label}
                 </Link>
@@ -139,7 +139,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           {isReportRoute && reportHeaderAction ? (
             <Link
               href={reportHeaderAction.href}
-              className="weather-button-primary inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:hidden"
+              className="weather-button-primary inline-flex min-h-[44px] shrink-0 items-center justify-center px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:hidden"
             >
               {reportHeaderAction.label}
             </Link>

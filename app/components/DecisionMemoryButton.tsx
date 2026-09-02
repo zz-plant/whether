@@ -106,7 +106,7 @@ export function DecisionMemoryButton({
         onClick={handleSave}
         disabled={saveState === "saving" || !clientId}
         title="Save this week's posture to your decision history for reference"
-        className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-fluid-xs font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-[background-color,color,transform] duration-200 weather-press-scale weather-focus-ring disabled:opacity-50 ${className}`}
+        className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-fluid-xs font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-[background-color,color,transform] duration-200 weather-press-scale weather-focus-ring disabled:opacity-50 ${className}`}
         aria-label="Save decision to history"
       >
       {saveState === "saved" ? (

@@ -27,7 +27,7 @@ type TimeMachineMonthPickerProps = {
 };
 
 const yearStepperButtonClass =
-  "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-sm px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-400";
+  "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-400";
 
 const monthOptionBaseClass =
   "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-fluid-xs font-semibold tracking-[0.12em] transition-colors";

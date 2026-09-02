@@ -92,7 +92,7 @@
 /* Lever decision micro-card for visual rhythm */
 .weather-lever-card {
   position: relative;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
   background: rgba(15, 23, 42, 0.35);
   backdrop-filter: blur(8px);

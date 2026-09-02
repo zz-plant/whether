@@ -11,7 +11,7 @@ import {
 } from "../../../lib/navigation/planningNavigation";
 
 const navItemStyles =
-  "weather-pill flex min-h-[56px] flex-col items-start gap-1.5 rounded-lg border px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors";
+  "weather-pill flex min-h-[56px] flex-col items-start gap-1.5 border px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors";
 
 const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
   "Weekly plan": <CircleTargetIcon className="h-3.5 w-3.5" />,

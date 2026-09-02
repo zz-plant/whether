@@ -85,7 +85,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
           {model.periodLabel ? <> · {model.periodLabel}</> : null}
         </p>
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-fluid-nano font-semibold ${REGIME_STYLE_TOKENS[model.regime].badge}`}
+          className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-fluid-nano font-semibold ${REGIME_STYLE_TOKENS[model.regime].badge}`}
         >
           <span className={`size-1.5 rounded-full ${REGIME_STYLE_TOKENS[model.regime].marker}`} />
           {model.regimeLabel}
@@ -151,7 +151,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
             {model.history.map((point) => (
               <li
                 key={point.label}
-                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-fluid-nano ${
+                className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-1 text-fluid-nano ${
                   point.isCurrent
                     ? `border ${REGIME_STYLE_TOKENS[point.regime].badge} font-semibold`
                     : "text-slate-400"

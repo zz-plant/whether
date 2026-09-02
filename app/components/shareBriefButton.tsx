@@ -64,7 +64,7 @@ export function ShareBriefButton({
       title={`${label} — copies to the clipboard, or shares if the browser offers it`}
       data-premium-intent="export_brief"
       data-premium-cta="share_brief_button"
-      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-semibold text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors weather-press-scale weather-focus-ring ${className}`}
+      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-semibold text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors weather-press-scale weather-focus-ring ${className}`}
       aria-label={label}
     >
       {didCopy ? (

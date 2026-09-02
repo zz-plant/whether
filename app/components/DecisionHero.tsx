@@ -361,7 +361,7 @@ export function DecisionHero({
                 <span className={`inline-block size-2 rounded-full ${revisitDecisions ? "bg-amber-400" : "bg-emerald-400"}`} />
                 What needs reconsideration this week?
               </p>
-              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.08em] border ${
+              <span className={`shrink-0 rounded-sm px-2.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.08em] border ${
                 revisitDecisions
                   ? "border-amber-500/40 bg-amber-500/20 text-semantic-caution-fg"
                   : "border-emerald-500/40 bg-emerald-500/20 text-semantic-easing-fg"

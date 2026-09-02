@@ -45,7 +45,7 @@ const ToastList = () => {
                 ) : null}
               </div>
               <Toast.Close
-                className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-800/70 text-xs text-slate-400 transition-colors hover:border-slate-600/70 hover:text-slate-200"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/70 text-xs text-slate-400 transition-colors hover:border-slate-600/70 hover:text-slate-200"
                 aria-label="Dismiss notification"
               >
                 ✕
@@ -54,7 +54,7 @@ const ToastList = () => {
             {toast.actionProps ? (
               <Toast.Action
                 {...toast.actionProps}
-                className={`inline-flex min-h-[32px] items-center justify-center rounded-full border border-slate-700/70 px-3 type-badge text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 ${
+                className={`inline-flex min-h-[32px] items-center justify-center rounded-lg border border-slate-700/70 px-3 type-badge text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 ${
                   toast.actionProps.className ?? ""
                 }`}
               />

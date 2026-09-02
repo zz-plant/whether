@@ -57,7 +57,7 @@ export function TemplateActions() {
       <button
         type="button"
         onClick={handlePrint}
-        className="weather-button-primary min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
+        className="weather-button-primary min-h-[44px] px-5 py-2.5 text-xs font-semibold"
       >
         Print this page
       </button>
@@ -65,7 +65,7 @@ export function TemplateActions() {
         type="button"
         onClick={handleCopy}
         aria-live="polite"
-        className="weather-button min-h-[44px] px-5 py-2.5 text-xs font-semibold rounded-lg"
+        className="weather-button min-h-[44px] px-5 py-2.5 text-xs font-semibold"
       >
         {copyLabel}
       </button>

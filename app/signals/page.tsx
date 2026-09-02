@@ -155,7 +155,7 @@ export default async function SignalsPage({
               Live macro coordinates match conditions during {getHistoricalAnalogPlaybook(model.assessment).analogPeriod}.
             </p>
           </div>
-          <span className="self-start sm:self-auto px-3 py-1 text-xs font-bold rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40">
+          <span className="self-start sm:self-auto px-3 py-1 text-xs font-bold rounded-sm bg-sky-500/20 text-sky-300 border border-sky-500/40">
             {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} analog
           </span>
         </div>
