@@ -445,7 +445,7 @@ export const insightDatabase = {
     ],
   },
   executiveBriefingSuite: {
-    title: "Executive Briefing Suite",
+    title: "Memos by executive role",
     subtitle: "Board-ready posture summary and guardrails from public signals",
     regimes: [
       {

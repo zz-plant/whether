@@ -43,7 +43,7 @@ export const PlaybookPanel = ({
         <div>
           <p className="type-label text-slate-400">Rules for this week</p>
           <h3 id="playbook-title" className="type-section text-slate-100">
-            {playbook?.title ?? "Operational Guidance"}
+            {playbook?.title ?? "Rules for new commitments"}
           </h3>
         </div>
         <div className="mt-4 weather-surface p-4">

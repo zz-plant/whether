@@ -57,7 +57,7 @@ export default async function FinancialStrategyPage({
           treasurySource: treasury.source,
         },
         page: {
-          pageTitle: "Financial Strategy",
+          pageTitle: "Financial strategy",
           currentPath: "/planning/financial",
           pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
           sectionLinks: operationsSectionLinks.plan,

@@ -45,11 +45,9 @@ export default async function HistoryPage({
         chrome: { sidebarVariant: "full" },
       }}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div>
-          <h1 className="text-display font-bold tracking-tight text-white">Historical Track Record</h1>
-          <p className="text-xs text-slate-400 mt-1">Multi-year posture logs, regime splits, and governance audit trails.</p>
-        </div>
+      {/* The shell's h1 already says History and TrackRecord names itself directly below, so a
+          second h1 here restated both; only the export action keeps this row. */}
+      <div className="flex justify-end mb-4">
         <ExportBoardAnnexButton record={trackRecord} />
       </div>
 

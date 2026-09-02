@@ -100,7 +100,7 @@ export default async function DecidePage({
       trustStatusDetail="One decision, closed with a bounded rule."
       trustStatusAction="Return to Planning after the decision is closed."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
-      pageTitle="Resolve"
+      pageTitle="Resolve one open decision"
       currentPath="/answer"
       pageSummary="Answer one decision without re-reading the whole brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
@@ -145,7 +145,7 @@ export default async function DecidePage({
           <article className="weather-surface space-y-4 px-4 py-4">
             <p className="type-eyebrow text-sky-200">{recommendedPath.kicker}</p>
             <div className="space-y-2">
-              <p className="text-lg font-semibold text-slate-100">{recommendedPath.title}</p>
+              <h3 className="text-lg font-semibold text-slate-100">{recommendedPath.title}</h3>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
             </div>
             <ButtonLink href={recommendedPath.href} variant="primary">
@@ -155,12 +155,12 @@ export default async function DecidePage({
 
           <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">
             <div className="space-y-1">
-              <p className="type-eyebrow">Alternative paths</p>
+              <p className="type-eyebrow">Other starting points</p>
               <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
             </div>
             <div className="space-y-4">
               <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-                <p className="type-eyebrow text-amber-200">Single answer</p>
+                <p className="type-eyebrow text-amber-200">Direct answers</p>
                 <p className="mt-1 text-fluid-xs text-slate-300">A direct yes-or-no decision.</p>
                 <div className="mt-3 space-y-2">
                   {recommendedAnswerPages.map((page) => (
@@ -175,7 +175,7 @@ export default async function DecidePage({
                 id="guided-translation"
                 className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
               >
-                <p className="type-eyebrow text-violet-200">Need this tailored to a role or company stage?</p>
+                <p className="type-eyebrow text-violet-200">By role or stage</p>
                 <p className="mt-1 text-fluid-xs text-slate-300">For a role or company-stage lens.</p>
                 <div className="mt-3 grid gap-2">
                   {recommendedStakeholderGuides.map((guide) => (
@@ -212,7 +212,7 @@ export default async function DecidePage({
           <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
-              <h2 className="text-sm type-eyebrow text-slate-300">More team help</h2>
+              <h2 className="text-sm type-eyebrow text-slate-300">Help by role</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
                   <Link key={role.slug} href={`/answer/${role.slug}`} className="weather-chip">
@@ -222,7 +222,7 @@ export default async function DecidePage({
               </div>
             </div>
             <div className="space-y-3">
-              <h2 className="text-sm type-eyebrow text-slate-300">More situation help</h2>
+              <h2 className="text-sm type-eyebrow text-slate-300">Help by situation</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
                   <Link key={situation.slug} href={`/answer/${situation.slug}`} className="weather-chip">

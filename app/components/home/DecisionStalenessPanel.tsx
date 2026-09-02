@@ -90,18 +90,22 @@ export function DecisionStalenessPanel({
 
   return (
     <section
-      aria-label="Decisions to reconsider"
+      aria-labelledby="decision-staleness-heading"
       className="weather-section rounded-xl border border-slate-800/70 bg-slate-900/40 p-4"
     >
+      {/* The heading names the list; the count and the all-clear live in the badge beside
+          it, so a zero state never reads as "decisions need attention". */}
       <div className="flex items-center justify-between gap-3">
-        <h2 className="type-section font-semibold tracking-tight text-white">
-          {attentionCount > 0
-            ? `${attentionCount} DECISION${attentionCount === 1 ? "" : "S"} NEED${attentionCount === 1 ? "S" : ""} ATTENTION`
-            : "DECISIONS NEED ATTENTION"}
+        <h2 id="decision-staleness-heading" className="type-section font-semibold tracking-tight text-white">
+          Decisions to reconsider
         </h2>
-        {attentionCount === 0 ? (
+        {attentionCount > 0 ? (
+          <span className="text-fluid-nano font-semibold text-amber-300">
+            {attentionCount} need{attentionCount === 1 ? "s" : ""} attention
+          </span>
+        ) : (
           <span className="text-fluid-nano font-semibold text-emerald-300">All on track</span>
-        ) : null}
+        )}
       </div>
 
       {attentionCount === 0 ? (

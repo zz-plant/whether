@@ -179,7 +179,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 py-6">
-            <h2 className="text-lg font-semibold text-slate-100">The calls, bounded</h2>
+            <h2 className="text-lg font-semibold text-slate-100">Bounded calls</h2>
             <ul className="space-y-4">
               {brief.decisions.map((decision) => (
                 <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">

@@ -59,7 +59,7 @@ export function RegimeStats({ series }: { series: TimeMachineRegimeEntry[] }) {
 
   return (
     <section className="space-y-3">
-      <p className="type-eyebrow">Regime velocity</p>
+      <p className="type-eyebrow">How often the regime changes</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
         <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
           <p className="text-slate-400">Avg duration</p>

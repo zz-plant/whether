@@ -15,7 +15,7 @@ export default function TemplatePage() {
     <PageShell backdropVariant="default">
       <article className="weather-panel space-y-8 px-5 py-5 max-w-2xl">
         <div className="space-y-3">
-          <h1 className="text-fluid-xl font-semibold text-slate-100">Bounded Decision Template</h1>
+          <h1 className="text-fluid-xl font-semibold text-slate-100">Bounded decision template</h1>
           <p className="text-sm text-slate-300 leading-relaxed">
             A bounded decision has three parts. Fill them out before the decision is urgent — 
             that is when the framework is most useful. Print this page or copy the structure 

@@ -85,22 +85,6 @@ export default async function DecideDetailPage({
             })}
           </div>
         </section>
-        <section className="weather-panel space-y-3 px-6 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Try these first</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {recommendedToolkitSlugs.map((slugItem) => {
-              const toolkit = findToolkitDefinition(slugItem);
-              if (!toolkit) return null;
-
-              return (
-                <Link key={`run-now-${slugItem}`} href={`/toolkits/${slugItem}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
-                  <p className="font-semibold">{toolkit.title}</p>
-                  <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
       </ContentPageShell>
     );
   }
@@ -112,7 +96,7 @@ export default async function DecideDetailPage({
         <p className="text-sm text-slate-300">The strongest paths for this decision.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Recommended</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {recommendedToolkitSlugs.map((toolkitSlug) => {
             const toolkit = findToolkitDefinition(toolkitSlug);
@@ -123,22 +107,6 @@ export default async function DecideDetailPage({
                 <p className="font-semibold">{toolkit.title}</p>
                 <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
                 <p className="text-xs text-slate-300">Artifact: {toolkit.decisionArtifact}</p>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Try these first</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {recommendedToolkitSlugs.map((toolkitSlug) => {
-            const toolkit = findToolkitDefinition(toolkitSlug);
-            if (!toolkit) return null;
-
-            return (
-              <Link key={`run-now-${toolkitSlug}`} href={`/toolkits/${toolkitSlug}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
-                <p className="font-semibold">{toolkit.title}</p>
-                <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
               </Link>
             );
           })}

@@ -183,6 +183,34 @@ Hold option alongside the email subscription. The CTA generates a recurring Mond
 event with a link back to `https://whether.work`, giving operators a weekly ritual trigger without
 requiring an email subscription.
 
+### 1.1.6 Heading copy pass (2026-09-02)
+Every h1–h4, eyebrow, and section label in `app/` was inventoried and rewritten against the six
+heading rules now in `docs/editorial-guardrails.md` → Headings (reader's words, eyebrow classifies
+/ heading states, no restating the host, sentence case, one name per thing, counts in a badge).
+What changed for operators:
+- `/`: the staleness panel's h2 is "Decisions to reconsider" with the count in a badge (was
+  "N DECISIONS NEED ATTENTION", asserted even at zero); the plan tester is "Plan stress test" here
+  and on `/operate` (was "Instant Plan Red-Team" / "AI Plan Stress-Tester").
+- `/operate`: the Share, Rules, Test, and Brief steps pass `hideHeader` to their inner
+  `ReportSection` (ids and sr-only headings kept), so each step carries one visible heading before
+  its panel. Panel headings are plain English: "Pick a format and copy", "Briefs for each
+  audience", "Decision check / Is this move safe right now?", "Compare two plans", "Memos by
+  executive role", "What operators have asked for next". The escalation block's eyebrow and h2
+  swapped ("Decision help" / "Still have one open question?"); the `decision help` smoke marker
+  still renders.
+- `/signals`: "Closest past cycle" with plain labels replaces the emoji-led analog block; the bare
+  "Trends" eyebrow is a heading naming both series.
+- `/trust`: h1 "How much to trust this week's call" (was "Forecast confidence"); the two "Source…"
+  sections are "Sources and last update" and "Cite this call"; the trust board's lanes are "What
+  you can approve" and "Data reliability".
+- `/history`: one h1 (the shell's); "/history/compare" says period, not epoch, in sentence case,
+  and reads its slot labels from `DECISION_CONTRACT_LABELS`.
+- Shared: "Decision contract" → "This week's bounded call"; "Continue decision flow" → "Where to
+  go next"; the mobile drawer group is "Product"; the IA label is "Compare periods".
+- Guardrails: Invariant 8 (slot labels) now matches case-insensitively, which also moved the
+  weekly email, decision alert, and share-image labels onto the constant; Invariant 9 fails on
+  any retired heading term returning to `app/` or `lib/`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

@@ -11,7 +11,7 @@ type PillarCtaBlockProps = {
 export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel }: PillarCtaBlockProps) {
   return (
     <section className="weather-panel space-y-3 border border-emerald-400/45 bg-emerald-500/10 px-6 py-6">
-      <p className="type-eyebrow text-emerald-200">Board CTA</p>
+      <p className="type-eyebrow text-emerald-200">Next step</p>
       <h3 className="text-xl font-semibold text-slate-100">{title}</h3>
       <p className="text-sm text-slate-200">{body}</p>
       <div className="flex flex-wrap gap-3">

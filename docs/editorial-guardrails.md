@@ -116,3 +116,33 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   diverge, flip describes the call reversal, transition describes forecast changes.
 - **Confidence is "Confidence", not "Call certainty"** on screens and gauges. "Certainty"
   is retired; do not reintroduce it as a user-facing label.
+
+## Headings (h1–h4, eyebrows, section labels)
+
+Headings are the scan path: an operator reads the heading, decides whether the block matters
+this week, and moves on. Six rules, each written after a real drift found by the 2026-09-02
+inventory of every heading in `app/`:
+
+- **A heading names what the reader gets, in the reader's words.** No codenames, framework
+  terms, or engine vocabulary. Retired from user-visible text: "Decision contract" (now "This
+  week's bounded call"), "Continue decision flow" ("Where to go next"), "Epoch" ("period"),
+  "Transmission Synthesizer", "Operator Loop", "Canon references", "Included instruments",
+  "Other handoffs", "Red-Team" and "Stress-Tester" (both "Plan stress test"), "Post-MVP", and a
+  visible "Primary keyword:" eyebrow. Invariant 9 in `tests/architectureInvariants.test.ts`
+  fails on any of them in a non-comment line under `app/` or `lib/`.
+- **Eyebrow classifies, heading states, description elaborates.** The eyebrow is the shortest
+  of the three. Never put the sentence in the eyebrow and the label in the heading — "Escalate
+  only if one question remains" over "Decision help" was the inverted case.
+- **A nested section does not restate its host.** Inside a stepper step or a panel that already
+  names it, pass `hideHeader` (`docs/agents/ui-ux-standards.md` → XI) or give it a strictly
+  more specific title. Four "share" headings on one `/operate` step was the failure case.
+- **Sentence case everywhere.** Capitals only for proper nouns: Whether, Boldness Budget, the
+  weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
+  emoji in a heading or label.
+- **One name per thing, across surfaces.** The paste-a-plan tester is "Plan stress test" on `/`
+  and `/operate`; the single-decision block is "This week's bounded call"; a per-area list is
+  "Bounded calls". Slot labels come from `DECISION_CONTRACT_LABELS`, and a Title Case variant
+  ("Action Now", "Pause Guardrail") is still a synonym — Invariant 8 matches case-insensitively.
+- **Counts and states live in a badge, not the heading.** "3 DECISIONS NEED ATTENTION" became
+  "Decisions to reconsider" with a count badge beside it, and a zero state never asserts a
+  problem.

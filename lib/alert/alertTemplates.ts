@@ -93,10 +93,7 @@ export const decisionVerdictEmail = ({
       sectionBlock("Why", why),
       `</div>`,
       `<div style="margin-top:12px;">`,
-      // "Action Now" is this template's own casing, not
-      // DECISION_CONTRACT_LABELS.action.actionNow ("Action now"). Reconciling the
-      // two is a copy change to sent email, not this refactor.
-      sectionBlock("Action Now", actionNow),
+      sectionBlock(DECISION_CONTRACT_LABELS.action.actionNow, actionNow),
       `</div>`,
       `<div style="margin-top:12px;">`,
       sectionBlock(DECISION_CONTRACT_LABELS.reversal.reversal, reversal, "#94a3b8", "#f1f5f9"),

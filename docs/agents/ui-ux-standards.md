@@ -95,6 +95,9 @@
   (e.g. step "Test a decision" → section "Is this move safe right now?").
 - NEVER: repeat a section's full description in both a checklist/index entry and that section's own
   header. The index carries titles; the section carries the description.
+- Heading *copy* — what a heading may say, casing, one name per thing — is governed by
+  `docs/editorial-guardrails.md` → Headings. This section governs where headers appear; that one
+  governs what they say.
 
 ## XII. Disclosure (what earns collapsing, and what carries its state)
 

@@ -378,9 +378,9 @@ export const DecisionShieldPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="type-label text-slate-400">Decision Shield</p>
+            <p className="type-label text-slate-400">Decision check</p>
             <h3 id="decision-shield-title" className="type-section text-slate-100">
-              Commit to the next move
+              Is this move safe right now?
             </h3>
             <p className="mt-2 type-data text-slate-300">
               Apply this week&apos;s call to a specific decision, then share the readout with your team.
@@ -498,7 +498,7 @@ export const DecisionShieldPanel = ({
             <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-100">AI Plan Stress-Tester</h4>
+                  <h4 className="text-sm font-bold text-slate-100">Plan stress test</h4>
                   <p className="text-fluid-xs text-slate-400">
                     Paste any planned hiring, infra, or contract decision. Tested against live macro tightness &amp; curve slope.
                   </p>
@@ -597,7 +597,7 @@ export const DecisionShieldPanel = ({
           {planMode === "compare" && (
             <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
               <div>
-                <h4 className="text-sm font-bold text-slate-100">Side-by-Side Plan Comparison</h4>
+                <h4 className="text-sm font-bold text-slate-100">Compare two plans</h4>
                 <p className="text-fluid-xs text-slate-400">
                   Audit two alternative initiatives to determine which path carries lower macro vulnerability.
                 </p>

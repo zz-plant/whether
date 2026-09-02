@@ -134,7 +134,7 @@ export default async function SignalsPage({
       />
 
       <div id="trends" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
-        <p className="type-eyebrow">Trends</p>
+        <h2 className="type-eyebrow">Funding pressure and risk appetite over time</h2>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
         <div className="grid gap-6 sm:grid-cols-2">
@@ -147,36 +147,36 @@ export default async function SignalsPage({
       <div id="analog-pattern" className="weather-panel scroll-mt-28 p-5 border border-sky-500/30 bg-slate-900/60 shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <p className="type-label text-sky-400 font-semibold">Macro Pattern Recognition</p>
+            <p className="type-label text-sky-400 font-semibold">Historical analog</p>
             <h3 className="text-base font-bold text-slate-100">
-              Closest Historical Cycle: {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} ({getHistoricalAnalogPlaybook(model.assessment).correlationScore}% Match)
+              Closest past cycle: {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} ({getHistoricalAnalogPlaybook(model.assessment).correlationScore}% match)
             </h3>
             <p className="text-fluid-xs text-slate-400 mt-0.5">
               Live macro coordinates match conditions during {getHistoricalAnalogPlaybook(model.assessment).analogPeriod}.
             </p>
           </div>
           <span className="self-start sm:self-auto px-3 py-1 text-xs font-bold rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40">
-            {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} Analog
+            {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} analog
           </span>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
           <div className="rounded-lg bg-rose-950/20 border border-rose-500/30 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-rose-300 tracking-wider">⚠️ The Consensus Trap</p>
+            <p className="text-fluid-nano uppercase font-bold text-rose-300 tracking-wider">What consensus got wrong</p>
             <p className="text-fluid-xs text-rose-100/90 mt-1 leading-relaxed">
               {getHistoricalAnalogPlaybook(model.assessment).consensusTrap}
             </p>
           </div>
 
           <div className="rounded-lg bg-emerald-950/20 border border-emerald-500/30 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-emerald-300 tracking-wider">🏆 The Winning Move</p>
+            <p className="text-fluid-nano uppercase font-bold text-emerald-300 tracking-wider">What worked</p>
             <p className="text-fluid-xs text-emerald-100/90 mt-1 leading-relaxed">
               {getHistoricalAnalogPlaybook(model.assessment).winningMove}
             </p>
           </div>
 
           <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-slate-300 tracking-wider">🔄 Reversal Marker</p>
+            <p className="text-fluid-nano uppercase font-bold text-slate-300 tracking-wider">What marked the turn</p>
             <p className="text-fluid-xs text-slate-300 mt-1 leading-relaxed">
               {getHistoricalAnalogPlaybook(model.assessment).reversalMarker}
             </p>

@@ -74,7 +74,7 @@ export function MobileNavContent({ navigationLinks, currentPathname, onClose }: 
       <div className="space-y-4">
         <div>
           <p className="px-4 type-eyebrow mb-1.5">
-            Operator Loop
+            Product
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
             {navigationLinks.map((link) => {

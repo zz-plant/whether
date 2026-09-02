@@ -44,7 +44,7 @@ const ogFontFaces = [
 ];
 
 const baseProps: CompareOgImageProps = {
-  headline: "Cloudy to Sunny · boldness +12 across two epochs",
+  headline: "Cloudy to Sunny · boldness +12 across two periods",
   epochA: {
     label: "Mar 2024",
     recordDate: "Mar 3, 2024",
@@ -92,9 +92,9 @@ describe("epoch compare OG template", () => {
 });
 
 describe("loadComparePreview", () => {
-  it("defaults to a fixed comparison when no epochs are selected", async () => {
+  it("defaults to a fixed comparison when no periods are selected", async () => {
     const preview = await loadComparePreview();
-    assert.equal(preview.eyebrow, "Epoch Comparison");
-    assert.match(preview.headline, /across two epochs/);
+    assert.equal(preview.eyebrow, "Compare periods");
+    assert.match(preview.headline, /across two periods/);
   });
 });

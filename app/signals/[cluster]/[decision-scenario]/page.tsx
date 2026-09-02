@@ -146,7 +146,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         ) : null}
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Decision contract</h2>
+        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s bounded call</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>
@@ -187,7 +187,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         />
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
           <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence cluster</Link>

@@ -52,7 +52,7 @@ export default function ApiDocsPage() {
   return (
     <PageShell backdropVariant="default">
       <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
-        <h1 className="text-fluid-xl font-semibold text-slate-100">API &amp; Agent Tools</h1>
+        <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Whether exposes the weekly brief through an MCP server, REST endpoints, a command-line
           client, and an embeddable widget. No API key required.

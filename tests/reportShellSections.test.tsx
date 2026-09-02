@@ -65,8 +65,8 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Approval readiness/);
-    assert.match(html, /Approval lane/);
-    assert.match(html, /Reliability window/);
+    assert.match(html, /What you can approve/);
+    assert.match(html, /Data reliability/);
     assert.match(html, /Source board/);
     assert.match(html, /\/trust#source-board/);
   });

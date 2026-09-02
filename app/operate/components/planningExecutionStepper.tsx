@@ -149,8 +149,7 @@ export function OperationsExecutionStepper({
         <div className="max-w-3xl">
           <div className="flex items-baseline justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Planning</p>
-              <h2 className="mt-1 text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s checklist</h2>
+              <h2 className="text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s checklist</h2>
             </div>
             <span className="text-fluid-xs font-medium text-slate-400 tabular-nums">
               {completedCount}/{steps.length}

@@ -50,8 +50,8 @@ export default async function MethodPage({
     <>
       <ReportSection
         id="source-board"
-        title="Source board"
-        description="The compact source handoff behind the homepage trust board."
+        title="Sources and last update"
+        description="Where each feed comes from and when it last refreshed."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
@@ -86,7 +86,7 @@ export default async function MethodPage({
               Check whether the weekly call is current enough to share or approve against.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#sources-freshness" variant="pill">Full freshness check</ActionLink>
+              <ActionLink href="#sources-freshness" variant="pill">Citation line</ActionLink>
               <ActionLink href="#meeting-snippet" variant="pill">Meeting snippet</ActionLink>
             </div>
           </article>
@@ -95,8 +95,8 @@ export default async function MethodPage({
 
       <ReportSection
         id="sources-freshness"
-        title="Sources and freshness"
-        description="Where the current recommendation came from and how current it is."
+        title="Cite this call"
+        description="The one-line citation for a recap or sourcing note."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
@@ -132,7 +132,7 @@ export default async function MethodPage({
               If a warning or revisit trigger fires, confirm freshness before moving ahead.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#sources-freshness" variant="pill">Recheck freshness</ActionLink>
+              <ActionLink href="#source-board" variant="pill">Recheck freshness</ActionLink>
               <ActionLink href="#revisit-call" variant="pill">Revisit triggers</ActionLink>
             </div>
           </article>
@@ -276,7 +276,7 @@ export default async function MethodPage({
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none"
           summary={
             <>
-              <span>Detailed verification &amp; source board</span>
+              <span>Detailed verification &amp; sources</span>
               <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
                 ▾
               </span>
