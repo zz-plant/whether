@@ -18,9 +18,6 @@ const OG_HEIGHT = 630;
 
 type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare";
 
-/** Lens templates, i.e. every one that is not data-driven. */
-type StaticOgTemplate = Exclude<OgTemplate, "report" | "brief-chart" | "compare">;
-
 const regimeKeys = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
 const normalizeRegime = (value: string): RegimeKey =>

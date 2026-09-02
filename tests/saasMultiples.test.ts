@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import {
   QuoteSourceUnavailableError,
+  fetchAlphaVantageValuation,
   fetchQuote,
   fetchSaaSValuations,
+  resolveMarketDataProvider,
   SAAS_BASKET,
 } from "../lib/saasMultiples";
 
@@ -67,5 +69,95 @@ describe("fetchSaaSValuations", () => {
     assert.equal(snapshot.companyCount, 1);
     assert.equal(snapshot.medianEvToRevenue, 100);
     assert.equal(snapshot.medianRevenueGrowth, 25);
+  });
+});
+
+describe("Alpha Vantage provider", () => {
+  const overviewBody = (evToRevenue: string, growth: string) =>
+    JSON.stringify({ Symbol: "CRM", Name: "Salesforce", EVToRevenue: evToRevenue, QuarterlyRevenueGrowthYOY: growth });
+
+  it("reads EV/Revenue and growth straight from OVERVIEW", async () => {
+    const seen: string[] = [];
+    stubFetch((url) => {
+      seen.push(url);
+      return new Response(overviewBody("7.85", "0.11"));
+    });
+
+    const result = await fetchAlphaVantageValuation("CRM", "k3y");
+
+    assert.deepEqual(result, { status: "ok", evToRevenue: 7.85, revenueGrowth: 0.11 });
+    const url = new URL(seen[0]);
+    assert.equal(url.searchParams.get("function"), "OVERVIEW");
+    assert.equal(url.searchParams.get("symbol"), "CRM");
+    assert.equal(url.searchParams.get("apikey"), "k3y");
+  });
+
+  it("maps the source's None to null instead of a number", async () => {
+    stubFetch(() => new Response(overviewBody("None", "-")));
+    const result = await fetchAlphaVantageValuation("CRM", "k3y");
+    assert.deepEqual(result, { status: "ok", evToRevenue: null, revenueGrowth: null });
+  });
+
+  it("treats a rate-limit notice as the source declining, not as an empty company", async () => {
+    // Alpha Vantage answers 200 with a Note when the daily allowance is spent.
+    stubFetch(() => new Response(JSON.stringify({ Note: "Thank you for using Alpha Vantage! Our standard API rate limit is 25 requests per day." })));
+    const result = await fetchAlphaVantageValuation("CRM", "k3y");
+    assert.equal(result.status, "unavailable");
+  });
+
+  it("treats an empty object as an unknown symbol", async () => {
+    stubFetch(() => new Response("{}"));
+    const result = await fetchAlphaVantageValuation("NOTATICKER", "k3y");
+    assert.equal(result.status, "missing");
+  });
+
+  it("never repeats the key in a failure reason", async () => {
+    spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      throw new Error(`connect failed for ${input.toString()}`);
+    });
+    const result = await fetchAlphaVantageValuation("CRM", "k3y-secret");
+    assert.equal(result.status, "unavailable");
+    assert.ok(result.status === "unavailable" && !result.reason.includes("k3y-secret"));
+  });
+
+  it("runs the basket on Alpha Vantage when a key is configured, and says so", async () => {
+    const previous = process.env.ALPHA_VANTAGE_API_KEY;
+    process.env.ALPHA_VANTAGE_API_KEY = "k3y";
+    try {
+      assert.equal(resolveMarketDataProvider(), "alpha-vantage");
+      stubFetch((url) =>
+        url.includes("alphavantage.co")
+          ? new Response(overviewBody("8.2", "0.2"))
+          : new Response("Yahoo must not be called", { status: 500 }),
+      );
+
+      const snapshot = await fetchSaaSValuations();
+
+      assert.equal(snapshot.source, "alpha-vantage");
+      assert.equal(snapshot.companyCount, SAAS_BASKET.length);
+      assert.equal(snapshot.medianEvToRevenue, 8.2);
+      assert.equal(snapshot.medianRevenueGrowth, 20);
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ALPHA_VANTAGE_API_KEY;
+      } else {
+        process.env.ALPHA_VANTAGE_API_KEY = previous;
+      }
+    }
+  });
+
+  it("stays on Yahoo without a key, and says so", async () => {
+    const previous = process.env.ALPHA_VANTAGE_API_KEY;
+    delete process.env.ALPHA_VANTAGE_API_KEY;
+    try {
+      assert.equal(resolveMarketDataProvider(), "yahoo");
+      stubFetch(() => new Response(quoteBody(1_000_000, 0.2)));
+      const snapshot = await fetchSaaSValuations();
+      assert.equal(snapshot.source, "yahoo");
+    } finally {
+      if (previous !== undefined) {
+        process.env.ALPHA_VANTAGE_API_KEY = previous;
+      }
+    }
   });
 });

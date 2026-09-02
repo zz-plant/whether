@@ -205,9 +205,31 @@ const concurrency = process.env.BUN_TEST_CONCURRENCY ?? (inDeployGate ? '2' : '8
  * NODE_ENV is not a result about the code, so the runner pins it. Overridable, for
  * the one run that deliberately wants another mode.
  */
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...targetArgs], {
+const childEnv = { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?? 'test' };
+/*
+ * The suite serves its own upstreams. A data key in the developer's shell would route
+ * FRED or market-data reads to the real API in the middle of a test and make a fixture
+ * miss, so the runner strips them: a result that depends on what happens to be exported
+ * in a shell is not a result about the code.
+ */
+for (const key of ['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY']) {
+  delete childEnv[key];
+}
+
+/*
+ * Order. Bun runs every file in one process, so module-level state (mock.module patches,
+ * memoized loaders, the FRED circuit breaker) leaks between files, and a suite that only
+ * ever runs in one order can pass because of that order — CLAUDE.md records a build that
+ * did. The deploy gate shuffles; bun prints the seed on every run, and BUN_TEST_SEED=<seed>
+ * replays one. A local run keeps a fixed order unless BUN_TEST_RANDOMIZE=1 asks otherwise.
+ */
+const randomize = inDeployGate || process.env.BUN_TEST_RANDOMIZE === '1';
+const seed = process.env.BUN_TEST_SEED;
+const orderArgs = seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : [];
+
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...orderArgs, ...targetArgs], {
   stdio: 'inherit',
-  env: { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?? 'test' },
+  env: childEnv,
 });
 
 child.on('exit', (code, signal) => {

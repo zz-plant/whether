@@ -9,9 +9,7 @@
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
 import {
-  buildWeeklyOperatorBriefCopyText,
 } from "../../../lib/report/home/artifactPayload";
-import { buildWeeklyTrustCueLine } from "../../../lib/report/trustStatus";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
@@ -53,24 +51,7 @@ export async function GET(request: Request) {
     const reversalCondition = "Two consecutive weeks of confirming signals";
     const dataFreshness = homepage.reportShell.fetchedAtLabel;
 
-    const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
-      assessment: reportData.assessment,
-      treasury: reportData.treasury,
-      date: reportData.weeklyRecordDate,
-      postureWithStageLabel: postureLabel,
-      confidenceLabel,
-      actionStripItems: actionItems,
-      flipConditionLabels,
-      canonicalDecisionCopy: canonicalDecision,
-      weeklyCall: homepage.weeklyCall,
-      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
-    });
 
-    const trustCue = buildWeeklyTrustCueLine({
-      confidenceLabel,
-      freshnessLabel: homepage.reportShell.fetchedAtLabel,
-      transitionWatch: "OFF",
-    });
 
     const briefUrl = buildWhetherBriefUrl({ ticker: tickerParam, ref });
     const attributionUrl = buildWhetherBriefUrl({ ref });

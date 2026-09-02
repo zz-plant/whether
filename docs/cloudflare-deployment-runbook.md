@@ -43,6 +43,58 @@ task and attaches its output.
 If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
 in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
 
+## Tracing
+
+`wrangler.toml` enables Workers automatic tracing (open beta) on both lanes under
+`[observability.traces]` with `head_sampling_rate = 1`. The runtime emits spans for every handler
+invocation, external fetch, and KV or Durable Object operation, with no code change. Export goes
+to an OTLP destination configured in the dashboard (Observability → Destinations); Honeycomb,
+Grafana Cloud, Axiom, and Sentry all accept it. Spans are billed from October 2026, and
+`head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
+against the 10s read deadline, what wrote to KV on a read) need a fraction of traffic.
+
+## Secrets and provider keys
+
+Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
+preview lane) and reach library code through `globalThis`, like every binding. None is required;
+each one switches a read from a keyless path to a keyed one.
+
+| Secret | Read by | Without it |
+| --- | --- | --- |
+| `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
+| `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts` | The regime-history Workflow fails at its PR step, loudly. Fine-grained token: contents and pull requests, write, on this repository only. |
+
+The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
+which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
+
+## Trial infrastructure
+
+Two platform pieces are declared on both lanes and switched on by `[vars]` on the preview lane
+only, so production keeps its current behavior until the trial is promoted:
+
+- **`IngestCoordinator`** (`worker/ingestCoordinator.ts`), a SQLite-backed Durable Object bound
+  as `INGEST_COORDINATOR`, holds the materialized signal model, the refresh lock, and an hourly
+  alarm that refreshes due families. `WHETHER_INGEST_COORDINATOR = "1"` makes
+  `getDefaultIngestionStore()` use it instead of KV. The object's own `GET /status` (reachable
+  from a Worker through the stub, not publicly) reports whether a model exists and when the next
+  alarm fires.
+- **`RegimeHistoryRefreshWorkflow`** (`worker/workflows/regimeHistoryRefresh.ts`), bound as
+  `REGIME_HISTORY_WORKFLOW`, turns the KV month in progress into a pull request against
+  `data/summary_monthly_regime_history.json`. `WHETHER_HISTORY_WORKFLOW = "1"` makes the Monday
+  cron start one instance (`bunx wrangler workflows instances list whether-regime-history-refresh
+  --env preview` shows the runs). It needs `GITHUB_TOKEN` and `GITHUB_REPOSITORY`.
+
+To promote either, copy its var into the production `[vars]` block; to retire it, remove the
+binding and add a `deleted_sqlite_classes` migration for the object. The DO migration list is
+top-level and applies to both lanes, which is why the class is declared on both.
+
+## Validating config without deploying
+
+`bunx wrangler types --env preview <out.d.ts>` parses and validates `wrangler.toml` for a lane
+without network or credentials and prints the bindings it resolved; run it after any config edit.
+The full dry run (`bun run deploy:cloudflare:preview:dry-run`) also builds and packages.
+
 ## Build + deploy commands
 
 This repo now has one Wrangler source of truth with two deployment targets:

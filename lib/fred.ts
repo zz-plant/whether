@@ -10,6 +10,50 @@ export const FRED_FETCH_HEADERS = {
 const isTestRuntime = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
+/**
+ * The FRED API proper, as opposed to the chart export above. It needs a free key, answers
+ * JSON, allows 120 requests a minute per key, and — the reason it matters here — can return
+ * a series as it was known on a past date (ALFRED vintages via realtime_start/realtime_end),
+ * which the CSV export cannot. Docs: https://fred.stlouisfed.org/docs/api/fred/
+ */
+export const FRED_API_BASE_URL = "https://api.stlouisfed.org/fred/series/observations";
+
+const FRED_API_HEADERS = {
+  accept: "application/json",
+  "user-agent": FRED_FETCH_HEADERS["user-agent"],
+} as const;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+/**
+ * The key is a Worker secret (`wrangler secret put FRED_API_KEY`), installed on globalThis
+ * by worker/index.ts like every other binding, or an environment variable for scripts and
+ * local runs. With no key, every read stays on the CSV path it has always used.
+ */
+export const resolveFredApiKey = (): string | null => {
+  const fromBinding: unknown = Reflect.get(globalThis, "FRED_API_KEY");
+  if (typeof fromBinding === "string" && fromBinding.trim() !== "") {
+    return fromBinding.trim();
+  }
+  const fromEnv = typeof process !== "undefined" ? process.env?.FRED_API_KEY : undefined;
+  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
+};
+
+/** A key must never travel in an error message or a log line. */
+export const redactFredApiKey = (text: string) => text.replace(/api_key=[^&\s"']+/g, "api_key=REDACTED");
+
+/** Thrown when a caller asks for a vintage and only the CSV export is available. */
+export class FredVintageUnavailableError extends Error {
+  constructor(seriesId: string) {
+    super(
+      `FRED vintage data for ${seriesId} needs the FRED API (set FRED_API_KEY); ` +
+        "the CSV export only serves the current revision",
+    );
+    this.name = "FredVintageUnavailableError";
+  }
+}
+
 const DEFAULT_TIMEOUT_MS = 8_000;
 const DEFAULT_REVALIDATE_SECONDS = 900;
 const DEFAULT_RETRY_ATTEMPTS = 3;
@@ -149,8 +193,10 @@ export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: stri
 // Without `cosd`, fredgraph.csv returns the full series history (decades of daily
 // rows, hundreds of KB per series). Every consumer needs a bounded window, so
 // callers pass a lookback and we request only that range.
-export const observationStartDateForLookback = (lookbackDays: number): string => {
-  const start = new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000);
+/** `anchor` is an ISO date to count back from; a vintage's window ends at its `asOf`, not today. */
+export const observationStartDateForLookback = (lookbackDays: number, anchor?: string): string => {
+  const end = anchor ? new Date(`${anchor}T00:00:00.000Z`).getTime() : Date.now();
+  const start = new Date(end - lookbackDays * 24 * 60 * 60 * 1000);
   return start.toISOString().slice(0, 10);
 };
 
@@ -165,11 +211,18 @@ export interface FetchFredCsvOptions {
   lookbackDays?: number;
 }
 
-export const fetchFredCsv = async (
-  fetcher: typeof fetch,
-  seriesId: string,
+/**
+ * One circuit breaker and one retry budget for every FRED request, whichever endpoint
+ * serves it: the breaker is about FRED being reachable, not about which URL was asked.
+ */
+const guardedFredRequest = async <T>(
+  attempt: (remainingMs: number) => Promise<T>,
   options?: FetchFredCsvOptions,
-): Promise<string> => {
+  /* An attempt that has a fallback behind it must not count against the breaker: six
+     families ingesting concurrently against a revoked key would otherwise open it before
+     any of their CSV fallbacks ran, and the fallback would fail without a request. */
+  recordFailure = true,
+): Promise<T> => {
   if (cbConsecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD) {
     const withinCooldown =
       cbLastFailureAt !== null && Date.now() - cbLastFailureAt < CIRCUIT_BREAKER_COOLDOWN_MS;
@@ -178,47 +231,190 @@ export const fetchFredCsv = async (
     }
   }
 
-  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const revalidateSeconds = options?.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS;
-
   try {
-    const result = await withRetry(
-      async (remainingMs) => {
-        const response = await fetchWithTimeout(
-          fetcher,
-          buildFredSeriesUrl(
-            seriesId,
-            options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays) : undefined,
-          ),
-          {
-            headers: FRED_FETCH_HEADERS,
-            next: { revalidate: revalidateSeconds },
-          },
-          // An attempt may not outlive the budget shared by the whole sequence.
-          Math.min(timeoutMs, remainingMs),
-        );
-
-        if (!response.ok) {
-          throw new FredResponseError(seriesId, response.status);
-        }
-
-        return response.text();
-      },
-      {
-        attempts: options?.attempts,
-        backoffMs: options?.backoffMs,
-        budgetMs: options?.budgetMs,
-      },
-    );
+    const result = await withRetry(attempt, {
+      attempts: options?.attempts,
+      backoffMs: options?.backoffMs,
+      budgetMs: options?.budgetMs,
+    });
 
     cbConsecutiveFailures = 0;
     cbLastFailureAt = null;
     return result;
   } catch (error) {
-    cbConsecutiveFailures += 1;
-    cbLastFailureAt = Date.now();
+    if (recordFailure) {
+      cbConsecutiveFailures += 1;
+      cbLastFailureAt = Date.now();
+    }
     throw error;
   }
+};
+
+export const fetchFredCsv = async (
+  fetcher: typeof fetch,
+  seriesId: string,
+  options?: FetchFredCsvOptions,
+): Promise<string> => {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const revalidateSeconds = options?.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS;
+
+  return guardedFredRequest(async (remainingMs) => {
+    const response = await fetchWithTimeout(
+      fetcher,
+      buildFredSeriesUrl(
+        seriesId,
+        options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays) : undefined,
+      ),
+      {
+        headers: FRED_FETCH_HEADERS,
+        next: { revalidate: revalidateSeconds },
+      },
+      // An attempt may not outlive the budget shared by the whole sequence.
+      Math.min(timeoutMs, remainingMs),
+    );
+
+    if (!response.ok) {
+      throw new FredResponseError(seriesId, response.status);
+    }
+
+    return response.text();
+  }, options);
+};
+
+export type FredRow = { date: string; value: number };
+
+export interface FredApiUrlOptions {
+  observationStart?: string;
+  /** ISO date. Return the series as it was known on that date (an ALFRED vintage). */
+  asOf?: string;
+}
+
+export const buildFredApiUrl = (seriesId: string, apiKey: string, options: FredApiUrlOptions = {}): string => {
+  const url = new URL(FRED_API_BASE_URL);
+  url.searchParams.set("series_id", seriesId);
+  url.searchParams.set("api_key", apiKey);
+  url.searchParams.set("file_type", "json");
+  if (options.observationStart) {
+    url.searchParams.set("observation_start", options.observationStart);
+  }
+  if (options.asOf) {
+    url.searchParams.set("realtime_start", options.asOf);
+    url.searchParams.set("realtime_end", options.asOf);
+  }
+  return url.toString();
+};
+
+/** The API's JSON body, reduced to the same rows the CSV parser produces. Missing values are ".". */
+export const parseFredApiObservations = (payload: unknown): FredRow[] => {
+  if (!isRecord(payload)) {
+    throw new Error("FRED API returned no observations payload");
+  }
+  const observations = payload.observations;
+  if (!Array.isArray(observations)) {
+    const message = payload.error_message;
+    throw new Error(
+      typeof message === "string" ? `FRED API error: ${redactFredApiKey(message)}` : "FRED API returned no observations array",
+    );
+  }
+  return observations.flatMap((entry): FredRow[] => {
+    if (!isRecord(entry)) return [];
+    const { date, value } = entry;
+    if (typeof date !== "string" || typeof value !== "string" || value === ".") return [];
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? [{ date, value: parsed }] : [];
+  });
+};
+
+export interface FetchFredRowsOptions extends FetchFredCsvOptions {
+  /** ISO date: observations as known on that date. Needs the API; the CSV export cannot serve it. */
+  asOf?: string;
+  /** Overrides key resolution. `null` forces the CSV path; omit to read the binding or env. */
+  apiKey?: string | null;
+}
+
+const redactError = (error: unknown) => {
+  if (error instanceof Error) {
+    error.message = redactFredApiKey(error.message);
+  }
+  return error;
+};
+
+const fetchFredApiRowsGuarded = async (
+  fetcher: typeof fetch,
+  seriesId: string,
+  apiKey: string,
+  options: FetchFredRowsOptions | undefined,
+  recordFailure: boolean,
+): Promise<FredRow[]> => {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const revalidateSeconds = options?.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS;
+
+  try {
+    return await guardedFredRequest(async (remainingMs) => {
+      const response = await fetchWithTimeout(
+        fetcher,
+        buildFredApiUrl(seriesId, apiKey, {
+          // A vintage's window counts back from its own date, not from today.
+          observationStart: options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays, options.asOf) : undefined,
+          asOf: options?.asOf,
+        }),
+        { headers: FRED_API_HEADERS, next: { revalidate: revalidateSeconds } },
+        Math.min(timeoutMs, remainingMs),
+      );
+
+      if (!response.ok) {
+        throw new FredResponseError(seriesId, response.status);
+      }
+
+      return parseFredApiObservations(await response.json());
+    }, options, recordFailure);
+  } catch (error) {
+    throw redactError(error);
+  }
+};
+
+export const fetchFredApiRows = (
+  fetcher: typeof fetch,
+  seriesId: string,
+  apiKey: string,
+  options?: FetchFredRowsOptions,
+): Promise<FredRow[]> => fetchFredApiRowsGuarded(fetcher, seriesId, apiKey, options, true);
+
+/**
+ * Observations for a series, from the API when a key is configured and from the CSV export
+ * otherwise. An API failure falls back to the CSV export so a revoked key degrades to the
+ * path the site ran on for years — except for a vintage request, which only the API can
+ * answer and which must fail rather than quietly return today's revision.
+ */
+export const fetchFredRows = async (
+  fetcher: typeof fetch,
+  seriesId: string,
+  options?: FetchFredRowsOptions,
+): Promise<FredRow[]> => {
+  const apiKey = options?.apiKey === undefined ? resolveFredApiKey() : options.apiKey;
+
+  if (options?.asOf && !apiKey) {
+    throw new FredVintageUnavailableError(seriesId);
+  }
+
+  if (apiKey) {
+    // With a CSV fallback behind it, an API failure is not yet a FRED failure: it must not
+    // open the breaker that the fallback is about to check.
+    const hasFallback = !options?.asOf;
+    try {
+      return await fetchFredApiRowsGuarded(fetcher, seriesId, apiKey, options, !hasFallback);
+    } catch (error) {
+      if (!hasFallback) {
+        throw error;
+      }
+      console.warn(
+        `[fred] API request failed for ${seriesId}; using the CSV export instead:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
+  }
+
+  return parseFredCsvRows(await fetchFredCsv(fetcher, seriesId, options));
 };
 
 export const parseFredCsvRows = (csv: string): { date: string; value: number }[] =>
@@ -234,12 +430,11 @@ export const parseFredCsvRows = (csv: string): { date: string; value: number }[]
     }))
     .filter((point) => Number.isFinite(point.value));
 
-export const findLatestFredRow = (csv: string): { observedAt: string; value: number } => {
-  const rows = parseFredCsvRows(csv);
+export const latestFredObservation = (rows: FredRow[], seriesId?: string): { observedAt: string; value: number } => {
   const latest = rows[rows.length - 1];
 
   if (!latest) {
-    throw new Error("No FRED rows found");
+    throw new Error(seriesId ? `No FRED rows found for ${seriesId}` : "No FRED rows found");
   }
 
   return {
@@ -247,6 +442,9 @@ export const findLatestFredRow = (csv: string): { observedAt: string; value: num
     value: latest.value,
   };
 };
+
+export const findLatestFredRow = (csv: string): { observedAt: string; value: number } =>
+  latestFredObservation(parseFredCsvRows(csv));
 
 const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 

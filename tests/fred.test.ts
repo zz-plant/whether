@@ -1,10 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "bun:test";
 import {
+  FRED_API_BASE_URL,
+  FRED_BASE_URL,
   FredResponseError,
+  FredVintageUnavailableError,
+  fetchFredApiRows,
   fetchFredCsv,
+  fetchFredRows,
   isRetryableFredError,
   resetFredCircuitBreaker,
+  resolveFredApiKey,
   getFredCircuitBreakerState,
   withRetry,
 } from "../lib/fred";
@@ -225,5 +231,211 @@ describe("withRetry — budget", () => {
     );
 
     assert.equal(calls, 1);
+  });
+});
+
+describe("fetchFredRows — API path", () => {
+  beforeEach(() => {
+    resetFredCircuitBreaker();
+  });
+
+  const API_BODY = JSON.stringify({
+    realtime_start: "2024-01-05",
+    realtime_end: "2024-01-05",
+    observations: [
+      { realtime_start: "2024-01-02", realtime_end: "9999-12-31", date: "2024-01-01", value: "4.00" },
+      { realtime_start: "2024-01-03", realtime_end: "9999-12-31", date: "2024-01-02", value: "." },
+      { realtime_start: "2024-01-04", realtime_end: "9999-12-31", date: "2024-01-03", value: "4.02" },
+    ],
+  });
+
+  const recordingFetcher = (respond: (url: string) => Response, calls: string[]): typeof fetch =>
+    async (input) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      calls.push(url);
+      return respond(url);
+    };
+
+  it("stays on the CSV export when no key is configured", async () => {
+    const calls: string[] = [];
+    const rows = await fetchFredRows(recordingFetcher(() => new Response(FRED_CSV), calls), "DGS10", {
+      apiKey: null,
+      backoffMs: 0,
+    });
+
+    assert.equal(calls.length, 1);
+    assert.ok(calls[0].startsWith(FRED_BASE_URL), "no key means the CSV export");
+    assert.equal(rows.length, 2);
+  });
+
+  it("asks the API for JSON with the key and the lookback window when a key is given", async () => {
+    const calls: string[] = [];
+    const rows = await fetchFredRows(recordingFetcher(() => new Response(API_BODY), calls), "DGS10", {
+      apiKey: "abc123",
+      lookbackDays: 30,
+      backoffMs: 0,
+    });
+
+    const url = new URL(calls[0]);
+    assert.equal(`${url.origin}${url.pathname}`, FRED_API_BASE_URL);
+    assert.equal(url.searchParams.get("series_id"), "DGS10");
+    assert.equal(url.searchParams.get("api_key"), "abc123");
+    assert.equal(url.searchParams.get("file_type"), "json");
+    assert.match(url.searchParams.get("observation_start") ?? "", /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(url.searchParams.get("realtime_start"), null, "no vintage unless asked");
+    // The missing value "." is dropped, as the CSV parser drops it.
+    assert.deepEqual(rows, [
+      { date: "2024-01-01", value: 4 },
+      { date: "2024-01-03", value: 4.02 },
+    ]);
+  });
+
+  it("pins a vintage with realtime_start and realtime_end", async () => {
+    const calls: string[] = [];
+    await fetchFredRows(recordingFetcher(() => new Response(API_BODY), calls), "UNRATE", {
+      apiKey: "abc123",
+      asOf: "2024-03-31",
+      backoffMs: 0,
+    });
+
+    const url = new URL(calls[0]);
+    assert.equal(url.searchParams.get("realtime_start"), "2024-03-31");
+    assert.equal(url.searchParams.get("realtime_end"), "2024-03-31");
+  });
+
+  it("refuses a vintage request without a key rather than returning today's revision", async () => {
+    const calls: string[] = [];
+    await assert.rejects(
+      fetchFredRows(recordingFetcher(() => new Response(FRED_CSV), calls), "UNRATE", { apiKey: null, asOf: "2024-03-31" }),
+      FredVintageUnavailableError,
+    );
+    assert.equal(calls.length, 0, "nothing was fetched");
+  });
+
+  it("falls back to the CSV export when the API rejects the key, and never repeats the key", async () => {
+    const calls: string[] = [];
+    const warnings: string[] = [];
+    const originalWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args.map(String).join(" "));
+    };
+
+    try {
+      const rows = await fetchFredRows(
+        recordingFetcher(
+          (url) =>
+            url.startsWith(FRED_API_BASE_URL)
+              ? new Response(JSON.stringify({ error_code: 400, error_message: "Bad Request. The value for variable api_key is not registered." }), { status: 400 })
+              : new Response(FRED_CSV),
+          calls,
+        ),
+        "DGS10",
+        { apiKey: "secret-key-123", backoffMs: 0 },
+      );
+
+      assert.equal(rows.length, 2, "served from the CSV export");
+      assert.ok(calls.some((url) => url.startsWith(FRED_API_BASE_URL)), "the API was tried first");
+      assert.ok(calls.some((url) => url.startsWith(FRED_BASE_URL)), "then the CSV export");
+      assert.equal(warnings.length, 1, "one warning names the fallback");
+      assert.ok(!warnings[0].includes("secret-key-123"), "the key does not appear in the warning");
+    } finally {
+      console.warn = originalWarn;
+    }
+  });
+
+  it("keeps the breaker closed while keyed reads fall back concurrently, so every fallback runs", async () => {
+    // Six families ingest at once. A revoked key fails all six API attempts together; before
+    // the fix the third failure opened the shared breaker and the remaining CSV fallbacks
+    // threw "circuit breaker open" without a request.
+    const calls: string[] = [];
+    const fetcher = recordingFetcher(
+      (url) =>
+        url.startsWith(FRED_API_BASE_URL)
+          ? new Response(JSON.stringify({ error_code: 400, error_message: "Bad Request. The value for variable api_key is not registered." }), { status: 400 })
+          : new Response(FRED_CSV),
+      calls,
+    );
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    try {
+      const results = await Promise.all(
+        ["DGS10", "BAA10Y", "UNRATE", "CPIAUCSL", "NFCI", "VIXCLS"].map((series) =>
+          fetchFredRows(fetcher, series, { apiKey: "revoked", backoffMs: 0 }),
+        ),
+      );
+      assert.ok(results.every((rows) => rows.length === 2), "every series was served from the CSV export");
+      assert.equal(calls.filter((url) => url.startsWith(FRED_BASE_URL)).length, 6, "every fallback made its request");
+      assert.equal(getFredCircuitBreakerState().open, false);
+      assert.equal(getFredCircuitBreakerState().consecutiveFailures, 0, "API failures with a fallback behind them do not count");
+    } finally {
+      console.warn = originalWarn;
+    }
+  });
+
+  it("counts an API failure against the breaker when nothing can fall back", async () => {
+    const fetcher = recordingFetcher(() => new Response("down", { status: 503 }), []);
+    await assert.rejects(fetchFredApiRows(fetcher, "DGS10", "abc123", { backoffMs: 0, attempts: 1 }));
+    assert.equal(getFredCircuitBreakerState().consecutiveFailures, 1);
+  });
+
+  it("anchors a vintage's lookback window to the requested date, not today", async () => {
+    const calls: string[] = [];
+    await fetchFredRows(recordingFetcher(() => new Response(API_BODY), calls), "UNRATE", {
+      apiKey: "abc123",
+      asOf: "2024-03-31",
+      lookbackDays: 90,
+      backoffMs: 0,
+    });
+
+    const url = new URL(calls[0]);
+    assert.equal(url.searchParams.get("observation_start"), "2024-01-01", "ninety days before the vintage date");
+    assert.equal(url.searchParams.get("realtime_start"), "2024-03-31");
+  });
+
+  it("does not fall back for a vintage: the CSV export cannot serve one", async () => {
+    const calls: string[] = [];
+    await assert.rejects(
+      fetchFredRows(recordingFetcher(() => new Response("down", { status: 503 }), calls), "DGS10", {
+        apiKey: "abc123",
+        asOf: "2024-03-31",
+        backoffMs: 0,
+        attempts: 1,
+      }),
+      FredResponseError,
+    );
+    assert.ok(calls.every((url) => url.startsWith(FRED_API_BASE_URL)), "the CSV export was never tried");
+  });
+
+  it("redacts the key from any error it throws", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      throw new Error(`connect failed for ${typeof input === "string" ? input : input instanceof URL ? input.href : input.url}`);
+    };
+
+    await assert.rejects(
+      fetchFredApiRows(fetcher, "DGS10", "topsecret", { backoffMs: 0, attempts: 1 }),
+      (error: unknown) =>
+        error instanceof Error && !error.message.includes("topsecret") && error.message.includes("api_key=REDACTED"),
+    );
+  });
+
+  it("resolves the key from the Worker binding before the environment", () => {
+    const previous = process.env.FRED_API_KEY;
+    delete process.env.FRED_API_KEY;
+    try {
+      assert.equal(resolveFredApiKey(), null);
+
+      process.env.FRED_API_KEY = "from-env";
+      assert.equal(resolveFredApiKey(), "from-env");
+
+      Object.assign(globalThis, { FRED_API_KEY: " from-binding " });
+      assert.equal(resolveFredApiKey(), "from-binding", "the binding wins and is trimmed");
+    } finally {
+      Reflect.deleteProperty(globalThis, "FRED_API_KEY");
+      if (previous === undefined) {
+        delete process.env.FRED_API_KEY;
+      } else {
+        process.env.FRED_API_KEY = previous;
+      }
+    }
   });
 });

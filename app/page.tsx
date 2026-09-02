@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
@@ -22,7 +21,6 @@ import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/ca
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
-  DIRECTION_ARROW,
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";

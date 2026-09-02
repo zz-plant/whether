@@ -96,7 +96,7 @@ const probeAssetUrl = async (assetUrl) => {
       ok: response.ok,
       status: response.status,
     };
-  } catch (error) {
+  } catch {
     try {
       const fallbackResponse = await fallbackFetch();
       return {

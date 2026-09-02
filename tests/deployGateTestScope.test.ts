@@ -114,6 +114,20 @@ describe("deploy gate resource defaults", () => {
     assert.match(runner, /NODE_ENV: process\.env\.WHETHER_TEST_NODE_ENV \?\? 'test'/);
   });
 
+  it("shuffles test order in the gate and lets a seed replay it", async () => {
+    // One process runs every file, so module state leaks between them and a fixed order
+    // can hide a dependency until the container orders the suite differently.
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.match(runner, /const randomize = inDeployGate \|\| process\.env\.BUN_TEST_RANDOMIZE === '1'/);
+    assert.match(runner, /--seed=\$\{seed\}/);
+    assert.ok(runner.includes("...orderArgs"), "the order flags never reach the spawned bun test");
+  });
+
+  it("strips data-provider keys so a shell cannot reroute the suite's upstreams", async () => {
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.match(runner, /for \(const key of \['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY'\]\)/);
+  });
+
   it("gives the landmark audit's bounds room for a cold container start", async () => {
     // The dev server is spawned cold in the build container while lint, tsc, and the
     // suite share its cores. The bounds stay bounds — a route that never answers still

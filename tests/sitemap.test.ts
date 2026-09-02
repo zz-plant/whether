@@ -139,8 +139,8 @@ describe("sitemap", () => {
       for (const brief of briefs) {
         const entry = entryByUrl.get(`${siteUrl}${buildPublishedBriefPath(brief.slug)}`);
         assert.ok(entry, `published week ${brief.slug} missing when programmaticEligible=${eligible}`);
-        assert.ok(entry?.lastModified instanceof Date);
-        assert.equal((entry?.lastModified as Date).toISOString(), new Date(brief.publishedAt).toISOString());
+        assert.ok(entry?.lastModified instanceof Date, `published week ${brief.slug} carries no lastModified date`);
+        assert.equal(entry.lastModified.toISOString(), new Date(brief.publishedAt).toISOString());
       }
     }
   });

@@ -42,7 +42,9 @@ describe("requestSubscription", () => {
         assert.equal(calls.length, 1, "sends exactly one request");
         assert.equal(calls[0].input, SUBSCRIBE_ENDPOINT);
         assert.equal(calls[0].init?.method, "POST");
-        assert.deepEqual(JSON.parse(String(calls[0].init?.body)), { email: "Operator@Example.com" });
+        const body = calls[0].init?.body;
+        assert.ok(typeof body === "string", "the subscribe request carries a JSON string body");
+        assert.deepEqual(JSON.parse(body), { email: "Operator@Example.com" });
         return outcome;
       },
     );

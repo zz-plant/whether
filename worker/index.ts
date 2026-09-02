@@ -9,6 +9,12 @@ import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 
+/* Durable Object and Workflow classes must be exported from the Worker entry to exist. Both
+   are trial infrastructure: declared everywhere, used only where the preview lane's vars
+   switch them on (WHETHER_INGEST_COORDINATOR, WHETHER_HISTORY_WORKFLOW). */
+export { IngestCoordinator } from "./ingestCoordinator";
+export { RegimeHistoryRefreshWorkflow } from "./workflows/regimeHistoryRefresh";
+
 interface Env {
   ASSETS: {
     fetch(request: Request): Promise<Response>;
@@ -31,6 +37,18 @@ interface Env {
   };
   WHETHER_CRON_SECRET?: string;
   SITE_URL?: string;
+  /* Data-provider secrets. Read by lib/fred.ts and lib/saasMultiples.ts off globalThis;
+     absent, both stay on the keyless paths they have always used. */
+  FRED_API_KEY?: string;
+  ALPHA_VANTAGE_API_KEY?: string;
+  /* Trial infrastructure (see the exports above). The bindings are typed loosely on purpose:
+     lib code reaches them through globalThis with structural checks, never through these types. */
+  INGEST_COORDINATOR?: unknown;
+  WHETHER_INGEST_COORDINATOR?: string;
+  REGIME_HISTORY_WORKFLOW?: { create(options?: { id?: string; params?: unknown }): Promise<unknown> };
+  WHETHER_HISTORY_WORKFLOW?: string;
+  GITHUB_TOKEN?: string;
+  GITHUB_REPOSITORY?: string;
   WHETHER_DURABLE_KV: { get(key: string): Promise<string | null>; put(key: string, value: string): Promise<void> };
   /* Read by lib/runtime/versionMetadata.ts so /api/health can name the running build. */
   CF_VERSION_METADATA?: { id: string; tag: string; timestamp: string };
@@ -119,6 +137,17 @@ export default {
       const result = await refreshMonthlyRegimeHistory();
       return { ok: result.ok, error: result.error };
     });
+
+    /* Monday only, and only where the trial is on: start the Workflow that turns the KV month
+       in progress into a pull request. It runs on its own (retried steps, its own log), so the
+       cron only has to hand it off. */
+    if (!isDailyIngestion && env.WHETHER_HISTORY_WORKFLOW === "1" && env.REGIME_HISTORY_WORKFLOW) {
+      const workflow = env.REGIME_HISTORY_WORKFLOW;
+      await runCronStep("regime-history-workflow", async () => {
+        await workflow.create({ id: `regime-history-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });
+        return { ok: true };
+      });
+    }
 
     if (snapshot && weeklyCall) {
       await runCronStep("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall }));

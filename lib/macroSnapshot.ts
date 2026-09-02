@@ -3,7 +3,7 @@
  * Prefers live series fetches and falls back to checked-in snapshot data.
  */
 import macroSnapshot from "../data/macro_snapshot.json";
-import { computeYearOverYearPoints, fetchFredCsv, parseFredCsvRows } from "./fred";
+import { computeYearOverYearPoints, fetchFredRows } from "./fred";
 import type { MacroSeriesId, MacroSeriesReading, SeriesHistoryPoint } from "./types";
 
 type MacroSnapshotPayload = {
@@ -107,8 +107,8 @@ const HISTORY_FETCH_LOOKBACK_DAYS = RECENT_HISTORY_WINDOW_DAYS + 90;
 const YOY_FETCH_LOOKBACK_DAYS = RECENT_HISTORY_WINDOW_DAYS + 460;
 
 const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: HISTORY_FETCH_LOOKBACK_DAYS });
-  const parsedHistory = trimHistoryToRecentWindow(parseFredCsvRows(csv));
+  const rows = await fetchFredRows(fetcher, seriesId, { lookbackDays: HISTORY_FETCH_LOOKBACK_DAYS });
+  const parsedHistory = trimHistoryToRecentWindow(rows);
   const latest = parsedHistory.at(-1);
 
   if (!latest) {
@@ -123,10 +123,8 @@ const readFredSeriesHistory = async (seriesId: string, fetcher: typeof fetch) =>
 };
 
 const readFredYearOverYearPoints = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: YOY_FETCH_LOOKBACK_DAYS });
-  const yoyHistory = trimHistoryToRecentWindow(
-    computeYearOverYearPoints(parseFredCsvRows(csv), seriesId),
-  );
+  const rows = await fetchFredRows(fetcher, seriesId, { lookbackDays: YOY_FETCH_LOOKBACK_DAYS });
+  const yoyHistory = trimHistoryToRecentWindow(computeYearOverYearPoints(rows, seriesId));
 
   const latest = yoyHistory.at(-1);
   if (!latest) {

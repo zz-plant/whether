@@ -18,6 +18,11 @@ import { fetchSaaSValuations } from "../saasMultiples";
 import { stressTestDecisionPlan } from "../decisionShield";
 import { getHistoricalAnalogPlaybook } from "../analogPlaybook";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
+import { agentSkills } from "../agentSkills";
+import { loadCanonicalReportInputs } from "../ingestion/materialized";
+import type { SignalKey } from "../ingestion/types";
+import { DEFAULT_THRESHOLDS, type RegimeKey } from "../regimeEngineCore";
+import { buildCanonicalBoundedDecisionRules, formatBoundedDecisionTriplet } from "../report/boundedDecisionRules";
 
 export const MCP_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26"] as const;
 
@@ -29,8 +34,26 @@ const SERVER_INFO = {
 
 const SERVER_INSTRUCTIONS =
   "Whether turns public macro data into a weekly operating call for startup leaders. " +
-  "Call get_brief for the current regime, action, and confidence; get_context and " +
-  "get_projection for regime trajectory; get_comps for SaaS valuation multiples.";
+  "Call get_brief for the current regime, action, and confidence; get_decision_rules for the " +
+  "bounded rules behind it; get_context and get_projection for regime trajectory; " +
+  "get_recent_history for one signal's trailing window; get_comps for SaaS valuation multiples.";
+
+const ALL_REGIMES: readonly RegimeKey[] = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"];
+const SIGNAL_KEYS: readonly SignalKey[] = [
+  "TREASURY_1M",
+  "TREASURY_3M",
+  "TREASURY_2Y",
+  "TREASURY_10Y",
+  "BBB_CREDIT_SPREAD",
+  "HY_CREDIT_SPREAD",
+  "CPI_YOY",
+  "UNEMPLOYMENT_RATE",
+  "CHICAGO_FCI",
+  "VIX_INDEX",
+];
+
+const isRegimeKey = (value: string): value is RegimeKey => ALL_REGIMES.some((regime) => regime === value);
+const isSignalKey = (value: string): value is SignalKey => SIGNAL_KEYS.some((key) => key === value);
 
 type JsonValue = unknown;
 
@@ -202,6 +225,70 @@ const TOOLS: ToolDefinition[] = [
       const { snapshot } = await loadWeeklyBriefSnapshot();
       return getHistoricalAnalogPlaybook(snapshot.reportData.assessment);
     },
+  },
+  /* The three tools below existed only on the stdio server (scripts/mcp/whether-mcp-server.ts),
+     which needs a local checkout. Remote clients get the same surface here. */
+  {
+    name: "get_decision_rules",
+    title: "Get the bounded decision rules",
+    description:
+      "Action, pause threshold, and reversal trigger per operating area for one regime, or for all four regimes when none is given.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        regime: {
+          type: "string",
+          enum: [...ALL_REGIMES],
+          description: "Regime key. Omit to get every regime keyed by name.",
+        },
+      },
+    },
+    execute: async (args) => {
+      const requested = typeof args.regime === "string" && args.regime !== "" ? args.regime.toUpperCase() : undefined;
+      if (requested !== undefined && !isRegimeKey(requested)) {
+        throw new Error(`Unknown regime: ${requested}`);
+      }
+      const rulesFor = (regime: RegimeKey) =>
+        buildCanonicalBoundedDecisionRules({
+          regime,
+          thresholds: DEFAULT_THRESHOLDS,
+          scores: { tightness: 50, riskAppetite: 50 },
+        }).map((rule) => ({ area: rule.area, ...formatBoundedDecisionTriplet(rule) }));
+      return requested ? rulesFor(requested) : Object.fromEntries(ALL_REGIMES.map((regime) => [regime, rulesFor(regime)]));
+    },
+  },
+  {
+    name: "get_recent_history",
+    title: "Get one signal's trailing history",
+    description:
+      "The trailing 92-day window for one signal key from the materialized model, for temporal analysis without parsing the whole brief.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        signal_key: { type: "string", enum: [...SIGNAL_KEYS] },
+      },
+      required: ["signal_key"],
+    },
+    execute: async (args) => {
+      const key = typeof args.signal_key === "string" ? args.signal_key : "";
+      if (!isSignalKey(key)) {
+        throw new Error(`Unknown signal key: ${key || "(missing signal_key)"}`);
+      }
+      // Same posture as the report read path: serve what is materialized, refresh off-request.
+      const inputs = await loadCanonicalReportInputs({ refresh: "background" });
+      const history = inputs?.materializedSignals.recentHistory?.[key];
+      if (!history) {
+        throw new Error(`No history is materialized for ${key}`);
+      }
+      return { signal_key: key, history };
+    },
+  },
+  {
+    name: "list_agent_skills",
+    title: "List the agent skills contract",
+    description: "The skill ids and output order an agent runtime should follow when working from a Whether brief.",
+    inputSchema: { type: "object", properties: {} },
+    execute: async () => ({ skills: agentSkills }),
   },
 ];
 

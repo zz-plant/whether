@@ -56,7 +56,7 @@ export default function IdenticonsMockupPage() {
   interactive={true}
   stateValue={${sandboxStateVal}}
 />`;
-    navigator.clipboard.writeText(codeSnippet);
+    void navigator.clipboard.writeText(codeSnippet);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
