@@ -23,7 +23,10 @@ The canonical rules live in `docs/agents/ui-ux-standards.md`. Read it before edi
 | VIII | IA boundaries per route — which page owns which content |
 | IX | Homepage weekly-brief motion guardrails |
 | X | Shared action-link primitives and their variants |
-| XI | Report shell hierarchy for `/evidence`, `/planning`, `/resolve`, `/trust` |
+| XI | Report shell hierarchy for `/signals`, `/operate`, `/answer`, `/trust` |
+| XII | Disclosure — what earns collapsing, and URL-carried open state |
+| XIII | Depth and enclosure — the outermost container owns the elevation |
+| XIV | Shape register — sharp asserts (stamps, controls), soft holds (cards, surfaces); no text-bearing pills |
 
 Sections VIII and XI are the ones most often violated by accident, because they're about *what belongs where* rather than about code. Before adding a card, ask which layer owns that information. If copy fits two layers, it goes on the earliest one and the later one links out.
 
