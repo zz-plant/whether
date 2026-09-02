@@ -60,7 +60,16 @@ describe("MCP streamable HTTP transport", () => {
     const response = await postMcp({ jsonrpc: "2.0", id: 4, method: "tools/list" });
     const payload = await response.json();
     const names = payload.result.tools.map((tool: { name: string }) => tool.name);
-    for (const expected of ["get_brief", "get_context", "get_projection", "get_comps", "get_signals"]) {
+    for (const expected of [
+      "get_brief",
+      "get_context",
+      "get_projection",
+      "get_comps",
+      "get_signals",
+      "get_decision_rules",
+      "get_recent_history",
+      "list_agent_skills",
+    ]) {
       assert.ok(names.includes(expected), `lists ${expected}`);
     }
     for (const tool of payload.result.tools) {
@@ -81,6 +90,39 @@ describe("MCP streamable HTTP transport", () => {
     assert.ok(!payload.error, "no protocol error");
     assert.ok(payload.result.content[0].text.includes("coverage"));
     assert.ok(payload.result.structuredContent.coverage, "structured content mirrors the text payload");
+  });
+
+  it("serves the bounded decision rules remotely, for one regime or all four", async () => {
+    const all = await postMcp({ jsonrpc: "2.0", id: 40, method: "tools/call", params: { name: "get_decision_rules", arguments: {} } });
+    const allPayload = await all.json();
+    assert.deepEqual(Object.keys(allPayload.result.structuredContent).sort(), ["DEFENSIVE", "EXPANSION", "SCARCITY", "VOLATILE"]);
+
+    const one = await postMcp({
+      jsonrpc: "2.0",
+      id: 41,
+      method: "tools/call",
+      params: { name: "get_decision_rules", arguments: { regime: "defensive" } },
+    });
+    const onePayload = await one.json();
+    assert.ok(Array.isArray(onePayload.result.structuredContent), "a single regime returns its rule list");
+    assert.ok(onePayload.result.structuredContent.length > 0);
+    assert.ok("area" in onePayload.result.structuredContent[0]);
+
+    const bad = await postMcp({
+      jsonrpc: "2.0",
+      id: 42,
+      method: "tools/call",
+      params: { name: "get_decision_rules", arguments: { regime: "SUNNY" } },
+    });
+    const badPayload = await bad.json();
+    assert.equal(badPayload.result.isError, true);
+  });
+
+  it("lists the agent skills contract remotely", async () => {
+    const response = await postMcp({ jsonrpc: "2.0", id: 43, method: "tools/call", params: { name: "list_agent_skills", arguments: {} } });
+    const payload = await response.json();
+    assert.ok(Array.isArray(payload.result.structuredContent.skills));
+    assert.ok(payload.result.structuredContent.skills.length > 0);
   });
 
   it("reports missing tool arguments as a tool error, not a protocol error", async () => {
