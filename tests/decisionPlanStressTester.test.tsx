@@ -79,7 +79,7 @@ describe("DecisionPlanStressTester & StagePersonaSelector", () => {
       />
     );
 
-    assert.ok(html.includes("Instant Plan Red-Team"));
+    assert.ok(html.includes("Plan stress test"));
     assert.ok(html.includes("Stress-Test Plan"));
     assert.ok(html.includes("Seed / Discovery"));
     assert.ok(html.includes("Series A / Growth"));

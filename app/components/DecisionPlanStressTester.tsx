@@ -117,7 +117,7 @@ export function DecisionPlanStressTester({
             <Zap className="size-4" />
           </span>
           <h3 id="decision-stress-test-heading" className="text-fluid-lg font-semibold tracking-tight text-white">
-            Instant Plan Red-Team
+            Plan stress test
           </h3>
         </div>
         <p className="mt-1.5 text-fluid-sm text-slate-300">

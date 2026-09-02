@@ -106,7 +106,7 @@ export const SignalsModeSwitcherSection = ({
     <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
       <div className="space-y-1">
         <p className="type-eyebrow text-sky-200">
-          Depth
+          Reading depth
         </p>
         {/* The paragraph that sat here restated both radio options, which carry
             their own descriptions a few lines below. */}

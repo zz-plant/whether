@@ -175,7 +175,7 @@ export async function DecisionAnswerPageContent({
           {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {(payload.noindexReasons ?? []).join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Continue decision flow">
+        <SecondaryPageSection title="Where to go next">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/" variant="pill">Weekly brief</ButtonLink>
             <ButtonLink href="/answer#unresolved-question-router" variant="pill">Decision Tools</ButtonLink>

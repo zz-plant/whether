@@ -82,10 +82,10 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
     <ContentPageShell>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{roleDefinition.title}: {scenarioDefinition.title}</h1>
-        <p className="text-sm text-slate-300">Role/scenario normalization for weekly decision transmission.</p>
+        <p className="text-sm text-slate-300">How this week&apos;s call applies to {roleDefinition.title} decisions about {scenarioDefinition.title.toLowerCase()}.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Decision contract</h2>
+        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s bounded call</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>
@@ -94,7 +94,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
         </ul>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
           <ActionLink href="/answer#unresolved-question-router" variant="pill">Decision help</ActionLink>
