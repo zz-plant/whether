@@ -3,6 +3,7 @@ import path from "node:path";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "./types";
 import { buildLineage, type DurableLineage } from "../storage/lineage";
 import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { IngestCoordinatorStore, coordinatorStubFor, resolveIngestCoordinatorNamespace } from "./coordinatorStore";
 
 export type StoredSnapshotRecord = DurableLineage & {
   sequence: number;
@@ -284,14 +285,26 @@ export class KvIngestionStore implements IngestionStore {
   }
 }
 
-let defaultStore: { store: IngestionStore; kvBinding: unknown } | null = null;
+let defaultStore: { store: IngestionStore; backend: unknown } | null = null;
 
+/**
+ * Backend selection, in order: the ingest coordinator Durable Object when this deployment
+ * has opted in and the binding is installed (see lib/ingestion/coordinatorStore.ts), then
+ * KV, then the local file store. Re-checked on every call rather than memoized for good,
+ * so a binding that appears after an earlier fallback takes over (AGENTS.md invariant).
+ */
 export const getDefaultIngestionStore = () => {
-  const kvBinding = getKvBinding();
-  if (defaultStore && defaultStore.kvBinding === kvBinding) {
+  const coordinator = resolveIngestCoordinatorNamespace();
+  const kvBinding = coordinator ? null : getKvBinding();
+  const backend: unknown = coordinator ?? kvBinding;
+  if (defaultStore && defaultStore.backend === backend) {
     return defaultStore.store;
   }
-  const store = kvBinding ? new KvIngestionStore(kvBinding) : new FileIngestionStore();
-  defaultStore = { store, kvBinding };
+  const store = coordinator
+    ? new IngestCoordinatorStore(coordinatorStubFor(coordinator))
+    : kvBinding
+      ? new KvIngestionStore(kvBinding)
+      : new FileIngestionStore();
+  defaultStore = { store, backend };
   return store;
 };
