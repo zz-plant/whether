@@ -86,9 +86,9 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "compare",
     href: "/history/compare",
-    label: "Compare Epochs",
+    label: "Compare periods",
     navLabel: "Compare",
-    description: "Compare side-by-side macro signal diffs across historical epochs.",
+    description: "Compare signals and operating calls between any two past months.",
     boundary: "Use this to contrast the current posture with previous periods.",
     tier: "supporting",
     parentKey: "history",

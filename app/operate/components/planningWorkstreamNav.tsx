@@ -31,9 +31,9 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
   return (
     <nav aria-label="Planning workstreams" className="weather-panel px-4 py-4">
       <div className="flex flex-col gap-1">
-        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Other handoffs</p>
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Other planning pages</p>
         <p className="text-sm text-slate-300">
-          Most teams start with Weekly plan. Open the other cards only when you need delivery, data, or terminal handoff.
+          Most teams start with Weekly plan. Open the others for finance direction or saved decisions.
         </p>
       </div>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
