@@ -99,10 +99,10 @@ export const loadComparePreview = async (
   if (boldnessDelta !== null) {
     headlineParts.push(`boldness ${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)}`);
   }
-  headlineParts.push("across two epochs");
+  headlineParts.push("across two periods");
 
   return {
-    eyebrow: "Epoch Comparison",
+    eyebrow: "Compare periods",
     headline: toImageSafeText(clampText(headlineParts.join(" · "), 72)),
     epochA,
     epochB,

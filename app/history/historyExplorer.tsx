@@ -52,7 +52,7 @@ export function HistoryExplorer({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h1>
+          <h2 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h2>
           <p className="text-sm text-slate-300">Continuous macro regime and funding-pressure trajectory since 2012.</p>
         </div>
         <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>

@@ -90,7 +90,7 @@ const metricValueStyle: CSSProperties = {
 };
 
 export const renderCompareOgImage = ({
-  eyebrow = "Epoch Comparison",
+  eyebrow = "Compare periods",
   headline,
   epochA,
   epochB,
@@ -132,8 +132,8 @@ export const renderCompareOgImage = ({
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
           <div style={{ display: "flex", gap: 12 }}>
-            <EpochBlock label="Epoch A" accent={accentA} epoch={epochA} />
-            <EpochBlock label="Epoch B" accent={accentB} epoch={epochB} />
+            <EpochBlock label="Period A" accent={accentA} epoch={epochA} />
+            <EpochBlock label="Period B" accent={accentB} epoch={epochB} />
           </div>
           <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
             <div style={metricRowStyle}>

@@ -5,6 +5,7 @@ import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot
 import { getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { DateSelector, type DateOption } from "./DateSelector";
 
 export const runtime = "edge";
@@ -45,10 +46,10 @@ export async function generateMetadata({
   const imageParams = buildCompareImageParams(resolved);
 
   return buildPageMetadata({
-    title: "Compare Epochs — Side-by-Side Signal Diffs",
-    description: "Side-by-side comparison of historical macro regimes, boldness scores, and playbook rules.",
+    title: "Compare periods — two months side by side",
+    description: "Side-by-side comparison of two past months: regime, Boldness Budget, and operating rules.",
     path: "/history/compare",
-    imageAlt: "Whether historical epoch comparison",
+    imageAlt: "Whether comparison of two past periods",
     imageParams,
   });
 }
@@ -136,9 +137,9 @@ export default async function HistoryComparePage({
           treasurySource: reportA.treasury?.source,
         },
         page: {
-          pageTitle: "Epoch Comparison",
+          pageTitle: "Compare two periods",
           currentPath: "/history/compare",
-          pageSummary: "Compare side-by-side macro signal diffs and operating posture recommendations across epochs.",
+          pageSummary: "Signals and operating calls for any two past months, side by side.",
           sectionLinks: [],
         },
         trust: {
@@ -155,7 +156,7 @@ export default async function HistoryComparePage({
         payloads: {
           decisionBanner: {
             label: "Compare",
-            decision: "Select any two historical epochs below to analyze their signals and decision rules side-by-side.",
+            decision: "Pick any two past months below to compare their signals and operating rules side by side.",
             horizon: "Replay Mode",
             confidence: snapA.trustStatus.trustStatusLabel,
             effectiveDate: reportA.recordDateLabel,
@@ -175,14 +176,14 @@ export default async function HistoryComparePage({
         {/* Date Selectors Row */}
         <div className="grid gap-6 md:grid-cols-2 p-6 rounded-lg border border-slate-800 bg-slate-950/60 backdrop-blur-md">
           <DateSelector
-            label="Epoch A (Left Column)"
+            label="Period A"
             paramPrefix="A"
             options={dateOptions}
             currentYear={yearA ?? snapshots[snapshots.length - 1].year}
             currentMonth={monthA ?? snapshots[snapshots.length - 1].month}
           />
           <DateSelector
-            label="Epoch B (Right Column)"
+            label="Period B"
             paramPrefix="B"
             options={dateOptions}
             currentYear={yearB}
@@ -192,22 +193,22 @@ export default async function HistoryComparePage({
 
         {/* Delta Analysis Panel */}
         <section className="weather-panel p-6">
-          <p className="type-label text-slate-400">Delta analysis</p>
-          <h3 className="type-section text-slate-100 mt-1">Comparison Highlights</h3>
+          <p className="type-label text-slate-400">Difference</p>
+          <h3 className="type-section text-slate-100 mt-1">What changed between them</h3>
           
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="weather-surface p-4 text-center">
-              <p className="type-eyebrow">Boldness Score Shift</p>
+              <p className="type-eyebrow">Boldness Budget change</p>
               <p className={`mt-2 text-2xl font-bold ${boldnessDelta > 0 ? "text-emerald-400" : boldnessDelta < 0 ? "text-rose-400" : "text-slate-300"}`}>
                 {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                {boldnessDelta > 0 ? "Epoch A is more aggressive" : boldnessDelta < 0 ? "Epoch A is more defensive" : "Equivalent risk postures"}
+                {boldnessDelta > 0 ? "Period A is more aggressive" : boldnessDelta < 0 ? "Period A is more defensive" : "Equivalent risk postures"}
               </p>
             </div>
 
             <div className="weather-surface p-4 text-center">
-              <p className="type-eyebrow">Yield Curve Delta</p>
+              <p className="type-eyebrow">Yield curve slope change</p>
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {spreadA !== null && spreadB !== null ? `${(spreadA - spreadB).toFixed(2)}%` : "N/A"}
               </p>
@@ -217,7 +218,7 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-surface p-4 text-center">
-              <p className="type-eyebrow">BBB Spread Diff</p>
+              <p className="type-eyebrow">Credit spread change</p>
               <p className="mt-2 text-2xl font-bold text-slate-200">
                 {bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
               </p>
@@ -234,7 +235,7 @@ export default async function HistoryComparePage({
           <div className="space-y-6">
             <div className="weather-panel p-6 border-sky-500/20">
               <div className="flex items-center justify-between">
-                <span className="weather-pill bg-sky-500/10 text-sky-300 font-semibold">Epoch A</span>
+                <span className="weather-pill bg-sky-500/10 text-sky-300 font-semibold">Period A</span>
                 <span className="text-xs text-slate-400">{snapA.reportData.recordDateLabel}</span>
               </div>
               <h2 className="mt-4 text-xl font-bold text-slate-100">
@@ -246,31 +247,31 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-panel p-6 space-y-4">
-              <h3 className="type-eyebrow">Playbook Rules</h3>
+              <h3 className="type-eyebrow">Rules in period A</h3>
               <div className="space-y-2">
-                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion pace:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising window:</span> <span className="text-slate-100 font-semibold">{snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
               </div>
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
                 <div>
-                  <p className="type-eyebrow text-emerald-300">Action Now</p>
+                  <p className="type-eyebrow text-emerald-300">{DECISION_CONTRACT_LABELS.action.actionNow}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.actionNow}</p>
                 </div>
                 <div>
-                  <p className="type-eyebrow text-amber-300">Pause Guardrail</p>
+                  <p className="type-eyebrow text-amber-300">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.pauseIf}</p>
                 </div>
                 <div>
-                  <p className="type-eyebrow text-violet-300">Reversal Trigger</p>
+                  <p className="type-eyebrow text-violet-300">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapA.weeklyCall.changeCourseIf}</p>
                 </div>
               </div>
             </div>
 
             <div className="weather-panel p-6">
-              <h3 className="type-eyebrow mb-4">Macro Signals</h3>
+              <h3 className="type-eyebrow mb-4">Signals in period A</h3>
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">
@@ -320,7 +321,7 @@ export default async function HistoryComparePage({
           <div className="space-y-6">
             <div className="weather-panel p-6 border-slate-700/60">
               <div className="flex items-center justify-between">
-                <span className="weather-pill bg-slate-800 text-slate-300 font-semibold">Epoch B</span>
+                <span className="weather-pill bg-slate-800 text-slate-300 font-semibold">Period B</span>
                 <span className="text-xs text-slate-400">{snapB.reportData.recordDateLabel}</span>
               </div>
               <h2 className="mt-4 text-xl font-bold text-slate-100">
@@ -332,31 +333,31 @@ export default async function HistoryComparePage({
             </div>
 
             <div className="weather-panel p-6 space-y-4">
-              <h3 className="type-eyebrow">Playbook Rules</h3>
+              <h3 className="type-eyebrow">Rules in period B</h3>
               <div className="space-y-2">
-                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion Pace:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
-                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising Window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Hiring window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.hiringWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Expansion pace:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.expansionWindow}</span></p>
+                <p className="text-sm"><span className="text-slate-400 font-medium">Fundraising window:</span> <span className="text-slate-100 font-semibold">{snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.raiseWindow}</span></p>
               </div>
 
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
                 <div>
-                  <p className="type-eyebrow text-emerald-300">Action Now</p>
+                  <p className="type-eyebrow text-emerald-300">{DECISION_CONTRACT_LABELS.action.actionNow}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.actionNow}</p>
                 </div>
                 <div>
-                  <p className="type-eyebrow text-amber-300">Pause Guardrail</p>
+                  <p className="type-eyebrow text-amber-300">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.pauseIf}</p>
                 </div>
                 <div>
-                  <p className="type-eyebrow text-violet-300">Reversal Trigger</p>
+                  <p className="type-eyebrow text-violet-300">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</p>
                   <p className="mt-1 text-sm text-slate-200">{snapB.weeklyCall.changeCourseIf}</p>
                 </div>
               </div>
             </div>
 
             <div className="weather-panel p-6">
-              <h3 className="type-eyebrow mb-4">Macro Signals</h3>
+              <h3 className="type-eyebrow mb-4">Signals in period B</h3>
               <table className="w-full text-sm text-left">
                 <tbody>
                   <tr className="border-b border-slate-800/50">

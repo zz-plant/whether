@@ -109,7 +109,7 @@ export async function buildTrustPageModel() {
         };
   const sectionLinks = [
     { href: "#trust-snapshot", label: "Snapshot" },
-    { href: "#source-board", label: "Source board" },
+    { href: "#source-board", label: "Sources" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
@@ -126,7 +126,7 @@ export async function buildTrustPageModel() {
     trustStatusDetail: `Coverage: ${sourceCoverage}`,
     trustStatusAction,
     trustStatusTone,
-    pageTitle: "Forecast confidence",
+    pageTitle: "How much to trust this week's call",
 
     currentPath: "/trust",
     pageSummary: "Check whether this week's forecast is current enough to act on.",

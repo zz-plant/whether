@@ -160,7 +160,7 @@ export function HeroTrustProvenanceBlock({
       <div className="grid gap-2 sm:grid-cols-2">
         <article className="weather-trust-lane px-3 py-3">
           <p className="type-eyebrow">
-            Approval lane
+            What you can approve
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-slate-100">
@@ -179,7 +179,7 @@ export function HeroTrustProvenanceBlock({
 
         <article className="weather-trust-lane px-3 py-3">
           <p className="type-eyebrow">
-            Reliability window
+            Data reliability
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-slate-100">
