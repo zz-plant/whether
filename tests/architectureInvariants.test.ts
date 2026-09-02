@@ -25,6 +25,133 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
+import { buildMaterializedReadModel } from "../lib/ingestion/materialized";
+import type { SignalEntitySnapshot, SignalFamily, SignalKey } from "../lib/ingestion/types";
+import { resetFredCircuitBreaker } from "../lib/fred";
+import { buildLineage } from "../lib/storage/lineage";
+
+/*
+ * The read-path invariants below own their upstreams. This suite runs both where FRED and
+ * Treasury answer (Cloudflare's build container) and where nothing does (a sandboxed
+ * session), and whether a read *writes* depends on what an ingest brings back — so a test
+ * about writes that inherits the network passes in one place and fails in the other.
+ * Until 2026-09-02 Invariant 1 did exactly that.
+ */
+const FRED_FIXTURE_LEVELS: Record<string, number> = {
+  DGS1MO: 4.3,
+  DGS3MO: 4.25,
+  DGS2: 3.9,
+  DGS10: 4.2,
+  BAA10Y: 1.7,
+  BAMLH0A0HYM2: 3.2,
+  UNRATE: 4.2,
+  CPIAUCSL: 320,
+  NFCI: -0.4,
+  VIXCLS: 16,
+};
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** A daily FRED CSV from `cosd` (or 900 days back) to today. CPI drifts so year-over-year is defined. */
+const fredCsvFixture = (seriesId: string, observationStart: string | null) => {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const start = observationStart
+    ? new Date(`${observationStart}T00:00:00.000Z`)
+    : new Date(today.getTime() - 900 * DAY_MS);
+  const level = FRED_FIXTURE_LEVELS[seriesId] ?? 1;
+  const rows = [`observation_date,${seriesId}`];
+  for (let time = start.getTime(), day = 0; time <= today.getTime(); time += DAY_MS, day += 1) {
+    const value = seriesId === "CPIAUCSL" ? level + day * 0.03 : level + 0.01 * (day % 7);
+    rows.push(`${new Date(time).toISOString().slice(0, 10)},${value.toFixed(3)}`);
+  }
+  return rows.join("\n");
+};
+
+const fixtureFetch: typeof fetch = async (input) => {
+  const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
+  if (url.host === "fred.stlouisfed.org" && url.pathname === "/graph/fredgraph.csv") {
+    return new Response(fredCsvFixture(url.searchParams.get("id") ?? "", url.searchParams.get("cosd")), {
+      status: 200,
+      headers: { "content-type": "text/csv" },
+    });
+  }
+  return new Response("not served by this test", { status: 404 });
+};
+
+const SIGNAL_KEYS_BY_FAMILY: Array<[SignalFamily, SignalKey[]]> = [
+  ["rates", ["TREASURY_1M", "TREASURY_3M", "TREASURY_2Y", "TREASURY_10Y"]],
+  ["spreads", ["BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD"]],
+  ["labor", ["UNEMPLOYMENT_RATE"]],
+  ["inflation", ["CPI_YOY"]],
+  ["credit", ["CHICAGO_FCI"]],
+  ["volatility", ["VIX_INDEX"]],
+];
+
+/** The stored form of a complete materialized model whose every family was ingested `ageMs` ago. */
+const storedModelIngested = (ageMs: number) => {
+  const now = new Date();
+  const ingestedAt = new Date(now.getTime() - ageMs).toISOString();
+  const snapshots: SignalEntitySnapshot[] = [];
+  for (const [family, keys] of SIGNAL_KEYS_BY_FAMILY) {
+    for (const signalKey of keys) {
+      snapshots.push({
+        signalKey,
+        family,
+        value: 3,
+        unit: "%",
+        source: { label: "FRED", url: `https://fred.stlouisfed.org/series/${signalKey}`, seriesId: signalKey },
+        observedAt: ingestedAt,
+        ingestedAt,
+        quality: "observed",
+        confidence: "high",
+      });
+    }
+  }
+  return JSON.stringify({ ...buildLineage("request-received-at"), model: buildMaterializedReadModel(snapshots, now) });
+};
+
+/**
+ * Run the public read path against a KV whose only content is `materialized` (null is a
+ * cold store), with upstreams served from fixtures, and report every write it made and
+ * every task it handed to waitUntil.
+ */
+const readWithStore = async (materialized: string | null) => {
+  const writes: string[] = [];
+  const detached: Promise<unknown>[] = [];
+  const trackingKv: KvNamespace = {
+    async get(key: string) {
+      return key === "ingestion:materialized:latest" ? materialized : null;
+    },
+    async put(key: string) {
+      writes.push(key);
+    },
+    async delete(key: string) {
+      writes.push(`delete:${key}`);
+    },
+    async list() {
+      return { keys: [], list_complete: true };
+    },
+  };
+  const originalFetch = globalThis.fetch;
+  Object.assign(globalThis, {
+    WHETHER_DURABLE_KV: trackingKv,
+    WHETHER_WAIT_UNTIL: (task: Promise<unknown>) => {
+      detached.push(task);
+    },
+  });
+  globalThis.fetch = fixtureFetch;
+  resetFredCircuitBreaker();
+
+  try {
+    const data = await loadReportData({});
+    return { writes, detached, data };
+  } finally {
+    globalThis.fetch = originalFetch;
+    Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
+    Reflect.deleteProperty(globalThis, "WHETHER_WAIT_UNTIL");
+    resetFredCircuitBreaker();
+  }
+};
 
 describe("Architecture Invariants", () => {
   beforeEach(() => {
@@ -33,33 +160,48 @@ describe("Architecture Invariants", () => {
     resetRuntimeBoundary();
   });
 
-  it("Invariant 1: Reading Whether performs zero writes", async () => {
-    let writeCount = 0;
-    const trackingKv: KvNamespace = {
-      async get(key: string) {
-        return null;
-      },
-      async put(key: string, value: string) {
-        writeCount++;
-      },
-      async delete(key: string) {
-        writeCount++;
-      },
-      async list() {
-        return { keys: [], list_complete: true };
-      },
-    };
+  /*
+   * "Reading Whether performs zero writes" is true of the state production is in almost
+   * always: a materialized model exists and no signal family is due. The two exceptions
+   * are the architecture's own (AGENTS.md, "Ingest stays off the read path"); 1b and 1c
+   * pin them, so a change to either shows up here and not in a build log.
+   */
+  it("Invariant 1: Serving the report from a current store performs zero writes", async () => {
+    const run = await readWithStore(storedModelIngested(0));
 
-    // Set mock KV in globalThis
-    Object.assign(globalThis, { WHETHER_DURABLE_KV: trackingKv });
+    assert.equal(run.data.treasury.yields.tenYear, 3, "the store, not an upstream, served the yields");
+    assert.deepEqual(run.writes, [], "a current store must not be written on read");
+    assert.equal(run.detached.length, 0, "nothing was due, so nothing was handed to waitUntil");
+  });
 
-    try {
-      const data = await loadReportData({});
-      assert.ok(data.assessment);
-      assert.equal(writeCount, 0, `Expected 0 writes on read path, but got ${writeCount}`);
-    } finally {
-      Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
-    }
+  it("Invariant 1b: Only a cold store ingests inline, and that ingest is the read path's only write", async () => {
+    const run = await readWithStore(null);
+
+    assert.equal(run.data.treasury.isLive, true, "the inline ingest served the report");
+    assert.ok(run.writes.includes("ingestion:materialized:latest"), "a cold store materializes what it ingested");
+    assert.deepEqual(
+      run.writes.filter((key) => !key.startsWith("ingestion:")),
+      [],
+      "a read writes nothing outside the ingestion store",
+    );
+    assert.equal(run.detached.length, 0, "a cold store has nothing to serve meanwhile, so it does not defer");
+  });
+
+  it("Invariant 1c: A stale store refreshes off the request, behind the KV lock", async () => {
+    // Older than every family's poll window (the longest is 24h), so all six are due.
+    const run = await readWithStore(storedModelIngested(25 * 60 * 60 * 1000));
+
+    assert.equal(run.data.treasury.yields.tenYear, 3, "the request still served the model it had");
+    assert.equal(run.detached.length, 1, "the refresh was handed to waitUntil, not awaited by the request");
+    assert.ok(run.writes.includes("ingestion:refresh-lock"), "the detached refresh runs behind the lock");
+
+    await Promise.all(run.detached);
+    assert.ok(run.writes.includes("ingestion:materialized:latest"), "the detached refresh materialized what it ingested");
+    assert.deepEqual(
+      run.writes.filter((key) => !key.startsWith("ingestion:")),
+      [],
+      "the refresh writes nothing outside the ingestion store",
+    );
   });
 
   it("Invariant 2: The same decision has the exact same staleness status everywhere", () => {
