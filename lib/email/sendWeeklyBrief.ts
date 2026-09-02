@@ -2,6 +2,7 @@ import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDel
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 export type SendWeeklyBriefResult = {
   ok: boolean;
@@ -57,9 +58,9 @@ export const sendWeeklyBrief = async (options?: {
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
         `Regime: ${regime}`,
-        `Action Now: ${actionNow}`,
-        `Pause If: ${pauseIf}`,
-        `Change Course If: ${changeCourseIf}`,
+        `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
+        `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
+        `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${changeCourseIf}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         `---`,
@@ -78,11 +79,11 @@ export const sendWeeklyBrief = async (options?: {
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#38bdf8;margin:0 0 6px;">Action Now</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#38bdf8;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.action.actionNow}</p>`,
         `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${actionNow}</p>`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">Pause If</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0 0 12px;color:#cbd5e1;">${pauseIf}</p>`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">Change Course If</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${changeCourseIf}</p>`,
         `</td></tr></table>`
       );

@@ -282,7 +282,7 @@ export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayl
   "Weekly call snapshot",
   `REGIME: ${payload.regime}`,
   `CALL: ${payload.call}`,
-  `DO NOW: ${payload.doNow}`,
+  `${publicDecisionLabels.action.toUpperCase()}: ${payload.doNow}`,
   `AVOID: ${payload.avoid}`,
   `WATCH: ${payload.watch}`,
   "FLIP CONDITIONS:",

@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import {
   GlyphMotif,
   OG_BG,
@@ -198,7 +199,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
                   labelColor: OG_TEXT_MUTED,
                 })}
                 {detailCard({
-                  label: "Do Now",
+                  label: DECISION_CONTRACT_LABELS.action.doNow,
                   value: preview.immediateDecision,
                   background: "#123023",
                   border: "1px solid #34d39955",
