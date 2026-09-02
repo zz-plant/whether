@@ -110,7 +110,10 @@ those defaults as flaky; `tests/tools/` ran, which shells out to `python3` the b
 guarantee; and `audit` (network) and `hotspot-preflight` (git history) ran where neither has what it
 needs. `WHETHER_DEPLOY_GATE=1` is what switches `scripts/run-tests.mjs` to 2 workers, a 120s
 ceiling, and no `tests/tools/`, and what gives the landmark audit's readiness and per-route bounds
-room for a cold start (180s / 60s instead of 90s / 30s). Those rules had only ever applied inside
+room for a cold start (180s / 60s instead of 90s / 30s). The runner also pins `NODE_ENV=test` for the
+suite it spawns: `bun test` only defaults it when unset, and a build container that sets
+`NODE_ENV=production` runs the suite in production mode, where `programmaticPayloadBuilder` stops
+relaxing its freshness contract and fails on fallback data. Those rules had only ever applied inside
 `scripts/vinext-run.mjs`'s inner gate — a step the build reaches *after* the outer command has
 already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
 `bun run check` (both); they are excluded from the deploy path, not from the repo.

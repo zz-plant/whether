@@ -106,6 +106,14 @@ describe("deploy gate resource defaults", () => {
     assert.ok(runner.includes("const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1'"));
   });
 
+  it("pins NODE_ENV to test for the spawned suite", async () => {
+    // bun test only defaults NODE_ENV when it is unset; a build container that sets
+    // NODE_ENV=production would otherwise run the suite in production mode, where the
+    // payload builder stops relaxing its freshness contract and fails on fallback data.
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.match(runner, /NODE_ENV: process\.env\.WHETHER_TEST_NODE_ENV \?\? 'test'/);
+  });
+
   it("gives the landmark audit's bounds room for a cold container start", async () => {
     // The dev server is spawned cold in the build container while lint, tsc, and the
     // suite share its cores. The bounds stay bounds — a route that never answers still

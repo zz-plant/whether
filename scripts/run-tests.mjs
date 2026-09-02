@@ -195,9 +195,19 @@ if (excludeToolTests) {
 
 const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, ...defaultTargets];
 const concurrency = process.env.BUN_TEST_CONCURRENCY ?? (inDeployGate ? '2' : '8');
+/*
+ * `bun test` sets NODE_ENV=test only when nothing else has. A build container often
+ * has — NODE_ENV=production is a common build variable — and then the suite runs in
+ * production mode without anyone asking for it. Under that mode
+ * lib/seo/programmaticPayloadBuilder.ts stops relaxing its freshness and provenance
+ * contract, so on fallback data (any box that cannot reach FRED) one test fails that
+ * passes everywhere NODE_ENV happens to be unset. A result that depends on ambient
+ * NODE_ENV is not a result about the code, so the runner pins it. Overridable, for
+ * the one run that deliberately wants another mode.
+ */
 const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...targetArgs], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?? 'test' },
 });
 
 child.on('exit', (code, signal) => {
