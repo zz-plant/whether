@@ -52,7 +52,7 @@ export default async function MethodPage({
         description="Where each feed comes from and when it last refreshed."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             {/* Split from the Sources card in System status rather than
                 repeating it: that card owns each source's *status*, so this one
                 owns when each last updated and where it came from. It used to
@@ -78,7 +78,7 @@ export default async function MethodPage({
               ) : null}
             </div>
           </article>
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Use in the room</p>
             <p className="text-sm text-slate-200">
               Check whether the weekly call is current enough to share or approve against.
@@ -97,7 +97,7 @@ export default async function MethodPage({
         description="The one-line citation for a recap or sourcing note."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Meeting citation</p>
             <p className="text-sm text-slate-200">{citationLine}</p>
             <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
@@ -115,7 +115,7 @@ export default async function MethodPage({
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
@@ -124,7 +124,7 @@ export default async function MethodPage({
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>
             </ul>
           </article>
-          <article className="weather-hub-card space-y-3 rounded-lg px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Escalation rule</p>
             <p className="text-sm text-slate-200">
               If a warning or revisit trigger fires, confirm freshness before moving ahead.
@@ -139,7 +139,7 @@ export default async function MethodPage({
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-hub-card space-y-3 rounded-md px-4 py-4">
+          <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Active warning patterns</p>
             {warnings.length === 0 ? (
               <p className="text-sm text-slate-300">No active warning pattern right now. Keep decisions staged and keep the normal change trigger in view.</p>
@@ -154,7 +154,7 @@ export default async function MethodPage({
               </ul>
             )}
           </article>
-          <article className="weather-hub-card rounded-md px-4 py-4">
+          <article className="weather-hub-card px-4 py-4">
             <p className="type-eyebrow">Revisit checklist</p>
             <ul className="mt-3 space-y-3 text-sm text-slate-200">
               {revisitBullets.map((item) => (
@@ -182,7 +182,7 @@ export default async function MethodPage({
   return (
     <ReportShell {...reportShellProps}>
       <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
-        <div className={`weather-hub-card rounded-lg px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
+        <div className={`weather-hub-card px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
           <div className="flex items-center gap-3">
             <span className={`flex h-3 w-3 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
             <p className="text-sm font-semibold text-slate-100">
@@ -196,7 +196,7 @@ export default async function MethodPage({
         </div>
 
         <div className="space-y-3">
-          <div className="weather-hub-card rounded-lg px-4 py-4">
+          <div className="weather-hub-card px-4 py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
@@ -208,7 +208,7 @@ export default async function MethodPage({
             <p className="mt-1 text-xs text-slate-400">{trustSummary}</p>
           </div>
 
-          <div className="weather-hub-card rounded-lg px-4 py-4">
+          <div className="weather-hub-card px-4 py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className={`flex h-2.5 w-2.5 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
@@ -222,7 +222,7 @@ export default async function MethodPage({
             </ul>
           </div>
 
-          <div className="weather-hub-card rounded-lg px-4 py-4">
+          <div className="weather-hub-card px-4 py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className={`flex h-2.5 w-2.5 rounded-full ${
@@ -236,7 +236,7 @@ export default async function MethodPage({
           </div>
 
           {warnings.length > 0 ? (
-            <div className="weather-hub-card rounded-lg px-4 py-4 border border-amber-500/30 bg-amber-500/5">
+            <div className="weather-hub-card px-4 py-4 border border-amber-500/30 bg-amber-500/5">
               <div className="flex items-center gap-2">
                 <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden="true" />
                 <p className="text-sm font-semibold text-amber-100">Active warnings</p>
@@ -248,7 +248,7 @@ export default async function MethodPage({
               </ul>
             </div>
           ) : (
-            <div className="weather-hub-card rounded-lg px-4 py-4">
+            <div className="weather-hub-card px-4 py-4">
               <div className="flex items-center gap-2">
                 <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
                 <p className="text-sm font-semibold text-slate-100">Warnings</p>

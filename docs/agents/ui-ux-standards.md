@@ -183,7 +183,7 @@ take the other's job.
   | --- | --- | --- | --- |
   | Stamp | `--radius-sm` (2px) | `rounded-sm`, `.weather-tag`, `.weather-chip`, `.weather-hub-chip` | status, verdict, regime, confidence and analog badges; chips; tags |
   | Data | `--radius-md` (4px) | `rounded-md`, `rounded` | stat tiles, rule segments, trust lanes, loading stages |
-  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-tab`, `.weather-cta`, `.weather-input`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, disclosure trigger, toast action |
+  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-tab`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
   | Card | `--radius-xl` (10px) | `rounded-xl`, `.weather-card`, the hub hero/section/card shells, page section shells | a self-contained item or section |
   | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
   | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |
@@ -198,9 +198,12 @@ take the other's job.
   `pill` / `ghost` variants of §X — not by corner shape. This reverses the 2026-08-11 "quiet
   pill" decision in `docs/one-screen-weekly-brief-spec.md`, which made the hero's secondary
   actions round so they would read quieter and produced exactly that mixed row.
-- NEVER: a named container on the control radius. `.weather-card`, `.weather-surface`, and the
-  hub shells are `xl` or `2xl`; a shell at 6px reads as a giant button and stops separating the
-  furniture from the controls inside it. Inner segments inside a card may sit at `md` or `lg`.
+- NEVER: a named container on the control radius, and never a `rounded-*` utility on one. The
+  classes that own a card or surface radius are `.weather-card`, `.weather-surface`,
+  `.weather-lever-card`, and the hub hero, section, card and link-card shells; they are `xl` or
+  `2xl`, and a shell at 6px reads as a giant button and stops separating the furniture from the
+  controls inside it. `.weather-panel` is a layout tier and owns no radius, so a panel that draws
+  a border takes `rounded-xl` itself. Inner segments inside a card may sit at `md` or `lg`.
 - MUST: keep `app/styles/tokens.css` the only place a radius is a number. Stylesheets reference
   `var(--radius-*)` (`inherit` and `50%` excepted). `tests/shapeRegister.test.ts` checks the
   three NEVERs above and keeps the `:root` scale and the `@theme inline` scale in lockstep.

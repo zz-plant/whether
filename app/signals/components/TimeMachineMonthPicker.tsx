@@ -121,7 +121,7 @@ export const TimeMachineMonthPicker = ({
                 );
               })}
             </div>
-            <div className="weather-surface mt-3 rounded-md px-3 py-2">
+            <div className="weather-surface mt-3 px-3 py-2">
               <p className="type-label text-slate-400">Available range</p>
               <p className="mt-1 text-fluid-xs text-slate-300">
                 {coverageMin && coverageMax ? `${coverageMin} → ${coverageMax}` : "No cache loaded yet."}

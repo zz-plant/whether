@@ -185,7 +185,7 @@ export const DataProvenanceStrip = ({
   }
 
   return (
-    <div className="weather-surface space-y-2 rounded-lg border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
+    <div className="weather-surface space-y-2 border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
       <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-400 type-eyebrow">{label}</span>

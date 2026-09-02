@@ -30,7 +30,7 @@ const adj = MACRO_ADJUSTMENT_CONSTANTS;
 
 function FormulaCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <article className="weather-hub-card space-y-2 rounded-lg px-4 py-4">
+    <article className="weather-hub-card space-y-2 px-4 py-4">
       <p className="type-eyebrow">{title}</p>
       {children}
     </article>
@@ -53,7 +53,7 @@ export function FormulaReference() {
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
           does in words first; the grid below it stays exact. */}
-      <div className="weather-surface mb-3 space-y-3 rounded-lg px-4 py-4">
+      <div className="weather-surface mb-3 space-y-3 px-4 py-4">
         <p className="type-eyebrow">In plain language</p>
         <ol className="space-y-2 text-sm text-slate-200">
           <li>

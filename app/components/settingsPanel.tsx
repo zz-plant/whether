@@ -205,7 +205,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="weather-input min-h-[44px] flex-1 rounded-md px-3 py-2 text-base sm:text-xs"
+                className="weather-input min-h-[44px] flex-1 px-3 py-2 text-base sm:text-xs"
               />
               <button
                 type="submit"

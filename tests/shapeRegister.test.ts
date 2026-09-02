@@ -11,8 +11,11 @@
  *   2. Controls inherit their radius. An element carrying a control class never adds a
  *      `rounded-*` utility; the header once overrode `.weather-button-primary` to a pill and gave
  *      one action row two button shapes.
- *   3. Stylesheets reference radius tokens. A radius is a number in app/styles/tokens.css only.
- *   4. The `:root` scale and the `@theme inline` scale (which generates the rounded-* utilities)
+ *   3. Containers inherit their radius too. `.weather-card`, `.weather-surface`, the lever card
+ *      and the hub shells own a card or surface radius in their stylesheet rule; a utility beside
+ *      them is the drift §XIV forbids — the trust rows once carried `weather-hub-card rounded-lg`.
+ *   4. Stylesheets reference radius tokens. A radius is a number in app/styles/tokens.css only.
+ *   5. The `:root` scale and the `@theme inline` scale (which generates the rounded-* utilities)
  *      are identical and strictly increasing. They drifted once and produced two scales.
  *
  * Mockups under app/mockups are the staging area for experiments and are not scanned.
@@ -51,7 +54,12 @@ const stringLiterals = (source: string): Literal[] => {
   return out;
 };
 
-const CONTROL_CLASS = /\bweather-(?:button-primary|button|pill|tab|cta)\b/;
+/* The lookahead stops `weather-pill` from matching `weather-pill-muted` and `weather-surface`
+   from matching `weather-surface-sky`: modifiers ride alongside the base class and are not
+   radius owners on their own. */
+const CONTROL_CLASS = /\bweather-(?:button-primary|button|pill|tab|cta|input|control)(?![\w-])/;
+/* Container classes whose stylesheet rule owns a card or surface radius (§XIV, Card and Surface tiers). */
+const CONTAINER_CLASS = /\bweather-(?:card|surface|lever-card|hub-hero|hub-section|hub-card|hub-link-card)(?![\w-])/;
 const RADIUS_UTILITY = /\brounded(?:-[a-z0-9]+)?\b/;
 
 const appFiles = collectSourceFiles(join(repoRoot, "app"));
@@ -78,6 +86,11 @@ describe("Shape register (ui-ux-standards §XIV)", () => {
   it("lets control classes own their radius", () => {
     const overrides = violations((text) => CONTROL_CLASS.test(text) && RADIUS_UTILITY.test(text));
     assert.deepEqual(overrides, [], `rounded-* utility on an element that carries a control class:\n${overrides.join("\n")}`);
+  });
+
+  it("lets container classes own their radius", () => {
+    const overrides = violations((text) => CONTAINER_CLASS.test(text) && RADIUS_UTILITY.test(text));
+    assert.deepEqual(overrides, [], `rounded-* utility on an element that carries a container class:\n${overrides.join("\n")}`);
   });
 
   it("keeps every stylesheet radius on a token", () => {

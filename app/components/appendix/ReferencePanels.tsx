@@ -35,7 +35,7 @@ export const OperatorRequestsPanel = ({
         {backlogRequests.map((request) => (
           <div
             key={request.title}
-            className="weather-surface rounded-lg px-4 py-4"
+            className="weather-surface px-4 py-4"
           >
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               {request.title}
@@ -77,7 +77,7 @@ export const CxoFunctionPanel = ({
       {cxoFunctionOutputs.map((item) => (
         <div
           key={item.role}
-          className="weather-surface rounded-lg px-5 py-4"
+          className="weather-surface px-5 py-4"
         >
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{item.role}</p>
           <p className="mt-3 text-sm text-slate-200">{item.focus}</p>
