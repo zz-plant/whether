@@ -42,7 +42,7 @@ export default function CompsPage() {
     <PageShell backdropVariant="default">
       <article className="weather-panel space-y-6 px-5 py-5">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">
-          Public SaaS Valuation Multiples
+          Public SaaS valuation multiples
         </h1>
         <p className="text-sm text-slate-300">
           Median enterprise value to revenue multiples for a basket of 15 public SaaS companies,

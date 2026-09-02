@@ -163,8 +163,8 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
       <div className="space-y-6 print:text-black">
         {decisionArtifact ? (
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-            <p className="type-eyebrow">This week first (live Whether posture)</p>
-            <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Decision delta before long-form reading</h2>
+            <p className="type-eyebrow">This week&apos;s call</p>
+            <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">What the live call says before you read on</h2>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -182,7 +182,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         ) : null}
 
         <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-          <p className="type-eyebrow">Problem-first operating brief</p>
+          <p className="type-eyebrow">Operating brief</p>
           <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>
           <p className="text-sm text-slate-200 print:text-slate-700">{article.description}</p>
           <div className="flex flex-wrap gap-2 text-sm">
@@ -193,7 +193,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         </section>
 
         <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-          <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Board-facing summary block (forwardable)</h2>
+          <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Summary to forward to the board</h2>
           <ul className="space-y-2 text-sm text-slate-200 print:text-slate-700">
             {article.boardSummary.map((item) => <li key={item}>• {item}</li>)}
           </ul>
@@ -263,7 +263,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             Open Decision Shield
           </Link>
           <div className="space-y-2 border-t border-slate-700/80 pt-3 text-xs text-slate-300">
-            <p className="font-semibold text-slate-100">Internal links</p>
+            <p className="font-semibold text-slate-100">Related pages</p>
             <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital Discipline pillar</Link>
             <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level Capital Posture Framework</Link>
             <Link href={article.toolLink.href as Route} className="block text-sky-200 underline underline-offset-4">Tool page</Link>

@@ -17,7 +17,7 @@ export default function ThresholdPage() {
   return (
     <PageShell backdropVariant="default">
       <article className="weather-panel space-y-8 px-5 py-5 max-w-3xl">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">Bounded Decisions</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">Bounded decisions</h1>
         <p className="text-sm text-slate-300 leading-relaxed">
           A bounded decision has three parts: an action, a threshold that pauses it, and a condition that reverses it.
           That is the complete structure. It works because it separates what you will do from the conditions under which you will stop.

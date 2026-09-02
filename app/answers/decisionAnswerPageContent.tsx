@@ -136,7 +136,7 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title={`${publicDecisionLabels.call} context`}>
+        <SecondaryPageSection title="This week's posture">
           <div className="space-y-2 text-sm text-slate-200">
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</p>
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</p>
@@ -164,7 +164,7 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Threshold trigger">
+        <SecondaryPageSection title="What would change this answer">
           <p className="text-sm text-slate-200">{thresholdTrigger}</p>
           <p className="text-sm text-slate-200">Current risk appetite: {assessment.scores.riskAppetite.toFixed(0)} / 100 · current tightness: {assessment.scores.tightness.toFixed(0)} / 100.</p>
         </SecondaryPageSection>

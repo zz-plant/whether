@@ -63,7 +63,7 @@ export const buildDownloadableResourceMetadata = (
 export function InternalLinksPanel({ links }: { links: ResourceLink[] }) {
   return (
     <section className="weather-panel space-y-2 px-6 py-6">
-      <h2 className="text-lg font-semibold text-slate-100">Internal links</h2>
+      <h2 className="text-lg font-semibold text-slate-100">Related pages</h2>
       {links.map((link) => (
         <Link key={link.href} href={link.href} className="block text-sm text-sky-200 underline underline-offset-4">
           {link.label}

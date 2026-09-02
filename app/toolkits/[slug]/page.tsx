@@ -92,7 +92,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         </ul>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Included instruments</h2>
+        <h2 className="text-lg font-semibold text-slate-100">What&apos;s in this toolkit</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           {toolkit.instruments.map((item, index) => {
             const mappedCanon = toolkit.canonLinks[index % toolkit.canonLinks.length];
@@ -111,11 +111,11 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Common mistakes to avoid</h2>
         <ul className="space-y-2 text-sm text-slate-200">{toolkit.misuseCases.map((item) => <li key={item}>• {item}</li>)}</ul>
-        <h2 className="pt-2 text-lg font-semibold text-slate-100">Canon references</h2>
+        <h2 className="pt-2 text-lg font-semibold text-slate-100">Related guidance</h2>
         <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <Link key={link.href} href={link.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">{link.label}</Link>)}</div>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Best starting decision paths</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Start from your role or situation</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {decisionPaths.roles.map((path) => (
             <Link key={path.slug} href={path.href as Route} className="weather-surface space-y-1 px-4 py-4 text-sm text-slate-100">
