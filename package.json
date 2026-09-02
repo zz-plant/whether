@@ -51,7 +51,7 @@
     "seo:weekly-runbook": "bun scripts/freezeWeeklyBrief.ts && bun scripts/seo-weekly-runbook.ts",
     "cli:whether": "node scripts/whether-cli.mjs",
     "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
-    "check:vinext": "bun run check",
+    "check:vinext": "WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks",
     "prepare": "husky",
     "check:production-edge": "bash scripts/check_production_edge.sh",
     "setup": "mise trust && bun install",

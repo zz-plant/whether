@@ -18,6 +18,31 @@ nothing stopped being verified.
 The commands below are for out-of-band deploys from a workstation (`wrangler
 login` first) and for verifying a build locally.
 
+## What Workers Builds runs
+
+The build command configured in the Workers Builds dashboard is `bun run check:vinext`. It is
+the deploy gate, not the full local check:
+
+```bash
+WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets \
+  && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks
+```
+
+The landmark audit runs second and alone: it spawns a dev server and compiles every route
+against it, and a server sharing a small container's cores with lint, tsc, and the suite turns a
+slow route into one that "never answered".
+
+`WHETHER_DEPLOY_GATE=1` makes `scripts/run-tests.mjs` run 2 workers with a 120s ceiling and skip
+`tests/tools/` (it shells out to `python3`, which the build image does not guarantee), and gives
+the landmark audit's dev-server readiness and per-route bounds room for a cold start. `audit`
+needs the network and `hotspot-preflight` needs git history, so both stay on `bun run check` and
+pre-push rather than the deploy path. It runs on every push, `main` included, so a red gate is a
+blocked deploy — read the build log in the dashboard, where `run-checks.mjs` names the failing
+task and attaches its output.
+
+If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
+in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
+
 ## Build + deploy commands
 
 This repo now has one Wrangler source of truth with two deployment targets:

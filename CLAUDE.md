@@ -94,10 +94,29 @@ would fabricate exactly the cadence it exists to prove, and `/history` now shows
 visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
-configured in Workers Builds is `bun run check:vinext`, which is just `bun run check` — so every
-push, `main` included, runs the whole gate (lint, typecheck, test, assets, audit,
-hotspot-preflight, landmarks) before anything is built or deployed. **A failing test does block a
-deploy.**
+configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
+deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets`, then
+`WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks` on its own. So every push, `main`
+included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
+before anything is built or deployed. The audit runs second and alone because it spawns a dev
+server and compiles every route against it; on a small box a server competing with lint, tsc,
+and the suite for cores turns a slow route into one that "never answered". **A failing test does
+block a deploy.**
+
+Until 2026-09-02 `check:vinext` was plain `bun run check`, which is the wrong gate for that
+container in three ways, and the deploy-gate rules this repo already had never reached it: the
+suite ran with workstation defaults (8 workers, 60s ceiling) on a box where this repo documents
+those defaults as flaky; `tests/tools/` ran, which shells out to `python3` the build image does not
+guarantee; and `audit` (network) and `hotspot-preflight` (git history) ran where neither has what it
+needs. `WHETHER_DEPLOY_GATE=1` is what switches `scripts/run-tests.mjs` to 2 workers, a 120s
+ceiling, and no `tests/tools/`, and what gives the landmark audit's readiness and per-route bounds
+room for a cold start (180s / 60s instead of 90s / 30s). The runner also pins `NODE_ENV=test` for the
+suite it spawns: `bun test` only defaults it when unset, and a build container that sets
+`NODE_ENV=production` runs the suite in production mode, where `programmaticPayloadBuilder` stops
+relaxing its freshness contract and fails on fallback data. Those rules had only ever applied inside
+`scripts/vinext-run.mjs`'s inner gate — a step the build reaches *after* the outer command has
+already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
+`bun run check` (both); they are excluded from the deploy path, not from the repo.
 
 This paragraph used to say the opposite — that the production branch skips the gate, so "a flaky
 test can never block a deploy" — and that sentence cost two days. Builds failed on all 27 commits

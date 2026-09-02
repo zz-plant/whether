@@ -45,6 +45,43 @@ describe("deploy gate test scope", () => {
     const checks = await readFile("scripts/run-checks.mjs", "utf8");
     assert.ok(!checks.includes("WHETHER_DEPLOY_GATE"), "bun run check must not inherit the exclusion");
   });
+
+  /*
+   * Workers Builds is configured to run `bun run check:vinext` on every push, main
+   * included, before anything is built or deployed. Until 2026-09-02 that script was
+   * plain `bun run check`: the whole suite with workstation defaults (8 workers, 60s),
+   * plus tests/tools/, plus `audit` (network) and `hotspot-preflight` (git history) —
+   * none of which the deploy-gate rules above ever reached, because they only took
+   * effect inside vinext-run's inner gate, a step the build reaches after the outer
+   * command has already passed. So the container ran the one configuration this repo
+   * documents as flaky there. The configured command now *is* the deploy gate.
+   */
+  it("is what the configured Workers Builds command runs", async () => {
+    const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
+    const command = packageJson.scripts?.["check:vinext"] ?? "";
+
+    assert.match(command, /^WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs\b/);
+    for (const task of ["lint", "typecheck", "test", "assets", "landmarks"]) {
+      assert.match(command, new RegExp(`\\b${task}\\b`), `check:vinext no longer runs ${task}`);
+    }
+    // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
+    assert.doesNotMatch(command, /\baudit\b|hotspot-preflight/);
+    // The landmark audit spawns a dev server and compiles every route against it. Run
+    // alongside lint, tsc, and the suite on a small box, that server competes for the same
+    // cores and memory, and a route that compiles slowly reads as a route that never
+    // answered. It runs by itself, after the four cheaper tasks have passed.
+    assert.match(command, /assets && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
+  });
+
+  it("runs the same tasks as the inner build gate", async () => {
+    const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
+    const gate = await readFile("scripts/vinext-run.mjs", "utf8");
+    const innerTasks = gate.match(/run-checks\.mjs",\s*((?:"[a-z-]+",?\s*)+)\]/)?.[1] ?? "";
+    const inner = [...innerTasks.matchAll(/"([a-z-]+)"/g)].map((match) => match[1]).sort();
+    const outer = (packageJson.scripts?.["check:vinext"] ?? "").split(/\s+/).filter((word) => /^[a-z-]+$/.test(word) && word !== "bun").sort();
+
+    assert.deepEqual(outer, inner);
+  });
 });
 
 describe("deploy gate resource defaults", () => {
@@ -67,5 +104,23 @@ describe("deploy gate resource defaults", () => {
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
     // The gate signal is the only thing that shifts the defaults.
     assert.ok(runner.includes("const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1'"));
+  });
+
+  it("pins NODE_ENV to test for the spawned suite", async () => {
+    // bun test only defaults NODE_ENV when it is unset; a build container that sets
+    // NODE_ENV=production would otherwise run the suite in production mode, where the
+    // payload builder stops relaxing its freshness contract and fails on fallback data.
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
+    assert.match(runner, /NODE_ENV: process\.env\.WHETHER_TEST_NODE_ENV \?\? 'test'/);
+  });
+
+  it("gives the landmark audit's bounds room for a cold container start", async () => {
+    // The dev server is spawned cold in the build container while lint, tsc, and the
+    // suite share its cores. The bounds stay bounds — a route that never answers still
+    // fails the gate — but a slow box must read as slow, not as broken.
+    const audit = await readFile("scripts/check-main-content-landmarks.mjs", "utf8");
+    assert.match(audit, /const inDeployGate = process\.env\.WHETHER_DEPLOY_GATE === "1"/);
+    assert.match(audit, /inDeployGate \? "180000" : "90000"/);
+    assert.match(audit, /inDeployGate \? "60000" : "30000"/);
   });
 });
