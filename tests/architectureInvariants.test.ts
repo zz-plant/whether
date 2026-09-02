@@ -241,9 +241,22 @@ describe("Architecture Invariants", () => {
    * Only the multi-word labels are checked. The noun slots (Action / Threshold / Reversal
    * / Trigger / Guardrail) are ordinary English that appears legitimately in prose, type
    * names, and domain content, and a rule that cries wolf on those gets deleted rather
-   * than obeyed. Matching is exact — "Pause if" fails, "Pause if funding pressure rises
-   * above 60." does not, because the latter is a threshold's value, not its label.
+   * than obeyed. Matching is whole-label — "Pause if" fails, "Pause if funding pressure rises
+   * above 60." does not, because the latter is a threshold's value, not its label — and
+   * case-insensitive, because /history/compare shipped "Action Now" in Title Case and a
+   * synonym that differs only in capitals is still a synonym.
    */
+  /** Every .ts/.tsx source file under `dir`, skipping node_modules and dotfiles. */
+  const collectSourceFiles = (dir: string, out: string[] = []): string[] => {
+    for (const name of readdirSync(dir)) {
+      if (name === "node_modules" || name.startsWith(".")) continue;
+      const full = join(dir, name);
+      if (statSync(full).isDirectory()) collectSourceFiles(full, out);
+      else if (/\.tsx?$/.test(full)) out.push(full);
+    }
+    return out;
+  };
+
   const SLOT_LABELS = [
     DECISION_CONTRACT_LABELS.action.actionNow,
     DECISION_CONTRACT_LABELS.action.doNow,
@@ -272,28 +285,18 @@ describe("Architecture Invariants", () => {
         label,
         patterns: [
           // "Pause if" / "Pause if:" as a whole string literal, not a longer sentence.
-          new RegExp(`(["'])${e}:?\\s*\\1`),
+          new RegExp(`(["'])${e}:?\\s*\\1`, "i"),
           // `Pause if: ${value}` — the label prefixing an interpolated value.
-          new RegExp("`" + e + ":"),
+          new RegExp("`" + e + ":", "i"),
           // >Pause if:</span> — a JSX text node that is only the label.
-          new RegExp(`>\\s*${e}:?\\s*[<{]`),
+          new RegExp(`>\\s*${e}:?\\s*[<{]`, "i"),
           // A JSX text node on its own line, immediately before an expression.
-          new RegExp(`^\\s*${e}:\\s*\\{`),
+          new RegExp(`^\\s*${e}:\\s*\\{`, "i"),
         ],
       };
     });
 
-    const collect = (dir: string, out: string[] = []): string[] => {
-      for (const name of readdirSync(dir)) {
-        if (name === "node_modules" || name.startsWith(".")) continue;
-        const full = join(dir, name);
-        if (statSync(full).isDirectory()) collect(full, out);
-        else if (/\.tsx?$/.test(full)) out.push(full);
-      }
-      return out;
-    };
-
-    const files = [...collect(join(repoRoot, "app")), ...collect(join(repoRoot, "lib"))]
+    const files = [...collectSourceFiles(join(repoRoot, "app")), ...collectSourceFiles(join(repoRoot, "lib"))]
       .filter((file) => !file.endsWith("lib/report/reportCopy.ts"));
 
     const violations: string[] = [];
@@ -307,6 +310,85 @@ describe("Architecture Invariants", () => {
           if (SLOT_LABEL_ALLOWLIST.has(`${rel}:${label}`)) continue;
           if (patterns.some((pattern) => pattern.test(line))) {
             violations.push(`${rel}:${index + 1} hardcodes "${label}" — read it from DECISION_CONTRACT_LABELS`);
+          }
+        }
+      });
+    }
+
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
+  });
+
+  /**
+   * Invariant 9 guards heading vocabulary the way Invariant 8 guards slot labels.
+   *
+   * A heading is the operator's scan path; when it carries an internal codename or an
+   * engine term, the reader has to translate it before deciding whether the block matters.
+   * The 2026-09-02 inventory of every h1–h4, eyebrow, and section label found these on live
+   * routes: "Decision contract" on four, "Epoch" across /history/compare and its OG image,
+   * "AI Transmission Synthesizer" and "Post-MVP demand" on /operate, "Operator Loop" in the
+   * mobile drawer. docs/editorial-guardrails.md → Headings names the replacements; this test
+   * keeps the retired words from coming back.
+   *
+   * Terms match on word boundaries in non-comment lines, so identifiers (`epochA`,
+   * `CompareEpoch`, `latestEpoch`) and comments stay free to use the engine's words.
+   */
+  const RETIRED_HEADING_TERMS = [
+    "Decision contract",
+    "Continue decision flow",
+    "Epoch",
+    "Transmission Synthesizer",
+    "Operator Loop",
+    "Canon references",
+    "Included instruments",
+    "Other handoffs",
+    "Red-Team",
+    "Stress-Tester",
+    "Post-MVP",
+    "Primary keyword:",
+  ];
+
+  /** Line numbers (1-based) inside a comment, so prose about the vocabulary is not drift. */
+  const commentLines = (source: string): Set<number> => {
+    const inside = new Set<number>();
+    let inBlock = false;
+    source.split("\n").forEach((line, index) => {
+      const trimmed = line.trim();
+      if (inBlock) {
+        inside.add(index + 1);
+        if (trimmed.includes("*/")) inBlock = false;
+        return;
+      }
+      const opener = trimmed.indexOf("/*");
+      if (opener !== -1 && !trimmed.includes("*/", opener + 2)) {
+        inBlock = true;
+        inside.add(index + 1);
+        return;
+      }
+      if (trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("{/*")) inside.add(index + 1);
+    });
+    return inside;
+  };
+
+  it("Invariant 9: Retired heading vocabulary never reaches user-visible source", () => {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matchers = RETIRED_HEADING_TERMS.map((term) => ({
+      term,
+      pattern: new RegExp(`\\b${escape(term)}${/\w$/.test(term) ? "\\b" : ""}`),
+    }));
+
+    const files = [...collectSourceFiles(join(repoRoot, "app")), ...collectSourceFiles(join(repoRoot, "lib"))];
+
+    const violations: string[] = [];
+    for (const file of files) {
+      const rel = relative(repoRoot, file);
+      const source = readFileSync(file, "utf8");
+      const skip = commentLines(source);
+      source.split("\n").forEach((line, index) => {
+        if (skip.has(index + 1)) return;
+        for (const { term, pattern } of matchers) {
+          if (pattern.test(line)) {
+            violations.push(`${rel}:${index + 1} says "${term}" — retired heading vocabulary, see docs/editorial-guardrails.md → Headings`);
           }
         }
       });
