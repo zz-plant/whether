@@ -19,7 +19,7 @@ body::-webkit-scrollbar-track,
 .weather-mobile-nav::-webkit-scrollbar-track,
 .weather-mobile-panel::-webkit-scrollbar-track {
   background: rgba(15, 23, 42, 0.3);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 html::-webkit-scrollbar-thumb,
@@ -27,7 +27,7 @@ body::-webkit-scrollbar-thumb,
 .weather-mobile-nav::-webkit-scrollbar-thumb,
 .weather-mobile-panel::-webkit-scrollbar-thumb {
   background: rgba(100, 116, 139, 0.5);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 2px solid transparent;
   background-clip: padding-box;
 }

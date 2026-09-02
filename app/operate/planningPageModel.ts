@@ -537,9 +537,9 @@ export async function buildPlanningPageModel(
           h("p", { className: "text-sm text-slate-300" }, "Use these warnings to catch weak assumptions before the plan goes out."),
         ),
         failureModes.length === 0
-          ? h("div", { className: "weather-surface rounded-md border px-4 py-4 text-sm text-slate-200" }, "No active warning right now. Hold standard guardrails and go deeper only if freshness drops or confidence weakens.")
+          ? h("div", { className: "weather-surface border px-4 py-4 text-sm text-slate-200" }, "No active warning right now. Hold standard guardrails and go deeper only if freshness drops or confidence weakens.")
           : h("div", { className: "grid gap-3 lg:grid-cols-2" },
-            failureModes.map((warning) => h("article", { key: warning.id, className: "weather-surface rounded-md border px-4 py-4" },
+            failureModes.map((warning) => h("article", { key: warning.id, className: "weather-surface border px-4 py-4" },
               h("p", { className: "text-sm font-semibold text-slate-100" }, warning.warning),
               h("p", { className: "mt-2 text-sm text-slate-300" }, warning.mitigationCheck),
             )),
@@ -572,7 +572,7 @@ export async function buildPlanningPageModel(
             resourcePillarPages.map((pillar) => h(Link, {
               key: pillar.slug,
               href: `/resources/${pillar.slug}` as Route,
-              className: "weather-surface rounded-md border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
+              className: "weather-surface border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
             },
               h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400" }, "Governance pillar"),
               h("p", { className: "mt-2 font-semibold text-slate-100" }, pillar.h1),

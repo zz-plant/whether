@@ -206,7 +206,7 @@ export function DecisionPlanStressTester({
             <div className="flex items-center gap-2">
               {verdictStyles[result.verdict].icon}
               <div>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider border ${verdictStyles[result.verdict].badge}`}>
+                <span className={`inline-flex items-center rounded-sm px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider border ${verdictStyles[result.verdict].badge}`}>
                   {result.verdict}
                 </span>
                 <span className="ml-2 text-xs font-semibold text-white">{result.headline}</span>

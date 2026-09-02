@@ -27,9 +27,9 @@ type ConfidenceBadgeProps = {
  * Single source of truth for confidence label rendering with optional parametric seal.
  * Used on homepage, evidence, planning, trust, and public state pages.
  *
- * - `pill` (default): rounded-full badge with bg + text, for hero/card contexts
+ * - `pill` (default): stamped badge (radius-sm, see ui-ux-standards §XIV) with bg + text, for hero/card contexts
  * - `text`: plain colored text, for inline/summary contexts
- * - `link`: pill that links to /trust#revisit-call
+ * - `link`: the same stamp, linking to /trust#revisit-call
  */
 export function ConfidenceBadge({
   label,
@@ -72,7 +72,7 @@ export function ConfidenceBadge({
     return (
       <Link
         href="/trust#revisit-call"
-        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 type-badge transition-colors hover:text-sky-200 no-underline ${pillClass} ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-0.5 type-badge transition-colors hover:text-sky-200 no-underline ${pillClass} ${className}`}
         title="When we get this wrong"
       >
         {iconSeal}
@@ -83,7 +83,7 @@ export function ConfidenceBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 type-badge ${pillClass} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-0.5 type-badge ${pillClass} ${className}`}
     >
       {iconSeal}
       {display}

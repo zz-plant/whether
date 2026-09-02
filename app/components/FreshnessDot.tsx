@@ -64,7 +64,7 @@ export function FreshnessDot({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-11 items-center gap-2 px-2.5 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+        className="inline-flex min-h-11 items-center gap-2 px-2.5 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}

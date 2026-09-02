@@ -205,12 +205,12 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="weather-input min-h-[44px] flex-1 rounded-md px-3 py-2 text-base sm:text-xs"
+                className="weather-input min-h-[44px] flex-1 px-3 py-2 text-base sm:text-xs"
               />
               <button
                 type="submit"
                 disabled={isSubscribing}
-                className="weather-button-primary min-h-[44px] rounded-md px-4 py-2 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                className="weather-button-primary min-h-[44px] px-4 py-2 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubscribing ? "…" : subscribed ? "Check inbox" : "Subscribe"}
               </button>
@@ -229,7 +229,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <div className="mt-4 flex items-center justify-between">
             <p className="text-fluid-micro text-slate-400">Changes apply on next brief refresh.</p>
             {saved ? (
-              <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-200">Saved</span>
+              <span className="rounded-sm bg-emerald-500/15 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-200">Saved</span>
             ) : null}
           </div>
         </Dialog.Popup>

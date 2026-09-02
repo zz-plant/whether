@@ -127,17 +127,26 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* Border radius — kiki: sharp, angular.
-     Still sharp, but the steps have to be tellable apart: the previous
-     2/3/4/6px scale put every tier inside a 4px band, so 538 rounded-*
-     usages all looked identical. Keep these in lockstep with the radius
-     values in the @theme inline block below, which is what generates the
-     rounded-* utilities — the two drifted apart and produced two scales. */
+  /* Border radius — two registers, assigned by role rather than by taste.
+     Sharp asserts: anything that states a fact or a call — status and verdict
+     stamps (sm), data tiles and rule segments (md), controls (lg). Soft holds:
+     the furniture around it — cards (xl), surfaces, sheets and dialogs (2xl).
+     The scale steps geometrically instead of the old 2/4/6/8/12 ramp so the
+     two registers are tellable apart: a card is never on the control radius
+     and a stamp is never on the card radius. `full` is for things that are
+     round — dots, markers, spinners, switches, progress bars, icon wells —
+     never for a text-bearing element; a pill beside a 2px chip was two badge
+     shapes for one class of information. docs/agents/ui-ux-standards.md §XIV
+     holds the role map. Keep these in lockstep with the @theme inline block
+     below, which generates the rounded-* utilities; tests/shapeRegister.test.ts
+     fails when the two drift, which they did once and produced two scales. */
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --radius-xl: 8px;
-  --radius-2xl: 12px;
+  --radius-xl: 10px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
   --radius-full: 9999px;
 
   /* Surfaces — the ladder has to be wide enough to read as depth. The previous
@@ -438,16 +447,17 @@ html[data-screenshot="true"] body {
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  /* Generates the rounded-* utilities. Mirrors the :root scale above; the
-     old calc(var(--radius) * n) chain derived everything from 0.25rem and
+  /* Generates the rounded-* utilities. Mirrors the :root scale above, and
+     tests/shapeRegister.test.ts fails when the two drift. The old
+     calc(var(--radius) * n) chain derived everything from 0.25rem and
      collapsed sm..2xl into 2.4-7.2px, with rounded-3xl resolving to 0px. */
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --radius-xl: 8px;
-  --radius-2xl: 12px;
-  --radius-3xl: 16px;
-  --radius-4xl: 20px;
+  --radius-xl: 10px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
 }
 
 .dark {

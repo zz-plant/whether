@@ -221,7 +221,7 @@ This memo aligns our company budget and operating guardrails with the current cl
       </div>
 
       {showMemo && (
-        <div className="weather-surface border-sky-500/25 bg-slate-950/60 p-5 rounded-lg space-y-4">
+        <div className="weather-surface border-sky-500/25 bg-slate-950/60 p-5 space-y-4">
           <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
             <div>
               <p className="type-eyebrow text-sky-200">Generated board memo</p>

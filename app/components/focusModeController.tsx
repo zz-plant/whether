@@ -40,7 +40,7 @@ export function FocusModeController() {
   if (!isFocusMode) return null;
 
   return (
-    <div className="fixed top-3 right-3 z-50 flex items-center gap-2 rounded-full border border-sky-500/40 bg-slate-900/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
+    <div className="fixed top-3 right-3 z-50 flex items-center gap-2 rounded-lg border border-sky-500/40 bg-slate-900/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
       <span className="inline-block size-2 rounded-full bg-sky-400 animate-ping" />
       <span className="text-fluid-nano font-mono font-semibold text-sky-200 uppercase tracking-wide">
         Presentation Focus Mode
@@ -48,7 +48,7 @@ export function FocusModeController() {
       <button
         type="button"
         onClick={() => setIsFocusMode(false)}
-        className="ml-2 rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+        className="ml-2 rounded-lg p-1 text-white/60 hover:bg-white/10 hover:text-white transition-colors"
         aria-label="Exit focus mode"
       >
         <Minimize2 size={14} />

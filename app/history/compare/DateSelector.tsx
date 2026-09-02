@@ -51,7 +51,7 @@ export function DateSelector({
         value={val}
         onChange={handleChange}
         style={{ colorScheme: "light dark" }}
-        className="weather-input min-h-[44px] w-full px-3 py-2 text-sm bg-[var(--bg-surface)] text-[var(--app-text)] border border-[var(--border-default)] rounded-md focus:border-sky-500 focus:outline-none cursor-pointer"
+        className="weather-input min-h-[44px] w-full px-3 py-2 text-sm bg-[var(--bg-surface)] text-[var(--app-text)] border border-[var(--border-default)] focus:border-sky-500 focus:outline-none cursor-pointer"
       >
         <option value="">Latest (Current week)</option>
         {options.map((opt) => (

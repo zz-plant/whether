@@ -169,7 +169,7 @@ export const MonthlyActionSummaryPanel = ({
                 Cadence alignment
               </p>
               <span
-                className={`inline-flex min-h-[24px] items-center rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.12em] ${cadenceBadge.classes}`}
+                className={`inline-flex min-h-[24px] items-center rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.12em] ${cadenceBadge.classes}`}
               >
                 {cadenceBadge.label}
               </span>

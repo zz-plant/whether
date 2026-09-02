@@ -53,7 +53,7 @@ export default async function ShipChecklistPage({
           ] as const).map(([key, label, options]) => (
             <label key={key} className="space-y-1 type-eyebrow text-slate-300">
               {label}
-              <select name={key} defaultValue={input[key]} className="weather-control rounded-md border-slate-700 bg-slate-900">
+              <select name={key} defaultValue={input[key]} className="weather-control border-slate-700 bg-slate-900">
                 {options.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}

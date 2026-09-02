@@ -63,7 +63,7 @@ export function RitualCheck({
         type="button"
         onClick={handleToggle}
         aria-label={reviewed ? "Reviewed: remove confirmation" : "Mark reviewed: confirm this week"}
-        className={`inline-flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
+        className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-colors active:scale-[0.97] ${
           reviewed
             ? "bg-emerald-500/12 text-emerald-300 border border-emerald-500/30"
             : "bg-white/[0.06] text-white/60 border border-white/[0.10] hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-sky-400"

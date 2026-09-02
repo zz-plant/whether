@@ -357,6 +357,28 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Threshold distance names the decision consequence.** The hero preserves the nearest bounded-rule distance but labels it with one associated surfaced decision (for example, `3 points until hiring review`). Shared thresholds use revisit priority rather than listing every affected lever; crossed lines render as crossed instead of implying distance remains.
 - **History no longer competes in a sticky rail.** Regime history, subscription, and the citable permalink now sit in a lower continuity-and-delivery section after the operating workflow.
 
+## Shape register pass (2026-09-02)
+
+Settled the bouba/kiki balance as a role assignment — sharp asserts, soft holds — and wrote it
+down as `docs/agents/ui-ux-standards.md` §XIV, with `tests/shapeRegister.test.ts` keeping it.
+
+- **One badge shape.** Status, verdict, regime, confidence and analog badges were the only
+  `rounded-full` text on the page, so the most assertive content sat in the softest shape while
+  metadata chips were 2px. They are 2px stamps now (`3 NEED ATTENTION`, `HOLD`, `Q4 2018 analog`,
+  `LOW` confidence). Round is reserved for what is round: dots, spinners, switches, progress bars,
+  icon wells, seals.
+- **One control shape.** This reverses the 2026-08-11 "quiet pill" decision below. The hero's
+  secondary actions (`Copy Brief`, `Log to Memory`, the freshness trigger, `Mark reviewed`), the
+  header's `Weekly Brief` / `Home` actions, and the theme toggle drop their `rounded-full` and
+  take the shared control radius (6px). Quietness is carried by their low-contrast fill and
+  border, which they already had; the round corners were a second hierarchy signal that made one
+  action row show two button shapes.
+- **Containers off the control radius.** `--radius-xl` 8px → 10px and `--radius-2xl` 12px →
+  16px, so a card is never on the button radius; the hub hero/section/card shells move from `lg`
+  to `xl`. Stamps (2px), data tiles (4px) and controls (6px) are unchanged.
+- **Not changed, deliberately.** Uppercase eyebrows, mono numerals, and the serif display face
+  keep their register; §XIV records why sentence-casing the eyebrows was rejected.
+
 ## Controls & nav pass (2026-08-11)
 
 Compressed the shell chrome and unified control vocabulary on `/`.

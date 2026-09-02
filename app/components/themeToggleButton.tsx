@@ -27,7 +27,7 @@ export function ThemeToggleButton({ className = "", showLabel = false, ...props 
       {...props}
       type="button"
       onClick={toggleTheme}
-      className={`weather-pill inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-full px-2.5 py-1.5 text-xs font-semibold tracking-[0.08em] ${className}`.trim()}
+      className={`weather-pill inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2.5 py-1.5 text-xs font-semibold tracking-[0.08em] ${className}`.trim()}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={!isDark}
       suppressHydrationWarning

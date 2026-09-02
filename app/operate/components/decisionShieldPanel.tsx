@@ -540,7 +540,7 @@ export const DecisionShieldPanel = ({
                 value={planText}
                 onChange={(e) => setPlanText(e.target.value)}
                 rows={3}
-                className="weather-input w-full p-3 font-mono text-xs text-slate-100 placeholder-slate-500 rounded-lg border border-slate-700 bg-slate-950/80 focus:border-sky-500 focus:outline-none"
+                className="weather-input w-full p-3 font-mono text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80 focus:border-sky-500 focus:outline-none"
                 placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
               />
 
@@ -548,7 +548,7 @@ export const DecisionShieldPanel = ({
               <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
                       stressTestResult.verdict === "SAFE"
                         ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
                         : stressTestResult.verdict === "RISKY"
@@ -610,7 +610,7 @@ export const DecisionShieldPanel = ({
                     value={planText}
                     onChange={(e) => setPlanText(e.target.value)}
                     rows={3}
-                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 rounded-lg border border-slate-700 bg-slate-950/80"
+                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                   />
                   <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                     <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
@@ -628,7 +628,7 @@ export const DecisionShieldPanel = ({
                     value={planBText}
                     onChange={(e) => setPlanBText(e.target.value)}
                     rows={3}
-                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 rounded-lg border border-slate-700 bg-slate-950/80"
+                    className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                   />
                   <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                     <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${

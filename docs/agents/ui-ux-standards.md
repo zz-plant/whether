@@ -163,3 +163,52 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   Tailwind `/opacity` modifier, so a regex looking for `rgb(` reports a page as clean when it is not.
   Normalise colour through a canvas, and treat "is it positioned" as a question about the ancestor
   chain — the popovers in this codebase carry their positioning on a parent.
+
+## XIV. Shape register (sharp asserts, soft holds)
+
+Scope: every `border-radius`, every `rounded-*` utility, and every element that reads as a badge,
+chip, control, or container under `app/`.
+
+Whether runs two shape registers at once, and the balance between them is a role assignment, not
+a slider. **Sharp asserts**: anything that states a fact or a call — a status or verdict stamp, a
+data tile, a rule segment, a control the operator presses. **Soft holds**: the furniture around
+it — cards, surfaces, sheets, dialogs — together with the voice (the serif display face, the
+shadow ladder, the ease-out motion). Sharpness carries information only while it is the
+exception, so the soft tier must be visibly softer than the sharp one, and neither register may
+take the other's job.
+
+- MUST: take the radius from the role, through the token — never from taste at the call site.
+
+  | Tier | Token | How it is applied | What lives here |
+  | --- | --- | --- | --- |
+  | Stamp | `--radius-sm` (2px) | `rounded-sm`, `.weather-tag`, `.weather-chip`, `.weather-hub-chip` | status, verdict, regime, confidence and analog badges; chips; tags |
+  | Data | `--radius-md` (4px) | `rounded-md`, `rounded` | stat tiles, rule segments, trust lanes, loading stages |
+  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-tab`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
+  | Card | `--radius-xl` (10px) | `rounded-xl`, `.weather-card`, the hub hero/section/card shells, page section shells | a self-contained item or section |
+  | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
+  | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |
+
+- NEVER: `rounded-full` on a text-bearing element. A pill beside a 2px chip is two badge shapes
+  for one class of information, and until 2026-09-02 it put the softest shape on the page around
+  the most assertive content (`3 NEED ATTENTION`, `HOLD`, `Q4 2018 analog`). Verdicts are
+  stamps.
+- NEVER: a `rounded-*` utility on an element that carries a control class. The class owns the
+  radius. The header's `rounded-full` overrides on `.weather-button-primary` gave one action row
+  two button shapes. Emphasis between controls is carried by fill and border — the `primary` /
+  `pill` / `ghost` variants of §X — not by corner shape. This reverses the 2026-08-11 "quiet
+  pill" decision in `docs/one-screen-weekly-brief-spec.md`, which made the hero's secondary
+  actions round so they would read quieter and produced exactly that mixed row.
+- NEVER: a named container on the control radius, and never a `rounded-*` utility on one. The
+  classes that own a card or surface radius are `.weather-card`, `.weather-surface`,
+  `.weather-lever-card`, and the hub hero, section, card and link-card shells; they are `xl` or
+  `2xl`, and a shell at 6px reads as a giant button and stops separating the furniture from the
+  controls inside it. `.weather-panel` is a layout tier and owns no radius, so a panel that draws
+  a border takes `rounded-xl` itself. Inner segments inside a card may sit at `md` or `lg`.
+- MUST: keep `app/styles/tokens.css` the only place a radius is a number. Stylesheets reference
+  `var(--radius-*)` (`inherit` and `50%` excepted). `tests/shapeRegister.test.ts` checks the
+  three NEVERs above and keeps the `:root` scale and the `@theme inline` scale in lockstep.
+- Uppercase eyebrows (`.type-eyebrow`), tracked badges (`.type-badge`), and tabular or mono
+  numerals stay sharp on purpose: they are tag-class labels and figures. Sentence-casing every
+  eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over
+  `Weekly plan`) across the report shells. Rationing eyebrows is per-surface content work
+  (`docs/ui-facelift-plan.md`, Phase 2), not a register change.

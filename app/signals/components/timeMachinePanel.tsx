@@ -248,7 +248,7 @@ export const TimeMachinePanel = ({
               )}
             </p>
             {showHistoricalCallout ? (
-              <div className="weather-surface mt-4 rounded-lg p-3">
+              <div className="weather-surface mt-4 p-3">
                 <p className="type-label text-slate-400">
                   Operational implication · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
                 </p>
