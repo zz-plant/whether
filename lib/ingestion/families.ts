@@ -1,5 +1,5 @@
 import { fetchTreasuryData } from "../treasury/treasuryClient";
-import { computeLatestYearOverYear, fetchFredCsv, findLatestFredRow, parseFredCsvRows } from "../fred";
+import { computeLatestYearOverYear, fetchFredRows, latestFredObservation } from "../fred";
 import type { SignalEntitySnapshot, SignalFamily } from "./types";
 
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
@@ -11,13 +11,13 @@ const LATEST_VALUE_LOOKBACK_DAYS = 90;
 const YEAR_OVER_YEAR_LOOKBACK_DAYS = 430;
 
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: LATEST_VALUE_LOOKBACK_DAYS });
-  return findLatestFredRow(csv);
+  const rows = await fetchFredRows(fetcher, seriesId, { lookbackDays: LATEST_VALUE_LOOKBACK_DAYS });
+  return latestFredObservation(rows, seriesId);
 };
 
 const readFredLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
-  const csv = await fetchFredCsv(fetcher, seriesId, { lookbackDays: YEAR_OVER_YEAR_LOOKBACK_DAYS });
-  return computeLatestYearOverYear(parseFredCsvRows(csv), seriesId);
+  const rows = await fetchFredRows(fetcher, seriesId, { lookbackDays: YEAR_OVER_YEAR_LOOKBACK_DAYS });
+  return computeLatestYearOverYear(rows, seriesId);
 };
 
 const fetchRates: FamilyFetcher = async (fetcher, ingestedAt) => {
