@@ -147,9 +147,9 @@ export default async function SignalsPage({
       <div id="analog-pattern" className="weather-panel scroll-mt-28 p-5 border border-sky-500/30 bg-slate-900/60 shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <p className="type-label text-sky-400 font-semibold">Closest past cycle</p>
+            <p className="type-label text-sky-400 font-semibold">Historical analog</p>
             <h3 className="text-base font-bold text-slate-100">
-              {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} ({getHistoricalAnalogPlaybook(model.assessment).correlationScore}% match)
+              Closest past cycle: {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} ({getHistoricalAnalogPlaybook(model.assessment).correlationScore}% match)
             </h3>
             <p className="text-fluid-xs text-slate-400 mt-0.5">
               Live macro coordinates match conditions during {getHistoricalAnalogPlaybook(model.assessment).analogPeriod}.

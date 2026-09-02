@@ -194,7 +194,7 @@ export default async function HistoryComparePage({
         {/* Delta Analysis Panel */}
         <section className="weather-panel p-6">
           <p className="type-label text-slate-400">Difference</p>
-          <h3 className="type-section text-slate-100 mt-1">What changed between them</h3>
+          <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
           
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="weather-surface p-4 text-center">
