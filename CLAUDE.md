@@ -95,9 +95,13 @@ visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
 configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
-deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets
-landmarks`. So every push, `main` included, runs lint, typecheck, the suite, the asset check, and
-the landmark audit before anything is built or deployed. **A failing test does block a deploy.**
+deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets`, then
+`WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks` on its own. So every push, `main`
+included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
+before anything is built or deployed. The audit runs second and alone because it spawns a dev
+server and compiles every route against it; on a small box a server competing with lint, tsc,
+and the suite for cores turns a slow route into one that "never answered". **A failing test does
+block a deploy.**
 
 Until 2026-09-02 `check:vinext` was plain `bun run check`, which is the wrong gate for that
 container in three ways, and the deploy-gate rules this repo already had never reached it: the

@@ -66,6 +66,11 @@ describe("deploy gate test scope", () => {
     }
     // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
     assert.doesNotMatch(command, /\baudit\b|hotspot-preflight/);
+    // The landmark audit spawns a dev server and compiles every route against it. Run
+    // alongside lint, tsc, and the suite on a small box, that server competes for the same
+    // cores and memory, and a route that compiles slowly reads as a route that never
+    // answered. It runs by itself, after the four cheaper tasks have passed.
+    assert.match(command, /assets && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
   });
 
   it("runs the same tasks as the inner build gate", async () => {

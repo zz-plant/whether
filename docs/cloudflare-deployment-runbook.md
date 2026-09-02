@@ -24,8 +24,13 @@ The build command configured in the Workers Builds dashboard is `bun run check:v
 the deploy gate, not the full local check:
 
 ```bash
-WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets landmarks
+WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets \
+  && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks
 ```
+
+The landmark audit runs second and alone: it spawns a dev server and compiles every route
+against it, and a server sharing a small container's cores with lint, tsc, and the suite turns a
+slow route into one that "never answered".
 
 `WHETHER_DEPLOY_GATE=1` makes `scripts/run-tests.mjs` run 2 workers with a 120s ceiling and skip
 `tests/tools/` (it shells out to `python3`, which the build image does not guarantee), and gives
