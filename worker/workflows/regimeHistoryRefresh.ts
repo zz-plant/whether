@@ -13,7 +13,7 @@ import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloud
 import { GitHubRepoClient } from "../../lib/github/repoClient";
 import type { KvNamespace } from "../../lib/runtime/kv";
 import {
-  buildRegimeHistoryFileUpdate,
+  buildRegimeHistoryUpdateAgainstBase,
   openRegimeHistoryPullRequest,
   readStoredMonthlyRegimeHistory,
   type OpenRegimeHistoryPullRequestResult,
@@ -38,27 +38,26 @@ export class RegimeHistoryRefreshWorkflow extends WorkflowEntrypoint<RegimeHisto
       readStoredMonthlyRegimeHistory(this.env.WHETHER_DURABLE_KV),
     );
 
-    const update = await step.do("merge it over the bundled series", async () => buildRegimeHistoryFileUpdate(stored));
-
-    if (!update.changed) {
-      return { opened: false, reason: "the bundled series already carries every month KV has" };
-    }
-
     const token = this.env.GITHUB_TOKEN;
     if (!token) {
       // Fail loudly: a workflow that cannot open its pull request has not done its job.
       throw new Error("GITHUB_TOKEN is not configured; the regime history cannot be recorded in the repository");
     }
 
-    return step.do(
-      "open the pull request",
-      { retries: { limit: 3, delay: "30 seconds", backoff: "exponential" } },
-      () =>
-        openRegimeHistoryPullRequest({
-          client: new GitHubRepoClient({ token, repository: this.env.GITHUB_REPOSITORY ?? DEFAULT_GITHUB_REPOSITORY }),
-          update,
-          base: event.payload?.base ?? "main",
-        }),
+    const client = new GitHubRepoClient({ token, repository: this.env.GITHUB_REPOSITORY ?? DEFAULT_GITHUB_REPOSITORY });
+    const base = event.payload?.base ?? "main";
+    const retries = { retries: { limit: 3, delay: "30 seconds", backoff: "exponential" as const } };
+
+    // The merge base is the file on the base branch as it stands now, never this
+    // deployment's bundle: a preview built from an older commit must not undo main.
+    const update = await step.do("merge it over the file on the base branch", retries, () =>
+      buildRegimeHistoryUpdateAgainstBase({ client, base, stored }),
     );
+
+    if (!update.changed) {
+      return { opened: false, reason: `${base} already carries every month KV has` };
+    }
+
+    return step.do("open the pull request", retries, () => openRegimeHistoryPullRequest({ client, update, base }));
   }
 }

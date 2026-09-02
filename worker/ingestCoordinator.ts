@@ -46,15 +46,28 @@ const isMaterializedModel = (value: unknown): value is MaterializedSignalReadMod
 const isSnapshotList = (value: unknown): value is SignalEntitySnapshot[] =>
   Array.isArray(value) && value.every((entry) => isRecord(entry) && typeof entry.signalKey === "string");
 
+export type CoordinatorOptions = {
+  /** Upstream fetch, injectable for tests. Defaults to the global fetch. */
+  fetcher?: typeof fetch;
+  now?: () => number;
+};
+
 export class IngestCoordinator {
   private readonly store: DurableStorageIngestionStore;
+  private readonly fetcher: typeof fetch;
 
+  /**
+   * The runtime constructs a Durable Object as `(state, env)`. The env is unused here (the
+   * object reads nothing from bindings), but the slot must stay so a test-only option never
+   * lands where the runtime puts the environment.
+   */
   constructor(
     private readonly state: CoordinatorState,
-    private readonly fetcher: typeof fetch = fetch,
-    now: () => number = () => Date.now(),
+    _env?: unknown,
+    options: CoordinatorOptions = {},
   ) {
-    this.store = new DurableStorageIngestionStore(state.storage, now);
+    this.fetcher = options.fetcher ?? fetch;
+    this.store = new DurableStorageIngestionStore(state.storage, options.now);
   }
 
   async fetch(request: Request): Promise<Response> {

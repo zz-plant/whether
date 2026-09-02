@@ -193,8 +193,10 @@ export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: stri
 // Without `cosd`, fredgraph.csv returns the full series history (decades of daily
 // rows, hundreds of KB per series). Every consumer needs a bounded window, so
 // callers pass a lookback and we request only that range.
-export const observationStartDateForLookback = (lookbackDays: number): string => {
-  const start = new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000);
+/** `anchor` is an ISO date to count back from; a vintage's window ends at its `asOf`, not today. */
+export const observationStartDateForLookback = (lookbackDays: number, anchor?: string): string => {
+  const end = anchor ? new Date(`${anchor}T00:00:00.000Z`).getTime() : Date.now();
+  const start = new Date(end - lookbackDays * 24 * 60 * 60 * 1000);
   return start.toISOString().slice(0, 10);
 };
 
@@ -216,6 +218,10 @@ export interface FetchFredCsvOptions {
 const guardedFredRequest = async <T>(
   attempt: (remainingMs: number) => Promise<T>,
   options?: FetchFredCsvOptions,
+  /* An attempt that has a fallback behind it must not count against the breaker: six
+     families ingesting concurrently against a revoked key would otherwise open it before
+     any of their CSV fallbacks ran, and the fallback would fail without a request. */
+  recordFailure = true,
 ): Promise<T> => {
   if (cbConsecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD) {
     const withinCooldown =
@@ -236,8 +242,10 @@ const guardedFredRequest = async <T>(
     cbLastFailureAt = null;
     return result;
   } catch (error) {
-    cbConsecutiveFailures += 1;
-    cbLastFailureAt = Date.now();
+    if (recordFailure) {
+      cbConsecutiveFailures += 1;
+      cbLastFailureAt = Date.now();
+    }
     throw error;
   }
 };
@@ -331,11 +339,12 @@ const redactError = (error: unknown) => {
   return error;
 };
 
-export const fetchFredApiRows = async (
+const fetchFredApiRowsGuarded = async (
   fetcher: typeof fetch,
   seriesId: string,
   apiKey: string,
-  options?: FetchFredRowsOptions,
+  options: FetchFredRowsOptions | undefined,
+  recordFailure: boolean,
 ): Promise<FredRow[]> => {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const revalidateSeconds = options?.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS;
@@ -345,7 +354,8 @@ export const fetchFredApiRows = async (
       const response = await fetchWithTimeout(
         fetcher,
         buildFredApiUrl(seriesId, apiKey, {
-          observationStart: options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays) : undefined,
+          // A vintage's window counts back from its own date, not from today.
+          observationStart: options?.lookbackDays ? observationStartDateForLookback(options.lookbackDays, options.asOf) : undefined,
           asOf: options?.asOf,
         }),
         { headers: FRED_API_HEADERS, next: { revalidate: revalidateSeconds } },
@@ -357,11 +367,18 @@ export const fetchFredApiRows = async (
       }
 
       return parseFredApiObservations(await response.json());
-    }, options);
+    }, options, recordFailure);
   } catch (error) {
     throw redactError(error);
   }
 };
+
+export const fetchFredApiRows = (
+  fetcher: typeof fetch,
+  seriesId: string,
+  apiKey: string,
+  options?: FetchFredRowsOptions,
+): Promise<FredRow[]> => fetchFredApiRowsGuarded(fetcher, seriesId, apiKey, options, true);
 
 /**
  * Observations for a series, from the API when a key is configured and from the CSV export
@@ -381,10 +398,13 @@ export const fetchFredRows = async (
   }
 
   if (apiKey) {
+    // With a CSV fallback behind it, an API failure is not yet a FRED failure: it must not
+    // open the breaker that the fallback is about to check.
+    const hasFallback = !options?.asOf;
     try {
-      return await fetchFredApiRows(fetcher, seriesId, apiKey, options);
+      return await fetchFredApiRowsGuarded(fetcher, seriesId, apiKey, options, !hasFallback);
     } catch (error) {
-      if (options?.asOf) {
+      if (!hasFallback) {
         throw error;
       }
       console.warn(

@@ -5,7 +5,9 @@ import { getBundledMonthlyRegimeHistory, monthKeyFor, type MonthlyRegimeHistoryE
 import {
   REGIME_HISTORY_FILE_PATH,
   buildRegimeHistoryFileUpdate,
+  buildRegimeHistoryUpdateAgainstBase,
   openRegimeHistoryPullRequest,
+  readRegimeHistoryFromBranch,
   readStoredMonthlyRegimeHistory,
   regimeHistoryBranchName,
 } from "../lib/summary/regimeHistoryPullRequest";
@@ -88,14 +90,14 @@ class FakeGitHub {
 
 describe("buildRegimeHistoryFileUpdate", () => {
   it("reports no change when KV carries nothing the bundle lacks", () => {
-    const update = buildRegimeHistoryFileUpdate([lastBundled]);
+    const update = buildRegimeHistoryFileUpdate([lastBundled], bundled);
     assert.equal(update.changed, false);
     assert.deepEqual(update.changedMonths, []);
   });
 
   it("adds the month in progress in the generator scripts' file format", () => {
     const entry = nextMonthEntry();
-    const update = buildRegimeHistoryFileUpdate([entry]);
+    const update = buildRegimeHistoryFileUpdate([entry], bundled);
 
     assert.equal(update.changed, true);
     assert.deepEqual(update.changedMonths, [monthKeyFor(entry.record_date)]);
@@ -108,7 +110,7 @@ describe("buildRegimeHistoryFileUpdate", () => {
 
   it("rewrites a month the bundle already has when KV's entry differs, and only that month", () => {
     const rewritten = { ...lastBundled, tightness: (lastBundled.tightness ?? 0) + 1 };
-    const update = buildRegimeHistoryFileUpdate([rewritten]);
+    const update = buildRegimeHistoryFileUpdate([rewritten], bundled);
     assert.deepEqual(update.changedMonths, [monthKeyFor(lastBundled.record_date)]);
     const parsed: MonthlyRegimeHistoryEntry[] = JSON.parse(update.content);
     assert.equal(parsed.length, bundled.length, "no entry was added");
@@ -122,13 +124,61 @@ describe("buildRegimeHistoryFileUpdate", () => {
   });
 });
 
+describe("merging against the base branch", () => {
+  /** A month main has that this deployment's bundle does not: the deployment is older than main. */
+  const monthOnMainOnly = (): MonthlyRegimeHistoryEntry => nextMonthEntry();
+  const monthAfter = (entry: MonthlyRegimeHistoryEntry): MonthlyRegimeHistoryEntry => {
+    const date = new Date(`${entry.record_date}T00:00:00.000Z`);
+    const next = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 15));
+    return { record_date: next.toISOString().slice(0, 10), regime: "DEFENSIVE", tightness: 55, riskAppetite: 48 };
+  };
+
+  it("reads and validates the file on the branch", async () => {
+    const github = new FakeGitHub(`${JSON.stringify(bundled, null, 2)}\n`);
+    const entries = await readRegimeHistoryFromBranch(github.client(), "main");
+    assert.equal(entries.length, bundled.length);
+  });
+
+  it("keeps months that reached main after this deployment was built", async () => {
+    const onMain = monthOnMainOnly();
+    const fromKv = monthAfter(onMain);
+    const github = new FakeGitHub(`${JSON.stringify([...bundled, onMain], null, 2)}\n`);
+
+    const update = await buildRegimeHistoryUpdateAgainstBase({ client: github.client(), base: "main", stored: [fromKv] });
+
+    const parsed: MonthlyRegimeHistoryEntry[] = JSON.parse(update.content);
+    assert.deepEqual(update.changedMonths, [monthKeyFor(fromKv.record_date)], "only KV's month is new");
+    assert.ok(parsed.some((entry) => entry.record_date === onMain.record_date), "main's month survives the merge");
+    assert.equal(parsed.length, bundled.length + 2);
+  });
+
+  it("reports no change when main already carries KV's month, even if this deployment's bundle does not", async () => {
+    const onMain = monthOnMainOnly();
+    const github = new FakeGitHub(`${JSON.stringify([...bundled, onMain], null, 2)}\n`);
+
+    const update = await buildRegimeHistoryUpdateAgainstBase({ client: github.client(), base: "main", stored: [onMain] });
+
+    assert.equal(update.changed, false);
+    assert.equal(github.calls.length, 1, "one read of the base file, nothing written");
+  });
+
+  it("refuses to proceed when the base file is missing or does not validate", async () => {
+    const missing = new FakeGitHub("[]");
+    missing.files.delete(`main:${REGIME_HISTORY_FILE_PATH}`);
+    await assert.rejects(readRegimeHistoryFromBranch(missing.client(), "main"), /is missing on main/);
+
+    const invalid = new FakeGitHub("not json");
+    await assert.rejects(readRegimeHistoryFromBranch(invalid.client(), "main"), /is not JSON/);
+  });
+});
+
 describe("openRegimeHistoryPullRequest", () => {
   const now = new Date("2026-09-07T13:00:00.000Z");
 
   it("branches from main, commits the file, and opens the pull request", async () => {
     const github = new FakeGitHub(`${JSON.stringify(bundled, null, 2)}\n`);
     const entry = nextMonthEntry();
-    const update = buildRegimeHistoryFileUpdate([entry]);
+    const update = buildRegimeHistoryFileUpdate([entry], bundled);
 
     const result = await openRegimeHistoryPullRequest({ client: github.client(), update, now });
 
@@ -161,7 +211,7 @@ describe("openRegimeHistoryPullRequest", () => {
 
   it("is idempotent for the day: a second run reports the open pull request instead of opening another", async () => {
     const github = new FakeGitHub(`${JSON.stringify(bundled, null, 2)}\n`);
-    const update = buildRegimeHistoryFileUpdate([nextMonthEntry()]);
+    const update = buildRegimeHistoryFileUpdate([nextMonthEntry()], bundled);
 
     const first = await openRegimeHistoryPullRequest({ client: github.client(), update, now });
     const second = await openRegimeHistoryPullRequest({ client: github.client(), update, now });
@@ -175,7 +225,7 @@ describe("openRegimeHistoryPullRequest", () => {
 
   it("does nothing when the update carries no change", async () => {
     const github = new FakeGitHub(`${JSON.stringify(bundled, null, 2)}\n`);
-    const result = await openRegimeHistoryPullRequest({ client: github.client(), update: buildRegimeHistoryFileUpdate([]), now });
+    const result = await openRegimeHistoryPullRequest({ client: github.client(), update: buildRegimeHistoryFileUpdate([], bundled), now });
     assert.equal(result.opened, false);
     assert.equal(github.calls.length, 0);
   });
@@ -185,7 +235,7 @@ describe("openRegimeHistoryPullRequest", () => {
     const client = new GitHubRepoClient({ token: "ghp_super_secret", repository: "zz-plant/whether", fetcher });
 
     await assert.rejects(
-      openRegimeHistoryPullRequest({ client, update: buildRegimeHistoryFileUpdate([nextMonthEntry()]), now }),
+      openRegimeHistoryPullRequest({ client, update: buildRegimeHistoryFileUpdate([nextMonthEntry()], bundled), now }),
       (error: unknown) =>
         error instanceof GitHubApiError && error.status === 401 && !error.message.includes("ghp_super_secret"),
     );

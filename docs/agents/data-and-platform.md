@@ -51,6 +51,8 @@ and 1c describe the behavior it must keep.
 
 `worker/workflows/regimeHistoryRefresh.ts` records the KV month in progress into
 `data/summary_monthly_regime_history.json` behind a pull request, in retried steps that fail
-visibly instead of reporting success without a PR. It adds only what the Worker observed: no
+visibly instead of reporting success without a PR. It merges over the file on the base branch as
+it stands at run time, never the series bundled into the running deployment, so a preview built
+from an older commit cannot undo months that reached `main` after it was built. It adds only what the Worker observed: no
 backfill, no regenerated history — the canonical series is still the generator scripts' job.
 On for the preview lane only (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.

@@ -85,7 +85,7 @@ const fixtureFetch: typeof fetch = async (input) => {
 /** The object and a client talking to it in-process: the stub is the object's own fetch. */
 const coordinatorPair = (options: { now?: () => number; fetcher?: typeof fetch } = {}) => {
   const storage = new FakeStorage();
-  const object = new IngestCoordinator({ storage }, options.fetcher ?? fixtureFetch, options.now);
+  const object = new IngestCoordinator({ storage }, {}, { fetcher: options.fetcher ?? fixtureFetch, now: options.now });
   const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
   return { storage, object, client };
 };
@@ -186,6 +186,25 @@ describe("IngestCoordinator", () => {
     assert.ok(model, "a model is materialized");
     assert.ok(Date.parse(model.signals.TREASURY_10Y?.snapshot.ingestedAt ?? "") >= before, "the due family was re-ingested");
     assert.ok(storage.alarm !== null && storage.alarm >= before + REFRESH_ALARM_INTERVAL_MS - 1000, "the next check is armed");
+  });
+
+  it("is constructed the way the runtime constructs it: (state, env), with env never mistaken for fetch", async () => {
+    const storage = new FakeStorage();
+    const runtimeEnv = { WHETHER_DURABLE_KV: {}, INGEST_COORDINATOR: {} };
+    const object = new IngestCoordinator({ storage }, runtimeEnv);
+    const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
+    await client.writeLatestMaterialized(fullModel(new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()));
+
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = fixtureFetch;
+    try {
+      const response = await object.fetch(new Request(`${COORDINATOR_ORIGIN}${COORDINATOR_ROUTES.refresh}`, { method: "POST" }));
+      assert.equal(response.status, 200, "the refresh used the global fetch, not the env object");
+      const body: unknown = await response.json();
+      assert.ok(body && typeof body === "object" && "refreshed" in body && Array.isArray(body.refreshed) && body.refreshed.length > 0);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 
   it("serves a cold read path end to end, so Invariant 1b holds on this backend too", async () => {

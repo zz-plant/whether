@@ -343,6 +343,55 @@ describe("fetchFredRows — API path", () => {
     }
   });
 
+  it("keeps the breaker closed while keyed reads fall back concurrently, so every fallback runs", async () => {
+    // Six families ingest at once. A revoked key fails all six API attempts together; before
+    // the fix the third failure opened the shared breaker and the remaining CSV fallbacks
+    // threw "circuit breaker open" without a request.
+    const calls: string[] = [];
+    const fetcher = recordingFetcher(
+      (url) =>
+        url.startsWith(FRED_API_BASE_URL)
+          ? new Response(JSON.stringify({ error_code: 400, error_message: "Bad Request. The value for variable api_key is not registered." }), { status: 400 })
+          : new Response(FRED_CSV),
+      calls,
+    );
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    try {
+      const results = await Promise.all(
+        ["DGS10", "BAA10Y", "UNRATE", "CPIAUCSL", "NFCI", "VIXCLS"].map((series) =>
+          fetchFredRows(fetcher, series, { apiKey: "revoked", backoffMs: 0 }),
+        ),
+      );
+      assert.ok(results.every((rows) => rows.length === 2), "every series was served from the CSV export");
+      assert.equal(calls.filter((url) => url.startsWith(FRED_BASE_URL)).length, 6, "every fallback made its request");
+      assert.equal(getFredCircuitBreakerState().open, false);
+      assert.equal(getFredCircuitBreakerState().consecutiveFailures, 0, "API failures with a fallback behind them do not count");
+    } finally {
+      console.warn = originalWarn;
+    }
+  });
+
+  it("counts an API failure against the breaker when nothing can fall back", async () => {
+    const fetcher = recordingFetcher(() => new Response("down", { status: 503 }), []);
+    await assert.rejects(fetchFredApiRows(fetcher, "DGS10", "abc123", { backoffMs: 0, attempts: 1 }));
+    assert.equal(getFredCircuitBreakerState().consecutiveFailures, 1);
+  });
+
+  it("anchors a vintage's lookback window to the requested date, not today", async () => {
+    const calls: string[] = [];
+    await fetchFredRows(recordingFetcher(() => new Response(API_BODY), calls), "UNRATE", {
+      apiKey: "abc123",
+      asOf: "2024-03-31",
+      lookbackDays: 90,
+      backoffMs: 0,
+    });
+
+    const url = new URL(calls[0]);
+    assert.equal(url.searchParams.get("observation_start"), "2024-01-01", "ninety days before the vintage date");
+    assert.equal(url.searchParams.get("realtime_start"), "2024-03-31");
+  });
+
   it("does not fall back for a vintage: the CSV export cannot serve one", async () => {
     const calls: string[] = [];
     await assert.rejects(
