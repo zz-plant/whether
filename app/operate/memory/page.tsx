@@ -55,7 +55,7 @@ export default async function DecisionMemoryPage({
           treasurySource: treasury.source,
         },
         page: {
-          pageTitle: "Decision Memory",
+          pageTitle: "Decision memory",
           currentPath: "/planning/memory",
           pageSummary: "Review saved weekly posture decisions, override notes, and print board-ready exports.",
           sectionLinks: operationsSectionLinks.plan,

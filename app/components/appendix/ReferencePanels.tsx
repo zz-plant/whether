@@ -19,9 +19,9 @@ export const OperatorRequestsPanel = ({
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="type-label text-slate-400">Post-MVP demand</p>
+          <p className="type-label text-slate-400">Requests</p>
           <h3 id="operator-requests-title" className="type-section text-slate-100">
-            Operator request backlog
+            What operators have asked for next
           </h3>
         </div>
         {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}

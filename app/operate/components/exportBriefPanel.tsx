@@ -342,8 +342,8 @@ export const ExportBriefPanel = ({
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Share first"
-          title="Update"
+          label="Share"
+          title="Pick a format and copy"
           titleId="export-briefs-title"
           description={
             <>
@@ -560,16 +560,16 @@ export const ExportBriefPanel = ({
           </div>
         </details>
 
-        {/* Multi-Stakeholder Transmission Synthesizer */}
+        {/* Briefs for each audience */}
         <div className="weather-surface mt-6 p-5 border border-sky-500/30 bg-slate-900/60 shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <p className="type-label text-sky-400 font-semibold">AI Transmission Synthesizer</p>
+              <p className="type-label text-sky-400 font-semibold">By audience</p>
               <h4 className="text-base font-bold text-slate-100">
-                1-Click Multi-Stakeholder Briefs
+                Briefs for each audience
               </h4>
               <p className="text-fluid-xs text-slate-400 mt-0.5">
-                One verified macro call synthesized into 5 ready-to-send role perspectives.
+                One call, five ready-to-send versions: board, engineering, sales, all-hands, finance.
               </p>
             </div>
             <ClipboardActionRow
