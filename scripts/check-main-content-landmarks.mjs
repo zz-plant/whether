@@ -38,11 +38,20 @@ const readArgValue = (flag, fallback) => {
 
 const DEFAULT_BASE_URL = process.env.LANDMARKS_BASE_URL ?? "http://127.0.0.1:3000";
 const baseUrl = readArgValue("--base-url", DEFAULT_BASE_URL);
-const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", "90000"), 10);
+/*
+ * Inside the deploy gate this runs in the Cloudflare build container: a smaller box
+ * than a dev machine, always a cold start (no Vite cache, no server to reuse), and
+ * lint, tsc, and the test suite competing for the same cores while the dev server
+ * boots and compiles its first routes. The bounds stay — a route that never answers
+ * must still fail the gate — but they get room a workstation never needs, so a slow
+ * container reads as slow rather than as broken. Both remain overridable by flag.
+ */
+const inDeployGate = process.env.WHETHER_DEPLOY_GATE === "1";
+const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", inDeployGate ? "180000" : "90000"), 10);
 const concurrency = Number.parseInt(readArgValue("--concurrency", "4"), 10);
 // Separate from --timeout-ms, which bounds dev-server readiness rather than a
 // single route. Tunable so a slow container can be given room without editing code.
-const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", "30000"), 10);
+const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "60000" : "30000"), 10);
 
 if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
   console.error("`--timeout-ms` must be a positive integer.");

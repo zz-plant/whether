@@ -126,5 +126,7 @@ describe("fetch-based main-content guard", () => {
     assert.match(prePush, /run-checks\.mjs[^\n]*\blandmarks\b/);
     assert.match(workflow, /run-checks\.mjs[^\n]*\blandmarks\b/);
     assert.match(previewBuild, /run-checks\.mjs[^\n]*\blandmarks\b/);
+    // The command Workers Builds is configured to run, on every push including main.
+    assert.match(packageJson, /"check:vinext":\s*"[^"]*run-checks\.mjs[^"]*\blandmarks\b[^"]*"/);
   });
 });
