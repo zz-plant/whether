@@ -68,6 +68,27 @@ This starts a stdio MCP server with tools:
 }
 ```
 
+## Option C: remote MCP endpoint
+
+`https://whether.work/api/mcp` is an MCP streamable-HTTP server (JSON-RPC 2.0; `initialize`,
+`ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
+key. Implementation: `lib/mcp/httpMcpServer.ts`; transport tests:
+`tests/mcpStreamableTransport.test.ts`.
+
+Tools: `get_brief`, `get_context`, `get_projection`, `get_comps`, `get_signals`,
+`stress_test_plan`, `lint_commitment`, `get_analog_playbook`, and — the same surface the stdio
+server had — `get_decision_rules`, `get_recent_history`, `list_agent_skills`.
+
+Client config (shape):
+
+```json
+{
+  "mcpServers": {
+    "whether": { "url": "https://whether.work/api/mcp" }
+  }
+}
+```
+
 ## Skills contract alignment
 
 The returned payload includes `skills` from `lib/agentSkills.ts`, so agent runtimes can:

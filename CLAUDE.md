@@ -10,9 +10,10 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~40s | 800 tests / 166 files. Before commit, not per-edit. |
-| `bun run typecheck` | ~9s | Cheap. Run after any type-surface change. |
-| `bun run lint` | ~24s | Before commit. |
+| `bun run test` | ~40s | 1,100+ tests / 205 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
+| `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
+| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
 | `bun run check` | ~40s | lint + typecheck + test + assets + audit + preflight, concurrently. Pre-merge only. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 
@@ -29,6 +30,38 @@ in-flight edit rather than yours — check `git status` first. The hook covers l
 assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the network — run
 `bun run check` before a merge to pick that one up. Cloudflare Workers Builds still builds and
 deploys every push, which is the only remote gate left.
+
+### Toolchain notes (2026-09-02)
+
+- **Lint is oxlint, at parity with the ESLint config it replaced.** `.oxlintrc.json` carries
+  the React and Next plugins, the two file-size budgets, and the `lib/report/home` import fence.
+  Oxlint's `correctness` category also brings rules ESLint never enforced here; the ones with
+  pre-existing findings on 2026-09-02 are switched off in the config so the swap changed the
+  tool, not the policy. Tighten one rule per PR, largest first: `no-unused-vars` (83: 49 unused
+  imports, 21 variables, 12 parameters), `jsx-a11y/prefer-tag-over-role` (32),
+  `no-useless-escape` (12), `jsx-a11y/label-has-associated-control` (11), then the singles.
+  ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
+  typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
+- **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)
+  adds `no-floating-promises`, `no-base-to-string`, and the type-constituent rules, and reports 28
+  pre-existing findings; a PR must not raise that number. Three consecutive runs in each mode
+  gave identical results, but one earlier run in the same session reported findings later runs
+  did not and could not be reproduced. Promote it into the gate after a week of identical runs.
+- **The gate shuffles test order.** `scripts/run-tests.mjs` passes `--randomize` under
+  `WHETHER_DEPLOY_GATE=1`; bun prints `--seed=<n>` at the end of every run, and
+  `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
+  `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
+  cannot route a fixture-driven test to a real upstream.
+- **Zod is pinned to 4.4.3.** 4.5.x changes schema types in a way `@modelcontextprotocol/sdk`
+  1.30's tool registration does not accept (`ZodString` is not assignable to its `AnySchema`);
+  `scripts/mcp/whether-mcp-server.ts` stops typechecking. Revisit with the MCP SDK v2 migration.
+- **Provider keys and trial switches.** `FRED_API_KEY` routes FRED reads to the API (JSON,
+  ALFRED vintages via `fetchFredRows(..., { asOf })`); `ALPHA_VANTAGE_API_KEY` routes the SaaS
+  comps median to Alpha Vantage; `GITHUB_TOKEN` lets the regime-history Workflow open its PR.
+  `WHETHER_INGEST_COORDINATOR=1` and `WHETHER_HISTORY_WORKFLOW=1` switch on the Durable Object
+  ingest coordinator and the Workflow; both are set on `env.preview` only. Details:
+  `docs/cloudflare-deployment-runbook.md` ("Secrets", "Trial infrastructure") and
+  `docs/agents/data-and-platform.md`.
 
 ### Scheduled automation
 
@@ -53,6 +86,9 @@ so the routines are told to end a run with `FAILED` rather than claim success wi
 
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
+Two more once the provider keys are set: `api.stlouisfed.org` (FRED API, `FRED_API_KEY`) and
+`www.alphavantage.co` (SaaS comps, `ALPHA_VANTAGE_API_KEY`); without a key each read stays on the
+keyless host it always used.
 Without the allowlist the first FRED fetch fails with `connect_rejected` — a 403 on CONNECT, not
 from FRED. Three routines all reporting FAILED with a 403 is the egress policy, not the data.
 
