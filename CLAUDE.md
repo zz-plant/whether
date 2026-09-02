@@ -141,7 +141,14 @@ Two things that made a red build hard to read, both fixed 2026-09-01:
 **If a local `check` passes and the remote build fails, suspect ordering or environment, not the
 doc.** `mock.module` patches the module registry process-wide, so a test file can pass only because
 another file ran first and installed its mock; CI orders the suite differently. Run the file alone
-(`bun run test <path>`) before concluding it is fine.
+(`bun run test <path>`) before concluding it is fine. Environment includes the network: Cloudflare's
+container reaches Treasury and often FRED, a sandboxed session reaches neither, and the read path
+*writes* when an ingest brings something back. Invariant 1 ("reading performs zero writes") ran a
+cold store against the real network, so it passed here and failed every container build from
+2026-08-30 to 2026-09-02 — the earlier tests had ingested a rates-only model into `.cache/ingestion`,
+the KV store read it through a file fallback it no longer has, and the read took the refresh lock.
+A test about writes has to serve its own upstreams (see `readWithStore` in
+`tests/architectureInvariants.test.ts`).
 
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.

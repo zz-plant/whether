@@ -129,14 +129,18 @@ const getKvBinding = () => {
   return binding;
 };
 
+/**
+ * KV is the only source this store reads. It used to fall back to the FileIngestionStore
+ * when a key was missing, which made a KV-bound read depend on whatever an earlier process
+ * in the same directory had ingested — in the deploy gate, a rates-only model left under
+ * .cache/ingestion by a test without a binding, which sent the next read down the
+ * background-refresh path and cost it a lock write. Workers never had a filesystem to fall
+ * back to, so production behavior is unchanged: an empty KV is a cold store, by design.
+ */
 export class KvIngestionStore implements IngestionStore {
-  private readonly fallback: FileIngestionStore | null;
   private queue: Promise<void> = Promise.resolve();
 
-  constructor(private readonly kv: KvNamespaceLike) {
-    const isEdge = typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime === "string";
-    this.fallback = isEdge ? null : new FileIngestionStore();
-  }
+  constructor(private readonly kv: KvNamespaceLike) {}
 
   async appendSnapshots(snapshots: SignalEntitySnapshot[]) {
     if (snapshots.length === 0) {
@@ -240,10 +244,6 @@ export class KvIngestionStore implements IngestionStore {
 
     const collected = await this.readSequences(selected);
 
-    if (collected.length === 0) {
-      return this.fallback?.readSnapshots(options) ?? [];
-    }
-
     return collected.sort((a, b) => a.sequence - b.sequence).map((entry) => entry.snapshot);
   }
 
@@ -251,7 +251,7 @@ export class KvIngestionStore implements IngestionStore {
     await this.queue;
     const raw = await this.kv.get(MATERIALIZED_KEY);
     if (!raw) {
-      return this.fallback?.readLatestMaterialized() ?? null;
+      return null;
     }
     return (JSON.parse(raw) as StoredMaterializedRecord).model;
   }
