@@ -338,9 +338,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "fred-series",
-    term: "FRED series codes (DFF, DGS2, DGS10)",
+    term: "FRED series codes (DGS1MO, DGS2, DGS10)",
     summary:
-      "FRED is the Federal Reserve's free public data service. Each code names one published series — DFF is the Fed's policy rate, DGS2 the two-year Treasury rate, DGS10 the ten-year.",
+      "FRED is the Federal Reserve's free public data service. Each code names one published series — DGS1MO is the one-month Treasury bill this uses as its base rate, DGS2 the two-year Treasury rate, DGS10 the ten-year.",
     why: "Why it matters: the codes are what make the score auditable — anyone can pull the same series and recompute it.",
     usedInLabel: "Formula reference",
     usedInHref: "/trust#formula-reference",
