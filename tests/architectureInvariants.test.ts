@@ -5,21 +5,17 @@ import { assessDecisionStaleness, stalenessVerdictLabel } from "../lib/report/de
 import { evaluateDecisionAssumptionHealth, buildDecisionMemoryEntry } from "../lib/decisionMemory";
 import { buildOperatingSnapshot, hashOperatingInputs } from "../lib/operatingState/snapshot";
 import {
-  InMemoryOperatingSnapshotStore,
-  KvOperatingSnapshotStore,
-  getOperatingSnapshotStore,
   resetOperatingSnapshotStore,
 } from "../lib/operatingState/snapshotStore";
 import {
   InMemoryDecisionMemoryRepository,
-  KvDecisionMemoryRepository,
   resetDecisionMemoryRepository,
 } from "../lib/storage/decisionMemoryRepository";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { snapshotData } from "../lib/snapshot";
 import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";
-import { getRuntimeBoundary, resetRuntimeBoundary, setRuntimeBoundaryForTesting } from "../lib/runtime/boundary";
+import { resetRuntimeBoundary, setRuntimeBoundaryForTesting } from "../lib/runtime/boundary";
 import type { KvNamespace } from "../lib/runtime/kv";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -305,7 +301,6 @@ describe("Architecture Invariants", () => {
   });
 
   it("Invariant 6: Production writes fail if durable storage is missing", () => {
-    const boundary = getRuntimeBoundary();
     // Simulate production environment
     const prodBoundary = {
       storage: null,

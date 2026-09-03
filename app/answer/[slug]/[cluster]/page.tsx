@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ActionLink } from "../../../components/ui/actionLink";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
 import { assessPublishReadiness } from "../lib/report/briefPublishGuard";
-import { parsePublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
+import { type PublishedBrief } from "../lib/report/publishedBriefs";
 
 describe("weekly brief workflow automation", () => {
   it("unifies Slack brief artifact and published brief freeze into one PR in the Monday workflow", async () => {

@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { evaluateRegime } from "../lib/regimeEngine";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
   extractMeetingSlidePayload,

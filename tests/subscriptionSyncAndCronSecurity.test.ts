@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, beforeEach, describe, it, mock, spyOn } from "bun:test";
+import { afterEach, beforeEach, describe, it, mock } from "bun:test";
 import { POST as legacySubscribePost } from "../app/api/subscribe/route";
 import { GET as syncGet, POST as syncPost } from "../app/api/sync/route";
 import { POST as ingestPost } from "../app/api/ingest/route";

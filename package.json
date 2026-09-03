@@ -51,14 +51,15 @@
     "seo:weekly-runbook": "bun scripts/freezeWeeklyBrief.ts && bun scripts/seo-weekly-runbook.ts",
     "cli:whether": "node scripts/whether-cli.mjs",
     "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
-    "check:vinext": "WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks",
+    "check:vinext": "WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks",
     "prepare": "husky",
     "check:production-edge": "bash scripts/check_production_edge.sh",
     "setup": "mise trust && bun install",
     "assets:check": "bun run scripts/check-assets.ts",
     "audit": "bun audit --audit-level=critical",
     "assets:generate": "bun run scripts/generate-scenes.ts",
-    "lint:types": "oxlint --type-aware --deny-warnings"
+    "lint:types": "oxlint --type-aware --deny-warnings",
+    "check:suppressions": "bun run scripts/check-suppression-census.ts"
   },
   "engines": {
     "bun": ">=1.3.14",

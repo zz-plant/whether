@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ParametricGraphic } from "../../components/ParametricGraphic";
 import { deriveVisualTokenMatrix } from "../../../lib/graphics/generatorEngine";
 import type { ShaderMode } from "../../../lib/identicon/shaderEngine";
-import { Sparkles, Sliders, Layers, RefreshCw, Cpu, Image } from "lucide-react";
+import { Sparkles, Sliders, Layers, RefreshCw } from "lucide-react";
 
 export default function VisualSystemMockupPage() {
   const [seed, setSeed] = useState("report-snapshot-2026-07-30-canonical");

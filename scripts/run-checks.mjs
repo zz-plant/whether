@@ -24,6 +24,11 @@ const TASKS = [
   { name: "typecheck", script: "typecheck" },
   { name: "test", script: "test" },
   { name: "assets", script: "assets:check" },
+  // Guards every other ratchet in this gate. Each one — the disabled-rule
+  // burn-down, lint:types, the suite — can be turned green by suppressing the
+  // finding instead of fixing it, and no other task here notices. This counts
+  // the suppressions themselves, so the shortcut costs more than the fix.
+  { name: "suppressions", script: "check:suppressions" },
   // Gated at `critical` on purpose. There are currently 38 high advisories, all
   // in transitive dev/build dependencies (picomatch via vinext's glob chain, for
   // one) rather than anything the Worker ships. Blocking on those would make

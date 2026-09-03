@@ -30,13 +30,6 @@ const monthLongYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-const monthDayYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
 const monthYearShort2DigitUtcFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "2-digit",

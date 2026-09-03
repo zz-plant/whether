@@ -22,8 +22,8 @@ describe("downloadable resource pages", () => {
       const config = downloadableResources[slug];
 
       assert.match(html, new RegExp(config.metadata.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-      assert.match(html, new RegExp(`href=\"${config.downloadCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\"`));
-      assert.match(html, new RegExp(`href=\"${config.secondaryCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\"`));
+      assert.match(html, new RegExp(`href="${config.downloadCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+      assert.match(html, new RegExp(`href="${config.secondaryCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
       assert.match(html, /Canonical pillar: Capital Discipline/);
       assert.match(html, /Board Framework page/);
     }

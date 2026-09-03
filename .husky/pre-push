@@ -16,4 +16,4 @@
 # than to what you are pushing. Check `git status` before assuming it is yours.
 [ "$SKIP_PREPUSH" = "1" ] && exit 0
 
-bun scripts/run-checks.mjs lint typecheck test assets hotspot-preflight landmarks
+bun scripts/run-checks.mjs lint typecheck test assets suppressions hotspot-preflight landmarks

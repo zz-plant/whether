@@ -20,7 +20,6 @@ export function SVGIdenticonGeometry({ params, size, useCase }: SVGGeometryProps
   const {
     symmetry,
     polygonSides,
-    innerRingCount,
     rotationDeg,
     hue1,
     hue2,

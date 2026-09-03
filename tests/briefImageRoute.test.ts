@@ -24,8 +24,6 @@ const collectText = (node: ReactNode): string => {
   return "";
 };
 
-type BriefImageHomepage = Parameters<typeof buildBriefImagePayload>[0];
-
 describe("buildBriefImagePayload", () => {
   it("passes weekly guardrail text and model tightness pause threshold to the image template", () => {
     const weeklyDecisionCardModel = buildWeeklyDecisionCardModel({

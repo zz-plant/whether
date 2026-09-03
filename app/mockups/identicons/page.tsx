@@ -21,7 +21,7 @@ export default function IdenticonsMockupPage() {
   const [sandboxSeed, setSandboxSeed] = useState("report-snapshot-2026-07-28-canonical");
   const [sandboxUseCase, setSandboxUseCase] = useState<ShaderMode>("reportSeal");
   const [sandboxSize, setSandboxSize] = useState(160);
-  const [sandboxStateVal, setSandboxStateVal] = useState(0.85);
+  const [sandboxStateVal] = useState(0.85);
   const [copiedCode, setCopiedCode] = useState(false);
 
   const playgroundParams = deriveIdenticonParams(sandboxSeed);

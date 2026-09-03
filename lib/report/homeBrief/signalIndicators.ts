@@ -1,6 +1,5 @@
 import { buildSignalInfluence, DEFAULT_THRESHOLDS } from "../../regimeEngine";
 import {
-  formatConfidencePlainLabel,
   formatRegimeSignalValue,
   formatTrendArrow,
   regimeSignalLabelByKey,

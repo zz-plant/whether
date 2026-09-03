@@ -45,7 +45,7 @@ function saveStateBlob(blob: StateBlob) {
   } catch {}
 }
 
-export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
+export function useCrossDeviceSync(storageKey: string, _initialValue: unknown) {
   const [synced, setSynced] = useState(false);
   const dirty = useRef<Set<string>>(new Set());
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -127,7 +127,7 @@ export function useCrossDeviceSync(storageKey: string, initialValue: unknown) {
   }, [flushDirty]);
 
   useEffect(() => {
-    pullFromServer().then((serverValue) => {
+    pullFromServer().then(() => {
       setSynced(true);
     });
   }, [pullFromServer]);

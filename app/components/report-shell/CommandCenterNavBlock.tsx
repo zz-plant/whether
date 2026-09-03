@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { ArrowRightIcon } from "../uiIcons";
 import { ReportCta } from "../reportCta";
 import { InternalAwareLink } from "./InternalAwareLink";
 import { ShareMenuDropdown } from "./ShareMenuDropdown";
@@ -28,10 +27,8 @@ export function CommandCenterNavBlock({
   trustStatusLabel,
   fetchedAtLabel,
   resolvedNextRefreshLabel,
-  missionSupportText,
   showOfflineBadge,
   offlineBadgeLabel,
-  decisionBanner,
   decisionDiffs,
 }: {
   heroVariant: "full" | "compact";
@@ -56,17 +53,10 @@ export function CommandCenterNavBlock({
   missionSupportText: string;
   decisionDiffs?: DecisionDiff[];
 }) {
-  const primaryDecisionText =
-    decisionBanner?.decision ??
-    (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   const headingClassName = heroVariant === "compact"
     ? "max-w-3xl font-semibold text-slate-100 text-fluid-2xl"
     : "type-headline max-w-3xl text-slate-100";
-  const decisionHeadingClassName = heroVariant === "compact"
-    ? "max-w-xl font-semibold leading-[1.15] text-slate-50 text-fluid-lg"
-    : "max-w-xl font-semibold leading-[1.12] text-slate-50 text-fluid-xl";
   const briefKicker = heroVariant === "compact" ? "Weekly brief" : "Weekly operating brief";
-  const hasUtilityActions = Boolean(secondaryCta || exportCta);
   const introMetaLine = [
     statusLabel,
     trustStatusLabel,
@@ -77,7 +67,6 @@ export function CommandCenterNavBlock({
     showOfflineBadge ? offlineBadgeLabel : null,
   ].filter(Boolean).join(" • ");
   const decisionDeltaLine = decisionDiffs?.map((item) => item.label).join(" • ");
-  const mobileDecisionText = decisionBanner?.decision ?? primaryDecisionText;
 
   return (
     <section

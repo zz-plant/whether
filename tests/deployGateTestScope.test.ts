@@ -61,7 +61,7 @@ describe("deploy gate test scope", () => {
     const command = packageJson.scripts?.["check:vinext"] ?? "";
 
     assert.match(command, /^WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs\b/);
-    for (const task of ["lint", "typecheck", "test", "assets", "landmarks"]) {
+    for (const task of ["lint", "typecheck", "test", "assets", "suppressions", "landmarks"]) {
       assert.match(command, new RegExp(`\\b${task}\\b`), `check:vinext no longer runs ${task}`);
     }
     // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
@@ -70,7 +70,8 @@ describe("deploy gate test scope", () => {
     // alongside lint, tsc, and the suite on a small box, that server competes for the same
     // cores and memory, and a route that compiles slowly reads as a route that never
     // answered. It runs by itself, after the four cheaper tasks have passed.
-    assert.match(command, /assets && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
+    assert.match(command, / && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
+    assert.doesNotMatch(command, /landmarks.*&&/, "landmarks must be the last command, run by itself");
   });
 
   it("runs the same tasks as the inner build gate", async () => {

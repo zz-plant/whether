@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import {
-  canonicalPositioningLine,
   websiteName,
 } from "../seo";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";

@@ -20,7 +20,6 @@ import {
   isBusinessModel,
   type DecisionAction,
   type DecisionCategory,
-  type DecisionOutput,
   type LifecycleStage,
   type CompanyFinancialProfile,
 } from "../../../lib/decisionShield";

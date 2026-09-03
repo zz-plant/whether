@@ -54,7 +54,7 @@ describe("CadenceSummaryCardAdapter", () => {
     let previousIndex = -1;
     for (const title of titles) {
       const index = html.indexOf(title);
-      assert.ok(index > previousIndex, `Expected \"${title}\" to appear in order.`);
+      assert.ok(index > previousIndex, `Expected "${title}" to appear in order.`);
       previousIndex = index;
     }
 
@@ -91,7 +91,7 @@ describe("CadenceSummaryCardAdapter", () => {
     let previousIndex = -1;
     for (const title of titles) {
       const index = html.indexOf(title);
-      assert.ok(index > previousIndex, `Expected \"${title}\" to appear in order.`);
+      assert.ok(index > previousIndex, `Expected "${title}" to appear in order.`);
       previousIndex = index;
     }
     assert.match(html, /href="\/api\/monthly"/);

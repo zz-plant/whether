@@ -6,9 +6,7 @@
 import type {
   PlanStressTestRequest,
   PlanStressTestResult,
-  PlanComparisonResult,
-  CompanyFinancialProfile,
-} from "../decisionShield";
+  } from "../decisionShield";
 import type { AnalogPlaybookResult } from "../analogPlaybook";
 
 export interface WhetherClientConfig {

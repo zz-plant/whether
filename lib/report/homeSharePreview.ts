@@ -111,7 +111,7 @@ export const loadHomeSharePreview = async (
     ...defaultDependencies,
     ...dependencies,
   } satisfies HomeSharePreviewDependencies;
-  const { reportResult, reportData, snapshot } = await resolvedDependencies.loadWeeklyBriefSnapshot(
+  const { reportData, snapshot } = await resolvedDependencies.loadWeeklyBriefSnapshot(
     searchParams,
     { route: "/" },
     { overlaySector: searchParams?.sector },

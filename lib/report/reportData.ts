@@ -75,14 +75,7 @@ import { withDeadline } from "../withDeadline";
 import { primeMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import type {
-  AnalogScoreDimensions,
-  ConfidenceTrendFraming,
-  HistoricalAnalog,
-  LastYearComparison,
-  ReportDynamics,
-  ReportEvidenceItem,
-  WeeklyConfidencePoint,
-} from "./reportDataTypes";
+  } from "./reportDataTypes";
 export type {
   AnalogScoreDimensions,
   ConfidenceTrendFraming,

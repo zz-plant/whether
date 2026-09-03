@@ -24,7 +24,6 @@ import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopySlackBriefButton } from "./CopySlackBriefButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { PresentModeButton } from "./PresentModeButton";
-import type { MeetingSlidePayload } from "../../lib/export/meetingSlideExport";
 import { ThresholdProximityBar } from "./ThresholdProximityBar";
 import { DeveloperQuickAccess } from "./DeveloperQuickAccess";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
@@ -102,7 +101,6 @@ export function DecisionHero({
   postureLabel,
   signalDirection,
   recordDate,
-  fetchedAt,
   confidenceLabel,
   trustStatusLabel,
   treasurySource,

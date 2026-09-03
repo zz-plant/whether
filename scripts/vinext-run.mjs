@@ -94,7 +94,7 @@ function main() {
       // (see scripts/run-tests.mjs). Those tests still run on every
       // `bun run check` and on pre-push; what they must not do is block a deploy
       // over a dependency that cannot affect the built artifact.
-      const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets", "landmarks"], {
+      const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets", "suppressions", "landmarks"], {
         env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
         stdio: "inherit",
       });

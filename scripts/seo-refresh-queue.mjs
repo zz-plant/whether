@@ -66,7 +66,7 @@ const computeSlaDueAtIso = ({ queueMeta, previousRequestedAtIso, nowIso }) => {
   return new Date(requestedAtBaseMs + priorityToSlaHours[queueMeta.priority] * HOURS).toISOString();
 };
 
-const buildQueueRecord = ({ page, metric, stale, conversionRate, previousUnderperformingStreak = 0 }) => {
+const buildQueueRecord = ({ metric, stale, conversionRate, previousUnderperformingStreak = 0 }) => {
   const trafficTier = toTrafficTier(metric);
   const conversionTarget = conversionTargetByTier[trafficTier];
   const conversionGap = conversionRate - conversionTarget;

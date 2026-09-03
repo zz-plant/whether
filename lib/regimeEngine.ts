@@ -21,10 +21,8 @@ import {
 import {
   applyMacroAdjustments,
   buildSignalInfluence,
-  buildRegimeChangeReasons,
   computeDiagnostics,
-  deriveRegimeTrend,
-} from "./regimeEngineDiagnostics";
+  } from "./regimeEngineDiagnostics";
 import { computePolicyAssessment } from "./regimeEnginePolicy";
 
 export * from "./regimeEngineCore";

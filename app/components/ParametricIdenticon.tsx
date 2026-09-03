@@ -37,7 +37,7 @@ export function ParametricIdenticon({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shaderRef = useRef<IdenticonShaderInstance | null>(null);
   const [params, setParams] = useState(() => deriveIdenticonParams(seed));
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
 
   // Update parameters when seed changes
   useEffect(() => {

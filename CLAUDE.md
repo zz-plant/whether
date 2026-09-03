@@ -37,11 +37,44 @@ deploys every push, which is the only remote gate left.
   the React and Next plugins, the two file-size budgets, and the `lib/report/home` import fence.
   Oxlint's `correctness` category also brings rules ESLint never enforced here; the ones with
   pre-existing findings on 2026-09-02 are switched off in the config so the swap changed the
-  tool, not the policy. Tighten one rule per PR, largest first: `no-unused-vars` (83: 49 unused
-  imports, 21 variables, 12 parameters), `jsx-a11y/prefer-tag-over-role` (32),
-  `no-useless-escape` (12), `jsx-a11y/label-has-associated-control` (11), then the singles.
+  tool, not the policy. Tighten one rule per PR, largest first. `no-unused-vars` (83: 49 unused
+  imports, 34 declarations, 46 files) was burned down and enforced on 2026-09-03, along with
+  `no-useless-escape` (12), `no-extra-boolean-cast` (3), `no-useless-rename` (2), and
+  `no-irregular-whitespace` (1) — all four auto-fixable and semantics-preserving. 100 findings
+  remain across 16 rules: `jsx-a11y/prefer-tag-over-role` (32), `react/set-state-in-effect` (26),
+  `react/no-danger` (12), `jsx-a11y/label-has-associated-control` (11), `react/refs` (4),
+  then the tail.
+
+  **`jsx-a11y/prefer-tag-over-role` is not a mechanical burn-down — do not batch it.** Ten of
+  its 32 findings are inline `<svg role="img" aria-labelledby=…>`, which is the recommended
+  pattern for accessible inline SVG; an `<svg>` cannot become an `<img>`, so "fixing" them
+  removes the accessible name and the rendering both. Several more are behavioural rewrites
+  rather than lint fixes — `role="slider"` to `<input type="range">`, `role="progressbar"` to
+  `<progress>`, `role="dialog"` to `<dialog>`. Only the `role="button"`, `role="region"`, and
+  `role="search"` cases are straightforward. Take it per-finding or leave it off.
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
+
+  **`max-lines` and `no-restricted-imports` are not part of that queue.** Both are `off` at the
+  top level only so an `overrides` block can apply them where they matter — the two file-size
+  budgets and the `lib/report/home` import fence. Turning either on globally is a policy choice
+  about a threshold, not a burn-down.
+
+  **Measuring one rule: do not trust `oxlint -D <rule> | grep '(<rule>)'`.** Oxlint prints a
+  plugin finding as `react(no-danger)`, not `react/no-danger`, and `nextjs/*` rules print under
+  `next(...)`. A grep for the config's spelling matches nothing and every plugin rule reads as
+  zero findings — which on 2026-09-03 produced a confident "16 rules are already clean" against
+  a tree that had 100 findings in them. Enable the rule and count `error <plugin>(<rule>):`
+  from a full run instead.
+- **Suppressions are themselves a gated metric.** `bun run check:suppressions`
+  (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
+  tests, and globally-disabled lint rules against an inline baseline, and fails when any rises.
+  It exists because every other ratchet here — the rule burn-down, `lint:types`, the suite — can
+  be turned green by suppressing the finding rather than fixing it, and nothing else in the gate
+  notices. A burn-down that trades a lint finding for a disable comment now moves one number down
+  and this one up, and is rejected. Baseline as of 2026-09-03: 7 lint suppressions, 3 type
+  suppressions, 0 skipped tests, 20 disabled rules, and a floor of 206 test files. Lower it in the
+  script when work earns it; raising one is a policy change and belongs in its own PR.
 - **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)
   adds `no-floating-promises`, `no-base-to-string`, and the type-constituent rules, and reports 28
   pre-existing findings; a PR must not raise that number. Three consecutive runs in each mode

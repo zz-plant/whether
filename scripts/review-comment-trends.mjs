@@ -109,7 +109,7 @@ function fetchPage(url) {
   curlArgs.push(url);
 
   const raw = execFileSync("curl", curlArgs, { encoding: "utf8" });
-  const boundaryPattern = /\r?\n\r?\n(?=[\[{])/g;
+  const boundaryPattern = /\r?\n\r?\n(?=[[{])/g;
   let boundaryMatch = null;
   for (const match of raw.matchAll(boundaryPattern)) {
     boundaryMatch = match;

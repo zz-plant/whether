@@ -360,7 +360,7 @@ export const buildHomeBriefModelInternal = (
     previousAssessment,
     treasury: {
       ...treasury,
-      isLive: !Boolean(treasury?.fallback_at || treasury?.fallback_reason),
+      isLive: !(treasury?.fallback_at || treasury?.fallback_reason),
     },
     last4Boldness: [],
     hiringTrendDelta: (weeklyDeltaBySignal.get("riskAppetite") ?? 0) - (weeklyDeltaBySignal.get("tightness") ?? 0),
@@ -398,9 +398,9 @@ export const buildHomeBriefModelInternal = (
         : treasury?.fetched_at
           ? "fresh"
           : "unknown",
-      mode: Boolean(historicalSelection)
+      mode: historicalSelection
         ? "historical"
-        : Boolean(treasury?.fallback_at || treasury?.fallback_reason)
+        : treasury?.fallback_at || treasury?.fallback_reason
           ? "cached"
           : "live",
       timestamp: treasury?.fetched_at ?? null,
