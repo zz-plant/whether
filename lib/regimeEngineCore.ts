@@ -165,7 +165,17 @@ export interface RegimeAssessment {
 
 /** Base rate below which rates contribute nothing to tightness. Roughly the
  *  post-2000 U.S. average policy rate — a rate near here reads as "normal", not
- *  as pressure. */
+ *  as pressure.
+ *
+ *  Calibrated against the policy rate but applied to the one-month bill, which is
+ *  what `getBaseRate` actually returns (the `FED` rung has never fired; see
+ *  `TREASURY_SOURCE_LABEL` below). They track closely, but not through a
+ *  debt-ceiling or month-end bill dislocation — and with the rate component
+ *  spending its whole 0-90 range across the 50bp from here to 4.0%, a bill-specific
+ *  move of that size is enough to shift the published regime for a reason that is
+ *  not monetary. Kept deliberately: switching the input series would move every
+ *  published call and break comparability with the archive those calls were scored
+ *  against. */
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 3.5;
 /** Ceiling on the rate component. Note the components are allowed to over-subscribe
  *  the cap: 90 here plus 25 of inversion plus the macro add-ons can reach past 100,
