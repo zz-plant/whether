@@ -253,7 +253,7 @@ async function PageContent({
     guardrailLabel ? `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${guardrailLabel}` : null,
     reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${reversalTriggerLabel}` : null,
     flipConditionLabels.length > 0
-      ? `${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${flipConditionLabels.join("; ")}`
+      ? `${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: ${flipConditionLabels.join("; ")}`
       : null,
   ].filter((line): line is string => Boolean(line));
 

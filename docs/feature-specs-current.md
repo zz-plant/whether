@@ -663,3 +663,25 @@ surfaces do not reintroduce the old words.
 - **Header.** The desktop nav renders the operator loop from `resolveGlobalHeaderLoopLinks`
   (supporting layers hidden below `lg`); the top-level API link moved under More. The live
   masthead no longer prints a "15m cadence" refresh label.
+
+### 9.1 Reversal and resume conditions (2026-09-02, follow-up)
+
+- **`buildFlipThreshold` returns one bounded condition.** It used to return three sentences: a
+  status ("No flip condition is tripped yet.") plus two that each repeated "flips this call",
+  under slot labels that already carry that verb. Because the compaction helpers cut a phrase at
+  its first period, the Slack export of a frozen brief read "Re-open when: No flip condition is
+  tripped yet." and carried no threshold at all. It now reads
+  `Funding pressure above 70 (63 today) or risk appetite at or below 50 (56 today).`
+  A boundary already crossed says "(already true at N)" and sorts first.
+- **The Evidence page's "Safe again when" shows the resume trigger.** It rendered `flipThreshold`,
+  the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
+  breaks if" — so the same string appeared under opposite meanings on two pages. It now reads
+  `actionStripItems[0].reversalCondition`, symmetric with the pause trigger in "Wrong if" above it.
+- **The hero's resume row is labeled `clearsWhen`, not `flipWatch`.** That row holds the resume
+  thresholds (66 / 54), and sat directly under the reversal row (70 / 50) as a near-synonym
+  carrying different numbers, leaving three unexplained pairs stacked in one box.
+- **`sectorSensitivity` reversal copy** uses `formatThresholdNumber`, so the sector tilt no longer
+  prints "above 70.0".
+
+Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
+archive is append-only and its exports are expected to read as they did on the day.

@@ -134,6 +134,7 @@ export const buildSignalsPageModel = async (
     statusLabel,
     stopItems,
     actionNowShort,
+    actionStripItems,
     guardrailThreshold,
     flipThreshold,
     treasury,
@@ -180,8 +181,13 @@ export const buildSignalsPageModel = async (
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
     : "Pause if thresholds weaken.";
-  const reversalCondition = flipThreshold?.trim().length
-    ? flipThreshold
+  // The resume trigger, symmetric with the pause trigger in "Wrong if" above.
+  // This rendered `flipThreshold` — the condition that BREAKS the call, which
+  // /trust correctly labels "This recommendation breaks if". Printing it under
+  // "Safe again when" told an operator the opposite of what it means.
+  const resumeTrigger = actionStripItems?.[0]?.reversalCondition;
+  const reversalCondition = resumeTrigger?.trim().length
+    ? resumeTrigger
     : "Resume once reversal thresholds recover.";
   const showMicroDecisionRows = shouldSplitDecisionConditionRows({
     trigger: triggerCondition,

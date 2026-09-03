@@ -76,13 +76,29 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
   };
 };
 
+/**
+ * The conditions that would flip the current call, as one bounded condition.
+ *
+ * This used to return three sentences: a status ("No flip condition is tripped
+ * yet.") followed by two that each repeated "flips this call". Every slot that
+ * renders it already carries that verb in its label — "Reversal:", "This
+ * recommendation breaks if:" — so the sentence spent its first clause saying
+ * what the label said and its next two repeating each other. Worse, the
+ * compaction helpers cut a phrase at its first period, so the Slack export of a
+ * frozen brief read "Re-open when: No flip condition is tripped yet." and
+ * carried no threshold at all.
+ *
+ * One sentence now, both boundaries, each with its live reading in parentheses.
+ * A boundary already crossed says so in place of the status preamble, and sorts
+ * first, because that is the half an operator has to act on.
+ */
 export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessNow = assessment.scores?.tightness;
   const riskNow = assessment.scores?.riskAppetite;
 
-  const crossingText = ({
+  const conditionText = ({
     label,
     now,
     threshold,
@@ -93,43 +109,44 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     threshold: number;
     direction: "riseAbove" | "fallToOrBelow";
   }) => {
-    const hasCurrentValue = typeof now === "number" && Number.isFinite(now);
-    const alreadyTriggered = hasCurrentValue && (direction === "riseAbove" ? now > threshold : now <= threshold);
-    const crossingCopy = direction === "riseAbove"
-      ? `climbs above ${formatScoreValue(threshold)}`
-      : `falls to or below ${formatScoreValue(threshold)}`;
-    const holdCopy = direction === "riseAbove"
+    const boundary = direction === "riseAbove"
       ? `above ${formatScoreValue(threshold)}`
       : `at or below ${formatScoreValue(threshold)}`;
 
-    if (!hasCurrentValue) {
-      return `${label} flips this call if it ${crossingCopy}.`;
+    if (typeof now !== "number" || !Number.isFinite(now)) {
+      return { text: `${label} ${boundary}`, tripped: false };
     }
 
-    return alreadyTriggered
-      ? `${label} is already in the flip zone at ${formatScoreValue(now)} and only has to stay ${holdCopy}.`
-      : `${label} flips this call if it ${crossingCopy}, from ${formatScoreValue(now)} today.`;
+    const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
+
+    return {
+      text: tripped
+        ? `${label} ${boundary} (already true at ${formatScoreValue(now)})`
+        : `${label} ${boundary} (${formatScoreValue(now)} today)`,
+      tripped,
+    };
   };
 
   const tightnessDirection: "riseAbove" | "fallToOrBelow" =
     assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
   const riskDirection: "riseAbove" | "fallToOrBelow" =
     assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
-  const tightnessTriggered = tightnessDirection === "riseAbove"
-    ? tightnessNow > tightnessThreshold
-    : tightnessNow <= tightnessThreshold;
-  const riskTriggered = riskDirection === "riseAbove"
-    ? riskNow > riskThreshold
-    : riskNow <= riskThreshold;
-  const watchPrefix = tightnessTriggered || riskTriggered
-    ? "One flip condition is already tripped."
-    : "No flip condition is tripped yet.";
 
-  return [
-    watchPrefix,
-    crossingText({ label: "Funding pressure", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
-    crossingText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
-  ].join(" ");
+  const conditions = [
+    conditionText({ label: "Funding pressure", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
+    conditionText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
+  ];
+
+  // Stable sort: a crossed boundary leads, otherwise the declared order holds.
+  const ordered = [...conditions].sort((a, b) => Number(b.tripped) - Number(a.tripped));
+
+  // Signal names are capitalized as labels but sit mid-sentence after "or" here,
+  // matching how the bounded rules already write them in prose.
+  return `${ordered
+    .map((condition, index) =>
+      index === 0 ? condition.text : condition.text.charAt(0).toLowerCase() + condition.text.slice(1),
+    )
+    .join(" or ")}.`;
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {

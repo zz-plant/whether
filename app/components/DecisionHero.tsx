@@ -450,7 +450,13 @@ export function DecisionHero({
                 ) : null}
                 {flipConditions && flipConditions.length > 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.watch.flipWatch}:</dt>
+                    {/* These are the resume thresholds — the levels at which the
+                        guardrail's pause lifts — so they take the contract's
+                        clears-when slot. Under the flip-watch slot they sat
+                        directly beneath the reversal row as a near-synonym
+                        carrying different numbers, which left three unexplained
+                        pairs of thresholds stacked in one box. */}
+                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
                   </div>
                 ) : null}

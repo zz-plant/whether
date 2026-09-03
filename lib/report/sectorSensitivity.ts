@@ -1,5 +1,6 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import { REGIME_SHORT_LABELS } from "../regimePresentation";
+import { formatThresholdNumber } from "../formatters";
 
 export type SectorKey = "b2b-saas" | "consumer" | "infrastructure" | "fintech" | "healthcare" | "ai-platforms";
 
@@ -141,11 +142,11 @@ const buildReversalCondition = (
 
   if (useTightness) {
     const direction = actionBias === "loosen" ? "rises above" : "falls to or below";
-    return `Drop the sector tilt if funding pressure ${direction} ${assessment.thresholds.tightnessRegime.toFixed(1)}.`;
+    return `Drop the sector tilt if funding pressure ${direction} ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`;
   }
 
   const direction = actionBias === "loosen" ? "falls to or below" : "rises above";
-  return `Drop the sector tilt if risk appetite ${direction} ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
+  return `Drop the sector tilt if risk appetite ${direction} ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)}.`;
 };
 
 export const deriveSectorAdjustedPosture = (
