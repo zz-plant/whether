@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
@@ -10,12 +10,10 @@ function OutlineItem({
   href,
   label,
   isActive,
-  onClick,
 }: {
   href: string;
   label: string;
   isActive: boolean;
-  onClick?: () => void;
 }) {
   const isHash = href.startsWith("#");
   const linkClass = `block rounded-md px-3 py-2 md:py-1.5 text-sm no-underline transition-colors min-h-[44px] md:min-h-0 flex items-center ${
@@ -26,26 +24,20 @@ function OutlineItem({
 
   if (isHash) {
     return (
-      <a href={href} onClick={onClick} className={linkClass}>
+      <a href={href} className={linkClass}>
         {label}
       </a>
     );
   }
 
   return (
-    <Link href={href} onClick={onClick} className={linkClass}>
+    <Link href={href} className={linkClass}>
       {label}
     </Link>
   );
 }
 
-function SidebarContent({
-  sectionLinks,
-  onClose,
-}: {
-  sectionLinks: ReportSectionLink[];
-  onClose?: () => void;
-}) {
+function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] }) {
   const currentPathname = usePathname() ?? "/";
   const [pathname, setPathname] = useState("/");
 
@@ -57,7 +49,6 @@ function SidebarContent({
     <>
       <Link
         href="/"
-        onClick={onClose}
         className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 no-underline hover:bg-slate-800/30"
       >
         <span className="text-lg font-semibold tracking-tight text-slate-100">
@@ -79,7 +70,6 @@ function SidebarContent({
                   href={section.href}
                   label={section.label}
                   isActive={isActive}
-                  onClick={onClose}
                 />
               );
             })}
@@ -104,7 +94,6 @@ function SidebarContent({
               href={route.href}
               label={route.navLabel ?? route.label}
               isActive={isActive}
-              onClick={onClose}
             />
           );
         })}
@@ -114,62 +103,13 @@ function SidebarContent({
 }
 
 type AppSidebarProps = {
-  mobileOpen?: boolean;
-  onMobileClose?: () => void;
   sectionLinks?: ReportSectionLink[];
 };
 
-export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: AppSidebarProps) {
-  const sidebarRef = useRef<HTMLElement>(null);
-  const triggerRef = useRef<Element | null>(null);
-
-  useEffect(() => {
-    if (mobileOpen) {
-      triggerRef.current = document.activeElement;
-      sidebarRef.current?.focus();
-    } else if (triggerRef.current && triggerRef.current instanceof HTMLElement) {
-      triggerRef.current.focus();
-      triggerRef.current = null;
-    }
-  }, [mobileOpen]);
-
-  useEffect(() => {
-    if (!mobileOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onMobileClose?.();
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [mobileOpen, onMobileClose]);
-
+export function AppSidebar({ sectionLinks = [] }: AppSidebarProps) {
   return (
-    <>
-      <aside className="hidden lg:flex lg:h-full lg:flex-col">
-        <SidebarContent sectionLinks={sectionLinks} />
-      </aside>
-
-      {mobileOpen ? (
-        <div
-          className="fixed inset-0 z-50 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Sidebar navigation"
-        >
-          <button
-            type="button"
-            aria-label="Close navigation"
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={onMobileClose}
-          />
-          <aside
-            ref={sidebarRef}
-            tabIndex={-1}
-            className="fixed inset-y-0 left-0 z-10 w-64 overflow-y-auto border-r border-slate-800/60 bg-slate-950/95 px-4 py-4 backdrop-blur-lg"
-          >
-            <SidebarContent sectionLinks={sectionLinks} onClose={onMobileClose} />
-          </aside>
-        </div>
-      ) : null}
-    </>
+    <aside className="hidden lg:flex lg:h-full lg:flex-col">
+      <SidebarContent sectionLinks={sectionLinks} />
+    </aside>
   );
 }
