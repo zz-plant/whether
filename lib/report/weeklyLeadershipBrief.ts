@@ -80,7 +80,6 @@ export const buildWeeklyLeadershipBriefModel = ({
   assessment,
   previousAssessment,
   treasury,
-  last4Boldness,
   hiringTrendDelta,
   stabilityWeeks,
 }: WeeklyLeadershipBriefInputs) => {

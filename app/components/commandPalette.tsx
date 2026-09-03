@@ -32,6 +32,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
 
   const filteredRef = useRef<CommandItem[]>([]);
   const selectedIndexRef = useRef(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
@@ -183,6 +184,13 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // The palette opens in response to an explicit command, so moving focus to
+  // the query field is what the user asked for. It rides in an effect rather
+  // than `autoFocus` so the focus move happens once the popup is mounted.
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, []);
+
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
@@ -191,12 +199,12 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-3 border-b border-slate-800/80 px-4 py-3.5 bg-slate-900/40">
             <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
             <input
+              ref={searchInputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search pages, actions, tools..."
               className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none font-medium"
-              autoFocus
               aria-label="Search commands"
             />
             <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900 rounded-md px-2 py-0.5 shadow-inner">ESC</kbd>

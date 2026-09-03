@@ -80,7 +80,9 @@ describe("sparkline", () => {
 
     assert.match(html, /aria-label="[^"]*ranging 40–70/);
     assert.match(html, /aria-label="[^"]*Latest 70 at Apr/);
-    assert.match(html, /role="img"/);
+    // The graphic is the <svg> itself, named in place. A role="img" on top of
+    // it only repeats what the element already reports.
+    assert.match(html, /<svg[^>]*aria-label="/);
   });
 
   it("renders nothing rather than a decorative stub when there is no shape", () => {

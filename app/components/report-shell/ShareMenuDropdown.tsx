@@ -34,8 +34,6 @@ export function ShareMenuDropdown({
   weeklyCallSnapshotText = "",
   weeklyOperatorBriefText = "",
   deltaOnlyBriefText = "",
-  boardSummary = "",
-  meetingPackText = "",
 }: ShareMenuDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

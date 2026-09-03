@@ -4,7 +4,6 @@ import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import { buildFlipConditionsWithoutTriggerDuplication } from "./canonicalDecisionCopy";
 import {
   buildScopedVariantDecisionAdjustment,
-  startupVariantModes,
   type StartupVariantMode,
 } from "./boundedDecisionRules";
 import { POLICY_OVERRIDE_CALL } from "./reportCopy";

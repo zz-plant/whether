@@ -35,11 +35,26 @@ deploys every push, which is the only remote gate left.
 
 - **Lint is oxlint, at parity with the ESLint config it replaced.** `.oxlintrc.json` carries
   the React and Next plugins, the two file-size budgets, and the `lib/report/home` import fence.
-  Oxlint's `correctness` category also brings rules ESLint never enforced here; the ones with
-  pre-existing findings on 2026-09-02 are switched off in the config so the swap changed the
-  tool, not the policy. Tighten one rule per PR, largest first: `no-unused-vars` (83: 49 unused
-  imports, 21 variables, 12 parameters), `jsx-a11y/prefer-tag-over-role` (32),
-  `no-useless-escape` (12), `jsx-a11y/label-has-associated-control` (11), then the singles.
+  Oxlint's `correctness` category also brings rules ESLint never enforced here. The backlog that
+  was switched off at the swap has been worked down: as of 2026-09-02 `no-unused-vars` (84),
+  every `jsx-a11y` rule (50), `no-useless-escape` (12), `no-extra-boolean-cast`,
+  and `no-useless-rename` are all **enforced at zero**.
+  Two files keep a scoped `jsx-a11y/prefer-tag-over-role` exemption because their ARIA pattern is
+  the correct one and the suggested native tag cannot carry it: `TimelineBar.tsx` renders a
+  segmented colour track as `role="slider"`, and `evidenceSections.tsx` renders a rich-content
+  `role="radiogroup"` whose custom radios are themselves guarded by `tests/evidenceSections.test.tsx`.
+  Still off, with counts: `react/set-state-in-effect` (26), `react/no-danger` (12 — all JSON-LD
+  injection, which is the intended use), `unicorn/no-thenable` (5), `react/refs` (4),
+  `nextjs/no-html-link-for-pages` (3), `react/purity` (2), `unicorn/no-new-array` (1),
+  `no-irregular-whitespace` (1), and `unicorn/no-useless-fallback-in-spread` (1 — its only
+  finding sits on a line carrying a pre-existing `as` cast, and touching that line makes
+  `review:hotspot-preflight` count it as a newly added type assertion). Tighten one per PR,
+  largest first.
+- **Product code carries a file-size budget.** `max-lines` is enforced at 800 effective lines
+  (blank lines and comments skipped) across `app/**` and `lib/**`. It is deliberately not applied
+  to `scripts/**` or `tests/**`, where a budget only invites fake overrides. The pre-existing
+  900-line exemptions for `weeklyDecisionCard.tsx` and `homePageAssembler.ts` are ordered after
+  the budget so they still win. Nine files sit between 500 and 800; 500 is the ratchet target.
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
 - **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)

@@ -148,6 +148,10 @@ export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: App
         <SidebarContent sectionLinks={sectionLinks} />
       </aside>
 
+      {/* The drawer is a div with role="dialog", not a real <dialog>. `<dialog open>`
+          is non-modal — no focus trap, no inertness — so it would not make the
+          aria-modal claim below any truer, while bringing UA sizing and background
+          that have to be fought off. */}
       {mobileOpen ? (
         <div
           className="fixed inset-0 z-50 lg:hidden"
@@ -155,7 +159,9 @@ export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: App
           aria-modal="true"
           aria-label="Sidebar navigation"
         >
-          <div
+          <button
+            type="button"
+            aria-label="Close navigation"
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onMobileClose}
           />

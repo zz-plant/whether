@@ -20,7 +20,6 @@ import {
   isBusinessModel,
   type DecisionAction,
   type DecisionCategory,
-  type DecisionOutput,
   type LifecycleStage,
   type CompanyFinancialProfile,
 } from "../../../lib/decisionShield";
@@ -421,7 +420,7 @@ export const DecisionShieldPanel = ({
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
-        <p className="sr-only" role="status" aria-live="polite">
+        <output className="sr-only" aria-live="polite">
           {copiedTarget === "verdict"
             ? "Verdict copied to clipboard."
             : copiedTarget === "link"
@@ -429,13 +428,13 @@ export const DecisionShieldPanel = ({
               : error
                 ? "Clipboard unavailable."
                 : ""}
-        </p>
-        <div className="mt-2 min-h-[20px] text-xs text-amber-200" role="status" aria-live="polite">
+        </output>
+        <output className="mt-2 block min-h-[20px] text-xs text-amber-200" aria-live="polite">
           {error && lastAttemptedTargetRef.current === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
-        </div>
-        <div className="mt-1 min-h-[20px] text-xs text-slate-300" role="status" aria-live="polite">
+        </output>
+        <output className="mt-1 block min-h-[20px] text-xs text-slate-300" aria-live="polite">
           {memoryStatus ?? ""}
-        </div>
+        </output>
         <div className="mt-4 min-h-[260px]">
           {error && lastAttemptedTargetRef.current === "verdict" ? (
             <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
@@ -605,8 +604,9 @@ export const DecisionShieldPanel = ({
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300">Plan A</label>
+                  <label className="text-xs font-bold text-slate-300" htmlFor="decision-shield-plan-a">Plan A</label>
                   <textarea
+                    id="decision-shield-plan-a"
                     value={planText}
                     onChange={(e) => setPlanText(e.target.value)}
                     rows={3}
@@ -623,8 +623,9 @@ export const DecisionShieldPanel = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300">Plan B</label>
+                  <label className="text-xs font-bold text-slate-300" htmlFor="decision-shield-plan-b">Plan B</label>
                   <textarea
+                    id="decision-shield-plan-b"
                     value={planBText}
                     onChange={(e) => setPlanBText(e.target.value)}
                     rows={3}
@@ -731,9 +732,9 @@ export const DecisionShieldPanel = ({
                 </p>
               ) : null}
             </div>
-            <p className="sr-only" role="status" aria-live="polite">
+            <output className="sr-only" aria-live="polite">
               {presetStatus ?? ""}
-            </p>
+            </output>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {presets.length === 0 ? (
                 <p className="text-sm text-slate-400">

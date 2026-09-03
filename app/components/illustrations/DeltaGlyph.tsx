@@ -59,7 +59,6 @@ export function DeltaGlyph({
       viewBox="0 0 48 16"
       width="100%"
       style={{ height: "auto" }}
-      role="img"
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >

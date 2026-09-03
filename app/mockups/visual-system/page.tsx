@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ParametricGraphic } from "../../components/ParametricGraphic";
 import { deriveVisualTokenMatrix } from "../../../lib/graphics/generatorEngine";
 import type { ShaderMode } from "../../../lib/identicon/shaderEngine";
-import { Sparkles, Sliders, Layers, RefreshCw, Cpu, Image } from "lucide-react";
+import { Sparkles, Sliders, Layers, RefreshCw } from "lucide-react";
 
 export default function VisualSystemMockupPage() {
   const [seed, setSeed] = useState("report-snapshot-2026-07-30-canonical");
@@ -121,10 +121,11 @@ export default function VisualSystemMockupPage() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label htmlFor="visual-seed" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                 Input Seed String
               </label>
               <input
+                id="visual-seed"
                 type="text"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
@@ -134,10 +135,11 @@ export default function VisualSystemMockupPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label htmlFor="visual-shader-mode" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Shader Mode
                 </label>
                 <select
+                  id="visual-shader-mode"
                   value={mode}
                   onChange={(e) => setMode(e.target.value as ShaderMode)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"
@@ -149,10 +151,11 @@ export default function VisualSystemMockupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label htmlFor="visual-rendering-tier" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Rendering Tier
                 </label>
                 <select
+                  id="visual-rendering-tier"
                   value={tier}
                   onChange={(e) => setTier(e.target.value as any)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"

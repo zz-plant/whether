@@ -8,7 +8,6 @@ import { buildDegradedSourceRows } from "./sourceHealth";
 import {
   buildInterpretationLayer,
   isInterpretationView,
-  type InterpretationLayer,
   type InterpretationView,
 } from "./interpretationLayer";
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
@@ -18,7 +17,7 @@ import { homeSectionSequence } from "./homeSections";
 import type { HomePageSearchParams } from "./homeMetadata";
 import { loadHomePageReportData } from "./homePageData";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
-import { resolveStartupVariantMode, type StartupVariantMode } from "./boundedDecisionRules";
+import { resolveStartupVariantMode } from "./boundedDecisionRules";
 import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
 import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
@@ -26,7 +25,6 @@ import { buildHomeStructuredData } from "./home/structuredData";
 import type { WeeklyCallContract } from "./weeklyCallContract";
 import type { OperatorContext } from "./operatorContext";
 import type {
-  ArtifactPayload,
   HomePageAssembly,
   HomePageDiagnosticsLane,
   HomePageWorkspaceModel,
@@ -182,22 +180,15 @@ export const assembleHomePage = async ({
     assessment,
     fetchedAtLabel,
     historicalSelection,
-    historicalAnalogs,
     recordDateLabel,
     weeklyRecordDate,
-    weeklyRecordDateLabel,
-    regimeAlert,
     reportDynamics,
     sensors,
     macroSeries,
     forecast,
-    regimeSeries,
     statusLabel,
-    stopItems,
     treasury,
     treasuryProvenance,
-    confidenceHistory,
-    confidenceTrend,
   } = reportData;
 
   const previousHistoricalSelection = historicalSelection

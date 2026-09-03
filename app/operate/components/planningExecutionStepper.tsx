@@ -187,10 +187,11 @@ export function OperationsExecutionStepper({
                 <a
                   href={stepHref}
                   aria-current={isActive ? "step" : undefined}
+                  aria-labelledby={`${step.id}-nav-title`}
                   className={`flex-1 min-w-0 no-underline ${isCompleted ? "opacity-60" : ""}`}
                 >
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
+                    <span id={`${step.id}-nav-title`} className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
                       {step.title}
                     </span>
                     <span className="type-eyebrow flex-shrink-0">

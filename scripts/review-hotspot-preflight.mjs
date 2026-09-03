@@ -122,7 +122,7 @@ export function isUnsafeAssertion(code) {
     return false;
   }
 
-  return /\sas\s+[A-Za-z_$<{\(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
+  return /\sas\s+[A-Za-z_$<{(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
 }
 
 function addedTypeAssertions(diffRange) {

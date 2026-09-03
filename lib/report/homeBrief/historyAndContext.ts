@@ -4,7 +4,6 @@ import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivi
 import { joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
 import { isImprovingSignalDelta } from "../reportData";
 import type {
-  BoundaryDirection,
   FlipRiskMeterState,
   HistoricalTimelineItem,
   HomeBriefTrustWarning,
@@ -210,8 +209,6 @@ const overallDirectionCopy: Record<string, string> = {
 export const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
-  tightnessNow,
-  riskNow,
   tightnessThreshold,
   riskThreshold,
   tightnessDirection,
@@ -233,7 +230,6 @@ export const buildWhyThisCall = ({
   const nearestIsTightness = tightnessGap <= riskGap;
   const nearestGap = nearestIsTightness ? tightnessGap : riskGap;
   const boundaryLabel = nearestIsTightness ? "Funding pressure" : "Risk appetite";
-  const boundaryNow = nearestIsTightness ? tightnessNow : riskNow;
   const boundaryThreshold = nearestIsTightness ? tightnessThreshold : riskThreshold;
   const boundaryDirection = (nearestIsTightness ? tightnessDirection : riskDirection) === "riseAbove"
     ? "rises above"

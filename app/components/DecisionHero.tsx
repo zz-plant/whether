@@ -24,7 +24,6 @@ import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { PresentModeButton } from "./PresentModeButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
-import type { MeetingSlidePayload } from "../../lib/export/meetingSlideExport";
 import { ThresholdProximityBar } from "./ThresholdProximityBar";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
@@ -101,7 +100,6 @@ export function DecisionHero({
   postureLabel,
   signalDirection,
   recordDate,
-  fetchedAt,
   confidenceLabel,
   trustStatusLabel,
   treasurySource,
@@ -401,9 +399,9 @@ export function DecisionHero({
             summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75"
             summary={<span>Why this call · {signalReadoutSummary}</span>}
           >
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Signal readout">
+            <fieldset className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Signal readout">
               {renderSignalCells("details")}
-            </div>
+            </fieldset>
             <p className="mt-2 text-fluid-nano text-white/45">
               Unfamiliar with a term here? <GlossaryLink>Open the glossary</GlossaryLink>
             </p>

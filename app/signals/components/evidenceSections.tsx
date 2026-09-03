@@ -133,24 +133,34 @@ export const SignalsModeSwitcherSection = ({
               "Diagnostics, replay, and the checks that would overturn the assessment.",
           },
         ] as const).map((item) => (
-          <button
+          <label
             key={item.id}
-            type="button"
-            role="radio"
-            aria-checked={activeSignalsView === item.id}
-            onClick={() => {
-              router.push(buildSignalsViewHref(searchParams, item.id));
-            }}
-            aria-label={item.label}
             className={
-              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-left outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-left outline-none transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sky-300 ${
                 activeSignalsView === item.id
                   ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
                   : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
               }`
             }
           >
-            <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80">
+            {/* A real radio, so one tab stop and arrow-key movement between the
+                two depths come from the platform. It is visually hidden because
+                the ring below is the visible control. */}
+            <input
+              type="radio"
+              name="signals-view"
+              value={item.id}
+              checked={activeSignalsView === item.id}
+              onChange={() => {
+                // replace, not push: with native radios the arrow keys move the
+                // selection, and pushing would add a history entry per keypress.
+                // Reading depth is a view toggle, not a destination.
+                router.replace(buildSignalsViewHref(searchParams, item.id));
+              }}
+              aria-label={item.label}
+              className="sr-only"
+            />
+            <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80" aria-hidden="true">
               {activeSignalsView === item.id ? (
                 <span className="h-2 w-2 rounded-full bg-sky-200" aria-hidden="true" />
               ) : null}
@@ -159,7 +169,7 @@ export const SignalsModeSwitcherSection = ({
               <span className="type-eyebrow">{item.label}</span>
               <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
             </span>
-          </button>
+          </label>
         ))}
       </div>
     </section>

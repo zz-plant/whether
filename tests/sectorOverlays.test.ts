@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { applySectorOverlay, SECTOR_CONFIGS } from "../lib/sectorOverlays";
+import { applySectorOverlay } from "../lib/sectorOverlays";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 
 const mockAssessment: RegimeAssessment = {

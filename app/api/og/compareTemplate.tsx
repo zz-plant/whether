@@ -8,10 +8,8 @@ import {
   OG_FONT_BODY,
   OG_FONT_DISPLAY,
   OG_PANEL,
-  OG_RAISED,
   OG_TEXT,
   OG_TEXT_MUTED,
-  OG_TEXT_SECONDARY,
 } from "./ogTheme";
 
 export type CompareEpoch = {

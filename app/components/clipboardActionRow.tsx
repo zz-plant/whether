@@ -70,9 +70,9 @@ export function ClipboardActionRow({
         {buttonLabel}
       </button>
       {showStatus ? (
-        <p className={statusClassName ?? "mt-2 min-h-[20px] text-xs text-slate-300"} role="status" aria-live="polite">
+        <output className={statusClassName ?? "mt-2 block min-h-[20px] text-xs text-slate-300"} aria-live="polite">
           {statusMessage ?? ""}
-        </p>
+        </output>
       ) : null}
     </div>
   );

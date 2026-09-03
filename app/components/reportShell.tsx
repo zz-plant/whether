@@ -20,10 +20,7 @@ import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { InternalAwareLink } from "./report-shell/InternalAwareLink";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
-import {
-  HeroTrustProvenanceBlock,
-  InlineTrustBlock,
-} from "./report-shell/TrustBlocks";
+import { InlineTrustBlock } from "./report-shell/TrustBlocks";
 import type {
   DecisionBanner,
   DecisionDiff,

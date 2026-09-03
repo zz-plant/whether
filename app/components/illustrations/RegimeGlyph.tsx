@@ -73,7 +73,6 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
       viewBox="0 0 32 32"
       width="100%"
       style={{ height: "auto", transition: "opacity 350ms ease" }}
-      role="img"
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >

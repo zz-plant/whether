@@ -177,7 +177,6 @@ export function ThresholdLadder({
       viewBox={`0 0 ${viewBoxWidth} ${scaleDirection ? 68 : 56}`}
       width="100%"
       style={{ height: "auto" }}
-      role="img"
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >

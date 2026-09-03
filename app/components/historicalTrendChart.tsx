@@ -93,7 +93,6 @@ export function HistoricalTrendChart({
         // below so neither turns into an ellipse.
         preserveAspectRatio="none"
         className="w-full h-8 overflow-visible"
-        role="img"
         // The chart is autoscaled, so the range has to be stated or the shape
         // can't be decoded.
         aria-label={`${label} over ${points.length} ${periodLabel}, ranging ${rangeLabel(domain)}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`}

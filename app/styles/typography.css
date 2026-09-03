@@ -1,16 +1,4 @@
-.weather-topbar {
-  position: relative;
-  overflow: hidden;
-}
 
-.weather-topbar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, var(--white-overlay-subtle), transparent 20%, transparent 80%, rgba(255, 255, 255, 0.02));
-}
 
 .weather-topbar-search {
   position: relative;

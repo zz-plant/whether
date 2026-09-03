@@ -71,3 +71,41 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
    - **Why it matters:** Users submit a full form request for simple filtering, with minimal assistive affordances like highlighted matches, quick facets, or saved intents.
    - **Code signals:** `/toolkits` uses server-rendered query filtering through a search form and plain results grid.
    - **Recommendation:** Keep server filtering but add lightweight client-side affordances (suggested intents, active-query chips, result counts near input).
+
+## Frontend cleanup pass (2026-09-02)
+
+Answers the "what needs a redesign / refactor" audit. Each item was measured before it was
+changed, and the numbers below are the measured ones.
+
+| ID | Item | Status |
+| --- | --- | --- |
+| DD-011 | Lint backlog switched off at the oxlint swap | Shipped — `no-unused-vars` (84), every `jsx-a11y` rule (50), `no-useless-escape` (12), `no-extra-boolean-cast` (3), `no-useless-rename` (2), `unicorn/no-useless-fallback-in-spread` (1) all fixed to zero and **enforced**. Remaining rules and counts are listed in CLAUDE.md → Toolchain notes. |
+| DD-012 | Dead CSS in the custom layer | Shipped — 41 of 138 `weather-*` classes were defined but never rendered. 321 lines removed across 9 stylesheets. Verified inert: 14 routes were crawled and none references a removed class. `@keyframes weather-stream-reveal` was kept, since live rules still animate it. |
+| DD-013 | `/mockups` served in production | Shipped — `app/mockups/layout.tsx` calls `notFound()` unless `NODE_ENV !== "production"` or `WHETHER_ENABLE_MOCKUPS=1`, which `wrangler.toml` sets on the preview lane only. Four routes were publicly reachable; they were `noindex` but still served. No inbound links existed. |
+| DD-014 | No file-size budget on product code | Shipped — `max-lines` enforced at 800 effective lines across `app/**` and `lib/**`. Deliberately not applied to `scripts/**` or `tests/**`. Nine files sit between 500 and 800; **500 is the ratchet target**. |
+| DD-015 | `exportBriefPanel.tsx` at 940 lines | Partial — down to 780. The two builders defined inside the component moved to `lib/export/issueTrackerBrief.ts`, and the twenty inline `useMemo` derivations became one pure `buildExportBriefArtifacts()` in `lib/export/exportBriefArtifacts.ts`. Both are now covered by 14 tests that could not exist before, because the panel only renders once its planning step is opened. Jira and Linear were computing byte-identical markdown twice; that is one value now. **Remaining: ~600 lines of JSX in one component, splittable at six sibling blocks.** |
+| DD-016 | `decisionShieldPanel.tsx` at 819 lines, 12 `useState` + 6 `useEffect` | Not started — the heaviest stateful component in the app. Needs its form state extracted to a hook before the JSX can be split. |
+| DD-017 | `ReportShell` has two public APIs | Not started — it accepts both a grouped `model` object and 42 flat props, and `normalizeReportShellInput` merges them. Four callers already pass `model`; three (`/answer`, `/signals`, `/trust`) pass flat props. Migrating those three would let the flat branch and its type be deleted. |
+| DD-018 | `react/set-state-in-effect` (26 findings) | Not started — a real React anti-pattern, but each case needs judgment about where the state should be derived instead. Not safe to bulk-fix. |
+| DD-019 | Component naming split in `app/components` | Not started, and deliberately so — 102 files sit flat in one directory, 25 PascalCase and 62 camelCase. Renaming is a large diff for a cosmetic gain and would collide with every in-flight branch. Worth doing as its own commit when the tree is quiet, not folded into a behavioural change. |
+
+### ARIA patterns that keep a scoped lint exemption
+
+`jsx-a11y/prefer-tag-over-role` is enforced everywhere except three files, each because the
+suggested native tag cannot carry the pattern:
+
+- `TimelineBar.tsx` — `role="slider"` over a segmented colour track. `<input type="range">` cannot
+  render the coloured month segments. The arrow/Home/End handler moved off the wrapper onto the
+  slider itself, which is what those keys actually drive, and the wrapper became a `<section>`.
+- `scrollProgressBar.tsx` — `role="progressbar"`. A `<progress>` rewrite was tried and reverted:
+  it depends on `::-webkit-progress-value` / `::-moz-progress-bar` styling that could not be
+  verified in this environment, and it dropped the width transition. The ARIA form works today.
+- `AppSidebar.tsx` — `role="dialog"`. A real `<dialog open>` is *non-modal*: no focus trap, no
+  inertness. It would not make the existing `aria-modal` claim any truer, and it brings UA sizing
+  and background that have to be neutralised. The backdrop did become a real `<button>`, so it is
+  now keyboard-closable.
+
+`app/signals/components/evidenceSections.tsx` keeps no exemption: its `role="radio"` buttons
+became native radios inside labels, because the old markup left **both** options in the tab order
+when a radiogroup owes one tab stop plus arrow keys. Selection uses `router.replace`, not `push`,
+so arrowing between reading depths does not fill the history stack.

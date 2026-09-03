@@ -5,7 +5,6 @@ import { DisplayModeManager } from "./displayModeManager";
 import { DisplayGuardian } from "./displayGuardian";
 import { AnchorFeedback } from "./anchorFeedback";
 import { serializeJsonLd } from "../../lib/seo";
-import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import type { RegimeKey } from "../../lib/types";
 
 export type RegimeIconType = RegimeKey | "NEUTRAL";

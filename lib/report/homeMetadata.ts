@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import {
-  canonicalPositioningLine,
-  websiteName,
-} from "../seo";
+import { websiteName } from "../seo";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
 import { decisionTransmissionSearchDescription } from "./decisionTransmissionCopy";

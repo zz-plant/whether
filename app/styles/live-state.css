@@ -1,22 +1,5 @@
 
 
-.weather-live-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid rgba(56, 189, 248, 0.14);
-  pointer-events: none;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 1px;
-}
-
-.weather-live-hero--high::before {
-  border-color: rgba(251, 191, 36, 0.20);
-}
-
 .weather-command-bar {
 }
 
@@ -40,18 +23,7 @@
     scroll-behavior: auto;
   }
 
-  .weather-live-hero::before,
-  .weather-live-hero::after,
-  .weather-live-dot,
-  .weather-live-chip,
-  .weather-live-band-chip,
-  .weather-motion-card,
-  .weather-signal-cell,
-  .weather-movement-fill::after,
-  .weather-loading-beacon,
-  .weather-loading-progress::after,
-  .weather-skeleton__shimmer,
-  .weather-stream-reveal {
+  .weather-skeleton__shimmer{
     animation: none;
   }
 
@@ -64,9 +36,7 @@
   .weather-route-card,
   .weather-hub-link-card,
   .weather-command-bar__card,
-  .weather-delta-card,
-  .weather-step-card,
-  .weather-step-summary {
+  .weather-delta-card{
     transition: none;
   }
 }

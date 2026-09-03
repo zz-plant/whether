@@ -98,8 +98,8 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             <p className="mt-4 text-xs text-slate-400">No historical data available.</p>
           ) : (
             <div className="mt-4 space-y-3">
-              <div>
-                <label className="type-eyebrow">Year</label>
+              <fieldset>
+                <legend className="type-eyebrow">Year</legend>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {years.map((year) => (
                     <button key={year} type="button" onClick={() => setSelectedYear(year)}
@@ -107,10 +107,10 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                     >{year}</button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
               {months.length > 0 ? (
-                <div>
-                  <label className="type-eyebrow">Month</label>
+                <fieldset>
+                  <legend className="type-eyebrow">Month</legend>
                   <div className="mt-1.5 grid grid-cols-4 gap-1.5">
                     {months.map((month) => (
                       <button key={month} type="button" onClick={() => navigateTo(selectedYear, month)}
@@ -118,7 +118,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                       >{new Date(selectedYear, month - 1).toLocaleString("en", { month: "short" })}</button>
                     ))}
                   </div>
-                </div>
+                </fieldset>
               ) : <p className="mt-2 text-xs text-slate-400">No data for {selectedYear}.</p>}
             </div>
           )}

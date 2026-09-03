@@ -1,9 +1,4 @@
 
-@media (min-width: 1536px) {
-  .weather-bento-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
 
 /* Container ladder ------------------------------------------------------
    Three tiers, deliberately distinct — do not add a fourth, and do not reach
@@ -232,19 +227,17 @@
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
-    .weather-surface-secondary, .weather-surface-utility
-  )
+    .weather-route-card, .weather-stat-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
-    .weather-surface-secondary, .weather-surface-utility
-  ) {
+    .weather-route-card, .weather-stat-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary){
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -259,36 +252,27 @@
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
-    .weather-surface-secondary, .weather-surface-utility
-  )
+    .weather-route-card, .weather-stat-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
-    .weather-surface-secondary, .weather-surface-utility
-  )
+    .weather-route-card, .weather-stat-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card, .weather-forecast-card,
-    .weather-trust-board, .weather-trust-lane, .weather-loading-stage,
-    .weather-surface-secondary, .weather-surface-utility
-  ):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+    .weather-route-card, .weather-stat-card,
+    .weather-trust-board, .weather-trust-lane,
+    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]){
   border-color: transparent;
   background: none;
-}
-
-/* Nav scroll fade — subtle right-edge gradient hinting at more items on small screens */
-.weather-nav-rail {
-  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent 100%);
 }
 
 /* Chip base — normalizes sizing across all chip-like elements */
@@ -333,30 +317,6 @@ button .weather-chip:active,
   outline-offset: 2px;
 }
 
-@container brief (max-width: 700px) {
-  .weather-brief-secondary-lane {
-    display: none;
-  }
-}
-
-@container brief (max-width: 860px) {
-  .weather-brief-call-heading {
-    font-size: 1.15rem;
-    margin-top: 0.5rem;
-  }
-}
-
-/* Decision delta strip — scannable in <5 seconds */
-.weather-decision-delta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem var(--space-md);
-  border-bottom: 1px solid var(--border-faint);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Page & Tab View Transitions */
 @view-transition {
   navigation: auto;
@@ -395,26 +355,6 @@ button .weather-chip:active,
   ::view-transition-new(root),
   .weather-page-enter {
     animation: none !important;
-  }
-}
-
-/* One-screen guarantee: compact the decision card on shorter viewports */
-@media (max-height: 880px) {
-  .weather-decision-card .weather-section-stage {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .weather-decision-card .weather-section-stage + .weather-section-stage {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 120px;
-  }
-
-  .weather-decision-card dt {
-    font-size: 0.6rem;
-  }
-
-  .weather-decision-card .type-data.font-semibold {
-    font-size: 0.8rem;
   }
 }
 

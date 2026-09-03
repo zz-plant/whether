@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePersistentClientId } from "../../components/clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";

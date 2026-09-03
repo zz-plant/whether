@@ -5,7 +5,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { Collapsible } from "@base-ui/react/collapsible";

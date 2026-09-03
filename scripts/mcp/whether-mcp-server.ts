@@ -11,7 +11,6 @@ import { agentSkills } from "../../lib/agentSkills.js";
 import {
   buildCanonicalBoundedDecisionRules,
   formatBoundedDecisionTriplet,
-  type BoundedDecisionRule,
 } from "../../lib/report/boundedDecisionRules.js";
 import { DEFAULT_THRESHOLDS, type RegimeKey } from "../../lib/regimeEngineCore.js";
 import { loadCanonicalReportInputs } from "../../lib/ingestion/materialized.js";

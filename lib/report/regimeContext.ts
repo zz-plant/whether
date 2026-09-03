@@ -114,7 +114,6 @@ export function getRegimeProjection(
 
   /* Project which regime would follow */
   const tightDir = tightnessDelta > 0 ? "tightening" : "easing";
-  const riskDir = riskAppetiteDelta > 0 ? "braver" : "more cautious";
 
   const projectedRegime = weeksEstimate <= 4
     ? (tightDir === "tightening" ? "SCARCITY" : "EXPANSION")

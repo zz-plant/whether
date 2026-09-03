@@ -141,7 +141,6 @@ export function Sparkline({
       // aspect matches the viewBox (5:1) so the stroke never distorts.
       style={{ width: `${widthEm}em`, height: `${widthEm / 5}em` }}
       className={`inline-block shrink-0 align-[-0.15em] overflow-visible ${className ?? ""}`}
-      role="img"
       aria-label={accessibleLabel}
     >
       {band ? (

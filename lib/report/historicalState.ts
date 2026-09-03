@@ -49,9 +49,7 @@ export const loadHistoricalState = ({
   thresholds,
   assessment,
   reportDynamics,
-  previousAssessment,
   lastYearAssessment,
-  evaluateRegimeFn,
 }: {
   searchParams?: ReportSearchParams;
   treasury: TreasuryData;

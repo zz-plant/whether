@@ -6,8 +6,6 @@
 import type {
   PlanStressTestRequest,
   PlanStressTestResult,
-  PlanComparisonResult,
-  CompanyFinancialProfile,
 } from "../decisionShield";
 import type { AnalogPlaybookResult } from "../analogPlaybook";
 

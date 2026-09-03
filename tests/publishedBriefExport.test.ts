@@ -4,7 +4,6 @@ import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefSlackUpdate,
   findPublishedBrief,
-  getPublishedBriefs,
   type PublishedBrief,
 } from "../lib/report/publishedBriefs";
 import { buildCanonicalUrl } from "../lib/seo";

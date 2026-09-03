@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import {
   getTimeMachineRegimeSeries,
   type TimeMachineRegimeEntry,
@@ -272,10 +272,8 @@ export function TimelineBar({
     : "";
 
   return (
-    <div
+    <section
       className={`timeline-bar-root flex flex-col gap-2 select-none ${className}`}
-      onKeyDown={handleKeyDown}
-      role="region"
       aria-label="Timeline navigation scrubber"
     >
       {/* Top Header Row: Step buttons, Active Readout, Zoom Presets, Jump to Live */}
@@ -366,6 +364,7 @@ export function TimelineBar({
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerLeave}
         onWheel={handleWheel}
+        onKeyDown={handleKeyDown}
         tabIndex={0}
         role="slider"
         aria-label="Select month"
@@ -487,6 +486,6 @@ export function TimelineBar({
           </span>
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }

@@ -78,8 +78,7 @@ export function SwipeableWeek({
   }, [goToPreviousMonth, goToNextMonth]);
 
   return (
-    <div
-      role="region"
+    <section
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className="touch-pan-y outline-none space-y-3"
@@ -94,7 +93,7 @@ export function SwipeableWeek({
         className="mb-1"
       />
       {children}
-    </div>
+    </section>
   );
 }
 

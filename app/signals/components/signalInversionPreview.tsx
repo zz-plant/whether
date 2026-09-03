@@ -110,7 +110,7 @@ export function SignalInversionPreview({
         </p>
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
-        <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
+        <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
           {/* Zone fills and strokes were hardcoded rgba() tuned to the dark
               ground; on the light theme they rendered as dark-toned washes. */}
           <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="var(--color-semantic-tightening-border)" fillOpacity="0.12" />

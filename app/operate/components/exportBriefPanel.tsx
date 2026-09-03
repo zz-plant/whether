@@ -9,30 +9,10 @@ import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { formatNumberWithUnit, resolveWeekEndingIsoDateUTC } from "../../../lib/formatters";
-import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
-import type { CanonicalDecisionCopy } from "../../../lib/report/canonicalDecisionCopy";
-import {
-  buildWeeklyBoardSnippetPlainText,
-  buildWeeklyCallSnapshotPlainText,
-  buildWeeklyOperatorBriefCardText,
-  buildWeeklyOperatorBriefPayload,
-  buildWeeklyOperatorBriefPlainText,
-  buildWeeklyOperatorBriefSlackBlocks,
-} from "../../../lib/export/weeklyOperatorBrief";
-import { buildStakeholderBriefs, type StakeholderRole } from "../../../lib/export/stakeholderBriefs";
+import { type StakeholderRole } from "../../../lib/export/stakeholderBriefs";
 import { buildExplainerBriefContent } from "../../../lib/export/explainerBrief";
-import { buildComplianceStamp } from "../../../lib/exportNotices";
-import { formatRegimeLabel } from "../../../lib/regimeFormat";
-import {
-  buildBoundedDecisionLines,
-  buildBoardSlideBullets,
-  buildBoardBrief,
-  buildCallCitation,
-  buildConstraintHeadlines,
-  buildSlackBrief,
-  type ModeledExportDecisionPayload,
-} from "../../../lib/export/briefBuilders";
+import { type ExportDecisionModel } from "../../../lib/export/issueTrackerBrief";
+import { buildExportBriefArtifacts } from "../../../lib/export/exportBriefArtifacts";
 import { WeeklyDigestDownload } from "./weeklyDigestDownload";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -46,69 +26,6 @@ import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { WorkAppLabel } from "../../components/workAppIcon";
 import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
 import { DECISION_CONTRACT_LABELS, PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
-
-const buildExportStamp = (
-  treasury: TreasuryData,
-  confidence: string
-) =>
-  buildComplianceStamp({
-    sourceLine: treasury.source,
-    timestamp: treasury.record_date,
-    confidence,
-  });
-
-type ExportDecisionModel = ModeledExportDecisionPayload & {
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
-  confidencePercent?: number;
-  compactFlipConditionLabels?: string[];
-  canonicalDecisionCopy?: CanonicalDecisionCopy;
-  decisionShiftSummary?: string;
-  trendLabel?: string;
-};
-
-const buildIssueTrackerMarkdownBrief = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[],
-  decisionModel?: ExportDecisionModel,
-  format: "markdown" | "wiki" = "markdown",
-) => {
-  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
-  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = formatRegimeLabel(assessment.regime);
-  const postureLabel = decisionModel?.postureWithStageLabel ?? regimeLabel;
-  const bullet = format === "wiki" ? "*" : "-";
-  const heading2 = format === "wiki" ? "h2. " : "## ";
-  const heading3 = format === "wiki" ? "h3. " : "### ";
-  const macroLines = macros.map((macro) => `${bullet} ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`);
-  const boundedDecisionLines = buildBoundedDecisionLines(assessment, { modeledDecision: decisionModel })
-    .map((line) => `${bullet} ${line.replace(/^•\s*/, "")}`);
-  const sourceLine = format === "wiki"
-    ? `Source: [${treasury.source}|${treasury.source}]`
-    : `Source: ${treasury.source}`;
-
-  return [
-    `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
-    `${format === "wiki" ? "*Posture:*" : "**Posture:**"} ${postureLabel}`,
-    ...(postureLabel !== assessment.regime
-      ? [`${format === "wiki" ? "*Regime:*" : "**Regime:**"} ${assessment.regime}`]
-      : []),
-    `${format === "wiki" ? "*Tightness:*" : "**Tightness:**"} ${assessment.scores.tightness} / ${format === "wiki" ? "*Risk appetite:*" : "**Risk appetite:**"} ${assessment.scores.riskAppetite}`,
-    `${format === "wiki" ? "*Base rate:*" : "**Base rate:**"} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `${format === "wiki" ? "*Curve slope:*" : "**Curve slope:**"} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
-    "",
-    `${heading3}Macro signals`,
-    ...macroLines,
-    "",
-    `${heading3}Bounded decision`,
-    ...boundedDecisionLines,
-    "",
-    sourceLine,
-    "",
-    ...buildExportStamp(treasury, decisionModel?.confidenceLabel ? `${decisionModel.confidenceLabel} confidence` : "Score-based posture confidence"),
-  ].join("\n");
-};
 
 export const ExportBriefPanel = ({
   assessment,
@@ -169,97 +86,31 @@ export const ExportBriefPanel = ({
     lastStatusRef.current = status;
   }, [add, copiedTarget, errorReason, status]);
 
-  const briefing = useMemo(
-    () => buildSlackBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel }),
-    [assessment, treasury, sensors, macroSeries, decisionModel]
+  // One pure builder instead of twenty memos. Everything here is derived from
+  // props plus the team note; the override banner is applied per artifact below.
+  const artifacts = useMemo(
+    () => buildExportBriefArtifacts({ assessment, treasury, sensors, macroSeries, decisionModel, customTeamNote }),
+    [assessment, treasury, sensors, macroSeries, decisionModel, customTeamNote],
   );
-  const weeklyOperatorDate = useMemo(
-    () => resolveWeekEndingIsoDateUTC(treasury.record_date),
-    [treasury.record_date],
-  );
-  const weeklyOperatorPayload = useMemo(() => buildWeeklyOperatorBriefPayload({
-    assessment,
-    treasury,
-    date: weeklyOperatorDate,
-    postureWithStageLabel: decisionModel?.postureWithStageLabel,
-    confidenceLabel: decisionModel?.confidenceLabel,
-    actionStripItems: decisionModel?.actionStripItems,
-    flipConditionLabels: decisionModel?.compactFlipConditionLabels,
-    canonicalDecisionCopy: decisionModel?.canonicalDecisionCopy,
-    customTeamNote: customTeamNote.trim() ? customTeamNote.trim() : undefined,
-  }), [assessment, treasury, weeklyOperatorDate, decisionModel, customTeamNote]);
-  const weeklyOperatorPlainText = useMemo(
-    () => buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload),
-    [weeklyOperatorPayload],
-  );
-  const weeklyOperatorSlackBlocks = useMemo(
-    () => buildWeeklyOperatorBriefSlackBlocks(weeklyOperatorPayload),
-    [weeklyOperatorPayload],
-  );
-  const weeklyOperatorCardText = useMemo(
-    () => buildWeeklyOperatorBriefCardText(weeklyOperatorPayload),
-    [weeklyOperatorPayload],
-  );
+  const {
+    weekEndingDate,
+    briefing,
+    weeklyOperatorPlainText,
+    weeklyOperatorSlackBlocks,
+    weeklyOperatorCardText,
+    stakeholderBriefs,
+    citation,
+    markdownBrief,
+    wikiBrief,
+    slideBullets,
+    boardBrief,
+    boardNote,
+    callSnapshot,
+    constraintHeadlines,
+    agentPayload,
+    agentPrompt,
+  } = artifacts;
   const [activeStakeholderRole, setActiveStakeholderRole] = useState<StakeholderRole>("board");
-  const stakeholderBriefs = useMemo(
-    () => buildStakeholderBriefs(weeklyOperatorPayload),
-    [weeklyOperatorPayload],
-  );
-  const citation = useMemo(
-    () => buildCallCitation(assessment, treasury, {
-      postureWithStageLabel: decisionModel?.postureWithStageLabel,
-      operatingStanceLine: decisionModel?.operatingStanceLine,
-    }),
-    [assessment, treasury, decisionModel],
-  );
-  const jiraMarkdownBrief = useMemo(
-    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "markdown"),
-    [assessment, treasury, sensors, macroSeries, decisionModel]
-  );
-  const confluenceWikiBrief = useMemo(
-    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "wiki"),
-    [assessment, treasury, sensors, macroSeries, decisionModel]
-  );
-  const linearMarkdownBrief = useMemo(
-    () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macroSeries, decisionModel, "markdown"),
-    [assessment, treasury, sensors, macroSeries, decisionModel]
-  );
-  const slideBullets = useMemo(
-    () => buildBoardSlideBullets(assessment, treasury, macroSeries, { modeledDecision: decisionModel }),
-    [assessment, treasury, macroSeries, decisionModel],
-  );
-  const boardBrief = useMemo(
-    () => buildBoardBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel }),
-    [assessment, treasury, sensors, macroSeries, decisionModel],
-  );
-  const boardNote = useMemo(
-    () => buildWeeklyBoardSnippetPlainText({
-      trustLine: fallbackActive
-        ? `TRUST: FALLBACK SNAPSHOT · As of ${treasury.record_date}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
-        : `TRUST: LIVE · As of ${treasury.record_date}`,
-      postureLine: `POSTURE: ${decisionModel?.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} · ${decisionModel?.confidenceLabel ?? "Score-based"} confidence${decisionModel?.confidencePercent ? ` (${Math.round(decisionModel.confidencePercent)}%)` : ""}`,
-      changedLine: `CHANGED: ${decisionModel?.decisionShiftSummary ?? "Use the current weekly call as the operating baseline."}`,
-      guardrailLine: `GUARDRAIL: ${decisionModel?.guardrailThreshold ?? weeklyOperatorPayload.pauseIf}`,
-      flipLine: `FLIP: ${decisionModel?.canonicalDecisionCopy?.flipTrigger ?? decisionModel?.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf}`,
-      stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
-    }),
-    [assessment.regime, decisionModel, fallbackActive, treasury, weeklyOperatorPayload],
-  );
-  const callSnapshot = useMemo(
-    () => buildWeeklyCallSnapshotPlainText({
-      regime: decisionModel?.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
-      call: decisionModel?.canonicalDecisionCopy?.operatingCall ?? decisionModel?.operatingStanceLine ?? weeklyOperatorPayload.currentCall,
-      trend: decisionModel?.trendLabel ?? "Current",
-      confidence: decisionModel?.confidencePercent
-        ? `${Math.round(decisionModel.confidencePercent)}% (${decisionModel?.confidenceLabel ?? "Score-based"})`
-        : decisionModel?.confidenceLabel ?? "Score-based confidence",
-      doNow: decisionModel?.canonicalDecisionCopy?.doNowLines[0] ?? decisionModel?.actionNow ?? weeklyOperatorPayload.actionNow,
-      avoid: decisionModel?.guardrailThreshold ?? weeklyOperatorPayload.pauseIf,
-      watch: decisionModel?.canonicalDecisionCopy?.flipTrigger ?? decisionModel?.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf,
-      flipConditions: decisionModel?.canonicalDecisionCopy?.flipConditions ?? decisionModel?.compactFlipConditionLabels ?? weeklyOperatorPayload.flipConditionLabels,
-    }),
-    [assessment.regime, decisionModel, weeklyOperatorPayload],
-  );
   const explainerBrief = buildExplainerBriefContent({
     boardSummary: applyOverride(boardBrief),
     weeklyOperatorBrief: applyOverride(weeklyOperatorPlainText),
@@ -282,18 +133,6 @@ export const ExportBriefPanel = ({
     citation,
   ].join("\n");
 
-  const constraintHeadlines = useMemo(
-    () => buildConstraintHeadlines(assessment, treasury),
-    [assessment, treasury]
-  );
-  const agentPayload = useMemo(
-    () => buildAgentPayloadJson(assessment, treasury, sensors, macroSeries),
-    [assessment, treasury, sensors, macroSeries]
-  );
-  const agentPrompt = useMemo(
-    () => buildAgentPrompt(assessment, treasury),
-    [assessment, treasury]
-  );
   const mailSubject = encodeURIComponent(`Whether Weekly Brief — ${treasury.record_date}`);
   const mailBody = encodeURIComponent(briefing);
 
@@ -659,7 +498,7 @@ export const ExportBriefPanel = ({
                 onClick={() =>
                   handleDownload(
                     applyOverride(weeklyOperatorPlainText),
-                    `whether-weekly-operator-brief-${weeklyOperatorDate}.txt`
+                    `whether-weekly-operator-brief-${weekEndingDate}.txt`
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
@@ -671,7 +510,7 @@ export const ExportBriefPanel = ({
                 onClick={() =>
                   handleDownload(
                     weeklyOperatorSlackBlocks,
-                    `whether-weekly-operator-slack-blocks-${weeklyOperatorDate}.json`
+                    `whether-weekly-operator-slack-blocks-${weekEndingDate}.json`
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
@@ -838,13 +677,13 @@ export const ExportBriefPanel = ({
                     label={<><span>Copy</span> <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" /></>}
                     state={clipboardState("Jira note")}
                     disabled={isCopyDisabled("Jira note")}
-                    onClick={() => void handleCopy(jiraMarkdownBrief, "Jira note")}
+                    onClick={() => void handleCopy(markdownBrief, "Jira note")}
                   />
                   <Button
                     type="button"
                     onClick={() =>
                       handleDownload(
-                        jiraMarkdownBrief,
+                        markdownBrief,
                         `whether-jira-note-${treasury.record_date}.md`
                       )
                     }
@@ -866,13 +705,13 @@ export const ExportBriefPanel = ({
                     label={<><span>Copy</span> <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" /></>}
                     state={clipboardState("Confluence note")}
                     disabled={isCopyDisabled("Confluence note")}
-                    onClick={() => void handleCopy(confluenceWikiBrief, "Confluence note")}
+                    onClick={() => void handleCopy(wikiBrief, "Confluence note")}
                   />
                   <Button
                     type="button"
                     onClick={() =>
                       handleDownload(
-                        confluenceWikiBrief,
+                        wikiBrief,
                         `whether-confluence-note-${treasury.record_date}.txt`
                       )
                     }
@@ -894,13 +733,13 @@ export const ExportBriefPanel = ({
                     label={<><span>Copy</span> <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" /></>}
                     state={clipboardState("Linear note")}
                     disabled={isCopyDisabled("Linear note")}
-                    onClick={() => void handleCopy(linearMarkdownBrief, "Linear note")}
+                    onClick={() => void handleCopy(markdownBrief, "Linear note")}
                   />
                   <Button
                     type="button"
                     onClick={() =>
                       handleDownload(
-                        linearMarkdownBrief,
+                        markdownBrief,
                         `whether-linear-note-${treasury.record_date}.md`
                       )
                     }
@@ -931,9 +770,9 @@ export const ExportBriefPanel = ({
             </div>
           ) : null}
         </div>
-        <p className="sr-only" role="status" aria-live="polite">
+        <output className="sr-only" aria-live="polite">
           {copiedTarget ? `${copiedTarget} brief copied to clipboard.` : ""}
-        </p>
+        </output>
       </div>
     </section>
   );

@@ -154,16 +154,15 @@ export const SummaryCard = ({
         </Accordion.Root>
       ) : (
         <pre
-          tabIndex={0}
           aria-label="Summary card text"
           className="mt-4 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
         >
           {summaryCopy}
         </pre>
       )}
-      <div className="mt-2 min-h-[20px] text-xs text-slate-400" role="status" aria-live="polite">
+      <output className="mt-2 block min-h-[20px] text-xs text-slate-400" aria-live="polite">
         {copyError ? errorMessage : copied ? "Summary copied to clipboard." : ""}
-      </div>
+      </output>
     </div>
   );
 };

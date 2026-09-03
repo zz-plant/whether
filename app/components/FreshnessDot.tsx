@@ -84,9 +84,8 @@ export function FreshnessDot({
       </button>
 
       {open ? (
-        <div
+        <section
           id={menuId}
-          role="region"
           aria-label="Data freshness"
           className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left overscroll-contain"
         >
@@ -142,7 +141,7 @@ export function FreshnessDot({
               All macro feeds nominal.
             </div>
           )}
-        </div>
+        </section>
       ) : null}
     </div>
   );

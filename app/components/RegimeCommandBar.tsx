@@ -2,7 +2,6 @@ import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefMode
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { FORECAST_CONE_HIGH, FORECAST_CONE_MEDIUM, FORECAST_CONE_LOW } from "../../lib/regimeEngineCore";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import type { Route } from "../../lib/navigation/routeType";
 
 export type RegimeCommandBarProps = {
   regime: RegimeKey;
@@ -135,7 +134,6 @@ const TrajectoryMap = ({
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
-          role="img"
           aria-label={`Posture map. Tightness ${postureTrajectory.current.tightness.toFixed(1)} and risk appetite ${postureTrajectory.current.riskAppetite.toFixed(1)}. ${regimeDistance.pointsToFlip.toFixed(1)} points from the nearest flip line.`}
         >
           <rect x="0" y="0" width={riskThresholdX} height={tightnessThresholdY} fill="rgba(56,189,248,0.08)" />

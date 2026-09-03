@@ -12,7 +12,9 @@ const fallbacks = [
 describe("suspense fallbacks", () => {
   it("announces itself as a busy region", () => {
     for (const { name, html } of fallbacks) {
-      assert.match(html, /role="status"/, `${name} is not a live region`);
+      // `<output>` carries an implicit role="status", so either form is a live
+      // region. The element is what matters here, not the literal attribute.
+      assert.match(html, /(role="status"|^<output|<output )/, `${name} is not a live region`);
       assert.match(html, /aria-busy="true"/, `${name} does not report busy`);
       assert.match(html, /aria-label="[^"]+"/, `${name} has no accessible name`);
     }
@@ -30,7 +32,9 @@ describe("suspense fallbacks", () => {
   it("mirrors the wrapper of the component it stands in for", () => {
     // Height comes out right by construction when the fallback reuses the real
     // component's outer classes, rather than being guessed at with `h-28`.
-    assert.match(fallbacks[0].html, /class="weather-panel px-4 py-4"/);
+    // `<output>` is inline by default, so it carries `block` to keep the panel's
+    // box; the wrapper classes it mirrors follow.
+    assert.match(fallbacks[0].html, /class="(block )?weather-panel px-4 py-4"/);
   });
 });
 

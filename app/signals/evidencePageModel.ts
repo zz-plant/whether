@@ -136,7 +136,6 @@ export const buildSignalsPageModel = async (
     actionNowShort,
     actionStripItems,
     guardrailThreshold,
-    flipThreshold,
     treasury,
     treasuryProvenance,
   } = reportData;

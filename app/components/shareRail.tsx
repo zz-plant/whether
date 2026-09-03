@@ -97,8 +97,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             </div>
           </fieldset>
 
-          <label className="flex items-center gap-2 text-sm text-slate-300">
+          <label className="flex items-center gap-2 text-sm text-slate-300" htmlFor={`${includeContextLabelId}-control`}>
             <Switch.Root
+              id={`${includeContextLabelId}-control`}
               checked={includeContext}
               onCheckedChange={setIncludeContext}
               aria-labelledby={includeContextLabelId}
@@ -109,8 +110,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <span id={includeContextLabelId}>Include context for non-users</span>
           </label>
 
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer" htmlFor={`${slackOverlayLabelId}-control`}>
             <Switch.Root
+              id={`${slackOverlayLabelId}-control`}
               checked={slackOverlayActive}
               onCheckedChange={handleToggleSlackOverlay}
               aria-labelledby={slackOverlayLabelId}
@@ -134,9 +136,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               />
             </div>
             <p className="type-eyebrow">Copy as</p>
-            <p role="status" aria-live="polite" className="sr-only">
+            <output aria-live="polite" className="sr-only">
               {copyStatusMessage}
-            </p>
+            </output>
             <div className="mt-2 flex gap-2">
               <button
                 type="button"

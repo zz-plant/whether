@@ -10,7 +10,7 @@ import type { RegimeKey } from "../lib/types";
 /** A paint attribute holding a bare custom-property name renders nothing in the browser. */
 const assertTokensWrapped = (html: string) => {
   assert.equal(
-    /=\"--[a-z-]+\"/.test(html),
+    /="--[a-z-]+"/.test(html),
     false,
     "found a bare custom-property name in a paint attribute; it must be wrapped in var()",
   );

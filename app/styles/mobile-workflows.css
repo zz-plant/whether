@@ -1,31 +1,23 @@
 html,
-body,
-.weather-mobile-nav,
-.weather-mobile-panel {
+body{
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 116, 139, 0.45) rgba(15, 23, 42, 0.35);
 }
 
 html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-.weather-mobile-nav::-webkit-scrollbar,
-.weather-mobile-panel::-webkit-scrollbar {
+body::-webkit-scrollbar{
   width: 8px;
   height: 8px;
 }
 
 html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-.weather-mobile-nav::-webkit-scrollbar-track,
-.weather-mobile-panel::-webkit-scrollbar-track {
+body::-webkit-scrollbar-track{
   background: rgba(15, 23, 42, 0.3);
   border-radius: var(--radius-full);
 }
 
 html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-.weather-mobile-nav::-webkit-scrollbar-thumb,
-.weather-mobile-panel::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb{
   background: rgba(100, 116, 139, 0.5);
   border-radius: var(--radius-full);
   border: 2px solid transparent;
@@ -33,9 +25,7 @@ body::-webkit-scrollbar-thumb,
 }
 
 html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-.weather-mobile-nav::-webkit-scrollbar-thumb:hover,
-.weather-mobile-panel::-webkit-scrollbar-thumb:hover {
+body::-webkit-scrollbar-thumb:hover{
   background: rgba(125, 211, 252, 0.55);
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -46,12 +36,6 @@ body::-webkit-scrollbar-thumb:hover,
   align-items: center;
   padding: 1rem 0.75rem;
   margin: -1rem -0.75rem;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .weather-live-dot {
-    animation: none;
-  }
 }
 
 .cadence-checklist {
@@ -220,11 +204,7 @@ body::-webkit-scrollbar-thumb:hover,
   }
 
   .onboarding-step-card,
-  .weather-decision-chip,
-  .weather-delta-card,
-  .weather-step-card,
-  .weather-step-summary,
-  .weather-live-chip {
+  .weather-delta-card{
     transition: none;
   }
 

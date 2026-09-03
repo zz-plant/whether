@@ -5,7 +5,7 @@ import { ButtonLink } from "../components/ui/buttonLink";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
   situationUseCaseDefinitions,
@@ -82,9 +82,6 @@ export default async function DecidePage({
   const recommendedAnswerPages = featuredAnswerPages.slice(0, 2);
   const recommendedStakeholderGuides = featuredStakeholders.slice(0, 2);
   const recommendedStageGuides = stageGuides.slice(0, 2);
-  const hasGuidedTranslationSelection = Boolean(
-    resolvedSearchParams?.stakeholder || resolvedSearchParams?.stage,
-  );
   const sectionLinks = [
     { href: "#unresolved-question-router", label: "Best next step" },
     { href: "#decide-secondary-paths", label: "More options" },

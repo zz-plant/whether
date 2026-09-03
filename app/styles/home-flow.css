@@ -79,13 +79,6 @@
   box-shadow: var(--home-band-panel-shadow) !important;
 }
 
-.home-band .weather-step-card {
-  border-color: var(--home-band-border);
-  background-color: color-mix(in srgb, var(--home-band-panel-bg) 88%, rgba(2, 6, 23, 0.2));
-  background-image: var(--home-band-panel-image);
-  box-shadow: var(--home-band-panel-shadow);
-}
-
 .home-band-card--priority {
   border-top: 2px solid var(--home-band-accent-soft);
 }

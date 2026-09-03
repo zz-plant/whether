@@ -101,6 +101,9 @@ NEXT_PUBLIC_SITE_URL = "https://whether.work"
 # The trial switches. Production leaves both unset until the preview lane has proven them.
 WHETHER_INGEST_COORDINATOR = "1"
 WHETHER_HISTORY_WORKFLOW = "1"
+# Design-scratch routes under /mockups. Production leaves this unset, so those
+# routes 404 there; the preview lane keeps them for design review.
+WHETHER_ENABLE_MOCKUPS = "1"
 GITHUB_REPOSITORY = "zz-plant/whether"
 
 [env.preview.images]

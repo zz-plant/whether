@@ -89,28 +89,27 @@ export function SignalWaterfall({
   }, [show]);
 
   return (
-    <div
-      ref={containerRef}
-      role="button"
-      tabIndex={hasData ? 0 : undefined}
-      aria-haspopup="dialog"
-      aria-expanded={show}
-      className={`relative inline-block rounded-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 ${
-        hasData ? "cursor-pointer border-b border-dashed border-white/25 transition-colors hover:border-white/50" : ""
-      }`}
-      onClick={() => hasData && setShow((s) => !s)}
-      onKeyDown={(e) => {
-        if (!hasData) return;
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setShow((s) => !s);
-        } else if (e.key === "Escape") {
-          e.preventDefault();
-          setShow(false);
-        }
-      }}
-    >
-      {children}
+    <div ref={containerRef} className="relative inline-block">
+      {/* The disclosure is a real button, so Enter/Space and the pressed state
+          come from the platform rather than from a hand-rolled key handler. */}
+      <button
+        type="button"
+        disabled={!hasData}
+        aria-haspopup="dialog"
+        aria-expanded={show}
+        className={`rounded-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 ${
+          hasData ? "cursor-pointer border-b border-dashed border-white/25 transition-colors hover:border-white/50" : ""
+        }`}
+        onClick={() => setShow((s) => !s)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            setShow(false);
+          }
+        }}
+      >
+        {children}
+      </button>
 
       {show && hasData ? (
         <div className="absolute right-0 top-full mt-3 z-50 w-64 origin-top-right rounded-xl border border-white/[0.08] bg-[var(--bg-raised)] px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">

@@ -21,7 +21,8 @@ export default function IdenticonsMockupPage() {
   const [sandboxSeed, setSandboxSeed] = useState("report-snapshot-2026-07-28-canonical");
   const [sandboxUseCase, setSandboxUseCase] = useState<ShaderMode>("reportSeal");
   const [sandboxSize, setSandboxSize] = useState(160);
-  const [sandboxStateVal, setSandboxStateVal] = useState(0.85);
+  // The slider that set this was removed; the value is still read by the preview.
+  const [sandboxStateVal] = useState(0.85);
   const [copiedCode, setCopiedCode] = useState(false);
 
   const playgroundParams = deriveIdenticonParams(sandboxSeed);
@@ -262,10 +263,11 @@ export default function IdenticonsMockupPage() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label htmlFor="sandbox-seed" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                 Input Report / Signal Seed String
               </label>
               <input
+                id="sandbox-seed"
                 type="text"
                 value={sandboxSeed}
                 onChange={(e) => setSandboxSeed(e.target.value)}
@@ -276,10 +278,11 @@ export default function IdenticonsMockupPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label htmlFor="sandbox-shader-mode" className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Shader Mode
                 </label>
                 <select
+                  id="sandbox-shader-mode"
                   value={sandboxUseCase}
                   onChange={(e) => setSandboxUseCase(e.target.value as ShaderMode)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"

@@ -146,8 +146,6 @@ const keyDocs: SearchEntity[] = [
   },
 ];
 
-const formatFailureModeSlug = (slug: string) => slug;
-
 export const buildSearchIndex = (): SearchEntity[] => {
   const toolkitEntities: SearchEntity[] = toolkitDefinitions.map((toolkit) => ({
     id: `toolkit-${toolkit.slug}`,

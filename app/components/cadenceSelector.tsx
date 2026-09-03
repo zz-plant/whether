@@ -64,7 +64,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
     buttonsRef.current[nextIndex]?.focus();
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
     const delta = event.key === "ArrowLeft" ? -1 : 1;
@@ -75,10 +75,8 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
   };
 
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={ariaLabel}
-      onKeyDown={handleKeyDown}
       className="flex items-center gap-0.5 rounded-sm border border-white/[0.10] bg-[var(--bg-nested)] p-0.5"
     >
       {options.map((option, index) => {
@@ -91,6 +89,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
             }}
             type="button"
             aria-current={isActive ? "true" : undefined}
+            onKeyDown={handleKeyDown}
             onClick={() => navigate(option.key)}
             onMouseEnter={() => prefetch(option.key)}
             onFocus={() => prefetch(option.key)}
@@ -107,7 +106,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
           </button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 

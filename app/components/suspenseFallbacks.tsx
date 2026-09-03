@@ -28,9 +28,9 @@ function LoadingRegion({
   children: React.ReactNode;
 }) {
   return (
-    <div role="status" aria-busy="true" aria-label={label} className={className}>
+    <output aria-busy="true" aria-label={label} className={`block ${className ?? ""}`.trimEnd()}>
       {children}
-    </div>
+    </output>
   );
 }
 

@@ -37,7 +37,7 @@ export function ParametricIdenticon({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shaderRef = useRef<IdenticonShaderInstance | null>(null);
   const [params, setParams] = useState(() => deriveIdenticonParams(seed));
-  const [isHovered, setIsHovered] = useState(false);
+  const [_isHovered, setIsHovered] = useState(false);
 
   // Update parameters when seed changes
   useEffect(() => {
@@ -126,11 +126,11 @@ export function ParametricIdenticon({
     <div
       className={`relative flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/80 shadow-lg ring-1 ring-slate-800 ${className}`}
       style={{ width: size, height: size }}
-      role="img"
-      aria-label={accessibleLabel}
     >
+      <span className="sr-only">{accessibleLabel}</span>
       <canvas
         ref={canvasRef}
+        aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover"
         style={{ width: size, height: size }}
       />

@@ -395,16 +395,15 @@ export const TimeMachinePanel = ({
             ) : null}
           </div>
           {statusMessages.length > 0 ? (
-            <div
+            <output
               id={statusMessages.some((message) => message.includeId) ? errorId : undefined}
-              className="weather-surface space-y-2 border border-amber-400/20 bg-amber-500/8 p-4 text-sm text-amber-100"
-              role="status"
+              className="weather-surface block space-y-2 border border-amber-400/20 bg-amber-500/8 p-4 text-sm text-amber-100"
               aria-live="polite"
             >
               {statusMessages.map((message) => (
                 <p key={message.key}>{message.message}</p>
               ))}
-            </div>
+            </output>
           ) : null}
         </div>
       </div>

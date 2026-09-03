@@ -88,7 +88,7 @@ export const buildSignalDecisionScenarioMetadata = ({
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { cluster: cluster, "decision-scenario": decisionScenario } = await params;
+  const { cluster, "decision-scenario": decisionScenario } = await params;
   const signal = findSignalsCluster(cluster);
   const scenario = findDecisionScenario(decisionScenario);
 
@@ -107,7 +107,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 export default async function SignalDecisionScenarioPage({ params }: { params: Promise<Params> }) {
-  const { cluster: cluster, "decision-scenario": decisionScenario } = await params;
+  const { cluster, "decision-scenario": decisionScenario } = await params;
   const signal = findSignalsCluster(cluster);
   const scenario = findDecisionScenario(decisionScenario);
   if (!signal || !scenario) notFound();

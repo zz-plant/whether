@@ -17,8 +17,8 @@
     inset 0 1px 0 var(--edge-highlight-faint);
 }
 
-/* Tier 3: Utility surfaces — chips, stat cards, tags */
-.weather-surface-utility {
+/* Tier 3: Utility surfaces — chips,
+stat cards{
   @apply rounded-md border;
   border-color: var(--color-border-subtle);
   background-color: transparent;
@@ -265,28 +265,7 @@
   font-weight: 600;
 }
 
-.weather-hub-breadcrumbs ol {
-  gap: 0.5rem;
-}
-
-.weather-hub-breadcrumbs li {
-  min-height: 2.2rem;
-  padding-inline: 0.1rem;
-}
-
-.weather-hub-breadcrumbs a,
-.weather-hub-breadcrumbs span[aria-current="page"] {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  border-radius: var(--radius-sm);
-  padding-inline: 0.7rem;
-  background: rgba(15, 23, 42, 0.5);
-}
-
-.weather-page-grid-2,
-.weather-page-grid-3,
-.weather-page-grid-sidebar {
+.weather-page-grid-3{
   display: grid;
   gap: clamp(0.85rem, 0.75rem + 0.6vw, 1.25rem);
   grid-template-columns: minmax(0, 1fr);
@@ -495,13 +474,11 @@
 }
 
 .weather-panel,
-.weather-appbar,
 .weather-panel-static,
 .weather-route-card,
 .weather-stat-card,
 .weather-secondary-header,
-.weather-secondary-section,
-.weather-tile {
+.weather-secondary-section{
   min-width: 0;
 }
 
@@ -509,34 +486,8 @@
   padding: var(--space-lg) var(--space-lg);
 }
 
-/* 960px breakpoint merged into 1024px block below */
-
-.weather-forecast-card {
-  @apply rounded-lg border p-3;
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  min-height: 7.25rem;
-  padding: 0.9rem;
-  border-color: var(--border-default);
-  background: var(--bg-surface-raised);
-  font-variant-numeric: tabular-nums;
-}
-
 @media (min-width: 640px) {
   .weather-hub-stat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .weather-bento-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .weather-page-grid-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .weather-forecast-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -545,14 +496,6 @@
   .weather-hub-hero {
     grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
     align-items: start;
-  }
-
-  .weather-bento-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .weather-page-grid-sidebar {
-    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
   }
 
   .weather-secondary-header-layout {

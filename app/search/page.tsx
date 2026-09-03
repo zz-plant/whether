@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import {
-  searchJobLabels,
   searchIndex,
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
@@ -60,25 +59,6 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
 
   return "/signals#decision-summary";
 };
-
-const searchIntentPrompts = [
-  {
-    label: "What changed this week?",
-    query: "signals thresholds",
-  },
-  {
-    label: "Should we freeze hiring?",
-    query: "hiring freeze",
-  },
-  {
-    label: "What could break this call?",
-    query: "failure mode",
-  },
-  {
-    label: "Can we trust this posture?",
-    query: "sources confidence formulas",
-  },
-] as const;
 
 export default async function SearchPage({
   searchParams,

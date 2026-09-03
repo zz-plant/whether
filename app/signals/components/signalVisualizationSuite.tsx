@@ -286,7 +286,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 ))}
               </div>
             </div>
-            <svg viewBox="0 0 100 36" className="h-48 w-full" role="img" aria-label="1M, 3M, 2Y and 10Y rate stack">
+            <svg viewBox="0 0 100 36" className="h-48 w-full" aria-label="1M, 3M, 2Y and 10Y rate stack">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
@@ -325,7 +325,6 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             <svg
               viewBox="0 0 100 72"
               className="h-48 w-full"
-              role="img"
               aria-label={
                 monthlyScatter.length >= 2
                   ? `Monthly steepness vs level, ${monthlyScatter.length} months tracing from ${monthlyScatter[0].key} to ${monthlyScatter[monthlyScatter.length - 1].key}. Arrows follow the direction of travel.`
@@ -403,7 +402,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-8">
             <PanelTitle title="4) Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
-            <svg viewBox="0 0 100 36" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline">
+            <svg viewBox="0 0 100 36" className="h-40 w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
