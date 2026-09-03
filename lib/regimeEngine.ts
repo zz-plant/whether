@@ -6,11 +6,13 @@ import { advanceRegimeState, type RegimeMachineSnapshot } from "./report/regimeS
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import {
   RISK_APPETITE_EXPLANATION,
-  RISK_APPETITE_MIN_SLOPE,
+  MISSING_SLOPE_FALLBACK,
   buildRegimeInputs,
   buildTightnessExplanation,
   computeCurveSlope,
   computeRiskAppetiteScore,
+  TIGHTNESS_CAP,
+  computeTightnessPressure,
   computeTightnessScore,
   getBaseRate,
   getRegimeProfile,
@@ -56,9 +58,14 @@ export const evaluateRegime = (
 
   const baseRateForScore =
     baseRate.used === "MISSING" ? thresholds.baseRateTightness : baseRate.value;
-  const curveSlopeForScore = curveSlope ?? RISK_APPETITE_MIN_SLOPE;
+  const curveSlopeForScore = curveSlope ?? MISSING_SLOPE_FALLBACK;
 
   const baselineTightness = computeTightnessScore(
+    baseRateForScore,
+    curveSlopeForScore,
+    thresholds.baseRateTightness,
+  );
+  const tightnessPressure = computeTightnessPressure(
     baseRateForScore,
     curveSlopeForScore,
     thresholds.baseRateTightness,
@@ -73,6 +80,7 @@ export const evaluateRegime = (
     thresholds,
     macroAdjusted.boundaryContributors,
     macroAdjusted.weakReadCount,
+    baseRate.used === "MISSING" || curveSlope === null,
   );
   const regimeTransition = advanceRegimeState(previousMachineState, {
     tightness,
@@ -95,6 +103,8 @@ export const evaluateRegime = (
     regimeTransition,
     scores: {
       tightness,
+      tightnessPressure,
+      tightnessSaturated: tightnessPressure > TIGHTNESS_CAP,
       riskAppetite,
       baseRateUsed: baseRate.used,
       baseRate: baseRate.value,

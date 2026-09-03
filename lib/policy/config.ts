@@ -23,7 +23,7 @@ export interface PolicyThresholdBands {
 
 export interface PolicyRefusalConfig {
   disagreementThreshold: number;
-  volatilityThreshold: number;
+  dispersionThreshold: number;
   maxMissingSignalCount: number;
 }
 
@@ -77,7 +77,7 @@ export const POLICY_SPEC_V1: PolicySpecConfig = {
   },
   refusal: {
     disagreementThreshold: 1,
-    volatilityThreshold: 1,
+    dispersionThreshold: 1,
     maxMissingSignalCount: 1,
   },
 };

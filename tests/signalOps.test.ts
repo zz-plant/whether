@@ -66,7 +66,7 @@ const assessment = (
     composites: { cts: 0, ras: 0 },
     posture: "TRANSITION",
     band: "NEUTRAL",
-    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
     refusal: { refused: false, reasons: [] },
     governanceParameters: {
       hiringThreshold: "HIGH",

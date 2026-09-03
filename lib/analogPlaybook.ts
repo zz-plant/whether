@@ -3,7 +3,7 @@
  * Matches current macro coordinates to historical analog cycles and extracts
  * the consensus trap, the winning counter-intuitive move, and the reversal marker.
  */
-import type { RegimeAssessment } from "./regimeEngine";
+import type { RegimeScores } from "./regimeEngine";
 
 export type AnalogCoordinate = {
   key: "baseRate" | "curveSlope" | "tightness" | "riskAppetite";
@@ -18,11 +18,16 @@ export type AnalogCoordinate = {
 export interface AnalogPlaybookResult {
   analogPeriod: string;
   /**
-   * Nearness of the closest reference cycle on a 65–96 scale derived from the
-   * coordinate distance. Kept for API compatibility; it is not a measured
-   * correlation, and the site no longer renders it. Read `matchBasis`.
+   * Nearness of the closest reference cycle, 0–100, as `100 / (1 + d)` where `d`
+   * is the coordinate distance below. 100 is an exact coordinate match; it falls
+   * away smoothly and has no floor.
+   *
+   * It is a nearness score against four hand-picked cycles — not a correlation,
+   * not a probability, and not evidence that the analog will repeat. It was
+   * called `correlationScore` and floored at 65, so the worst possible match
+   * still reported 65% similarity to anything reading the API.
    */
-  correlationScore: number;
+  matchScore: number;
   regimeType: string;
   /** How many reference cycles were compared. Four, hand-picked — say so. */
   referenceCycleCount: number;
@@ -109,7 +114,52 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
   },
 ];
 
-export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): AnalogPlaybookResult {
+/**
+ * Spread of each coordinate across the reference set, used to make the four
+ * terms of the distance comparable.
+ *
+ * The previous distance applied fixed weights — rate ×10, slope ×20, the two
+ * scores ×1 — which did not do what they read as. `tightness` and `riskAppetite`
+ * are largely derived from `baseRate` and `curveSlope`, and tightness alone moves
+ * up to 90 units for a one-point rate difference, so the derived terms swamped
+ * the nominal weights on the inputs they came from. Dividing by each
+ * coordinate's own spread gives every axis one unit of range to contribute.
+ */
+const MATCH_COORDINATE_KEYS = ["baseRate", "curveSlope", "tightness", "riskAppetite"] as const;
+
+type MatchCoordinateKey = (typeof MATCH_COORDINATE_KEYS)[number];
+
+/** A degenerate spread would divide by zero; 1 leaves that axis in raw units. */
+const spreadOf = (key: MatchCoordinateKey): number => {
+  const values = HISTORICAL_CYCLES.map((cycle) => cycle[key]);
+  return Math.max(...values) - Math.min(...values) || 1;
+};
+
+const COORDINATE_SPREADS: Record<MatchCoordinateKey, number> = {
+  baseRate: spreadOf("baseRate"),
+  curveSlope: spreadOf("curveSlope"),
+  tightness: spreadOf("tightness"),
+  riskAppetite: spreadOf("riskAppetite"),
+};
+
+type Coordinates = Record<MatchCoordinateKey, number>;
+
+/** Root-mean-square distance in spread-normalised units. 0 is an exact match. */
+const coordinateDistance = (live: Coordinates, cycle: Coordinates): number => {
+  const keys = MATCH_COORDINATE_KEYS;
+  const total = keys.reduce((sum: number, key) => {
+    const scaled = (live[key] - cycle[key]) / COORDINATE_SPREADS[key];
+    return sum + scaled ** 2;
+  }, 0);
+  return Math.sqrt(total / keys.length);
+};
+
+/** Only the four match coordinates are read, so that is all this asks for. */
+export type AnalogPlaybookInput = {
+  scores: Pick<RegimeScores, "baseRate" | "curveSlope" | "tightness" | "riskAppetite">;
+};
+
+export function getHistoricalAnalogPlaybook(assessment: AnalogPlaybookInput): AnalogPlaybookResult {
   const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
   const currentSlope = curveSlope ?? 0;
 
@@ -117,14 +167,9 @@ export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): Analo
   let lowestDistance = Number.POSITIVE_INFINITY;
 
   for (const cycle of HISTORICAL_CYCLES) {
-    // Weighted Euclidean distance across key coordinates
-    const rateDiff = (baseRate - cycle.baseRate) * 10;
-    const slopeDiff = (currentSlope - cycle.curveSlope) * 20;
-    const tightnessDiff = tightness - cycle.tightness;
-    const riskDiff = riskAppetite - cycle.riskAppetite;
-
-    const distance = Math.sqrt(
-      rateDiff ** 2 + slopeDiff ** 2 + tightnessDiff ** 2 + riskDiff ** 2
+    const distance = coordinateDistance(
+      { baseRate, curveSlope: currentSlope, tightness, riskAppetite },
+      cycle,
     );
 
     if (distance < lowestDistance) {
@@ -133,7 +178,7 @@ export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): Analo
     }
   }
 
-  const correlation = Math.max(65, Math.min(96, Math.round(100 - lowestDistance * 0.4)));
+  const matchScore = Math.max(0, Math.min(100, Math.round(100 / (1 + lowestDistance))));
 
   const matchBasis: AnalogCoordinate[] = [
     { key: "baseRate", label: "Base rate", historical: bestMatch.baseRate, live: baseRate, unit: "%" },
@@ -144,7 +189,7 @@ export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): Analo
 
   return {
     analogPeriod: bestMatch.period,
-    correlationScore: correlation,
+    matchScore,
     regimeType: bestMatch.regimeType,
     referenceCycleCount: HISTORICAL_CYCLES.length,
     matchBasis,

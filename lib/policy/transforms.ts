@@ -26,6 +26,14 @@ export const computeCompositeScore = (first: number, firstWeight: number, second
   return first * firstWeight + second * secondWeight;
 };
 
+/**
+ * Population standard deviation of the values given.
+ *
+ * Divides by n on purpose: callers hand it a complete set of current readings to
+ * measure the spread *within that set*, not a sample from a larger series. The
+ * rolling-window baseline in `regimeEnginePolicy` is the opposite case and uses
+ * n-1.
+ */
 export const computeVolatility = (values: number[]) => {
   if (values.length <= 1) {
     return 0;

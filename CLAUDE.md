@@ -303,6 +303,33 @@ recapture correctly.
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
 
+## Regime scoring: what the numbers do and do not claim
+
+The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
+of them, which is less obvious.
+
+- **`tightness` saturates, on purpose, and hides that it has.** The rate component spans 0-90
+  across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the cap, so
+  above ~4% the published score is a constant 100 and its week-over-week delta is zero. Read
+  `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
+  `scores.tightnessSaturated` to tell a clipped score from a flat reading. Classification still
+  uses the bounded score, so no published regime moved when pressure was added.
+- **The two axes are not independent.** `riskAppetite` is a pure function of curve slope, and
+  slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
+  `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a
+  relationship the threshold's own doc comment asks callers not to encode.
+- **Confidence measures distance from a boundary, nothing else.** It is not calibrated against
+  outcomes. Two guards matter: an imputed input caps it (`CONFIDENCE_PERCENT_IMPUTED_CEILING`),
+  because the stand-ins sit far from the boundaries and used to score the *ceiling* on an empty
+  payload; and the risk gap is converted to its tightness equivalent before the two are compared,
+  because the raw scales differ 4.5x and the risk axis otherwise decided the answer in 164 of 175
+  historical months. Calibrating the percent against `data/summary_archive.json` — how often a
+  call at distance d was later revised — is the open work; the scale still tops out for most
+  months.
+- **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
+  threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
+  window driving the whole classification, a bill-specific dislocation moves the published call.
+
 ## Where things live
 
 Canonical modules — extend these before creating new ones:

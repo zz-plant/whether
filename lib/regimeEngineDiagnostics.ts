@@ -189,12 +189,20 @@ export const computeDiagnostics = (
   thresholds: RegimeThresholds,
   boundaryContributors: string[] = [],
   weakReadCount = 0,
+  /*
+   * Set when either score came from a stand-in rather than a reading. Both
+   * stand-ins sit far from the regime boundaries, and distance from a boundary is
+   * what the confidence label below reads — so without this, a payload with no
+   * data at all reported HIGH.
+   */
+  hasImputedInputs = false,
 ): RegimeDiagnostics => {
   const tightnessDelta = Math.round(tightness - thresholds.tightnessRegime);
   const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessDelta), Math.abs(riskAppetiteDelta));
-  const confidence =
-    nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
+  const confidence: RegimeDiagnostics["confidence"] = hasImputedInputs
+    ? "LOW"
+    : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
       ? "HIGH"
       : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA
         ? "MEDIUM"

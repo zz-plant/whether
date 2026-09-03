@@ -663,8 +663,10 @@ surfaces do not reintroduce the old words.
   that already carry the verb read as sentences. `formatThresholdNumber` drops the `.0` on integer
   thresholds everywhere a threshold is printed.
 - **Historical analog.** The Evidence page shows the four match coordinates (then vs now) and
-  names the block "Nearest reference cycle"; the clamped `correlationScore` stays in the API
-  payload for compatibility but is not rendered as a match percentage.
+  names the block "Nearest reference cycle". The API field is `matchScore` (0-100, `100 / (1 + d)`
+  over the spread-normalised coordinate distance). It replaced `correlationScore`, which was
+  neither a correlation nor unbounded below: it was floored at 65, so the worst possible match
+  reported 65% similarity to every API and MCP consumer.
 - **Header.** The desktop nav renders the operator loop from `resolveGlobalHeaderLoopLinks`
   (supporting layers hidden below `lg`); the top-level API link moved under More. The live
   masthead no longer prints a "15m cadence" refresh label.
