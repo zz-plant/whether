@@ -24,7 +24,15 @@ reports every failure in one pass; add `--serial` for fail-fast sequencing when 
 `check` also runs automatically on `git push` via `.husky/pre-push`, and since 2026-08-22 that hook
 is the check gate rather than a mirror of one: the GitHub workflows are manual-only, because this
 private repo's Actions minutes are billed and the account stopped paying for them. Skipping the hook
-means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that
+means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`.
+
+**The hook clears git's exported environment before running the gate, and must keep doing so.**
+Git hands every hook `GIT_DIR`, `GIT_INDEX_FILE`, and friends, and every `git` the gate shells out
+to inherits them — which silently redirects those calls at the pushing repository.
+`tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets this one instead;
+`review:hotspot-preflight` resolves `HEAD~1` against the wrong index. Both pass standalone and fail
+only under the hook, so the symptom reads as flakiness. Reproduce it with
+`GIT_DIR=$PWD/.git bun run test tests/checkGateMarker.test.ts`. Note that
 this worktree is often shared with other sessions, so a pre-push failure may be someone else's
 in-flight edit rather than yours — check `git status` first. The hook covers lint, typecheck, test,
 assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the network — run
