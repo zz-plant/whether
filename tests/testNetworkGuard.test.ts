@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { createGuardedFetch, isLocalTarget, targetUrl } from "../scripts/test-network-guard";
+import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../scripts/test-network-guard";
 
 /**
  * The suite runs offline by default.
@@ -39,6 +39,41 @@ describe("test network guard", () => {
       () => guardedFetch("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"),
       /blocked outbound fetch to https:\/\/fred\.stlouisfed\.org/,
     );
+  });
+
+  /*
+   * The message reaches test output and, in the deploy gate, a build log. Several URLs
+   * here are credentials outright: SLACK_WEBHOOK_URL and PREMIUM_FUNNEL_WEBHOOK_URL carry
+   * their secret in the path, and lib/premiumFunnel.ts hands one straight to the global
+   * fetch this guard wraps. So the message names the origin and drops everything after it
+   * — right by construction, where a path-scrubbing heuristic would have to keep being
+   * right about every shape of secret added later.
+   */
+  it("names a blocked upstream without repeating its credentials", async () => {
+    const slackWebhook = "https://hooks.slack.com/services/T00000000/B00000000/xoxbSuperSecretToken";
+    const { fetch: guardedFetch } = guarded();
+
+    const error = await guardedFetch(slackWebhook).then(
+      () => null,
+      (reason: unknown) => (reason instanceof Error ? reason.message : String(reason)),
+    );
+
+    assert.ok(error, "a webhook URL must still be blocked");
+    assert.match(error, /https:\/\/hooks\.slack\.com/, "the origin is what makes the message actionable");
+    for (const secret of ["xoxbSuperSecretToken", "T00000000", "B00000000", "/services/"]) {
+      assert.ok(!error.includes(secret), `the message leaked ${secret}`);
+    }
+  });
+
+  it("keeps the origin and drops path, query, fragment and userinfo", () => {
+    assert.equal(redactTarget("https://hooks.slack.com/services/T0/B0/secret"), "https://hooks.slack.com");
+    assert.equal(redactTarget("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"), "https://fred.stlouisfed.org");
+    assert.equal(redactTarget("https://example.com/x#tok=abc"), "https://example.com");
+    assert.equal(redactTarget("https://user:pa55word@example.com/x"), "https://example.com");
+    // A non-default port distinguishes two upstreams on one host, so it is part of the origin.
+    assert.equal(redactTarget("https://example.com:8443/x"), "https://example.com:8443");
+    // Never fall back to echoing something unparseable.
+    assert.equal(redactTarget("::: not a url :::"), "an unparseable URL");
   });
 
   it("explains how to serve the upstream once, not on every call", async () => {

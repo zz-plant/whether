@@ -170,9 +170,14 @@ describe("deploy gate resource defaults", () => {
     assert.ok(runner.includes("...orderArgs"), "the order flags never reach the spawned bun test");
   });
 
-  it("strips data-provider keys so a shell cannot reroute the suite's upstreams", async () => {
+  it("strips data-provider keys and webhook URLs so a shell cannot reroute the suite's upstreams", async () => {
+    // The webhook URLs are the sharper case: their value is the credential, in the path,
+    // and lib/premiumFunnel.ts hands one straight to the global fetch. A test must not be
+    // able to post to a real Slack channel because a shell happened to export one.
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
-    assert.match(runner, /for \(const key of \['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY'\]\)/);
+    for (const key of ["FRED_API_KEY", "ALPHA_VANTAGE_API_KEY", "SLACK_WEBHOOK_URL", "PREMIUM_FUNNEL_WEBHOOK_URL"]) {
+      assert.match(runner, new RegExp(`for \\(const key of \\[[^\\]]*'${key}'`), `${key} is no longer stripped`);
+    }
   });
 
   it("gives the landmark audit's bounds room for a cold container start", async () => {

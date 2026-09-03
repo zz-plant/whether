@@ -226,8 +226,16 @@ const childEnv = { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?
  * FRED or market-data reads to the real API in the middle of a test and make a fixture
  * miss, so the runner strips them: a result that depends on what happens to be exported
  * in a shell is not a result about the code.
+ *
+ * The webhook URLs are stripped for a second reason on top of that one: their value *is*
+ * the credential, secret and all, in the path. `lib/premiumFunnel.ts` hands
+ * PREMIUM_FUNNEL_WEBHOOK_URL straight to the global `fetch`, so with one exported in the
+ * environment a test could post to a real Slack channel — and the network guard, catching
+ * it, would name it. The guard redacts to an origin (scripts/test-network-guard.ts), but
+ * the suite should not be holding the secret in the first place. Tests that need one set
+ * their own; tests/apiBillingWebhookRoute.test.ts does.
  */
-for (const key of ['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY']) {
+for (const key of ['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY', 'SLACK_WEBHOOK_URL', 'PREMIUM_FUNNEL_WEBHOOK_URL']) {
   delete childEnv[key];
 }
 
