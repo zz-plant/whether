@@ -251,7 +251,7 @@ app/
 └── components/                       # Shared UI components
     ├── DecisionHero.tsx              # Primary weekly decision card + shortcuts
     ├── CadenceCallCard.tsx           # Monthly/quarterly lead for the cadence selector
-    ├── ThresholdProximityBar.tsx     # Visual tightening buffer indicator
+    ├── illustrations/                # Threshold rails, delta and regime glyphs, trend marks
     ├── commandPalette.tsx            # Cmd+K palette
     └── KeyboardShortcuts.tsx         # Global keyboard handlers
 ```

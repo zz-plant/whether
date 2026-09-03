@@ -97,9 +97,17 @@ describe("DecisionHero plain-English layer", () => {
 
   it("draws the tightness ladder label from the shared scale constant", () => {
     const html = render();
-    assert.equal(
-      html.match(new RegExp(compositeSignalScales.tightness.directionLabel, "g"))?.length,
-      2,
+    // The rail splits the direction across the two ends it names and drops the
+    // number each half carries, because the rail end under it already prints it.
+    // The unsplit sentence survives in the accessible description.
+    const [low, high] = compositeSignalScales.tightness.directionLabel
+      .split(" · ")
+      .map((half) => half.replace(/^-?\d+(?:\.\d+)?\s*=\s*/, ""));
+    assert.match(html, new RegExp(`>${low}<`));
+    assert.match(html, new RegExp(`>${high}<`));
+    assert.match(
+      html,
+      new RegExp(`Scale direction: ${compositeSignalScales.tightness.directionLabel}`),
       "the ladder states the same direction in its visible label and its accessible description",
     );
   });

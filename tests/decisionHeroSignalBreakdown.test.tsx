@@ -46,10 +46,10 @@ describe("DecisionHero signal breakdown", () => {
     assert.match(disclosure, /Funding pressure<\/p><p[^>]*>64<span[^>]*>\/100/);
     assert.match(disclosure, /Funding pressure: 64/);
     assert.match(disclosure, /Trigger at 68\./);
-    assert.equal(
-      disclosure.match(/0 = easier funding · 100 = harder funding/g)?.length,
-      2,
-      "the visible ladder label and accessible description should state the same direction",
-    );
+    // The rail splits the scale direction across the two ends it names, so the
+    // visible halves and the description's full sentence have to agree.
+    assert.match(disclosure, />easier funding</);
+    assert.match(disclosure, />harder funding</);
+    assert.match(disclosure, /Scale direction: 0 = easier funding · 100 = harder funding/);
   });
 });

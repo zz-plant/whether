@@ -111,10 +111,13 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
                 <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
                 <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
               </span>
-              <span className="text-slate-400 font-mono text-xs">{boldnessScore}/100</span>
+              {/* The hero sets this same score in the sans; mono here made one
+                  number look like two quantities. Columns get mono, readouts
+                  beside a label get tabular figures — see tokens.css. */}
+              <span className="text-slate-400 tabular-nums text-xs">{boldnessScore}/100</span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
-            <span className={`hidden flex-shrink-0 text-fluid-xs font-mono font-medium ${deltaColor} min-[430px]:inline`}>{deltaLabel}</span>
+            <span className={`hidden flex-shrink-0 text-fluid-xs tabular-nums font-medium ${deltaColor} min-[430px]:inline`}>{deltaLabel}</span>
             <a
               href={imageBriefHref}
               download="whether-brief.png"
